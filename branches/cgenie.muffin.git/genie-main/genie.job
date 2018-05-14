@@ -1,0 +1,368 @@
+#! /bin/bash -e
+#
+
+#
+# ###################################################################
+#
+# genie.job - This script runs the GENIE model. 
+#
+# Defaults (from src/xml-config/xml/definition.xml) are applied, unless they are
+# overridden by those in XML config' file, supplied on the command line.
+#
+# Make any changes you need to in 'user.sh'.
+#
+# This script makes use of:
+#  - user.sh
+#
+# Additionally the XSLT scripts in src/xml-config/xslt.
+#
+# ###################################################################
+
+# == default variable values ==
+CONFIGFILES=''
+MAKEFLAGS=''
+TESTING_MODE="FALSE"
+COMPILE_ONLY="FALSE"
+COMPARE_AGAINST_ASSUMEDGOOD="TRUE"
+COMPARE_AGAINST_KNOWNGOOD="FALSE"
+CREATE_REF_MODE="FALSE"
+RESTARTREAD="FALSE"
+REMAKE="TRUE"
+OLD_CONFIG="FALSE"
+EXPID=genie_test
+TRANSLATE_CONFIG="python ./translate_config.py"
+MAKE=make
+
+# == USER ded=faults read from file: user.sh ==
+source user.sh
+
+# *******************************************************************
+# 
+# LOCAL FUNCTIONS - defined first, used later
+#
+# == useage information function ==
+usage () {
+    echo "usage: $0 [-btrakzxCO]"
+    echo "      -f {config_file1} [ {config_file2} ... ] -o {OUTROOT} -c {CODEDIR} -m {MAKEFLAGS}"
+    echo "      -g {RUNTIME_ROOT} -h {RUNTIME_OUTDIR}"
+    echo "b: call upon the BFG.."
+    echo "t: testing mode"
+    echo "r: create reference file mode"
+    echo "a: compare against assumedgood files (testing mode)"
+    echo "k: compare against knowngood files (testing mode)"
+    echo "z: do not try to remake (default is to call make)"
+    echo "x: compile the model but don't run it (see genie-experiments/build-experiment.sh"
+    echo "C: along with the model binary, create executable to compute a cost function based on model-data difference"
+    echo "O: process old-style (pre-XML) configuration file"
+}
+
+# == cleanup (temporary files) function ==
+cleanup () {
+    rm -f tmp$$.configure.xml
+    rm -f tmp$$.merged.xml
+    rm -f tmp$$.vars.sh
+    rm -f tmp$$.build.sh
+    rm -f tmp$$.testing.sh
+    if [ $OLD_CONFIG = "TRUE" ]; then
+	for conf_file in $CONFIGFILES; do
+	    rm -f tmp$$.`basename $conf_file`.xml
+	done
+    fi
+}
+
+# == report errors function ==
+die () {
+    MSG=$1
+    echo "ERROR: $MSG"
+    exit 1
+}
+
+# == report errors function ==
+warn () {
+    MSG=$1
+    echo "WARNING: $MSG"
+}
+
+# == abort execution, making a record of problem output ==
+ABORT ()
+{
+set +e
+\cp fort.2 $OUTDIR/results_fail
+die "!!!!!!!!!! ERROR PROCESSING !!!!!!!!!!"
+exit 1
+}
+
+# == function to perform tests on the output of a run ==
+runtests () {
+    # set up 
+    OK="FALSE"
+    if [ $COMPARE_AGAINST_ASSUMEDGOOD = "TRUE" ] ; then
+	REF_DIR=$OUTROOT/$ASSUMEDGOOD_NAME
+	DIFF_OPTS="-v -a 6e-15 -r2"
+    elif [ $COMPARE_AGAINST_KNOWNGOOD = "TRUE" ] ; then
+	REF_DIR=$CODEDIR/genie-knowngood/$KNOWNGOOD_NAME
+	DIFF_OPTS="-v -a 6e-15 -r35"
+    # nothing to be done for preservation checks in setup
+    else
+	echo "ERROR: must choose to compare against assumedgoods, knowngoods or preserve fluxes"
+    fi
+
+    # nccompare.exe binary under Windows needs win32 recognisable paths
+    if [ $(uname -s | grep -i "cygwin") ]; then
+      OUTDIR=$(cygpath -m $OUTDIR)
+      REF_DIR=$(cygpath -m $REF_DIR)
+    fi
+    
+    # choose comparison tool based on file suffix--not over the moon about this..
+    if [ "${TESTFILE##*.}" = "nc" ] ; then
+	DIFFTOOL="$RUNTIME_ROOT/genie-main/src/c/nccompare.exe $DIFF_OPTS"
+    else
+	DIFFTOOL="diff --strip-trailing-cr"
+    fi
+    
+    # perform comparison
+    echo "${EXPID}:"
+    
+    # Convervation tests are a special case
+    if [ $CHECKFLUXES = "TRUE" ] ; then
+	RETVAL=`cat $OUTDIR/$TESTFILE`
+	if [ $RETVAL = "T" ] ; then
+	    OK="TRUE"
+	fi
+    else 
+	if $DIFFTOOL $OUTDIR/$TESTFILE $REF_DIR/$TESTFILE ; then
+	    OK="TRUE"
+	fi
+    fi
+    
+    # reporting
+    if [ $OK = "TRUE" ] ; then
+	echo "**TEST OK**"
+        # clean up if test successful
+	\rm -rf $OUTDIR 
+	# clean up comparison dir too if its a restartread test
+	if [ $RESTARTREAD = "TRUE" ] ; then
+	    \rm -rf $REF_DIR
+	fi
+    else
+	echo "**TEST FAILED**"
+    fi
+}
+
+# == function to add a preprocessor option to the list passed to make ==
+
+addfppopt () {
+    OPT=$1
+    if [ "$OPT" != "" ] ; then
+	FPPOPTS="$OPT $FPPOPTS"
+    fi
+}
+
+checkConfig() {
+# if terminate is set to 'yes' then xsltproc completes
+# with a non-zero return value if it encounters an error.
+DEFINITIONS_HOME=${CODEDIR}/genie-main/src/xml-config/xml
+xsltproc --param definitions "'"${DEFINITIONS_HOME}"/definition.xml'" --param verbose "'no'" --param terminate "'yes'" $1 $2
+# shouldn't reach this test, since terminate in xsltproc should trigger an overall stop
+if [ $? -ne 0 ] ; then
+    die "ERROR: triggered when checking config file with $1"
+fi
+}
+
+#
+# END LOCAL FUNCTIONS
+#
+# *******************************************************************
+
+# ###################################################################
+# parse command line arguments using bash built-in 'getopts'
+# ###################################################################
+while getopts "btrakzxCDOf:o:c:m:g:h:" options; do
+  case $options in
+    b ) USE_BFG="TRUE";;
+    x ) COMPILE_ONLY="TRUE";;
+    t ) TESTING_MODE="TRUE";
+	CREATE_REF_MODE="FALSE";;
+    r ) TESTING_MODE="FALSE";
+	CREATE_REF_MODE="TRUE";;      
+    a ) COMPARE_AGAINST_ASSUMEDGOOD="TRUE";
+        COMPARE_AGAINST_KNOWNGOOD="FALSE";;
+    k ) COMPARE_AGAINST_ASSUMEDGOOD="FALSE";
+        COMPARE_AGAINST_KNOWNGOOD="TRUE";;
+    z ) REMAKE="FALSE";;
+    f ) CONFIGFILES=$OPTARG ;;
+    O ) OLD_CONFIG="TRUE";;
+    o ) OUTROOT=$OPTARG ;;
+    c ) CODEDIR=$OPTARG ;;
+    m ) MAKEFLAGS=$OPTARG ;;
+    g ) RUNTIME_ROOT=$OPTARG ;;
+    h ) RUNTIME_OUTDIR=$OPTARG ;;
+    * ) usage
+          exit 1;;
+  esac
+done
+
+# disallow old style useage
+if [ $# -eq 1 ] ; then
+    usage
+    die "ERROR: must use command line options as above"
+fi
+
+\cd $CODEDIR/genie-main
+
+# ###################################################################
+# If CONFIG file is specified, read and validate it.
+# NB settings in config file override defaults.
+# ###################################################################
+if [ "$CONFIGFILES" != '' ] ; then
+    cp src/xml-config/xml/definition.xml tmp$$.configure.xml
+    DATE=`date`
+    for conf_file in $CONFIGFILES; do
+	# convert old-style (pre-XML) configuration file into a new-style configuration file
+	if [ $OLD_CONFIG = "TRUE" ] ; then
+	    $TRANSLATE_CONFIG $conf_file > tmp$$.`basename $conf_file`.xml
+	    conf_file=tmp$$.`basename $conf_file`.xml
+	fi
+	if [ ! -f $conf_file ] ; then
+	    die "ERROR: config file '${conf_file}' does not exist"
+	else
+	# check the configuration file for consistency against the definitions file
+        # check for valid model names
+	#    checkConfig src/xml-config/xslt/CheckModelNames.xsl $conf_file
+        # check that models specified in parameters exist in config
+	###    checkConfig src/xml-config/xslt/CheckModelNamesConsistency.xsl $conf_file 
+        # check for valid param names
+	    checkConfig src/xml-config/xslt/CheckParamNames.xsl $conf_file 
+	# Other checks...
+	# all being well, process the config file
+	    xsltproc -stringparam OUTROOT $OUTROOT -stringparam CODEDIR $CODEDIR -stringparam RUNTIME_ROOT $RUNTIME_ROOT -stringparam RUNTIME_OUTDIR $RUNTIME_OUTDIR -stringparam DATE "$DATE" -stringparam user_xml ../../../$conf_file src/xml-config/xslt/apply_job_configuration.xsl tmp$$.configure.xml > tmp$$.configure.tmp.xml
+	    mv tmp$$.configure.tmp.xml tmp$$.configure.xml
+	fi
+    done
+    xsltproc -stringparam OUTROOT $OUTROOT -stringparam CODEDIR $CODEDIR -stringparam RUNTIME_ROOT $RUNTIME_ROOT -stringparam RUNTIME_OUTDIR $RUNTIME_OUTDIR -stringparam DATE "$DATE" src/xml-config/xslt/build_job.xsl tmp$$.configure.xml > tmp$$.merged.xml
+    DEFINITION_FILE=tmp$$.$conf_file.merged.xml
+    xsltproc src/xml-config/xslt/vars.xsl tmp$$.merged.xml > tmp$$.vars.sh
+    xsltproc src/xml-config/xslt/testing.xsl tmp$$.merged.xml > tmp$$.testing.sh
+    xsltproc src/xml-config/xslt/build.xsl tmp$$.merged.xml > tmp$$.build.sh
+	# read-in any relevant environment variables produced during processing
+    source tmp$$.vars.sh
+    source tmp$$.testing.sh
+    source tmp$$.build.sh
+else
+    die "must supply at least one config file"
+fi
+
+# ###################################################################
+# Set the output directory.
+# ###################################################################
+# This is dependent upon whether we are in testing mode,
+# and further whether we are creating test reference files.
+# (reference files be they assumed- or known-goods, always 
+# start life in assumedgood output location)
+if [ $TESTING_MODE = "TRUE" ] ; then
+    echo "**** TESTING - $CONFIGFILES ****"
+    OUTDIR=$OUTROOT/$TEST_NAME
+elif [ $CREATE_REF_MODE = "TRUE" ] ; then
+    OUTDIR=$OUTROOT/$ASSUMEDGOOD_NAME
+else 
+    OUTDIR=$OUTROOT/$EXPID
+fi
+
+# ###################################################################
+# Assemble any options that must be passed to the build.
+# ###################################################################
+# NB Config files describe an expt.  Since GENIE has both
+# build-time and compile-time settings, options which effect
+# the compilation are also in the config files.  
+#
+# Preprocessor macros are read in from tmp$$.build.sh.
+#
+# arguments passed to subsequent calls to make are collected
+# (also from tmp$$.build.sh) blow. 
+
+MAKE_ARGS="${MAKEFLAGS}"
+# Build type
+if (set -u; : $BUILD_TYPE) 2> /dev/null; then 
+    MAKE_ARGS="${MAKE_ARGS} BUILD=${BUILD_TYPE}"
+fi
+
+#######################################################
+# Compile the model, if requested
+#######################################################
+if [ $REMAKE = "TRUE" ]; then
+    $MAKE $MAKE_ARGS "GENIE_FPPFLAGS=${FPPOPTS}"
+fi
+
+# ###################################################################
+# Create output directories (need to be cleaned out if running a test).
+# ###################################################################
+
+# Make some output directories
+[ ! -d $OUTDIR ]             &&   mkdir -p $OUTDIR
+[ ! -d $OUTDIR/main ]        &&   mkdir -p $OUTDIR/main
+[ ! -d $OUTDIR/goldstein ]   &&   mkdir -p $OUTDIR/goldstein
+[ ! -d $OUTDIR/embm ]        &&   mkdir -p $OUTDIR/embm
+[ ! -d $OUTDIR/plasim ]        &&   mkdir -p $OUTDIR/plasim
+[ ! -d $OUTDIR/goldsteinseaice ]      &&   mkdir -p $OUTDIR/goldsteinseaice
+[ ! -d $OUTDIR/biogem ]    &&   mkdir -p $OUTDIR/biogem
+[ ! -d $OUTDIR/atchem ]    &&   mkdir -p $OUTDIR/atchem
+[ ! -d $OUTDIR/sedgem ]    &&   mkdir -p $OUTDIR/sedgem
+[ ! -d $OUTDIR/rokgem ]    &&   mkdir -p $OUTDIR/rokgem
+[ ! -d $OUTDIR/ecogem ]    &&   mkdir -p $OUTDIR/ecogem
+[ ! -d $OUTDIR/goldlite ]    &&   mkdir -p $OUTDIR/goldlite
+[ ! -d $OUTDIR/ocnlite ]    &&   mkdir -p $OUTDIR/ocnlite
+[ ! -d $OUTDIR/gemlite ]    &&   mkdir -p $OUTDIR/gemlite
+[ ! -d $OUTDIR/ents ]      &&   mkdir -p $OUTDIR/ents
+[ ! -d $OUTDIR/archive ]      &&   mkdir -p $OUTDIR/archive
+# additional cgenie
+[ ! -d $ARCHIVEDIR ]      &&   mkdir -p $ARCHIVEDIR
+[ ! -d $LOGDIR ]      &&   mkdir -p $LOGDIR
+# *******************************************************************
+
+# ###################################################################
+# copy xml files and write svn info and svn diff into archive directory in output directory.
+# ###################################################################
+cp $DEFINITIONS_HOME/definition.xml $OUTDIR/archive
+cp $CONFIGFILES $OUTDIR/archive
+#svn diff ../ > $OUTDIR/archive/svn.diff
+#svn info ../ > $OUTDIR/archive/svn.info
+
+# ###################################################################
+# Create the namelist and goin files.
+# The details of this are kept in a separate file: "namelists.sh"
+# ###################################################################
+
+xsltproc -stringparam NML_DIR $OUTDIR src/xml-config/xslt/toNml.xsl tmp$$.merged.xml > /dev/null
+
+cleanup
+
+#######################################################
+# Create file units/streams used by exe, copy key files
+# to outdir, from where exe will be run
+#######################################################
+cd $OUTDIR
+\cp $RUNTIME_ROOT"/genie-main/makefile.arc" $RUNTIME_OUTDIR/archive        # Copy makefile.arc
+\cp $RUNTIME_ROOT"/genie-main/"$0 $RUNTIME_OUTDIR/archive                  # Copy this file
+\cp $RUNTIME_ROOT"/genie-main/genie.exe" $RUNTIME_OUTDIR           # Copy executable
+
+if [ $COMPILE_ONLY = "FALSE" ] ; then
+    #######################################################
+    # Run the EXPT
+    #######################################################
+    echo 'STARTING EXPERIMENT:'
+    date
+    time ./genie.exe ||  ABORT EXECUTE
+    echo 'ENDING EXPERIMENT:'
+    set +e                                  # Disable exit on error.
+fi
+
+#######################################################
+# COMPARISONS, CLEANUPS ETC
+#######################################################
+
+if [ $TESTING_MODE = "TRUE" ] ; then
+    runtests
+fi
+
+exit 0                                  # Successful termination.
+#

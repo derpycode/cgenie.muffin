@@ -1,0 +1,40 @@
+
+ 01 02   03 04 05 06                                            07       08        09
+ \/ \/   \/ \/ \/ \/                                            \/       \/        \/
+
+-START-OF-DATA-
+ F  0.0  F  F  F  'surface air temperature'                     'K'      73.15     373.15
+ F  0.0  F  F  F  'specific humidity'                           '1'       0.00     100.00
+ t  0.1  f  t  F  'carbon dioxide (CO2) partial pressure'       'atm'     0.00       1.00
+ t  0.1  f  t  F  'd13C CO2'                                    'o/oo'   -9.99E+2    9.99E+2
+ t  0.1  f  t  F  'd14C CO2'                                    'o/oo'   -9.99E+5    9.99E+2
+ F  1.0  F  F  f  'oxygen (O2) partial pressure'                'atm'     0.00       1.00
+ F  1.0  F  F  F  'd18O O2'                                     'o/oo'   -9.99E+2    9.99E+2
+ F  1.0  F  F  F  'nitrogen (N2) partial pressure'              'atm'     0.00       1.00
+ F  1.0  F  F  F  'd15N N2'                                     'o/oo'   -9.99E+2    9.99E+2
+ F  1.0  F  F  F  'methane (CH4) partial pressure'              'atm'    0.00        1.00
+ F  1.0  F  F  F  'd13C CH4'                                    'o/oo'   -9.99E+2    9.99E+2
+ F  1.0  F  F  F  'd14C CH4'                                    'o/oo'   -9.99E+5    9.99E+2
+ F  1.0  F  F  F  'sulphur hexafloride (SF6) partial pressure'  'atm'     0.00       1.00
+ F  1.0  F  F  F  'nitrous oxide (N2O) partial pressure'        'atm'     0.00       1.00
+ F  1.0  F  F  F  'd15N N2O'                                    'o/oo'   -9.99E+2    9.99E+2
+ F  1.0  F  F  F  'hydrogen sulphide (H2S) partial pressure'    'atm'     0.00       1.00
+ F  1.0  F  F  F  'd32S of H2S'                                 'o/oo'   -9.99E+2    9.99E+2
+ t  0.1  F  F  F  'CFC-11 partial pressure'                     'atm'     0.00       1.00
+ t  0.1  F  F  F  'CFC-12 partial pressure'                     'atm'     0.00       1.00
+-END-OF-DATA-
+
+ /\ /\   /\ /\ /\ /\                                            /\       /\        /\
+ 01 02   03 04 05 06                                            07       08        09
+
+DATA FORMAT AND ORDER:
+
+COLUMN #01: include restoring forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #02: time constant of restoring forcing (years) [DATA FORMAT: real]
+COLUMN #03: include flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #04: scale flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #05: force ocean surface in equilibrium with atmosphere? (needs ocean restoring forcing set) [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #06: tracer variable description
+COLUMN #07: tracer units
+COLUMN #08: min tracer value
+COLUMN #09: max tracer value

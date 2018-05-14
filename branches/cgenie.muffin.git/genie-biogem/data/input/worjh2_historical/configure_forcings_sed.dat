@@ -1,0 +1,61 @@
+
+ 01 02 03                                     04       05        06
+ \/ \/ \/                                     \/       \/        \/
+
+-START-OF-DATA-
+ F  F  'dummy index'                          'n/a'     0.00       0.00
+ F  F  'dummy index'                          'n/a'     0.00       0.00
+ f  t  'particulate organic carbon (POC)'     'wt%'     0.00     100.00
+ F  F  'd13C of POC'                          'o/oo'   -9.99E+2    9.99E+2
+ F  F  'd14C of POC'                          'o/oo'   -9.99E+5    9.99E+2
+ F  F  'particulate organic nitrogen (PON)'   'wt%'     0.00     100.00
+ F  F  'd15N of PON'                          'o/oo'   -9.99E+2    9.99E+2
+ f  t  'particulate organic phosphate (POP)'  'wt%'     0.00     100.00
+ f  t  'particulate organic cadmium (POCd)'   'wt%'     0.00     100.00
+ F  F  'particulate organic iron (POFe)'      'wt%'     0.00     100.00
+ f  t  'POM scavenged 231Pa'                  'wt%'     0.00     100.00
+ f  t  'POM scavenged 230Th'                  'wt%'     0.00     100.00
+ f  t  'POM scavenged Fe'                     'wt%'     0.00     100.00
+ F  F  'calcium carbonate (CaCO3)'            'wt%'     0.00     100.00
+ F  F  'd13C of CaCO3'                        'o/oo'   -9.99E+2    9.99E+2
+ F  F  'd14C of CaCO3'                        'o/oo'   -9.99E+5    9.99E+2
+ F  F  'd18O of CaCO3'                        'o/oo'   -9.99E+2    9.99E+2
+ F  F  'CaCO3 incorporated cadmium'           'wt%'     0.00     100.00
+ f  t  'CaCO3 scavenged 231Pa'                'wt%'     0.00     100.00
+ f  t  'CaCO3 scavenged 230Th'                'wt%'     0.00     100.00
+ f  t  'CaCO3 scavenged Fe'                   'wt%'     0.00     100.00
+ f  F  'detrital (refractory) material'       'wt%'     0.00     100.00
+ f  t  'detrital scavenged 231Pa'             'wt%'     0.00     100.00
+ f  t  'detrital scavenged 230Th'             'wt%'     0.00     100.00
+ F  F  'detrital scavenged Fe'                'wt%'     0.00     100.00
+ F  F  'opal'                                 'wt%'     0.00     100.00
+ F  F  'd30Si of opal'                        'o/oo'   -9.99E+2    9.99E+2
+ F  F  'opal incorporated germanium'          'wt%'     0.00     100.00
+ f  t  'opal scavenged 231Pa'                 'wt%'     0.00     100.00
+ f  t  'opal scavenged 230Th'                 'wt%'     0.00     100.00
+ f  t  'opal scavenged Fe'                    'wt%'     0.00     100.00
+ f  F  'ash'                                  'wt%'     0.00     100.00
+ F  F  'n/a'                                  'n/a'     0.00       0.00
+ F  F  'n/a'                                  'n/a'     0.00       0.00
+ F  F  'n/a'                                  'n/a'     0.00       0.00
+ F  F  'CaCO3 numerical age tracer'           'years'   0.00E+0    4.50E+9
+ F  F  'planktic foraminiferal CaCO3 d13C'    'o/oo'   -9.99E+2    9.99E+2
+ F  F  'planktic foraminiferal CaCO3 d14C'    'o/oo'   -9.99E+5    9.99E+2
+ F  F  'planktic foraminiferal CaCO3 d18O'    'o/oo'   -9.99E+2    9.99E+2
+ F  F  'benthic foraminiferal CaCO3 d13C'     'o/oo'   -9.99E+2    9.99E+2
+ F  F  'benthic foraminiferal CaCO3 d14C'     'o/oo'   -9.99E+5    9.99E+2
+ F  F  'benthic foraminiferal CaCO3 d18O'     'o/oo'   -9.99E+2    9.99E+2
+-END-OF-DATA-
+
+ /\ /\ /\                                     /\       /\        /\
+ 01 02 03                                     04       05        06
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: include flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #02: scale flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #03: tracer variable description
+COLUMN #04: tracer UNITS
+COLUMN #05: tracer min
+COLUMN #06: tracer max

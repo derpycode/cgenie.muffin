@@ -1,0 +1,21 @@
+# $Id$
+
+# Below is a log of when particular assumedgood files needed to be remade.
+# **PLEASE ADD TO THIS WHENEVER YOUR CODE CHANGE FORCES AN ASSUMEDGOOD UPDATE**  
+
+2005
+
+Jan28	assumedgood_genie				??
+Jan28	assumedgood_genie_ig_go_sl_dyex			??
+Jan28	assumedgood_genie_eb_go_gs
+Jan28	assumedgood_genie_r8r8
+Feb01	assumedgood_genie_r8r4
+Feb01	assumedgood_genie_r4r8
+Apr11	assumedgood_genie_ig_go_gs
+May23	assumedgood_genie_ig_fi_fi_ml
+Jun01	assumedgood_genie_ig_fi_fi_ml
+Jun01	assumedgood_genie_r4r8
+Jun02	assumedgood_genie_ig_fi_fi_ml_restartmake	??
+Jun20	assumedgood_genie_ig_go72_gs72_ml
+Oct12	assumedgood_genie_ig_go72_gs72_ml
+Oct12	assumedgood_genie_eb_go_gs

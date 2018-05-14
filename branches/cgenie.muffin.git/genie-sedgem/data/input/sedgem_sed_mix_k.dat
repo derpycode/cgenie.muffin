@@ -1,0 +1,26 @@
+-START-OF-DATA-
+1.000000
+1.000000
+1.000000
+1.000000
+0.367879
+0.135335
+0.049787
+0.018316
+0.006738
+0.002479
+0.000912
+0.000335
+0.000123
+0.000045
+0.000017
+0.000006
+0.000002
+0.000001
+0.000000
+0.000000
+-END-OF-DATA-
+
+NOTE: the bioturbation solid diffusion constants sould be in units of cm2 yr-1
+NOTE: the mixing rate is normalized to a value of unity at the maximum mixing rate
+NOTE: the bottom value in the mixing rate should be zero to properly terminate the profile

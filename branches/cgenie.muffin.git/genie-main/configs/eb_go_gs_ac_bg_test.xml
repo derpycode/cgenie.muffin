@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job author="config2xml.py - automatic conversion of ASCII text config file">
+	<vars>
+		<var name="EXPID">genie_eb_go_gs_ac_bg</var>
+	</vars>
+	<config>
+		<model name="atchem"/>
+		<model name="goldstein"/>
+		<model name="goldsteinseaice"/>
+		<model name="biogem"/>
+		<model name="embm"/>
+	</config>
+	<parameters>
+		<control>
+                <!-- main -->
+			<param name="write_flag_atm">.false.</param>
+			<param name="ksic_loop">5</param>
+			<param name="koverall_total">2500</param>
+			<param name="genie_timestep">63115.2</param>
+			<param name="write_flag_sic">.false.</param>
+			<param name="kocn_loop">5</param>
+			<param name="dt_write">2500</param>
+			<param name="lgraphics">.false.</param>
+                <!-- gem -->
+                        <paramArray name="atm_select">
+				<param index="3">.true.</param>
+				<param index="4">.true.</param>
+				<param index="5">.true.</param>
+				<param index="6">.true.</param>
+				<param index="18">.true.</param>
+				<param index="19">.true.</param>
+			</paramArray>
+                        <paramArray name="ocn_select">
+				<param index="3">.true.</param>
+				<param index="4">.true.</param>
+				<param index="5">.true.</param>
+				<param index="8">.true.</param>
+				<param index="10">.true.</param>
+				<param index="12">.true.</param>
+				<param index="15">.true.</param>
+				<param index="16">.true.</param>
+				<param index="17">.true.</param>
+				<param index="20">.true.</param>
+				<param index="45">.true.</param>
+				<param index="46">.true.</param>
+			</paramArray>
+                        <paramArray name="sed_select">
+				<param index="3">.true.</param>
+				<param index="4">.true.</param>
+				<param index="5">.true.</param>
+				<param index="8">.true.</param>
+				<param index="14">.true.</param>
+				<param index="15">.true.</param>
+				<param index="16">.true.</param>
+				<param index="22">.true.</param>
+				<param index="32">.true.</param>
+				<param index="33">.true.</param>
+				<param index="34">.true.</param>
+				<param index="36">.true.</param>
+			</paramArray>
+		</control>
+		<model name="atchem">
+                        <param name="ctrl_continuing">.false.</param>
+                        <paramArray name="atm_init">
+				<param index="3">278.0E-06</param>
+				<param index="4">-6.50</param>
+				<param index="6">0.2095</param>
+			</paramArray>
+		</model>
+		<model name="goldstein">
+			<param name="ans">n</param>
+			<param name="iwstp">500</param>
+			<param name="ascout">y</param>
+			<param name="ianav">501</param>
+			<param name="itstp">501</param>
+			<param name="npstp">501</param>
+			<param name="lout">rst</param>
+			<param name="scf">1.931692</param>
+			<param name="rel">0.9000000</param>
+			<param name="temp1">0.0</param>
+			<param name="temp0">0.0</param>
+			<param name="adrag">2.939598</param>
+			<param name="netout">n</param>
+			<paramArray name="diff">
+				<param index="2">2.7242320E-05</param>
+				<param index="1">4488.812</param>
+			</paramArray>
+		</model>
+		<model name="goldsteinseaice">
+			<param name="npstp">501</param>
+			<param name="ianav">501</param>
+			<param name="itstp">501</param>
+			<param name="iwstp">500</param>
+			<param name="netout">n</param>
+			<param name="diffsic">6200.000</param>
+			<param name="ascout">y</param>
+			<param name="ans">n</param>
+			<param name="lout">rst</param>
+		</model>
+		<model name="biogem">
+                        <param name="ctrl_continuing">.false.</param>
+                        <paramArray name="ocn_init">
+				<param index="3">2.244E-03</param>
+				<param index="4">0.4</param>
+				<param index="8">2.159E-06</param>
+				<param index="10">1.696E-04</param>
+				<param index="12">2.363E-03</param>
+			</paramArray>
+
+                        <!-- BIOLOGICAL NEW PRODUCTION -->
+                        <param name="par_bio_k0_PO4">1.8622476E-06</param><!--maximum PO4 consumption rate (mol kg-1 yr-1)-->
+                        <param name="par_bio_c0_PO4">2.2195215E-07</param><!--[PO4] M-M half-sat value (mol kg-1)-->
+                        <!-- ORGANIC MATTER EXPORT RATIOS -->
+                        <param name="par_bio_red_POP_POC">117.0</param>
+                        <param name="par_bio_red_POP_PO2">-170.0</param>
+                        <param name="par_bio_red_DOMfrac">0.66</param><!--production fraction of dissolved organic matter-->
+                        <!-- INORGANIC MATTER EXPORT RATIOS -->
+                        <param name="par_bio_red_POC_CaCO3">0.043987</param><!--base CaCO3:POC export ratio-->
+                        <param name="par_bio_red_POC_CaCO3_pP">0.7438526</param><!--exponent for modifier of CaCO3:POC export ratio-->
+                        <!-- REMINERALIZATION -->
+                        <param name="par_bio_remin_DOMlifetime">0.5</param><!--DOC lifetime (yrs)-->
+                        <param name="par_bio_remin_POC_frac2">5.6834821E-02</param><!--initial fractional abundance of POC component #2-->
+                        <param name="par_bio_remin_POC_eL1">590.0558</param><!--remineralization length #1 for POC-->
+                        <param name="par_bio_remin_POC_eL2">1000000.0</param><!--remineralization length #2 for POC-->
+                        <param name="par_bio_remin_CaCO3_frac2">0.4725959</param><!--initial fractional abundance of CaCO3 component #2-->
+                        <param name="par_bio_remin_CaCO3_eL1">1255.455</param><!--remineralization length #1 for CaCO3-->
+                        <param name="par_bio_remin_CaCO3_eL2">1000000.0</param><!--remineralization length #2 for CaCO3-->
+
+                        <param name="par_misc_t_start">0</param>
+                        <param name="par_misc_t_runtime">5</param>
+
+                        <param name="par_infile_slice_name">genie_eb_go_gs_ac_bg_test_save_timeslice.dat</param>
+                        <param name="par_infile_sig_name">genie_eb_go_gs_ac_bg_test_save_sig.dat</param>
+                        <param name="par_windspeed_file">genie_eb_go_gs_ac_bg_test_windspeed.dat</param>
+                        <param name="par_forcing_name">biogem_test</param>
+		</model>
+		<model name="embm">
+			<param name="ans">n</param>
+			<param name="scf">1.931692</param>
+			<param name="atchem_radfor">y</param>
+			<param name="netout">n</param>
+			<param name="npstp">501</param>
+			<param name="extra1a">-2.1228021E-02</param>
+			<param name="ianav">501</param>
+			<param name="itstp">501</param>
+			<param name="iwstp">500</param>
+			<param name="difflin">6.3252553E-02</param>
+			<param name="diffwid">1.083292</param>
+			<param name="extra1c">0.1273681</param>
+			<param name="ascout">y</param>
+			<param name="extra1b">0.1202921</param>
+			<param name="lout">rst</param>
+			<paramArray name="diffamp">
+				<param index="2">1097107.0</param>
+				<param index="1">4667550.0</param>
+			</paramArray>
+			<paramArray name="betaz">
+				<param index="1">0.1121861</param>
+				<param index="2">0.2269510</param>
+			</paramArray>
+			<paramArray name="betam">
+				<param index="1">0.0000000E+00</param>
+				<param index="2">0.2269510</param>
+			</paramArray>
+		</model>
+	</parameters>
+	<build>
+		<make-arg name="IGCMATMOSDP">TRUE</make-arg>
+		<make-arg name="GENIEDP">TRUE</make-arg>
+		<macro handle="GENIENYOPTS" status="defined">
+			<identifier>GENIENY</identifier>
+			<replacement>36</replacement>
+		</macro>
+		<macro handle="GENIENXOPTS" status="defined">
+			<identifier>GENIENX</identifier>
+			<replacement>36</replacement>
+		</macro>
+		<macro handle="GOLDSTEINNTRACSOPTS" status="defined">
+			<identifier>GOLDSTEINNTRACS</identifier>
+			<replacement>14</replacement>
+		</macro>
+	</build>
+	<testing>
+		<var name="TESTFILE">biogem/fields_biogem_3d.nc</var>
+	</testing>
+</job>

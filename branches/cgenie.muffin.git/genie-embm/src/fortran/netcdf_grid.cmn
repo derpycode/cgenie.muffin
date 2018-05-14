@@ -1,0 +1,8 @@
+c AY (22/03/04) : GENIE grid variables required in embm.F for
+c                 netCDF operations
+c AY (05/10/04) : moved from embm.cmn to here
+      real
+     :     nclon1(maxi),nclat1(maxj),
+     :     nclon2(maxi),nclat2(maxj),
+     :     nclon3(maxi),nclat3(maxj)
+      common /embm_grid/nclon1,nclat1,nclon2,nclat2,nclon3,nclat3

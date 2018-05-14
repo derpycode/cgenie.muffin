@@ -1,0 +1,12 @@
+-START-OF-DATA-
+0.0      0.0
+2010.0   0.0
+2010.0   1.0
+2100.0   1.0
+2100.0   0.0
+999999.9 0.0
+-END-OF-DATA-
+
+NOTE: total flux in units of mol yr-1
+can be rescaled in the user-config file by setting the value of parameter:
+bg_par_atm_force_scale_val_9

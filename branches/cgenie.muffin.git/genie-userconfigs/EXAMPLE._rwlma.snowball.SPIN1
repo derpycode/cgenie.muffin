@@ -1,0 +1,180 @@
+#
+#
+# --- CLIMATE ---------------------------------------------------------
+#
+# solar constant
+# NOTE: modern S0 is 1368 W m-2
+#       for a ca. 720 Ma time-interval (Sturtian onset), S0 will be 1286.9
+#       for a ca. 635 Ma time-interval (Marinoan onset), S0 will be 1295.4
+ma_genie_solar_constant=1295.4
+# set climate feedback
+ea_36=y
+#
+# --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
+#
+# No biology
+bg_par_bio_prodopt='NONE'
+#
+# --- SEDIMENTS ------------------------------------------------
+#
+# Sediment grid
+SEDGEMNLONSOPTS='$(DEFINE)SEDGEMNLONS=18'
+SEDGEMNLATSOPTS='$(DEFINE)SEDGEMNLATS=18'
+# sediment grid options
+sg_par_sed_Dmax_neritic=176.0
+sg_par_sed_topo_D_name="_rwlma.depth.18x18x16"
+sg_par_sed_reef_mask_name="_rwlma.reefmask.18x18x16"
+sg_par_sedcore_save_mask_name="_rwlma.sedcoremask.18x18x16"
+# sediment diagenesis options
+sg_par_sed_diagen_CaCO3opt="NONE"
+# additional detrital flux:
+# global modern dust: 4483 Tg yr-1, divided by the Earth's surface area (5.1E14 m2), and then from: g m-2 yr-1 to g cm-2 kyr-1 = 0.88 g cm-2 kyr-1
+sg_par_sed_fdet=0.88
+# reefs 'on'
+sg_ctrl_sed_neritic_reef_force=.TRUE.
+sg_par_sed_Dmax_neritic=0.0
+# set and scale abiotic precip
+sg_par_sed_CaCO3_abioticohm_min=10.0
+sg_par_sed_CaCO3precip_sf=3.402890846505764e-007
+# set zero porosity
+sg_par_sed_poros_CaCO3_reef=0.0
+# increase number of internal array sedcore layers (from 10 x run duration to 20x run duration (kyr))
+sg_par_n_sedcore_tot_perky=20
+#
+# --- WEATHERING ------------------------------------------------------
+#
+# set a CLOSED system
+bg_ctrl_force_sed_closedsystem=.true.
+# set prescribed weathering rate
+rg_par_weather_CaCO3=0.15E+14
+rg_par_weather_CaCO3_d13C=3.0
+#
+# --- GEOCHEM ACCELERATION -------------------------------------
+#
+gl_ctrl_update_pCO2=.true.
+ma_gem_notyr_min=9999999
+ma_gem_notyr_max=9999999
+ma_gem_yr_min=1
+ma_gem_yr_max=1
+ma_gem_dyr=0
+ma_gem_adapt_auto=.false.
+#
+# --- DATA SAVING -----------------------------------------------------
+#
+# date saving & reporting options
+bg_par_data_save_level=4
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=1
+#
+# --- FORCINGS --------------------------------------------------------
+#
+bg_ctrl_force_oldformat=.false.
+bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2_FRALK_FDIC_F13DIC_FCa"
+bg_par_atm_force_scale_val_3=2780.0E-6
+bg_par_atm_force_scale_val_4=-6.5
+bg_par_ocn_force_scale_val_3=1000.0E12
+bg_par_ocn_force_scale_val_4=0.0
+bg_par_ocn_force_scale_val_12=2000.0E12
+bg_par_ocn_force_scale_val_35=1000.0E12
+bg_par_ocn_force_scale_val_76=0.0
+bg_par_force_invert_ohmega=10.0
+bg_ctrl_force_invert_noneg=.false.
+# use internal wind-speed
+bg_ctrl_force_windspeed=.false.
+#re-scale gas transfer coeff to give ~0.058 mol m-2 yr-1 uatm-1 global mean air-sea coefficient (original: 0.310)
+bg_par_gastransfer_a=0.715813093980993
+# add a geothermal heat flux (W m-2)
+bg_ctrl_force_GOLDSTEInTS=.TRUE.
+bg_par_Fgeothermal=100.0E-3
+#
+# --- MISC -----------------------------------------------------
+#
+# Set tracer initial values
+ac_atm_init_3=2780.0E-06
+ac_atm_init_4=-6.5
+ac_atm_init_6=0.2095
+bg_ocn_init_3=12563.608E-6
+bg_ocn_init_4=0.4
+bg_ocn_init_8=2.159E-06
+bg_ocn_init_10=1.696E-04
+bg_ocn_init_12=12554.361E-6
+bg_ocn_init_35=1.025E-02
+bg_ocn_init_38=2.916E-02
+bg_ocn_init_50=5.282E-02
+bg_ocn_init_53=26.0e-6
+bg_ocn_init_54=32.3
+bg_ocn_init_76=0.0
+#
+# **************************************************************
+# *** Ca cycling ***********************************************
+# **************************************************************
+#
+# INITIAL CONDITIONS
+bg_ocn_init_35=1.025E-02
+bg_ocn_init_76=2.1
+#
+# RIVER FLUX
+# NOTE: Heiko values! (against SRM915) from Holden et al 2012
+rg_par_weather_CaSiO3_d44Ca=+0.9
+rg_par_weather_CaCO3_d44Ca=+0.9
+#
+# HYDROTHERMAL FLUX
+# NOTE: assume 2.0 Tmol yt-1 Ca input [Blattler et al., 2011] (and DePaolo [2004])
+# NOTE: assume 0.9 o/oo d44Ca input [Blattler et al., 2011] (and Heuser et al. [2005])
+sg_par_sed_hydroip_fCa=2.0E12
+sg_par_sed_hydroip_fCa_d44Ca=+0.9
+#
+# CARBOANTE FRACTIONATION
+# NOTE: Heiko values! -1.1 for forams based on Holmden 2012
+sg_par_d44Ca_CaCO3_epsilon=-1.10
+bg_par_d44Ca_CaCO3_epsilon=-1.10
+#
+# **************************************************************
+#
+# **************************************************************
+# *** Li cycling ***********************************************
+# **************************************************************
+#
+# INITIAL CONDITIONS
+bg_ocn_init_53=26.0e-6
+bg_ocn_init_54=32.3
+#
+# TERRESTRIAL WEATHERING SOURCE
+# NOTE: calibrated for riverine flux of 10e9 mol yr-1
+# NOTE: calibrated for riverine d7Li = 23.0 [FIXED]
+rg_par_weather_CaSiO3_fracLi=0.006125
+rg_par_weather_Li_Rscale=1.0
+rg_par_weather_Li_Roffset=1.0
+rg_par_weather_CaSiO3_Li_d7Li=23.0
+rg_par_weather_Li_7Li_epsilon=0.0
+#
+# HYDROTHERMAL SOURCE
+# NOTE: 13E9 as per Misra and Froelich [2012]
+sg_par_sed_hydroip_fLi=12.0e9
+sg_par_sed_hydroip_fLi_d7Li=8.3
+#
+# LOW-T HYDROTHERMAL (AOC) SINK
+# Li removal coefficient (m-2 s-1)
+# based on 26 umol Li /// 8.0E9 mol yr-1 total sink (convert to units of m-2 and s-1)
+sg_par_sed_lowTalt_fLi_alpha=2.874784060225298e-008
+sg_par_sed_lowTalt_7Li_epsilon=-16.0
+#
+# CLAY (MAAC) SINK
+# Li-clay removal coefficient
+# based on 26 umol Li /// 13.0E9 mol yr-1 total marine clay sink
+# REMEMBER: parameterized as a function of detrital flux ...
+sg_par_sed_clay_fLi_alpha=10.062556213494556
+sg_par_sed_clay_7Li_epsilon=-16.0
+#
+# BIOGENIC PELAGIC CaCO3 'SINK'
+# Li uptake
+bg_par_bio_red_CaCO3_LiCO3=0.0E-6
+# Li/Ca partition coefficient
+# based on: 26 umol Li : 0.01025 mol Ca in seawater = 2600 umol mol-1 Li:Ca /// ~13 umol mol-1 Li:Ca in forams
+sg_par_bio_red_CaCO3_LiCO3_alpha=0.005
+sg_par_d7Li_LiCO3_epsilon=-2.0
+#
+# **************************************************************
+#
+# --- END ------------------------------------------------------
+#

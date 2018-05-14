@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job author="config2xml.py - automatic conversion of ASCII text config file">
+	<vars>
+		<var name="EXPID">genie_eb_go_gs</var>
+	</vars>
+	<config>
+		<model name="goldstein"/>
+		<model name="goldsteinseaice"/>
+		<model name="embm"/>
+	</config>
+	<parameters>
+		<control>
+			<param name="write_flag_atm">.false.</param>
+			<param name="ksic_loop">5</param>
+			<param name="koverall_total">10000</param>
+			<param name="write_flag_sic">.false.</param>
+			<param name="kocn_loop">5</param>
+			<param name="dt_write">50000</param>
+			<param name="lgraphics">.false.</param>
+		</control>
+		<model name="goldstein">
+			<param name="iwstp">1000</param>
+			<param name="ianav">1000</param>
+			<param name="itstp">10</param>
+			<param name="npstp">1000</param>
+			<param name="temp1">10.</param>
+			<param name="temp0">10.</param>
+			<paramArray name="diff">
+				<param index="2">1.e-4</param>
+			</paramArray>
+		</model>
+		<model name="goldsteinseaice">
+			<param name="npstp">1000</param>
+			<param name="ianav">1000</param>
+			<param name="itstp">10</param>
+			<param name="iwstp">1000</param>
+		</model>
+		<model name="embm">
+			<param name="npstp">1000</param>
+			<param name="ianav">1000</param>
+			<param name="itstp">10</param>
+			<param name="iwstp">1000</param>
+			<param name="tatm">0.0</param>
+		</model>
+	</parameters>
+	<build>
+		<make-arg name="IGCMATMOSDP">TRUE</make-arg>
+		<make-arg name="GENIEDP">TRUE</make-arg>
+		<macro handle="GENIENYOPTS" status="defined">
+			<identifier>GENIENY</identifier>
+			<replacement>36</replacement>
+		</macro>
+		<macro handle="GENIENXOPTS" status="defined">
+			<identifier>GENIENX</identifier>
+			<replacement>36</replacement>
+		</macro>
+	</build>
+	<testing>
+		<var name="TESTFILE">goldstein/gold_spn_av_0000000020_00.nc</var>
+	</testing>
+</job>

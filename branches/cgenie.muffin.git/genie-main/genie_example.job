@@ -1,0 +1,78 @@
+#! /bin/bash -e
+#
+
+#
+#####################################################################
+#
+# genie_example.job - This script runs the GENIE model. 
+#
+# this wrapper parses the arguments of the original
+# 'old_genie_example.job' script and subsequently calls './genie.job'
+# with the corresponding options
+#
+#####################################################################
+#
+
+#==================================================================**
+# usage information
+#==================================================================**
+usage () {
+    echo "usage: $0 [-btrakzxCO]"
+    echo "      -f {config_file} -o {OUTROOT} -c {CODEDIR} -m {MAKEFLAGS}"
+    echo "      -g {RUNTIME_ROOT} -h {RUNTIME_OUTDIR}"
+    echo "b: call upon the BFG.."
+    echo "t: testing mode"
+    echo "r: create reference file mode"
+    echo "a: compare against assumedgood files (testing mode)"
+    echo "k: compare against knowngood files (testing mode)"
+    echo "z: do not try to remake (default is to call make)"
+    echo "x: compile the model but don't run it (see genie-experiments/build-experiment.sh"
+    echo "C: along with the model binary, create executable to compute a cost function based on model-data difference"
+    echo "O: process old-style (pre-XML) configuration file"
+}
+
+#====================================================================
+# parse command line arguments and construct arguemtns for call to
+# 'genie.job'
+# ====================================================================
+OPTS=''
+OPT_MAKEFLAG="FALSE"
+while getopts "btrakzxCOf:o:c:m:g:h:" options; do
+  case $options in
+    b ) OPTS="${OPTS} -b";;
+    x ) OPTS="${OPTS} -x";;
+    t ) OPTS="${OPTS} -t";;
+    r ) OPTS="${OPTS} -r";;
+    a ) OPTS="${OPTS} -a";;
+    k ) OPTS="${OPTS} -k";;
+    z ) OPTS="${OPTS} -z";;
+    C ) OPTS="${OPTS} -C";;
+    f ) OPTS="${OPTS} -f ${OPTARG}" ;;
+    O ) OPTS="${OPTS} -O" ;;
+    o ) OPTS="${OPTS} -o ${OPTARG}" ;;
+    c ) OPTS="${OPTS} -c ${OPTARG}" ;;
+    m ) OPT_MAKEFLAG="TRUE" ;
+	MAKEFLAGS=$OPTARG ;;
+    g ) OPTS="${OPTS} -g ${OPTARG}" ;;
+    h ) OPTS="${OPTS} -h ${OPTARG}" ;;
+    * ) usage
+          exit 1;;
+  esac
+done
+
+#====================================================================
+# disallow old style useage
+#====================================================================
+if [ $# -eq 1 ] ; then
+    usage
+    die "ERROR: must use command line options as above"
+fi
+
+#====================================================================
+# call 'genie.job'
+#====================================================================
+if [ $OPT_MAKEFLAG = "TRUE" ]; then
+    ./genie.job ${OPTS} -m "${MAKEFLAGS}"
+else
+    ./genie.job $OPTS
+fi

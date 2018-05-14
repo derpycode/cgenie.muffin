@@ -1,0 +1,8 @@
+c AY (22/03/04) : GENIE grid variables required in gold_seaice.F
+c                 for netCDF operations
+c AY (04/10/04) : moved from seaice.cmn to here
+      real
+     :     nclon1(maxi),nclat1(maxj),
+     :     nclon2(maxi),nclat2(maxj),
+     :     nclon3(maxi),nclat3(maxj)
+      common /sic_grid/nclon1,nclat1,nclon2,nclat2,nclon3,nclat3

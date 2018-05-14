@@ -1,0 +1,43 @@
+#
+#
+# --- CLIMATE ---------------------------------------------------------
+#
+# scaling for atmospheric CO2 radiative forcing, relative to 278 ppm
+# (so x4 CO2 == 1112 ppm)
+ea_radfor_scl_co2=4.0
+#
+# --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
+#
+# No biology
+bg_par_bio_prodopt='NONE'
+#
+# --- DATA SAVING -----------------------------------------------------
+#
+# date saving & reporting options
+bg_par_data_save_level=6
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=2
+#
+# --- MISC -----------------------------------------------
+#
+# === ATMOSPHERE ===
+# CO2 radiative forcing scaling factor [DEFAULT = 4.0]
+ea_radfor_scl_co2=4.0
+# CH4 radiative forcing scaling factor [DEFAULT = 1.0]
+ea_radfor_scl_ch4=1.0
+# Equator-to-pole different in planetary albedo [DEFAULT = 0.260]
+ea_albedop_amp=0.260
+# Baseline planetary albedo [DEFAULT = 0.200]
+ea_albedop_offs=0.200
+# atmospheric diffusivity of temperature (horizontal) [DEFAULT = 5.0e6]
+ea_12=5.0e6
+# === OCEAN ===
+# ocean diffusivity of temperature + salinity (horizontal) [DEFAULT = 1494.4]
+go_14=1494.4
+# scaling for wind stress (set values of both identical) [DEFAULT = 1.531]
+go_13=1.531
+ea_11=1.531
+#
+# --- END -------------------------------------------------------------
+#
+#

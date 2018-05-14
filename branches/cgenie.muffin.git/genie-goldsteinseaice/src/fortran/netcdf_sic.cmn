@@ -1,0 +1,6 @@
+c
+      integer nall,nfiles
+      parameter(nall=100,nfiles=2)
+      integer nco(nfiles),iddimo(nall,nfiles),idvaro(nall,nfiles)
+      common/netcdfvars_sic/nco,iddimo,idvaro
+c

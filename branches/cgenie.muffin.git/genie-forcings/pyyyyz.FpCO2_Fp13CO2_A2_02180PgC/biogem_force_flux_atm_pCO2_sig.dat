@@ -1,0 +1,20 @@
+-START-OF-DATA-
+000000.0  0.0
+002000.0  0.0
+2000.0	6.90
+2010.0	8.46
+2020.0	11.01
+2030.0	13.53
+2040.0	15.01
+2050.0	16.49
+2060.0	18.49
+2070.0	20.49
+2080.0	22.97
+2090.0	25.94
+2100.0	28.91
+002111.1  0.0
+999999.0  0.0
+-END-OF-DATA-
+
+NOTE: units of PgC yr-1, hence scaling of factor 8.3333e+013 (to mol yr-1) needed in user-config file, i.e.:
+bg_par_atm_force_scale_val_3=8.3333e+013

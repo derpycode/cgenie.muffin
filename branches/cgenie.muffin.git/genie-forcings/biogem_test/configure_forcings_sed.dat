@@ -1,0 +1,20 @@
+
+ 00 01 02 03                                     04       05        06
+ \/ \/ \/ \/                                     \/       \/        \/
+
+-START-OF-DATA-
+-END-OF-DATA-
+
+ /\ /\ /\ /\                                     /\       /\        /\
+ 00 01 02 03                                     04       05        06
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #00: TRACER NUMBER
+COLUMN #01: include flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #02: scale flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #03: tracer variable description
+COLUMN #04: tracer UNITS
+COLUMN #05: tracer min
+COLUMN #06: tracer max

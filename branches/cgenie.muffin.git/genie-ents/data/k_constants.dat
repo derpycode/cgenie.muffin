@@ -1,0 +1,30 @@
+
+
+
+PBH
+THIS DATA FILE IS NO LONGER USED. THE PARAMETERS NOW ARE ALL NAMELIST PARAMETERS
+OTHER THAN K21 WHICH IS DEFINED IN SETUP_ENTS.F AS IT IS THE UNIVERSAL GAS CONSTANT
+
+
+298.15           ! topt  Optimal temperature
+280.             ! copt  Optimal pco2
+0.461            ! k7    Used to calculate snow albedo
+0.45             ! k8    Used to calculate bucket capacity 
+0.15             ! k9    
+0.02             ! k10   
+309.15           ! k11   Used to calculate fta
+283.15           ! k11a
+268.15           ! k12
+29.              ! k13   Used to calculate fco2
+145.             ! k14
+11.5             ! k16   Used to calculate epsv
+0.35             ! k17   Used to calculate fv
+4.35             ! k18   Used to calculate photo 
+54830.           ! k20   Used to calculate veg respiration
+8.314            ! k21
+0.215            ! k24
+0.131            ! k26   Used to calculate leaf litter
+0.125            ! k29   Used to calculate soil respiration
+308.56           ! k31
+227.13           ! k32
+0.0452           ! kz0   Used to calculate roughness length feedback

@@ -1,0 +1,76 @@
+#
+#
+# --- CLIMATE ---------------------------------------------------------
+#
+# solar constant
+# NOTE: modern S0 is 1368 W m-2
+#       for a ca. 720 Ma time-interval (Sturtian onset), S0 will be 1286.9
+#       for a ca. 635 Ma time-interval (Marinoan onset), S0 will be 1295.4
+ma_genie_solar_constant=1295.4
+# scaling for atmospheric CO2 radiative forcing, relative to 278 ppm
+ea_radfor_scl_co2=10.0
+#
+# --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
+#
+# No biology
+bg_par_bio_prodopt='NONE'
+#
+# --- ORGANIC MATTER EXPORT RATIOS ------------------------------------
+#
+#
+# --- INORGANIC MATTER EXPORT RATIOS ----------------------------------
+#
+#
+# --- REMINERALIZATION ------------------------------------------------
+#
+#
+# --- TRACE METALS ----------------------------------------------------
+#
+#
+# --- SEDIMENTS -------------------------------------------------------
+#
+#
+# --- WEATHERING ------------------------------------------------------
+#
+#
+# --- DATA SAVING -----------------------------------------------------
+#
+# date saving & reporting options
+bg_par_data_save_level=9
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=0
+# save frequency
+bg_par_infile_sig_name='save_timeseries_EVERY000100.dat'
+# representative NH latitude and season to sample orbital variation of insolation
+bg_par_t_sig_count_N=12
+bg_par_sig_j_N=17
+# SH latitude/season
+bg_par_t_sig_count_S=12
+bg_par_sig_j_S=2
+#
+# --- FORCINGS --------------------------------------------------------
+#
+# use internal wind-speed
+bg_ctrl_force_windspeed=.false.
+# add a geothermal heat flux (W m-2)
+bg_ctrl_force_GOLDSTEInTS=.TRUE.
+bg_par_Fgeothermal=100.0E-3
+# ORBITS!!!
+# Call orbit_radfor
+ea_38="y"
+# Specify the type of orbital forcing default (0), time-varying (1),
+alternative config (2)
+ea_39=1
+# Number of data points in orbits file
+ea_40=1001
+# Interval between data points in goldstein time steps
+ea_41=48000
+# filename for orbital parameters (must be in genie-embm/data/input)
+ea_42="orbits_La2004_1Myr.dat"
+#
+# --- MISC ------------------------------------------------------------
+#
+go_debug_init=.true.
+#
+# --- END ------------------------------------------------------
+#

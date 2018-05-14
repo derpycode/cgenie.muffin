@@ -1,0 +1,101 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.33
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GCM == foam (OK)
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+       - Axis info read.
+>   4. READING MASK & TOPO GRIDS ...
+       - Mask & topo info read.
+>   5. RE-GRIDING MASK ...
+       - Mask re-gridded.
+       * Original land area fraction    = 0.30089
+       * Re-gridded land area fraction  = 0.29398
+>   6. RE-GRIDING TOPOGRAPHY ...
+       - Topography re-gridded.
+>   7. FILTERING MASK ...
+       * found 1 water masses
+       * found 2 water masses
+       * found 3 water masses
+       * found 4 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.31019
+       * Final land area fraction   = 0.31019
+>   9. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  12. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       * Creating random runoff ...
+       - .k1 file saved
+>  13. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+       * found 5 land masses
+       * found 6 land masses
+       * found 7 land masses
+       * found 8 land masses
+>  14. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * total # true islands = 1
+ *** User intevention required @ (10,22) to resolve problem with island path (illegal tripple junction found).
+ *** User intevention required @ (11,22) to resolve problem with island path (illegal tripple junction found).
+ *** User intevention required @ (29,20) to resolve problem with island path (illegal tripple junction found).
+ *** User intevention required @ (30,20) to resolve problem with island path (illegal tripple junction found).
+       * Borders alteration procedure :
+         (1) left button to increase border #
+         (2) right button to decrease border # (0 == no border)
+         (3) middle button to finish
+         [exit (middle button) if unsure WTF]
+         -> Decreasing border # at (11, 22) to 0
+         -> Increasing border # at (12, 23) to 1
+         -> Decreasing border # at (30, 20) to 0
+         -> Increasing border # at (31, 21) to 1
+       * Borders alteration complete
+>  15. GENERATING .paths FILE ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (33,3)
+         -> SE corner :: Add additional path entry @ (33,2)
+         -> NE corner :: Skip path entry @ (36,2)
+         -> SE corner :: Add additional path entry @ (36,1)
+         -> NE corner :: Skip path entry @ (13,2)
+         -> SE corner :: Add additional path entry @ (13,1)
+       - .paths file saved
+>  16. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  17. CREATING WIND PRODUCTS ...
+       - Regridding wind stress (u) to GOLDSTEIN u-grid
+       - Regridding wind stress (v) to GOLDSTEIN u-grid
+       - Regridding wind stress (u) to GOLDSTEIN v-grid
+       - Regridding wind stress (v) to GOLDSTEIN v-grid
+       - Regridding wind velocity (u) to GOLDSTEIN c-grid
+       - Regridding wind velocity (v) to GOLDSTEIN c-grid
+       - Regridding wind speed to GOLDSTEIN c-grid
+       - Written tau u (u point) data to Y:\MODEL.muffin.paleo\muffingen\../OUTPUT\FM000_\FM000__taux_u.dat
+       - Written tau u (v point) data to Y:\MODEL.muffin.paleo\muffingen\../OUTPUT\FM000_\FM000__taux_v.dat
+       - Written tau v (u point) data to Y:\MODEL.muffin.paleo\muffingen\../OUTPUT\FM000_\FM000__tauy_u.dat
+       - Written tau v (v point) data to Y:\MODEL.muffin.paleo\muffingen\../OUTPUT\FM000_\FM000__tauy_v.dat
+       - Written u wind speed data to Y:\MODEL.muffin.paleo\muffingen\../OUTPUT\FM000_\FM000__u.dat
+       - Written v wind speed data to Y:\MODEL.muffin.paleo\muffingen\../OUTPUT\FM000_\FM000__v.dat
+       - Written BIOGEM windspeed data to Y:\MODEL.muffin.paleo\muffingen\../OUTPUT\FM000_\FM000__windspeed.dat
+       - Re-grided GCM wind products.
+>  18. LOADING ALBEDO DATA ...
+       - Read GCM albedo data.
+>  19. CREATING ALBEDO DATA ...
+       - Re-gridded GCM albedo data.
+       - Generated zonal mean albedo profile.
+       - .albd.dat file saved
+>  21. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

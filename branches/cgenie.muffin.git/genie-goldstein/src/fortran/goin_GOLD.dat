@@ -1,0 +1,22 @@
+/fake/inputdata
+/fake/outputdata
+100 100  1  100          npstp iwstp itstp ianav
+n                        new/continuing
+100                      timesteps per year
+20 20 0.90 2.00          temp0 temp1 rel scl_tau
+2000. 1e-4               ocean diffusivites iso/dia (or horiz/vert)
+2.5                      inverse minimum drag in days
+0. 0. 0.                 tatm relh0_ocean relh0_land
+tmp                      output file number
+tmp.avg                  input file name
+
+% AY (01/12/03) : 
+% The following lines have been removed/modified because of the
+% GOLDSTEIN, EMBM and sea-ice split
+100   5                  timesteps per year and A/O dt ratio
+5.0e6   1e6  1.0 0.1     atm. diff. amp. for T and q and dist'n width, slope
+0. 0. 0.4 0.4            atm. advection factors for T_z, T_m, q_z, q_m  
+1.0 0.0                  scl_co2 pc_co2_rise
+2000.                    sea-ice eddy diffusivity
+0. 0. 0.                 tatm relh0_ocean relh0_land
+-0.03 0.17 0.18          extra1a extra1b extra1c

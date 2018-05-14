@@ -1,0 +1,118 @@
+* var.cmn common block containing variables update 15/2/2
+* EMBM variables added 29/8/2 
+* v2 seasonality variable nyear added 3/6/3
+* non-essential variables removed nre 270204
+*
+* AY (23/09/04) : upgraded to handle sea-ice albedo
+
+! For GOLDSTEIN seaice
+#ifndef GOLDSTEINNLONS
+#define GOLDSTEINNLONS 36
+#endif
+#ifndef GOLDSTEINNLATS
+#define GOLDSTEINNLATS 36
+#endif
+#ifndef GOLDSTEINNLEVS
+#define GOLDSTEINNLEVS 8
+#endif
+
+      implicit none
+      integer maxi,maxj,maxk
+      parameter ( maxi = GOLDSTEINNLONS , maxj = GOLDSTEINNLATS ,
+     1        maxk = GOLDSTEINNLEVS)
+      integer imax,jmax,kmax,k1(0:maxi+1,0:maxj+1),nyear
+      common /sic_invars/imax,jmax,kmax,k1,nyear
+
+crma      real dtsic,dphi,dphi2,ds,ds2,u(2,0:maxi,0:maxj)
+      real dtsic,phi0,dphi,ds(maxj),dsv(1:maxj-1),rds2(2:maxj-1)
+     1 ,u(2,0:maxi,0:maxj)
+     1 ,s(0:maxj),c(0:maxj),sv(0:maxj), cv(0:maxj),t0
+crma      common /sic_vars/dtsic,dphi,dphi2,ds,ds2,u
+      common /sic_vars/dtsic,phi0,dphi,ds,dsv,rds2,u
+     1 ,s,c,sv,cv,t0
+c reciprocal and other variables to speed up fortran
+crma      real rc(0:maxj),rcv(0:maxj),rdphi,rds,cv2(0:maxj),rc2(0:maxj)
+      real rc(0:maxj),rcv(0:maxj),rdphi,rds(maxj),rdsv(1:maxj-1)
+     1 ,cv2(0:maxj),rc2(0:maxj)
+      common /sic_recips/rc,rcv,rdphi,rds,rdsv,cv2,rc2
+
+c  dimensional scale values
+      real usc,rsc,dsc,fsc,gsc,rh0sc,rhosc,cpsc,tsc,pi
+      common /sic_dimsc/usc,rsc,dsc,fsc,gsc,rh0sc,rhosc,cpsc,tsc,pi
+
+c AY (03/05/04) : grid cell area
+      real asurf(maxj)
+      common /sic_area/asurf
+
+c EMBM 
+c AY (23/09/04) : sea-ice albedo added (for restarts)
+      real varice(2,maxi,maxj),varice1(2,maxi,maxj)
+     1 ,tice(maxi,maxj),albice(maxi,maxj)
+     2 ,dtatm,ghs,rdtdim,ryear,dtha(2,maxi,maxj),rho0,hlf,rhoice
+     3 ,rho0sea,diffsic,hmin,rhoio,rhooi,rhmin
+     4 ,varicedy(2,maxi,maxj),variceth(2,maxi,maxj)                       ! yka211004
+     5 ,maxalbice,scale_oheat                     !used in plasim coupling only
+      common /sic_ebmvar/varice,varice1,tice,albice,dtatm,ghs,rdtdim
+     1 ,ryear,dtha,rho0,hlf,rhoice,rho0sea,diffsic,hmin,rhoio,rhooi
+     2 ,rhmin
+     3 ,varicedy,variceth                                                 ! yka101004
+     4 ,maxalbice,scale_oheat
+
+c AY (08/04/04) : days per year (necessary for GENIE)
+      real yearlen
+      common /sic_yearlen/yearlen
+
+c v2 seasonal diagnostics
+      real haavg(2,maxi,maxj),ticeavg(maxi,maxj),albiceavg(maxi,maxj),
+     1     dthaavg(2,maxi,maxj),
+     2     fxdelavg(maxi,maxj),fwdelavg(maxi,maxj)
+      common /sic_oscavg/haavg,ticeavg,albiceavg,dthaavg,
+     1     fxdelavg,fwdelavg
+
+c nre no mixed-type common blocks
+      integer nsteps, npstp, iwstp, itstp, iw, ianav
+      integer lenin, lenout, lenrst, iav
+
+      common /sicgint/nsteps, npstp, iwstp, itstp, iw, ianav
+     1     , lenin, lenout, lenrst, iav
+
+c AY (01/12/03) : input and output directory locations
+      character lout*3,indir_name*100,outdir_name*100
+      common /sicgchar/lout,indir_name,outdir_name
+
+c AY (23/07/04) : variables to convert FW fluxes mm/s <--> m/s
+      real m2mm, mm2m
+      common /sicfwconv/m2mm,mm2m
+
+c AY (22/03/04) : GENIE grid variables required in gold_seaice.F
+c                 for netCDF operations
+c AY (04/10/04) : moved from here to netcdf_grid.cmn
+c     real nclon1(maxi),nclat1(maxj),
+c    :     nclon2(maxi),nclat2(maxj),
+c    :     nclon3(maxi),nclat3(maxj)
+c     common /sic_grid/nclon1,nclat1,nclon2,nclat2,nclon3,nclat3
+
+c AY (04/10/04) : copying Dan's GOLDSTEIN changes
+c     Added by DJL for netcdf restarts
+      character filenetin*200,dirnetout*200,rstdir_name*200
+      logical lnetin,lnetout,lascout
+      integer iyear_rest,imonth_rest,ioffset_rest
+      real day_rest
+
+      common /sic_restarts/filenetin,dirnetout,
+     :     lnetin,lnetout,lascout,rstdir_name,
+     :     iyear_rest,imonth_rest,ioffset_rest,day_rest
+
+c     for goldseaice energy/water check:
+      integer conserv_per
+      common /conservcheck/conserv_per
+
+c AR (18/01/08) : run-time seasonality option; debugging options
+      logical dosc,impsic,debug_init,debug_end,debug_loop
+      common /sic_ctrl/dosc,impsic,debug_init,debug_end,debug_loop
+      
+c AR (19/12/12) : sea-ice dynamics parameter control:
+c                 fractional area threshold for blocking sea-ice advection
+c                 sea-ice thickness threshold for blocking sea-ice advection
+      real par_sica_thresh,par_sich_thresh
+      common /sic_dyn/par_sica_thresh,par_sich_thresh

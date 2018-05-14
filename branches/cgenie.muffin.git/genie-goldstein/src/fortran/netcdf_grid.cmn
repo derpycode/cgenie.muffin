@@ -1,0 +1,11 @@
+c AY (17/03/04) : GENIE grid variables required in goldstein.F for
+c                 netCDF operations
+c DJL moved from ocean.cmn to here.... 
+      real nclon1(maxi),nclat1(maxj),
+     :     nclon2(maxi),nclat2(maxj),
+     :     nclon3(maxi),nclat3(maxj),
+     :     ncdepth(maxk),ncdepth1(maxk+1)
+      common /ocngrid/nclon1,nclat1,nclon2,nclat2,nclon3,nclat3,
+     :     ncdepth,ncdepth1
+
+c

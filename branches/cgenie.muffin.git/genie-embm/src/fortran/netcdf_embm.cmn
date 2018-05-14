@@ -1,0 +1,14 @@
+c
+      integer nmaxdims,nall,nfiles
+      parameter(nmaxdims=4,nall=100,nfiles=2)
+c      integer nvar,ndim,natts(nall),nattsvar(nall)
+c     :        vdims(nall),vadims(nmaxdims,nall),
+c     :        ndims(nall)
+c      character dimname(nall)*200
+c     :          attdimname(2,nmaxdims,nall)*200,
+c     :          attvarname(2,nmaxdims,nall)*200
+c      character varname(nall)*200
+
+      integer nco(nfiles),iddimo(nall,nfiles),idvaro(nall,nfiles)
+      common/netcdfvars_embm/nco,iddimo,idvaro
+c
