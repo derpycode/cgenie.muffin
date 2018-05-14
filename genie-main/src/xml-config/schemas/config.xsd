@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Rupert Ford (Manchester Informatics Ltd.) -->
+<!--<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.genie.ac.uk" targetNamespace="http://www.genie.ac.uk" elementFormDefault="qualified">-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="job">
+		<xs:annotation>
+			<xs:documentation>GENIE configuration schema</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="vars" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="var" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="name" type="xs:string" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="config">
+					<xs:annotation>
+						<xs:documentation>specification of the models to use for this job</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="model" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="name" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="bfgref" type="xs:string" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="parameters">
+					<xs:annotation>
+						<xs:documentation>specification of any  parameter overides to use for this job</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element name="control">
+								<xs:complexType>
+									<xs:choice maxOccurs="unbounded">
+										<xs:element name="param">
+											<xs:complexType mixed="true">
+												<xs:choice minOccurs="0" maxOccurs="unbounded">
+													<xs:element name="sep"/>
+													<xs:element name="varref" type="xs:string"/>
+												</xs:choice>
+												<xs:attributeGroup ref="paramattr"/>
+												<xs:attribute name="comment" type="xs:string" use="optional"/>
+											</xs:complexType>
+										</xs:element>
+										<xs:element ref="paramArray"/>
+									</xs:choice>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="model" minOccurs="0">
+								<xs:complexType>
+									<xs:choice maxOccurs="unbounded">
+										<xs:element name="param">
+											<xs:complexType mixed="true">
+												<xs:choice minOccurs="0" maxOccurs="unbounded">
+													<xs:element name="sep"/>
+													<xs:element name="varref" type="xs:string"/>
+												</xs:choice>
+												<xs:attributeGroup ref="paramattr"/>
+												<xs:attribute name="comment" type="xs:string" use="optional"/>
+											</xs:complexType>
+										</xs:element>
+										<xs:element ref="paramArray"/>
+									</xs:choice>
+									<xs:attribute name="name" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="build" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>specification of any pre-processor overides to use for this job</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element name="make-arg">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="name" type="xs:string" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="macro">
+								<xs:complexType>
+									<xs:all>
+										<xs:element name="identifier" type="xs:string"/>
+										<xs:element name="replacement" type="xs:string" minOccurs="0"/>
+									</xs:all>
+									<xs:attribute name="handle" type="xs:string" use="required"/>
+									<xs:attribute name="status" type="statusType" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="testing" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="var" maxOccurs="unbounded">
+								<xs:complexType mixed="true">
+									<xs:choice minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="sep"/>
+										<xs:element name="varref" type="xs:string"/>
+									</xs:choice>
+									<xs:attributeGroup ref="paramattr"/>
+									<xs:attribute name="comment" type="xs:string" use="optional"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+			<xs:attribute name="author" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="description" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>generic description of parent element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:simpleType name="valueType">
+		<xs:annotation>
+			<xs:documentation>the type that a value may take</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="onoffType">
+		<xs:annotation>
+			<xs:documentation>enumerated on/off type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="on"/>
+			<xs:enumeration value="off"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="modelType">
+		<xs:annotation>
+			<xs:documentation>types of model that are supported</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="atmosphere"/>
+			<xs:enumeration value="ocean"/>
+			<xs:enumeration value="seaice"/>
+			<xs:enumeration value="icesheet"/>
+			<xs:enumeration value="land"/>
+			<xs:enumeration value="chem"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="optionType">
+		<xs:annotation>
+			<xs:documentation>types of pre-processor options that are supported</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="macro"/>
+			<xs:enumeration value="makearg"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="valuedatatypeType">
+		<xs:annotation>
+			<xs:documentation>datatypes that the 'value' element supports</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="boolean"/>
+			<xs:enumeration value="integer"/>
+			<xs:enumeration value="real"/>
+			<xs:enumeration value="string"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="paramArray">
+		<xs:annotation>
+			<xs:documentation>standard way to specify an array for namelist input</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="param">
+					<xs:complexType mixed="true">
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="sep"/>
+							<xs:element name="varref" type="xs:string"/>
+						</xs:choice>
+						<xs:attribute name="comment" type="xs:string" use="optional"/>
+						<xs:attribute name="index" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="comment" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="file">
+		<xs:annotation>
+			<xs:documentation>provides a specification of what namelists and namelist values to put in a file</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="namelist" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="value">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="valueType">
+					<xs:attribute name="datatype" type="valuedatatypeType" use="required"/>
+					<xs:attribute name="expand" type="xs:boolean" use="optional"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:attributeGroup name="paramattr" id="myid">
+		<xs:annotation>
+			<xs:documentation>provides the base set of attributes for a parameter element</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+	</xs:attributeGroup>
+	<xs:complexType name="mixedtest" mixed="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="sep"/>
+			<xs:element name="varref"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="statusType">
+		<xs:annotation>
+			<xs:documentation>status of macro</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="defined"/>
+			<xs:enumeration value="undefined"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

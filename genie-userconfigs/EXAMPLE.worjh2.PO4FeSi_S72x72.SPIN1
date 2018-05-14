@@ -1,0 +1,141 @@
+#
+#
+# --- CLIMATE -------------------------------------------------------
+#
+# set no climate feedback
+ea_36=n
+#
+# --- BIOLOGICAL NEW PRODUCTION -------------------------------------
+#
+# biological scheme ID string
+bg_par_bio_prodopt="bio_PFeSi"
+# biological uptake time-scales
+bg_par_bio_tau_sp=60.0
+bg_par_bio_tau_nsp=120.0
+# spsilon 30Si associated with opal formation [DEFAULT: -1.1]
+bg_par_d30Si_opal_epsilon=0.0
+#
+# --- ORGANIC MATTER EXPORT RATIOS ----------------------------------
+#
+# production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# --- INORGANIC MATTER EXPORT RATIOS --------------------------------
+#
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+bg_par_bio_red_POC_CaCO3=0.10
+# exponent for modifier of CaCO3:POC export ratio
+bg_par_bio_red_POC_CaCO3_pP=0.7440
+#
+# --- REMINERALIZATION ----------------------------------------------
+#
+# DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=1.0
+# initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=0.055
+# depth of remineralization or particulate organic matter
+bg_par_bio_remin_POC_eL1=589.9451
+# remineralization length #2 for POC
+bg_par_bio_remin_POC_eL2=1000000.0
+# initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.45
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1.8905e+003
+# remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+# OPAL
+bg_ctrl_bio_remin_opal_fixed=.false.
+bg_par_bio_remin_sinkingrate=125.0
+#
+# --- IRON ----------------------------------------------------------
+#
+# aeolian Fe solubility
+bg_par_det_Fe_sol=0.00291468
+#exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
+bg_par_det_Fe_sol_exp=0.500
+# modifier of the scavenging rate of dissolved Fe
+bg_par_scav_Fe_sf_POC=1.338130
+bg_par_scav_Fe_sf_CaCO3=0.000
+bg_par_scav_Fe_sf_opal=0.000
+bg_par_scav_Fe_sf_det=0.000
+# no scavenged regeneration
+bg_par_scav_fremin=0.0
+# return POFe
+bg_ctrl_bio_NO_fsedFe=.false.
+# Variable Fe:C
+bg_ctrl_bio_red_fixedFetoC=.false.
+# adjust pK'(FeL)
+bg_par_K_FeL_pP=11.0
+#(max) C/Fe organic matter ratio
+bg_par_bio_red_POFe_POC=250000.0
+#[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- power
+bg_par_bio_FetoC_pP=-0.4225
+#[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- scaling
+bg_par_bio_FetoC_K=103684.0
+#[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- constant
+bg_par_bio_FetoC_C=0.0
+#
+# --- TRACE METALS --------------------------------------------------
+#
+#
+# --- SEDIMENTS -----------------------------------------------------
+#
+# Sediment grid
+SEDGEMNLONSOPTS='$(DEFINE)SEDGEMNLONS=72'
+SEDGEMNLATSOPTS='$(DEFINE)SEDGEMNLATS=72'
+# sediment grid options
+sg_par_sed_Dmax_neritic=175.0
+sg_par_sed_topo_D_name="worjh2_topo.72x72"
+sg_par_sed_reef_mask_name="worjh2_reef_mask.72x72"
+sg_par_sedcore_save_mask_name="worjh2_save_mask.72x72"
+# sediment diagenesis options
+sg_par_sed_diagen_CaCO3opt="ridgwell2001lookup"
+sg_par_sed_diagen_opalopt="ridgwelletal2003lookup"
+sg_ctrl_sed_bioturb=.FALSE.
+sg_ctrl_sed_bioturb_Archer=.false.
+sg_par_n_sed_mix=20
+# set invarient surface bioturbation mixing rate
+sg_par_sed_mix_k_sur_max=0.15
+sg_par_sed_mix_k_sur_min=0.15
+# no additional detrital flux
+sg_par_sed_fdet=0.0
+# set CaCO3 precipitation
+sg_par_sed_CaCO3precip_sf=0.0
+sg_par_sed_CaCO3precip_exp=0.0
+sg_par_sed_reef_CaCO3precip_sf=0.0000
+sg_par_sed_reef_CaCO3precip_exp=1.0
+#
+# --- WEATHERING ----------------------------------------------------
+#
+# set a 'CLOSED' system
+bg_ctrl_force_sed_closedsystem=.true.
+# global (carbonate) weathering rate (mol Ca2+ yr-1)
+rg_par_weather_CaCO3=10.0E+12
+# d13C
+rg_par_weather_CaCO3_d13C=3.0
+#
+# --- DATA SAVING ---------------------------------------------------
+#
+# save frequency definitions
+bg_par_infile_slice_name='save_timeslice.dat'
+bg_par_infile_sig_name='save_sig.dat'
+# additional biogeochem time-slice iagnostics
+bg_ctrl_data_save_slice_diag=.true.
+bg_ctrl_data_save_sig_diag=.true.
+bg_ctrl_data_save_slice_misc=.true.
+# full frequency of run-time reporting
+bg_ctrl_debug_lvl0=.true.
+# adjust on-screen output
+ma_debug_loop=2
+#
+# --- FORCINGS ------------------------------------------------------
+#
+# specify forcings
+bg_ctrl_force_oldformat=.false.
+bg_par_forcing_name="worjh2_RpCO2_Rp13CO2_FeMahowald2006"
+bg_par_atm_force_scale_val_3=278.0E-06
+bg_par_atm_force_scale_val_4=-6.5
+#
+# --- MISC ----------------------------------------------------------
+#
+#

@@ -1,0 +1,130 @@
+
+ 01               02  03  04  05                                        06          07         08
+ \/               \/  \/  \/  \/                                        \/          \/         \/
+
+-START-OF-DATA-
+ temp             01  01  00  'temperature'                             'degrees C'  -9.999     99.999
+ sal              02  02  00  'salinity'                                'PSU'         0.0       99.999
+ DIC              03  03  01  'dissolved inorganic carbon (DIC)'        'mol kg-1'   -9.99E+2    9.99E-1
+ DIC_13C          04  03  11  'd13C of DIC'                             'o/oo'       -9.99E+2    9.99E+2
+ DIC_14C          05  03  12  'd14C of DIC'                             'o/oo'       -9.99E+5    9.99E+5
+ NO3              06  06  01  'dissolved nitrate (NO3)'                 'mol kg-1'   -9.99E+2    9.99E-1
+ NO3_15N          07  06  14  'd15N of NO3'                             'o/oo'       -9.99E+2    9.99E+2
+ PO4              08  08  01  'dissolved phosphate (PO4)'               'mol kg-1'   -9.99E+2    9.99E-1
+ O2               10  10  01  'dissolved oxygen (O2)'                   'mol kg-1'   -9.99E+2    9.99E-1
+ O2_18O           11  10  13  'd18O of O2'                              'o/oo'       -9.99E+2    9.99E+2
+ ALK              12  12  01  'alkalinity (ALK)'                        'mol kg-1'   -9.99E+2    9.99E-1
+ SiO2             13  13  01  'aqueous silicic acid (H4SiO4)'           'mol kg-1'   -9.99E+2    9.99E-1
+ SiO2_30Si        14  13  16  'd30Si of H4SiO4'                         'o/oo'       -9.99E+2    9.99E+2
+ DOM_C            15  15  01  'dissolved organic matter (DOM); carbon'  'mol kg-1'   -9.99E+2    9.99E-1
+ DOM_C_13C        16  15  11  'd13C of DOM-C'                           'o/oo'       -9.99E+2    9.99E+2
+ DOM_C_14C        17  15  12  'd14C of DOM-C'                           'o/oo'       -9.99E+5    9.99E+5
+ DOM_N            18  18  01  'dissolved organic matter; nitrogen'      'mol kg-1'   -9.99E+2    9.99E-1
+ DOM_N_15N        19  18  14  'd15N of DOM-N'                           'o/oo'       -9.99E+2    9.99E+2
+ DOM_P            20  20  01  'dissolved organic matter; phosphorous'   'mol kg-1'   -9.99E+2    9.99E-1
+ DOM_Cd           21  21  01  'dissolved organic matter; cadmium'       'mol kg-1'   -9.99E+2    9.99E-1
+ DOM_Cd_114Cd     52  21  17  'd114Cd of DOM-Cd'                        'mol kg-1'   -9.99E+2    9.99E+2
+ DOM_Fe           22  22  01  'dissolved organic matter; iron'          'mol kg-1'   -9.99E+2    9.99E-1
+ DOM_Fe_56Fe      81  22  22  'dissolved organic matter; iron'          'mol kg-1'   -9.99E+2    9.99E+2
+ DOM_I            94  94  01  'dissolved organic matter; iodine'        'mol kg-1'   -9.99E+2    9.99E-1
+ RDOM_C           67  67  01  'R-dissolved organic matter (RDOM); C'    'mol kg-1'   -9.99E+2    9.99E-1
+ RDOM_C_13C       68  67  11  'd13C of RDOM-C'                          'o/oo'       -9.99E+2    9.99E+2
+ RDOM_C_14C       69  67  12  'd14C of RDOM-C'                          'o/oo'       -9.99E+5    9.99E+5
+ RDOM_N           70  70  01  'R-dissolved organic matter; nitrogen'    'mol kg-1'   -9.99E+2    9.99E-1
+ RDOM_N_15N       71  70  14  'd15N of RDOM-N'                          'o/oo'       -9.99E+2    9.99E+2
+ RDOM_P           72  72  01  'R-dissolved organic matter; phosphorous' 'mol kg-1'   -9.99E+2    9.99E-1
+ RDOM_Cd          73  73  01  'R-dissolved organic matter; cadmium'     'mol kg-1'   -9.99E+2    9.99E-1
+ RDOM_Cd_114Cd    74  73  17  'd114Cd of RDOM-Cd'                       'mol kg-1'   -9.99E+2    9.99E+2
+ RDOM_Fe          75  75  01  'R-dissolved organic matter; iron'        'mol kg-1'   -9.99E+2    9.99E-1
+ RDOM_Fe_56Fe     82  75  22  'R-dissolved organic matter; iron'        'mol kg-1'   -9.99E+2    9.99E+2
+ RDOM_I           95  94  01  'R-dissolved organic matter; iodine'      'mol kg-1'   -9.99E+2    9.99E-1
+ CH4              25  25  01  'dissolved methane (CH4)'                 'mol kg-1'   -9.99E+2    9.99E-1
+ CH4_13C          26  25  11  'd13C of CH4'                             'o/oo'       -9.99E+2    9.99E+2
+ CH4_14C          27  25  12  'd14C of CH4'                             'o/oo'       -9.99E+5    9.99E+5
+ NH4              28  28  01  'dissolved ammonium (NH4)'                'mol kg-1'   -9.99E+2    9.99E-1
+ NH4_15N          29  28  14  'd15N of NH4'                             'mol kg-1'   -9.99E+2    9.99E+2
+ N2               30  30  01  'dissolved nitrogen (N2)'                 'mol kg-1'   -9.99E+2    9.99E-1
+ N2_15N           31  30  14  'd15N of N2'                              'o/oo'       -9.99E+2    9.99E+2
+ N2O              32  32  01  'dissolved nitrous oxide (N2O)'           'mol kg-1'   -9.99E+2    9.99E-1
+ N2O_15N          33  32  14  'd15N of N2O'                             'o/oo'       -9.99E+2    9.99E+2
+ NO2              79  79  01  'dissolved NO2 (NO2)'                     'mol kg-1'   -9.99E+2    9.99E-1
+ NO2_15N          80  80  14  'd15N of NO2'                             'o/oo'       -9.99E+2    9.99E+2
+ Cd               34  34  01  'dissolved cadmium (Cd)'                  'mol kg-1'   -9.99E+2    9.99E-1
+ Cd_114Cd         51  34  17  'd114Cd of Cd'                            'o/oo'       -9.99E+2    9.99E+2
+ Ca               35  35  01  'dissolved calcium (Ca)'                  'mol kg-1'   -9.99E+2    9.99E-1
+ Ca_44Ca          76  35  20  'd44Ca of Ca'                             'o/oo'       -9.99E+2    9.99E+2
+ B                36  36  01  'dissolved boron (B)'                     'mol kg-1'   -9.99E+2    9.99E-1
+ F                37  37  01  'dissolved florine (F)'                   'mol kg-1'   -9.99E+2    9.99E-1
+ SO4              38  38  01  'dissolved sulphate (SO4)'                'mol kg-1'   -9.99E+2    9.99E-1
+ SO4_34S          39  38  15  '32S of SO4'                              'o/oo'       -9.99E+2    9.99E+2
+ H2S              40  40  01  'dissolved hydrogen sulphide (H2S)'       'mol kg-1'   -9.99E+2    9.99E-1
+ H2S_34S          41  40  15  '32S of H2S'                              'o/oo'       -9.99E+2    9.99E+2
+ Mo               77  77  01  'dissolved Molybdenum (Mo)'               'mol kg-1'   -9.99E+2    9.99E-1
+ Mo_98Mo          78  77  21  '98Mo of Mo'                              'o/oo'       -9.99E+2    9.99E+2
+ 231Pa            43  43  01  '231Pa'                                   'mol kg-1'   -9.99E+2    9.99E-1
+ 230Th            44  44  01  '230Th'                                   'mol kg-1'   -9.99E+2    9.99E-1
+ CFC11            45  45  01  'dissolved CFC-11'                        'mol kg-1'   -9.99E+2    9.99E-1
+ CFC12            46  46  01  'dissolved CFC-12'                        'mol kg-1'   -9.99E+2    9.99E-1
+ SF6              47  47  01  'dissolved sulphur hexafloride (SF6)'     'mol kg-1'   -9.99E+2    9.99E-1
+ Mg               50  50  01  'dissolved Magnesium (Mg)'                'mol kg-1'   -9.99E+2    9.99E-1
+ Li               53  53  01  'dissolved Lithium (Li)'                  'mol kg-1'   -9.99E+2    9.99E-1
+ Li_7Li           54  53  18  '7Li of Li'                               'o/oo'       -9.99E+2    9.99E+2
+ Nd               55  55  01  'dissolved Neodymium (Nd)'                'mol kg-1'   -9.99E+2    9.99E-1
+ Nd_144Nd         56  55  19  '144Nd of Nd'                             'o/oo'       -9.99E+2    9.99E+2
+ colr             48  48  01  'RED numerical (color) tracer'            'n/a'        -9.99E+9    9.99E+9
+ colb             49  49  01  'BLUE numerical (color) tracer'           'n/a'        -9.99E+9    9.99E+9
+ col0             57  57  01  'numerical (color) tracer #0'             'n/a'        -9.99E+9    9.99E+9
+ col1             58  58  01  'numerical (color) tracer #1'             'n/a'        -9.99E+9    9.99E+9
+ col2             59  59  01  'numerical (color) tracer #2'             'n/a'        -9.99E+9    9.99E+9
+ col3             60  60  01  'numerical (color) tracer #3'             'n/a'        -9.99E+9    9.99E+9
+ col4             61  61  01  'numerical (color) tracer #4'             'n/a'        -9.99E+9    9.99E+9
+ col5             62  62  01  'numerical (color) tracer #5'             'n/a'        -9.99E+9    9.99E+9
+ col6             63  63  01  'numerical (color) tracer #6'             'n/a'        -9.99E+9    9.99E+9
+ col7             64  64  01  'numerical (color) tracer #7'             'n/a'        -9.99E+9    9.99E+9
+ col8             65  65  01  'numerical (color) tracer #8'             'n/a'        -9.99E+9    9.99E+9
+ col9             66  66  01  'numerical (color) tracer #9'             'n/a'        -9.99E+9    9.99E+9
+ Fe               09  09  01  'dissolved iron III (Fe)'                 'mol kg-1'   -9.99E+2    9.99E-1
+ Fe2              83  83  01  'dissolved iron II (Fe)'                  'mol kg-1'   -9.99E+2    9.99E-1
+ L                24  24  01  'free ligand (iron binding)'              'mol kg-1'   -9.99E+2    9.99E-1
+ L2               84  84  01  'free ligand #2 (iron binding)'           'mol kg-1'   -9.99E+2    9.99E-1
+ FeL              23  23  01  'ligand-bound Fe'                         'mol kg-1'   -9.99E+2    9.99E-1
+ FeL2             85  85  01  'ligand2-bound Fe'                        'mol kg-1'   -9.99E+2    9.99E-1
+ Fe_56Fe          86  09  22  '56Fe of dissolved iron III (Fe)'         'o/oo'       -9.99E+2    9.99E+2
+ Fe2_56Fe         87  83  22  '56Fe of dissolved iron II (Fe)'          'o/oo'       -9.99E+2    9.99E+2
+ FeL_56Fe         88  23  22  '56Fe of ligand-bound Fe'                 'o/oo'       -9.99E+2    9.99E+2
+ FeL2_56Fe        89  85  22  '56Fe of ligand2-bound Fe'                'o/oo'       -9.99E+2    9.99E+2
+ TDFe             90  90  01  'total dissolved Fe'                      'mol kg-1'   -9.99E+2    9.99E-1
+ TDFe_56Fe        91  90  22  '56Fe of total dissolved Fe'              'o/oo'       -9.99E+2    9.99E+2
+ TL               42  42  01  'total dissolved ligand'                  'mol kg-1'   -9.99E+2    9.99E-1
+ I                92  92  01  'iodide'                                  'mol kg-1'   -9.99E+2    9.99E-1
+ IO3              93  93  01  'iodate'                                  'mol kg-1'   -9.99E+2    9.99E-1
+ Ba               96  96  01  'dissolved barium (Ba)'                   'mol kg-1'   -9.99E+2    9.99E-1
+ Ba_138Ba         97  96  23  'd138Ba of Ba'                            'o/oo'       -9.99E+2    9.99E+2
+ Sr               98  98  01  'dissolved strontium (Sr)'                'mol kg-1'   -9.99E+2    9.99E-1
+ Sr_87Sr          99  98  24  '87Sr of Sr'                              'o/oo'       -9.99E+2    9.99E+2
+ Sr_88Sr         100  98  25  '88Sr of Sr'                              'o/oo'       -9.99E+2    9.99E+2
+ H2O             101 101  01  'water! (H2O)'                            'mol kg-1'   -9.99E+2    9.99E-1
+-END-OF-DATA-
+
+ /\               /\  /\  /\  /\                                        /\          /\         /\
+ 01               02  03  04  05                                        06          07         08
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: tracer variable name [MAXIMUM STRING LENGTH = 16 CHARACTERS]
+COLUMN #02: tracer variable identifier [DO NOT ADJUST]
+COLUMN #03: tracer variable dependencies [DO NOT ADJUST]
+COLUMN #04: tracer variable type [DO NOT ADJUST]
+COLUMN #05: tracer variable description [MAXIMUM STRING LENGTH = 128 CHARACTERS]
+COLUMN #06: tracer UNITS [MAXIMUM STRING LENGTH = 12 CHARACTERS]
+COLUMN #07: tracer min
+COLUMN #08: tracer max
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+
+
+
+
+

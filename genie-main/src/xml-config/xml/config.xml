@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job author="A. N. Other">
+        <vars>
+                <var name="RUNTIME_OUTDIR">..</var>
+                <var name="EXPID">genie_ig_fi_sl_dyex</var>
+                <var name="GLIMMER_MASTER_CONFIG"><varref>RUNTIME_ROOT</varref><sep/>genie-icesheet<sep/>data<sep/>override_config</var>
+        </vars>
+	<config>
+		<model name="igcm"/>
+		<model name="fixedocean"/>
+		<model name="slabseaice"/>
+		<model name="fixedchem"/>
+		<model name="glimmer"/>
+	</config>
+	<parameters>
+		<control>
+			<param name="koverall_total">86400</param>
+			<param name="gem_indir_name">this-is-the-new<sep/><varref>RUNTIME_ROOT</varref>string</param>
+                        <param name="outputdir_name">newvalue-control</param>
+		</control>
+		<model name="igcm">
+			<param name="ldaily">.false.</param>
+                        <param name="outputdir_name">newvalue-model</param>
+                        <param name="outputdir_name_igcmlandsurf"><varref>RUNTIME_OUTDIR</varref><sep/>igcm3</param>
+                        <paramArray name="snolook">
+                               <param index="1">0.234</param>
+                               <param index="8">0.234</param>
+                        </paramArray>
+                        <param name="tyblcnst">0.95</param>
+		</model>
+		<model name="slabseaice">
+			<param name="flag_fixedextent">.true.</param>
+		</model>
+<!--CWA - this is now a var
+                <model name="glimmer">
+                        <param name="config_file"><varref>RUNTIME_ROOT</varref><sep/>genie-icesheet<sep/>data<sep/>override_config</param>
+                </model>
+-->
+	</parameters>
+        <build>
+         <make-arg name="GENIEDP">TRUE</make-arg>
+         <macro handle="GENIENXOPTS" status="defined">
+           <identifier>GENIENX</identifier>
+           <replacement>48</replacement>
+         </macro>
+         <!--note that the macro below has a different handle but the value of the macro GENIENY is still changed after merge-->
+<!--
+         <macro handle="GENIENYASDF" status="defined">
+           <identifier>GENIENY</identifier>
+           <replacement>48</replacement>
+         </macro>
+-->
+        </build>
+        <testing>
+         <var name="KNOWNGOOD_NAME"><varref>EXPID</varref>_knowngood<sep/>blah.dat</var>
+        </testing>
+</job>

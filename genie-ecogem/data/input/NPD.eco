@@ -1,0 +1,33 @@
+
+ 01                 02    03
+ \/                 \/    \/
+
+-START-OF-DATA-
+ Phytoplankton    10.00   1
+-END-OF-DATA-
+
+ /\                 /\    /\
+ 01                 02    03
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: plankton functional type name
+COLUMN #02: plankton diameter (micrometers)
+COLUMN #03: number of randomised replicates
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+                                 Phytoplankton
+                                 Zooplankton
+                                 Mixotroph
+
+
+
+

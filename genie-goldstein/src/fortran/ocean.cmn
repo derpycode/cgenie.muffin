@@ -1,0 +1,316 @@
+*
+* var.cmn common block containing variables update 15/2/2       
+* EMBM variables added 29/8/2 
+* v2 seasonality variables nyear, maxnyr added 3/6/3
+*
+* AY (02/12/03) : removed EMBM variables, v2 seasonality retained
+* AY (16/12/03) : common block names altered to be ocean-specific
+*
+* RM (16/5/05) : edited for variable sin(lat) resolution (from NRE, 6/12/04)
+*
+! For GOLDSTEIN ocean
+#ifndef GOLDSTEINNLONS
+#define GOLDSTEINNLONS 36
+#endif
+#ifndef GOLDSTEINNLATS
+#define GOLDSTEINNLATS 36
+#endif
+#ifndef GOLDSTEINNLEVS
+#define GOLDSTEINNLEVS 8
+#endif
+#ifndef GOLDSTEINNTRACS
+#define GOLDSTEINNTRACS 2
+#endif
+#ifndef GOLDSTEINMAXISLES
+#define GOLDSTEINMAXISLES 10
+#endif
+
+      implicit none
+
+      integer maxi,maxj,maxk,maxl,mpxi,mpxj,maxisles,isles
+     1         ,mpi,maxnyr
+      parameter ( maxi = GOLDSTEINNLONS , maxj = GOLDSTEINNLATS ,
+     1        maxk = GOLDSTEINNLEVS , maxl = GOLDSTEINNTRACS)
+c      parameter ( maxi = GOLDSTEINNLONS , maxj = GOLDSTEINNLATS ,
+c     1        maxk = GOLDSTEINNLEVS , maxl = 2)
+      parameter (maxnyr=11520)
+c for streamfunction equation
+      parameter ( mpxi = maxi , mpxj = maxj+1 )
+c for islands
+      parameter ( maxisles = GOLDSTEINMAXISLES , mpi = 2*(maxi+maxj))
+      integer imax,jmax,kmax,lmax,ntot,intot,k1(0:maxi+1,0:maxj+1)
+     1 ,ku(2,maxi,maxj),mk(maxi+1,maxj),nyear
+      common /ocn_invars/imax,jmax,kmax,lmax,ntot,intot,k1,ku,mk,nyear
+      integer ips(maxj),ipf(maxj),ias(maxj),iaf(maxj),jsf
+      common /ocn_lego/ips,ipf,ias,iaf,jsf
+      integer lpisl(mpi,maxisles), ipisl(mpi,maxisles)
+     1  ,jpisl(mpi,maxisles),npi(maxisles)
+c     integer lpisl(mpi,isles+1), ipisl(mpi,isles+1), jpisl(mpi,isles+1)
+c    1 ,npi(isles+1)
+      common /ocn_islands/lpisl,ipisl,jpisl,npi,isles
+
+crma      real dt(maxk),dphi,dphi2,ds,ds2,dz(maxk),u(3,0:maxi,0:maxj,maxk)
+crma     1 ,ts(maxl,0:maxi+1,0:maxj+1,0:maxk+1),s(0:maxj),c(0:maxj)
+crma     2 ,dzu(2,maxk)
+crma      real dt(maxk),dphi,ds(maxj),dsv(1:maxj-1),rds2(1:maxj),dz(maxk)
+      real dt(maxk),phi0,dphi,ds(maxj),dsv(1:maxj-1),rds2(2:maxj-1),
+     1 dz(maxk),u(3,0:maxi,0:maxj,maxk),
+     2 ts(maxl,0:maxi+1,0:maxj+1,0:maxk+1),s(0:maxj),c(0:maxj),
+     2 dzu(2,maxk),tau(2,maxi,maxj),drag(2,maxi+1,maxj),
+     3 dztau(2,maxi,maxj),diff(2),ec(5)
+     4 ,cn,ratm(mpxi*mpxj,mpxi+1),ub(2,0:maxi+1,0:maxj)
+     5 ,rho(0:maxi+1,0:maxj+1,0:maxk)
+     6 ,ts1(maxl,0:maxi+1,0:maxj+1,0:maxk+1),sv(0:maxj)
+      real
+     6 cv(0:maxj),dza(maxk),dztav(2,maxi,maxj),gb(mpxi*mpxj)
+     7 ,gap(mpxi*mpxj,2*mpxi+3),ez0
+     8 ,cost(maxi,maxj),rh(3,0:maxi+1,0:maxj+1),gbold(mpxi*mpxj)
+     9 ,sda1,sdomg,dzz,tau0(maxi,maxj),dztav0(maxi,maxj)
+     1 ,tau1(maxi,maxj),dztav1(maxi,maxj),tsa0(maxj),t0
+     2 ,fw_hosing(maxi,maxj),rhosing(maxi,maxj),zro(maxk)
+     3 ,zw(0:maxk),dzg(maxk,maxk),z2dzg(maxk,maxk),rdzg(maxk,maxk)
+     4 ,fw_anom(maxi,maxj),fw_anom_rate(maxi,maxj)
+      real psi(0:maxi,0:maxj)
+crma      common /ocn_vars/dt,dphi,dphi2,ds,ds2,dz,u
+      common /ocn_vars/dt,dphi,ds,dsv,rds2,dz,u,phi0
+c    1 ,ts,t,s,c,dzu
+     1 ,ts,s,c,dzu
+     2 ,tau,drag,dztau
+     3 ,diff,ec
+     4 ,cn,ratm,ub
+     5 ,rho,ts1,sv,cv
+     6 ,dza,dztav,gb
+     7 ,gap,ez0
+     8 ,cost,rh,gbold
+     9 ,sda1,sdomg,dzz,tau0,dztav0
+     1 ,tau1,dztav1,tsa0,t0
+     2 ,fw_hosing,rhosing
+     3 ,zro,zw,dzg,z2dzg,rdzg
+     4 ,fw_anom,fw_anom_rate
+      common /ocn_holes/psi
+      real rel,u1(3,0:maxi,0:maxj,maxk)
+      common /ocn_relax/rel,u1
+c reciprocal and other variables to speed up fortran
+crma      real rc(0:maxj),rcv(0:maxj),rdphi,rds,cv2(0:maxj),rc2(0:maxj)
+crma     1 ,rtv(maxi,maxj),rtv3(maxi,maxj),rdz(maxk),rdza(maxk)
+crma      common /ocn_recips/rc,rcv,rdphi,rds,cv2,rc2,rtv,rtv3,rdz,rdza
+crma      real rc(0:maxj),rcv(1:maxj-1),rdphi,rds(maxj),rdsv(0:maxj-1)
+      real rc(0:maxj),rcv(1:maxj-1),rdphi,rds(maxj),rdsv(1:maxj-1)
+     & ,cv2(1:maxj-1)
+     1 ,rc2(0:maxj),rtv(maxi,maxj),rtv3(maxi,maxj),rdz(maxk),rdza(maxk)
+      common /recips/rc,rcv,rdphi,rds,rdsv,cv2,rc2,rtv,rtv3,rdz,rdza
+
+c topography and grid
+      character(len=8) gridnam
+      common /topog/gridnam
+
+c pressure integral arrays
+      real bp(maxi+1,maxj,maxk), sbp(maxi+1,maxj)
+      common /ocn_press/bp,sbp
+
+c diagnostics
+      real dmax
+      common /ocn_testvar/dmax
+      integer limps,icosd(maxi,maxj)
+      common /ocn_testint/limps,icosd
+
+c  dimensional scale values
+      real usc,rsc,dsc,fsc,gsc,rh0sc,rhosc,cpsc,tsc,pi
+      common /ocn_dimsc/usc,rsc,dsc,fsc,gsc,rh0sc,rhosc,cpsc,tsc,pi
+
+c AY (26/02/04) : OPSIT scaling factor
+      real opsisc
+      common /ocn_opsisc/opsisc
+
+c AY (29/11/04) : ASURF grid cell area
+      real asurf(maxj)
+      common /ocn_asurf/asurf
+
+c AY (08/04/04) : days per year (necessary for GENIE)
+      real yearlen
+      common /ocn_yearlen/yearlen
+
+c AY (05/05/04) : depth level for OPSIT min/max overturning
+      integer overdep
+      common /ocn_overdep/overdep
+
+c v2 seasonal diagnostics
+      real tsavg(maxl,0:maxi+1,0:maxj+1,0:maxk+1),
+     :     uavg(3,0:maxi,0:maxj,maxk),
+     :     rhoavg(0:maxi+1,0:maxj+1,0:maxk)
+      common /ocn_oscavg/tsavg,uavg,rhoavg
+c AY (02/04/04) : extra seasonal diagnostics for fluxes and winds
+      real fx0avg(5,maxi,maxj), fwavg(4,maxi,maxj),
+     :     windavg(4,maxi,maxj)
+      common /ocn_fluxavg/fx0avg, fwavg, windavg
+
+c AY (08/12/03) : reinstated flux scaling parameters
+      real rfluxsc, saln0, rpmesco, scf
+      common /ocn_fluxscale/rfluxsc,saln0,rpmesco,scf
+
+c variables formerly in main program
+
+      integer nsteps, npstp, iwstp, itstp, iw, ianav, istep0
+      integer lenin, lenout, iav
+
+      common /ocngint/nsteps, npstp, iwstp, itstp, iw, ianav, istep0
+     1     , lenin, lenout, iav
+
+c AY (01/12/03) : input and output directory locations
+
+      character lout*3,indir_name*200,outdir_name*200
+
+      common /ocngchar/lout,indir_name,outdir_name
+
+c AY (02/02/04) : names of data files for error calculation
+      character tdatafile*128, sdatafile*128, tdata_varname*25,
+     &       sdata_varname*25
+      real tdata_missing,tdata_scaling,tdata_offset
+      real sdata_missing,sdata_scaling,sdata_offset
+      logical tsinterp
+      common /ocnobsc/tdatafile,sdatafile,tdata_varname,
+     &       sdata_varname
+      common /ocnobsc2/tdata_missing,tdata_scaling,tdata_offset,
+     &       sdata_missing,sdata_scaling,sdata_offset
+      common /ocnobsc3/tsinterp
+
+      integer   lentdata, lensdata, lentvar, lensvar
+      common /ocnobsi/lentdata,lensdata,lentvar,lensvar
+
+      logical flat
+
+      common /ocnglog/flat
+
+      real psisl(0:maxi,0:maxj,maxisles)
+      real ubisl(2,0:maxi+1,0:maxj,maxisles)
+      real erisl(maxisles,maxisles+1)
+      real psibc(maxisles)
+c AY (23/01/04) : need this variable to store T and S between
+c	          iterations (otherwise these values are lost)
+      real ts_store(maxl,maxi,maxj,maxk)
+
+      common /ocngreal/psisl,ubisl,erisl,psibc,ts_store
+
+c AY (09/12/03) : reinstated climatological albedo array
+      real albcl(maxi,maxj)
+      common /ocnalb/albcl
+
+c AY (02/12/03) : EMBM diagnostics for v2
+c AY (02/12/03) : EMBM variables commented out
+
+c AY (17/06/04) : surflux routine dealing with GOLDSTEIN ocean and
+c	          sea-ice constructed (i.e. no EMBM).  consequently, 
+c                 we need GOLDSTEIN to include several variables 
+c                 previously handled by EMBM's surflux
+c
+      real cd, rhoair, cpa, rho0, rhoao, sigma, emo, hlv, hlf, hls, 
+     +     const1, const2, const3, const4, const5,
+     +     consic, zeroc, rhoice, rrholf, hmin, rhmin,
+     +     ch_ice, u_tau_ice, cpo_ice, rsictscsf, rhooi, tfreez,
+     +     albocn, gust, ene_tune
+      common /ocnsurflux/cd, rhoair, cpa, rho0, rhoao, sigma, emo,
+     +     hlv, hlf, hls, const1, const2, const3, const4, const5, 
+     +     consic, zeroc, rhoice, rrholf, hmin, rhmin,
+     +     ch_ice, u_tau_ice, cpo_ice, rsictscsf, rhooi, tfreez,
+     +     albocn, gust, ene_tune
+
+c AY (23/09/04) : no longer needed
+c AY (08/07/04) : to separate the ocean and sea-ice heat fluxes,
+c                 the surflux module needs to remember albedo from
+c                 the last time step - these arrays store this
+c     real alb_ocn(maxi,maxj), alb_sic(maxi,maxj), alb_avg(maxi,maxj),
+c    +     temp_avg(maxi,maxj)
+c     common /ocnsurf_alb/alb_ocn,alb_sic,alb_avg,temp_avg
+
+c RMA (3/5/06) : extra parameters for hosing
+      real hosing, hosing_trend
+      common /ocnhosing/ hosing, hosing_trend
+      integer nsteps_hosing
+      common /ocnhosingi/ nsteps_hosing
+
+c RMA (1/8/06) : optional convection scheme
+      integer iconv
+      common /iocnconv/ iconv
+
+c AY (23/07/04) : variables to convert FW fluxes mm/s <--> m/s
+      real m2mm, mm2m
+      common /ocnfwconv/m2mm,mm2m
+
+c AY (15/09/04) : Dan has moved these to netcdf_grid.cmn
+c AY (17/03/04) : GENIE grid variables required in goldstein.F for
+c                 netCDF operations
+c     real nclon1(maxi),nclat1(maxj),
+c    :     nclon2(maxi),nclat2(maxj),
+c    :     nclon3(maxi),nclat3(maxj),
+c    :     ncdepth(maxk),ncdepth1(maxk+1)
+c     common /ocngrid/nclon1,nclat1,nclon2,nclat2,nclon3,nclat3,
+c    :     ncdepth,ncdepth1
+
+c AY (02/09/04) : handled already
+c+DJL 31/8/2004
+
+c     Added by DJL for netcdf restarts
+      character filenetin*200,dirnetout*200,rstdir_name*200
+      logical lnetin,lnetout,lascout
+      integer iyear_rest,imonth_rest,ioffset_rest
+      real day_rest
+
+      common /netcdfrestarts/filenetin,dirnetout,
+     :     lnetin,lnetout,lascout,rstdir_name,
+     :     iyear_rest,imonth_rest,ioffset_rest,day_rest
+c-DJL 31/8/2004
+
+c     for goldstein energy/water check:
+      integer conserv_per
+      common /conservcheck/conserv_per
+
+c-DJL 1/6/2005
+c     for delay in goldstien energy and evap fluxes
+      real evap_save1(maxi,maxj)
+      real late_save1(maxi,maxj)
+      real sens_save1(maxi,maxj)
+      real evap_save2(maxi,maxj)
+      real late_save2(maxi,maxj)
+      real sens_save2(maxi,maxj)
+      common /savevars/evap_save1,late_save1,sens_save1,
+     :  evap_save2,late_save2,sens_save2
+
+c KICO for mixed layer calc
+      real mldpebuoy(maxi,maxj),mldpeconv(maxi,maxj),
+     1 mldpelayer1(maxi,maxj),mldketau(maxi,maxj),
+     2 mldemix(maxi,maxj),mldpebuoycoeff,
+     3 mldketaucoeff, mld(maxi,maxj), mlddec(maxk), mlddecd(maxk),
+     4 mldwindkedec
+      integer mldk(maxi,maxj)
+      integer imld
+      common /mldvars/ mldpebuoy,mldpeconv,mldpelayer1,
+     : mldketau,mldemix,mldpebuoycoeff,mldketaucoeff,
+     : mld,mlddec,mlddecd,mldwindkedec,mldk,imld
+
+c KICO for variable diapycnal diffusivity calc
+      real ediff0,ediffpow1,ediffpow2,ediffvar,
+     1 ediff1(maxi,maxj,maxk-1),diffmax(maxk),
+     2 diffv_test(maxi,maxj,maxk),
+     3 dzrho_test(maxi,maxj,maxk)
+      integer iediff,ediffpow2i
+      common /ediffvars/ ediff0,ediffpow1,ediffpow2,ediffvar,
+     : ediff1,diffmax,iediff,ediffpow2i,diffv_test,dzrho_test
+
+c KICO equation of state switch
+      integer ieos
+      common /eosvars/ ieos
+
+c KICO for isopycnal mixing
+      real ssmaxsurf,ssmaxdeep,ssmax(maxk-1)
+      common /isovars/ ssmaxsurf,ssmaxdeep,ssmax
+ 
+c AR (18/01/08) : run-time seasonality option
+c AR (13/06/08) : diagend CALL option
+c AR (14/11/02) : option to reset ocean T
+c AR (17/11/30) : option to diagnose (only) MLD
+
+      logical dosc,diso,ctrl_diagend,debug_init,debug_end,debug_loop,
+     1 rst_reset_T,ctrl_diagmld
+      common /goldstein_ctrl/dosc,diso,ctrl_diagend,
+     : debug_init,debug_end,debug_loop,
+     : rst_reset_T,ctrl_diagmld

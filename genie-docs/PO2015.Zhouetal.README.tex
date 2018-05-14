@@ -1,0 +1,122 @@
+% cGENIE README document
+
+% ---------------------------------------------------------------------------------------------------------------------------------
+% ---------------------------------------------------------------------------------------------------------------------------------
+
+\documentclass[10pt,twoside]{article}
+\usepackage[paper=a4paper,portrait=true,margin=2.5cm,ignorehead,footnotesep=1cm]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{paralist}
+\usepackage{caption}
+\usepackage{float}
+
+\linespread{1.1}
+\setlength{\pltopsep}{2.5pt}
+\setlength{\plparsep}{2.5pt}
+\setlength{\partopsep}{2.5pt}
+\setlength{\parskip}{2.5pt}
+
+\title{READ-ME for \textit{Zhou et al.} [2015]}
+\author{Andy Ridgwell}
+\date{\today}
+
+\begin{document}
+
+
+%=================================================================================================================================
+%=== BEGIN DOCUMENT ==============================================================================================================
+%=================================================================================================================================
+
+\maketitle
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- cGENIE READ-ME --------------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Blurb}
+
+Before you do anything, you'll need a subversion client of some sort in order to get hold of the code in the first place. You'll also need to have installed or linked to an appropriate FORTRAN compiler and netCDF library (built with the same FORTRAN compiler). The GNU FORTRAN compiler (gfort) \textbf{version 4.4.4} or later is recommended. The netCDF version needs to be \textbf{4.0} (more recent versions require a little work-around, not documented here ...)
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Downloading \& installation}
+
+There are three basic steps to getting the model going:
+
+\begin{compactenum}
+\item Firstly, you need to download the source code.
+\ From your home directory (or elsewhere, but several path variables will have to be edited -- see below), type:
+\vspace{-5pt}\begin{verbatim}
+svn co https://svn.ggy.bris.ac.uk/subversion/genie/tags/cgenie.Zhouetal2015 
+--username=genie-user cgenie.Zhouetal2015
+\end{verbatim}\vspace{-5pt}
+NOTE: All this must be typed continuously on ONE LINE, with a S P A C E before `\texttt{--username}', and before `\texttt{cgenie.Zhouetal2015}'.
+Unless you have logged onto the \texttt{svn} server before from your computing account, you be asked for a password -- it is \texttt{g3n1e-user}.
+
+\item Secondly, you will need to set a couple of environment variables -- the compiler name, netCDF library name, and netCDF path. These are specified in the file \texttt{user.mak} (\texttt{genie-main} directory). If the \textit{c}genie code tree (\texttt{cgenie.Zhouetal2015}) and output directory (\texttt{cgenie\_output}) are installed anywhere other than in your account HOME directory, paths specifying this will have to be edited in: \texttt{user.mak} and \texttt{user.sh} (\texttt{genie-main} directory). If using the \texttt{rungenie*.sh} experiment configuration/launching scripts, you'll also have to set the home directory  and change every occurrence of \texttt{cgenie.Zhouetal2015} to the model directory name you are using (if different).
+
+Installing the model code under the default directory name (\texttt{cgenie.Zhouetal2015}) in your \texttt{\$HOME} directory is hence by far the simplest and avoids incurring additional/unnecessary pain (configuration complexity) ...
+
+\item Lastly -- check that the code download was completely successful and the environmental variables have been correctly set. To do this -- change directory to \texttt{cgenie.Zhouetal2015/genie-main} and type:
+\vspace{-5pt}\begin{verbatim}
+make testbiogem
+\end{verbatim}\vspace{-5pt}
+This compiles a carbon cycle enabled configuration of \textit{c}GENIE and runs a short test, comparing the results against those of a pre-run experiment (also downloaded alongside the model source code). It serves to check that you have the software environment correctly configured. If you are unsuccessful here ... double-check the software and directory environment settings in \texttt{user.mak} (or \texttt{user.sh}) and for a netCDF error, check the value of the \texttt{NETCDF\_DIR} environment variable. (Refer to the User Manual for addition fault-finding tips.)
+
+Assuming success, before running any experiments, type:
+\vspace{-5pt}\begin{verbatim}
+make cleanall
+\end{verbatim}\vspace{-5pt}
+
+\end{compactenum}
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Running experiments}
+
+To run the experiments (from \texttt{\$HOME/cgenie.Zhouetal2015/genie-main}):
+
+\begin{itemize}
+
+\item For the pre-OAE2 state (x1 PO\(_{4}\) in the ocean, x2 atmospheric CO\(_{2}\)):
+
+\vspace{-5pt}\begin{verbatim}
+./runcgenie.sh cgenie_eb_go_gs_ac_bg_foam_CT_36x36x16_Ncycle 
+        MS/PO2015.Zhouetal CT93k_NT_1P2C 20000
+\end{verbatim}\vspace{-5pt}
+
+\item For the syn-OAE2 state ( (x2 PO\(_{4}\) in the ocean, x4 atmospheric CO\(_{2}\)):
+
+\vspace{-5pt}\begin{verbatim}
+./runcgenie.sh cgenie_eb_go_gs_ac_bg_foam_CT_36x36x16_Ncycle
+        MS/PO2015.Zhouetal CT93k_NT_2P4C 20000
+\end{verbatim}\vspace{-5pt}
+
+These experiments are exactly as used in \textit{Monteiro et al.} [2012].
+
+\end{itemize}
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Additional information}
+
+Refer to the \textit{c}GENIE \texttt{User\_manual} for more information regarding installing, running, and analyzing model output, and \textit{c}GENIE \texttt{Examples} for more information on this specific example. 
+\\Also highly recommended ... is in order to have a working appreciation of the structure of the model and output, plus the format of the model output and how to visualize it -- to read through:
+\small\vspace{-5pt}\begin{verbatim}
+http://www.seao2.info/cgenie/labs/EC4.2013/GEOGM1110andM1404.2013-14.cGENIE_LAB.0000.pdf
+\end{verbatim}\vspace{-5pt}\normalsize
+(which serves as a basic introduction to the model and how to use it).
+
+\noindent All these documents can be downloaded from the \href{http://www.seao2.info/mycgenie.html}{cGENIE website}.
+
+\noindent \textbf{Note that the currently available documentation no longer reflects the nomenclature of the model exactly as it was ca. 2012 (the date of the \textit{Monteiro et al.} OAE2 paper).}
+
+%=================================================================================================================================
+%=== END DOCUMENT ================================================================================================================
+%=================================================================================================================================
+
+\end{document}

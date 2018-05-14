@@ -1,0 +1,85 @@
+
+\documentclass[10pt,twoside]{article}
+\usepackage[paper=a4paper,portrait=true,margin=2.5cm,ignorehead,footnotesep=1cm]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{paralist}
+\usepackage{caption}
+\usepackage{float}
+
+\linespread{1.1}
+\setlength{\pltopsep}{2.5pt}
+\setlength{\plparsep}{2.5pt}
+\setlength{\partopsep}{2.5pt}
+\setlength{\parskip}{2.5pt}
+
+\title{GENIE Super-quick-start Guide}
+\author{Andy Ridgwell}
+\date{\today}
+
+\begin{document}
+
+
+
+%=================================================================================================================================
+%=== BEGIN DOCUMENT ==============================================================================================================
+%=================================================================================================================================
+
+\maketitle
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- Super-quick-start guide -----------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+
+\begin{compactenum}
+	
+	\item	To get a (read-only) copy of the most up-to-date state of the source code for GENIE; from your home directory (\texttt{\~{}}):
+  \vspace{-5.5pt}\begin{verbatim}
+  $ svn co http://source.ggy.bris.ac.uk/subversion/genie/trunk
+  --username=genie-user genie
+  \end{verbatim}\vspace{-16.5pt}
+  NOTE: All this must be typed continuously on ONE LINE, with a S P A C E before '\texttt{--username}', and before \texttt{genie}.
+	You will be asked for a password -- it is \texttt{g3n1e-user}.
+		
+	\item	Change directory to \texttt{\~{}/genie/genie-main} and type:
+  \vspace{-5.5pt}\begin{verbatim}
+  $ make
+  \end{verbatim}\vspace{-16.5pt}
+  This compiles the default configuration of GENIE. It serves to check that you have the software environment correctly configured. If you are unsuccessful here ... too bad. Try editing \texttt{user.mak} or \texttt{user.sh} which are located in \texttt{\~{}/genie/genie-main} and which set the environment.
+
+	\item	Next:
+  \vspace{-5.5pt}\begin{verbatim}
+  $ make assumedgood
+  \end{verbatim}\vspace{-16.5pt}
+  This creates a 'gold standard' set of experimental results for GENIE-2 (GENIE with the dynamical (ICGM) atmosphere), against which your version of GENIE-2 can subsequently be check to ensure that you have not broken it in any way.
+  
+	\item	There are a bunch of tests that check the integrity of the code and results, but you can assume that the version that you have installed has already been extensively checked and is good to go. (The tests are: \texttt{make test} -- short tests that check against your newly created 'assumed good' experimental results; \texttt{make testebgogs} -- the EMBM-based climate model; \texttt{make testbiogem} -- climate  model plus ocean biogeochemsitry (BIOGEM). Because the results of the EMBM-based climate model are not chaotic, these tests compare the result against a 'known good' set of results files that are held on SVN and installed along with the code in \texttt{\~{}/genie/genie-knowngood}.)
+  
+	\item	At this point, the science modules are currently compiled in a grid and/or number of tracers configuration that is unlikely to be what you want for running experiments. Clean up all the compiled GENIE modules, ready for re-compiling from the source code, by:
+  \vspace{-5.5pt}\begin{verbatim}
+  $ make cleanall
+  \end{verbatim}\vspace{-11pt}
+
+	\item	That is it as far as basic installation goes. Except to read the \textit{user manual} ;)
+	There is a script available that carries out some basic configuration tasks and packages up the results -- \texttt{old\_rungenie.sh}, which can be downloaded from \href{http://mygenie.seao2.org}{\texttt{mygenie.seao2.org}}. This file should be installed in your home (\~{}) directory, and \textbf{MUST} have executable permissions (\texttt{chmod u+x old\_rungenie.sh}).
+	Note that you run \texttt{old\_rungenie.sh} from your home directory, \textbf{NOT} \texttt{\~{}/genie/genie-main}.
+	For running GENIE-1 via the '\texttt{old\_rungenie.sh}' script, you must create the following directories:
+  \vspace{-5.5pt}\begin{verbatim}
+	~/genie_archive
+~/genie_forcings
+~/genie_log
+~/genie_userconfigs
+  \end{verbatim}\vspace{-11pt}
+
+	\item	(\textbf{OPTIONAL}) Refer to the GENIE \textit{tutorial} document, download the required \textit{user config} files and \textit{tracer forcing} configuration from \href{http://mygenie.seao2.org}{\texttt{mygenie.seao2.org}}, and try running an experiment.
+
+\end{compactenum}
+
+
+%=================================================================================================================================
+%=== END DOCUMENT ================================================================================================================
+%=================================================================================================================================
+
+\end{document}

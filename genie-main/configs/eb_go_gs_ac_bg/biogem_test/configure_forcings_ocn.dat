@@ -1,0 +1,72 @@
+
+ 01 02 03   04 05 06                                        07          08         09
+ \/ \/ \/   \/ \/ \/                                        \/          \/         \/
+
+-START-OF-DATA-
+ f  f  0.1  F  F  'temperature'                             'K'         260.0      360.0
+ f  f  0.1  f  t  'salinity'                                'PSU'         0.0       50.0
+ f  f  0.1  f  t  'dissolved inorganic carbon (DIC)'        'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd13C of DIC'                             'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'd14C of DIC'                             'o/oo'       -9.99E+5    9.99E+2
+ F  T  1.0  F  F  'dissolved nitrate (NO3)'                 'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd15N of NO3'                             'o/oo'       -9.99E+2    9.99E+2
+ f  t  0.1  f  t  'dissolved phosphate (PO4)'               'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved iron (Fe)'                     'mol kg-1'    0.00E+0    9.99E-1
+ f  t  0.5  F  F  'dissolved oxygen (O2)'                   'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd18O of O2'                              'o/oo'       -9.99E+2    9.99E+2
+ f  f  0.1  F  F  'alkalinity (ALK)'                        'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'aqueous silicic acid (H4SiO4)'           'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd30Si of H4SiO4'                         'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'dissolved organic matter (DOM); carbon'  'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd13C of DOM-C'                           'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'd14C of DOM-C'                           'o/oo'       -9.99E+5    9.99E+2
+ F  T  1.0  F  F  'dissolved organic matter; nitrogen'      'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd15N of DOM-N'                           'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'dissolved organic matter; phosphorous'   'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved organic matter; cadmium'       'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved organic matter; iron'          'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'ligand-bound Fe'                         'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'free ligand (iron binding)'              'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved methane (CH4)'                 'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd13C of CH4'                             'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'd14C of CH4'                             'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'dissolved ammonia (NH3)'                 'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd15N of NH3'                             'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved nitrogen (N2)'                 'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd15N of N2'                              'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'dissolved nitrous oxide (N2O)'           'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'd15N of N2O'                             'o/oo'       -9.99E+2    9.99E+2
+ f  T  1.0  F  F  'dissolved cadmium (Cd)'                  'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved calcium (Ca)'                  'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved boron (B)'                     'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved florine (F)'                   'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved sulphate (SO4)'                'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  '32S of SO4'                              'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'dissolved hydrogen sulphide (H2S)'       'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  '32S of H2S'                              'o/oo'       -9.99E+2    9.99E+2
+ F  T  1.0  F  F  'gemanium'                                'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  '231Pa'                                   'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  '230Th'                                   'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  f  F  'dissolved CFC-11'                        'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  f  F  'dissolved CFC-12'                        'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved sulphur hexafloride (SF6)'     'mol kg-1'    0.00E+0    9.99E-1
+ F  T  1.0  f  F  'RED numerical (color) tracer'            'n/a'         0.00E+0    9.99E-1
+ F  T  1.0  f  F  'BLUE numerical (color) tracer'           'n/a'         0.00E+0    9.99E-1
+ F  T  1.0  F  F  'dissolved Magnesium (Mg)'                'mol kg-1'    0.00E+0    9.99E-1
+-END-OF-DATA-
+
+ /\ /\ /\   /\ /\ /\                                        /\          /\         /\
+ 01 02 03   04 05 06                                        07          08         09
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: include restoring forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #02: restrict restoring forcing to surface? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #03: time constant of restoring forcing (years) [DATA FORMAT: real]
+COLUMN #04: include flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #05: scale flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #06: tracer variable description
+COLUMN #07: tracer UNITS
+COLUMN #08: tracer min
+COLUMN #09: tracer max

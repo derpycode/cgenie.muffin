@@ -1,0 +1,95 @@
+
+\documentclass[10pt,twoside]{article}
+\usepackage[paper=a4paper,portrait=true,margin=2.5cm,ignorehead,footnotesep=1cm]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{paralist}
+\usepackage{caption}
+\usepackage{float}
+
+\linespread{1.1}
+\setlength{\pltopsep}{2.5pt}
+\setlength{\plparsep}{2.5pt}
+\setlength{\partopsep}{2.5pt}
+\setlength{\parskip}{2.5pt}
+
+\title{cGENIE READ-ME}
+\author{Andy Ridgwell}
+\date{\today}
+
+\begin{document}
+
+
+%=================================================================================================================================
+%=== BEGIN DOCUMENT ==============================================================================================================
+%=================================================================================================================================
+
+\maketitle
+
+
+%=================================================================================================================================
+%=== CONTENTS ====================================================================================================================
+%=================================================================================================================================
+
+%\tableofcontents
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- cGENIE READ-ME --------------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+
+\subsection{Whats new in 'cGENIE'?}\label{Whats new in 'cGENIE'?}
+
+There are a number of relatively minor changes in the way that cGENIE is configured and run compared to previous versions of 'GENIE'. (Starting with the model and hence root model directory name change ...)
+
+\begin{compactenum}
+
+\item Firstly: some of the (rarely if ever used, or simply not working and/or redundant) science modules have been deleted. In particular -- the IGCM dynamical climate module has gone. This means that it is no longer necessary (nor even possible) to make the 'assumedgood' test results as part of the initial model installation procedure.
+
+\item The recommended way to run cGENIE is via \texttt{runcgenie.sh} -- a script that carries out the basic configuration tasks and packages up the results for you (similar to \texttt{old\_rungenie.sh} before. By default it has 96 time steps per year compared with a 100 previously. However, \textbf{note} that this script is configured for running on a specific computing cluster, and may require adapting to a different computing environment.
+\\ \texttt{runcgenie.sh}\footnote{Note the file \texttt{runcgenie.sh} \textbf{MUST} have executable permissions (you can add executable permissions by typing the command: \texttt{chmod u+x runcgenie.sh}).} is held under SVN and resides in the directory \texttt{\~{}/cgenie/genie-main}, from where experiments are run.
+ 
+\item The complete command line now looks like:
+\vspace{-5pt}\begin{verbatim}
+./runcgenie.sh cgenie_eb_go_gs_ac_bg.worjh2.BASEFe / 
+EXAMPLE_worjh2_PO4Fe_SPIN 10000
+\end{verbatim}\vspace{-5pt}
+  
+Note that no path is given for the \textit{user configs} other than `/' because cGENIE is expecting \texttt{\~{}/cgenie/genie-userconfigs} by default.
+\\(If you use a subdirectory of \texttt{\~{}/cgenie/genie-userconfigs} then you would specify the subdirectory name in place of `/', e.g.: \texttt{/paleo\_experiments}.)
+
+\item For running cGENIE via the `\texttt{runcgenie.sh}' script, you must also create the following two directories:
+\vspace{-5pt}\begin{verbatim}
+~/cgenie_archive
+~/cgenie_log
+\end{verbatim}\vspace{-5pt}
+(The \texttt{\~{}/cgenie\_output} directory is automatically created if you have run e.g. `\texttt{make testbiogem}' during model installation.)
+ 
+\item Previously, the forcing directory was set in the \textit{user config} file by the namelist parameter:
+\\ \texttt{bg\_par\_fordir\_name}. But now the forcing directory is set to \texttt{\~{}/cgenie/genie-forcings} as default and the namelist parameter: \texttt{bg\_par\_fordir\_name} needs not be set (to anything different).
+
+Instead, which forcing is used is set by the namelist parameter: \texttt{bg\_par\_forcing\_name}, e.g.:
+\vspace{-5pt}\begin{verbatim}
+bg_par_forcing_name=''worjh2_preindustrial_FeMahowald2006''
+\end{verbatim}\vspace{-0pt}
+
+\item  Submitting to the cluster.
+
+The same \texttt{runcgenie.sh} script can be used from \texttt{\~{}/cgenie/genie-main} to submit jobs to the cluster (taking the example of the 'kitten' queue (on the 'iwan' cluster)).
+        
+For example:
+\vspace{-5pt}\begin{verbatim}
+qsub -q cat.q -j y -o cgenie_log -S /bin/bash
+runcgenie.sh cgenie_eb_go_gs_ac_bg_itfclsd_16l_JH_BASEFe / 
+EXAMPLE_worjh2_PO4Fe_SPIN 50
+\end{verbatim}\vspace{-5pt}
+  
+\end{compactenum}
+
+
+%=================================================================================================================================
+%=== END DOCUMENT ================================================================================================================
+%=================================================================================================================================
+
+\end{document}

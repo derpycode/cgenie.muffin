@@ -1,0 +1,9 @@
+1                                   msimpleland 
+0.05                                Cveg_ini
+0.05                                Csoil_ini
+0                                   orogswitch (0=off 1=on)
+1                                   snowswitch (0=off 1=on)
+1                                   seasonswitch (0=ann. av. 1=seasonal fields)
+n                                   include emissions (y or n)
+0                                   Use(=1) or don't use(=0) a DIFFERENT land restart file
+/esdata/env/e306/genie_output/ebgogssl_5k/ents/spn.sland     DIFFERENT restart dump input file relative to executable location

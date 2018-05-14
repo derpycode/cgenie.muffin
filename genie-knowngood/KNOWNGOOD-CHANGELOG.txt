@@ -1,0 +1,23 @@
+
+! ******************************************************************************************************************************* !
+! KNOWNGOOD CHANGELOG
+! ******************************************************************************************************************************* !
+
+
+AJR/08/01/23	Replaced genie_eb_go_gs_ac_bg_knowngood due to:
+                (i) re-calculation of entire 3-D carbonate constant array in the saving of 3-D time-slices (subroutine: diag_biogem_timeslice)
+                (ii) change to re-calculation of surface carbonate constants being made every BIOGEM time-step (subroutine: biogem)
+
+AJR/08/04/17    Replaced genie_eb_go_gs_ac_bg_knowngood due to:
+                Change in atmospheric volume and conversion of mol <-> atm (ppm)
+
+
+SG/27/05/2K8    Added genie-ents knowngood file (genie_eb_go_gs_sl_knowngood)
+
+
+SG/10/05/2K8    Renamed genie_eb_go_gs_sl_knowngood to genie_eb_go_gs_el_knowngood
+
+
+
+SAM/27/01/2010  Replaced genie_eb_go_gs_el_knowngood/ents/ents_yearav_0000000020.nc with a new version. The new test now runs ENTS coupled to EMBM climate, rather than forced with external fields ('ents_offlineswitch' is set to 0), as well as with the orography adjustment of surface air temperatures turned on ('orogswitch' is set to 1).
+

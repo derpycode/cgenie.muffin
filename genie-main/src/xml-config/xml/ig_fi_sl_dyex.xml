@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job>
+	<config>
+		<model name="igcm"/>
+		<model name="fixedocean"/>
+		<model name="slabseaice"/>
+		<model name="fixedchem"/>
+		<model name="fixed_icesheet"/>
+	</config>
+	<parameters>
+		<control>
+			<param name="koverall_total">86400</param>
+		</control>
+		<model name="igcm">
+			<param name="ldaily">.false.</param>
+		</model>
+		<model name="slabseaice">
+			<param name="flag_fixedextent">.true.</param>
+		</model>
+	</parameters>
+</job>

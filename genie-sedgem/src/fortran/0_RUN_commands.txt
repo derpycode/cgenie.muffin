@@ -1,0 +1,8 @@
+
+################### 07.11.2016
+
+# 1) RUN PEAK OAE2 - with O2 restoring and weathering - now with SO4, H2S enabled (was off at 05.11.); k1 = 0.1, k2 = 0.01 - job 8142 
+qsub -j y -o cgenie_output -V -S /bin/bash runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0093k.BASESFePOM-S DOM/06_OAE2_OMEN-SED EXAMPLE06_Riverside1116.p0093k-OMEN-SED.PO4Fe_S36x36.2P4CO2_weathering_O2restore_0711_higherk 5000 EXAMPL06_p0093k_S36x36.SPIN_2P4CO2_REF
+
+3 2) as 1) - but  with k1 = 0.01, k2 = 0.0001 -  job 8143 
+qsub -j y -o cgenie_output -V -S /bin/bash runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0093k.BASESFePOM-S DOM/06_OAE2_OMEN-SED EXAMPLE06_Riverside1116.p0093k-OMEN-SED.PO4Fe_S36x36.2P4CO2_weathering_O2restore_0711 5000 EXAMPL06_p0093k_S36x36.SPIN_2P4CO2_REF

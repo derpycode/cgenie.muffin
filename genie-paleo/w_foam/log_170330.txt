@@ -1,0 +1,83 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.2.
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       GENIE grid will be loaded directly from k1 or mask text file: w_foam
+>   2. CREATING GENIE GRID ...
+>   3. READ AXES INFORMATION ...
+       (Nothing to load.)
+>   4. READ MASK & TOPO GRIDS ...
+>   5. RE-GRID MASK ...
+       Nothing to re-grid (k1/mask file already loaded).
+>   6. RE-GRID TOPOGRAPHY ...
+       - Nothing to re-grid -- converting k1 file data.
+>   8. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button to finish
+       * Mask alteration complete
+       * Revised land area fraction = 0.14043
+       * Final land area fraction   = 0.14043
+>   9. RE-GRID OCEAN BATHYMETRY ...
+       Nothing to re-grid (k1 file loaded).
+>  11. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button to finish
+       * Topography alteration complete
+>  12. CALCULATE RUN-OFF AND GENERATE .k1 FILE ...
+       * Creating random runoff ...
+       - .k1 saved
+>  13. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+>  14. UPDATE ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * updated find: 3 islands
+       * updated find: 4 islands
+       * updated find: N pole island (currently uncounted)
+       * updated find: S pole island (currently uncounted)
+       * total # true islands = 5
+       * Borders alteration procedure :
+         (1) left button to increase border #
+         (2) right button to decrease border # (0 == no border)
+         (3) middle button to finish
+         [exit (middle button) if unsure WTF]
+       * Borders alteration complete
+>  15. GENERATE .paths FILE ...
+       ! Initial E direction path follow step failed ...
+         ... trying the S direction ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (17,27)
+         -> SE corner :: Add additional path entry @ (9,17)
+       * Building path #3 ...
+         -> NE corner :: Skip path entry @ (25,24)
+         -> SE corner :: Add additional path entry @ (18,13)
+       * Building path #4 ...
+         -> NE corner :: Skip path entry @ (9,33)
+         -> SE corner :: Add additional path entry @ (5,28)
+         -> NE corner :: Skip path entry @ (8,28)
+         -> SE corner :: Add additional path entry @ (2,20)
+       * Building path #5 ...
+       * Building path #6 ...
+       - .paths saved
+>  16. GENERATE .psiles FILE ...
+       - .psiles saved
+>  17. GENERATE ZONAL WIND PRODUCTS ...
+   START [make_grid_winds] >>>
+   <<< END [make_grid_winds]
+>  21. GENERATE CONFIG PARAMETER LINES ...
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

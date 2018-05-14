@@ -1,0 +1,206 @@
+C var_ents.cmn
+C Common blocks for ENTS
+C
+#ifndef GOLDSTEINNLONS
+#define GOLDSTEINNLONS 36
+#endif
+#ifndef GOLDSTEINNLATS
+#define GOLDSTEINNLATS 36
+#endif
+
+      integer maxients,maxjents
+      parameter ( maxients = GOLDSTEINNLONS , maxjents = GOLDSTEINNLATS)
+c      parameter ( imax = GOLDSTEINNLONS , jmax = GOLDSTEINNLATS)
+c      integer dum_k1(maxi,maxj),dum_kmax,dum_nyear
+c      common /ocn_grid/maxients,maxjents,maxnyrents
+
+
+cmsw Tunable Constants 
+      REAL
+     & k0,
+     & k7,
+     & k8,
+     & k9,
+     & k10,
+     & k11,    
+     & k11a,                 
+     & k12,  
+     & k13,                     
+     & k14,                     
+     & k16,
+     & k17,                     
+     & k18,  
+     & k20,
+     & k21,
+     & k24,
+     & k26,
+     & k29,
+     & k31,
+     & k32,
+     & kz0,
+     & rk19,
+     & rk25,
+     & rk30,
+     & q10,
+     & mu,
+     & rmu,
+     & topt,
+     & copt,
+     & tzero
+
+cmsw 'Proper' constants
+
+      REAL
+     & k_a,                     ! number of moles of molecules in the atm
+     & gtm,                     ! Conversion const. (GtC to moles C)
+     & gtk,                     ! Conversion const. (GtC to kgC)
+     & rgtm,                    ! Conversion const. (moles C to GtC)
+     & rgtk,                    ! Conversion const. (kgC to GtC)
+     & mtp,                     ! ppmv to ppv
+     & rmtp,                    ! ppv to ppmv
+     & asurfrea,                ! gridbox area (m2)
+     & rasurf,                  ! reciprocal of above
+     & rsyr,                     ! reciprocal of secs/yr
+     & dtland                   ! time (seconds) of each land timestep
+
+cmsw Model specific constants
+
+      INTEGER
+     & land_pts_ents,           ! number of land points
+     & msimpleland              ! how often simple land called (units of istep)
+
+      PARAMETER ( land_pts_ents=362 )
+      PARAMETER ( tzero=273.15 )
+
+
+      COMMON /landconsts_real/k0,k7,k8,k9,k10,k11,k11a,k12,k13,k14
+     & ,k16,k17,k18,k20,k21,k24
+     & ,k26,k29,k31,k32,kz0
+     & ,rk25,rk19,rk30,mu,rmu,topt,copt
+     & ,k_a,gtm,rgtm,mtp,rmtp,asurfrea,rasurf,rsyr
+     & ,q10,gtk,rgtk,dtland
+
+      COMMON /landconsts_int/msimpleland
+
+cmsw carbon reservoirs
+   
+      REAL 
+     & Cveg(maxients,maxjents),        ! Veg carbon reservoir present (kgC/m2)
+     & Csoil(maxients,maxjents),       ! Soil carbon reservoir present (kgC/m2)
+     & fv(maxients,maxjents),          ! Fractional vegetation cover (/gridbox)
+     & epsv(maxients,maxjents),        ! Vegetation shelf shading fraction (/gridbox)
+     & pco2ld                  ! atmospheric pCO2 (ppmv)
+      
+      COMMON /landCreservoirs/ Cveg,Csoil,fv,epsv,
+     & pco2ld
+
+      REAL
+     & leaf(maxients,maxjents),         ! leaf litter (kgC/m2/yr) 
+     & respveg(maxients,maxjents),      ! vegetation respiration (kgC/m2/yr)
+     & respsoil(maxients,maxjents),     ! soil respiration (kgC/m2/yr) 
+     & photo(maxients,maxjents)         ! photosynthesis (kgC/m2/yr)
+
+      COMMON /components/ leaf,respveg,respsoil,photo
+
+cmsw Arrays used to calculate .sland.avg files
+cmsw Used in annav_diags (these arrays only used 
+cmsw to calculate .avg files)
+
+      REAL
+     & sphoto(maxients,maxjents),      ! summed photosynth  
+     & srveg(maxients,maxjents),       ! summed veg resp 
+     & sleaf(maxients,maxjents),       ! summed leaf litter 
+     & srsoil(maxients,maxjents),      ! summed soil resp 
+     & sCveg1(maxients,maxjents),      ! summed veg carbon 
+     & sCsoil1(maxients,maxjents),     ! summed soil carbon 
+     & sfv1(maxients,maxjents),        ! summed veg fraction 
+     & sepsv1(maxients,maxjents),      ! summed self shading 
+     & pco2ld_tot,             ! for use in timeseries summing
+     & tot_mass_ocn_c,         ! for use in timeseries summing
+     & stqld(2,maxients,maxjents),     ! summed land temp (1) and water (2)
+     & sfx0a(maxients,maxjents),       ! summed flux into atmosphere over land
+     & sfx0o(maxients,maxjents),       ! summed flux into land
+     & sfxsens(maxients,maxjents),     ! summed sensible heat flux over land
+     & sfxlw(maxients,maxjents),       ! summed net longwave heat flux over land
+     & sevap(maxients,maxjents),       ! summed evapotranspiration over land
+     & spptn(maxients,maxjents),       ! summed pptn over land
+     & srelh(maxients,maxjents),       ! summed relative humidity over land
+     & sbcap(maxients,maxjents),       ! summed soil field capacity
+     & salbs(maxients,maxjents),       ! summed albedo over land
+     & ssnow(maxients,maxjents),       ! summed snow over land
+     & sz0(maxients,maxjents)          ! summed roughness length over land
+
+      COMMON /avgarrays/ sphoto,srveg,sleaf,srsoil,
+     & sCveg1,sCsoil1,sfv1,sepsv1,pco2ld_tot,tot_mass_ocn_c,
+     & stqld,sfx0a,sfx0o,sfxsens,sfxlw,
+     & sevap,spptn,srelh,sbcap,salbs,ssnow,sz0
+
+cmsw Land radiation and hydrology arrays
+
+      REAL
+     &  tqld(2,maxients,maxjents)          ! land temp(1) oC and bucket fullness(2) m
+     & ,tqldavg(2,maxients,maxjents)       ! avg version of above
+     & ,bcap(maxients,maxjents)            ! bucket capacity m
+     & ,bcapavg(maxients,maxjents)         ! avg bucket capacity (m)
+     & ,fxavg(7,maxients,maxjents)         ! avg heat fluxes (W/m2)/timescale avg over
+     & ,snowavg(maxients,maxjents)         ! avg fractional snow cover
+     & ,z0avg(maxients,maxjents)           ! avg roughness length (m)
+     & ,albedol                    ! land albedo
+     & ,albsavg(maxients,maxjents)         ! average surface albedo
+     & ,dtdim                      ! length of ocean timestep (s)
+     & ,z0(maxients,maxjents)              ! roughness length (m) 
+     & ,lambda                     ! decay timescale for new pptn scheme
+     & ,asnow                      ! snow albedo
+     & ,asnowv                     ! snow with veg present albedo
+     & ,aveg                       ! vegetation albedo
+     & ,apeat                      ! peat albedo
+     & ,asand                      ! sand albedo
+c     & ,albo(maxjents,maxnyrents)          ! ocean albedo
+c     & ,palb(maxients,maxjents)            ! planetary albedo
+c     & ,palbavg(maxients,maxjents)         ! average planetary albedo
+     & ,evapavg(maxients,maxjents)         ! average evapotranspiration (m/s)
+     & ,pptnavg(maxients,maxjents)         ! average pptn (m/s)
+     & ,runavg(maxients,maxjents)          ! average runoff (m/s)
+     & ,gmairttot                  ! summed global mean temperature
+     & ,fvfv(maxients,maxjents)            ! vegetation fraction for fixed vegetation
+
+      COMMON /entsrad/
+     & tqld,tqldavg,bcap,bcapavg,fxavg,snowavg,z0avg,
+     & albedol,dtdim,z0,lambda,
+     & asnow,asnowv,
+     & albsavg,aveg,apeat,asand,
+c     & albsavg,aveg,apeat,asand,albo,palb,palbavg,
+     & evapavg,
+     & pptnavg,runavg,gmairttot,
+     & fvfv
+
+cmsw Switches and datasets
+
+      REAL
+     &  rhoref                    ! reference average ocean density for sea-level change
+     & ,glairts                   ! summed air temp over Greenland
+     & ,glairt                    ! annual average air temp over Greenland
+     & ,isslold                   ! last year's sealevel change from Greenland melt
+     & ,issl                      ! sealevel change from Greenland melt
+     & ,glmelt                    ! annual mean runoff from Greenland melt (m/s)
+     & ,isslfwf                   ! Same as issl if FW added to ocean
+     & ,glairtini                 ! initial air temperature over Greenland
+
+      INTEGER
+     &  snowswitch            ! turns on/off snow albedo feedbacks on climate
+     & ,icemeltfwfswitch      ! turns on/off Greenland FW melt added to ocean
+
+      CHARACTER
+     & include_emissions      ! y/n for emissions to be included or not 
+
+      COMMON /other/
+     &  rhoref,glairts,glairt,isslold
+     & ,issl,glmelt,isslfwf,glairtini
+
+      COMMON /switches/snowswitch
+c    & ,offlineswitch,seasonswitch,icemeltfwfswitch,imth
+     & ,icemeltfwfswitch
+
+      COMMON /emiss_ch/include_emissions
+
+cvs-sg Variables moved from cgoldstein

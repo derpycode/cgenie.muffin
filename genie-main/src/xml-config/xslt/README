@@ -1,0 +1,14 @@
+This dir contains the schemas developed in Bristol for the default/vanilla/definition file
+(GENIE_definition.xsd) and config/user files (GENIE_config.xsd).
+There is also an XSLT file for merging instances of these two filetypes along with 
+example instance documents. The tmp.xml file is an example of the merged output.
+
+To perform the merge, e.g.:
+xsltproc -stringparam user_xml genie_example_config.xml merge.xsl genie_example_def.xml
+
+To validate instance documents, e.g.:
+xmllint --noout --schema GENIE_definition.xsd genie_example_def.xml
+
+xsltproc is part of libxslt and xmllint is part of libxml; see xmlsoft.org.
+It may be possible to bundle these utilities with genie...?
+Another handy utility is xmlindent: xmlindent.sourceforge.net.

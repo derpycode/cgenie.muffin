@@ -1,0 +1,391 @@
+*
+* var.cmn common block containing variables update 15/2/2       
+* EMBM variables added 29/8/2 
+* v2 seasonality variables nyear, maxnyr added 3/6/3
+*
+#ifndef GOLDSTEINNLONS
+#define GOLDSTEINNLONS 36
+#endif
+#ifndef GOLDSTEINNLATS
+#define GOLDSTEINNLATS 36
+#endif
+#ifndef GOLDSTEINNLEVS
+#define GOLDSTEINNLEVS 8
+#endif
+
+      implicit none
+c     integer mpi, mpxi, mpxj
+      integer maxi,maxj,maxk,maxl,maxnyr
+      parameter ( maxi = GOLDSTEINNLONS , maxj = GOLDSTEINNLATS ,
+     1        maxk = GOLDSTEINNLEVS , maxl = 2)
+      parameter (maxnyr=400)
+      integer imax,jmax,kmax,lmax,ntot,intot,k1(0:maxi+1,0:maxj+1)
+     1 ,ku(2,maxi,maxj),mk(maxi+1,maxj),nyear
+      common /embm_invars/imax,jmax,kmax,lmax,ntot,intot,k1,ku,mk,nyear
+
+crma      real dt(maxk),dphi,dphi2,ds,ds2,dz(maxk)
+      real dt(maxk),phi0,dphi,ds(maxj),dsv(1:maxj-1),rds2(2:maxj-1),
+     1 dz(maxk),time,s(0:maxj),c(0:maxj),dzu(2,maxk)
+     2 ,tau(2,maxi,maxj),drag(2,maxi+1,maxj),dztau(2,maxi,maxj)
+     3 ,diff(2),ec(4)
+     6 ,sv(0:maxj)
+      real
+     6 cv(0:maxj),dza(maxk),dztav(2,maxi,maxj),ez0
+     9 ,sda1,sdomg,dzz,tau0(maxi,maxj),dztav0(maxi,maxj)
+     1 ,tau1(maxi,maxj),dztav1(maxi,maxj),tsa0(maxj),t0
+crma      common /embm_vars/dt,dphi,dphi2,ds,ds2,dz
+      common /embm_vars/dt,phi0,dphi,ds,dsv,rds2,dz
+     1 ,time,s,c,dzu
+     2 ,tau,drag,dztau
+     3 ,diff,ec
+     4 ,sv,cv
+     5 ,dza,dztav,ez0
+     6 ,sda1,sdomg,dzz,tau0,dztav0
+     7 ,tau1,dztav1,tsa0,t0
+c reciprocal and other variables to speed up fortran
+crma      real rc(0:maxj),rcv(0:maxj),rdphi,rds,cv2(0:maxj),rc2(0:maxj)
+crma     1 ,rtv(maxi,maxj),rtv3(maxi,maxj),rdz(maxk),rdza(maxk)
+crma      common /embm_recips/rc,rcv,rdphi,rds,cv2,rc2,rtv,rtv3,rdz,rdza
+      real rc(0:maxj),rcv(1:maxj-1),rdphi,rds(maxj),rdsv(1:maxj-1)
+     1 ,cv2(1:maxj-1)
+     2 ,rc2(0:maxj),rtv(maxi,maxj),rtv3(maxi,maxj),rdz(maxk),rdza(maxk)
+      common /embm_recips/rc,rcv,rdphi,rds,rdsv,cv2,rc2,rtv,rtv3,rdz
+     1 ,rdza
+
+c AY (19/12/03) : dztau and dztav are used in c-GOLDSTEIN to hold the
+c	          d(tau)/dz fields at, respectively, the u and v points
+c                 of the grid.  Values are read into these variables
+c                 from data files and then scaled.  x and y wind
+c	          stresses, variable tau, are then calculated.  In the
+c	          genie.f version of GOLDSTEIN it appears necessary
+c	          for GOLDSTEIN to receive dztau and dztav as well as
+c	          tau, so unscaled fields of dztau and dztav are
+c	          passed between modules.  In the case of the EMBM
+c	          and surflux, this means that the unscaled fields
+c	          need a separate identity to the scaled fields, hence
+c	          these new variable names
+      real us_dztau(2, maxi, maxj), us_dztav(2, maxi, maxj)
+      common /embm_dztau/us_dztau,us_dztav
+
+c  dimensional scale values
+      real usc,rsc,dsc,fsc,gsc,rh0sc,rhosc,cpsc,tsc,pi
+      common /embm_dimsc/usc,rsc,dsc,fsc,gsc,rh0sc,rhosc,cpsc,tsc,pi
+
+c RMA (30/09/05) : grid cell area
+      real asurf(maxj)
+      common /sic_area/asurf
+
+c EMBM 
+      integer igrid, ndta
+      common /embm_inebm/igrid, ndta
+      real cd,tq(2,maxi,maxj),tq1(2,maxi,maxj)
+     1 ,qsata(maxi,maxj),qsato(maxi,maxj)
+     2 ,co2(maxi,maxj),ch4(maxi,maxj),n2o(maxi,maxj)
+     3 ,varice(2,maxi,maxj),varice1(2,maxi,maxj),dtatm
+     4 ,tqa(2,maxi,maxj),solfor(maxj,maxnyr),ghs,rdtdim,scf
+     5 ,z1_embm
+      common /embm_ebmvar/cd,tq,tq1
+     1 ,qsata,qsato
+     2 ,co2,ch4,n2o
+     3 ,varice,varice1,dtatm
+     4 ,tqa,solfor,ghs,rdtdim,scf
+     5 ,z1_embm
+c constants for embm
+      real emo,
+     &     eml,               !< land emissivity
+     &     ema
+     1 ,tfreez,rfluxsc,rfluxsca
+     2 ,b00,b10,b20,b01,b11,b21,b02,b12,b22,b03,b13,b23,delf2x
+     3 ,co20,ch40,n2o0
+     4 ,rate_co2,rate_ch4,rate_n2o
+     5 ,ryear,olr_adj0,olr_adj,t_eqm,aerofac,volfac,solfac
+      common /embm_ebmconsts/emo,eml,ema
+     1 ,tfreez,rfluxsc,rfluxsca
+     2 ,b00,b10,b20,b01,b11,b21,b02,b12,b22,b03,b13,b23,delf2x
+     3 ,co20,ch40,n2o0
+     4 ,rate_co2,rate_ch4,rate_n2o
+     5 ,ryear,olr_adj0,olr_adj,t_eqm,aerofac,volfac,solfac
+c arrays for embm
+      real albcl(maxi,maxj)
+     1 ,fxsw(maxi,maxj),fxplw(maxi,maxj)
+     2 ,fx0a(maxi,maxj),fx0o(maxi,maxj)
+     3 ,fxsen(maxi,maxj),pmeadj(maxi,maxj)
+     4 ,pptn(maxi,maxj),evap(maxi,maxj),usurf(maxi,maxj)
+     5 ,fxlata(maxi,maxj),fxlato(maxi,maxj)
+     6 ,fxlw(maxi,maxj)
+     7 ,diffa(2,2,maxj),betam(2),betaz(2),hatmbl(2)
+     8 ,ca(maxi,maxj)
+     9 ,qb(maxi,maxj),qbsic(maxi,maxj)
+       real fx0sic(maxi,maxj)
+     2 ,fx0neto(maxi,maxj),fwfxneto(maxi,maxj)
+     3 ,evapsic(maxi,maxj),tsfreez(maxi,maxj)
+      common /embm_ebmflux/albcl,fxsw,fxplw
+     1 ,fx0a,fx0o,fxsen
+     2 ,pmeadj,pptn,evap,usurf,fxlata,fxlato
+     3 ,fxlw,diffa,betam,betaz,hatmbl,ca
+     4 ,qb,qbsic,fx0sic,fx0neto
+     5 ,fwfxneto,evapsic,tsfreez
+c      real, allocatable:: embm_forc(:,:)
+cc      real embm_forc(4,10)
+c      common /embm_forcing/embm_forc
+c forcing stuff
+       logical useforc
+       common /embm_useforc/useforc
+       character forcname*20
+       common /embm_forcname/forcname
+
+c adjustable freshwater forcing parameters
+      real extra1(3)
+      common /fwf_real/extra1
+c constants and parameters for atmosphere
+      real rhoair,rhoao,cpa
+     1 ,rho0,hlv,hls,hlf,const1,const2,const3,const4,const5,rmax
+     2 ,saln0,rpmesca,rpmesco
+     3 ,diffmod0,ppmin,ppmax
+      common /embm_atmosconsts/rhoair,rhoao,cpa
+     1 ,rho0,hlv,hls,hlf,const1,const2,const3
+     2 ,const4,const5,rmax,saln0,rpmesca,rpmesco
+     3 ,diffmod0,ppmin,ppmax
+c prescribed/diagnosed atmospheric transports and velocities
+      real uatm(2,maxi,maxj)
+      common /embm_transps/uatm
+c constants and parameters for sea ice
+      real rsictscsf,rhoice,rho0sea,consic,diffsic
+     1 ,tsic,hmin,rhoio,rhooi,rrholf,rhmin
+      common /embm_sicconsts/ rsictscsf,rhoice,rho0sea
+     1 ,consic,diffsic,tsic,hmin,rhoio,rhooi,rrholf,rhmin
+c adjustable freshwater forcing parameters
+      integer nsteps_extra0
+      common /embm_fwf_int/ nsteps_extra0
+      real extra0,range0,extra1a,extra1b,extra1c
+      common /embm_fwf_real/ extra0,range0,extra1a,extra1b,extra1c
+
+c AY (08/04/04) : days per year (necessary for GENIE)
+      real yearlen
+      common /ocn_yearlen/yearlen
+
+c v2 seasonal diagnostics
+c AP (03/08/06) : Addition of avg precipitated atm. humidity
+      real tqavg(2,maxi,maxj),fxlatavg(maxi,maxj),fxsenavg(maxi,maxj),
+     1     fxswavg(maxi,maxj),fxlwavg(maxi,maxj),fwpptavg(maxi,maxj),
+     2     fwevpavg(maxi,maxj)
+c variable 'qdryavg' has been superseded by 'q_pa_avg'
+c , qdryavg(maxi,maxj)
+      common /embm_oscavg/tqavg,fxlatavg,fxsenavg,fxswavg,fxlwavg,
+     1     fwpptavg,fwevpavg
+c ,qdryavg
+c AY (03/05/04) : extra seasonal diagnostics for fluxes
+      real fx0avg(4,maxi,maxj), fwavg(2,maxi,maxj)
+      common /embm_fluxavg/fx0avg, fwavg
+
+*
+* AY (01/12/03) : variables from mains.F that (probably) will be
+*                 needed when GOLDSTEIN is separated (still need to
+*                 excise EMBM or sea-ice variables)
+* AY (06/01/04) : list editted to remove variables that can be
+*                 locally defined
+*
+
+c nre no mixed-type common blocks
+
+      integer nsteps, npstp, iwstp, itstp, iw, ianav
+      integer lenin, lenout, lenrst, iav
+
+      common /ebmgint/nsteps, npstp, iwstp, itstp, iw, ianav,
+     1     lenin, lenout, lenrst, iav
+
+c AY (01/12/03) : input and output directory locations
+
+      character lout*3, indir_name*100, outdir_name*100
+
+      common /ebmgchar/lout,indir_name,outdir_name
+
+c AY (02/02/04) : names of data files for error calculation
+
+      character tdatafile*128, qdatafile*128,tdata_varname*25,
+     &       qdata_varname*25
+      real tdata_missing,tdata_scaling,tdata_offset
+      real qdata_missing,qdata_scaling,qdata_offset
+      logical tqinterp,qdata_rhum
+      common /ebmobsc/tdatafile,qdatafile,tdata_varname,
+     &       qdata_varname
+      common /ebmobsc2/tdata_missing,tdata_scaling,tdata_offset,
+     &       qdata_missing,qdata_scaling,qdata_offset
+      common /ebmobsc3/tqinterp,qdata_rhum
+
+      integer   lentdata, lenqdata, lentvar, lenqvar
+      common /ebmobsi/lentdata,lenqdata,lentvar,lenqvar
+
+      logical flat
+
+      common /ebmglog/flat
+
+c AY (23/07/04) : variables to convert FW fluxes mm/s <--> m/s
+      real m2mm, mm2m
+      common /ebmfwconv/m2mm,mm2m
+
+
+c AY (22/03/04) : GENIE grid variables required in embm.F for
+c                 netCDF operations
+c AY (05/10/04) : moved from here to netcdf_grid.cmn
+c     real nclon1(maxi),nclat1(maxj),
+c    :     nclon2(maxi),nclat2(maxj),
+c    :     nclon3(maxi),nclat3(maxj)
+c     common /embm_grid/nclon1,nclat1,nclon2,nclat2,nclon3,nclat3
+
+c AY (05/10/04) : copying Dan's GOLDSTEIN changes
+c     Added by DJL for netcdf restarts
+      character filenetin*200,dirnetout*200,rstdir_name*200
+      logical lnetin,lnetout,lascout
+      integer iyear_rest,imonth_rest,ioffset_rest
+      real day_rest
+
+      common /embm_restarts/filenetin,dirnetout,
+     :     lnetin,lnetout,lascout,rstdir_name,
+     :     iyear_rest,imonth_rest,ioffset_rest,day_rest
+
+c AR (01/01/07) : added interactive carbon-climate system flag
+c SG (15/02/2K7) : added ENTS albedo scheme flag
+      character atchem_radfor*1
+      character orbit_radfor*1
+      common /embm_radfor/atchem_radfor,orbit_radfor
+
+c SG (16/02/2K7) : added orbital parameters for albedo calculation
+      integer en_ntimes_max
+      parameter (en_ntimes_max=2000)
+
+      character*200 filenameorbit
+      integer t_orbit,norbit,orbitsteps
+      real orbitecc_vect(en_ntimes_max)
+      real orbitobl_vect(en_ntimes_max)
+      real orbitpre_vect(en_ntimes_max)
+      real orbittau_vect(en_ntimes_max)
+      real orbitall_vect(en_ntimes_max,5)
+      real par_orbit_osce
+      real par_orbit_oscsob
+      real par_orbit_oscgam
+      real par_orbit_osctau0      
+
+      common/orbit_vary/
+     &                  orbitecc_vect,
+     &                  orbitobl_vect,
+     &                  orbitpre_vect,
+     &                  orbittau_vect,
+     &                  orbitall_vect,
+     &                  t_orbit,norbit,orbitsteps,
+     &                  filenameorbit
+     
+      COMMON /embm_orbits/
+     & par_orbit_osce,par_orbit_oscsob,
+     & par_orbit_oscgam,par_orbit_osctau0
+
+c pbh co2 times series 
+      character*200 filenameco2
+      integer t_co2,nco2,co2steps
+      real co2_vect(en_ntimes_max)
+      
+      common/co2_vary/
+     &                  co2_vect,
+     &                  t_co2,nco2,co2steps,
+     &                  filenameco2
+
+c SG : added albedo paramters from ENTS
+      REAL
+     &  albo(maxj,maxnyr)          ! ocean albedo
+     & ,palb(maxi,maxj)            ! planetary albedo
+     & ,palbavg(maxi,maxj)         ! average planetary albedo
+
+      COMMON /entsalb/
+     & albo,palb,palbavg
+
+c AR (18/01/08) : run-time seasonality option
+      logical dosc,debug_init,debug_end,debug_loop
+      common /embm_ctrl/dosc,debug_init,debug_end,debug_loop
+
+c AR : radiative forcing by CH4 and N2O
+      real alphach4,alphan2o
+      common /embm_greenhouse/alphach4,alphan2o
+
+c orography
+      real lapse_rate
+      real orog_vect(maxi,maxj,en_ntimes_max)
+      integer orogswitch,t_orog,norog,orogsteps
+      character*200 filenameorog
+      common /embm_orog/lapse_rate,orog_vect,orogswitch,t_orog,norog,
+     &       orogsteps,filenameorog
+
+c land ice sheet
+      character*200 filenamelice
+      integer t_lice,nlice,licesteps
+      real lice_vect(maxi,maxj,en_ntimes_max),lice_k9
+      common /embm_lice/lice_k9,lice_vect,t_lice,nlice,licesteps,
+     &       filenamelice
+
+c d18o derived orography and ice sheet
+      character*200 filenamed18o,filenamed18oicethresh
+      character*200 filenamed18oorogmin,filenamed18ooroggrad
+      integer t_d18o,nd18o,d18osteps
+      real d18o_vect(en_ntimes_max)
+      real d18o_ice_thresh(maxi,maxj)
+      real d18o_orog_min(maxi,maxj)
+      real d18o_orog_grad(maxi,maxj)
+      real d18o_k,scale_mwfx
+      common /embm_d18o_ice/d18o_vect,d18o_ice_thresh,d18o_orog_min,
+     &       d18o_orog_grad,d18o_k,scale_mwfx,t_d18o,nd18o,d18osteps,
+     &       filenamed18o,filenamed18oicethresh,filenamed18oorogmin,
+     &       filenamed18ooroggrad
+
+c interpolated seasonal fields
+cmsw Offline arrays
+
+      integer ents_seasonswitch,ents_offlineswitch,nmth
+      parameter(nmth=12)
+      real uatml(2,maxi,maxj,maxnyr),  ! u and v wind comp.'s
+     &     usurfl(maxi,maxj,maxnyr),   ! windspeed (m/s)
+     &     tncep(maxi,maxj,maxnyr),    ! NCEP air temperature (oC)
+     &     pncep(maxi,maxj,maxnyr),    ! NCEP pptn (m/s)
+     &     rhncep(maxi,maxj,maxnyr),   ! NCEP relative humidity at 1000mb (%)
+     &     atm_alb(maxi,maxj,maxnyr)   ! atmospheric albedo
+      common /embm_seasonal/tncep,pncep,rhncep,atm_alb,
+     &     uatml,usurfl,ents_seasonswitch,ents_offlineswitch
+
+c transfer coefficients for land grid boxes
+      real chl(maxi,maxj),             ! transfer coefficient
+     &     cel(maxi,maxj)              ! ditto
+      common /embm_land/chl,cel
+
+c precipitation timescale and land radiation
+      real lambdapptn,
+     &     rhcld                      ! scale used to calculate r.o.c. land temp.
+      common /embm_pptn/lambdapptn,rhcld
+
+c diagnostics of precipitation-adjusted specific and relative
+c humidity (i.e., specific and relative humidity after precipitation)
+      real q_pa(maxi,maxj),rq_pa(maxi,maxj),q_pa_avg(maxi,maxj),
+     &     rq_pa_avg(maxi,maxj)
+      common /embm_diag/q_pa,rq_pa,q_pa_avg,rq_pa_avg
+
+c integer arrays for runoff scheme
+      integer iroff(maxi,maxj),jroff(maxi,maxj)
+c ghc ents runoff scheme
+      real par_runoff_b
+      real par_runoff_tau
+      real runoff_factor_1
+      real runoff_factor_2
+      integer par_runoff_scheme
+      common /embm_runoff1/iroff,jroff,par_runoff_b,par_runoff_tau,
+     &       runoff_factor_1,runoff_factor_2,par_runoff_scheme
+
+c LG: added option to get get rid of the conditional zonal averaging
+c     of winds near the poles     
+      integer par_wind_polar_avg
+      integer unify_winds
+      common /embm_wind_par/par_wind_polar_avg,unify_winds
+c AR (19/12/12) : sea-ice dynamics parameter control:
+c                 max sea-ice thickness (m)
+      real par_sich_max
+      common /embm_sicconsts/par_sich_max
+      real par_albsic_min,par_albsic_max
+      common /embm_sicconsts/par_albsic_min,par_albsic_max
+      logical opt_freeze
+      common /embm_sicconsts/opt_freeze

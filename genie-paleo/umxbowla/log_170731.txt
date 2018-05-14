@@ -1,0 +1,96 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.42
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GCM == hadcm3 (OK)
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+       - Axis info read.
+>   4. READING MASK & TOPO GRIDS ...
+       - Mask & topo info read.
+>   5. RE-GRIDING MASK ...
+       - Mask re-gridded.
+       * Original land area fraction    = 0.28944
+       * Re-gridded land area fraction  = 0.29398
+>   6. RE-GRIDING TOPOGRAPHY ...
+       - Topography re-gridded.
+>   7. FILTERING MASK ...
+       - Single cell embayments filtered out.
+       - Polar connections cleaned up.
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.30633
+       * Final land area fraction   = 0.30633
+>   9. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  12. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  13. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+       * found 5 land masses
+       * found 6 land masses
+       * found 7 land masses
+       * found 8 land masses
+       * found 9 land masses
+>  14. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * updated find: 3 islands
+       * updated find: 4 islands
+       * total # true islands = 3
+>  15. GENERATING .paths FILE ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (16,17)
+         -> SE corner :: Add additional path entry @ (14,7)
+         -> NE corner :: Skip path entry @ (14,8)
+         -> SE corner :: Add additional path entry @ (11,8)
+       * Building path #3 ...
+         -> NE corner :: Skip path entry @ (13,20)
+         -> SE corner :: Add additional path entry @ (10,17)
+       * Building path #4 ...
+         -> NE corner :: Skip path entry @ (15,3)
+         -> SE corner :: Add additional path entry @ (15,2)
+         -> NE corner :: Skip path entry @ (31,3)
+         -> SE corner :: Add additional path entry @ (31,1)
+       - .paths file saved
+>  16. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  17. CREATING WIND PRODUCTS ...
+       - Creating wind product input mask
+       - Regridding wind stress (u) to GOLDSTEIN u-grid
+       - Regridding wind stress (v) to GOLDSTEIN u-grid
+       - Regridding wind stress (u) to GOLDSTEIN v-grid
+       - Regridding wind stress (v) to GOLDSTEIN v-grid
+       - Regridding wind velocity (u) to GOLDSTEIN c-grid
+       - Regridding wind velocity (v) to GOLDSTEIN c-grid
+       - Regridding wind speed to GOLDSTEIN c-grid
+       - Written tau u (u point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\umxbowla\umxbowla_taux_u.dat
+       - Written tau u (v point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\umxbowla\umxbowla_taux_v.dat
+       - Written tau v (u point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\umxbowla\umxbowla_tauy_u.dat
+       - Written tau v (v point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\umxbowla\umxbowla_tauy_v.dat
+       - Written u wind speed data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\umxbowla\umxbowla_u.dat
+       - Written v wind speed data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\umxbowla\umxbowla_v.dat
+       - Written BIOGEM windspeed data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\umxbowla\umxbowla_windspeed.dat
+       - Re-grided GCM wind products.
+>  18. LOADING ALBEDO DATA ...
+       - Read GCM albedo data.
+>  19. CREATING ALBEDO DATA ...
+       - Re-gridded GCM albedo data.
+       - 2D albedo file saved
+       - Generated zonal mean albedo profile.
+       - .albd.dat file saved
+>  21. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

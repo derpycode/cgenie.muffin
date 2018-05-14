@@ -1,0 +1,88 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.42
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GCM == foam (OK)
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+       - Axis info read.
+>   4. READING MASK & TOPO GRIDS ...
+       - Mask & topo info read.
+>   5. RE-GRIDING MASK ...
+       - Mask re-gridded.
+       * Original land area fraction    = 0.30089
+       * Re-gridded land area fraction  = 0.29398
+>   6. RE-GRIDING TOPOGRAPHY ...
+       - Topography re-gridded.
+>   7. FILTERING MASK ...
+       - Single cell embayments filtered out.
+       - Polar connections cleaned up.
+       * found 1 water masses
+       * found 2 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.31636
+       * Final land area fraction   = 0.31636
+>   9. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  12. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       * Creating random runoff ...
+       - .k1 file saved
+>  13. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+       * found 5 land masses
+       * found 6 land masses
+       * found 7 land masses
+       * found 8 land masses
+>  14. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * total # true islands = 1
+>  15. GENERATING .paths FILE ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (15,3)
+         -> SE corner :: Add additional path entry @ (15,2)
+         -> NE corner :: Skip path entry @ (18,2)
+         -> SE corner :: Add additional path entry @ (18,1)
+         -> NE corner :: Skip path entry @ (31,2)
+         -> SE corner :: Add additional path entry @ (31,1)
+       - .paths file saved
+>  16. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  17. CREATING WIND PRODUCTS ...
+       - Regridding wind stress (u) to GOLDSTEIN u-grid
+       - Regridding wind stress (v) to GOLDSTEIN u-grid
+       - Regridding wind stress (u) to GOLDSTEIN v-grid
+       - Regridding wind stress (v) to GOLDSTEIN v-grid
+       - Regridding wind velocity (u) to GOLDSTEIN c-grid
+       - Regridding wind velocity (v) to GOLDSTEIN c-grid
+       - Regridding wind speed to GOLDSTEIN c-grid
+       - Written tau u (u point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\fm0000ae\fm0000ae_taux_u.dat
+       - Written tau u (v point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\fm0000ae\fm0000ae_taux_v.dat
+       - Written tau v (u point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\fm0000ae\fm0000ae_tauy_u.dat
+       - Written tau v (v point) data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\fm0000ae\fm0000ae_tauy_v.dat
+       - Written u wind speed data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\fm0000ae\fm0000ae_u.dat
+       - Written v wind speed data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\fm0000ae\fm0000ae_v.dat
+       - Written BIOGEM windspeed data to Y:\MS.GMD.muffingen\INPUT\../OUTPUT\fm0000ae\fm0000ae_windspeed.dat
+       - Re-grided GCM wind products.
+>  18. LOADING ALBEDO DATA ...
+       - Read GCM albedo data.
+>  19. CREATING ALBEDO DATA ...
+       - Re-gridded GCM albedo data.
+       - 2D albedo file saved
+       - Generated zonal mean albedo profile.
+       - .albd.dat file saved
+>  21. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

@@ -1,0 +1,22 @@
+-START-OF-DATA-
+000000.0  0.0
+002000.0  0.0
+2000.0	 7.971
+2010.0	 9.577
+2020.0	12.254
+2030.0	14.724
+2040.0	16.074
+2050.0	17.425
+2060.0	19.155
+2070.0	20.885
+2080.0	23.217
+2090.0	26.152
+2100.0	29.086
+2200.0	29.086
+2300.0	 0.000
+999999.0  0.0
+-END-OF-DATA-
+
+NOTE: units of PgC yr-1, hence scaling of factor 8.3333e+013 (to mol yr-1) needed in user-config file, i.e.:
+bg_par_atm_force_scale_val_3=8.3333e+013
+NOTE: INCLUDES land use + deforestation

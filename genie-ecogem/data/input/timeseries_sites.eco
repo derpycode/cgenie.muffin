@@ -1,0 +1,37 @@
+Name, Latitude, Longitude
+North & East are positive
+South & West are negative
+
+ 01      02    03
+ \/      \/    \/
+-START-OF-DATA-
+HOT      +23.   -158.
+BATS     +32.    -64.
+EQPAC    +00.   -140.
+ARABIAN  +16.    +62.
+NABE     +47.    -19.
+STNP     +50.   -145.
+KERFIX   -55.    +68.
+APFZ     -61.5  -170.
+ROSS     -71.4  -180.
+-END-OF-DATA-
+ /\      /\    /\
+ 01      02    03
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: Time-series site name
+COLUMN #02: Time-series site latitude
+COLUMN #03: Time-series site longitude
+
+e.g.
+HOT      +23.   -158.
+BATS     +32.    -64.
+EQPAC    +00.   -140.
+ARABIAN  +16.    +62.
+NABE     +47.    -19.
+STNP     +50.   -145.
+KERFIX   -55.    +68.
+APFZ     -61.5  -170.
+ROSS     -71.4  -180.

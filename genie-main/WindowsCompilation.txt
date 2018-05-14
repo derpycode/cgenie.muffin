@@ -1,0 +1,261 @@
+***********************************************************
+Compiling a genie model under Windows
+***********************************************************
+
+The GENIE makefiles have been modified to enable a command
+line compilation of the framework under Windows using Linux
+emulation software. The build has been tested with the
+following software:
+
+WindowsXP Pro				Version 2002 SP2
+CygWin					1.5.12-1
+Python					2.3.3
+Compaq Visual Fortran			v6.6c
+NetCDF					3.6.0-p1
+Microsoft Visual Studio .NET 2003	v7.1.3088
+
+
+17/02/2007 - see amendments at bottom of file
+Intel Visual Fortran                    v9.1
+Microsoft Visual Studio 2005            v8.0.50727.762
+Microsoft Platform SDK for Server 2003  R2
+
+
+Pre-requisite software installation:
+====================================
+
+The Windows build has only been tested with Compaq Visual
+Fortran. It should be straight-forward to add new Windows
+compilers - at least no more complicated than adding a new
+UNIX/Linux compiler. (Please ask Gethin Williams or Andrew
+Price if you need any assistance). The remainder of this
+document assumes that CVF is installed and that the system
+environment variables are set such that the compiler can
+be used from the command line.
+
+
+If you do not already have CygWin installed, perform an 
+installation of CygWin following the instructions on the
+website (http://www.cygwin.com/). In addition to the
+default packages that CygWin installs you will need to
+include the GNU 'make' package which is found inside the
+'Devel' section during the "Select packages" stage of the
+install.
+
+To guarantee the environment variables are set
+appropriately for building GENIE you can update the Cygwin
+batch file as follows. Edit the file <cygwin>/cygwin.bat:
+
+@echo off
+
+call "c:\Program Files\Microsoft Visual Studio\DF98\BIN\DFVARS.BAT"
+call "c:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin\vcvars32.bat"
+
+E:
+chdir E:\cygwin\bin
+
+bash --login -i
+
+
+I have tested the build using a native Windows installation
+of Python. There is a version of python bundled with Cygwin
+which may(?) be suitable but I have not checked. This 
+document assumes a recent Python distribution (>1.5.2) is
+installed at the location C:\Python23. To install Python on
+a Windows platform please follow the instructions available
+at:
+
+http://www.python.org/
+
+
+NetCDF installation
+===================
+
+The GENIE framework requires a full installation of the
+NetCDF library including the C, F77, F90 and C++ interfaces
+(although the latter is only required for the nightly build
+tests and can be omitted if these will not be run). The
+UCAR website does not currently (August 2005) provide pre-
+built binaries for Win32 satisfying these requirements so
+we must build the libraries manually.
+
+Download the NetCDF source code from the UCAR website:
+
+ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf.tar.gz
+
+Extract the contents of the archive to a local directory.
+Open the src\win32\NET\netcdf.sln file with Microsoft Visual
+Studio. Open the Configuration Manager and set the Active
+Solution to "Release". Highlight the netcdf project and open
+the properties dialog. Select C/C++ -> Command Line and add
+the following compiler option in the Additional Options
+dialog:
+
+/D FCALLSC_QUALIFIER="__declspec(dllexport) __stdcall"
+
+This compiler directive causes the F77 interface to be built
+in addition to the default C interface. Build the solution
+and close Visual Studio.
+
+Open a Command Prompt and configure the CVF and the VC++.NET
+environments (modify the paths to your local installation if
+necessary):
+
+"C:\Program Files\Microsoft Visual Studio\DF98\BIN\DFVARS.BAT"
+"C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin\vcvars32.bat"
+
+Navigate to the src\f90 directory and build the F90 library:
+
+f90.exe /compile_only typeSizes.f90
+f90.exe /compile_only netcdf.f90
+lib /OUT:netcdf_f90.lib typeSizes.obj netcdf.obj
+
+The Win32 build of the C++ interface is not officially
+supported by UCAR (at least no specific documentation exists
+on this). Unfortunately, we require a 'hack' to the code to 
+get the C++ interface to build using Visual Studio. Create a
+copy of the netcdf.h header file:
+
+copy src\libsrc\netcdf.h src\cxx\netcdf.h
+
+Edit the new copy of netcdf.h in src\cxx and comment out
+
+Line 199 (line number may vary between releases)
+// #define off_t __int64
+
+Navigate to the src\cxx directory and build the C++ library:
+
+netcdf-3.6.0-p1:
+cl.exe /c /O2 /I..\libsrc /DNDEBUG /D "DLL_NETCDF" /EHsc netcdf.cpp
+cl.exe /c /O2 /I..\libsrc /DNDEBUG /D "DLL_NETCDF" /EHsc ncvalues.cpp
+lib /OUT:netcdf_c++.lib netcdf.obj ncvalues.obj
+
+netcdf-3.6.1:
+cl.exe /c /O2 /I..\libsrc /I..\win32\NET /DNDEBUG /D "DLL_NETCDF" /EHsc netcdf.cpp
+cl.exe /c /O2 /I..\libsrc /I..\win32\NET /DNDEBUG /D "DLL_NETCDF" /EHsc ncvalues.cpp
+lib /OUT:netcdf_c++.lib netcdf.obj ncvalues.obj
+
+Unfortunately, we have to create our own installation. Please
+create directories and copy files as indicated below. Use the
+command prompt or Windows Explorer according to preference.
+
+cd <netcdf_root>		(contains the src folder)
+[cut-and-paste should work for the commands below]
+
+mkdir bin
+mkdir lib
+mkdir include
+
+copy src\win32\NET\Release\netcdf.dll bin\
+copy src\win32\NET\Release\ncdump.exe bin\
+copy src\win32\NET\Release\ncgen.exe bin\
+
+copy src\win32\NET\Release\netcdf.lib lib\
+copy src\f90\netcdf_f90.lib lib\
+copy "src\cxx\netcdf_c++.lib" lib\
+
+copy src\libsrc\netcdf.h include\
+copy src\fortran\netcdf.inc include\
+copy src\f90\netcdf.mod include\
+copy src\f90\typeSizes.mod include\
+copy src\cxx\netcdf.hh include\
+copy src\cxx\netcdfcpp.h include\
+copy src\cxx\ncvalues.h include\
+
+
+Compilation:
+============
+
+In makefile.arc:
+
+F77=f90.exe
+CXX=cl.exe
+MACHINE=WIN32
+NETCDF_DIR=E:\\users\\andrew\\netcdf-3.6.0-p1
+NETCDF_NAME=netcdf.lib
+
+Change the path as appropriate for the location of your
+Win32 NetCDF installation.
+
+At the CygWin bash prompt make sure that the NetCDF DLL and
+Python are in the system path:
+
+$ export PATH=$PATH:/cygdrive/c/Python23
+
+It is worth checking that Python can be invoked from the shell
+and that the version is >1.5.2. To build the binary it should
+be possible to execute the make command:
+
+$ cd [install-path]/genie-main
+$ make
+
+The following warning message will be issued during the final 
+link phase of the build:
+
+LINK : warning LNK4044: unrecognized option "module:..\genie-lib\mod"; ignored
+
+This is an expected outcome and does not impact the final 
+production of the GENIE binary.
+
+
+Execution:
+==========
+
+To run the resulting binary you will need to ensure that
+it is able to find the NetCDF dynamic link library netcdf.dll.
+Please either add the location of this dll to the system PATH
+or copy the dll to the same location as the binary.
+
+$ export PATH=/cygdrive/e/users/andrew/netcdf-3.6.0-p1/bin:$PATH
+
+Using the CygWin bash prompt it should also be possible to execute
+the genie_example.job suite of scripts to configure, build and run
+the different available models. As with Linux you need to modify
+the paths to reflect the location of the code or pass in parameters
+as appropriate. To create reference files and run the nightly
+build tests execute the appropriate make targets:
+
+$ make assumedgood
+$ make test
+
+$ make assumedgoodlong
+$ make testlong
+
+
+
+***********************************************************
+Amendments for Intel Visual Fortran 9.1 build
+***********************************************************
+
+Cygwin
+======
+
+Install as described above. Set up the shortcut with:
+
+call "D:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\SetEnv.Cmd" /XP32 /RETAIL
+call "D:\Program Files (x86)\Intel\Compiler\Fortran\9.1\ia32\Bin\IFortVars.bat"
+
+
+NetCDF
+======
+
+Build the netcdf windows solution as described above. This 
+still needs to be performed using Visual Studio .NET 2003.
+The f90 library and module files must be built as follows:
+
+ifort.exe /iface:cvf /compile-only typeSizes.f90
+ifort.exe /iface:cvf /compile-only netcdf.f90
+lib /OUT:netcdf_f90.lib typeSizes.obj netcdf.obj
+
+Copy netcdf_f90.lib into netcdf/lib
+Copy typeSizes.mod into netcdf/include
+Copy netcdf.mod into netcdf/include
+
+Build
+=====
+
+In makefile.arc:
+
+F77=ifort.exe
+
+and proceed as described above.

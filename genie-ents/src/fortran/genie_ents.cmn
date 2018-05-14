@@ -1,0 +1,70 @@
+*
+* SG 22/01/2K7 Adding variables that are used by ents, but reside
+* in var.cmn (genie-cgoldstein)
+* genie_ents.cmn
+* 
+*
+! For GOLDSTEIN ocean
+#ifndef GOLDSTEINNLONS
+#define GOLDSTEINNLONS 36
+#endif
+#ifndef GOLDSTEINNLATS
+#define GOLDSTEINNLATS 36
+#endif
+
+      implicit none
+      
+      integer maxi,maxj,maxnyr,imax,jmax
+      parameter ( maxi = GOLDSTEINNLONS , maxj = GOLDSTEINNLATS)
+      parameter (maxnyr=220)
+      parameter ( imax = GOLDSTEINNLONS , jmax = GOLDSTEINNLATS)
+      integer ents_k1(maxi,maxj),ents_kmax,ents_nyear
+        real ents_lat(maxj)
+c      common /ocn_grid/maxi,maxj,maxnyr
+      common /ocn_grid/ents_k1,ents_kmax,ents_nyear,ents_lat
+
+c      real daysperyear
+
+c      common /globvars/daysperyear
+
+c MAF : The par_output_years_0d and _2d, rstdir_name, start_year,
+c MAF : opt_timeseries_output, opt_append_data vars are defined to be 
+c MAF : a similar type here as the parameters with similar names 
+c MAF : in the sedgem and rokgem namelists defined in their libs.
+c MAF : They are defined here because they are in the ents module in
+c MAF : genie-main/src/xml-config/xml/definition.xml
+
+      character lout*3,indir_name*200,outdir_name*200,condir_name*200
+     1  ,ents_out_name*200,ents_restart_file*200,ents_netin*1
+     2  ,ents_netout*1,ents_ascout*1,ents_filenetin*200
+     3  ,ents_dirnetout*200,rstdir_name*255
+     4  ,par_output_years_file_0d*127,par_output_years_file_2d*127
+      common /pathvars/lout,indir_name,outdir_name,condir_name
+     1 ,ents_out_name,ents_restart_file,ents_netin,ents_netout
+     2 ,ents_ascout,ents_filenetin,ents_dirnetout,rstdir_name
+     3 ,par_output_years_file_0d,par_output_years_file_2d
+      
+      integer lenin, lenout, lencon, iav,ents_npstp
+      integer ents_igrid,ents_iwstp,ents_itstp,ents_ianav
+      real ents_yearlen,start_year
+      character ents_restart*1
+      common /dirvars/ ents_yearlen,start_year,
+     1 lenin,lenout,lencon,iav,ents_npstp,
+     2 ents_igrid,ents_iwstp,ents_itstp,ents_ianav,
+     3 ents_restart
+
+      integer iniday
+      common /ents_nc/iniday
+
+c SG : run-time seasonality option
+
+      logical dosc
+      common /ents_ctrl/dosc
+
+      logical atchem_fert,atchem_update
+      common /ents_ctrl/atchem_fert,atchem_update
+
+c MAF : These 'opt_' variables are defined here because they appear in 
+c MAF : genie-main/src/xml-config/xml/definition.xml
+      logical opt_timeseries_output,opt_append_data
+      common /ents_ctrl/opt_timeseries_output,opt_append_data

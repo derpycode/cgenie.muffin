@@ -1,0 +1,39 @@
+
+ 01        02  03  04  05                                            06            07        08
+ \/        \/  \/  \/  \/                                            \/            \/        \/
+
+-START-OF-DATA-
+ temp      01  01  00  'surface air temperature'                     'degrees C' -199.99      99.99
+ humidity  02  02  00  'specific humidity'                           '1'            0.00     100.00
+ pCO2      03  03  01  'carbon dioxide (CO2)'                        'atm'         -1.00       1.00
+ pCO2_13C  04  03  11  'd13C CO2'                                    'o/oo'        -9.99E+2    9.99E+2
+ pCO2_14C  05  03  12  'd14C CO2'                                    'o/oo'        -9.99E+5    9.99E+5
+ pO2       06  06  01  'oxygen (O2)'                                 'atm'         -1.00       1.00
+ pO2_18O   07  06  13  'd18O O2'                                     'o/oo'        -9.99E+2    9.99E+2
+ pN2       08  08  01  'nitrogen (N2)'                               'atm'         -1.00       1.00
+ pN2_15N   09  08  14  'd15N N2'                                     'o/oo'        -9.99E+2    9.99E+2
+ pCH4      10  10  01  'methane (CH4)'                               'atm'         -1.00       1.00
+ pCH4_13C  11  10  11  'd13C CH4'                                    'o/oo'        -9.99E+2    9.99E+2
+ pCH4_14C  12  10  12  'd14C CH4'                                    'o/oo'        -9.99E+5    9.99E+5
+ pSF6      13  13  01  'sulphur hexafloride (SF6)'                   'atm'         -1.00       1.00
+ pN2O      14  14  01  'nitrous oxide (N2O)'                         'atm'         -1.00       1.00
+ pN2O_15N  15  14  14  'd15N N2O'                                    'o/oo'        -9.99E+2    9.99E+2
+ pH2S      16  16  01  'hydrogen sulphide (H2S)'                     'atm'         -1.00       1.00
+ pH2S_34S  17  16  15  'd32S of H2S'                                 'o/oo'        -9.99E+2    9.99E+2
+ pCFC11    18  18  01  'CFC-11'                                      'atm'         -1.00       1.00
+ pCFC12    19  19  01  'CFC-12'                                      'atm'         -1.00       1.00
+-END-OF-DATA-
+
+ /\        /\  /\  /\  /\                                            /\       /\        /\
+ 01        02  03  04  05                                            06       07        08
+
+DATA FORMAT AND ORDER:
+
+COLUMN #01: tracer variable name [MAXIMUM STRING LENGTH = 16 CHARACTERS]
+COLUMN #02: tracer variable identifier [DO NOT ADJUST]
+COLUMN #03: tracer variable dependencies [DO NOT ADJUST]
+COLUMN #04: tracer variable type [DO NOT ADJUST]
+COLUMN #05: tracer variable description [MAXIMUM STRING LENGTH = 128 CHARACTERS]
+COLUMN #06: tracer units [MAXIMUM STRING LENGTH = 12 CHARACTERS]
+COLUMN #07: min tracer value
+COLUMN #08: max tracer value

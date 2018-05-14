@@ -1,0 +1,228 @@
+<job author="phil holden">
+	<vars>
+		<var name="EXPID">muffintest_biogem</var> <!-- Experiment name. A directory with this name will be created and all output piped into this directory -->
+	</vars>
+	<config>
+		<model name="goldstein"/>          <!-- include the module goldstein -->
+		<model name="goldsteinseaice"/>    <!-- include the module goldsteinseaice -->
+		<model name="plasim"/>             <!-- include the module plasim-ents -->
+		<model name="biogem"/>
+		<model name="atchem"/>
+	</config>
+	<parameters>
+		<control>
+			<param name="koverall_total">23040000</param> <!--total length of simulation, defined by the number of atmosphere timesteps
+			                                                  plasim has a timestep of 45 minutes = 32 timesteps per day, with 360 model days per year
+			                                                  => 32*360*1000=11,520,000 -->
+                        <param name="genie_timestep">2739.375</param>     <!--atmosphere time step in seconds = 365.25*24*60*60/11520 nb 365.25 day year-->
+			<param name="kocn_loop">16</param>            <!-- gearing of ocean (number of atmosphere timesteps per ocean timestep) = 16*45 minutes = 12 hours -->
+			<param name="ksic_loop">16</param>            <!-- gearing of sea ice (number of atmosphere timesteps per sea-ice timestep) = 16*45 minutes = 12 hours -->
+
+                        <param name="conv_kocn_katchem">10</param>
+                        <param name="conv_kocn_kbiogem">10</param>
+                        <param name="conv_kocn_krokgem">10</param>
+                        <param name="conv_kocn_ksedgem">180</param>
+                        <param name="par_grid_lon_offset">-2.8125</param>
+                <!-- gem -->
+                        <paramArray name="atm_select">
+				<param index="3">.true.</param>
+				<param index="4">.true.</param>
+				<param index="5">.true.</param>
+				<param index="6">.true.</param>
+				<param index="18">.true.</param>
+				<param index="19">.true.</param>
+			</paramArray>
+                        <paramArray name="ocn_select">
+				<param index="3">.true.</param>
+				<param index="4">.true.</param>
+				<param index="5">.true.</param>
+				<param index="8">.true.</param>
+				<param index="10">.true.</param>
+				<param index="12">.true.</param>
+				<param index="15">.true.</param>
+				<param index="16">.true.</param>
+				<param index="17">.true.</param>
+				<param index="20">.true.</param>
+				<param index="45">.true.</param>
+				<param index="46">.true.</param>
+			</paramArray>
+                        <paramArray name="sed_select">
+				<param index="3">.true.</param>
+				<param index="4">.true.</param>
+				<param index="5">.true.</param>
+				<param index="8">.true.</param>
+				<param index="14">.true.</param>
+				<param index="15">.true.</param>
+				<param index="16">.true.</param>
+				<param index="22">.true.</param>
+				<param index="32">.true.</param>
+				<param index="33">.true.</param>
+				<param index="34">.true.</param>
+				<param index="36">.true.</param>
+			</paramArray>
+		</control>
+		<model name="goldstein">
+			<param name="igrid">2</param>                 <!-- igrid==2 switch to tell goldstein we are using T21 latitude spacing  -->
+			<param name="yearlen">360</param>             <!-- goldstein year length in days. We apply a 360 day year. -->>
+			<param name="nyear">720</param>               <!-- number of goldstein time steps per year. i.e. 12 hour timestep, 360 day year -->
+			<param name="iwstp">72000</param>             <!-- goldstein restart output frequency in goldstein timesteps. 100 years -->
+			<param name="ianav">72000</param>              <!-- goldstein output frequency for 3D fields. 10 years -->
+			<param name="itstp">7200</param>               <!-- goldstein output frequency for integral diagnostics. 1 year -->
+			<param name="npstp">7200</param>               <!-- goldstein putput frequency for screen diagnostics. 1 year -->
+			<param name="world">igcm16</param>            <!-- indentifying label for the files that describe the world. These files are:
+			                                                   a file that describes the land-sea mask, runoff routing and ocean bathymetry "/genie/genie-goldstein/data/input/pl32_1.k1"
+			                                                   a file that defines any paths around islands "/genie/genie-goldstein/data/input/pl32_1.paths"
+			                                                     (we here consider only the ACC)
+			                                                   a file that defines the islands separated by these paths "/genie/genie-goldstein/data/input/pl32_1.psiles"
+			                                                     (we here consider only the ACC, so have two islands being Antartica and the rest of the world -->
+			<param name="tdatafile">pl16_tempann.silo</param>  <!-- name of data file of observational ocean temperature field, found in genie/genie-goldtstein/data/input -->
+			<param name="sdatafile">pl16_saliann.silo</param>  <!-- name of data file of observational ocean sainity field, found in genie/genie-goldtstein/data/input -->
+			<param name="temp1">0.0</param>                   <!-- initial ocean temperature in northern hemisphere (degC). When set to less than -2, ocean initialised with observations --> 
+			<param name="temp0">0.0</param>                   <!-- initial ocean temperature in southern hemisphere (degC). When set to less than -2, ocean initialised with observations --> 
+			<paramArray name="diff">
+			   <param index="1">2005.240135</param>              <!-- isopycnal diffusivity (m2s-1) -                         subjectively tuned parameter OHD -->
+			   <param index="2">0.000135386</param>            <!-- diapycnal diffusivity (m2s-1) -                         subjectively tuned parameter OVD -->
+			</paramArray>
+			<param name="adrag">2.554625913</param>              <!-- inverse frictional drag (days) -                        subjectively tuned parameter ADRAG -->
+			<param name="scf">2.44653955</param>                 <!-- wind stress scaling (dimensionless) -                   subjectively tuned parameter SCF -->
+			<param name="ediffpow1">1.077402066</param>          <!-- diapycnal diffusivity depth profile (dimensionless) -   subjectively tuned parameter OP1 --> 
+			<param name="ieos">1</param>                       <!-- switch to include thermobaricity in the equation of state (1==on) -->
+			<param name="iediff">1</param>                     <!-- switch to turn on stratification dependent mixing (1==on) -->
+		</model>
+		<model name="goldsteinseaice">
+			<param name="igrid">2</param>                      <!-- for following parameters see the equivalent desciptions for goldstein -->
+			<param name="nyear">720</param>
+			<param name="iwstp">72000</param>
+			<param name="ianav">72000</param>
+			<param name="npstp">7200</param>
+			<param name="itstp">7200</param>
+			<param name="world">igcm16</param>
+			<param name="diffsic">15000.</param>              <!-- sea ice diffusivity (m2s-1) - non-default parameter SID -->
+		</model>
+		<model name="plasim">
+			<param name="ngear">1</param>
+			<param name="ngear_years_plasim">1</param>
+			<param name="ngear_multiple">10</param>
+			<param name="nafter">960</param>               <!-- output frequency for averaged plasim-ents fields = 45 minutes * 115200 = 10 years -->
+			<param name="atchem_radfor">.TRUE.</param> 
+			<param name="indir_name"><varref>RUNTIME_ROOT</varref>/genie-plasim/data/input/T21_IGCM16</param>
+
+			<param name="albgmax">0.8</param>
+			<param name="qthresh">0.1</param>                 <!-- dimensionless threshold moisture content for photosynthesis - non default parameter QTHRESH -->
+
+			<param name="scale_apm">0</param>         <!-- dimensionless scaling of the atlantic-pacific moisture flux adjustment - subjectively tuned parameter APM -->
+			<param name="albseamax">0.449923169</param>               <!-- latitudinal dependence of ocean albedo (dimensionless) - non-default parameter ALBSEAMAX --> 
+
+			<param name="tdissd">0.012448584</param>
+			<param name="tdissz">0.046267461</param>
+			<param name="tdisst">1.03201731</param>
+			<param name="tdissq">0.061880547</param>
+			<param name="vdiff_lamm">12.95755067</param>
+			<param name="tswr1">0.324030081</param>
+			<param name="tswr2">0.032974609</param>
+			<param name="acllwr">0.501520425</param>
+			<param name="th2oc">0.023572382</param>
+			<param name="rcritmin">0.948665442</param>
+			<param name="gamma">0.007991045</param>
+
+			<param name="k17">0.842488946</param>
+			<param name="k18">1.204E-07</param>
+			<param name="k26">2.41966E-09</param>
+			<param name="k32">218.3556628</param>
+		</model>
+		<model name="atchem">
+                        <param name="ctrl_continuing">.false.</param>
+                        <paramArray name="atm_init">
+				<param index="3">280.0E-06</param>
+				<param index="4">-6.50</param>
+				<param index="6">0.2095</param>
+			</paramArray>
+		</model>
+		<model name="biogem">
+                    <param name="ctrl_force_windspeed">.false.</param>
+                        <param name="ctrl_continuing">.false.</param>
+                        <paramArray name="ocn_init">
+				<param index="3">2.244E-03</param>
+				<param index="4">0.4</param>
+				<param index="8">2.159E-06</param>
+				<param index="10">1.696E-04</param>
+				<param index="12">2.363E-03</param>
+			</paramArray>
+
+                        <!-- BIOLOGICAL NEW PRODUCTION -->
+                        <param name="par_bio_k0_PO4">2.27102E-05</param><!--maximum PO4 consumption rate (mol kg-1 yr-1)-->
+                        <param name="par_bio_c0_PO4">1.21364E-06</param><!--[PO4] M-M half-sat value (mol kg-1)-->
+                        <!-- ORGANIC MATTER EXPORT RATIOS -->
+                        <param name="par_bio_red_POP_POC">117.0</param>
+                        <param name="par_bio_red_POP_PO2">-170.0</param>
+                        <!-- INORGANIC MATTER EXPORT RATIOS -->
+                        <param name="par_bio_red_POC_CaCO3">0.076451613</param><!--base CaCO3:POC export ratio-->
+                        <param name="par_bio_red_POC_CaCO3_pP">0.510762052</param><!--exponent for modifier of CaCO3:POC export ratio-->
+                        <!-- REMINERALIZATION -->
+                        <param name="par_bio_remin_POC_frac2">0.031470878</param><!--initial fractional abundance of POC component #2-->
+                        <param name="par_bio_remin_POC_eL1">802.2577104</param><!--remineralization length #1 for POC-->
+                        <param name="par_bio_remin_POC_eL2">1000000.</param><!--remineralization length #2 for POC-->
+                        <param name="par_bio_remin_CaCO3_frac2">0.22708127</param><!--initial fractional abundance of CaCO3 component #2-->
+                        <param name="par_bio_remin_CaCO3_eL1">1315.250789</param><!--remineralization length #1 for CaCO3-->
+                        <param name="par_bio_remin_CaCO3_eL2">1000000.0</param><!--remineralization length #2 for CaCO3-->
+
+                        <param name="par_gastransfer_a">0.460061804</param><!--remineralization length #2 for CaCO3-->
+
+                        <param name="par_misc_t_start">0</param>
+                        <param name="par_misc_t_runtime">2000</param>
+
+                        <param name="par_infile_slice_name">plasim_save_timeslice.dat</param>
+                        <param name="par_infile_sig_name">plasim_save_sig.dat</param>
+                        <param name="par_forcing_name">pyyyyz.RpCO2_Rp13CO2</param>	
+                        <paramArray name="par_atm_force_scale_val">
+                            <param index="3">280.0E-6</param>  
+                            <param index="4">-6.5</param>  
+                        </paramArray>
+                        <param name="ctrl_force_oldformat">.false.</param>
+		</model>
+	</parameters>
+	<build>
+		<make-arg name="IGCMATMOSDP">TRUE</make-arg>              <!-- atmosphere double precision (for compiler)-->
+		<make-arg name="GENIEDP">TRUE</make-arg>                  <!-- genie double precision (for compiler) -->
+		<macro handle="GENIENXOPTS" status="defined">
+			<identifier>GENIENX</identifier>
+			<replacement>64</replacement>                     <!-- atmosphere resolution in longitude -->
+		</macro>
+		<macro handle="GENIENYOPTS" status="defined">
+			<identifier>GENIENY</identifier>
+			<replacement>32</replacement>                     <!-- atmosphere resolution in latitude -->
+		</macro>
+		<macro handle="GOLDSTEINNLONSOPTS" status="defined">
+			<identifier>GOLDSTEINNLONS</identifier>
+			<replacement>64</replacement>                     <!-- ocean resolution in longitude -->
+		</macro>
+		<macro handle="GOLDSTEINNLATSOPTS" status="defined">
+			<identifier>GOLDSTEINNLATS</identifier>
+			<replacement>32</replacement>                     <!-- ocean resolution in latitude -->
+		</macro>
+		<macro handle="GOLDSTEINNLEVSOPTS" status="defined">
+			<identifier>GOLDSTEINNLEVS</identifier>
+			<replacement>16</replacement>                     <!-- ocean resolution in depth -->
+		</macro>
+		<macro handle="GOLDSTEINNTRACSOPTS" status="defined">
+			<identifier>GOLDSTEINNTRACS</identifier>
+			<replacement>14</replacement>
+		</macro>
+                <macro handle="SEDGEMNLONSOPTS" status="defined">
+                        <identifier>SEDGEMNLONS</identifier>
+                        <replacement>64</replacement>
+                </macro>
+                <macro handle="SEDGEMNLATSOPTS" status="defined">
+                  <identifier>SEDGEMNLATS</identifier>
+                  <replacement>32</replacement>
+                </macro>
+                <macro handle="ROKGEMNLONSOPTS" status="defined">
+                        <identifier>ROKGEMNLONS</identifier>
+                        <replacement>64</replacement>
+                </macro>
+                <macro handle="ROKGEMNLATSOPTS" status="defined">
+                  <identifier>ROKGEMNLATS</identifier>
+                  <replacement>32</replacement>
+                </macro>
+	</build>
+</job>

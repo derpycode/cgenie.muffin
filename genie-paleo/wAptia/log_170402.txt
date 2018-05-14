@@ -1,0 +1,159 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.2.
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       GCM == foam (OK)
+>   2. CREATING GENIE GRID ...
+>   3. READ AXES INFORMATION ...
+>   4. READ MASK & TOPO GRIDS ...
+>   5. RE-GRID MASK ...
+       * Original land area fraction    = 0.26643
+       * Re-gridded land area fraction  = 0.25231
+>   6. RE-GRID TOPOGRAPHY ...
+>   7. FILTER MASK ...
+       - Single cell embayments filtered out
+       - Polar connections cleaned up
+       * found 1 water masses
+       - Small water bodies cleaned up
+       * Revised land area fraction = 0.25926
+       * Final land area fraction   = 0.25926
+>   9. RE-GRID OCEAN BATHYMETRY ...
+>  10. FILTER BATHYMETRY ...
+         -> MAKE SHALLOWER :: Loop count = 1 @ (2,27,1); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (2,30,6); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (3,25,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (4,24,1); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (4,27,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (5,28,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (5,29,2); s = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (8,2,11); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (10,4,8); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (15,15,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (15,16,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,14,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,15,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,11,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,12,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,13,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (18,10,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (18,34,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (19,11,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (19,34,6); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,9,8); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,11,9); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,33,6); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (21,33,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (22,9,2); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (22,10,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (23,11,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (23,27,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (26,30,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (27,30,6); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (27,31,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (28,29,6); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (28,31,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (28,32,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (29,30,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (34,15,1); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (37,27,2); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (10,4,7); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (15,15,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,15,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (17,12,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (17,15,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (18,10,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (18,11,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (18,34,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (18,35,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,9,9); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,11,10); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (21,33,6); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (22,9,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (22,10,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (23,27,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (27,31,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (28,29,5); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (28,30,2); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (10,4,6); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (17,11,4); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (18,34,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (18,35,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,9,10); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (22,9,4); s = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 4 @ (10,4,5); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 4 @ (22,9,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 5 @ (22,9,6); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 6 @ (22,9,7); s = 3; l = 0
+       - Topography filtered
+>  12. CALCULATE RUN-OFF AND GENERATE .k1 FILE ...
+       * Creating random runoff ...
+       - .k1 file saved
+>  13. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+       * found 5 land masses
+       * found 6 land masses
+       * found 7 land masses
+>  14. UPDATE ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * updated find: 3 islands
+       * total # true islands = 2
+>  15. GENERATE .paths FILE ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (10,36)
+         -> SE corner :: Add additional path entry @ (10,32)
+         -> NE corner :: Skip path entry @ (11,32)
+         -> SE corner :: Add additional path entry @ (11,27)
+         -> NE corner :: Skip path entry @ (24,29)
+         -> SE corner :: Add additional path entry @ (24,28)
+         -> NE corner :: Skip path entry @ (25,28)
+         -> SE corner :: Add additional path entry @ (25,27)
+         -> NE corner :: Skip path entry @ (26,27)
+         -> SE corner :: Add additional path entry @ (26,26)
+         -> NE corner :: Skip path entry @ (27,26)
+         -> SE corner :: Add additional path entry @ (26,21)
+         -> NE corner :: Skip path entry @ (28,21)
+         -> SE corner :: Add additional path entry @ (28,20)
+       * Building path #3 ...
+         -> NE corner :: Skip path entry @ (14,25)
+         -> SE corner :: Add additional path entry @ (12,23)
+       - .paths file saved
+>  16. GENERATE .psiles FILE ...
+       - .psiles file saved
+>  Something odd about the islands count or configuration ...
+>  17. RE-GRID WIND PRODUCTS ...
+       - Regridding wind stress (u) to GOLDSTEIN u-grid
+       - Regridding wind stress (v) to GOLDSTEIN u-grid
+       - Regridding wind stress (u) to GOLDSTEIN v-grid
+       - Regridding wind stress (v) to GOLDSTEIN v-grid
+<a href="matlab: opentoline('C:\__WORKING\MODEL.muffin.paleo\muffingen\source\make_grid_winds_foam.m',220,1)">220 </a>fprintf('       - Regridding wind velocity (u) to GOLDSTEIN c-grid\n');
+if system_dependent('IsDebugMode')==1, dbcont; end
+       - Regridding wind velocity (u) to GOLDSTEIN c-grid
+if system_dependent('IsDebugMode')==1, dbcont; end
+       - Regridding wind velocity (v) to GOLDSTEIN c-grid
+if system_dependent('IsDebugMode')==1, dbcont; end
+       - Regridding wind speed to GOLDSTEIN c-grid
+       - Written tau u (u point) data to C:\__WORKING\MODEL.muffin.paleo\muffingen\../OUTPUT\wAptia\wAptia_taux_u.dat
+       - Written tau u (v point) data to C:\__WORKING\MODEL.muffin.paleo\muffingen\../OUTPUT\wAptia\wAptia_taux_v.dat
+       - Written tau v (u point) data to C:\__WORKING\MODEL.muffin.paleo\muffingen\../OUTPUT\wAptia\wAptia_tauy_u.dat
+       - Written tau v (v point) data to C:\__WORKING\MODEL.muffin.paleo\muffingen\../OUTPUT\wAptia\wAptia_tauy_v.dat
+       - Written u wind speed data to C:\__WORKING\MODEL.muffin.paleo\muffingen\../OUTPUT\wAptia\wAptia_u.dat
+       - Written v wind speed data to C:\__WORKING\MODEL.muffin.paleo\muffingen\../OUTPUT\wAptia\wAptia_v.dat
+       - Written BIOGEM windspeed data to C:\__WORKING\MODEL.muffin.paleo\muffingen\../OUTPUT\wAptia\wAptia_windspeed.dat
+>  18. LOAD ALBEDO DATA ...
+>  19. RE-GRID & PROCESS ALBEDO ...
+       - .albd.dat file saved
+>  21. GENERATE CONFIG PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

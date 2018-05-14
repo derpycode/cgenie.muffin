@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job author="config2xml.py - automatic conversion of ASCII text config file">
+	<vars>
+		<var name="EXPID">genie_eb_go_gs_restartread</var>
+		<var name="RESTARTREAD">"TRUE"</var>
+	</vars>
+	<config>
+		<model name="goldstein"/>
+		<model name="goldsteinseaice"/>
+		<model name="embm"/>
+	</config>
+	<parameters>
+		<control>
+			<param name="write_flag_atm">.false.</param>
+			<param name="ksic_loop">5</param>
+			<param name="koverall_total">5000</param>
+			<param name="write_flag_sic">.false.</param>
+			<param name="kocn_loop">5</param>
+			<param name="dt_write">50000</param>
+			<param name="lgraphics">.false.</param>
+		</control>
+		<model name="goldstein">
+			<param name="iwstp">1000</param>
+			<param name="ianav">1000</param>
+			<param name="itstp">10</param>
+			<param name="npstp">1000</param>
+			<param name="nyear">100</param>
+			<param name="yearlen">360</param>
+			<param name="temp1">10.</param>
+			<param name="temp0">10.</param>
+			<paramArray name="diff">
+				<param index="2">1.e-4</param>
+			</paramArray>
+                        <param name="ans">c</param>
+                        <param name="lin">spn.1</param>
+                        <param name="rstdir_name"><varref>OUTROOT</varref>/<varref>ASSUMEDGOOD_NAME</varref>/goldstein</param>
+                        <param name="netout">y</param>
+                        <param name="netin">y</param>
+                        <param name="ascout">y</param>
+			<param name="filenetin"><varref>OUTROOT</varref>/<varref>ASSUMEDGOOD_NAME</varref>/goldstein/goldstein_restart_2009_12_30.nc</param>
+		</model>
+		<model name="goldsteinseaice">
+			<param name="iwstp">1000</param>
+			<param name="ianav">1000</param>
+			<param name="itstp">10</param>
+			<param name="npstp">1000</param>
+			<param name="nyear">100</param>
+			<param name="yearlen">360</param>
+                        <param name="ans">c</param>
+                        <param name="lin">spn.1</param>
+                        <param name="rstdir_name"><varref>OUTROOT</varref>/<varref>ASSUMEDGOOD_NAME</varref>/goldsteinseaice</param>
+                        <param name="netout">y</param>
+                        <param name="netin">y</param>
+                        <param name="ascout">y</param>
+			<param name="filenetin"><varref>OUTROOT</varref>/<varref>ASSUMEDGOOD_NAME</varref>/goldsteinseaice/goldsic_restart_2009_12_30.nc</param>
+		</model>
+		<model name="embm">
+			<param name="iwstp">1000</param>
+			<param name="ianav">1000</param>
+			<param name="itstp">10</param>
+			<param name="npstp">1000</param>
+			<param name="nyear">100</param>
+			<param name="yearlen">360</param>
+			<param name="tatm">0.0</param>
+                        <param name="ans">c</param>
+                        <param name="lin">spn.1</param>
+                        <param name="rstdir_name"><varref>OUTROOT</varref>/<varref>ASSUMEDGOOD_NAME</varref>/embm</param>
+                        <param name="netout">y</param>
+                        <param name="netin">y</param>
+                        <param name="ascout">y</param>
+			<param name="filenetin"><varref>OUTROOT</varref>/<varref>ASSUMEDGOOD_NAME</varref>/embm/embm_restart_2009_12_30.nc</param>
+		</model>
+	</parameters>
+	<build>
+		<make-arg name="IGCMATMOSDP">TRUE</make-arg>
+		<make-arg name="GENIEDP">TRUE</make-arg>
+		<macro handle="GENIENYOPTS" status="defined">
+			<identifier>GENIENY</identifier>
+			<replacement>36</replacement>
+		</macro>
+		<macro handle="GENIENXOPTS" status="defined">
+			<identifier>GENIENX</identifier>
+			<replacement>36</replacement>
+		</macro>
+	</build>
+	<testing>
+                <var name="ASSUMEDGOOD_NAME">genie_eb_go_gs_restartmake</var>
+		<var name="TESTFILE">goldstein/goldstein_restart_2019_12_30.nc</var>
+	</testing>
+</job>

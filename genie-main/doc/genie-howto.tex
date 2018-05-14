@@ -1,0 +1,636 @@
+
+\documentclass[11pt,twoside]{article}
+\usepackage[paper=a4paper,portrait=true,margin=2.5cm,ignorehead,footnotesep=1cm]{geometry}
+\usepackage{graphics}
+\usepackage{hyperref}
+\usepackage{paralist}
+\usepackage{seqsplit}
+
+\linespread{1.1}
+\setlength{\pltopsep}{2.5pt}
+\setlength{\plparsep}{2.5pt}
+\setlength{\partopsep}{2.5pt}
+\setlength{\parskip}{2.5pt}
+
+\title{GENIE HOW-TO}
+\author{Andy Ridgwell}
+\date{\today}
+
+\begin{document}
+
+
+
+%=================================================================================================================================
+%=== BEGIN DOCUMENT ==============================================================================================================
+%=================================================================================================================================
+
+\maketitle
+
+
+
+%=================================================================================================================================
+%=== CONTENTS ====================================================================================================================
+%=================================================================================================================================
+
+\tableofcontents
+
+
+
+%=================================================================================================================================
+%=== CHAPTERS ====================================================================================================================
+%=================================================================================================================================
+
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- Introduction ----------------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}\label{Introduction}
+
+BLAH
+
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- HOW-TOs: General ------------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\newpage
+\section{HOW-TOs: General}\label{how-to-1}
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Do some thing dumb}\label{Do some thing dumb}
+
+Easy! Just close your eyes and change some parameter values at random. Better still, start using the model without reading the manual first ...
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Add a new namelist parameter}\label{Add a new namelist parameter}
+
+\begin{compactenum}
+
+	\item First you will need to define the new namelist parameter and set a default value.
+	You define the parameter in \texttt{genie-main/namelists.sh} by:
+\begin{verbatim}item=xy_$item\end{verbatim}
+where item is the parameter name that it used in the science module, and \texttt{xy} is the module abbreviation (i.e., '\texttt{ac}', '\texttt{bg}', '\texttt{sg}', ...). Note that if the parameter is a string then the line must be in the form:
+\begin{verbatim}item="$xy_item"\end{verbatim}
+
+	\item The default value of the new namelist parameter is set in \texttt{genie-main/runtime\_defaults.sh}:
+\begin{verbatim}xy_item=value
+\end{verbatim}where value is the default value of the parameter. Note that for logical parameters, the required syntax is .true. and .false..
+
+	\item For the biogeochemistry modules (ATCHEM, BIOGEM, SEDGEM, and ROKGEM), the module parameters are defined at the top of:
+\vspace{-5.5pt}\begin{verbatim}modulename_lib.f90\end{verbatim}\vspace{-5.5pt}
+(where \texttt{\textit{modulename}} is the name of the module). The namelist parameters are also assigned to a particular namelist here.
+
+\item The namelist parameters are read in automatically in subroutines at the top of:
+\vspace{-5.5pt}\begin{verbatim}modulename_data.f90\end{verbatim}\vspace{-5.5pt}
+The code only needs to be edited in order to report the read-in values at run-time.
+
+\item The climate modules differ from the biogeochemistry modules, and global variables are defined in common blocks (extension \texttt{.cmn}) and separately from the reading in and assignment of parameters to namelists.
+
+\end{compactenum}
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Speed up the model}\label{Speed up the model}
+
+*sign* You speed freak. Is this all you care about? What about the 'quality' of the simulation - does that mean absolutely nothing to you? Oh well ...
+There is a bunch of stuff that slows GENIE down that may not be absolutely essential to a particular model experiment. These include:
+\begin{compactenum}
+	\item	The number of tracers - if you don't need 'em, then don't select 'em! Selected tracers are automatically passed to GOLDSTEIN and advected/convected/diffused with ocean circulation. Similarly, BIOGEM does a whole bunch of stuff with tracers, particularly those which can be biologically transformed. All this is numerically wasteful if you aren't interested in them. Equally importantly, the more tracers you have selected the more careful you have to be in configuring the model. Superfluous tracers therefore cost more configuration time and/or increase the change of a model crash.
+	\item 'Tracer auditing' - the  continuous updating and checking global tracer inventories to ensure that there is no spurious loss or gain of any tracer (i.e., a bug) has computational overheads associated with it. Whether this checking is carried out or not is set by the value of the flag \texttt{bg\_ctrl\_audit}\footnote{It is \texttt{.false.} by default.}.
+	\item Time-series results saving. Model tracer (plus some 'physical') properties are bring continuously averaged in constructing time-series results files. Cutting down on time-series that you don't need will help minimize model run-time. The various categories of time-series that will be saved are specified by a series of namelist parameter flags. However, within each category (such as \texttt{ocn} tracers - \texttt{bg\_ctrl\_data\_save\_sig\_ocn}) all properties will be saved - you are not given to option to save a defined sub-set (for example, DIC and PO4 in the ocean but not ALK). Note that time-series saving of data that is a 2-D average, such as atmospheric composition at the ocean-atmosphere interface, sediment composition at the ocean-sediment interface, or just ocean surface conditions, is less numerically demanding than mean values that have to be derived from a 3-D data field.
+	\item Time-slice results saving. If you have relatively few requested time-slices over the course of the model integration then this is unlikely to significantly impact the overall run-time (even will all possible data category save namelist flags set to \texttt{.true.}). However, note that if you have accidently triggered the default time-slice saving interval (by having no data items in the time-slice specification file (\texttt{bg\_par\_infile\_slice\_name}) you may end up with the model running about as fast as a 2-legged dog super-glued to a 10-tonne biscuit.
+	\item Alter the degree of asynchronicity between GOLDSTEIN and ATCHEM/BIOGEM/SEDGEM (see later HOW-TO).
+\end{compactenum}
+As a very rough guide, the impact on total run-time of making various changes to the model configuration are listed as follows. Numbers are given as a percentage increase in total model run-time (using the /usr/bin/time linux command). Tracers selected in the ocean are DIC, ALK, PO4, O2, DOM\_C, DOM\_P, DOM\_O2, as well as 13C isotopic components (DIC\_13C and DOM\_C\_13C) (+ T and S). The corresponding tracers are present in the atmosphere and as particulates. The model is run for 10 years as a new run (i.e., not loading in a restart file):
+\begin{compactitem}
+	\item	ADD auditing \begin{math}\Rightarrow\end{math} +15\%
+	\item	ADD time-slice saving	\begin{math}\Rightarrow\end{math} +20\%\footnote{Because only a 10 year integration has been carried out with a time-slice saved at 10 years, the computational cost of time-slice saving is disproportionately high as displayed. With a longer integration, the relative cost of saving a time-slice will fall. In constrast, the computational cost as a fraction of total run-time of time-series saving and auditing is likely to remain the same.}
+	\item	ADD time-series saving	\begin{math}\Rightarrow\end{math} +15\%
+	\item	REMOVE \begin{math}^{13}\end{math}C isotopic species (= DIC and DOC ocean tracers) \begin{math}\Rightarrow\end{math} -10\%\footnote{The speed gained by removing two tracers is not proportional to the fractional decrease in number of tracers (in this example reducing from 11 to 9 the number of tracers in the ocean gives only a ca. 10\% improvement in overall speed).}
+\end{compactitem}
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Alter the time-stepping between ocean circulation and biogeochemistry}\label{Alter the time-stepping between ocean circulation and biogeochemistry}
+
+By default\footnote{In flavors using an 8-level configuration of the ocean model.}; ATCHEM, BIOGEM, SEDGEM, and ROKGEM are not updated at the same rate as GOLDSTEIN. The purpose of this is to increase numerical efficiency as the rate-limiting step in the GENIE-1 Earth system model is in the (often ocean) biogeochemistry. The default is set to a 1:5:5:50 ratio of GOLDSTEIN:ATCHEM:BIOGEM:SEDGEM:ROKGEM. In other words, for every SEDGEM time-step, ATCHEM and BIOGEM both\footnote{Ideally, keep the ATCHEM and BIOGEM time step gearing ratios with GOLDSTEIN the same -- i.e., if GOLDSTEIN:BIOGEM is 1:5, then also set GOLDSTEIN:ATCHEM to 1:5).} take 10 (50/5) and GOLDSTEIN takes 50. With a time-step for GOLDSTEIN of 0.01 years (see Section I.5.1), ATCHEM and BIOGEM are updated every 0.05 years, and SEDGEM every 0.5 years. (For comparison, the default ratio between the GOLDSTEIN and the EMBM is 2:1; i.e., the EMBM takes two time-steps for every GOLDSTEIN time step.)
+
+As with all numerical approximations there is a trade-off between accuracy (in terms of how close one approaches the true solution) and speed; The higher degree of asynchronicity between GOLDSTEIN and BIOGEM, the faster that GENIE-1 will run but at the expense of larger numerical error. 
+To the degree of asynchronicity is governed by a set of namelist parameters defining the time-stepping ratios between GOLDSTEIN and the respective biogeochemistry modules:
+\begin{compactitem}
+	\item \texttt{ma\_conv\_kocn\_katchem=5}
+	\item \texttt{ma\_conv\_kocn\_kbiogem=5}
+	\item \texttt{ma\_conv\_kocn\_ksedgem=50}
+	\item \texttt{ma\_conv\_kocn\_krokgem=5}
+\end{compactitem}
+
+In a series of tests to characterize the consequences of the specific choice of asynchronicity in which the values of \texttt{ma\_conv\_kocn\_katchem} and \texttt{ma\_conv\_kocn\_kbiogem} are systematically increased and a CO2 perturbation experiment run. The experiment uses the baseline model [\textit{Ridgwell et al.}, 2007a] a future fossil CO2 emissions scenario in which a total of 15,000 GtC is released into the atmosphere over the course of about 700 years, with the total run belong from year 2000 ® 3000 and starting from a historical spin up (year 1765 ® 2000 and itself starting from a spin-up to steady-state). This is a pretty extreme scenario and you are unlikely to ever need to perturb the model biogeochemistry in a more extreme way, so this test delineates the 'worst case' of model error arising from the GOLDSTEIN:BIOGEM asynchronicity. The atmospheric CO2 value measured at the year 2300 (so not the most extreme values achieved) together with global carbonate export (a sensitive measure of (mean) ocean surface pH and saturation state) for the different GOLDSTEIN:BIOGEM parameters settings are as follows:
+\begin{compactitem}
+	\item 1:1			3329.598 ppm	0.100053´1013 mol yr-1
+	\item 1:5			3330.442 ppm	0.999950´1013 mol yr-1
+	\item 1:10		3331.926 ppm	0.102388´1013 mol yr-1
+	\item 1:20		FATAL INSTABILITY IN CARBONATE SYSTEM
+\end{compactitem}
+At year 2300 there is relatively little different between runs considering how extreme the total carbon addition is. The exception is in the case of the 1:20 time-stepping ratio where the model died between year 2200 and 2300 due to a numerical instability in the solution of the surface ocean aqueous carbonate state. However, by year 3000 the picture is:
+\begin{compactitem}
+	\item 1:1			5233.136 ppm	0.523057´1011 mol yr-1
+	\item 1:5			5234.665 ppm	0.521429´1011 mol yr-1
+	\item 1:10		5256.287 ppm	0.642561´1012 mol yr-1
+	\item 1:20		FATAL INSTABILITY IN CARBONATE SYSTEM
+\end{compactitem}
+Now the 1:10 gearing is has deviated significantly from the 1:1 and 1:5 ratios for both atmospheric CO2 and global export.
+
+A degree of asynchronicity between GOLDSTEIN and BIOGEM with a 1:5 ratio between time-steps is thus apparently 'safe' under all practical circumstances. A 1:10 ratio will lead to significant errors in extreme perturbations of the carbon cycle, while a 1:20 ratio is not even stable under all practical eventualities. The recommendation is to keep the default setting for \texttt{ma\_conv\_kocn\_katchem} and \texttt{ma\_conv\_kocn\_kbiogem} (1:5).
+
+With a 16-level version of the ocean circulation model GOLDSTEIN, the shallower surface layer necessitates a shorted time-step in the biogeochemistry so as to minimize errors during air-sea gas exchange. The defaults in this case are:
+
+\begin{compactitem}
+	\item \texttt{ma\_conv\_kocn\_katchem=2}
+	\item \texttt{ma\_conv\_kocn\_kbiogem=2}
+	\item \texttt{ma\_conv\_kocn\_ksedgem=50}
+	\item \texttt{ma\_conv\_kocn\_krokgem=2}
+\end{compactitem}
+
+\subsection{Construct a new base configuration of GENIE-1}\label{Construct a new base configuration of GENIE-1}
+
+The selection of the science modules, grid resolution, and basic configuration of the 'physics' of GENIE-1 is specified in a \textit{base config} file (extension: \texttt{.config}) in:
+\vspace{-11pt}\begin{verbatim}~\genie\genie-main\configs\end{verbatim}\vspace{-11pt}
+New configurations can be easily created by coping and editing an existing one.
+
+Alternatively, the basic configuration and climatology of the model can be adjusted by means of namelist parameter additions to the \textit{user config} file. The following example is given to illustrate:
+
+The \textit{Tutorial} document describes experiments mostly involving two different base configuration of GENIE-1:
+
+\begin{compactitem}
+
+	\item \texttt{worbe2\_preindustrial} -- 36x36x8, with non-seasonally forced, with climatology identical to that described in
+ \textit{Ridgwell et al.} [2007]. The \textit{base config} for this is:
+\vspace{-5.5pt}\begin{verbatim}genie_eb_go_gs_ac_bg\end{verbatim}\vspace{-5.5pt}
+ 
+	\item \texttt{worjh2\_preindustrial} -- 36x36x16, seasonally forced, with climatology calibrated against present-day observations by a multi-objective tuning process, using exactly the same observational data of annual average surface air temperature and humidity, and 3-D ocean temperature and salinity as described in \textit{Hargreaves et al.} [2004]. Temperature diffusion around Antarctica (90-60°S) is additionally reduced by 75\% in the 2-D atmospheric energy balance component to capture some of the relative (seasonal) isolation of the atmosphere in this region. The \textit{base config} for this is:
+\vspace{-5.5pt}\begin{verbatim}genie_eb_go_gs_ac_bg_itfclsd_16l_JH\end{verbatim}\vspace{-5.5pt}
+	
+\end{compactitem}
+
+In both of these configurations of the GENIE-1 model, some of the changes to the physics (compared to the default parameter values) are actually specified in the \textit{user config} file rather than the \textit{base config} (\texttt{.config}) file. This makes it simpler to 'mix up' the climatology between the two different GENIE-1 configurations by means of changes made just to the  \textit{user config} file.
+
+The grid resolution (8 vs. 16 levels in the ocean) and calibration of the parameters for climatology are specified in the \textit{base config} (\texttt{.config}) file. Seasonality and the reduction in atmospheric diffusion at high Southern latitudes for \texttt{worjh2\_preindustrial} is specified in the user config file. The parameters controlling biogeochem cycling in the ocean are set differently and also specified in the user config file.
+
+The relative important of: vertical resolution, parameter set, seasonality, and atmospheric diffusion at high Southern latitudes can in theory be pulled apart by constructing a set of configurations than encompass all combinations of the above:
+
+\begin{compactitem}
+
+	\item To add seasonality to the 8-level model (\texttt{worbe2\_preindustrial}):
+	\\In the \textit{user config} file, comment out the following lines:
+	\vspace{-5.5pt}\begin{verbatim}
+	#ea_dosc=.false.
+	#go_dosc=.false.
+	#gs_dosc=.false.
+	\end{verbatim}
+	or alternatively set them all to \texttt{.true.}.
+	Similarly, seasonality can be removed from the 16-level model (\texttt{worjh2\_preindustrial}) by adding to the \textit{user config} file (e.g., at the bottom):
+	\vspace{-5.5pt}\begin{verbatim}
+	ea_dosc=.false.
+	go_dosc=.false.
+	gs_dosc=.false.
+	\end{verbatim}
+
+	\item To reduce atmospheric diffusion at high Southern latitudes in the 8-level model (\texttt{worbe2\_preindustrial}):
+	\\In the \textit{user config} file, add the following lines (e.g., at the bottom of the file):
+	\vspace{-5.5pt}\begin{verbatim}
+	#diffusivity scaling factor
+	ea_diffa_scl=0.25
+	#grid point distance over which scalar is applied (j direction)
+	ea_diffa_len=3
+	\end{verbatim}
+	Similarly, the atmospheric diffusivity modification can be disabled in the 16-level model (\texttt{worjh2\_preindustrial}) by commenting out the lines listed under \texttt{\# --- CLIMATE ---} at the beginning of the \textit{user config} file.
+	
+	\item To employ the physics parameter values from a different base configuration:
+	\\Copy the block of parameter values listed under \texttt{\# PHYSICAL CLIMATE CONFIGURATION} in one \texttt{.config} file and paste into the \textit{user config} file. Alternatively a new \texttt{.config} file could be created with the alternative physics parameter set in.
+	
+	\item To swap over the biogeochemical parameter values:
+	\\Copy and replace the blocks of parameter definitions in the \textit{user config} file under the headings:
+	\vspace{-5.5pt}\begin{verbatim}
+	# --- BIOLOGICAL NEW PRODUCTION ---
+	# --- ORGANIC MATTER EXPORT RATIOS ---
+	# --- INORGANIC MATTER EXPORT RATIOS ---
+	# --- REMINERALIZATION ---
+	\end{verbatim}\vspace{-5.5pt}
+
+	\item To double the number of vertical levels in the 8-level configuration to 16:
+	\\It is easiest to use the 16-level base config (e.g. \texttt{genie\_eb\_go\_gs\_ac\_bg\_itfclsd\_16l\_JH}) and in the 	\textit{user config} file, add in all the namelist values associated with the 8-level version as described above -- i.e.:
+	\begin{compactitem}
+			\item remove seasonality
+			\item remove the atmospheric diffusion modification
+			\item copy in the physics parameter values from the \textit{base config} \texttt{genie\_eb\_go\_gs\_ac\_bg}
+			\item copy in (/replace) the biogeochemical parameter values from \texttt{worbe2\_preindustrial}
+	\end{compactitem}
+	
+	\item To halve the number of vertical levels in the 16-level configuration:
+	\\As above, except use the 8-level base config \texttt{genie\_eb\_go\_gs\_ac\_bg} and make everything else as per the 16-level configuration.
+	
+\end{compactitem}
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Chop genie runs into manageable pieces (useful for very long runs)}\label{Chop genie runs into manageable pieces (useful for very long runs)}
+
+Use the scripts in \texttt{genie-tools/runscripts}. Read the \texttt{READ\_ME} file in this directory for instructions.
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Generate ensembles and visualise their output using Mathematica}\label{Generate ensembles and visualise their output using Mathematica}
+
+Use the scripts in \texttt{genie-tools/runscripts}. Read the \texttt{READ\_ME} file in this directory for instructions. The Mathematica notebooks allow for easy ensemble generation accross multiple variables (still using non-XML version though!), and also for interactive plotting of time-series and netcdf data with GUIs - including comparisons and movies etc. (note: you can get a free trial of Mathematica if you don't have access to it).
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- HOW-TOs: Climate system -----------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\newpage
+\section{HOW-TOs: Climate system}\label{how-to-2}
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Adjust solar forcing in a time-dependent manner}\label{Adjust solar forcing in a time-dependent manner}
+
+The value of the solar constant in GENIE-1 is set by the namelist parameter \texttt{ma\_genie\_solar\_constant} and by default is set to 1368 W m-2, i.e.:
+\vspace{-11pt}\begin{verbatim}ma_genie_solar_constant=1368.0\end{verbatim}\vspace{-5.5pt}
+Specifying a different value for \texttt{ma\_genie\_solar\_constant} in the user config file allows the solar forcing of the EMBM to be altered. For example, to induce a 'snowball Earth' like state under a solar constant applicable to the late Neoproterozoic (some 6\% less than modern) you would set:
+\vspace{-11pt}\begin{verbatim}ma_genie_solar_constant=1330.56\end{verbatim}\vspace{-5.5pt}
+
+Modification of \texttt{ma\_genie\_solar\_constant} can be turned into a time-dependent forcing of solar forcing, but only by frequent re-starting using a sequence of short model integrations.
+
+Alternatively, a crude (temporary) hack is provided to allow a semi-continual adjustment of solar forcing. Whether you wish to vary the solar constant in a time-dependent manner is determined by the namelist parameter \texttt{bg\_ctrl\_force\_solconst}. By default this is set to \texttt{.false.}. By adding to the user config file:
+\vspace{-11pt}\begin{verbatim}bg_ctrl_force_solconst=.true.\end{verbatim}\vspace{-11pt}
+a time-varying change in the value of the solar constant will be imposed. For this, BIOGEM will expect the presence of a file called \texttt{biogem\_force\_solconst\_sig.dat} in the forcing directory\footnote{REMEMBER: The location of which is specified by the namelist parameter bg\_par\_fordir\_name.}.
+
+\texttt{biogem\_force\_solconst\_sig.dat} must contain two columns of information: the first is a time marker (year) and the second is a paired value for the solar constant. In the current crude incarnation of this feature, the time markers (1st column) \textbf{must} correspond exactly to the time markers in the time-series specification file\footnote{REMEMBER: The filename of which is specified by the namelist parameter bg\_par\_infile\_sig\_name.}. GENIE-1 will exit with an appropriate error message if this is not the case.
+
+Seasonal solar insolation is re-calculated each year with a call to:
+\vspace{-11pt}\begin{verbatim}radfor(genie_solar_constant)\end{verbatim}\vspace{-11pt}
+(EMBM file: \texttt{radfor.F}) at the start of the time-stepping loop in \texttt{genie.F}. At each time-marker, BIOGEM sets the value of \texttt{genie\_solar\_constant} equal to the corresponding value specified in \texttt{biogem\_force\_solconst\_sig.dat}. Thus, regardless of how closely-spaced the time-marker years are, (seasonal) solar insolation is only adjusted every year. For a longer time-marker interval than yearly, no interpolation is performed on the series of solar constant values, and in this way time-dependint solar forcing currently differs from the calculation of other forcings.
+
+EXAMPLE: A simple file might look something like:
+\vspace{-11pt}\begin{verbatim}
+-START-OF-DATA-
+ 0.5   1367.0
+ 1.5   1366.0
+ 2.5   1365.0
+ 3.5   1364.0
+ 4.5   1363.0
+ 5.5   1362.0
+ 6.5   1361.0
+ 7.5   1360.0
+ 8.5   1359.0
+ 9.5   1358.0
+10.5   1357.0
+-END-OF-DATA-
+\end{verbatim}\vspace{-11pt}
+which will decrease the value of the solar constant by 1 W m-2 each year. Note that because the solar forcing is only updated each year (with the call to \texttt{radfor.F}), the first year will be characterized by climate with a solar constant of 1368 W m-2, the default. Although BIOGEM sets a new value of \texttt{genie\_solar\_constant} (1367 W m-2) mid way through the first year, it is only at the start of the second year that solar insolation is recalculated according to the reduction in solar constant.
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Manipulate ocean circulation (e.g., collapse Atlantic meridional overturning)}\label{Manipulate ocean circulation (e.g., collapse Atlantic meridional overturning}
+
+BLAH
+
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- HOW-TOs: Ocean biology and biogeochemical cycling ---------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\newpage
+\section{HOW-TOs: Ocean biology and biogeochemical cycling}\label{how-to-3}
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Specify the CaCO3:POC export ratio}\label{Specify the CaCO3:POC export ratio}
+
+In the default\footnote{The default biological scheme is given by: \texttt{bg\_par\_bio\_prodopt='1N1T\_PO4MM'}.} 'biological' scheme in GENIE the CaCO3:POC export ratio from the surface ocean in BIOGEM is parameterized as a power law function of the degree of ambient oversaturation w.r.t. calcite [\textit{Ridgwell et al.}, 2007a,b]. The calculated CaCO\begin{math}_3\end{math}:POC ratio will vary therefore both spatially, particularly w.r.t. latitude (and temperature), as well as in time, if the surface ocean saturation state changes. The latter can arise from climatic (temperature) or circulation changes, or through a change in the DIC and/or ALK inventory of the ocean (such as resulting from emissions of fossil fuel CO2) or the re-partitioning of these species vertically within the ocean (e.g., as a result of any change in the strength of the biological pump).
+
+There may be situations in which it is advisable to hold the CaCO\begin{math}_3\end{math}:POC export ratio invariant. For instance, considering the current very considerable uncertainties in the impacts of ocean acidification on marine calcifiers [\textit{Ridgwell et al.}, 2007a] the safest assumption is arguably to exclude any acidification impact on calcification and carbonate export. Specifying a spatially uniform value of the CaCO\begin{math}_3\end{math}:POC ratio ratio (e.g. 0.25 or 0.3) also allows comparison with the results of early carbon cycle model studies. For deeper-time geological studies where little about marine carbonate production may be known \textit{a priori}, a spatially uniform value represents the simplest possible assumption (e.g., \textit{Panchuk et al.} [2008]).
+
+BIOGEM can be told to use a prescribed (spatially and temporally invariant) 2D field of CaCO\begin{math}_3\end{math}:POC export rain ratios (instead of calculating these internally as a function of ocean chemistry) by setting the 'Replace internal CaCO3:POC export rain ratio?' namelist flag to \texttt{.true.}:
+\vspace{-5.5pt}\begin{verbatim}bg_ctrl_force_CaCO3toPOCrainratio=.true.\end{verbatim}\vspace{-5.5pt}
+You must also then provide a 2D data field that specifies the value of the rain ratio at each and every surface ocean grid point. The filename of this field is set by default to:
+\vspace{-5.5pt}\begin{verbatim}bg_par_CaCO3toPOCrainratio_file="CaCO3toPOCrainratio.dat"\end{verbatim}\vspace{-5.5pt}
+and the file must be located in the 'BIOGEM data input directory'\footnote{\texttt{\$RUNTIME\_ROOT} being equal to \texttt{\~{}/genie}.}, which by default is:
+\vspace{-5.5pt}\begin{verbatim}bg_par_indir_name="$RUNTIME_ROOT/genie-biogem/data/input"\end{verbatim}\vspace{-5.5pt}
+
+This 2-D field must be in the form of an ASCII file with space (or tab) separated values arranged in rows and columns of latitude and longitude. The format of the file must follow the GOLDSTEIN ocean grid with the first line being the most Northerly row, and the last line the most Southerly row of grid points. Data along a row is from West to East. The latitude of the first column of values must be consistent with the defined starting latitude of the model grid, which is specified by the namelist parameter \texttt{gm\_par\_grid\_lon\_offset}\footnote{-260E by default}. Examples are given in the code repository\footnote{e.g., \texttt{\~{}/genie/genie-biogem/data/input/CaCO3toPOCrainratio\_worbe2\_preindustrial.dat}}.
+
+If you are using a uniform value, it is an easy enough job to create a \begin{math}36\times36\end{math} array of the value you so desire\footnote{It doesn't matter if you specify a value over land because only values associated with wet cells will be acted on.}.
+
+If you want to hold a previously-calculated (spatially variable) CaCO\begin{math}_3\end{math}:POC field constant, then the easiest way to achieve this is to copy the information contained in the time-slice results field \texttt{misc\_sur\_rCaCO3toPOC} in the results netCDF file \texttt{fields\_biogem\_2d.nc}\footnote{You must have the 'miscellaneous properties' time-slice save flag set to: \texttt{bg\_ctrl\_data\_save\_slice\_misc=.true.} (the default) for this field to be saved.}. Because this is a 3D data field (\begin{math}36\times36\times8\end{math}), carefully highlight just the surface ocean (2D) distribution (e.g., from the Panoply viewer) or extract from the netCDF file by some other means, and then copy and paste into \texttt{CaCO3toPOCrainratio.dat} (or whatever you have specified the filename as). When copying Panoply data, 'NaN's should be replaced by values of zero. Take care that the final (steady-state) time-slice is being copied and not the first (un-spunup) one ...
+
+\textbf{TIP}: In order to quantify the importance of calcification feedbacks with CO2 and climate, two model integrations are required: one with the CaCO\begin{math}_3\end{math}:POC ratio held constant and the other with it allowed to vary, thereby allowing the effect of a changing CaCO\begin{math}_3\end{math}:POC ratio on the system to to elucidated.
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Configure an abiotic ocean}\label{Configure an abiotic ocean}
+
+All biological productivity in the ocean can be turned off easily to create an abiotic ocean (why you would want to do this is another matter ... perhaps analysing the solubility pump or a 'deep-time' pre- significant marine life study(?)). The biological option is set by the namelist parameter \texttt{bg\_par\_bio\_prodopt} which by default takes a value of \texttt{"1N1T\_PO4MM"} to enable the scheme described in \textit{Ridgwell et al.} [2007a]. To have no biological production in the ocean, in the user config file, add:
+\vspace{-11pt}\begin{verbatim}bg_par_bio_prodopt="NONE"\end{verbatim}\vspace{-5.5pt}
+With this set, you do not have to specify any biological production or remineralization namelist parameter values in the \textit{user config} file.
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Prescribe biological export production}\label{Prescribe biological export production}
+
+Two possibilities:
+
+\begin{compactenum}
+
+	\item \textbf{Via a full prescription of all particulate fluxes in surface ocean}
+		\\Create a full set of particulate (sediment tracer) flux forcings fields for the surface ocean, one for each biologically-related sediment tracer selected in the model, including isotopes (and trace metals). Everything except for the surface layer can be left as a zero (0.0) in the two 3D spatial fields required for each tracer.
+  	\\You must also create a set of dissolved (ocean) tracer flux forcings fields for the surface ocean, one for each dissolved tracer associated with the particulates and selected in the model (including isotopes etc). The dissolved tracer flux fields must be create so as to exactly cancel out the particulate fields to conserve mass. For most tracers this is trivial, i.e., the fields for P in particulate organic matter (sed\_POP) need be associated with fields for dissolved PO4 (ocn\_PO4) which will simply be equal in magnitude but opposite in sign to POP. Complications start to arise for CaCO3 (2 alklinities) and there is also the question of alkalinity changes associated with organic matter creation/destruction (via changes in NO3).
+	
+	\item \textbf{By just prescribing just the POC flux}
+		\\An alternative has been provided enabling a full biological productivity in the surface ocean, but controlled by prescribing just the particulate organic carbon export flux. This 'biological' scheme is selected with::
+\vspace{-5.5pt}\begin{verbatim}bg_par_bio_prodopt="bio_POCflux"\end{verbatim}\vspace{-5.5pt}
+What happens in practice is that the POC flux is used to calculate the equivalent PO4 change in the surface ocean, and then this is passed to the biological scheme and export production calculated 'as usual'. (The POC flux forcing is set to zero once the associated PO4 (uptake) flux has been calculated.)
+		\\A particulate (sediment tracer) flux forcing for POC in the surface ocean still has to be defined and selected, but no other forcings (including dissolved) are required. An example forcing configuration is given in \texttt{EXAMPLE\_bio\_POCflux} (and which can be obtained form mygenie.seao2.org) and would naturally be selected by:
+\vspace{-5.5pt}\begin{verbatim}bg_par_fordir_name="$HOME/genie_forcings/TEST_bio_POCflux"\end{verbatim}\vspace{-5.5pt}
+\noindent \textbf{NOTE}: Take care with dissolved organic matter (DOM) production, as a fraction of the specified POC flux will be converted into POC (and similarly for the other components of POM). Simplest is to set no DOM production if you are uncertain:
+\vspace{-5.5pt}\begin{verbatim}bg_par_bio_red_DOMfrac=0.0\end{verbatim}\vspace{-5.5pt}
+\noindent \textbf{NOTE}: Also take care with the units of the flux forcing to the surface layer in the ocean (mol yr-1). Since GENIE-1 is often run on a equal area grid, it is not difficult to convert export production densities to mol yr-1. However, with an equal area grid, whatever the units are of the desired POC export field are do no matter -- the global export can be set and the spatial distribution will then be appropriately scaled (as per in the \texttt{EXAMPLE\_bio\_POCflux} example). Also be aware that if there is insufficient PO4 to support the require POC flux, you will not get your entire POC flux. Global total export may thus be somewhat less than that specified.
+
+\end{compactenum}
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Add new tracers}\label{Add new tracers}
+
+BLAH
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Extend the scope of isotopic fractionation}{Extend the scope of isotopic fractionation}
+
+BLAH
+
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- HOW-TOs: Sediments and weathering -------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\newpage
+\section{HOW-TOs: Sediments and weathering}\label{how-to-4}
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Spin-up the marine carbon cycle with sediments}\label{Spin-up the marine carbon cycle with sediments}
+
+ideally, one would simply spin up climate plus a full marine carbon cycle (i.e., including deep-sea sediments and weathering input) in GENIE-1 in a single experiment. This is indeed quite possible to do, but suffers from several drawbacks. Firstly, the time taken to reach a steady-state in a system with a fixed weathering input is order 100 kyr. The situation is much worse (order 1 Myr) if the weathering is calculated as a function of climate in the model. Secondly, because there is a prolonged interval during which the rate of carbonate burial in deep-sea sediments is less than weathering as sediment composition slowly adjusts from its initialization conditions of 0 wt\% CaCO3, the Ca and ALK inventories of the ocean will diverge from the initial conditions -- i.e., the final steady state of the marine carbon cycle will not be characterized by the modern (preindustrial) ocean chemistry in which the ocean was initialized. It does not matter whether atmospheric CO2 is prescribed (i.e., fixed) during the spin-up or is allowed to evolve freely. Lastly, the rate of weathering require to balance CaCO3 burial in deep-sea sediments and produce a close approximation of the modern observed distribution of CaCO3 in surface sediments, may not be known \textit{a priori}, except in the case of the model being configured identically following a published configuration, e.g., \textit{Ridgwell and Hargreaves} [2007]. The last of these problems is arguably the most important -- i.e., what weathering flux should be set (or how to scale a mechanistically-based weathering scheme) in order to sufficiently closely reproduce modern CaCO3 burial (and production and preservation) in deep-sea sediments?
+
+There are a number of possible solutions to this. One; a 'brute force' attack, involves running an ensemble of models with a range of weathering rates (solute fluxes) and choosing the ensemble member that most closely reproduces modern core-top CaCO3 distributions. An alternative multi-step spin-up is described in \textit{Ridgwell and Hargreaves} [2007]. This methodology is described in detail as follows:
+
+\begin{compactenum}
+
+	\item \textbf{Closed system spin-up}
+	\\The \textit{base configuration} required for the 8-level ocean closed system spin-up with sediments but no weathering module, is:
+\vspace{-5.5pt}\begin{verbatim}genie_eb_go_gs_ac_bg_sg\end{verbatim}\vspace{-5.5pt}
+and for the 16-level ocean:
+\vspace{-5.5pt}\begin{verbatim}genie_eb_go_gs_ac_bg_sg_itfclsd_16l_JH\end{verbatim}\vspace{-5.5pt}
+
+	\item \textit{User config} files and sets of \textit{forcings} are provided on the \href{mygenie.seao2.org}{'mygenie'} website and are described in the Tutorial:
+
+\begin{compactitem}
+	
+	\item \texttt{worbe2\_preindustrial\_fullCC\_spin1\_ORIGINAL} (8-level ocean). 
+		
+	\item \texttt{worjh2\_preindustrial\_fullCC\_spin1\_ORIGINAL} (16-level ocean). 
+	
+\end{compactitem}
+
+	The key features of these experimental designs are:
+	\begin{compactitem}
+		\item By configuring the marine carbon cycle as 'closed', with no losses from the sediments and no weathering input, ocean [Ca2+] and [ALK] will not diverge from the initial values\footnote{Except for a small difference due to the presence of a non-zero amount of particulate and dissolved biogenic material in the ocean.}. A closed system is requested by:
+\vspace{-5.5pt}\begin{verbatim}bg_ctrl_force_sed_closedsystem=.true.\end{verbatim}\vspace{-5.5pt}
+		\item The flavor (as defined in the \textit{base config}) of GENIE-1 does not include the ROKGEM module, so no weathering flux (input to the ocean) is applied. 
+		\item The sediments are configured with no bioturbation applied to the uppermost layers in order to accelerate achieving the steady state condition. This is done by setting:
+\vspace{-5.5pt}\begin{verbatim}sg_ctrl_sed_bioturb=.false.\end{verbatim}\vspace{-5.5pt}
+		It does not matter then which bioturbation option is used (i.e., whether \texttt{\seqsplit{sg\_ctrl\_sed\_bioturb\_Archer}}, the option to use the \textit{Archer et al.} [2002] bioturbation parameterization, is \texttt{.false.} or \texttt{.true.}), nor the maximum number of sediment layers to be bioturbated (\texttt{sg\_par\_n\_sed\_mix}). However, the \textit{Archer} [1991] sediment model, which is selected by:
+\vspace{-5.5pt}\begin{verbatim}sg_par_sed_diagen_CaCO3opt="archer1991explicit"\end{verbatim}\vspace{-5.5pt}
+requires an appropriate rate of bioturbation in order to correctly calculate CaCO3 preservation in the sediments. This is the purpose of the namelist lines:
+\vspace{-5.5pt}\begin{verbatim}
+sg_par_sed_mix_k_sur_max=0.15
+sg_par_sed_mix_k_sur_min=0.15
+\end{verbatim}\vspace{-5.5pt}
+under the sub-heading 'set invarient surface bioturbation mixing rate' in the \textit{user config} file. Basically, this constrains the bioturbation rate at the sediment surface, which the Archer [1991] sediment diagenesis model applies unformly throughout the sediment column, to always be 0.15 cm2 yr-1.
+		\item A non-carbonate (detrital material + opal) flux field to the sediments is prescribed in order to provide a dilution of CaCO3 and thus achieve an improved simile of the modern observed distribution of wt\% CaCO3 in surface sediments\footnote{Note that an additional (spatially uniform) detrital flux should nto then be applied as well, which is specified by: 
+\texttt{sg\_par\_sed\_fdet=0.0}.}. The resquesite set of \textit{forcings} (for the 8-level ocean configuration) is requested by:
+\vspace{-5.5pt}\begin{verbatim}bg_par_fordir_name="~/genie_forcings/worbe2_0278CO2_detplusopalSED"\end{verbatim}\vspace{-5.5pt}
+This field is described in further detail in \textit{Ridgwell and Hargreaves} [2007].
+		\item Atmospheric CO2 is held at (= restored to) 278 ppm during the experiment. The \textit{forcing} for this is defined as specified above. Ocean DIC can diverge from its initial inventory by exchange with the atmosphere.
+		\item In this experimental design, the CaCO3:POC rain ratio is free to evolve in response to spatial and temporal variations in carbonate ion concentration (i.e., there is no prescribed field of CaCO3:POC)\footnote{This is the default and thus does not need to be explicitly set in the \textit{user config}.}, i.e.:
+\vspace{-5.5pt}\begin{verbatim}bg_ctrl_force_CaCO3toPOCrainratio=.false.\end{verbatim}\vspace{-5.5pt}
+Note that the fraction of exported CaCO3 that reaches the sea floor without being subject to dissolution has been adjusted slightly compared to the calibrated value described in \textit{Ridgwell and Hargreaves} [2007] to optimize the resulting distribution of core-top wt\% CaCO3 because of changes to the sediment dissolution model and porosity parameterization [\textit{Ridgwell} 2007].
+		\item Additional time-slice saving of sediment related properties is requested in the \textit{user config}:
+		\vspace{-5.5pt}\begin{verbatim}
+		#time-slice data save: Sediment (interface) composition (2D)?
+		bg_ctrl_data_save_slice_ocnsed=.true.
+		#time-slice data save: Ocean-sediment flux (2D)?
+		bg_ctrl_data_save_slice_focnsed=.true.
+		#time-slice data save: Sediment-ocean flux (2D)?
+		bg_ctrl_data_save_slice_fsedocn=.true.
+		\end{verbatim}\vspace{-5.5pt}
+		\item The recommended time required for a steady-state to be achieved is 25 kyr\footnote{This value is set at the command line when using the \texttt{old\_rungenie.sh} script.}. When using the time-slice and time-series data saving specification files that are prescribed in the example experiments:
+\vspace{-5.5pt}\begin{verbatim}
+bg_par_infile_slice_name="save_timeslice_log10_25kend.dat"
+bg_par_infile_sig_name="save_sig_log10_25kend.dat"
+\end{verbatim}\vspace{-5.5pt}
+it will be necessary to specify a run-time of 25001 years, as the last save points are set with a mid-point at 25000.5. Alternative, create and prescribe a different set of time-slice and time-series data saving specification files ...
+	\end{compactitem}
+	
+	\item \textbf{Open system spin-up}
+		\\To balance the sedimentation loss in an open system, a weathering flux (input to the ocean) must be applied. The ROKGEM weathering module is thus now required. The \textit{base configuration} required for the 8-level ocean open system spin-up with sediments AND weathering is:
+\vspace{-5.5pt}\begin{verbatim}genie_eb_go_gs_ac_bg_sg_rg\end{verbatim}\vspace{-5.5pt}
+and for the 16-level ocean:
+\vspace{-5.5pt}\begin{verbatim}genie_eb_go_gs_ac_bg_sg_rg_itfclsd_16l_JH\end{verbatim}\vspace{-5.5pt}
+
+\begin{compactitem}
+	
+	\item \texttt{worbe2\_preindustrial\_fullCC\_spin2} (8-level ocean). 
+		
+	\item \texttt{worjh2\_preindustrial\_fullCC\_spin2} (16-level ocean). 
+	
+\end{compactitem}
+
+		The key features of these experimental designs are:
+	\begin{compactitem}
+		\item The marine carbon cycle is configured as 'open', allowing losses due to burial in accumulating sediments.
+In the \textit{user config} an open system is set by:
+\vspace{-5.5pt}\begin{verbatim}bg_ctrl_force_sed_closedsystem=.false.\end{verbatim}\vspace{-5.5pt}
+		\item An appropriate weathering flux must be set. The simplest implementation of this is to set the flux as a CaCO3 equivalent weathering rate. The value is diagnosed from the closed system spin-up (described above). Global CaCO3 burial ('\texttt{Total CaCO3 pres (sediment grid)}') at the end of the model run is recorded by the SEDGEM module and saved in a file called:
+		\vspace{-5.5pt}\begin{verbatim}seddiag_misc_DATA_GLOBAL.res\end{verbatim}\vspace{-5.5pt}
+	This value is used to set a fixed carbonate weathering flux (silicate weathering is zero by default), e.g.:
+\vspace{-5.5pt}\begin{verbatim}rg_par_weather_CaCO3=0.100000E+14\end{verbatim}\vspace{-5.5pt}
+		\item The sediments are now configured with bioturbational mixing applied to the uppermost layers, by:
+\vspace{-5.5pt}\begin{verbatim}sg_ctrl_sed_bioturb=.true.\end{verbatim}\vspace{-5.5pt}
+The minimum and maximum limits of bioturbational mixing intensity (measured at the sediment-ocean interface) are set consistent with \textit{Archer} [1991] as before:
+\vspace{-5.5pt}\begin{verbatim}
+sg_par_sed_mix_k_sur_max=0.15
+sg_par_sed_mix_k_sur_min=0.15
+\end{verbatim}\vspace{-5.5pt}
+The profile of declining mixing intensity with depth in the sediments, and by default is set to:
+\vspace{-5.5pt}\begin{verbatim}sg_par_sed_mix_k_name="sedgem_sed_mix_k.dat"\end{verbatim}\vspace{-5.5pt}
+This corresponds to the profile described in \textit{Ridgwell} [2007].
+		\item The spatial pattern of CaCO3:POC rain ratio is still free to evolve. The main differences compared to the spin-up will be due to the routing of a weathering solute flux via the rivers to the ocean. As a result of small changes in CaCO3:POC, the predicted distribution of CaCO3 in deep-sea sediments will change slightly, as will ocean chemistry.
+		\item The recommended runtime is 50 kyr. When using the time-slice and time-series data saving specification files that are prescribed in the example experiments:
+\vspace{-5.5pt}\begin{verbatim}
+bg_par_infile_slice_name="save_timeslice_log10_50kend.dat"
+bg_par_infile_sig_name="save_sig_log10_50kend.dat"
+\end{verbatim}\vspace{-5.5pt}
+it will be necessary to specify a run-time of 50001 years, as the last save points are set with a mid-point at 50000.5. Alternative, create and prescribe a different set of time-slice and time-series data saving specification files yourself ...
+	\end{compactitem}
+	
+\end{compactenum}
+
+This methodology was highly successful in \textit{Ridgwell and Hargreaves} [2007], with the switch from a closed system to open producing little overall change in marine carbon cycling. However, the original model used a weathering input that was evenly distributed throughout the entire ocean. With the advent of the ROKGEM weathering module, solute fluxes derived from weathering are routed via the rivers, with the solute input mostly localized to relatively few coastal cells. Thus, in going from a closed to open system,  carbonate chemistry in coastal cells is significantly modified. This has impacts on CaCO3 production (and air-sea gas exchange) and on CaCO3 preservation and burial in shallower sediments. The result is a drift in ocean chemistry (e.g., Ca2+ and ALK) during the open system phase of the spin-up compared to the state saved at the end of the initial closed system spin-up phase.
+
+An alternative, 2-part spin-up methodology now resolves this:
+
+\begin{compactenum}
+
+	\item \textbf{Revised methodology: First-guess closed system spin-up}
+	\\As of \textbf{r4211} this it is possible to carry out the initial spin-up, \textbf{with} a solute input to the ocean via rivers, but also with the system configured 'closed', i.e.,:
+\vspace{-5.5pt}\begin{verbatim}bg_ctrl_force_sed_closedsystem=.true.\end{verbatim}\vspace{-5.5pt}
+The weathering flux is subtracted from ocean cells overlying the sediments to balance the global budget and ensure a closed system. This subtraction involves partitioning the total global weathering flux between each ocean floor cell with a subtraction in proportion to the estimated CaCO3 preservation and burial rate. To utilize this methodology now requires that the ROKGEM module is used, i.e., a \textit{base config} such as:
+\vspace{-5.5pt}\begin{verbatim}genie_eb_go_gs_ac_bg_sg_rg\end{verbatim}\vspace{-5.5pt}
+A first guess for the weathering flux must now be prescribed. This could be derived from a previous closed system model experiment with no weathering flux specified (diagnosing weathering from total global CaCO3 burial as described earlier), or from the literature, e.g., \textit{Ridgwell} [2007] cites 20 Tmol HCO3- yr-1, an equivalent CaCO3 weathering rate of 10 Tmol yr-1:
+\vspace{-5.5pt}\begin{verbatim}rg_par_weather_CaCO3=10.00E+12\end{verbatim}
+
+\textit{User config} files and sets of \textit{forcings} are provided on the \href{mygenie.seao2.org}{'mygenie'} website and are described in the Tutorial:
+
+\begin{compactitem}
+	
+	\item \texttt{worbe2\_preindustrial\_fullCC\_spin1} -- a non-seasonally forced 8-level ocean. 
+		
+	\item \texttt{worjh2\_preindustrial\_fullCC\_spin1} -- a seasonally-forced 16-level ocean. 
+	
+\end{compactitem}	
+\noindent To launch one of these experiments, type (all in one line; notes space separators between line items in this document format):
+\vspace{-5.5pt}\begin{verbatim}./old_rungenie.sh genie_eb_go_gs_ac_bg_sg_rg ~/genie_userconfigs
+worbe2_preindustrial_fullCC_spin1 25001 
+\end{verbatim}
+	
+	\item \textbf{Revised methodology: Open system spin-up}
+	\\The last stage is an open system spin-up as described previously. The prescribed weathering flux (\texttt{rg\_par\_weather\_CaCO3}) is revised from the diagnosed global CaCO3 burial rate calculated in the previous closed system experiment.
+Do not forget to set an open system in the \textit{user config}:
+\vspace{-5.5pt}\begin{verbatim}bg_ctrl_force_sed_closedsystem=.false.\end{verbatim}\vspace{-5.5pt}
+
+\textit{User config} files and sets of \textit{forcings} are provided on the \href{mygenie.seao2.org}{'mygenie'} website and are described in the Tutorial:
+
+\begin{compactitem}
+	
+	\item \texttt{worbe2\_preindustrial\_fullCC\_spin2} -- a non-seasonally forced 8-level ocean. 
+		
+	\item \texttt{worjh2\_preindustrial\_fullCC\_spin2} -- a seasonally-forced 16-level ocean. 
+	
+\end{compactitem}
+
+\noindent To launch one of these experiments:
+\vspace{-5.5pt}\begin{verbatim}./old_rungenie.sh genie_eb_go_gs_ac_bg_sg_rg ~/genie_userconfigs
+worbe2_preindustrial_fullCC_spin2 50001 
+~/genie_output/genie_eb_go_gs_ac_bg_sg_rg.worbe2_preindustrial_fullCC_spin1
+\end{verbatim}
+
+\end{compactenum}
+
+There is still some departure of ocean Ca and ALK inventories during the revised multi-stage spin-up compared to observed (and the initialized values), but this is substantially reduced compared to the original 2-part spin-up methodology as well as to a single spin-up methodology.
+
+\noindent \textbf{TIP}: Having completed the full marine carbon cycle spin-up, it is recommended that the CaCO3:rain ratio is set invariant -- see earlier HOWTO. If the default CaCO3 parameterization setting is retained, CO2-calcification feedback as described in \textit{Ridgwell et al.} [2007b] is enabled.
+
+\noindent \textbf{TIP}: It is also possible to iterate the weathering estimate in a 'second-guess' closed system spin-up. For this -- after the fist stage closed system spin-up, run a 2nd closed spin-up, with the prescribed weathering input (\texttt{rg\_par\_weather\_CaCO3}) set equal to the diagnosed global CaCO3 burial rate ('\texttt{Total CaCO3 pres (sediment grid)}') in the SEDGEM module results file \texttt{seddiag\_misc\_DATA\_GLOBAL.res}). The end result of the previous iteration can also be employed as a restart to bring the system closer to steady-state initially. However, this additional iterative step does not seem to offer any significant benefit, at least where the initial weathering guess was sufficiently close to the subsequently diagnosed CaCO3 burial flux.
+
+\noindent \textbf{NOTE}: There is no climate feedback by default. To run experiments with feedback between CO2 and climate, add:\vspace{-11pt}\begin{verbatim}ea_36=y\end{verbatim}\vspace{-11pt}
+at the end of the \textit{user config}.
+
+ \textbf{SHORT-CUT} [by Greg Colbourn]: 
+The above methodology has been handily compiled into the scripts \texttt{genie\_configpatches/worbe2\_fullCC\_*.sh}, to be used in conjunction with \texttt{\seqsplit{genie\_myr\_multipart.sh}} and \texttt{qsub\_genie\_myr\_multipart.sh} in the directory \texttt{\seqsplit{genie-tools/genie\_runscripts}} (these can also be run with other scripts to generate ensembles of runs that are split into manageable chunks of a few thousand years each. See \texttt{\seqsplit{genie-tools/genie\_runscripts/READ\_ME}} for details). For a basic run, when in  \texttt{genie-tools/genie\_runscripts}, type (all on 1 line):
+\vspace{-5.5pt}\begin{verbatim}/bin/bash qsub_genie_myr_multipart.sh genie_eb_go_gs_ac_bg_sg_rg worbe2_fullCC 
+your_tparams 3 1 x 0 10
+\end{verbatim}
+Where \texttt {your\_params} is a config file in \texttt{genie\_configpatches} containing any additional parameters you want to set, and \texttt{x} is the length in number of years of each job to be submitted (e.g. \texttt{4000} for a short queue).  \texttt {3} is the number of parts to the experiment (2 parts spin-up, one main experiment); run lengths for different parts are set in the files \texttt{\seqsplit{genie\_configpatches/worbe2\_fullCC\_*.sh}}. The default of \texttt{RUNLENGTH=100,001} in \texttt{worbe2\_fullCC\_2.sh} is because sediments are much closer to equilibrium after 100,000 years than 50,000.
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Run the sediments at higher resolution}\label{Run the sediments at higher resolution}
+
+By default (as set in the \textit{base config} file in \texttt{\~{}/genie/genie-main/configs}) the SEDGEM sediment grid is configured at a resolution of 36x36 (and on an equal area grid), by:
+\vspace{-5.5pt}\begin{verbatim}
+SEDGEMNLONSOPTS='$(DEFINE)SEDGEMNLONS=36'
+SEDGEMNLATSOPTS='$(DEFINE)SEDGEMNLATS=36'
+\end{verbatim}\vspace{-5.5pt}
+Several data input files are required by SEDGEM consistent with the specified grid:
+
+\begin{compactitem}
+	
+	\item A mask, which specifies the sediment grid locations (if any!) at which 'sediment cores' (see: \textit{Ridgwell} [2007]) are to be generated at:
+	\vspace{-5.5pt}\begin{verbatim}sg_par_sedcore_save_mask_name="sedgem_save_mask.36x36"\end{verbatim}\vspace{-5.5pt}
+	The example provided on SVN contains some illustrative locations set (by a '\texttt{1}') for cores to be generated in.
+	
+	\item The required sediment grid topography (bathymetry):
+	\vspace{-5.5pt}\begin{verbatim}sg_par_sed_topo_D="sedgem_topo_D.36x36"\end{verbatim}\vspace{-5.5pt}
+	This particular grid is derived from observed bathymetry and excludes sediment locations shallower than the surface ocean layer (of the 8-level model) as described in Ridgwell and Hargreaves [2007].
+	
+\end{compactitem}
+
+The directory location of the required files is set by input directory namelist setting, which by default is:
+	\vspace{-11pt}\begin{verbatim}sg_par_indir_name="$RUNTIME_ROOT/genie-sedgem/data/input"\end{verbatim}\vspace{-5.5pt}
+
+As described in Ridgwell and Hargreaves [2007], SEDGEM can be sub-gridded to a resolution of 72x72 (equal area). The following namelist additions are necessary to the \textit{user config} file:
+\vspace{-5.5pt}\begin{verbatim}
+SEDGEMNLONSOPTS='$(DEFINE)SEDGEMNLONS=72'
+SEDGEMNLATSOPTS='$(DEFINE)SEDGEMNLATS=72'
+sg_par_sed_topo_D="sedgem_topo_D.72x72"
+sg_par_sedcore_save_mask_name="sedgem_save_mask.72x72"
+\end{verbatim}\vspace{-5.5pt}
+
+\textbf{NOTE}: Carbonate chemistry stability problems (= model crash) may occur in the 16-level configuration in conjunction with 72x72 resolution sub-gridded sediments. Who knows why?! :(
+
+
+
+%---------------------------------------------------------------------------------------------------------------------------------
+%--- Contact Information ---------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------------------------------
+
+\newpage
+\section{Contact Information}
+
+\begin{compactitem}
+	\item Andy Ridgwell: \texttt{andy@seao2.org}
+	\item Greg Colbourn: \texttt{gcolbourn@hotmail.com}
+\end{compactitem}
+
+
+
+%=================================================================================================================================
+%=== END DOCUMENT ================================================================================================================
+%=================================================================================================================================
+
+\end{document}

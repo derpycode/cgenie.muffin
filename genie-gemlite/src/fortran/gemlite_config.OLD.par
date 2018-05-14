@@ -1,0 +1,22 @@
+! *************************************************************************************************
+! gemlite_config.dat
+! INPUT PARAMETER FILE
+! *************************************************************************************************
+
+-START-OF-DATA-
+
+*** INTEGRATION CONTROL ***
++0.050E+04                      Time interval of non-accelerated 'normal' mode operation (yr)   [DATA FORMAT: 'E10.3']   [DEFAULT: +2.300E+03]
++2.000E+04                      Time interval of accelerated geochemistry (yr)                  [DATA FORMAT: 'E10.3']   [DEFAULT: +0.765E+03]
+000500                          number of time steps between atm-ocn-sed re-equilibrium         [DATA FORMAT: 'I10']     [DEFAULT: 0000001000]
+000010                          number of time steps between recalculating forcings             [DATA FORMAT: 'I10']     [DEFAULT: 0000000010]
+
+*** I/O ***
+001000                          number of time steps between status updates                     [DATA FORMAT: 'I10']     [DEFAULT: 0000000010]
+f                               debug Gemlite?                                                  [DATA FORMAT: 'L4']      [DEFAULT: F]
+-END-OF-DATA-
+
+FILE FORMAT:
+
+COLUMN #00: data value
+COLUMN #32: description, data format, and default data value
