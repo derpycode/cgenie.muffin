@@ -1056,7 +1056,7 @@ subroutine biogem(        &
                       & .AND. &
                       & (force_flux_ocn_select(io_DIC_13C) .OR. force_flux_atm_select(ia_pCO2_13C)) &
                       & ) THEN
-                    ! (3) INVERSIONS: ocean DIC d13C [SURFACE ONLY] -- DIC *OR* pCO2 fluxes ...
+                    ! (3) INVERSIONS: ocean DIC of DOC d13C [SURFACE ONLY] -- DIC *OR* pCO2 fluxes ...
                     if (force_restore_ocn_select(io_DIC_13C)) then
                        ! calculate local variables
                        loc_standard = const_standards(ocn_type(io_DIC_13C))
@@ -1070,6 +1070,10 @@ subroutine biogem(        &
                        else
                           loc_delta_actual = loc_force_actual_d13C
                        end if
+                          loc_delta_target = fun_calc_isotope_delta( &
+                              & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_13C),i,j,n_k), &
+                              & loc_standard,.FALSE.,const_real_null &
+                              & )
                     elseif (force_restore_ocn_select(io_DOM_C_13C)) then
                        ! calculate local variables
                        loc_standard = const_standards(ocn_type(io_DOM_C_13C))
@@ -1083,11 +1087,11 @@ subroutine biogem(        &
                        else
                           loc_delta_actual = loc_force_actual_d13C
                        end if
+                          loc_delta_target = fun_calc_isotope_delta( &
+                              & force_restore_locn(io2l(io_DOM_C),i,j,n_k),force_restore_locn(io2l(io_DOM_C_13C),i,j,n_k), &
+                              & loc_standard,.FALSE.,const_real_null &
+                              & )
                     end if
-                    loc_delta_target = fun_calc_isotope_delta( &
-                         & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_13C),i,j,n_k), &
-                         & loc_standard,.FALSE.,const_real_null &
-                         & )
                     IF (force_flux_ocn_select(io_DIC_13C)) THEN
                        loc_frac = force_flux_locn(io2l(io_DIC_13C),i,j,n_k)/force_flux_locn(io2l(io_DIC),i,j,n_k)
                        loc_delta_source = fun_calc_isotope_delta( &
