@@ -1109,20 +1109,16 @@ subroutine biogem(        &
                        loc_delta_source = 0.0
                     end IF
                     ! calculate the sign of the CO2 input
-                    If (loc_delta_target > loc_delta_actual) then
-                       if (loc_delta_source > loc_delta_actual) then
-                          loc_force_sign = 1.0
-                       else
-                          loc_force_sign = -1.0
-                          if (ctrl_force_invert_noneg) loc_force_sign = 0.0
-                       end If
+                    ! NOTE: becasue the target is DOC or DIC, it does not make sense to contrast source and target d13C
+                    !       (and adjust the sign of teh force on this basis)
+                    If (loc_force_target < loc_force_actual) then
+                       loc_force_sign = 1.0
                     else
-                       if (loc_delta_source > loc_delta_actual) then
-                          loc_force_sign = -1.0
-                          if (ctrl_force_invert_noneg) loc_force_sign = 0.0
+                       if (ctrl_force_invert_noneg) then
+                          loc_force_sign = 0.0
                        else
-                          loc_force_sign = 1.0
-                       end If
+                          loc_force_sign = -1.0
+                       end if
                     end If
                     ! calculate flux of CO2 to ocean *OR* atmosphere with specified d13C to approach atmospheric d13C target
                     ! NOTE: units of (mol yr-1)
