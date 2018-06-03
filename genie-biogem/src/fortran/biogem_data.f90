@@ -2707,6 +2707,8 @@ CONTAINS
          & .OR. &
          & (force_restore_ocn_select(io_DIC_13C) .AND. force_flux_atm_select(ia_pCO2_13C)) &
          & .OR. &
+         & (force_restore_ocn_select(io_DOM_C_13C) .AND. force_flux_atm_select(ia_pCO2_13C)) &
+         & .OR. &
          & (force_restore_ocn_select(io_DIC_13C) .AND. force_flux_ocn_select(io_DIC_13C)) &
          & .OR. &
          & (force_restore_ocn_select(io_ALK) .AND. force_flux_ocn_select(io_ALK)) &

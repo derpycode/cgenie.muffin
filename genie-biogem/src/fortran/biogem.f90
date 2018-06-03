@@ -1070,10 +1070,10 @@ subroutine biogem(        &
                        else
                           loc_delta_actual = loc_force_actual_d13C
                        end if
-                          loc_delta_target = fun_calc_isotope_delta( &
-                              & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_13C),i,j,n_k), &
-                              & loc_standard,.FALSE.,const_real_null &
-                              & )
+                       loc_delta_target = fun_calc_isotope_delta( &
+                           & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_13C),i,j,n_k), &
+                           & loc_standard,.FALSE.,const_real_null &
+                           & )
                     elseif (force_restore_ocn_select(io_DOM_C_13C)) then
                        ! calculate local variables
                        loc_standard = const_standards(ocn_type(io_DOM_C_13C))
@@ -1087,10 +1087,10 @@ subroutine biogem(        &
                        else
                           loc_delta_actual = loc_force_actual_d13C
                        end if
-                          loc_delta_target = fun_calc_isotope_delta( &
-                              & force_restore_locn(io2l(io_DOM_C),i,j,n_k),force_restore_locn(io2l(io_DOM_C_13C),i,j,n_k), &
-                              & loc_standard,.FALSE.,const_real_null &
-                              & )
+                       loc_delta_target = fun_calc_isotope_delta( &
+                           & force_restore_locn(io2l(io_DOM_C),i,j,n_k),force_restore_locn(io2l(io_DOM_C_13C),i,j,n_k), &
+                           & loc_standard,.FALSE.,const_real_null &
+                           & )
                     end if
                     IF (force_flux_ocn_select(io_DIC_13C)) THEN
                        loc_frac = force_flux_locn(io2l(io_DIC_13C),i,j,n_k)/force_flux_locn(io2l(io_DIC),i,j,n_k)
@@ -1111,7 +1111,7 @@ subroutine biogem(        &
                     ! calculate the sign of the CO2 input
                     ! NOTE: becasue the target is DOC or DIC, it does not make sense to contrast source and target d13C
                     !       (and adjust the sign of teh force on this basis)
-                    If (loc_force_target < loc_force_actual) then
+                    If (loc_delta_target < loc_delta_actual) then
                        loc_force_sign = 1.0
                     else
                        if (ctrl_force_invert_noneg) then
