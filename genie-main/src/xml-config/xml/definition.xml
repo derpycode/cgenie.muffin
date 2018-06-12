@@ -4096,16 +4096,12 @@
                         <description>Specific CH4 oxidation rate (d-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_kAER">
-            <value datatype="real">50.0</value>
+            <value datatype="real">1.57</value>
                         <description>Aerobic methanotrophy rate constant (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_Km_O2">
-            <value datatype="real">10.0E-06</value>
+            <value datatype="real">20.0E-06</value>
                         <description>Aerobic methanotrophy O2 half sat constant (mol kg-1)</description>
-                    </param>
-                    <param name="par_bio_remin_AER_Km_CH4">
-            <value datatype="real">0.1E-06</value>
-                        <description>Aerobic methanotrophy CH4 half sat constant (mol kg-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_thermo">
             <value datatype="string">off</value>
@@ -4116,16 +4112,12 @@
                         <description>Std Gibbs free energy of AER (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_BEQ">
-            <value datatype="real">10.0</value>
+            <value datatype="real">15.0</value>
                         <description>AER biological energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_kAOM">
-            <value datatype="real">0.056</value>
+            <value datatype="real">0.022</value>
                         <description>AOM rate constant (yr-1) (see Olson et al., 2016)</description>
-                    </param>
-                    <param name="par_bio_remin_AOM_Km_CH4">
-            <value datatype="real">1.0E-06</value>
-                        <description>AOM CH4 half sat constant (mol kg-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_Km_SO4">
             <value datatype="real">500.0E-6</value>
@@ -4140,7 +4132,7 @@
                         <description>Std Gibbs free energy of AOM (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_BEQ">
-            <value datatype="real">10.0</value>
+            <value datatype="real">15.0</value>
                         <description>AOM bio energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_Rgas">
