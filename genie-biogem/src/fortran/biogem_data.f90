@@ -241,12 +241,10 @@ CONTAINS
        print*,'Specific CH4 oxidation rate (d-1)                   : ',par_bio_remin_CH4rate
        print*,'AER rate constant (yr-1)                            : ',par_bio_remin_AER_kAER
        print*,'AER O2 half sat constant (mol kg-1)                 : ',par_bio_remin_AER_Km_O2
-       print*,'AER CH4 half sat constant (mol kg-1)                : ',par_bio_remin_AER_Km_CH4
        print*,'Thermodynamic drive ID string for AER               : ',par_bio_remin_AER_thermo
        print*,'Std Gibbs free energy of AER (kJ mol-1)             : ',par_bio_remin_AER_dG0
        print*,'Biological energy quantum (BEQ) for AER (kJ mol-1)  : ',par_bio_remin_AER_BEQ
        print*,'AOM rate constant (yr-1)                            : ',par_bio_remin_AOM_kAOM
-       print*,'AOM CH4 half sat constant (mol kg-1)                : ',par_bio_remin_AOM_Km_CH4
        print*,'AOM SO4 half sat constant (mol kg-1)                : ',par_bio_remin_AOM_Km_SO4
        print*,'Thermodynamic drive ID string for AOM               : ',par_bio_remin_AOM_thermo
        print*,'Std Gibbs free energy of AOM (kJ mol-1)             : ',par_bio_remin_AOM_dG0
