@@ -251,8 +251,6 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_AER_kAER
   real::par_bio_remin_AER_Km_O2                                  ! AER O2 half sat constant (mol kg-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_AER_Km_O2
-  real::par_bio_remin_AER_Km_CH4                                 ! AER CH4 half sat constant (mol kg-1)
-  NAMELIST /ini_biogem_nml/par_bio_remin_AER_Km_CH4
   CHARACTER(len=63)::par_bio_remin_AER_thermo                    ! AER thermodynamic drive ID string
   NAMELIST /ini_biogem_nml/par_bio_remin_AER_thermo
   real::par_bio_remin_AER_dG0                                    ! Std Gibbs free energy of AOM (kJ mol-1)
@@ -261,8 +259,6 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_AER_BEQ
   real::par_bio_remin_AOM_kAOM                                   ! AOM rate constant (yr-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_AOM_kAOM
-  real::par_bio_remin_AOM_Km_CH4                                 ! AOM CH4 half sat constant (mol kg-1)
-  NAMELIST /ini_biogem_nml/par_bio_remin_AOM_Km_CH4
   real::par_bio_remin_AOM_Km_SO4                                 ! AOM SO4 half sat constant (mol kg-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_AOM_Km_SO4
   CHARACTER(len=63)::par_bio_remin_AOM_thermo                    ! AOM thermodynamic drive ID string

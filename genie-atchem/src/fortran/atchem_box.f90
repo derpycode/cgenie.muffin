@@ -127,8 +127,10 @@ CONTAINS
      real::loc_tau
      real::loc_fracdecay
      real::loc_O2, loc_CH4, loc_CO2
-     real::loc_13CH4, loc_r13CH4
-     real::loc_13CO2, loc_r13CO2
+     real::loc_13CH4, loc_14CH4
+     real::loc_r13CH4, loc_r14CH4
+     real::loc_13CO2, loc_14CO2
+     real::loc_r13CO2, loc_r14CO2
      real::loc_atmV
      real::loc_p00, loc_p10, loc_p01, loc_p20, loc_p11, loc_p02, loc_p30, loc_p21, loc_p12,    &
            &  loc_p03, loc_p40, loc_p31, loc_p22, loc_p13, loc_p04, loc_p50, loc_p41, loc_p32, &
@@ -142,10 +144,14 @@ CONTAINS
      loc_CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2,:,:))
 
      loc_13CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4_13C,:,:))
+     loc_14CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4_14C,:,:))
      loc_13CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2_13C,:,:))
+     loc_14CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2_13C,:,:))
 
      loc_r13CH4 = loc_13CH4/loc_CH4
+     loc_r14CH4 = loc_14CH4/loc_CH4
      loc_r13CO2 = loc_13CO2/loc_CO2
+     loc_r14CO2 = loc_14CO2/loc_CO2
 
      loc_atmV = SUM(phys_atm(ipa_V,:,:))
 
@@ -218,28 +224,34 @@ CONTAINS
        
      ! *** PERFORM METHANE OXIDATION ***
      ! NOTE: stoichiometry of CH4 oxidation : CH4 + 2O2 + hv  --> CO2 + 2H2O
-     loc_O2      = loc_O2    - 2.0*loc_fracdecay*loc_CH4
+     ooc_CH4     = loc_CH4   - loc_fracdecay*loc_CH4
+     loc_13CH4   = loc_13CH4 - loc_fracdecay*loc_13CH4
+     loc_14CH4   = loc_14CH4 - loc_fracdecay*loc_14CH4
      loc_CO2     = loc_CO2   + loc_fracdecay*loc_CH4
-     loc_13CO2   = loc_13CO2 + loc_fracdecay*loc_r13CH4
-     loc_CH4     = (1.0 - loc_fracdecay)*loc_CH4
-     loc_13CH4   = (1.0 - loc_fracdecay)*loc_r13CH4
+     loc_13CO2   = loc_13CO2 + loc_fracdecay*loc_13CH4
+     loc_14CO2   = loc_14CO2 + loc_fracdecay*loc_14CH4
+     loc_O2      = loc_O2    - 2.0*loc_CH4
      
      ! *** ADJUST INVENTORIES TO AVOID -VE CH4 ***
      IF (loc_CH4 < const_real_zero) THEN
-      loc_CO2 = loc_CO2 + loc_CH4
-      loc_O2  = loc_O2 - 2.0*loc_CH4
-      loc_CH4 = const_real_zero
+      loc_CH4   = const_real_zero
       loc_13CH4 = loc_13CH4 - loc_r13CH4*(loc_CH4)
+      loc_14CH4 = loc_14CH4 - loc_r14CH4*(loc_CH4)
+      loc_CO2   = loc_CO2   + loc_CH4
       loc_13CO2 = loc_13CO2 + loc_r13CH4*(loc_CH4)
+      loc_14CO2 = loc_14CO2 + loc_r14CH4*(loc_CH4)
+      loc_O2    = loc_O2    - 2.0*loc_CH4
      END IF    
 
      ! *** UPDATE ATM. TRACERS ***
      atm(ia_pCH4,:,:)     = (loc_CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-     atm(ia_pCO2,:,:)     = (loc_CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-     atm(ia_pO2,:,:)      = (loc_O2 /loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
      atm(ia_pCH4_13C,:,:) = (loc_13CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+     atm(ia_pCH4_14C,:,:) = (loc_14CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+     atm(ia_pCO2,:,:)     = (loc_CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
      atm(ia_pCO2_13C,:,:) = (loc_13CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-     
+     atm(ia_pCO2_14C,:,:) = (loc_14CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+     atm(ia_pO2,:,:)      = (loc_O2 /loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+
   END SUBROUTINE sub_calc_oxidize_CH4_claire
   ! ****************************************************************************************************************************** !
   
@@ -254,8 +266,10 @@ CONTAINS
     real::loc_tau
     real::loc_fracdecay
     real::loc_O2, loc_CH4, loc_CO2
-    real::loc_13CH4, loc_r13CH4
-    real::loc_13CO2, loc_r13CO2
+    real::loc_13CH4, loc_14CH4
+    real::loc_r13CH4, loc_r14CH4
+    real::loc_13CO2, loc_14CO2
+    real::loc_r13CO2, loc_r14CO2
     real::loc_atmV
     real::loc_p00, loc_p10, loc_p01, loc_p20, loc_p11, loc_p02, loc_p30, loc_p21, loc_p12,   &
           & loc_p03, loc_p40, loc_p31, loc_p22, loc_p13, loc_p04, loc_p50, loc_p41, loc_p32, &
@@ -268,12 +282,16 @@ CONTAINS
     loc_O2  = SUM(dum_conv_atm_mol*atm(ia_pO2,:,:))
     loc_CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4,:,:))
     loc_CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2,:,:))
-  
+
     loc_13CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4_13C,:,:))
+    loc_14CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4_14C,:,:))
     loc_13CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2_13C,:,:))
-  
+    loc_14CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2_13C,:,:))
+
     loc_r13CH4 = loc_13CH4/loc_CH4
+    loc_r14CH4 = loc_14CH4/loc_CH4
     loc_r13CO2 = loc_13CO2/loc_CO2
+    loc_r14CO2 = loc_14CO2/loc_CO2
   
     loc_atmV = SUM(phys_atm(ipa_V,:,:))
   
@@ -353,27 +371,33 @@ CONTAINS
      ! *** PERFORM METHANE OXIDATION AND HYDROGEN ESCAPE ***
      ! NOTE: stoichiometry of CH4 oxidation : CH4 + 2O2 + hv  --> CO2 + 2H2O
      ! NOTE: stoichiometry of H2 escape : CH4 + O2 + hv --> CO2 + 4H_space
-     loc_O2      = loc_O2    - 2.0*loc_fracdecay*loc_CH4 - dH_esc
-     loc_CO2     = loc_CO2   + loc_fracdecay*loc_CH4     + dH_esc
-     loc_13CO2   = loc_13CO2 + loc_fracdecay*loc_r13CH4  + dH_esc*loc_r13CH4
-     loc_CH4     = (1.0 - loc_fracdecay)*loc_CH4         - dH_esc
-     loc_13CH4   = (1.0 - loc_fracdecay)*loc_r13CH4      - dH_esc*loc_r13CH4
-     
+     loc_CH4    = loc_CH4   - loc_fracdecay*loc_CH4     - dH_esc
+     loc_13CH4  = loc_13CH4 - loc_fracdecay*loc_13CH4   - dH_esc*loc_r13CH4
+     loc_14CH4  = loc_14CH4 - loc_fracdecay*loc_14CH4   - dH_esc*loc_r14CH4
+     loc_CO2    = loc_CO2   + loc_fracdecay*loc_CH4     + dH_esc
+     loc_13CO2  = loc_13CO2 + loc_fracdecay*loc_13CH4   - dH_esc*loc_r13CH4
+     loc_14CO2  = loc_14CO2 + loc_fracdecay*loc_14CH4   - dH_esc*loc_r14CH4
+     loc_O2     = loc_O2    - 2.0*loc_fracdecay*loc_CH4 - dH_esc
+
      ! *** ADJUST INVENTORIES TO AVOID -VE CH4 ***
      IF (loc_CH4 < const_real_zero) THEN
-      loc_CO2 = loc_CO2 + loc_CH4
-      loc_O2  = loc_O2 - 2.0*loc_CH4
-      loc_CH4 = const_real_zero
+      loc_CH4   = const_real_zero
       loc_13CH4 = loc_13CH4 - loc_r13CH4*(loc_CH4)
+      loc_14CH4 = loc_14CH4 - loc_r14CH4*(loc_CH4)
+      loc_CO2   = loc_CO2   + loc_CH4
       loc_13CO2 = loc_13CO2 + loc_r13CH4*(loc_CH4)
+      loc_14CO2 = loc_14CO2 + loc_r14CH4*(loc_CH4)
+      loc_O2    = loc_O2    - 2.0*loc_CH4
      END IF    
 
      ! *** UPDATE ATM. TRACERS ***
      atm(ia_pCH4,:,:)     = (loc_CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-     atm(ia_pCO2,:,:)     = (loc_CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-     atm(ia_pO2,:,:)      = (loc_O2 /loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
      atm(ia_pCH4_13C,:,:) = (loc_13CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+     atm(ia_pCH4_14C,:,:) = (loc_14CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+     atm(ia_pCO2,:,:)     = (loc_CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
      atm(ia_pCO2_13C,:,:) = (loc_13CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+     atm(ia_pCO2_14C,:,:) = (loc_14CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+     atm(ia_pO2,:,:)      = (loc_O2 /loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
   
   END SUBROUTINE sub_calc_oxidize_CH4_claireH
   ! ****************************************************************************************************************************** !
