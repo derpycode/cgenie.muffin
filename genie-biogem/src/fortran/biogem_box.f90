@@ -2685,7 +2685,7 @@ CONTAINS
             END SELECT
             ! allow CH4 oxidation with O2 (units: mol CH4 kg-1)
             ! Michaelis-Menten term
-            loc_MM = (loc_O2/(loc_O2+par_bio_remin_AER_Km_O2))*(loc_CH4/(loc_CH4*par_bio_remin_AER_Km_CH4))
+            loc_MM = loc_O2/(loc_O2+par_bio_remin_AER_Km_O2)
             ! temperature term
             loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
             loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
@@ -2697,9 +2697,9 @@ CONTAINS
             loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
             loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
             ! perform aerobic methanotrophy
-            loc_bio_remin(io_CH4,k) = -loc_AER
-            loc_bio_remin(io_DIC,k) =  loc_AER
-            loc_bio_remin(io_O2,k)  = -2.0*loc_AER
+            loc_bio_remin(io_CH4,k)     = -loc_AER
+            loc_bio_remin(io_DIC,k)     =  loc_AER
+            loc_bio_remin(io_O2,k)      = -2.0*loc_AER
             loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AER
             loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AER
             loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AER
@@ -2794,7 +2794,7 @@ CONTAINS
              END SELECT
              ! allow CH4 oxidation coupled to SO4 reduction (units: mol CH4 kg-1)
              ! Michaelis-Menten term
-             loc_MM = (loc_SO4/(loc_SO4*par_bio_remin_AOM_Km_SO4))*(loc_CH4/(loc_CH4*par_bio_remin_AOM_Km_CH4))
+             loc_MM = loc_SO4/(loc_SO4*par_bio_remin_AOM_Km_SO4)
              ! temperature term
              loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
              loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
@@ -2806,11 +2806,11 @@ CONTAINS
              loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
              loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
              ! perform AOM
-             loc_bio_remin(io_CH4,k) = -loc_AOM
-             loc_bio_remin(io_DIC,k) =  loc_AOM
-             loc_bio_remin(io_SO4,k) = -loc_AOM
-             loc_bio_remin(io_H2S,k) =  loc_AOM
-             loc_bio_remin(io_ALK,k) =  2.0*loc_AOM
+             loc_bio_remin(io_CH4,k)     = -loc_AOM
+             loc_bio_remin(io_DIC,k)     =  loc_AOM
+             loc_bio_remin(io_SO4,k)     = -loc_AOM
+             loc_bio_remin(io_H2S,k)     =  loc_AOM
+             loc_bio_remin(io_ALK,k)     =  2.0*loc_AOM
              loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AOM
              loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AOM
              loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AOM
