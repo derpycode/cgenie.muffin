@@ -15,7 +15,7 @@ MODULE atchem_box
 
 CONTAINS
 
-  ! TESTING PULL FROM REMOTE REPOSITORY ON GITHUB. DID IT WORK?
+
   ! ****************************************************************************************************************************** !
   ! EXCHANGE CARBON WITH A VIRTUAL TERRESTRIAL RESERVOIR
   SUBROUTINE sub_calc_terrCO2exchange(dum_i,dum_j,dum_dtyr,dum_fatm)
