@@ -254,7 +254,7 @@ CONTAINS
 
   END SUBROUTINE sub_calc_oxidize_CH4_claire
   ! ****************************************************************************************************************************** !
-  ! *** THIS IS A TEST FOR GITHUB PUSHING! DID IT WORK? *** 
+ 
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- UPDATED PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], H ESCAPE ENABLED (CTR|05-2017)
   SUBROUTINE sub_calc_oxidize_CH4_claireH(dum_dtyr, dum_conv_atm_mol)
