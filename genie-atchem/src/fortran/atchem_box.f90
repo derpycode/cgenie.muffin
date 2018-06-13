@@ -224,7 +224,7 @@ CONTAINS
        
      ! *** PERFORM METHANE OXIDATION ***
      ! NOTE: stoichiometry of CH4 oxidation : CH4 + 2O2 + hv  --> CO2 + 2H2O
-     ooc_CH4     = loc_CH4   - loc_fracdecay*loc_CH4
+     loc_CH4     = loc_CH4   - loc_fracdecay*loc_CH4
      loc_13CH4   = loc_13CH4 - loc_fracdecay*loc_13CH4
      loc_14CH4   = loc_14CH4 - loc_fracdecay*loc_14CH4
      loc_CO2     = loc_CO2   + loc_fracdecay*loc_CH4
