@@ -15,7 +15,7 @@ MODULE atchem_box
 
 CONTAINS
 
-  
+
   ! ****************************************************************************************************************************** !
   ! EXCHANGE CARBON WITH A VIRTUAL TERRESTRIAL RESERVOIR
   SUBROUTINE sub_calc_terrCO2exchange(dum_i,dum_j,dum_dtyr,dum_fatm)
@@ -224,7 +224,7 @@ CONTAINS
        
      ! *** PERFORM METHANE OXIDATION ***
      ! NOTE: stoichiometry of CH4 oxidation : CH4 + 2O2 + hv  --> CO2 + 2H2O
-     ooc_CH4     = loc_CH4   - loc_fracdecay*loc_CH4
+     loc_CH4     = loc_CH4   - loc_fracdecay*loc_CH4
      loc_13CH4   = loc_13CH4 - loc_fracdecay*loc_13CH4
      loc_14CH4   = loc_14CH4 - loc_fracdecay*loc_14CH4
      loc_CO2     = loc_CO2   + loc_fracdecay*loc_CH4
@@ -254,7 +254,7 @@ CONTAINS
 
   END SUBROUTINE sub_calc_oxidize_CH4_claire
   ! ****************************************************************************************************************************** !
-  
+ 
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- UPDATED PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], H ESCAPE ENABLED (CTR|05-2017)
   SUBROUTINE sub_calc_oxidize_CH4_claireH(dum_dtyr, dum_conv_atm_mol)
