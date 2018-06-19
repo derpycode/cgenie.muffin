@@ -1084,13 +1084,18 @@ subroutine biogem(        &
                                & ocn(io_DOM_C_13C,par_force_point_i,par_force_point_j,n_k), &
                                & loc_standard,.FALSE.,const_real_null &
                                & )
+                          loc_delta_target = fun_calc_isotope_delta( &
+                              & force_restore_locn(io2l(io_DOM_C),par_force_point_i,par_force_point_j,n_k), &
+                              & force_restore_locn(io2l(io_DOM_C_13C),par_force_point_i,par_force_point_j,n_k), &
+                              & loc_standard,.FALSE.,const_real_null &
+                              & )
                        else
                           loc_delta_actual = loc_force_actual_d13C
+                          loc_delta_target = fun_calc_isotope_delta( &
+                              & force_restore_locn(io2l(io_DOM_C),i,j,n_k),force_restore_locn(io2l(io_DOM_C_13C),i,j,n_k), &
+                              & loc_standard,.FALSE.,const_real_null &
+                              & )
                        end if
-                       loc_delta_target = fun_calc_isotope_delta( &
-                           & force_restore_locn(io2l(io_DOM_C),i,j,n_k),force_restore_locn(io2l(io_DOM_C_13C),i,j,n_k), &
-                           & loc_standard,.FALSE.,const_real_null &
-                           & )
                     end if
                     IF (force_flux_ocn_select(io_DIC_13C)) THEN
                        loc_frac = force_flux_locn(io2l(io_DIC_13C),i,j,n_k)/force_flux_locn(io2l(io_DIC),i,j,n_k)
