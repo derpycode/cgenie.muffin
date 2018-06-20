@@ -1,0 +1,5 @@
+TEST_NAME=iso.test_SPIN_regtest
+ASSUMEDGOOD_NAME=iso.test_SPIN_assumedgood
+KNOWNGOOD_NAME=iso.test_SPIN_knowngood
+TESTFILE=xxxx
+CHECKFLUXES=FALSE
