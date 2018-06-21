@@ -542,7 +542,7 @@ CONTAINS
          & '2N2T_PO4MM_NO3',    &
          & '2N2T_PN_Tdep',      &
          & '3N2T_PNFe_Tdep'     &
-
+         
          & )
        loc_kI = phys_ocnatm(ipoa_solfor,dum_i,dum_j)/phys_solar_constant
     case (                        &
@@ -991,8 +991,8 @@ CONTAINS
             & 'bio_PFeSi'            &
             & )
           if (ocn(io_SiO2,dum_i,dum_j,n_k) > const_real_nullsmall) then
-             !!!bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
-             !!!     & ((0.25E-9/(loc_FeT+0.125E-9))+1.0)
+!!!bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
+!!!     & ((0.25E-9/(loc_FeT+0.125E-9))+1.0)
              bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
                   & ((par_part_red_opal_FeTKSp/(loc_FeT+par_part_red_opal_FeToff))+1.0)
           else
@@ -1040,10 +1040,10 @@ CONTAINS
                    loc_bio_red_POC_POFe_nsp = 1.0/ &
                         & MIN(333000.0,20000.0 + 31805.0*(1.0E9*(loc_FeT - par_part_red_FeTmin))**(-0.65))
                    if (loc_dPO4 > const_real_nullsmall) then
-                       bio_part_red(is_POC,is_POFe,dum_i,dum_j) = &
+                      bio_part_red(is_POC,is_POFe,dum_i,dum_j) = &
                            & (loc_dPO4_sp*loc_bio_red_POC_POFe_sp + loc_dPO4_nsp*loc_bio_red_POC_POFe_nsp)/loc_dPO4
                    else
-                       ![default (fixed) Redfield ratio already set]
+                      ![default (fixed) Redfield ratio already set]
                    end if
                 else
                    bio_part_red(is_POC,is_POFe,dum_i,dum_j) = 1.0/333000.0
@@ -1051,7 +1051,7 @@ CONTAINS
              else
                 ! unified scheme
                 if (loc_FeT > par_part_red_FeTmin) then
-                    bio_part_red(is_POC,is_POFe,dum_i,dum_j) = 1.0/ &
+                   bio_part_red(is_POC,is_POFe,dum_i,dum_j) = 1.0/ &
                         & MIN(par_part_red_FetoCmax,(par_bio_FetoC_C + par_bio_FetoC_K*(1.0E9*loc_FeT)**(par_bio_FetoC_pP)))
                 else
                    bio_part_red(is_POC,is_POFe,dum_i,dum_j) = 1.0/par_part_red_FetoCmax
@@ -1110,9 +1110,9 @@ CONTAINS
     ! TRACE ELEMENTS: I (:POC)
     if (ocn_select(io_IO3)) then
        bio_part_red(is_POC,is_POI,dum_i,dum_j) = par_bio_red_POC_POI
-!       ! NOTE: I:C scales with ambient [IO3-]
-!       bio_part_red(is_POC,is_POI,dum_i,dum_j) = &
-!            & par_bio_red_POC_POI*loc_IO3/par_bio_red_POC_POI_C0
+       !       ! NOTE: I:C scales with ambient [IO3-]
+       !       bio_part_red(is_POC,is_POI,dum_i,dum_j) = &
+       !            & par_bio_red_POC_POI*loc_IO3/par_bio_red_POC_POI_C0
     end if
     !
     ! TRACE METALS: Cd (:CaCO3)
@@ -1408,8 +1408,8 @@ CONTAINS
     ! I cycle
     ! NOTE: IO3- is transformed to I- within the cell (default species exchange with POI is I- not IO3-)
     !       as default, the reverse of remineralization is applied in order to calculate dissolved update,
-     !       meaning that only the I- speices would be removed (rather than IO3- removed and O2 released)
-     !       ... note ideal to have to have 'exceptions' like tnhis :(
+    !       meaning that only the I- speices would be removed (rather than IO3- removed and O2 released)
+    !       ... note ideal to have to have 'exceptions' like tnhis :(
     if (ocn_select(io_IO3)) then
        loc_bio_uptake(io_IO3,loc_k_mld:n_k) = loc_bio_uptake(io_IO3,loc_k_mld:n_k) + loc_bio_uptake(io_I,loc_k_mld:n_k)
        loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k) - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
@@ -1633,13 +1633,13 @@ CONTAINS
        ! NOTE: simply use the existing array value if unable to calculate a new one ...
        if (loc_dPO4_nsp*bio_part(is_POC,dum_i,dum_j,n_k) > const_real_nullsmall) then
           diag_bio(idiag_bio_CaCO3toPOC_nsp,dum_i,dum_j) = (loc_dPO4/loc_dPO4_nsp)* &
-             & bio_part(is_CaCO3,dum_i,dum_j,n_k)/bio_part(is_POC,dum_i,dum_j,n_k)
+               & bio_part(is_CaCO3,dum_i,dum_j,n_k)/bio_part(is_POC,dum_i,dum_j,n_k)
        else
           diag_bio(idiag_bio_CaCO3toPOC_nsp,dum_i,dum_j) = diag_bio(idiag_bio_CaCO3toPOC_nsp,dum_i,dum_j)
        endif
        if (loc_dPO4_sp*bio_part(is_POC,dum_i,dum_j,n_k) > const_real_nullsmall) then
           diag_bio(idiag_bio_opaltoPOC_sp,dum_i,dum_j) = (loc_dPO4/loc_dPO4_sp)* &
-             & bio_part(is_opal,dum_i,dum_j,n_k)/bio_part(is_POC,dum_i,dum_j,n_k)
+               & bio_part(is_opal,dum_i,dum_j,n_k)/bio_part(is_POC,dum_i,dum_j,n_k)
        else
           diag_bio(idiag_bio_opaltoPOC_sp,dum_i,dum_j) = diag_bio(idiag_bio_opaltoPOC_sp,dum_i,dum_j)
        endif
@@ -2131,9 +2131,9 @@ CONTAINS
 	     ! Second order equation of enzyme kinetics which accounts for both O2 and NH4 limitations on nitrification
              loc_potO2cap = ocn(io_O2,dum_i,dum_j,k) + bio_remin(io_O2,dum_i,dum_j,k)
              loc_NH4_oxidation = dum_dtyr*par_nitri_mu*loc_NH4*loc_potO2cap &
-                & /(par_nitri_c0_NH4*par_nitri_c0_O2 +par_nitri_c0_O2*loc_NH4 &
-                & +par_nitri_c0_NH4*loc_potO2cap +loc_NH4*loc_potO2cap) &
-                & *min(loc_NH4,loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))
+                  & /(par_nitri_c0_NH4*par_nitri_c0_O2 +par_nitri_c0_O2*loc_NH4 &
+                  & +par_nitri_c0_NH4*loc_potO2cap +loc_NH4*loc_potO2cap) &
+                  & *min(loc_NH4,loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))
              If (loc_NH4_oxidation > min(loc_NH4,loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))) then
                 loc_NH4_oxidation = min(loc_NH4,loc_potO2cap*loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))
              end if
@@ -2627,7 +2627,7 @@ CONTAINS
   end SUBROUTINE sub_calc_bio_remin_oxidize_CH4
   ! ****************************************************************************************************************************** !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! AEROBIC WATER COLUMN REMINERALIZATION OF METHANE - new Michaelis-Menten scheme [CTR|2018]
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AER(dum_i,dum_j,dum_k1,dum_dtyr)
@@ -2661,49 +2661,49 @@ CONTAINS
        loc_O2 = ocn(io_O2,dum_i,dum_j,k)
        loc_CH4 = ocn(io_CH4,dum_i,dum_j,k)
        if ((loc_CH4 > const_real_nullsmall) .AND. (loc_O2 > const_real_nullsmall)) then
-            SELECT CASE (par_bio_remin_AER_thermo)
-            CASE('off')
-            ! thermo term disabled
-            loc_Ft = 1.0
-            CASE('on')
-            ! estimate free energy available for aerobic methanotrophy
-            loc_CO2 = carb(ic_conc_CO2,dum_i,dum_j,k)
-            loc_T = ocn(io_T,dum_i,dum_j,k)
-            loc_dG = par_bio_remin_AER_dG0 +                                                     &
-                    & ( par_bio_remin_Rgas *                                                     &
-                    &   loc_T *                                                                  &
-                    &   LOG( (par_bio_remin_gammaCO2*loc_CO2) /                                  &
-                    &        ((par_bio_remin_gammaO2*loc_O2)*(par_bio_remin_gammaCH4*loc_CH4)) ) &
-                    & )
-            ! calculate thermodynamic drive
-            loc_Ft_min = 0
-            loc_Ft = max(loc_Ft_min,1-exp((loc_dG+par_bio_remin_AER_BEQ)/(par_bio_remin_Rgas*loc_T)))
-            if (loc_Ft > 1 .OR. loc_Ft < 0) then
+          SELECT CASE (par_bio_remin_AER_thermo)
+          CASE('off')
+             ! thermo term disabled
+             loc_Ft = 1.0
+          CASE('on')
+             ! estimate free energy available for aerobic methanotrophy
+             loc_CO2 = carb(ic_conc_CO2,dum_i,dum_j,k)
+             loc_T = ocn(io_T,dum_i,dum_j,k)
+             loc_dG = par_bio_remin_AER_dG0 +                                                     &
+                  & ( par_bio_remin_Rgas *                                                     &
+                  &   loc_T *                                                                  &
+                  &   LOG( (par_bio_remin_gammaCO2*loc_CO2) /                                  &
+                  &        ((par_bio_remin_gammaO2*loc_O2)*(par_bio_remin_gammaCH4*loc_CH4)) ) &
+                  & )
+             ! calculate thermodynamic drive
+             loc_Ft_min = 0
+             loc_Ft = max(loc_Ft_min,1-exp((loc_dG+par_bio_remin_AER_BEQ)/(par_bio_remin_Rgas*loc_T)))
+             if (loc_Ft > 1 .OR. loc_Ft < 0) then
                 print*,' WARNING: AER thermodynamic drive out of bounds; DIC = ',ocn(io_DIC,dum_i,dum_j,k), &
-                      &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
-            end if
-            END SELECT
-            ! allow CH4 oxidation with O2 (units: mol CH4 kg-1)
-            ! Michaelis-Menten term
-            loc_MM = loc_O2/(loc_O2+par_bio_remin_AER_Km_O2)
-            ! temperature term
-            loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
-            loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
-            ! rate of aerobic methanotrophy (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, and temperature control)
-            loc_AER = par_bio_remin_AER_kAER*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
-            ! but don't oxidize too much CH4!
-            loc_AER = min(loc_AER,loc_CH4,0.5*loc_O2)
-            ! calculate isotopic ratios
-            loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-            loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-            ! perform aerobic methanotrophy
-            loc_bio_remin(io_CH4,k)     = -loc_AER
-            loc_bio_remin(io_DIC,k)     =  loc_AER
-            loc_bio_remin(io_O2,k)      = -2.0*loc_AER
-            loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AER
-            loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AER
-            loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AER
-            loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AER
+                     &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
+             end if
+          END SELECT
+          ! allow CH4 oxidation with O2 (units: mol CH4 kg-1)
+          ! Michaelis-Menten term
+          loc_MM = loc_O2/(loc_O2+par_bio_remin_AER_Km_O2)
+          ! temperature term
+          loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
+          loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
+          ! rate of aerobic methanotrophy (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, and temperature control)
+          loc_AER = par_bio_remin_AER_kAER*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
+          ! but don't oxidize too much CH4!
+          loc_AER = min(loc_AER,loc_CH4,0.5*loc_O2)
+          ! calculate isotopic ratios
+          loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
+          loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
+          ! perform aerobic methanotrophy
+          loc_bio_remin(io_CH4,k)     = -loc_AER
+          loc_bio_remin(io_DIC,k)     =  loc_AER
+          loc_bio_remin(io_O2,k)      = -2.0*loc_AER
+          loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AER
+          loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AER
+          loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AER
+          loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AER
        end if
     end DO
     ! -------------------------------------------------------- !
@@ -2734,7 +2734,7 @@ CONTAINS
   end SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AER
   ! ****************************************************************************************************************************** !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! ANAEROBIC WATER COLUMN REMINERALIZATION OF METHANE [SLO|2015 CTR|2018]
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AOM(dum_i,dum_j,dum_k1,dum_dtyr)
@@ -2769,52 +2769,52 @@ CONTAINS
        loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
        loc_CH4 = ocn(io_CH4,dum_i,dum_j,k)
        if ((loc_O2 < const_real_nullsmall) .AND. (loc_SO4 > const_real_nullsmall) .AND. (loc_CH4 > const_real_nullsmall)) then
-            SELECT CASE (par_bio_remin_AOM_thermo)
-            CASE('off')
-            ! thermo term disabled
-            loc_Ft = 1.0
-            CASE('on')
-            ! estimate free energy available for anaerobic oxidation of methane           
-            loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
-            loc_HCO3 = carb(ic_conc_HCO3,dum_i,dum_j,k)
-            loc_T = ocn(io_T,dum_i,dum_j,k)
-            loc_dG = par_bio_remin_AOM_dG0 +                                                        &
-                    & ( par_bio_remin_Rgas *                                                        &
-                    &   loc_T *                                                                     &
-                    &   LOG( ((par_bio_remin_gammaHS*loc_H2S)*(par_bio_remin_gammaHCO3*loc_HCO3)) / &
-                    &        ((par_bio_remin_gammaSO4*loc_SO4)*(par_bio_remin_gammaCH4*loc_CH4)) )  &
-                    & )
+          SELECT CASE (par_bio_remin_AOM_thermo)
+          CASE('off')
+             ! thermo term disabled
+             loc_Ft = 1.0
+          CASE('on')
+             ! estimate free energy available for anaerobic oxidation of methane           
+             loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
+             loc_HCO3 = carb(ic_conc_HCO3,dum_i,dum_j,k)
+             loc_T = ocn(io_T,dum_i,dum_j,k)
+             loc_dG = par_bio_remin_AOM_dG0 +                                                        &
+                  & ( par_bio_remin_Rgas *                                                        &
+                  &   loc_T *                                                                     &
+                  &   LOG( ((par_bio_remin_gammaHS*loc_H2S)*(par_bio_remin_gammaHCO3*loc_HCO3)) / &
+                  &        ((par_bio_remin_gammaSO4*loc_SO4)*(par_bio_remin_gammaCH4*loc_CH4)) )  &
+                  & )
              ! calculate thermodynamic drive
              loc_Ft_min = 0
              loc_Ft = max(loc_Ft_min,1 - exp((loc_dG+par_bio_remin_AOM_BEQ)/(par_bio_remin_Rgas*loc_T)))
              if (loc_Ft > 1 .OR. loc_Ft < 0) then
-                 print*,' WARNING: AOM thermodynamic drive out of bounds; DIC = ',ocn(io_DIC,dum_i,dum_j,k), &
-                       &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
+                print*,' WARNING: AOM thermodynamic drive out of bounds; DIC = ',ocn(io_DIC,dum_i,dum_j,k), &
+                     &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
              end if
-             END SELECT
-             ! allow CH4 oxidation coupled to SO4 reduction (units: mol CH4 kg-1)
-             ! Michaelis-Menten term
-             loc_MM = loc_SO4/(loc_SO4*par_bio_remin_AOM_Km_SO4)
-             ! temperature term
-             loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
-             loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
-             ! rate of AOM (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, temperature, and thermodynamic control)
-             loc_AOM = par_bio_remin_AOM_kAOM*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
-             ! but don't oxidize too much CH4!
-             loc_AOM = min(loc_AOM,loc_CH4,loc_SO4)
-             ! calculate isotopic ratios
-             loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-             loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-             ! perform AOM
-             loc_bio_remin(io_CH4,k)     = -loc_AOM
-             loc_bio_remin(io_DIC,k)     =  loc_AOM
-             loc_bio_remin(io_SO4,k)     = -loc_AOM
-             loc_bio_remin(io_H2S,k)     =  loc_AOM
-             loc_bio_remin(io_ALK,k)     =  2.0*loc_AOM
-             loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AOM
-             loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AOM
-             loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AOM
-             loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AOM
+          END SELECT
+          ! allow CH4 oxidation coupled to SO4 reduction (units: mol CH4 kg-1)
+          ! Michaelis-Menten term
+          loc_MM = loc_SO4/(loc_SO4*par_bio_remin_AOM_Km_SO4)
+          ! temperature term
+          loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
+          loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
+          ! rate of AOM (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, temperature, and thermodynamic control)
+          loc_AOM = par_bio_remin_AOM_kAOM*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
+          ! but don't oxidize too much CH4!
+          loc_AOM = min(loc_AOM,loc_CH4,loc_SO4)
+          ! calculate isotopic ratios
+          loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
+          loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
+          ! perform AOM
+          loc_bio_remin(io_CH4,k)     = -loc_AOM
+          loc_bio_remin(io_DIC,k)     =  loc_AOM
+          loc_bio_remin(io_SO4,k)     = -loc_AOM
+          loc_bio_remin(io_H2S,k)     =  loc_AOM
+          loc_bio_remin(io_ALK,k)     =  2.0*loc_AOM
+          loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AOM
+          loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AOM
+          loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AOM
+          loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AOM
        end if
     end DO
     ! -------------------------------------------------------- !
@@ -2847,7 +2847,7 @@ CONTAINS
   end SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AOM
   ! ****************************************************************************************************************************** !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! OXIDATION OF IODIDE
   SUBROUTINE sub_calc_bio_remin_oxidize_I(dum_i,dum_j,dum_k1,dum_dtyr)
@@ -2878,34 +2878,34 @@ CONTAINS
     ! 2I + 3O2 -> 2IO3
     ! NOTE: loc_I_oxidation_const units are (???)
     DO k=n_k,dum_k1,-1
-        loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-        loc_I  = ocn(io_I,dum_i,dum_j,k)
-        if ((loc_O2 > const_real_nullsmall) .AND. (loc_I > const_real_nullsmall)) then
-            ! calculate I oxidation, and cap value at I concentration if necessary
-            SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
-                CASE ('Fennel')
-                    ! from: Fennel et al. [2005]
-                    ! oxidation rate constant: 6 yr-1
-                    ! oxidation half saturation for oxygen: 2.0E-05 mol kg-1
-                    loc_I_oxidation = dum_dtyr*par_bio_remin_kItoIO3*loc_I*(loc_O2/(par_bio_remin_cO2_ItoIO3 + loc_O2))
-                case ('lifetime')
-                    if (par_bio_remin_Ilifetime > dum_dtyr) then
-                        loc_I_oxidation = min((dum_dtyr/par_bio_remin_Ilifetime)*loc_I,(2.0/3.0)*loc_O2)
-                    else
-                        loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
-                    end if
-                case ('complete')
-                    loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
-                case default
-                    loc_I_oxidation = 0.0
-            end select
-            ! double-check on I removal ...
-            if (loc_I_oxidation > loc_I) loc_I_oxidation = loc_I
-            ! calculate tracer remin changes
-            loc_bio_remin(io_I,k)   = -loc_I_oxidation
-            loc_bio_remin(io_IO3,k) = loc_I_oxidation
-            loc_bio_remin(io_O2,k)  = -(3.0/2.0)*loc_I_oxidation
-        end if
+       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_I  = ocn(io_I,dum_i,dum_j,k)
+       if ((loc_O2 > const_real_nullsmall) .AND. (loc_I > const_real_nullsmall)) then
+          ! calculate I oxidation, and cap value at I concentration if necessary
+          SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
+          CASE ('Fennel')
+             ! from: Fennel et al. [2005]
+             ! oxidation rate constant: 6 yr-1
+             ! oxidation half saturation for oxygen: 2.0E-05 mol kg-1
+             loc_I_oxidation = dum_dtyr*par_bio_remin_kItoIO3*loc_I*(loc_O2/(par_bio_remin_cO2_ItoIO3 + loc_O2))
+          case ('lifetime')
+             if (par_bio_remin_Ilifetime > dum_dtyr) then
+                loc_I_oxidation = min((dum_dtyr/par_bio_remin_Ilifetime)*loc_I,(2.0/3.0)*loc_O2)
+             else
+                loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
+             end if
+          case ('complete')
+             loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
+          case default
+             loc_I_oxidation = 0.0
+          end select
+          ! double-check on I removal ...
+          if (loc_I_oxidation > loc_I) loc_I_oxidation = loc_I
+          ! calculate tracer remin changes
+          loc_bio_remin(io_I,k)   = -loc_I_oxidation
+          loc_bio_remin(io_IO3,k) = loc_I_oxidation
+          loc_bio_remin(io_O2,k)  = -(3.0/2.0)*loc_I_oxidation
+       end if
     end DO
     ! -------------------------------------------------------- !
     ! WRITE GLOBAL ARRAY DATA
@@ -2963,30 +2963,30 @@ CONTAINS
     ! look for some IO3 and see if it can be instantaneously reduced
     ! 2IO3 -> 2I + 3O2
     DO k=n_k,dum_k1,-1
-        loc_O2   = ocn(io_O2,dum_i,dum_j,k)
-        loc_IO3  = ocn(io_IO3,dum_i,dum_j,k)
-        if (loc_IO3 > const_real_nullsmall) then
-            ! calculate IO3 reduction
-            SELECT CASE (opt_bio_remin_reduce_IO3toI)
-            case ('inhibition')
-                loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
-                & (loc_IO3/(loc_IO3 + par_bio_remin_cIO3_IO3toI))*(1.0 - loc_O2/(loc_O2 + par_bio_remin_cO2_IO3toI))
-            case ('threshold')
-                if (loc_O2 < par_bio_remin_cO2_IO3toI) then
-                    loc_IO3_reduction = loc_IO3
-                else
-                    loc_IO3_reduction = 0.0
-                endif
-            case default
+       loc_O2   = ocn(io_O2,dum_i,dum_j,k)
+       loc_IO3  = ocn(io_IO3,dum_i,dum_j,k)
+       if (loc_IO3 > const_real_nullsmall) then
+          ! calculate IO3 reduction
+          SELECT CASE (opt_bio_remin_reduce_IO3toI)
+          case ('inhibition')
+             loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
+                  & (loc_IO3/(loc_IO3 + par_bio_remin_cIO3_IO3toI))*(1.0 - loc_O2/(loc_O2 + par_bio_remin_cO2_IO3toI))
+          case ('threshold')
+             if (loc_O2 < par_bio_remin_cO2_IO3toI) then
+                loc_IO3_reduction = loc_IO3
+             else
                 loc_IO3_reduction = 0.0
-            end select
-            ! double-check on IO3 removal ...
-            if (loc_IO3_reduction > loc_IO3) loc_IO3_reduction = loc_IO3
-            ! calculate tracer remin changes
-            loc_bio_remin(io_IO3,k) = -loc_IO3_reduction
-            loc_bio_remin(io_I,k)   = loc_IO3_reduction
-            loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_IO3_reduction
-        end if
+             endif
+          case default
+             loc_IO3_reduction = 0.0
+          end select
+          ! double-check on IO3 removal ...
+          if (loc_IO3_reduction > loc_IO3) loc_IO3_reduction = loc_IO3
+          ! calculate tracer remin changes
+          loc_bio_remin(io_IO3,k) = -loc_IO3_reduction
+          loc_bio_remin(io_I,k)   = loc_IO3_reduction
+          loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_IO3_reduction
+       end if
     end DO
     ! -------------------------------------------------------- !
     ! WRITE GLOBAL ARRAY DATA
@@ -3038,30 +3038,33 @@ CONTAINS
     ! NOTE: truncate loc concentrations at zero to avoid negative values being propagated ...
     ! NOTE: equation form follows Arndt et al. [2013] (ESR) and Boudreau [1997] (book)
     if (ocn_select(io_O2)) then
-       loc_O2 = max(0.0,dum_ocn(io2l(io_O2)))
+       loc_O2 = max(const_real_nullsmall,dum_ocn(io2l(io_O2)))
        loc_kO2 = loc_O2/(loc_O2 + par_bio_remin_c0_O2)
        loc_kiO2 = par_bio_remin_ci_O2/(par_bio_remin_ci_O2 + loc_O2)
        loc_k = loc_k + par_bio_remin_k_O2*loc_kO2
     else
-       loc_kO2 = 0.0
+       loc_O2   = 0.0
+       loc_kO2  = 0.0
        loc_kiO2 = 1.0
     end if
     if (ocn_select(io_NO3)) then
-       loc_NO3 = max(0.0,dum_ocn(io2l(io_NO3)))
+       loc_NO3 = max(const_real_nullsmall,dum_ocn(io2l(io_NO3)))
        loc_kNO3 = loc_NO3/(loc_NO3 + par_bio_remin_c0_NO3)
        loc_kiNO3 = par_bio_remin_ci_NO3/(par_bio_remin_ci_NO3 + loc_NO3)
        loc_k = loc_k + par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
     else
-       loc_kNO3 = 0.0
+       loc_NO3   = 0.0
+       loc_kNO3  = 0.0
        loc_kiNO3 = 1.0
     end if
     if (ocn_select(io_SO4)) then
-       loc_SO4 = max(0.0,dum_ocn(io2l(io_SO4)))
+       loc_SO4 = max(const_real_nullsmall,dum_ocn(io2l(io_SO4)))
        loc_kSO4 = loc_SO4/(loc_SO4 + par_bio_remin_c0_SO4)
        loc_kiSO4 = par_bio_remin_ci_SO4/(par_bio_remin_ci_SO4 + loc_SO4)
        loc_k = loc_k + par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
     else
-       loc_kSO4 = 0.0
+       loc_SO4   = 0.0
+       loc_kSO4  = 0.0
        loc_kiSO4 = 1.0
     end if
     if (ocn_select(io_CH4)) then
@@ -3070,7 +3073,32 @@ CONTAINS
     else
        loc_kmeth = 0.0
     end if
+    ! ---------------------------------------------------------- ! remove normalization for kinetic scheme
     if (ctrl_bio_remin_POC_kinetic .OR. (loc_k < const_real_nullsmall)) loc_k = 1.0
+    ! ---------------------------------------------------------- ! modify for hard threshold scheme
+    if (ctrl_bio_remin_thresh) then
+       if (loc_O2 > par_bio_remin_cthresh_O2) then
+          loc_k     = par_bio_remin_k_O2*loc_kO2
+          loc_kNO3  = 0.0
+          loc_kSO4  = 0.0
+          loc_kmeth = 0.0
+       elseif (loc_NO3 > par_bio_remin_cthresh_NO3) then
+          loc_kO2   = 0.0
+          loc_k     = par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
+          loc_kSO4  = 0.0
+          loc_kmeth = 0.0
+       elseif (loc_SO4 > par_bio_remin_cthresh_SO4) then
+          loc_kO2   = 0.0
+          loc_kNO3  = 0.0
+          loc_k     = par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
+          loc_kmeth = 0.0
+       else
+          loc_kO2   = 0.0
+          loc_kNO3  = 0.0
+          loc_kSO4  = 0.0
+          loc_k     = par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2
+       end if
+    end if
     ! ---------------------------------------------------------- ! calculate weighted remin array
     ! NOTE: normalize to 1.0 if a non-kinetic decay scheme is being used
     !       (an exception is the basic temperature-only scheme which also needs to be normalized)
@@ -3084,14 +3112,14 @@ CONTAINS
                      & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
                      & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
              else
-          if (loc_SO4 < const_real_nullsmall) loc_kSO4 = 1.0
+                if (loc_SO4 < const_real_nullsmall) loc_kSO4 = 0.0
                 dum_conv_ls_lo(:,:) = &
                      & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
                      & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
                      & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
              end if
           else
-          if (loc_NO3 < const_real_nullsmall) loc_kNO3 = 1.0
+             if (loc_NO3 < const_real_nullsmall) loc_kNO3 = 0.0
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
                   & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:)
@@ -3103,13 +3131,13 @@ CONTAINS
                   & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
                   & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
-          if (loc_SO4 < const_real_nullsmall) loc_kSO4 = 1.0
+             if (loc_SO4 < const_real_nullsmall) loc_kSO4 = 0.0
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
                   & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
           end if
        else
-          if (loc_O2 < const_real_nullsmall) loc_kO2 = 1.0
+          if (loc_O2 < const_real_nullsmall) loc_kO2 = 0.0
           dum_conv_ls_lo(:,:) = &
                & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:)
        end if
@@ -3220,7 +3248,7 @@ CONTAINS
     integer::loc_i,loc_j,loc_k1
     real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                       !
     CHARACTER(len=31)::loc_string     ! 
-    
+
     real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
     allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
 
@@ -3320,11 +3348,11 @@ CONTAINS
              if (lo > 0) then
                 tmp_bio_remin = loc_conv_ls_lo(lo,ls)*loc_bio_part(l2is(ls),k)
                 loc_vbio_remin(lo,k) = loc_vbio_remin(lo,k) + tmp_bio_remin
-                         if (ctrl_bio_remin_redox_save) then
-                            loc_string = 'reminD_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                            id = fun_find_str_i(trim(loc_string),string_diag_redox)
-                            loc_diag_redox(id,k) = tmp_bio_remin
-                         end if
+                if (ctrl_bio_remin_redox_save) then
+                   loc_string = 'reminD_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                   loc_diag_redox(id,k) = tmp_bio_remin
+                end if
              end if
           end do
        end DO
@@ -3336,7 +3364,7 @@ CONTAINS
     dum_vbio_remin%mk(:,:) = loc_vbio_remin(:,:)
     !
     if (ctrl_bio_remin_redox_save) diag_redox(:,loc_i,loc_j,:) = diag_redox(:,loc_i,loc_j,:) + loc_diag_redox(:,:)
-    
+
     ! 
     DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
@@ -3395,9 +3423,9 @@ CONTAINS
     real,dimension(1:n_l_ocn,1:n_k)::loc_bio_remin
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_settle
     real,dimension(1:n_l_sed)::loc_bio_part_remin
-        
+
     CHARACTER(len=31)::loc_string     ! 
-        
+
     real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
     allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
 
@@ -3907,7 +3935,7 @@ CONTAINS
                    loc_bio_part(l,loc_bio_remin_min_k) = loc_bio_part_TMP(l,loc_bio_remin_min_k)
                 case default
                    loc_bio_part(l,loc_bio_remin_min_k) = loc_bio_part(l,loc_bio_remin_min_k) + &
-                    & loc_bio_part_TMP(l,loc_bio_remin_min_k)
+                        & loc_bio_part_TMP(l,loc_bio_remin_min_k)
                 end SELECT
              end do
           end if
@@ -3949,7 +3977,7 @@ CONTAINS
        is = conv_iselected_is(l)
        bio_settle(is,dum_i,dum_j,:) = loc_bio_settle(l,:)
     end do
-    
+
     ! 
     DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
@@ -4065,7 +4093,7 @@ CONTAINS
                   & dum_bio_part(is2l(is_det_Fe)) + (loc_scav_Fe_k_det/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
           end if
           ! -------------------------------------------------- ! set output [Fe]
-       fun_box_scav_Fe = loc_scav_dFe_tot
+          fun_box_scav_Fe = loc_scav_dFe_tot
        end if
        ! ----------------------------------------------------- !
     end if
@@ -4308,11 +4336,11 @@ CONTAINS
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
        loc_H2S_scavenging = dum_dt_scav*par_bio_remin_kH2StoSO4*loc_H2S*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
        loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
-!       print*, 'oxidationanalogue, par_bio_remin_kH2StoSO4 ', par_bio_remin_kH2StoSO4
-!       print*, 'loc_H2S, loc_H2S_scavenging', loc_H2S, loc_H2S_scavenging
+       !       print*, 'oxidationanalogue, par_bio_remin_kH2StoSO4 ', par_bio_remin_kH2StoSO4
+       !       print*, 'loc_H2S, loc_H2S_scavenging', loc_H2S, loc_H2S_scavenging
     CASE ('kinetic')
-!        print*, 'kinetic '
-!        print*, 'par_bio_remin_kH2StoPOMS ', par_bio_remin_kH2StoPOMS
+       !        print*, 'kinetic '
+       !        print*, 'par_bio_remin_kH2StoPOMS ', par_bio_remin_kH2StoPOMS
        ! use rate constant from Dale et al. 2009 k = 0.2 M-1 yr-1
        ! NOTE: the concentration that dum_bio_part represents is actually spread across multiple cells during each time step
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
@@ -4322,7 +4350,7 @@ CONTAINS
     CASE ('complete')
        loc_H2S_scavenging = min(loc_part_den_POCl,loc_H2S)
     case default
-!        print*, 'No sulphurization '
+       !        print*, 'No sulphurization '
        loc_H2S_scavenging = 0.0
     end select
     ! implement scavenging

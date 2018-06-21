@@ -211,6 +211,10 @@ CONTAINS
        print*,'Organic matter carrying capacity of lithogenics     : ',par_bio_remin_ballast_kl
        print*,'Aerobic remineralization of OM -> NH4 (not NO3)?    : ',ctrl_bio_remin_ONtoNH4
        print*,'Denitrification [O2] threshold (mol kg-1)           : ',par_bio_remin_denitrO2thresh
+       print*,'Apply a hard tracer oxidant remin threshold?        : ',ctrl_bio_remin_thresh
+       print*,'Hard threshold for oxic remin (mol kg-1)            : ',par_bio_remin_cthresh_O2
+       print*,'Hard threshold for denitrification (mol kg-1)       : ',par_bio_remin_cthresh_NO3
+       print*,'Hard threshold for sulphate reduction (mol kg-1)    : ',par_bio_remin_cthresh_SO4
        print*,'Catch rapidly-oxidizing species going < 0.0?        : ',ctrl_bio_remin_reminfix
        print*,'NH4 -> NO3 odixation option                         : ',trim(opt_bio_remin_oxidize_NH4toNO3)
        print*,'H2S -> SO4 oxidation option                         : ',trim(opt_bio_remin_oxidize_H2StoSO4)
@@ -623,9 +627,9 @@ CONTAINS
        if (ctrl_ocn_rst_reset_T) then
           ocn(io_T,:,:,:) = ocn_init(io_T)
        end if
-          if (ctrl_force_ocn_age) then
-             ocn(io_colb,:,:,:) = ocn(io_colb,:,:,:) + par_misc_t_runtime*ocn(io_colr,:,:,:)
-          end if
+       if (ctrl_force_ocn_age) then
+          ocn(io_colb,:,:,:) = ocn(io_colb,:,:,:) + par_misc_t_runtime*ocn(io_colr,:,:,:)
+       end if
     end If
     ! -------------------------------------------------------- !
     ! END
@@ -843,7 +847,7 @@ CONTAINS
           loc_string(n) = 'H2StoSO4_dO2' 
           n = n+1
           loc_string(n) = 'H2StoSO4_dALK'     
-       end if  
+       end if
     end if
     if (ocn_select(io_NH4)) then
        if (ocn_select(io_O2)) then
@@ -855,7 +859,7 @@ CONTAINS
           loc_string(n) = 'NH4toNO3_dO2'  
           n = n+1
           loc_string(n) = 'NH4toNO3_dALK'   
-       end if    
+       end if
     end if
     if (ocn_select(io_CH4)) then
        if (ocn_select(io_O2)) then
@@ -867,7 +871,7 @@ CONTAINS
           loc_string(n) = 'CH4toDIC_dO2'   
           n = n+1
           loc_string(n) = 'CH4toDIC_dALK'   
-       end if    
+       end if
        if (ocn_select(io_SO4)) then
           n = n+1
           loc_string(n) = 'CH4toDICaom_dCH4'
@@ -879,8 +883,8 @@ CONTAINS
           loc_string(n) = 'CH4toDICaom_dSO4'  
           n = n+1
           loc_string(n) = 'CH4toDICaom_dALK'      
-       end if    
-    end if    
+       end if
+    end if
     if (ocn_select(io_I) .AND. ocn_select(io_I)) then
        if (ocn_select(io_O2)) then
           n = n+1
@@ -896,31 +900,31 @@ CONTAINS
           n = n+1
           loc_string(n) = 'IO3toI_dO2'  
        end if
-    end if    
+    end if
     ! -------------------------------------------------------- ! (2) solid -> dissolved
     !                                                                NOTE: repeat loop to add dissolved redox transformations
     !                                                                      (as if a 2nd set of particulates)
     if (ctrl_bio_remin_redox_save) then
-                DO ls=1,n_l_sed
-                   loc_tot_m = conv_ls_lo_i(0,ls)
-                   do loc_m=1,loc_tot_m
-                      lo = conv_ls_lo_i(loc_m,ls)
-                      if (lo > 0) then
-          n = n+1
-                         loc_string(n) = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                      end if
-                   end do
-                end DO
-                DO ls=1,n_l_sed
-                   loc_tot_m = conv_ls_lo_i(0,ls)
-                   do loc_m=1,loc_tot_m
-                      lo = conv_ls_lo_i(loc_m,ls)
-                      if (lo > 0) then
-          n = n+1
-                         loc_string(n) = 'reminD_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                      end if
-                   end do
-                end DO
+       DO ls=1,n_l_sed
+          loc_tot_m = conv_ls_lo_i(0,ls)
+          do loc_m=1,loc_tot_m
+             lo = conv_ls_lo_i(loc_m,ls)
+             if (lo > 0) then
+                n = n+1
+                loc_string(n) = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+             end if
+          end do
+       end DO
+       DO ls=1,n_l_sed
+          loc_tot_m = conv_ls_lo_i(0,ls)
+          do loc_m=1,loc_tot_m
+             lo = conv_ls_lo_i(loc_m,ls)
+             if (lo > 0) then
+                n = n+1
+                loc_string(n) = 'reminD_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+             end if
+          end do
+       end DO
     end if
     ! -------------------------------------------------------- ! record total
     n_diag_redox = n
@@ -1556,7 +1560,7 @@ CONTAINS
   END SUBROUTINE sub_data_init_phys_ocnatm
   ! ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! CONFIGURE AND INITIALIZE TRACER COMPOSITION - OCEAN
   SUBROUTINE sub_init_tracer_ocn_comp()
@@ -2354,14 +2358,14 @@ CONTAINS
                & n_itype_min:n_itype_max)
              loc_tot_i = conv_sed_ocn_i(0,is)
              If (loc_tot_i < 1) then
-                      loc_string2 = string_sed(is)
-                      CALL sub_report_error( &
-                           & 'biogem_data','sub_check_par', &
-                           & 'Particulate tracer '//TRIM(loc_string2)// &
-                           & ' does does not have *any* corresponding ocean tracer selected', &
-                           & 'STOPPING ...', &
-                           & (/const_real_null/),.true. &
-                           & )
+                loc_string2 = string_sed(is)
+                CALL sub_report_error( &
+                     & 'biogem_data','sub_check_par', &
+                     & 'Particulate tracer '//TRIM(loc_string2)// &
+                     & ' does does not have *any* corresponding ocean tracer selected', &
+                     & 'STOPPING ...', &
+                     & (/const_real_null/),.true. &
+                     & )
              end If
              do loc_i=1,loc_tot_i
                 io = conv_sed_ocn_i(loc_i,is)
@@ -2477,7 +2481,7 @@ CONTAINS
        ctrl_data_save_sig_diag_bio = ctrl_data_save_sig_diag
        ctrl_data_save_sig_diag_geochem = ctrl_data_save_sig_diag
     end select
-    
+
     ! meta meta options
     if (ctrl_data_save_slice_cdrmip) par_data_save_level = 0
 
@@ -3042,7 +3046,7 @@ CONTAINS
     DO nloc=1,n_orb_pts_nloc
        loc_locstr = 'i'//fun_conv_num_char_n(2,orb_pts_loc(nloc,1))//'j'//fun_conv_num_char_n(2,orb_pts_loc(nloc,2))
        loc_filename=fun_data_timeseries_filename( & 
-           & loc_t,par_outdir_name,trim(par_outfile_name)//'_orb',loc_locstr,string_results_ext)
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_orb',loc_locstr,string_results_ext)
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -3799,8 +3803,8 @@ CONTAINS
        DO b = 1,par_lookup_Fe_n_2
           DO c = 1,par_lookup_Fe_n_3
              DO d = 1,par_lookup_Fe_n_4
-                   READ(unit=in,FMT=*,iostat=ios) lookup_Fe_4D_Fe3(a,b,c,d)
-                   call check_iostat(ios,__LINE__,__FILE__)
+                READ(unit=in,FMT=*,iostat=ios) lookup_Fe_4D_Fe3(a,b,c,d)
+                call check_iostat(ios,__LINE__,__FILE__)
              END DO
           END DO
        END DO
@@ -3821,8 +3825,8 @@ CONTAINS
        DO b = 1,par_lookup_Fe_n_2
           DO c = 1,par_lookup_Fe_n_3
              DO d = 1,par_lookup_Fe_n_4
-                   READ(unit=in,FMT=*,iostat=ios) lookup_Fe_4D_geo(a,b,c,d)
-                   call check_iostat(ios,__LINE__,__FILE__)
+                READ(unit=in,FMT=*,iostat=ios) lookup_Fe_4D_geo(a,b,c,d)
+                call check_iostat(ios,__LINE__,__FILE__)
              END DO
           END DO
        END DO
