@@ -676,10 +676,10 @@ CONTAINS
           loc_filename=fun_data_timeseries_filename(loc_t, &
                & par_outdir_name,trim(par_outfile_name)//'_series_diag_bio',trim(string_diag_bio(ib)),string_results_ext)
           SELECT CASE (ib)
-             CASE (idiag_bio_dPO4,idiag_bio_dPO4_1,idiag_bio_dPO4_2,idiag_bio_N2fixation,idiag_bio_NH4assim)
-                loc_string = '% time (yr) / integrated global rate (mol yr-1)'
-             case default
-                loc_string = '% time (yr) / global mean'
+          CASE (idiag_bio_dPO4,idiag_bio_dPO4_1,idiag_bio_dPO4_2,idiag_bio_N2fixation,idiag_bio_NH4assim)
+             loc_string = '% time (yr) / integrated global rate (mol yr-1)'
+          case default
+             loc_string = '% time (yr) / global mean'
           end select
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
@@ -891,13 +891,13 @@ CONTAINS
           END DO
        END IF
     end if
-  ! Save 3D water column DIC d13C data for specific ij location
+    ! Save 3D water column DIC d13C data for specific ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN
        loc_filename=fun_data_timeseries_filename( &
-           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_DIC_13C_ij',string_results_ext)
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_DIC_13C_ij',string_results_ext)
        loc_string = '% time (yr) / DIC_13C_k1 / DIC_13C_k2 / DIC_13C_k3 / DIC_13C_k4 / DIC_13C_k5 /' // &
-                  & 'DIC_13C_k6 / DIC_13C_k7 / DIC_13C_k8 / DIC_13C_k9 / DIC_13C_k10 / DIC_13C_k11 /' // &
-                  & 'DIC_13C_k12 / DIC_13C_k13 / DIC_13C_k14 / DIC_13C_k15 / DIC_13C_k16'
+            & 'DIC_13C_k6 / DIC_13C_k7 / DIC_13C_k8 / DIC_13C_k9 / DIC_13C_k10 / DIC_13C_k11 /' // &
+            & 'DIC_13C_k12 / DIC_13C_k13 / DIC_13C_k14 / DIC_13C_k15 / DIC_13C_k16'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -909,10 +909,10 @@ CONTAINS
     ! And temperature
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_T))) THEN
        loc_filename=fun_data_timeseries_filename( &
-           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_temp_ij',string_results_ext)
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_temp_ij',string_results_ext)
        loc_string = '%time (yr) / temp_k1 / temp_k2 / temp_k3 / temp_k4 / temp_k5 /' // &
-                  & 'temp_k6 / temp_k7 / temp_k8 / temp_k9 / temp_k10 / temp_k11/' // &
-                  & 'temp_k12 / temp_k13 / temp_k14 / temp_k15 / temp_k16'
+            & 'temp_k6 / temp_k7 / temp_k8 / temp_k9 / temp_k10 / temp_k11/' // &
+            & 'temp_k12 / temp_k13 / temp_k14 / temp_k15 / temp_k16'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -1735,21 +1735,21 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__) 
-             ! all Sr species
-             loc_filename=fun_data_timeseries_filename(loc_t, &
-                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Sr_fexport_Sr',string_results_ext)
-             call check_unit(out,__LINE__,__FILE__)
-             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-             call check_iostat(ios,__LINE__,__FILE__)
-             WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
-                  & loc_t, &
-                  & int_fexport_sig(is_SrCO3)/int_t_sig, &
-                  & (int_fexport_sig(is_SrCO3)-int_fexport_sig(is_SrCO3_87Sr)-int_fexport_sig(is_SrCO3_88Sr))/int_t_sig, &
-                  & int_fexport_sig(is_SrCO3_87Sr)/int_t_sig, &
-                  & int_fexport_sig(is_SrCO3_88Sr)/int_t_sig
-             call check_iostat(ios,__LINE__,__FILE__)
-             CLOSE(unit=out,iostat=ios)
-             call check_iostat(ios,__LINE__,__FILE__)
+          ! all Sr species
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Sr_fexport_Sr',string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
+               & loc_t, &
+               & int_fexport_sig(is_SrCO3)/int_t_sig, &
+               & (int_fexport_sig(is_SrCO3)-int_fexport_sig(is_SrCO3_87Sr)-int_fexport_sig(is_SrCO3_88Sr))/int_t_sig, &
+               & int_fexport_sig(is_SrCO3_87Sr)/int_t_sig, &
+               & int_fexport_sig(is_SrCO3_88Sr)/int_t_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
           IF (flag_sedgem) THEN
              ! (1) OCN -> SED FLUXES
              ! all Sr species
@@ -1787,7 +1787,7 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)
              CLOSE(unit=out,iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
-          ! 88Sr
+             ! 88Sr
              loc_filename=fun_data_timeseries_filename(loc_t, &
                   & par_outdir_name,trim(par_outfile_name)//'_series','misc_Sr_focnsed_d88Sr',string_results_ext)
              call check_unit(out,__LINE__,__FILE__)
@@ -1984,19 +1984,19 @@ CONTAINS
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
           SELECT CASE (ib)
-             CASE (idiag_bio_dPO4,idiag_bio_dPO4_1,idiag_bio_dPO4_2,idiag_bio_N2fixation,idiag_bio_NH4assim)
-                WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
-                     & loc_t,                        &
-                     & loc_ocn_tot_M_sur*loc_sig
-             CASE (idiag_bio_CaCO3toPOC_nsp,idiag_bio_opaltoPOC_sp,idiag_bio_fspPOC)
-                ! correct for the number of sub-slices to create an average
-                WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
-                     & loc_t,                        &
-                     & loc_sig/real(int_t_sig_count)
-             case default
-                WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
-                     & loc_t,                        &
-                     & loc_sig
+          CASE (idiag_bio_dPO4,idiag_bio_dPO4_1,idiag_bio_dPO4_2,idiag_bio_N2fixation,idiag_bio_NH4assim)
+             WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_ocn_tot_M_sur*loc_sig
+          CASE (idiag_bio_CaCO3toPOC_nsp,idiag_bio_opaltoPOC_sp,idiag_bio_fspPOC)
+             ! correct for the number of sub-slices to create an average
+             WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_sig/real(int_t_sig_count)
+          case default
+             WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_sig
           end select
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)
@@ -2301,10 +2301,10 @@ CONTAINS
           END DO
        END IF
     end if
-  ! Save 3D data from a particular ij location
+    ! Save 3D data from a particular ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN
        loc_filename=fun_data_timeseries_filename( &
-           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_DIC_13C_ij',string_results_ext)
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_DIC_13C_ij',string_results_ext)
        DO k=1,n_k
           loc_tot_3D(k)=ocn(io_DIC,par_misc_save_i,par_misc_save_j,k)/int_t_sig
           loc_frac_3D(k)=ocn(io_DIC_13C,par_misc_save_i,par_misc_save_j,k)/int_t_sig
@@ -2322,7 +2322,7 @@ CONTAINS
     ! And temperature
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_T))) THEN
        loc_filename=fun_data_timeseries_filename( & 
-           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_temp_ij',string_results_ext)
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ocn_temp_ij',string_results_ext)
        DO k=1,n_k
           loc_sig_3D(k)=ocn(io_T,par_misc_save_i,par_misc_save_j,k)/int_t_sig - const_zeroC
        END DO
@@ -2834,31 +2834,31 @@ CONTAINS
          & ' PgC yr-1'
     if (int_diag_bio_sig(idiag_bio_dPO4) < const_real_nullsmall) then
        int_diag_bio_sig(idiag_bio_dPO4) = const_real_nullsmall
-    end if         
-       select case (par_bio_prodopt)
-       CASE (                        &
-            & 'bio_PFeSi',           &
-            & 'bio_PFeSi_Ridgwell02' &
-            & )
-    Write(unit=out,fmt=*) ' '
-    write(unit=out,fmt='(A22,e15.7,A12,f7.3,A13)',iostat=ios) &
-         & ' Total opal export  : ', &
-         & SUM(int_bio_settle_timeslice(is_opal,:,:,n_k))/int_t_timeslice, &
-         & ' mol yr-1 = ', &
-         & 1.0E-12*SUM(int_bio_settle_timeslice(is_opal,:,:,n_k))/int_t_timeslice, &
-         & ' Tmol Si yr-1'
-    write(unit=out,fmt='(A22,f7.3,A13)',iostat=ios) &
-         & ' -> sp POC export   : ', &
-         & (int_diag_bio_sig(idiag_bio_dPO4_1)/int_diag_bio_sig(idiag_bio_dPO4))* &
-         & 1.0E-12*conv_C_mol_kg*SUM(int_bio_settle_timeslice(is_POC,:,:,n_k))/int_t_timeslice, &
-         & ' PgC yr-1'
-    write(unit=out,fmt='(A22,f7.3,A13)',iostat=ios) &
-         & ' -> nsp POC export  : ', &
-         & (int_diag_bio_sig(idiag_bio_dPO4_2)/int_diag_bio_sig(idiag_bio_dPO4))* &
-         & 1.0E-12*conv_C_mol_kg*SUM(int_bio_settle_timeslice(is_POC,:,:,n_k))/int_t_timeslice, &
-         & ' PgC yr-1'
-       end select
-         
+    end if
+    select case (par_bio_prodopt)
+    CASE (                        &
+         & 'bio_PFeSi',           &
+         & 'bio_PFeSi_Ridgwell02' &
+         & )
+       Write(unit=out,fmt=*) ' '
+       write(unit=out,fmt='(A22,e15.7,A12,f7.3,A13)',iostat=ios) &
+            & ' Total opal export  : ', &
+            & SUM(int_bio_settle_timeslice(is_opal,:,:,n_k))/int_t_timeslice, &
+            & ' mol yr-1 = ', &
+            & 1.0E-12*SUM(int_bio_settle_timeslice(is_opal,:,:,n_k))/int_t_timeslice, &
+            & ' Tmol Si yr-1'
+       write(unit=out,fmt='(A22,f7.3,A13)',iostat=ios) &
+            & ' -> sp POC export   : ', &
+            & (int_diag_bio_sig(idiag_bio_dPO4_1)/int_diag_bio_sig(idiag_bio_dPO4))* &
+            & 1.0E-12*conv_C_mol_kg*SUM(int_bio_settle_timeslice(is_POC,:,:,n_k))/int_t_timeslice, &
+            & ' PgC yr-1'
+       write(unit=out,fmt='(A22,f7.3,A13)',iostat=ios) &
+            & ' -> nsp POC export  : ', &
+            & (int_diag_bio_sig(idiag_bio_dPO4_2)/int_diag_bio_sig(idiag_bio_dPO4))* &
+            & 1.0E-12*conv_C_mol_kg*SUM(int_bio_settle_timeslice(is_POC,:,:,n_k))/int_t_timeslice, &
+            & ' PgC yr-1'
+    end select
+
     !
     Write(unit=out,fmt=*) ' '
     Write(unit=out,fmt=*) '=========================='

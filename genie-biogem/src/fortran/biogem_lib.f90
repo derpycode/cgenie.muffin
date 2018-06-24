@@ -236,6 +236,12 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_ONtoNH4
   REAL::par_bio_remin_denitrO2thresh                             ! Denitrification [O2] threshold (mol kg-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_denitrO2thresh
+  LOGICAL::ctrl_bio_remin_thresh                                 ! Apply a hard tracer oxidant remin threshold? 
+  NAMELIST /ini_biogem_nml/ctrl_bio_remin_thresh
+  real::par_bio_remin_cthresh_O2                                 ! Hard threshold for oxic remin (mol kg-1) 
+  real::par_bio_remin_cthresh_NO3                                ! Hard threshold for denitrification (mol kg-1)
+  real::par_bio_remin_cthresh_SO4                                ! Hard threshold for sulphate reduction (mol kg-1)
+  NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_SO4
   LOGICAL::ctrl_bio_remin_reminfix                               ! Catch mis-behaving rapidly-oxidizing species going < 0.0?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_reminfix
   CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
@@ -672,7 +678,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::ipo_dzrho                            = 22   ! density gradient
   INTEGER,PARAMETER::ipo_diffv                            = 23   ! vertical diffusivity
   INTEGER,PARAMETER::ipo_rho_go                           = 24   ! goldstein density
-! ocean-atmosphere interface 'physics' properties array indices
+  ! ocean-atmosphere interface 'physics' properties array indices
   INTEGER,PARAMETER::ipoa_lat                             = 01   ! latitude (degrees) [mid-point]
   INTEGER,PARAMETER::ipoa_lon                             = 02   ! longitude (degrees) [mid-point]
   INTEGER,PARAMETER::ipoa_dlat                            = 03   ! latitude (degrees) [width]
@@ -1073,7 +1079,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm,n_i,n_j)::int_diag_airsea_timeslice       ! air-sea gas exchange diagnostics
   ! redox
   real,DIMENSION(:,:,:,:),ALLOCATABLE::int_diag_redox_timeslice  ! redox diagnostics 3D time-slice
-    ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
+  ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
   !
   ! ############################################################################################################################## !
 

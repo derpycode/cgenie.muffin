@@ -26,7 +26,7 @@ SUBROUTINE cpl_comp_ocngem(                 &
   ! NOTE: currently, the GENIE arrays are defiend with the max number of ocn tracers (not selected number)
   DO l=1,n_l_ocn
      io = conv_iselected_io(l)
-     !!!dum_genie_ocn(l,:,:,:) = ocn(io,:,:,:)
+!!!dum_genie_ocn(l,:,:,:) = ocn(io,:,:,:)
   end do
   dum_genie_ocn(:,:,:,:) = dum_genie_ocn(:,:,:,:) + dum_dts*ocn(:,:,:,:)/conv_yr_s
 end SUBROUTINE cpl_comp_ocngem
@@ -54,7 +54,7 @@ SUBROUTINE cpl_comp_gemocn(                 &
   ! NOTE: <dum_genie_docn> is passed in as an ANOMALY
   DO l=1,n_l_ocn
      io = conv_iselected_io(l)
-     !!!ocn(io,:,:,:) = dum_genie_ocn(l,:,:,:)
+!!!ocn(io,:,:,:) = dum_genie_ocn(l,:,:,:)
   end do
   ocn(:,:,:,:) = ocn(:,:,:,:) + dum_genie_docn(:,:,:,:)
   ! reset anomoly array
@@ -86,7 +86,7 @@ SUBROUTINE cpl_comp_gematm1(    &
   ! NOTE: <dum_genie_datm1> is passed in as an ANOMALY
   DO l=1,n_l_atm
      ia = conv_iselected_ia(l)
-     !!!atm(ia,:,:) = dum_genie_atm(l,:,:)
+!!!atm(ia,:,:) = dum_genie_atm(l,:,:)
   end do
   dum_sfcatm1(:,:,:) = dum_sfcatm1(:,:,:) + dum_genie_datm1(:,:,:)
   ! reset anomoly array
