@@ -3038,30 +3038,42 @@ CONTAINS
     ! NOTE: truncate loc concentrations at zero to avoid negative values being propagated ...
     ! NOTE: equation form follows Arndt et al. [2013] (ESR) and Boudreau [1997] (book)
     if (ocn_select(io_O2)) then
-       loc_O2 = max(const_real_nullsmall,dum_ocn(io2l(io_O2)))
-       loc_kO2 = loc_O2/(loc_O2 + par_bio_remin_c0_O2)
+       loc_O2 = max(0.0,dum_ocn(io2l(io_O2)))
+       if (loc_O2 <= const_real_nullsmall) then
+          loc_kO2 = 0.0
+       else
+          loc_kO2 = loc_O2/(loc_O2 + par_bio_remin_c0_O2)
+       end if
        loc_kiO2 = par_bio_remin_ci_O2/(par_bio_remin_ci_O2 + loc_O2)
-       loc_k = loc_k + par_bio_remin_k_O2*loc_kO2
+       loc_k    = loc_k + par_bio_remin_k_O2*loc_kO2
     else
        loc_O2   = 0.0
        loc_kO2  = 0.0
        loc_kiO2 = 1.0
     end if
     if (ocn_select(io_NO3)) then
-       loc_NO3 = max(const_real_nullsmall,dum_ocn(io2l(io_NO3)))
-       loc_kNO3 = loc_NO3/(loc_NO3 + par_bio_remin_c0_NO3)
+       loc_NO3 = max(0.0,dum_ocn(io2l(io_NO3)))
+       if (loc_NO3 <= const_real_nullsmall) then
+          loc_kNO3 = 0.0
+       else
+          loc_kNO3 = loc_NO3/(loc_NO3 + par_bio_remin_c0_NO3)
+       end if
        loc_kiNO3 = par_bio_remin_ci_NO3/(par_bio_remin_ci_NO3 + loc_NO3)
-       loc_k = loc_k + par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
     else
        loc_NO3   = 0.0
        loc_kNO3  = 0.0
        loc_kiNO3 = 1.0
     end if
     if (ocn_select(io_SO4)) then
-       loc_SO4 = max(const_real_nullsmall,dum_ocn(io2l(io_SO4)))
-       loc_kSO4 = loc_SO4/(loc_SO4 + par_bio_remin_c0_SO4)
+       loc_SO4 = max(0.0,dum_ocn(io2l(io_SO4)))
+       if (loc_SO4 <= const_real_nullsmall) then
+          loc_kSO4 = 0.0
+       else
+          loc_kSO4 = loc_SO4/(loc_SO4 + par_bio_remin_c0_SO4)
+       end if
        loc_kiSO4 = par_bio_remin_ci_SO4/(par_bio_remin_ci_SO4 + loc_SO4)
-       loc_k = loc_k + par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
     else
        loc_SO4   = 0.0
        loc_kSO4  = 0.0
@@ -3069,7 +3081,7 @@ CONTAINS
     end if
     if (ocn_select(io_CH4)) then
        loc_kmeth = 1.0
-       loc_k = loc_k + par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2
     else
        loc_kmeth = 0.0
     end if
@@ -3102,6 +3114,9 @@ CONTAINS
     ! ---------------------------------------------------------- ! calculate weighted remin array
     ! NOTE: normalize to 1.0 if a non-kinetic decay scheme is being used
     !       (an exception is the basic temperature-only scheme which also needs to be normalized)
+    ! NOTE: catch a local oxidation value of const_real_nullsmall (or less),
+    !       as this means that the oxidant was probably negative in the first place
+    !       => disable that particular redox remin pathway by setting the kinetic parameter to ZERO
     if (ocn_select(io_O2)) then
        if (ocn_select(io_NO3)) then
           if (ocn_select(io_SO4)) then
@@ -3112,14 +3127,12 @@ CONTAINS
                      & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
                      & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
              else
-                if (loc_SO4 < const_real_nullsmall) loc_kSO4 = 0.0
                 dum_conv_ls_lo(:,:) = &
                      & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
                      & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
                      & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
              end if
           else
-             if (loc_NO3 < const_real_nullsmall) loc_kNO3 = 0.0
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
                   & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:)
@@ -3131,13 +3144,11 @@ CONTAINS
                   & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
                   & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
-             if (loc_SO4 < const_real_nullsmall) loc_kSO4 = 0.0
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
                   & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
           end if
        else
-          if (loc_O2 < const_real_nullsmall) loc_kO2 = 0.0
           dum_conv_ls_lo(:,:) = &
                & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:)
        end if
