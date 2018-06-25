@@ -3035,8 +3035,11 @@ CONTAINS
     ! CREATE REMIN ARRAY
     ! ---------------------------------------------------------- !
     ! ---------------------------------------------------------- ! set MM-type rate limitations
-    ! NOTE: truncate loc concentrations at zero to avoid negative values being propagated ...
     ! NOTE: equation form follows Arndt et al. [2013] (ESR) and Boudreau [1997] (book)
+    ! NOTE: truncate loc concentrations at zero to avoid negative values being propagated ...
+    ! NOTE: catch a local oxidation value of const_real_nullsmall (or less),
+    !       as this means that the oxidant was probably negative in the first place
+    !       => disable that particular redox remin pathway by setting the kinetic parameter to ZERO
     if (ocn_select(io_O2)) then
        loc_O2 = max(0.0,dum_ocn(io2l(io_O2)))
        if (loc_O2 <= const_real_nullsmall) then
@@ -3114,9 +3117,6 @@ CONTAINS
     ! ---------------------------------------------------------- ! calculate weighted remin array
     ! NOTE: normalize to 1.0 if a non-kinetic decay scheme is being used
     !       (an exception is the basic temperature-only scheme which also needs to be normalized)
-    ! NOTE: catch a local oxidation value of const_real_nullsmall (or less),
-    !       as this means that the oxidant was probably negative in the first place
-    !       => disable that particular redox remin pathway by setting the kinetic parameter to ZERO
     if (ocn_select(io_O2)) then
        if (ocn_select(io_NO3)) then
           if (ocn_select(io_SO4)) then
