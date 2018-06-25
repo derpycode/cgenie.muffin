@@ -5,7 +5,7 @@ SUBROUTINE end_biogem()
   USE biogem_lib
   USE biogem_data
   USE genie_util, ONLY: check_iostat
-  
+
   print*,'======================================================='
   print*,' >>> Initialising BIOGEM module shutdown ...'
 

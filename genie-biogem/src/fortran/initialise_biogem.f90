@@ -225,10 +225,10 @@ SUBROUTINE initialise_biogem(                       &
   IF (ctrl_debug_lvl2) print*, 'initialize ocean and ocean-atmosphere interfacing grids and physics'
   CALL sub_init_phys_ocn()
   CALL sub_init_phys_ocnatm()
-!>>> ALT VECTOR FORM
+  !>>> ALT VECTOR FORM
   CALL sub_data_init_phys_ocn()
   CALL sub_data_init_phys_ocnatm()
-!<<< ALT VECTOR FORM
+  !<<< ALT VECTOR FORM
   ! ---------------------------------------------------------- ! 
   ! load default values for ocean, atmosphere, and sediment tracers and and initialize tracer arrays and options
   IF (ctrl_debug_lvl2) print*, 'load default values for ocean, atmosphere, and sediment tracers'

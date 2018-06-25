@@ -424,11 +424,11 @@ subroutine biogem(        &
                                 loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                              end if
                              locij_fsedocn(l2io(lo),i,j) = locij_fsedocn(l2io(lo),i,j) + loc_remin
-                         if (ctrl_bio_remin_redox_save) then
-                            loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                            id = fun_find_str_i(trim(loc_string),string_diag_redox)
-                            diag_redox(id,i,j,loc_k1) = diag_redox(id,i,j,loc_k1) + phys_ocn(ipo_rM,i,j,loc_k1)*loc_remin
-                         end if 
+                             if (ctrl_bio_remin_redox_save) then
+                                loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+                                id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                                diag_redox(id,i,j,loc_k1) = diag_redox(id,i,j,loc_k1) + phys_ocn(ipo_rM,i,j,loc_k1)*loc_remin
+                             end if
                           end if
                        end do
                     end DO
@@ -456,16 +456,16 @@ subroutine biogem(        &
                        if (lo == io2l(io_PO4)) then
                           loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                           dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
-                          &  (loc_remin - locij_fsedocn(io_PO4,i,j))
+                               &  (loc_remin - locij_fsedocn(io_PO4,i,j))
                           if (ctrl_bio_red_ALKwithPOC) then
                              ! do nothing -- ALK with POC
                           else
                              dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
-                                &  conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
+                                  &  conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
                           end if
                        end if
                     end do
-                 end if   
+                 end if
               end if
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
@@ -581,7 +581,7 @@ subroutine biogem(        &
 
            IF (n_k >= loc_k1) THEN
               n = n + 1
-              
+
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** UPDATE CARBONATE CHEMSITRY ***'
               IF (opt_select(iopt_select_carbchem)) THEN
@@ -665,7 +665,7 @@ subroutine biogem(        &
                       & carb(:,i,j,n_k)       &
                       & )
               end if
-              
+
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** BRINE REJECTION ***'
               ! *** BRINE REJECTION ***
@@ -862,12 +862,12 @@ subroutine biogem(        &
                  ! (1) ocean ALK adjustment INVERSIONS
                  ! ------------------------------------------- !
                  IF ( force_restore_atm_select(ia_pCO2) .AND. &
-                    & ( &
-                          & (.NOT. force_restore_ocn_select(io_colr)) .AND. &
-                          & (.NOT. force_restore_ocn_select(io_colb)) .AND. &
-                          & (par_force_invert_ohmega < const_real_nullsmall) &
-                       & ) &
-                    & ) THEN
+                      & ( &
+                      & (.NOT. force_restore_ocn_select(io_colr)) .AND. &
+                      & (.NOT. force_restore_ocn_select(io_colb)) .AND. &
+                      & (par_force_invert_ohmega < const_real_nullsmall) &
+                      & ) &
+                      & ) THEN
                     ! (1a) ocean ALK [GEOENGINEEGING of pCO2]
                     ! NOTE: re-scale the 'target' in case the atm flux forcing has been scaled (same param applied to both)
                     loc_force_actual = dum_sfcatm1(ia_pCO2,i,j)
@@ -1071,9 +1071,9 @@ subroutine biogem(        &
                           loc_delta_actual = loc_force_actual_d13C
                        end if
                        loc_delta_target = fun_calc_isotope_delta( &
-                           & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_13C),i,j,n_k), &
-                           & loc_standard,.FALSE.,const_real_null &
-                           & )
+                            & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_13C),i,j,n_k), &
+                            & loc_standard,.FALSE.,const_real_null &
+                            & )
                     elseif (force_restore_ocn_select(io_DOM_C_13C)) then
                        ! calculate local variables
                        loc_standard = const_standards(ocn_type(io_DOM_C_13C))
@@ -1085,16 +1085,16 @@ subroutine biogem(        &
                                & loc_standard,.FALSE.,const_real_null &
                                & )
                           loc_delta_target = fun_calc_isotope_delta( &
-                              & force_restore_locn(io2l(io_DOM_C),par_force_point_i,par_force_point_j,n_k), &
-                              & force_restore_locn(io2l(io_DOM_C_13C),par_force_point_i,par_force_point_j,n_k), &
-                              & loc_standard,.FALSE.,const_real_null &
-                              & )
+                               & force_restore_locn(io2l(io_DOM_C),par_force_point_i,par_force_point_j,n_k), &
+                               & force_restore_locn(io2l(io_DOM_C_13C),par_force_point_i,par_force_point_j,n_k), &
+                               & loc_standard,.FALSE.,const_real_null &
+                               & )
                        else
                           loc_delta_actual = loc_force_actual_d13C
                           loc_delta_target = fun_calc_isotope_delta( &
-                              & force_restore_locn(io2l(io_DOM_C),i,j,n_k),force_restore_locn(io2l(io_DOM_C_13C),i,j,n_k), &
-                              & loc_standard,.FALSE.,const_real_null &
-                              & )
+                               & force_restore_locn(io2l(io_DOM_C),i,j,n_k),force_restore_locn(io2l(io_DOM_C_13C),i,j,n_k), &
+                               & loc_standard,.FALSE.,const_real_null &
+                               & )
                        end if
                     end if
                     IF (force_flux_ocn_select(io_DIC_13C)) THEN
@@ -1323,7 +1323,7 @@ subroutine biogem(        &
               ! NOTE: also account for O2 consumed in the atmosphere in the oxidation of H2S
               ! NOTE: only do anything if there is O2 in the atmosphere!!!
               if (ocn_select(io_H2S) .AND. atm_select(ia_pH2S)) then
-              select case (opt_ocnatmH2S_fix)
+                 select case (opt_ocnatmH2S_fix)
                  case ('KMM')
                     IF (                                                       &
                          & (locij_focnatm(ia_pH2S,i,j) > const_real_nullsmall) &
@@ -1397,13 +1397,13 @@ subroutine biogem(        &
               ! *** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***
               select case (par_bio_remin_CH4ox)
               case ('default')
-              if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                 call sub_calc_bio_remin_oxidize_CH4(i,j,loc_k1,loc_dtyr)
-              end If
+                 if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
+                    call sub_calc_bio_remin_oxidize_CH4(i,j,loc_k1,loc_dtyr)
+                 end If
               case ('CH4ox_MM')
-              if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                 call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
-              end If
+                 if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
+                    call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
+                 end If
               end select
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -2250,22 +2250,22 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
   n_orb_pts = n_orb_pts+1
   if (n_orb_pts > n_orb_pts_nmax) then
      CALL sub_report_error( &
-        & 'biogem','diag_biogem_rec_orb', &
-        & 'Maximum temporary record storage exceeded -- parameter: bg_n_orb_pts_nmax', &
-        & 'CONTINUING and overwriting last data', &
-        & (/real(n_orb_pts_nmax)/),.false. &
-        & )
+          & 'biogem','diag_biogem_rec_orb', &
+          & 'Maximum temporary record storage exceeded -- parameter: bg_n_orb_pts_nmax', &
+          & 'CONTINUING and overwriting last data', &
+          & (/real(n_orb_pts_nmax)/),.false. &
+          & )
      n_orb_pts = n_orb_pts_nmax
-  end if 
+  end if
   orb_pts_time(n_orb_pts) = loc_yr
   ! ---------------------------------------------------------- ! START LOOP
   DO nloc=1,n_orb_pts_nloc
      ! extract (i,j)
      loc_i = orb_pts_loc(nloc,1)
      loc_j = orb_pts_loc(nloc,2)
-  
+
      DO nvar=1,n_orb_pts_nvar
-     
+
         ! (1) deduce k value  
         ! zero local k layer value
         loc_k = 0
@@ -2312,7 +2312,7 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
               orb_pts(n_orb_pts,nloc,nvar) = carb(loc_istr,loc_i,loc_j,loc_k)
               exit
            end if
-        end do 
+        end do
         ! (2c) -- sediment tracers (particulate fluxes)
         do n=1,n_sed
            loc_istr = INDEX(orb_pts_var(nvar)(:),'sed')
@@ -2328,20 +2328,20 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
                     orb_pts(n_orb_pts,nloc,nvar) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
                  case default
                     orb_pts(n_orb_pts,nloc,nvar) = bio_settle(loc_istr,loc_i,loc_j,loc_k)
-                 END SELECT              
+                 END SELECT
                  exit
               end if
            end if
-        end do 
-        !!!! (2d) -- ocean physics
-        !!!do n=1,n_phys_ocn
-        !!!   loc_istr = INDEX(orb_pts_var(nvar)(:),trim(string_phys_ocn(n))//'.')
-        !!!   if (loc_istr /= 0) then
-        !!!      loc_istr = fun_find_str_i(trim(string_phys_ocn(n)),string_phys_ocn)
-        !!!      orb_pts(n_orb_pts,nloc,nvar) = phys_ocn(loc_istr,loc_i,loc_j,loc_k)
-        !!!      exit
-        !!!   end if
-        !!!end do 
+        end do
+!!!! (2d) -- ocean physics
+!!!do n=1,n_phys_ocn
+!!!   loc_istr = INDEX(orb_pts_var(nvar)(:),trim(string_phys_ocn(n))//'.')
+!!!   if (loc_istr /= 0) then
+!!!      loc_istr = fun_find_str_i(trim(string_phys_ocn(n)),string_phys_ocn)
+!!!      orb_pts(n_orb_pts,nloc,nvar) = phys_ocn(loc_istr,loc_i,loc_j,loc_k)
+!!!      exit
+!!!   end if
+!!!end do 
         ! (2e) -- ocean-atmosphere interface 'physics'
         do n=1,n_phys_ocnatm
            loc_istr = INDEX(orb_pts_var(nvar)(:),trim(string_phys_ocnatm(n))//'.')
@@ -2350,7 +2350,7 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
               orb_pts(n_orb_pts,nloc,nvar) = phys_ocnatm(loc_istr,loc_i,loc_j)
               exit
            end if
-        end do 
+        end do
         ! (2f) -- atmosphere tracers
         do n=1,n_atm
            loc_istr = INDEX(orb_pts_var(nvar)(:),'atm')
@@ -2369,10 +2369,10 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
                  END SELECT
                  exit 
               end if
-           end if  
-        end do 
+           end if
+        end do
      end do
-  
+
   end do
   ! ---------------------------------------------------------- ! END LOOP
   ! ---------------------------------------------------------- !
@@ -2442,7 +2442,7 @@ subroutine diag_biogem( &
         CALL sub_audit_update()
      END IF
   end IF if_report
-  
+
 end subroutine diag_biogem
 ! ******************************************************************************************************************************** !
 
@@ -2466,7 +2466,7 @@ subroutine diag_biogem_timesync( &
   logical,intent(out)::dum_intslice                                     ! integrate time-slice data?
   logical,intent(out)::dum_endseries                                    ! end of time-series data integration interval?
   logical,intent(out)::dum_endslice                                     ! end of time-slice data integration interval?
-  
+
   ! *** RETURN TIME INFORMATON ***
   ! 
   dum_tseries   = par_misc_t_tseries
@@ -2475,7 +2475,7 @@ subroutine diag_biogem_timesync( &
   dum_intslice  = par_misc_t_intslice
   dum_endseries = par_misc_t_endseries
   dum_endslice  = par_misc_t_endslice
-  
+
 end subroutine diag_biogem_timesync
 ! ******************************************************************************************************************************** !
 
@@ -2759,7 +2759,7 @@ SUBROUTINE diag_biogem_timeslice( &
              & .OR.                                                   &
              & (int_t_timeslice_count == par_data_save_slice_n)       &
              & ) then
-             
+
            if_save3b: if (dum_save) then
 
               ! set save time
@@ -2822,7 +2822,7 @@ SUBROUTINE diag_biogem_timeslice( &
               ! save global diagnostics
               If (ctrl_data_save_GLOBAL) call sub_data_save_global_av()
               If (ctrl_data_save_GLOBAL .AND. ctrl_data_save_derived) call sub_data_save_global_snap(loc_t,dum_sfcatm1(:,:,:))
-              
+
               ! save orbits data
               if ((n_orb_pts_nloc > 0) .and. (n_orb_pts > 0)) then  
                  WRITE(unit=6,fmt='(A57,f12.3)') &
@@ -2831,25 +2831,25 @@ SUBROUTINE diag_biogem_timeslice( &
                  DO nloc=1,n_orb_pts_nloc 
                     loc_locstr = 'i'//fun_conv_num_char_n(2,orb_pts_loc(nloc,1))//'j'//fun_conv_num_char_n(2,orb_pts_loc(nloc,2))
                     loc_filename=fun_data_timeseries_filename( & 
-                       & loc_t,par_outdir_name,trim(par_outfile_name)//'_orb',loc_locstr,string_results_ext)
+                         & loc_t,par_outdir_name,trim(par_outfile_name)//'_orb',loc_locstr,string_results_ext)
                     call check_unit(out,__LINE__,__FILE__)
                     OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                     call check_iostat(ios,__LINE__,__FILE__) 
                     DO n=1,n_orb_pts
                        WRITE(unit=out,fmt='(f12.3,999e14.6)',iostat=ios) &
-                          & orb_pts_time(n), &
-                          & (orb_pts(n,nloc,nvar),nvar=1,n_orb_pts_nvar)
+                            & orb_pts_time(n), &
+                            & (orb_pts(n,nloc,nvar),nvar=1,n_orb_pts_nvar)
                        call check_iostat(ios,__LINE__,__FILE__)
                     end do
                     CLOSE(unit=out,iostat=ios)
-                   call check_iostat(ios,__LINE__,__FILE__)
+                    call check_iostat(ios,__LINE__,__FILE__)
                  end do
                  ! reset data counter, empty arrays
                  n_orb_pts       = 0
                  orb_pts(:,:,:)  = 0.0
                  orb_pts_time(:) = 0.0
               end if
-    
+
            end if if_save3b
 
            ! reset array values
@@ -2866,9 +2866,9 @@ SUBROUTINE diag_biogem_timeslice( &
         END IF
 
      else
-     
+
         par_misc_t_intslice = .false.
-     
+
      end if if_save2
   end if if_save1
 
@@ -2955,7 +2955,7 @@ SUBROUTINE diag_biogem_timeseries( &
         par_misc_t_tseries = par_misc_t_end - par_data_save_sig(par_data_save_sig_i)
 
         if_save3: if (dum_save) then
-           
+
            ! calculate local constants
            ! total ocean mass and recpirocal
            loc_ocn_tot_M = sum(phys_ocn(ipo_M,:,:,:))
@@ -3275,7 +3275,7 @@ SUBROUTINE diag_biogem_timeseries( &
         int_t_sig_count = int_t_sig_count + 1
 
      else
-     
+
         par_misc_t_intseries = .false.
 
      end IF if_save2
