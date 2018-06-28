@@ -3149,8 +3149,14 @@ CONTAINS
                   & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
           end if
        else
-          dum_conv_ls_lo(:,:) = &
-               & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:)
+          if (ocn_select(io_CH4)) then
+             dum_conv_ls_lo(:,:) = &
+                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
+                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+          else
+             dum_conv_ls_lo(:,:) = &
+                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:)
+          end if
        end if
     else
        dum_conv_ls_lo(:,:) = 0.0
@@ -4973,12 +4979,13 @@ CONTAINS
     !       2NO3- + 2H+ -> N2 + 5/2O2 + H2O <--> 5O2 + 2N2 + 2H2O -> 4NO3- + 4H+
     ! NOTE: ALK changes associayed with NO3- are taken into account in the NO3- budget
     !       => no additional/explicit ALK budgeting w.r.t either N2 or NH4 is required
-    ! NOTE: for O2 -- count only O2 in oxidized forms
+    ! NOTE: for O2 -- account for the deficit from reduced forms 
     !       => do not attempt to implicitly oxidize reduced forms and calculate the resulting O2 deficit
     ! NOTE: for ALK -- count the charges (+vs and -ve)
     !       (excluding PO4)
     if (ocn_select(io_CH4)) then
        fun_audit_combinetracer(io_DIC) = fun_audit_combinetracer(io_DIC) + dum_ocn(io_CH4)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - 2.0*dum_ocn(io_CH4)
     end if
     fun_audit_combinetracer(io_CH4) = 0.0
     if (ocn_select(io_CH4_13C)) then
@@ -5004,6 +5011,7 @@ CONTAINS
     if (ocn_select(io_NH4)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + dum_ocn(io_NH4)
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) - dum_ocn(io_NH4)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - (3.0/2.0)*dum_ocn(io_NH4)
     end if
     fun_audit_combinetracer(io_NH4) = 0.0
     if (ocn_select(io_SO4)) then

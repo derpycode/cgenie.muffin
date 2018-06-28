@@ -281,6 +281,7 @@ CONTAINS
        print*,'Planktic foram 13C fractionation scheme ID string   : ',opt_bio_foram_p_13C_delta
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
+       print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
        ! --- IRON CYCLING -------------------------------------------------------------------------------------------------------- !
        print*,'--- IRON CYCLING -----------------------------------'
        print*,'Aeolian Fe solubility                               : ',par_det_Fe_sol
@@ -960,6 +961,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     real,dimension(1:n_ocn,1:n_sed)::loc_conv_sed_ocn          !
+    real::loc_alpha
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- !
@@ -1046,7 +1048,7 @@ CONTAINS
        if (ocn_select(io_NH4)) then
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
           conv_sed_ocn_N(io_NH4,is_PON) = 1.0
-          conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON) - conv_sed_ocn_N(io_NO3,is_PON)
+          conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_N(io_O2,is_PON)  = 0.0
        else
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
@@ -1084,7 +1086,7 @@ CONTAINS
        if (ocn_select(io_NH4)) then
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
           conv_sed_ocn_S(io_NH4,is_PON) = 1.0
-          conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON) - conv_sed_ocn_N(io_NO3,is_PON)
+          conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_S(io_O2,is_PON)  = 0.0
        else
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
@@ -1111,13 +1113,21 @@ CONTAINS
     end if
     ! -------------------------------------------------------- ! Modify for methanogenesis
     ! NOTE: methanogenesis is acetoclastic - CH2O -> 0.5CO2 + 0.5CH4
+    ! NOTE: O2 released by the creation of organic matter:
+    !       conv_sed_ocn(io_O2,is_POC) + conv_sed_ocn(io_O2,is_POP) + conv_sed_ocn(io_O2,is_PON)
+    !       == par_bio_red_POP_PO2/par_bio_red_POP_POC
+    !       => this has to be balanced by O2 consumded by CH4 oxidation
+    ! NOTE: in the alternative N transformations -- *no* O2 is involved
+    ! NOTE: assume that in POP --> PO4, the O2 comes from 'elsewhere' (O in organic matter, or H2O)
+    !       (and don't explicitly account for O2 changing hands)
     if (ocn_select(io_CH4)) then
        conv_sed_ocn_meth(:,:) = conv_sed_ocn(:,:)
+       loc_alpha = 1.0 + par_d13C_Corg_CH4_epsilon/1000.0
        ! N
        if (ocn_select(io_NH4)) then
           conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
           conv_sed_ocn_meth(io_NH4,is_PON) = 1.0
-          conv_sed_ocn_meth(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON) - conv_sed_ocn_N(io_NO3,is_PON)
+          conv_sed_ocn_meth(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
        else
           conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
@@ -1126,12 +1136,12 @@ CONTAINS
           conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
        endif
        ! P,C
-       conv_sed_ocn_meth(io_CH4,is_POP) = -0.5*conv_sed_ocn_meth(io_O2,is_POP)
-       conv_sed_ocn_meth(io_DIC,is_POP) = -0.5*conv_sed_ocn_meth(io_O2,is_POP)
        conv_sed_ocn_meth(io_O2,is_POP)  = 0.0
-       conv_sed_ocn_meth(io_CH4,is_POC) = -0.5*conv_sed_ocn_meth(io_O2,is_POC)
-       conv_sed_ocn_meth(io_DIC,is_POC) = -0.5*conv_sed_ocn_meth(io_O2,is_POC)
-       conv_sed_ocn_meth(io_O2,is_POC)  = 0.0 
+       conv_sed_ocn_meth(io_CH4,is_POC) = -0.5*par_bio_red_POP_PO2/par_bio_red_POP_POC
+       conv_sed_ocn_meth(io_DIC,is_POC) = 1.0 - conv_sed_ocn_meth(io_CH4,is_POC)
+       conv_sed_ocn_meth(io_O2,is_POC)  = 0.0
+       conv_sed_ocn_meth(io_CH4_13C,is_POC_13C) = loc_alpha*conv_sed_ocn_meth(io_CH4,is_POC)
+       conv_sed_ocn_meth(io_DIC_13C,is_POC_13C) = 1.0 - conv_sed_ocn_meth(io_CH4_13C,is_POC_13C)
     else
        conv_sed_ocn_meth(:,:) = 0.0
     end if

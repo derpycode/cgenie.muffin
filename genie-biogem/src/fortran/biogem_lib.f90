@@ -357,6 +357,8 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d44Ca_CaCO3_epsilon
   real::par_d88Sr_SrCO3_epsilon                                  ! 88/86Sr fractionation between Sr and SrCO3 
   namelist /ini_biogem_nml/par_d88Sr_SrCO3_epsilon
+  real::par_d13C_Corg_CH4_epsilon                                ! 'methanogenesis fractionation
+  namelist /ini_biogem_nml/par_d13C_Corg_CH4_epsilon
   ! ------------------- IRON CYCLING --------------------------------------------------------------------------------------------- !
   real::par_det_Fe_sol                                           ! fractional solubility of Fe in dust
   real::par_det_Fe_sol_exp                                       ! exponent for aeolian Fe solubility
