@@ -4475,6 +4475,10 @@
 			<value datatype="real">-0.236</value>
                         <description>88/86Sr fractionation between Sr and SrCO3 -- modified from Vollstaedt et al. [2014] (87/86Sr fractionation is simply half as large)</description>
                     </param>
+                    <param name="par_d13C_Corg_CH4_epsilon">
+			<value datatype="real">-35.0</value>
+                        <description>methanogenesis fractionation</description>
+                    </param>
 <!-- IRON  -->
                     <param name="par_det_Fe_sol">
 			<value datatype="real">1.0</value>
