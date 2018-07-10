@@ -27,7 +27,7 @@ SUBROUTINE atchem(    &
 
   ! *** CALCULATE LOCAL CONSTANTS ***
   ! local constants for converting between partial pressure and molar quantity
-  ! NOTE: atm(ia_T,:,:) in K
+  ! NOTE: atm(ia_T,:,:) in C
   loc_conv_atm_mol(:,:) = phys_atm(ipa_V,:,:)/(conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC))
   loc_conv_mol_atm(:,:) = 1.0/loc_conv_atm_mol(:,:)
   ! time
