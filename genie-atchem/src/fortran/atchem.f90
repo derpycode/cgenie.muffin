@@ -60,7 +60,9 @@ SUBROUTINE atchem(    &
         case ('snowball')      
            IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
               if (sum(dum_sfcatm(ia_T,:,:))/size(dum_sfcatm(ia_T,:,:)) > 0.0) then
-                 CALL sub_calc_oxidize_CH4_default(i,j,loc_dtyr)
+                 IF (atm(ia_pCH4,i,j) > 700.0E-9) THEN
+                    CALL sub_calc_oxidize_CH4_default(i,j,loc_dtyr)
+                 END if
               END IF
            END IF
         case ('schmidt03')
