@@ -1186,12 +1186,10 @@ contains
   !!
   subroutine goldlite_wrapper
     implicit none
-print*,'> START goldlite_wrapper'
     call goldlite(                                                            &
          & go_ts(intrac_ocn-n_intrac_col:intrac_ocn,1:ilon1_ocn,1:ilat1_ocn,1:inl1_ocn), & ! input/output
          & go_ts1(intrac_ocn-n_intrac_col:intrac_ocn,1:ilon1_ocn,1:ilat1_ocn,1:inl1_ocn) & ! input/output
          )
-print*,'> END goldlite_wrapper'
   end subroutine goldlite_wrapper
 
   !!
