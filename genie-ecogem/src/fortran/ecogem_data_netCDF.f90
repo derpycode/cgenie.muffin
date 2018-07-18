@@ -15,7 +15,7 @@ MODULE ecogem_data_netCDF
 
 CONTAINS
 
-  
+
   ! ****************************************************************************************************************************** !
   ! SAVE NETCDF RESTART DATA
   ! ****************************************************************************************************************************** !
@@ -100,20 +100,20 @@ CONTAINS
     loc_it_3(3) = loc_id_depth
     ! -------------------------------------------------------- ! define 2D and 3D variables
     DO io=1,iomax+iChl
-      DO jp=1,npmax
-        if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
-          ! Create description strings
-          write (shrtstrng, "(A1,A,A1,I3.3)") "_",trim(adjustl(quotastrng(io))),'_',jp
-          write (longstrng, "(A11,A,A2,I3.3)") ": Plankton ",trim(adjustl(quotastrng(io))),' #',jp
-          write (vardesc, "(A2,A,A14,F7.2,A8,A,A2,A,A1)") &
-               & ': ',trim(adjustl(quotastrng(io))),' biomass of...',diameter(jp), ' micron ',&
-               & trim(adjustl(pft(jp))),' (',trim(adjustl(quotaunits(io))),')'
-          ! define (2D) variables
-          call sub_defvar('eco2D'//shrtstrng,loc_iou,2,loc_it_2,loc_c0,loc_c0,' ','F','eco2D'//longstrng,'eco2D'//vardesc,' ')
-          ! define (3D) variables
-          call sub_defvar('eco3D'//shrtstrng,loc_iou,3,loc_it_3,loc_c0,loc_c0,' ','F','eco3D'//longstrng,'eco3D'//vardesc,' ')
-        endif ! end if not zooplankton chlorophyll
-      end do
+       DO jp=1,npmax
+          if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
+             ! Create description strings
+             write (shrtstrng, "(A1,A,A1,I3.3)") "_",trim(adjustl(quotastrng(io))),'_',jp
+             write (longstrng, "(A11,A,A2,I3.3)") ": Plankton ",trim(adjustl(quotastrng(io))),' #',jp
+             write (vardesc, "(A2,A,A14,F7.2,A8,A,A2,A,A1)") &
+                  & ': ',trim(adjustl(quotastrng(io))),' biomass of...',diameter(jp), ' micron ',&
+                  & trim(adjustl(pft(jp))),' (',trim(adjustl(quotaunits(io))),')'
+             ! define (2D) variables
+             call sub_defvar('eco2D'//shrtstrng,loc_iou,2,loc_it_2,loc_c0,loc_c0,' ','F','eco2D'//longstrng,'eco2D'//vardesc,' ')
+             ! define (3D) variables
+             call sub_defvar('eco3D'//shrtstrng,loc_iou,3,loc_it_3,loc_c0,loc_c0,' ','F','eco3D'//longstrng,'eco3D'//vardesc,' ')
+          endif ! end if not zooplankton chlorophyll
+       end do
     end do
     ! -------------------------------------------------------- ! end definitions
     call sub_enddef(loc_iou)
@@ -131,18 +131,18 @@ CONTAINS
     loc_ij_mask(:,:)    =  real(wet_mask_ij)
     loc_ijk_mask(:,:,:) =  real(wet_mask_ijk)
     DO io=1,iomax+iChl
-      DO jp=1,npmax
-        if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
-          ! Create description strings
-          write (shrtstrng, "(A1,A,A1,I3.3)") "_",trim(adjustl(quotastrng(io))),'_',jp
-          ! write 2D variables
-          loc_ij(:,:) = plankton(io,jp,:,:,n_k)
-          call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_ij_mask(:,:))
-          ! write 3D variables
-          loc_ijk(:,:,:) = plankton(io,jp,:,:,:)
-          call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_ijk_mask(:,:,:))        
-        endif ! end if not zooplankton chlorophyll
-      end do
+       DO jp=1,npmax
+          if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
+             ! Create description strings
+             write (shrtstrng, "(A1,A,A1,I3.3)") "_",trim(adjustl(quotastrng(io))),'_',jp
+             ! write 2D variables
+             loc_ij(:,:) = plankton(io,jp,:,:,n_k)
+             call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_ij_mask(:,:))
+             ! write 3D variables
+             loc_ijk(:,:,:) = plankton(io,jp,:,:,:)
+             call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_ijk_mask(:,:,:))        
+          endif ! end if not zooplankton chlorophyll
+       end do
     end do
     ! -------------------------------------------------------- ! close file and return IOU
     call sub_closefile(loc_iou)
@@ -330,7 +330,7 @@ CONTAINS
     real,dimension(1:n_k)::loc_depth
     real,dimension(0:n_k)::loc_depth_e
     real,dimension(n_i,n_j)::loc_ij,loc_mask
-    
+
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- ! set default valid data limits
@@ -412,7 +412,7 @@ CONTAINS
     !--------------------------------------------------------- !
   END SUBROUTINE sub_update_netcdf
   ! ****************************************************************************************************************************** !
-  
+
   ! ****************************************************************************************************************************** !
   SUBROUTINE sub_update_netcdf_tser(k)
     !-----------------------------------------------------------------------
@@ -426,7 +426,7 @@ CONTAINS
     logical::loc_defined
     character(255)::loc_name
     integer::i, j, loc_i, loc_iou, loc_ntrec
-    
+
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- ! set default valid data limits
@@ -455,7 +455,7 @@ CONTAINS
     ! END
     !--------------------------------------------------------- ! 
     ! update record number
-     ncout1d_ntrec(k) = loc_ntrec
+    ncout1d_ntrec(k) = loc_ntrec
 
     !
     call sub_sync(loc_iou)
@@ -499,7 +499,7 @@ CONTAINS
     loc_iou   = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
     loc_mask(:,:) = real(wet_mask_ij)
-    
+
     !-----------------------------------------------------------------------
     ! POPULATION AND COMMUNITY BIOMASS
     !-----------------------------------------------------------------------
@@ -508,41 +508,41 @@ CONTAINS
     totalplankton = 0.0
     totalfluxes = 0.0
     DO io=1,iomax+iChl
-      DO jp=1,npmax
-        if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
-          ! Create description strings
-          write (diamtr,"(F10.2)") diameter(jp)
-          write (shrtstrng, "(A10,A,A1,I3.3)") "_Plankton_",trim(adjustl(quotastrng(io))),'_',jp   
-          write (longstrng, "(A,A18,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Biomass - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
-          ! write population biomasses and sum for community
-          loc_ij(:,:) = int_plankton_timeslice(io,jp,:,:,n_k)
-          call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-          call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
-          totalplankton(io,:,:) = totalplankton(io,:,:) + int_plankton_timeslice(io,jp,:,:,n_k)   
-          if (io.le.iomax) then
-            totalfluxes(io,:,:) = totalfluxes(io,:,:) + int_uptake_timeslice(io,jp,:,:,n_k)   
+       DO jp=1,npmax
+          if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
+             ! Create description strings
+             write (diamtr,"(F10.2)") diameter(jp)
+             write (shrtstrng, "(A10,A,A1,I3.3)") "_Plankton_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A,A18,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Biomass - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             ! write population biomasses and sum for community
+             loc_ij(:,:) = int_plankton_timeslice(io,jp,:,:,n_k)
+             call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+             call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
+             totalplankton(io,:,:) = totalplankton(io,:,:) + int_plankton_timeslice(io,jp,:,:,n_k)   
+             if (io.le.iomax) then
+                totalfluxes(io,:,:) = totalfluxes(io,:,:) + int_uptake_timeslice(io,jp,:,:,n_k)   
+             endif
+          endif ! end if not zooplankton chlorophyll
+          if ((io.ne.iCarb).and.(io.le.iomax).and.(autotrophy(jp).gt.0.0)) then ! limiting factors for autotroph nutrient quotas only
+             ! quota limitation status 
+             loc_ij(:,:) = int_gamma_timeslice(io,jp,:,:,n_k)
+             write (shrtstrng, "(A8,A,A1,I3.3)") "_xGamma_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A,A21,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Limitation - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+             call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
           endif
-        endif ! end if not zooplankton chlorophyll
-        if ((io.ne.iCarb).and.(io.le.iomax).and.(autotrophy(jp).gt.0.0)) then ! limiting factors for autotroph nutrient quotas only
-          ! quota limitation status 
-          loc_ij(:,:) = int_gamma_timeslice(io,jp,:,:,n_k)
-          write (shrtstrng, "(A8,A,A1,I3.3)") "_xGamma_",trim(adjustl(quotastrng(io))),'_',jp   
-          write (longstrng, "(A,A21,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Limitation - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
-          call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-          call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
-        endif
-      end do
-      ! Write community total biomasses and inorganic resource fluxes
-      write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
-      write (longstrng, "(A,A16)") trim(adjustl(quotastrng(io))) ," Biomass - Total" 
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totalplankton(io,:,:),loc_mask(:,:))   
-      if (io.le.iomax) then
-        write (shrtstrng, "(A15,A)") "_Uptake_Fluxes_",trim(adjustl(quotastrng(io)))  
-        write (longstrng, "(A14,A)") "Uptake Fluxes ",trim(adjustl(quotastrng(io)))  
-        call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
-        call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totalfluxes(io,:,:),loc_mask(:,:)) 
-      endif
+       end do
+       ! Write community total biomasses and inorganic resource fluxes
+       write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
+       write (longstrng, "(A,A16)") trim(adjustl(quotastrng(io))) ," Biomass - Total" 
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totalplankton(io,:,:),loc_mask(:,:))   
+       if (io.le.iomax) then
+          write (shrtstrng, "(A15,A)") "_Uptake_Fluxes_",trim(adjustl(quotastrng(io)))  
+          write (longstrng, "(A14,A)") "Uptake Fluxes ",trim(adjustl(quotastrng(io)))  
+          call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+          call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totalfluxes(io,:,:),loc_mask(:,:)) 
+       endif
     end do
     ! temperature limitation status
     loc_ij(:,:) = int_gamma_timeslice(iomax+1,1,:,:,n_k)
@@ -550,34 +550,34 @@ CONTAINS
     write (longstrng, "(A22)") 'Temperature Limitation'
     call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
     call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
-    
+
     DO ii=1,iimax
-      ! Create description strings
-      write (shrtstrng, "(A11,A)") "_Nutrients_",trim(adjustl(rsrcstrng(ii)))
-      write (longstrng, "(A10,A)") "Nutrients ",trim(adjustl(rsrcstrng(ii)))    
-      ! write 2D variables
-      loc_ij(:,:) = int_nutrient_timeslice(ii,:,:,n_k)
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mmol '//trim(rsrcstrng(ii))//' m^-3',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))     
+       ! Create description strings
+       write (shrtstrng, "(A11,A)") "_Nutrients_",trim(adjustl(rsrcstrng(ii)))
+       write (longstrng, "(A10,A)") "Nutrients ",trim(adjustl(rsrcstrng(ii)))    
+       ! write 2D variables
+       loc_ij(:,:) = int_nutrient_timeslice(ii,:,:,n_k)
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mmol '//trim(rsrcstrng(ii))//' m^-3',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))     
     end do
 
     !-----------------------------------------------------------------------
     ! COMMUNITY SIZE & DIVERSITY METRICS (AUTOTROPHS ONLY)
     !-----------------------------------------------------------------------
- ! Size metrics ... total plankton, phytoplankton and zooplankton
- ! Carbon biomass weighted mean size
+    ! Size metrics ... total plankton, phytoplankton and zooplankton
+    ! Carbon biomass weighted mean size
     weightedmean(:,:)    = 0.0
     totalplankton(:,:,:) = 0.0
     do jp=1,npmax
-      if (autotrophy(jp).gt.0.0) then ! AUTOTROPHIC plankton ONLY
-        ! Carbon biomass weighted geometric mean of size
-        weightedmean(:,:)        = weightedmean(:,:)        + int_plankton_timeslice(iCarb,jp,:,:,n_k) * logesd(jp)
-        totalplankton(iCarb,:,:) = totalplankton(iCarb,:,:) + int_plankton_timeslice(iCarb,jp,:,:,n_k)
-      endif
+       if (autotrophy(jp).gt.0.0) then ! AUTOTROPHIC plankton ONLY
+          ! Carbon biomass weighted geometric mean of size
+          weightedmean(:,:)        = weightedmean(:,:)        + int_plankton_timeslice(iCarb,jp,:,:,n_k) * logesd(jp)
+          totalplankton(iCarb,:,:) = totalplankton(iCarb,:,:) + int_plankton_timeslice(iCarb,jp,:,:,n_k)
+       endif
     enddo
     weightedmean(:,:) = weightedmean(:,:) / totalplankton(iCarb,:,:)
-    
-! Carbon biomass weighted standard deviation of size
+
+    ! Carbon biomass weighted standard deviation of size
     weighteddev(:,:) = 0.0
     nphyto           = 0.0
     nthresh(:,:)     = 0.0
@@ -590,103 +590,103 @@ CONTAINS
     nanochl(:,:)     = 0.0
     microchl(:,:)    = 0.0
     do jp=1,npmax
-      if (autotrophy(jp).gt.0.0) then   
-        nphyto           = nphyto + 1.0
-        ! Carbon biomass weighted geometric standard deviation of size
-        weighteddev(:,:) = weighteddev(:,:) + int_plankton_timeslice(iCarb,jp,:,:,n_k) * (logesd(jp)-weightedmean)**2  
-        ! ADB threshold diversity index - Population above threshold
-        nthresh(:,:)     = nthresh(:,:) + MERGE(1.0,0.0,   int_plankton_timeslice(iCarb,jp,:,:,n_k).gt.(totalplankton(iCarb,:,:)*0.001))
-        ! Minimum size - Population above threshold and diameter less than current minimum value
-        minsize(:,:)     = MERGE(diameter(jp),minsize(:,:),int_plankton_timeslice(iCarb,jp,:,:,n_k).gt.(totalplankton(iCarb,:,:)*0.001) .and. minsize(:,:).gt.diameter(jp) )
-        ! Maximum size - Population above threshold and diameter more than current maximum value
-        maxsize(:,:)     = MERGE(diameter(jp),maxsize(:,:),int_plankton_timeslice(iCarb,jp,:,:,n_k).gt.(totalplankton(iCarb,:,:)*0.001) .and. maxsize(:,:).lt.diameter(jp) )
-        ! Shannon-Wiener
-        shannon(:,:)     = shannon(:,:) -     int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:) &
-                                      & * log(int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:))
-        ! Gini-Simpson
-        simpson(:,:)     = simpson(:,:) +    (int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:)) ** 2
-        ! Berger-Parker
-        berger(:,:)     = MERGE(int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:),berger(:,:),int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:).gt.berger(:,:))
-        ! size fractionated chlorophyll biomass
-        if (diameter(jp).lt.2.0) then
-          picochl(:,:)    = picochl(:,:)  + int_plankton_timeslice(iChlo,jp,:,:,n_k)
-        elseif (diameter(jp).ge.2.0.and.diameter(jp).lt.20.0) then
-          nanochl(:,:)    = nanochl(:,:)  + int_plankton_timeslice(iChlo,jp,:,:,n_k)
-        elseif (diameter(jp).ge.20.0) then
-          microchl(:,:)   = microchl(:,:) + int_plankton_timeslice(iChlo,jp,:,:,n_k)
-        endif
-      endif
+       if (autotrophy(jp).gt.0.0) then   
+          nphyto           = nphyto + 1.0
+          ! Carbon biomass weighted geometric standard deviation of size
+          weighteddev(:,:) = weighteddev(:,:) + int_plankton_timeslice(iCarb,jp,:,:,n_k) * (logesd(jp)-weightedmean)**2  
+          ! ADB threshold diversity index - Population above threshold
+          nthresh(:,:)     = nthresh(:,:) + MERGE(1.0,0.0,   int_plankton_timeslice(iCarb,jp,:,:,n_k).gt.(totalplankton(iCarb,:,:)*0.001))
+          ! Minimum size - Population above threshold and diameter less than current minimum value
+          minsize(:,:)     = MERGE(diameter(jp),minsize(:,:),int_plankton_timeslice(iCarb,jp,:,:,n_k).gt.(totalplankton(iCarb,:,:)*0.001) .and. minsize(:,:).gt.diameter(jp) )
+          ! Maximum size - Population above threshold and diameter more than current maximum value
+          maxsize(:,:)     = MERGE(diameter(jp),maxsize(:,:),int_plankton_timeslice(iCarb,jp,:,:,n_k).gt.(totalplankton(iCarb,:,:)*0.001) .and. maxsize(:,:).lt.diameter(jp) )
+          ! Shannon-Wiener
+          shannon(:,:)     = shannon(:,:) -     int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:) &
+               & * log(int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:))
+          ! Gini-Simpson
+          simpson(:,:)     = simpson(:,:) +    (int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:)) ** 2
+          ! Berger-Parker
+          berger(:,:)     = MERGE(int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:),berger(:,:),int_plankton_timeslice(iCarb,jp,:,:,n_k)/totalplankton(iCarb,:,:).gt.berger(:,:))
+          ! size fractionated chlorophyll biomass
+          if (diameter(jp).lt.2.0) then
+             picochl(:,:)    = picochl(:,:)  + int_plankton_timeslice(iChlo,jp,:,:,n_k)
+          elseif (diameter(jp).ge.2.0.and.diameter(jp).lt.20.0) then
+             nanochl(:,:)    = nanochl(:,:)  + int_plankton_timeslice(iChlo,jp,:,:,n_k)
+          elseif (diameter(jp).ge.20.0) then
+             microchl(:,:)   = microchl(:,:) + int_plankton_timeslice(iChlo,jp,:,:,n_k)
+          endif
+       endif
     enddo
     ! take inverse of Gini-Simpson and Berger-Parker diversity indices 
     simpson(:,:) = 1.0 - simpson(:,:)
     berger(:,:)  = 1.0 - berger(:,:)
     !
     weighteddev(:,:) = sqrt( nphyto * weighteddev / ((nphyto-1.0) * totalplankton(iCarb,:,:)) )
-    
+
     ! only save these variables if Phyto diversity is possible
     if (nphyto.gt.1.0) then
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A10)") "_Size_Mean"  
-      write (longstrng, "(A31)") "Geometric Mean of Cell Diameter"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'µm',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,10.0 ** weightedmean(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A11)") "_Size_Stdev"  
-      write (longstrng, "(A45)") "Geometric Standard Deviation of Cell Diameter"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'Relative magnitude',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,10.0 ** weighteddev(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A13)") "_Size_Minimum"  
-      write (longstrng, "(A21)") "Minimum Cell Diameter"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'µm',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,minsize(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A13)") "_Size_Maximum"  
-      write (longstrng, "(A21)") "Maximum Cell Diameter"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'µm',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,maxsize(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A20)") "_Diversity_Threshold"  
-      write (longstrng, "(A25)") "Threshold Diversity Index"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,nthresh(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A18)") "_Diversity_Shannon"  
-      write (longstrng, "(A23)") "Shannon Diversity Index"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,shannon(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A18)") "_Diversity_Simpson"
-      write (longstrng, "(A23)") "Simpson Diversity Index"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,simpson(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A17)") "_Diversity_Berger"
-      write (longstrng, "(A22)") "Berger Diversity Index"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,berger(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A19)") "_Size_Frac_Pico_Chl"  
-      write (longstrng, "(A24)") "Pico chlorophyll biomass"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mg Chl m^-3',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,picochl(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A19)") "_Size_Frac_Nano_Chl"  
-      write (longstrng, "(A24)") "Nano chlorophyll biomass"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mg Chl m^-3',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,nanochl(:,:),loc_mask(:,:))
-      ! Create description strings and write 2D variables
-      write (shrtstrng, "(A20)") "_Size_Frac_Micro_Chl"  
-      write (longstrng, "(A25)") "Micro chlorophyll biomass"
-      call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mg Chl m^-3',loc_c0,loc_c0)
-      call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,microchl(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A10)") "_Size_Mean"  
+       write (longstrng, "(A31)") "Geometric Mean of Cell Diameter"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'µm',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,10.0 ** weightedmean(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A11)") "_Size_Stdev"  
+       write (longstrng, "(A45)") "Geometric Standard Deviation of Cell Diameter"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'Relative magnitude',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,10.0 ** weighteddev(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A13)") "_Size_Minimum"  
+       write (longstrng, "(A21)") "Minimum Cell Diameter"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'µm',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,minsize(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A13)") "_Size_Maximum"  
+       write (longstrng, "(A21)") "Maximum Cell Diameter"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'µm',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,maxsize(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A20)") "_Diversity_Threshold"  
+       write (longstrng, "(A25)") "Threshold Diversity Index"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,nthresh(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A18)") "_Diversity_Shannon"  
+       write (longstrng, "(A23)") "Shannon Diversity Index"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,shannon(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A18)") "_Diversity_Simpson"
+       write (longstrng, "(A23)") "Simpson Diversity Index"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,simpson(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A17)") "_Diversity_Berger"
+       write (longstrng, "(A22)") "Berger Diversity Index"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'-',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,berger(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A19)") "_Size_Frac_Pico_Chl"  
+       write (longstrng, "(A24)") "Pico chlorophyll biomass"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mg Chl m^-3',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,picochl(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A19)") "_Size_Frac_Nano_Chl"  
+       write (longstrng, "(A24)") "Nano chlorophyll biomass"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mg Chl m^-3',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,nanochl(:,:),loc_mask(:,:))
+       ! Create description strings and write 2D variables
+       write (shrtstrng, "(A20)") "_Size_Frac_Micro_Chl"  
+       write (longstrng, "(A25)") "Micro chlorophyll biomass"
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,'mg Chl m^-3',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,microchl(:,:),loc_mask(:,:))
     endif
 
     !-----------------------------------------------------------------------
     ! PHYSIOLOGICAL STATUS (RESOURCE AND ABIOTIC LIMITATION FACTORS)
     !-----------------------------------------------------------------------
-    
-    
+
+
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ###################################################################### !
     !
     ! ######################################################################################################################### !
@@ -730,33 +730,33 @@ CONTAINS
     loc_c0 = 0.0
     loc_c1 = 1.0
     DO io=1,iomax+iChl
-      DO jp=1,npmax
-        if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
-          ! Create description strings
-          write (shrtstrng, "(A10,A,A1,I3.3)") "_Plankton_",trim(adjustl(quotastrng(io))),'_',jp   
-          write (longstrng, "(A9,A,A2,I3.3)") "Plankton ",trim(adjustl(quotastrng(io))),' #',jp     
-          ! write 3D variables
-          loc_ijk(:,:,:) = int_plankton_timeslice(io,jp,:,:,:)
-          call sub_adddef_netcdf(loc_iou,4,'eco3D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-          call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask(:,:,:)) 
-          totalplankton(io,:,:,:) = totalplankton(io,:,:,:) + int_plankton_timeslice(io,jp,:,:,:)       
-        endif ! end if not zooplankton chlorophyll
-      end do
-      ! Write community total biomasses
-      write (shrtstrng, "(A16,A)") "_Total_Plankton_",trim(adjustl(quotastrng(io)))  
-      write (longstrng, "(A15,A)") "Total Plankton ",trim(adjustl(quotastrng(io)))  
-      call sub_adddef_netcdf(loc_iou,4,'eco3D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-      call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,totalplankton(io,:,:,:),loc_mask(:,:,:))  
+       DO jp=1,npmax
+          if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
+             ! Create description strings
+             write (shrtstrng, "(A10,A,A1,I3.3)") "_Plankton_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A9,A,A2,I3.3)") "Plankton ",trim(adjustl(quotastrng(io))),' #',jp     
+             ! write 3D variables
+             loc_ijk(:,:,:) = int_plankton_timeslice(io,jp,:,:,:)
+             call sub_adddef_netcdf(loc_iou,4,'eco3D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+             call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask(:,:,:)) 
+             totalplankton(io,:,:,:) = totalplankton(io,:,:,:) + int_plankton_timeslice(io,jp,:,:,:)       
+          endif ! end if not zooplankton chlorophyll
+       end do
+       ! Write community total biomasses
+       write (shrtstrng, "(A16,A)") "_Total_Plankton_",trim(adjustl(quotastrng(io)))  
+       write (longstrng, "(A15,A)") "Total Plankton ",trim(adjustl(quotastrng(io)))  
+       call sub_adddef_netcdf(loc_iou,4,'eco3D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+       call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,totalplankton(io,:,:,:),loc_mask(:,:,:))  
     end do
-      
+
     DO ii=1,iimax
-      ! Create description strings
-      write (shrtstrng, "(A11,A)") "_Nutrients_",trim(adjustl(rsrcstrng(ii)))
-      write (longstrng, "(A10,A)") "Nutrients ",trim(adjustl(rsrcstrng(ii)))    
-      ! write 3D variables
-      loc_ijk(:,:,:) = nutrient(ii,:,:,:)
-      call sub_adddef_netcdf(loc_iou,4,'eco3D'//shrtstrng,longstrng,'mmol m^{-3}',loc_c0,loc_c0)
-      call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask(:,:,:))  
+       ! Create description strings
+       write (shrtstrng, "(A11,A)") "_Nutrients_",trim(adjustl(rsrcstrng(ii)))
+       write (longstrng, "(A10,A)") "Nutrients ",trim(adjustl(rsrcstrng(ii)))    
+       ! write 3D variables
+       loc_ijk(:,:,:) = nutrient(ii,:,:,:)
+       call sub_adddef_netcdf(loc_iou,4,'eco3D'//shrtstrng,longstrng,'mmol m^{-3}',loc_c0,loc_c0)
+       call sub_putvar3d('eco3D'//shrtstrng,loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask(:,:,:))  
     end do
     ! ### INSERT CODE TO SAVE ADDITIONAL 3-D DATA FIELDS ###################################################################### !
     !
@@ -801,50 +801,50 @@ CONTAINS
     totalplankton = 0.0
     totalfluxes = 0.0
     DO io=1,iomax+iChl
-      DO jp=1,npmax
-        if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
-          ! Create description strings
-          write (diamtr,"(F10.2)") diameter(jp)
-          write (shrtstrng, "(A10,A,A1,I3.3)") "_Plankton_",trim(adjustl(quotastrng(io))),'_',jp   
-          write (longstrng, "(A,A18,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Biomass - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
-          ! write population biomasses and sum for community
-          loc_ij(:) = plankton_tser(io,jp,k,:)
-          call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-          call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0) 
-           totalplankton(io,:) = totalplankton(io,:) + plankton_tser(io,jp,k,:)   
-           if (io.le.iomax) then
-             totalfluxes(io,:) = totalfluxes(io,:) + uptake_tser(io,jp,k,:)   
-           endif
-        endif ! end if not zooplankton chlorophyll
-         if ((io.ne.iCarb).and.(io.le.iomax).and.(autotrophy(jp).gt.0.0)) then ! limiting factors for autotroph nutrient quotas only
-           ! quota limitation status 
-           loc_ij(:) = gamma_tser(io,jp,k,:)
-           write (shrtstrng, "(A8,A,A1,I3.3)") "_xGamma_",trim(adjustl(quotastrng(io))),'_',jp   
-           write (longstrng, "(A,A21,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Limitation - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
-           call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-           call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
-         endif
-      end do
+       DO jp=1,npmax
+          if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
+             ! Create description strings
+             write (diamtr,"(F10.2)") diameter(jp)
+             write (shrtstrng, "(A10,A,A1,I3.3)") "_Plankton_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A,A18,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Biomass - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             ! write population biomasses and sum for community
+             loc_ij(:) = plankton_tser(io,jp,k,:)
+             call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+             call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0) 
+             totalplankton(io,:) = totalplankton(io,:) + plankton_tser(io,jp,k,:)   
+             if (io.le.iomax) then
+                totalfluxes(io,:) = totalfluxes(io,:) + uptake_tser(io,jp,k,:)   
+             endif
+          endif ! end if not zooplankton chlorophyll
+          if ((io.ne.iCarb).and.(io.le.iomax).and.(autotrophy(jp).gt.0.0)) then ! limiting factors for autotroph nutrient quotas only
+             ! quota limitation status 
+             loc_ij(:) = gamma_tser(io,jp,k,:)
+             write (shrtstrng, "(A8,A,A1,I3.3)") "_xGamma_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A,A21,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Limitation - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+             call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
+          endif
+       end do
        ! Write community total biomasses and inorganic resource fluxes
        write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
        write (longstrng, "(A,A16)") trim(adjustl(quotastrng(io))) ," Biomass - Total" 
        call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
        call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,totalplankton(io,:),loc_c1,loc_c0)   
        if (io.le.iomax) then
-         write (shrtstrng, "(A15,A)") "_Uptake_Fluxes_",trim(adjustl(quotastrng(io)))  
-         write (longstrng, "(A14,A)") "Uptake Fluxes ",trim(adjustl(quotastrng(io)))  
-         call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
-         call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,totalfluxes(io,:),loc_c0,loc_c0) 
+          write (shrtstrng, "(A15,A)") "_Uptake_Fluxes_",trim(adjustl(quotastrng(io)))  
+          write (longstrng, "(A14,A)") "Uptake Fluxes ",trim(adjustl(quotastrng(io)))  
+          call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+          call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,totalfluxes(io,:),loc_c0,loc_c0) 
        endif
     end do
-     ! temperature limitation status
-     loc_ij(:) = gamma_tser(iomax+1,1,k,:)
-     write (shrtstrng, "(A9)") "_xGamma_T"   
-     write (longstrng, "(A22)") 'Temperature Limitation'
-     call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-     call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
-     
-     DO ii=1,iimax
+    ! temperature limitation status
+    loc_ij(:) = gamma_tser(iomax+1,1,k,:)
+    write (shrtstrng, "(A9)") "_xGamma_T"   
+    write (longstrng, "(A22)") 'Temperature Limitation'
+    call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+    call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
+
+    DO ii=1,iimax
        ! Create description strings
        write (shrtstrng, "(A11,A)") "_Nutrients_",trim(adjustl(rsrcstrng(ii)))
        write (longstrng, "(A10,A)") "Nutrients ",trim(adjustl(rsrcstrng(ii)))    
@@ -852,72 +852,72 @@ CONTAINS
        loc_ij(:) = nutrient_tser(ii,k,:)
        call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,'mmol '//trim(rsrcstrng(ii))//' m^-3',loc_c0,loc_c0)
        call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c0,loc_c0)     
-     end do
-! 
-!     !-----------------------------------------------------------------------
-!     ! COMMUNITY SIZE & DIVERSITY METRICS (AUTOTROPHS ONLY)
-!     !-----------------------------------------------------------------------
-  ! Size metrics ... total plankton, phytoplankton and zooplankton
-  ! Carbon biomass weighted mean size
-     weightedmean(:)    = 0.0
-     totalplankton(iCarb,:) = 0.0
-     do jp=1,npmax
+    end do
+    ! 
+    !     !-----------------------------------------------------------------------
+    !     ! COMMUNITY SIZE & DIVERSITY METRICS (AUTOTROPHS ONLY)
+    !     !-----------------------------------------------------------------------
+    ! Size metrics ... total plankton, phytoplankton and zooplankton
+    ! Carbon biomass weighted mean size
+    weightedmean(:)    = 0.0
+    totalplankton(iCarb,:) = 0.0
+    do jp=1,npmax
        if (autotrophy(jp).gt.0.0) then ! AUTOTROPHIC plankton ONLY
-         ! Carbon biomass weighted geometric mean of size
-         weightedmean(:)        = weightedmean(:)        + plankton_tser(iCarb,jp,k,:) * logesd(jp)
-         totalplankton(iCarb,:) = totalplankton(iCarb,:) + plankton_tser(iCarb,jp,k,:)
+          ! Carbon biomass weighted geometric mean of size
+          weightedmean(:)        = weightedmean(:)        + plankton_tser(iCarb,jp,k,:) * logesd(jp)
+          totalplankton(iCarb,:) = totalplankton(iCarb,:) + plankton_tser(iCarb,jp,k,:)
        endif
-     enddo
-     weightedmean(:) = weightedmean(:) / totalplankton(iCarb,:)
-     
- ! Carbon biomass weighted standard deviation of size
-     weighteddev(:) = 0.0
-     nphyto         = 0.0
-     nthresh(:)     = 0.0
-     minsize(:)     = maxval(diameter(:))
-     maxsize(:)     = minval(diameter(:))
-     shannon(:)     = 0.0
-     simpson(:)     = 0.0
-     berger(:)      = 0.0
-     picochl(:)     = 0.0
-     nanochl(:)     = 0.0
-     microchl(:)    = 0.0
-     do jp=1,npmax
+    enddo
+    weightedmean(:) = weightedmean(:) / totalplankton(iCarb,:)
+
+    ! Carbon biomass weighted standard deviation of size
+    weighteddev(:) = 0.0
+    nphyto         = 0.0
+    nthresh(:)     = 0.0
+    minsize(:)     = maxval(diameter(:))
+    maxsize(:)     = minval(diameter(:))
+    shannon(:)     = 0.0
+    simpson(:)     = 0.0
+    berger(:)      = 0.0
+    picochl(:)     = 0.0
+    nanochl(:)     = 0.0
+    microchl(:)    = 0.0
+    do jp=1,npmax
        if (autotrophy(jp).gt.0.0) then   
-         nphyto           = nphyto + 1.0
-         ! Carbon biomass weighted geometric standard deviation of size
-         weighteddev(:) = weighteddev(:) + plankton_tser(iCarb,jp,k,:) * (logesd(jp)-weightedmean)**2  
-         ! ADB threshold diversity index - Population above threshold
-         nthresh(:)     = nthresh(:) + MERGE(1.0,0.0,   plankton_tser(iCarb,jp,k,:).gt.(totalplankton(iCarb,:)*0.001))
-         ! Minimum size - Population above threshold and diameter less than current minimum value
-         minsize(:)     = MERGE(diameter(jp),minsize(:),plankton_tser(iCarb,jp,k,:).gt.(totalplankton(iCarb,:)*0.001) .and. minsize(:).gt.diameter(jp) )
-         ! Maximum size - Population above threshold and diameter more than current maximum value
-         maxsize(:)     = MERGE(diameter(jp),maxsize(:),plankton_tser(iCarb,jp,k,:).gt.(totalplankton(iCarb,:)*0.001) .and. maxsize(:).lt.diameter(jp) )
-         ! Shannon-Wiener
-         shannon(:)     = shannon(:) -     plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:) &
-                                   & * log(plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:))
-         ! Gini-Simpson
-         simpson(:)     = simpson(:) +    (plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:)) ** 2
-         ! Berger-Parker
-         berger(:)     = MERGE(plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:),berger(:),plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:).gt.berger(:))
-         ! size fractionated chlorophyll biomass
-         if (diameter(jp).lt.2.0) then
-           picochl(:)    = picochl(:)  + plankton_tser(iChlo,jp,k,:)
-         elseif (diameter(jp).ge.2.0.and.diameter(jp).lt.20.0) then
-           nanochl(:)    = nanochl(:)  + plankton_tser(iChlo,jp,k,:)
-         elseif (diameter(jp).ge.20.0) then
-           microchl(:)   = microchl(:) + plankton_tser(iChlo,jp,k,:)
-         endif
+          nphyto           = nphyto + 1.0
+          ! Carbon biomass weighted geometric standard deviation of size
+          weighteddev(:) = weighteddev(:) + plankton_tser(iCarb,jp,k,:) * (logesd(jp)-weightedmean)**2  
+          ! ADB threshold diversity index - Population above threshold
+          nthresh(:)     = nthresh(:) + MERGE(1.0,0.0,   plankton_tser(iCarb,jp,k,:).gt.(totalplankton(iCarb,:)*0.001))
+          ! Minimum size - Population above threshold and diameter less than current minimum value
+          minsize(:)     = MERGE(diameter(jp),minsize(:),plankton_tser(iCarb,jp,k,:).gt.(totalplankton(iCarb,:)*0.001) .and. minsize(:).gt.diameter(jp) )
+          ! Maximum size - Population above threshold and diameter more than current maximum value
+          maxsize(:)     = MERGE(diameter(jp),maxsize(:),plankton_tser(iCarb,jp,k,:).gt.(totalplankton(iCarb,:)*0.001) .and. maxsize(:).lt.diameter(jp) )
+          ! Shannon-Wiener
+          shannon(:)     = shannon(:) -     plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:) &
+               & * log(plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:))
+          ! Gini-Simpson
+          simpson(:)     = simpson(:) +    (plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:)) ** 2
+          ! Berger-Parker
+          berger(:)     = MERGE(plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:),berger(:),plankton_tser(iCarb,jp,k,:)/totalplankton(iCarb,:).gt.berger(:))
+          ! size fractionated chlorophyll biomass
+          if (diameter(jp).lt.2.0) then
+             picochl(:)    = picochl(:)  + plankton_tser(iChlo,jp,k,:)
+          elseif (diameter(jp).ge.2.0.and.diameter(jp).lt.20.0) then
+             nanochl(:)    = nanochl(:)  + plankton_tser(iChlo,jp,k,:)
+          elseif (diameter(jp).ge.20.0) then
+             microchl(:)   = microchl(:) + plankton_tser(iChlo,jp,k,:)
+          endif
        endif
-     enddo
-     ! take inverse of Gini-Simpson and Berger-Parker diversity indices 
-     simpson(:) = 1.0 - simpson(:)
-     berger(:)  = 1.0 - berger(:)
-     !
-     weighteddev(:) = sqrt( nphyto * weighteddev / ((nphyto-1.0) * totalplankton(iCarb,:)) )
-!     
-     ! only save these variables if Phyto diversity is possible
-     if (nphyto.gt.1.0) then
+    enddo
+    ! take inverse of Gini-Simpson and Berger-Parker diversity indices 
+    simpson(:) = 1.0 - simpson(:)
+    berger(:)  = 1.0 - berger(:)
+    !
+    weighteddev(:) = sqrt( nphyto * weighteddev / ((nphyto-1.0) * totalplankton(iCarb,:)) )
+    !     
+    ! only save these variables if Phyto diversity is possible
+    if (nphyto.gt.1.0) then
        ! Create description strings and write 2D variables
        write (shrtstrng, "(A10)") "_Size_Mean"  
        write (longstrng, "(A31)") "Geometric Mean of Cell Diameter"
@@ -973,7 +973,7 @@ CONTAINS
        write (longstrng, "(A25)") "Micro chlorophyll biomass"
        call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,'mg Chl m^-3',loc_c0,loc_c0)
        call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,microchl(:),loc_c0,loc_c0)
-     endif
+    endif
 
   END SUBROUTINE sub_save_netcdf_tseries
   ! ****************************************************************************************************************************** !
