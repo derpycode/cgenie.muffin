@@ -11,20 +11,20 @@ MODULE ecogem_lib
   USE gem_cmn
   USE gem_util
   use gem_carbchem
-  
-  
+
+
   IMPLICIT NONE
   SAVE
 
-!-----------------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------------------
 
   ! ****************************************************************************************************************************** !
   ! *** NAMELIST DEFINITIONS ***************************************************************************************************** !
   ! ****************************************************************************************************************************** !
 
-! ****************************************************************************************************************************** !
-! *** ECOSYSTEM MODEL CONFIGURATION PARAMETERS ********************************************************************************* !
-! ****************************************************************************************************************************** !
+  ! ****************************************************************************************************************************** !
+  ! *** ECOSYSTEM MODEL CONFIGURATION PARAMETERS ********************************************************************************* !
+  ! ****************************************************************************************************************************** !
   integer :: n_keco   ! number of model layers with living plankton
   namelist/ini_ecogem_nml/n_keco
   integer :: komax   ! number of organic matter classes
@@ -49,13 +49,13 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/fundamental
   logical :: c13trace !ckc tracing for carbon 13
   namelist/ini_ecogem_nml/c13trace
-  
-!ckc need to add either a logical or other to choose which c13 scheme to use  
-  
-! ****************************************************************************************************************************** !
-! *** ECOSYSTEM MODEL RATE and RELATIONSHIP PARAMETERS ************************************************************************* !
-! ****************************************************************************************************************************** ! 
-! Nitrogen parameters
+
+  !ckc need to add either a logical or other to choose which c13 scheme to use  
+
+  ! ****************************************************************************************************************************** !
+  ! *** ECOSYSTEM MODEL RATE and RELATIONSHIP PARAMETERS ************************************************************************* !
+  ! ****************************************************************************************************************************** ! 
+  ! Nitrogen parameters
   real :: qminN_a,   qminN_b        ! a/b: minimum quota
   real :: qmaxN_a,   qmaxN_b        ! a/b: maximum quota
   real :: kexcN_a,   kexcN_b        ! a/b: excretion rate
@@ -71,7 +71,7 @@ MODULE ecogem_lib
   real ::affinNH4_a,affinNH4_b      ! a/b: half-saturation ammonium uptake (Michaelis-Menten)
   namelist/ini_ecogem_nml/qminN_a,qmaxN_a,vmaxNO3_a,affinNO3_a,vmaxNO2_a,affinNO2_a,vmaxNH4_a,affinNH4_a,kexcN_a,amminhib
   namelist/ini_ecogem_nml/qminN_b,qmaxN_b,vmaxNO3_b,affinNO3_b,vmaxNO2_b,affinNO2_b,vmaxNH4_b,affinNH4_b,kexcN_b
-! Phosphorus parameters
+  ! Phosphorus parameters
   real ::   qminP_a,   qminP_b      ! a/b: minimum quota
   real ::   qmaxP_a,   qmaxP_b      ! a/b: maximum quota
   real :: vmaxPO4_a, vmaxPO4_b      ! a/b: maximum uptake rate       (Michaelis-Menten)
@@ -79,7 +79,7 @@ MODULE ecogem_lib
   real ::   kexcP_a,   kexcP_b      ! a/b: excretion rate
   namelist/ini_ecogem_nml/qminP_a,qmaxP_a,vmaxPO4_a,affinPO4_a,kexcP_a
   namelist/ini_ecogem_nml/qminP_b,qmaxP_b,vmaxPO4_b,affinPO4_b,kexcP_b
-! Iron parameters
+  ! Iron parameters
   real :: qminFe_a,qminFe_b         ! a/b: minimum quota
   real :: qmaxFe_a,qmaxFe_b         ! a/b: maximum quota
   real :: vmaxFe_a,vmaxFe_b         ! a/b: maximum uptake rate    (Michaelis-Menten)
@@ -87,7 +87,7 @@ MODULE ecogem_lib
   real :: kexcFe_a,kexcFe_b         ! a/b: excretion rate
   namelist/ini_ecogem_nml/qminFe_a,qmaxFe_a,vmaxFe_a,affinFe_a,kexcFe_a
   namelist/ini_ecogem_nml/qminFe_b,qmaxFe_b,vmaxFe_b,affinFe_b,kexcFe_b
-! Silicon parameters
+  ! Silicon parameters
   real ::   qminSi_a,  qminSi_b     ! a/b: minimum quota
   real ::   qmaxSi_a,  qmaxSi_b     ! a/b: maximum quota
   real :: vmaxSiO2_a,vmaxSiO2_b     ! a/b: maximum uptake rate    (Michaelis-Menten)
@@ -95,7 +95,7 @@ MODULE ecogem_lib
   real ::   kexcSi_a,  kexcSi_b     ! a/b: excretion rate
   namelist/ini_ecogem_nml/qminSi_a,qmaxSi_a,vmaxSiO2_a,affinSiO2_a,kexcSi_a
   namelist/ini_ecogem_nml/qminSi_b,qmaxSi_b,vmaxSiO2_b,affinSiO2_b,kexcSi_b
-! Carbon quota and Photosynthesis parameters
+  ! Carbon quota and Photosynthesis parameters
   real :: vmaxDIC_a,vmaxDIC_b,vmaxDIC_c       ! a/b/c: maximum photosynthetic rate
   real :: qcarbon_a,qcarbon_b       ! a/b: carbon per cell
   real :: alphachl_a,alphachl_b     ! a/b: initial slope of PI curve
@@ -107,7 +107,7 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/vmaxDIC_a,vmaxDIC_b,vmaxDIC_c
   namelist/ini_ecogem_nml/qcarbon_a,alphachl_a,PARfrac,chl2nmax,biosynth,k_w,k_chl
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
-! Grazing parameters
+  ! Grazing parameters
   real :: ass_eff                   !      maximum assimilation efficiency
   integer :: ns                     !      prey switching exponent
   real :: hill                      !      hill number for grazing assimilation
@@ -118,7 +118,7 @@ MODULE ecogem_lib
   real ::pp_sig_a,pp_sig_b          ! a/b: width of grazing kernel
   namelist/ini_ecogem_nml/ass_eff,ns,hill,lambda,graz_a,kg_a,pp_opt_a,pp_sig_a
   namelist/ini_ecogem_nml/                       graz_b,kg_b,pp_opt_b,pp_sig_b
-! Other loss parameters
+  ! Other loss parameters
   real ::    respir_a,   respir_b   ! a/b: carbon respiration rate
   real ::   biosink_a,  biosink_b   ! a/b: biomass sinking rate
   real ::      mort_a,     mort_b   ! a/b: basal mortality
@@ -129,27 +129,34 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/respir_b,biosink_b,mort_b
   namelist/ini_ecogem_nml/beta_graz_a,beta_graz_b,beta_graz_c,beta_mort_a,beta_mort_b,beta_mort_c
   namelist/ini_ecogem_nml/par_bio_remin_POC_frac2,par_bio_remin_CaCO3_frac2
-! Mixotrophy parameters
+  ! Mixotrophy parameters
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff
-! Temperature dependence
+  ! Temperature dependence
   real ::  temp_A,temp_T0   ! 
   namelist/ini_ecogem_nml/temp_A,temp_T0
-! CaCO3 production
+  ! CaCO3 production
   real ::  par_bio_red_POC_CaCO3,par_bio_red_POC_CaCO3_pP
   namelist/ini_ecogem_nml/par_bio_red_POC_CaCO3,par_bio_red_POC_CaCO3_pP
-! logical control variables
+  ! logical control variables
   logical::ctrl_debug_eco_init    ! debug ecogem nml input
   NAMELIST /ini_ecogem_nml/ctrl_debug_eco_init
-! character strings
+  ! character strings
   character(10)::ctrl_tdep_form           ! form of temperature limitation function
   character(10)::ctrl_photosynth_form     ! form of temperature limitation function
   NAMELIST /ini_ecogem_nml/ctrl_tdep_form,ctrl_photosynth_form
-! other stuff
+  ! other stuff
   integer :: nsubtime ! Number of ecogem timesteps per biogem timestep
   NAMELIST /ini_ecogem_nml/nsubtime! 
   CHARACTER(len=127)::par_ecogem_plankton_file 
-  NAMELIST /ini_ecogem_nml/par_ecogem_plankton_file                         ! 
+  NAMELIST /ini_ecogem_nml/par_ecogem_plankton_file 
+  ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
+  CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
+  NAMELIST /ini_ecogem_nml/opt_d13C_DIC_Corg
+  real::par_d13C_DIC_Corg_b                                      ! b value for Popp et al. fractionation
+  NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_b
+  real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix
+  NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_ef
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                     ! continuing run?
   NAMELIST /ini_ecogem_nml/ctrl_continuing
@@ -197,7 +204,7 @@ MODULE ecogem_lib
   INTEGER,PARAMETER::n_j = ilat1_ocn                                    ! 
   INTEGER,PARAMETER::n_k = inl1_ocn                                     !
 
-! indices for ecological arrays
+  ! indices for ecological arrays
   INTEGER :: npmax
   INTEGER :: iDIC,iNO3,iNO2,iNH4,iPO4,iFe,iSiO2,iimax
   INTEGER :: iCarb,iNitr,iPhos,iIron,iSili,iChlo,iomax
@@ -221,7 +228,7 @@ MODULE ecogem_lib
   REAL   ,DIMENSION(n_i,n_j,n_k) ::ocn_grid_vol  !
   INTEGER,DIMENSION(n_i,n_j)     ::wet_mask_ij   ! 
   INTEGER,DIMENSION(n_i,n_j,n_k) ::wet_mask_ijk  ! 
-  
+
   ! Ecosystem arrays
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::nutrient      ! nutrient array (iimax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::plankton      ! plankton biomass array (npmax,iomax,i,j,k)
@@ -286,7 +293,7 @@ MODULE ecogem_lib
   real::par_misc_t_tslice  = 0.0
   logical::par_misc_t_intseries = .FALSE.
   logical::par_misc_t_intslice  = .FALSE.
-    ! ############################################################################################################################## !  
+  ! ############################################################################################################################## !  
   ! ### ADD ADDITIONAL TIME-SERIES ARRAY DEFINITIONS HERE ######################################################################## !
   INTEGER :: n_tser
   character(len=16),ALLOCATABLE,DIMENSION(:)    ::tser_name       ! Time series name
@@ -297,7 +304,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::uptake_tser   ! inorganic nutrient uptake flux for each plankton (iomax,npmax,nsite,48)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::gamma_tser    ! limiting factors (iomax,npmax,nsite,48)
   REAL             ,ALLOCATABLE,DIMENSION(:)      ::time_tser     ! timestep # (48)
-  
+
   ! ############################################################################################################################## !
 
   ! *** integrated (time-averaged) time-slice arrays ***

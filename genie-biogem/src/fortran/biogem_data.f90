@@ -543,9 +543,9 @@ CONTAINS
     close(unit=in)
     If (ios /= 0) then
        CALL sub_report_error( &
-            & 'atchem_data','sub_data_load_restart', &
+            & 'biogem_data','sub_data_load_restart', &
             & 'You have requested a CONTINUING run, but restart file <'//trim(loc_filename)//'> does not exist', &
-            & 'SKIPPING - using default initial values (FILE: gem_config_atm.par)', &
+            & 'SKIPPING - using default initial values', &
             & (/const_real_null/),.false. &
             & )
     else
@@ -1001,6 +1001,7 @@ CONTAINS
     ! reduce O2 demand associated with C (and H) oxidation => treat N and P explicitly
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
+    !       (and as implemented, ber N, this ends up as (5/2)/2 = 5.0/4.0
     if (abs(par_bio_red_POP_POC*par_bio_red_POP_PO2) > const_real_nullsmall) then
        if (ctrl_bio_red_O2withPOC) then
           conv_sed_ocn(io_O2,is_POP) = 0.0
@@ -1034,6 +1035,14 @@ CONTAINS
     ! NOTE: arrays are only one-way (i.e. there is no equivalent ocn --> sed transformation)
     ! NOTE: remember that conv_sed_ocn(io_O2,is_POC) is *negative*
     ! -------------------------------------------------------- ! Modify for N-reducing conditions
+    ! NOTE: to balance the uptake of NO3 into organic matter
+    !       [2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O]
+    !       with the release of N as ammonium and subsequent oxidation to NO3 ...
+    !       [NH4+ + 2O2 -> NO3- + 2H+ + H2O]
+    !       the remind of PON needs to be adjusted in order that everything is conserved:
+    !       2PON + 3H2O + 2H+ --> 2NH4+ + (3/2)O2
+    !       and per N:
+    !       PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
     ! NOTE: oxidation equivalence assumption (NH4): NO3- + H2O + 2H+ <-> 2O2 + NH4+
     !                                           or: O2 == (1/2)NO3- + (1/2)H2O + H+ - (1/2)NH4+
     !       e.g. P + NO3- + H2O + 2H+ -> PO4 + NH4+ (ignoring charges associated with P)
@@ -1049,7 +1058,7 @@ CONTAINS
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
           conv_sed_ocn_N(io_NH4,is_PON) = 1.0
           conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
-          conv_sed_ocn_N(io_O2,is_PON)  = 0.0
+          conv_sed_ocn_N(io_O2,is_PON)  = (3.0/4.0)
        else
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
           conv_sed_ocn_N(io_N2,is_PON)  = 0.5

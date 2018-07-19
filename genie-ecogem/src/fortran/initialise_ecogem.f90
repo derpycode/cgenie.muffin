@@ -38,7 +38,7 @@ SUBROUTINE initialise_ecogem(    &
   print*,'======================================================='
   print*,' >>> Initialising ECOGEM ocean ecology module ...'
 
-    ! *** load goin information ***
+  ! *** load goin information ***
   call sub_load_goin_ecogem()  
   ! ---------------------------------------------------------- ! set time
   ! NOTE: modify 'par_misc_t_start' according to the run-time accumulated in any requested restart,
@@ -52,7 +52,7 @@ SUBROUTINE initialise_ecogem(    &
   else
      par_misc_t_end = par_misc_t_start + par_misc_t_runtime
   end if
-  
+
   ! ---------------------------------------------------------- !
   ! *** copy GOLDSTEIn parameters ***
   ! ---------------------------------------------------------- !
@@ -65,27 +65,27 @@ SUBROUTINE initialise_ecogem(    &
   goldstein_sv(:)   = dum_sv(:)
   ! ---------------------------------------------------------- !
   CALL sub_init_phys_ocn()
-  
+
   ! check required nutrients are carried by BIOGEM!
   call check_egbg_compatible() 
-    
+
   ! get specifications of plankton populations from input file
   CALL sub_init_populations()    
   ! get names and locations of time-series sites for output
   CALL sub_init_timeseries()
-  
+
   if (ctrl_debug_eco_init) then
-    write(*,*),' ---------------------------------------------------'
-    write(*,*),'- Plankton population specifications from input file'
-    print '(a32,i5)','- number of plankton:          ',npmax
-    print '(a37)','   PFT                diameter      n'
-    do jp=1,npmax
-      write(*,'(a3,a16,a4,F7.1,a2,i5)'),'     ',pft(jp),"  ",diameter(jp),"  ",random_n(jp)
-    enddo
-    write(*,*),' ---------------------------------------------------'
+     write(*,*),' ---------------------------------------------------'
+     write(*,*),'- Plankton population specifications from input file'
+     print '(a32,i5)','- number of plankton:          ',npmax
+     print '(a37)','   PFT                diameter      n'
+     do jp=1,npmax
+        write(*,'(a3,a16,a4,F7.1,a2,i5)'),'     ',pft(jp),"  ",diameter(jp),"  ",random_n(jp)
+     enddo
+     write(*,*),' ---------------------------------------------------'
   endif
-! calculate other indices dependent on goin information 
-!order and indices for nutrient elements (unused elements to zero)
+  ! calculate other indices dependent on goin information 
+  !order and indices for nutrient elements (unused elements to zero)
   iDIC  = 1 ! Mandatory                                                  ! index for dissolved inorganic carbon 
   iNO3  = (    iDIC                           +1) * MERGE(1,0,useNO3)    ! index for nitrate
   iNO2  = (MAX(iDIC,iNO3,iNO2)                +1) * MERGE(1,0,useNO2)    ! index for nitrite
@@ -94,7 +94,7 @@ SUBROUTINE initialise_ecogem(    &
   iFe   = (MAX(iDIC,iNO3,iNO2,iNH4,iPO4)      +1) * MERGE(1,0,useFe)     ! index for dissolved iron
   iSiO2 = (MAX(iDIC,iNO3,iNO2,iNH4,iPO4,iFe)  +1) * MERGE(1,0,useSiO2)   ! index for silicate
   iimax =  MAX(iDIC,iNO3,iNO2,iNH4,iPO4,iFe,iSiO2) ! number of dissolved inorganic 'nutrients'
-!ckc order and indices for nutrient isotopes, put in if statement?
+  !ckc order and indices for nutrient isotopes, put in if statement?
   iDIC_13C = 1
   !iimaxiso = MAX(iDIC_13C) !ckc expandable for future isotope tracing
   iimaxiso = 1
@@ -107,12 +107,12 @@ SUBROUTINE initialise_ecogem(    &
   iChlo = (MAX(iCarb,iNitr,iPhos,iIron,iSili)+1) * MERGE(1,0,chlquota)   ! index for Chlorophyll quota
   iomax =  MAX(iCarb,iNitr,iPhos,iIron,iSili) ! number of planktonic elemental pools (not including chlorophyll)
   komax = 2
-!usage flags
+  !usage flags
   iChl = MERGE(1,0,chlquota) ! integer flag for dynamic chlorophyll
   iSil = MERGE(1,0,useSiO2)  ! integer flag for silicate quotas (diatoms only)
-! remember to load data fields the same order !
+  ! remember to load data fields the same order !
 
-!ckc create isotope tracing array for each plankton group, put in if statement?
+  !ckc create isotope tracing array for each plankton group, put in if statement?
   iCarb13C = 1
   !iomaxiso = MAX(iCarb13C) !ckc expandable for future isotope tracing
   iomaxiso = 1
@@ -124,8 +124,8 @@ SUBROUTINE initialise_ecogem(    &
   dum_egbg_sfcpart(:,:,:,:)  = 0.0
   dum_egbg_sfcremin(:,:,:,:) = 0.0
   dum_egbg_sfcocn(:,:,:,:)   = 0.0
-  
-  
+
+
   ! *** dimension tracer arrays ***
   ! NOTE: check for problems allocating array space
   ! ecogem state variables
@@ -144,7 +144,7 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(up_flux_iso(iomaxiso,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-  
+
   ! ecogem time-slice arrays
   ALLOCATE(int_plankton_timeslice(iomax+iChl,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -156,20 +156,20 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Time-series storage arrays
   if (n_tser.gt.0) then
-    ALLOCATE(nutrient_tser(iimax,n_tser,48),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__)
-    ALLOCATE(plankton_tser(iomax+iChl,npmax,n_tser,48),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__)
-    ALLOCATE(uptake_tser(iomax,npmax,n_tser,48),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__)
-    ALLOCATE(gamma_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__)
-    ALLOCATE(time_tser(48),STAT=alloc_error)
-  call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(nutrient_tser(iimax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(plankton_tser(iomax+iChl,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(uptake_tser(iomax,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(gamma_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(time_tser(48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
   endif
   ! Initialise time slices
   CALL sub_init_int_timeslice()
-  
+
   ! Carbonate chemistry parameters
   ALLOCATE(eco_carb(n_carb,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -245,41 +245,41 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(beta_mort(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-  
+
   ! Quota string labels
   ALLOCATE(quotastrng(iomax+iChl),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-                quotastrng(iCarb) = 'C'
+  quotastrng(iCarb) = 'C'
   if (nquota )  quotastrng(iNitr) = 'N'
   if (pquota )  quotastrng(iPhos) = 'P'
   if (squota )  quotastrng(iSili) = 'Si'
   if (fquota )  quotastrng(iIron) = 'Fe'
   if (chlquota) quotastrng(iChlo) = 'Chl'
-    
+
   ALLOCATE(quotaunits(iomax+iChl),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-                quotaunits(iCarb) = 'mmol C m^-3'
+  quotaunits(iCarb) = 'mmol C m^-3'
   if (nquota )  quotaunits(iNitr) = 'mmol N m^-3'
   if (pquota )  quotaunits(iPhos) = 'mmol P m^-3'
   if (squota )  quotaunits(iSili) = 'mmol Si m^-3'
   if (fquota )  quotaunits(iIron) = 'mmol Fe m^-3'
   if (chlquota) quotaunits(iChlo) = 'mg Chl m^-3'
-  
+
   ! Match nutrients to quotas
   ALLOCATE(nut2quota(iimax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-                nut2quota(iDIC)  = iCarb
+  nut2quota(iDIC)  = iCarb
   if (useNO3 )  nut2quota(iNO3)  = iNitr
   if (useNO2 )  nut2quota(iNO2)  = iNitr
   if (useNH4 )  nut2quota(iNH4)  = iNitr
   if (usePO4 )  nut2quota(iPO4)  = iPhos
   if (useFe )   nut2quota(iFe)   = iIron
   if (useSiO2 ) nut2quota(iSiO2) = iSili
-  
+
   ! Resource string labels
   ALLOCATE(rsrcstrng(iimax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-                rsrcstrng(iDIC)  = 'DIC'
+  rsrcstrng(iDIC)  = 'DIC'
   if (useNO3 )  rsrcstrng(iNO3)  = 'NO3'
   if (useNO2 )  rsrcstrng(iNO2)  = 'NO2'
   if (useNH4 )  rsrcstrng(iNH4)  = 'NH4'
@@ -297,9 +297,9 @@ SUBROUTINE initialise_ecogem(    &
   ! make wet mask for ocean cells
   wet_mask_ij(:,:) = MERGE(1,0,goldstein_k1.le.n_k)
   do k=1,n_k
-    wet_mask_ijk(:,:,k) = MERGE(1,0,goldstein_k1.le.k)
+     wet_mask_ijk(:,:,k) = MERGE(1,0,goldstein_k1.le.k)
   enddo
-  
+
   ! *** initialise plankton biomass array
   call sub_init_plankton()
 
@@ -309,22 +309,22 @@ SUBROUTINE initialise_ecogem(    &
   string_ncout3d = TRIM(par_outdir_name)//'fields_ecogem_3d.nc'
   string_nctsint = TRIM(par_outdir_name)//'timeseries_ecogem.nc'
   string_nctsi   = TRIM(par_outdir_name)//'ts_ecogem_int.nc'  
-  
-  
+
+
   ALLOCATE(ncout1d_iou(n_tser),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(ncout1d_ntrec(n_tser),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-  
+
   if (n_tser.gt.0) then
-    do k=1,n_tser
-      site_string = TRIM(par_outdir_name)//'timeseries_'//trim(tser_name(k))//'.nc'
-      call sub_init_netcdf_tser(site_string,loc_iou)
-      ncout1d_iou(k) = loc_iou
-      ncout1d_ntrec(k) = 0
-    enddo
+     do k=1,n_tser
+        site_string = TRIM(par_outdir_name)//'timeseries_'//trim(tser_name(k))//'.nc'
+        call sub_init_netcdf_tser(site_string,loc_iou)
+        ncout1d_iou(k) = loc_iou
+        ncout1d_ntrec(k) = 0
+     enddo
   endif
-  
+
   call sub_init_netcdf(trim(string_ncout2d),loc_iou,2)
   ncout2d_iou = loc_iou
   ncout2d_ntrec = 0
@@ -338,7 +338,7 @@ SUBROUTINE initialise_ecogem(    &
   end if
   ! ---------------------------------------------------------- !
 
-  
+
   print*,' <<< Initialisation complete'
   print*,'======================================================='
 
