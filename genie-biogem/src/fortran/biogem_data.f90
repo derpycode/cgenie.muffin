@@ -543,9 +543,9 @@ CONTAINS
     close(unit=in)
     If (ios /= 0) then
        CALL sub_report_error( &
-            & 'atchem_data','sub_data_load_restart', &
+            & 'biogem_data','sub_data_load_restart', &
             & 'You have requested a CONTINUING run, but restart file <'//trim(loc_filename)//'> does not exist', &
-            & 'SKIPPING - using default initial values (FILE: gem_config_atm.par)', &
+            & 'SKIPPING - using default initial values', &
             & (/const_real_null/),.false. &
             & )
     else
