@@ -111,12 +111,9 @@ eg_par_bio_red_POC_CaCO3_pP  = 0.7440 # exponent for modifier of CaCO3:POC expor
 eg_nsubtime                 =25
 eg_n_keco                   =1
 
-bg_ctrl_ncrst               =.true.
+# disable ECOGEM restarts (as not currently coded up / used)
 eg_ctrl_ncrst               =.false.
-bg_ctrl_continuing          =.true.
 eg_ctrl_continuing          =.false.
-
-bg_ctrl_audit               =.false.
 
 #
 # --- DATA SAVING -----------------------------------------------------
