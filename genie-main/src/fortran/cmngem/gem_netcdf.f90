@@ -489,7 +489,6 @@ CONTAINS
 
     character(len=*), intent(in) :: dum_trace
     integer,      intent(in) :: dum_ind
-
     if (dum_ind .ne. nf90_noerr) then
        print*, 'netcdf error: ', nf90_strerror(dum_ind)
        print*, 'trace string: ', dum_trace
@@ -682,8 +681,6 @@ CONTAINS
 
     integer :: i, loc_iv
 
-    !   print*,'putvar2di ', dum_name, dum_la, dum_lb, dum_din(1,1)
-
     i = nf90_inq_varid (dum_ncid, dum_name, loc_iv)
     call sub_checkerror (i,'putvar2dI nf_inq_varid '//dum_name)
 
@@ -721,6 +718,7 @@ CONTAINS
     where(dum_mask .ne. 1.0)
        loc_din = nf90_fill_double
     endwhere
+
     i = nf90_inq_varid (dum_ncid, dum_name, loc_iv)
     call sub_checkerror (i,'putvar2d nf_inq_varid '//dum_name)
     

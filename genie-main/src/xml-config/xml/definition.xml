@@ -4475,6 +4475,10 @@
 			<value datatype="real">-0.236</value>
                         <description>88/86Sr fractionation between Sr and SrCO3 -- modified from Vollstaedt et al. [2014] (87/86Sr fractionation is simply half as large)</description>
                     </param>
+                    <param name="par_d13C_Corg_CH4_epsilon">
+			<value datatype="real">-35.0</value>
+                        <description>methanogenesis fractionation</description>
+                    </param>
 <!-- IRON  -->
                     <param name="par_det_Fe_sol">
 			<value datatype="real">1.0</value>
@@ -7878,6 +7882,19 @@
 			<value datatype="real">0.744</value>
                         <description>exponent for modifier of CaCO3:POC export ratio</description>
                     </param>  
+<!-- ISOTOPIC FRACTIONATION -->
+                    <param name="opt_d13C_DIC_Corg">
+			<value datatype="string">Ridgwell2001</value>
+                        <description>Corg 13C fractionation scheme ID string [alt: 'Poppetal']</description>
+                    </param>
+                    <param name="par_d13C_DIC_Corg_b">
+                       <value datatype="real">171.0</value>
+                       <description>b value for Popp et al. fractionation</description>
+                    </param>
+                    <param name="par_d13C_DIC_Corg_ef">
+                       <value datatype="real">25.</value>
+                       <description>Fractionation for intercellular C fixation (Ridgwell, 2001, PhD. Thesis)</description>
+                    </param>
 <!-- Subtimestep -->  
                     <param name="nsubtime">
 			<value datatype="integer">25</value>

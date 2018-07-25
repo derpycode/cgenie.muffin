@@ -487,7 +487,8 @@ CONTAINS
           dum_carb(ic_fug_CO2)   = loc_conc_CO2/dum_carbconst(icc_QCO2) 
           dum_carb(ic_ohm_cal)   = dum_Ca*loc_conc_CO3/dum_carbconst(icc_kcal)
           dum_carb(ic_ohm_arg)   = dum_Ca*loc_conc_CO3/dum_carbconst(icc_karg)  
-          dum_carb(ic_H)         = loc_H
+          dum_carb(ic_H)         = loc_H 
+          dum_carb(ic_pHsws)     = -log10(loc_H)
           ! calculate value of [CO3--] at calcite and aragonite saturation
           ! NOTE: this assumes that the value of omega is unity at saturation (definition!)
           loc_sat_cal = dum_carbconst(icc_kcal) * 1.0/dum_Ca

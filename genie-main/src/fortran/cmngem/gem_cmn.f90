@@ -63,7 +63,7 @@ MODULE gem_cmn
 
   ! *** array dimensions ***
   ! main biogeochem ocean array dimensions 
-  INTEGER,PARAMETER::n_carb                               = 10          ! number of ocean box chemistry descriptors
+  INTEGER,PARAMETER::n_carb                               = 11          ! number of ocean box chemistry descriptors
   INTEGER,PARAMETER::n_carbconst                          = 17          ! number of ocean box chemistry constants descriptors
   INTEGER,PARAMETER::n_carbalk                            = 13          ! number of alkalinty chemistry descriptors
   INTEGER,PARAMETER::n_carbisor                           = 08          ! number of carbonate isotopic ratio descriptors
@@ -289,6 +289,7 @@ MODULE gem_cmn
   INTEGER,PARAMETER::ic_dCO3_cal                          = 08    ! degree of over-saturation [CO32-] w.r.t. calcite
   INTEGER,PARAMETER::ic_dCO3_arg                          = 09    ! degree of over-saturation [CO32-] w.r.t. aragonite
   INTEGER,PARAMETER::ic_RF0                               = 10    ! Revelle factor
+  INTEGER,PARAMETER::ic_pHsws                             = 11    ! pH(sws)
   ! (carbonate) chemistry descriptors array indices
   INTEGER,PARAMETER::icc_k                                = 01    ! 
   INTEGER,PARAMETER::icc_k1                               = 02    ! 
@@ -447,7 +448,8 @@ MODULE gem_cmn
        & 'ohm_arg         ', &
        & 'dCO3_cal        ', &
        & 'dCO3_arg        ', &
-       & 'RF0             ' /)
+       & 'RF0             ', &
+       & 'pHsws           ' /)
   ! carbonate chemistry dissociation constants
   CHARACTER(len=16),DIMENSION(n_carbconst),PARAMETER::string_carbconst = (/ &
        & 'k               ', &

@@ -27,7 +27,7 @@ SUBROUTINE atchem(    &
 
   ! *** CALCULATE LOCAL CONSTANTS ***
   ! local constants for converting between partial pressure and molar quantity
-  ! NOTE: atm(ia_T,:,:) in K
+  ! NOTE: atm(ia_T,:,:) in C
   loc_conv_atm_mol(:,:) = phys_atm(ipa_V,:,:)/(conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC))
   loc_conv_mol_atm(:,:) = 1.0/loc_conv_atm_mol(:,:)
   ! time
@@ -60,7 +60,9 @@ SUBROUTINE atchem(    &
         case ('snowball')      
            IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
               if (sum(dum_sfcatm(ia_T,:,:))/size(dum_sfcatm(ia_T,:,:)) > 0.0) then
-                 CALL sub_calc_oxidize_CH4_default(i,j,loc_dtyr)
+                 IF (atm(ia_pCH4,i,j) > 700.0E-9) THEN
+                    CALL sub_calc_oxidize_CH4_default(i,j,loc_dtyr)
+                 END if
               END IF
            END IF
         case ('schmidt03')

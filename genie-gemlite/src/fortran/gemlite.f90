@@ -79,7 +79,8 @@ subroutine gemlite(    &
   ! total ocean mass
   loc_ocn_tot_M = conv_m3_kg*loc_ocn_tot_V
   ! conversion between partial pressure and molar quantity
-  loc_conv_atm_mol(:,:) = phys_atm_V(:,:)/(conv_Pa_atm*const_R_SI*atm(ia_T,:,:))
+  ! NOTE: atm(ia_T,:,:) in C
+  loc_conv_atm_mol(:,:) = phys_atm_V(:,:)/(conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC))
 
   ! *** UPDATE OCEAN-ATMOSPHERE ***
 
