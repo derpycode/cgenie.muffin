@@ -156,19 +156,8 @@ CONTAINS
      loc_atmV = SUM(phys_atm(ipa_V,:,:))
 
      ! CH4-O3-O2 photochemistry after Claire et al. [2006] // no H escape from the atmosphere
-     ! *** truncate if beyond training values (in mol, from original bar) ***
-     ! NOTE: CH4 not truncated at lower level here; truncated lifetime at lower limit below
-      ! pO2
-      IF (loc_O2 < 1.7498E08) THEN
-          loc_O2 = 1.7498E08
-      ELSE IF (loc_O2 > 1.7498E19) THEN
-          loc_O2 = 1.7498E19
-      END IF
-
-      ! pCH4
-      IF (loc_CH4 > 4.0245E17) THEN
-          loc_CH4 = 4.0245E17
-      END IF
+     ! NOTE: neither O2 nor CH4 are truncated at edge of training values here, so USE CAUTION
+     ! NOTE: CH4 truncated lifetime at lower limit below [see Schmidt & Shindell 2003]
 
      ! *** LOCAL CONSTANTS ***
      loc_p00 =  1.712
@@ -296,19 +285,8 @@ CONTAINS
     loc_atmV = SUM(phys_atm(ipa_V,:,:))
   
      ! CH4-O3-O2 photochemistry after Claire et al. [2006] // no H escape from the atmosphere
-     ! *** truncate if beyond training values (in mol, from original bar) ***
-     ! NOTE: CH4 not truncated at lower level here; truncated lifetime at lower limit below
-      ! pO2
-      IF (loc_O2 < 1.7498E08) THEN
-          loc_O2 = 1.7498E08
-      ELSE IF (loc_O2 > 1.7498E19) THEN
-          loc_O2 = 1.7498E19
-      END IF
-
-      ! pCH4
-      IF (loc_CH4 > 4.0245E17) THEN
-          loc_CH4 = 4.0245E17
-      END IF
+     ! NOTE: neither O2 nor CH4 are truncated at edge of training values here, so USE CAUTION
+     ! NOTE: CH4 truncated lifetime at lower limit below [see Schmidt & Shindell 2003]
   
      ! *** LOCAL CONSTANTS ***
      loc_p00 =  1.712
