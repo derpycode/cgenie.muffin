@@ -35,15 +35,15 @@ bg_par_bio_red_DOMfrac=0.66
 # --- INORGANIC MATTER EXPORT RATIOS ----------------------------------
 #
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
-#bg_par_bio_red_POC_CaCO3=0.0485
+bg_par_bio_red_POC_CaCO3=0.0485
 # exponent for modifier of CaCO3:POC export ratio
-#bg_par_bio_red_POC_CaCO3_pP=0.7440
+bg_par_bio_red_POC_CaCO3_pP=0.7440
 #
 # SET NO PELAGIC CARBONATE PRODUCTION
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
-bg_par_bio_red_POC_CaCO3=0.0
+#bg_par_bio_red_POC_CaCO3=0.0
 # exponent for modifier of CaCO3:POC export ratio
-bg_par_bio_red_POC_CaCO3_pP=0.0
+#bg_par_bio_red_POC_CaCO3_pP=0.0
 #
 # --- REMINERALIZATION ------------------------------------------------
 #
@@ -62,8 +62,8 @@ bg_par_bio_remin_DOMlifetime=0.5
 # initial fractional abundance of POC component #2
 bg_par_bio_remin_POC_frac2=0.0557
 # depth of remineralization or particulate organic matter
-#bg_par_bio_remin_POC_eL1=589.9451
-bg_par_bio_remin_POC_eL1=294.9725
+bg_par_bio_remin_POC_eL1=589.9451
+#bg_par_bio_remin_POC_eL1=294.9725
 # remineralization length #2 for POC
 bg_par_bio_remin_POC_eL2=1000000.0
 # initial fractional abundance of CaCO3 component #2
@@ -145,7 +145,7 @@ ma_debug_loop=1
 bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2_RpO2"
 bg_par_atm_force_scale_val_3=278.0E-06      # restoring forcing for pCO2 [atm]
 bg_par_atm_force_scale_val_4=-6.5           # restoring forcing for d13C CO2 [o/oo]
-bg_par_atm_force_scale_val_6=0.21           # restoring forcing for pO2 [atm]
+bg_par_atm_force_scale_val_6=0.2095         # restoring forcing for pO2 [atm]
 ac_par_atm_wetlands_FCH4=100.0E12           # wetland CH4 flux [mol/yr]
 ac_par_atm_wetlands_FCH4_d13C=-60.0         # wetland d13C CH4 [o/oo]
 #
@@ -154,7 +154,7 @@ ac_par_atm_wetlands_FCH4_d13C=-60.0         # wetland d13C CH4 [o/oo]
 # ATMOSPHERIC CHEMISTRY
 ac_atm_init_3=278.0E-06             # pCO2 [atm]
 ac_atm_init_4=-6.5                  # d13C CO2 [o/oo]
-ac_atm_init_6=0.21                  # pO2 [atm]
+ac_atm_init_6=0.2095                # pO2 [atm]
 ac_atm_init_10=0.7E-06              # pCH4 [atm]
 ac_atm_init_11=-60.0                # d13C CH4 [o/oo]
 #
@@ -166,7 +166,7 @@ bg_ocn_init_10=0.0                  # O2 [mol/kg]
 bg_ocn_init_12=2.363E-03            # ALK [mol/kg]
 bg_ocn_init_15=0.0                  # DOM_C [mol/kg]
 bg_ocn_init_20=0.0                  # DOM_P [mol/kg]
-bg_ocn_init_25=10.0E-09             # CH4 [mol/kg]
+bg_ocn_init_25=1.0E-09              # CH4 [mol/kg]
 bg_ocn_init_26=-60.0                # d13C CH4 [o/oo]
 bg_ocn_init_35=1.025E-02            # Ca [mol/kg]
 bg_ocn_init_38=28.0E-03             # SO4 [mol/kg]
