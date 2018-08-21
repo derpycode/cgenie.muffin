@@ -7,8 +7,8 @@ subroutine ecogem(          &
      & dum_egbg_fxsw,       & ! input
      & dum_mld,             & ! input
      & dum_egbg_sfcocn,     & ! input  -- tracer concentrations
-     & dum_egbg_sfcpart,    &
-     & dum_egbg_sfcdiss     &
+     & dum_egbg_sfcpart,    & ! output -- change in particulate concentration field
+     & dum_egbg_sfcdiss     & ! output -- change in remin concentration field
      & )
 
   use gem_cmn
@@ -97,6 +97,9 @@ subroutine ecogem(          &
   ! ------------------------------------------------------- !
   ! local array for ocean tracers
   loc_ocn(:,:,:,:) = dum_egbg_sfcocn(:,:,:,:)
+  ! zero output arrays
+  dum_egbg_sfcpart = 0.0
+  dum_egbg_sfcdiss = 0.0
 
   ! *** CALCULATE LOCAL CONSTANTS & VARIABLES ***
   ! sea surface temp (in degrees C)
@@ -623,13 +626,14 @@ subroutine ecogem(          &
      print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
      STOP
   endif
+
   ! CaCO3 production
   gamma = (omega-1.0)**par_bio_red_POC_CaCO3_pP
   gamma = MERGE(gamma,0.0,omega.gt.1.0)
-
   dum_egbg_sfcpart(is_CaCO3,:,:,:) = dum_egbg_sfcpart(is_POC,:,:,:)       * par_bio_red_POC_CaCO3 * gamma
   dum_egbg_sfcdiss(io_DIC  ,:,:,:) = dum_egbg_sfcdiss(io_DIC,:,:,:) - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
   dum_egbg_sfcdiss(io_ALK  ,:,:,:) = dum_egbg_sfcdiss(io_ALK,:,:,:) - 2.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
+  dum_egbg_sfcdiss(io_Ca  ,:,:,:)  = dum_egbg_sfcdiss(io_Ca,:,:,:)  - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
 
   !cxarbon isotope for CaCO3
   if (useDIC_13C) then
