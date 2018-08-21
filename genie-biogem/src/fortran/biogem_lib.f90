@@ -337,6 +337,8 @@ MODULE biogem_lib
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
   CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
   NAMELIST /ini_biogem_nml/opt_d13C_DIC_Corg
+  CHARACTER(len=63)::opt_d44Ca_Ca_CaCO3                          ! CaCO3 44Ca fractionation scheme ID string
+  NAMELIST /ini_biogem_nml/opt_d44Ca_Ca_CaCO3
   real::par_d13C_DIC_Corg_b                                      ! b value for Popp et al. fractionation
   NAMELIST /ini_biogem_nml/par_d13C_DIC_Corg_b
   real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix

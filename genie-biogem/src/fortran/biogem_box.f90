@@ -368,7 +368,7 @@ CONTAINS
     real::loc_dPO4
     real::loc_dPO4_1,loc_dPO4_2
     real::loc_dPO4_sp,loc_dPO4_nsp
-    real::loc_ohm                                                       !
+    real::loc_ohm,loc_co3                                               !
     real::loc_frac_N2fix
     real::loc_ficefree,loc_intI,loc_kI,loc_kT
     real,dimension(n_ocn,n_k)::loc_bio_uptake                           !
@@ -495,6 +495,10 @@ CONTAINS
        end select
     else
        loc_FeT = 0.0
+    end if
+    if (sed_select(is_CaCO3)) then
+       loc_ohm = carb(ic_ohm_cal,dum_i,dum_j,n_k)
+       loc_co3 = carb(ic_conc_CO3,dum_i,dum_j,n_k)
     end if
     if (ocn_select(io_Cd)) then
        loc_Cd = ocn(io_Cd,dum_i,dum_j,n_k)
@@ -935,7 +939,6 @@ CONTAINS
     !      whereas the initially calculated CaCO3 and opal fluxes do not change
     !      => re-scale CaCO3 and opal ratios so that the prescribed export ratio value better reflects final export composition
     if (sed_select(is_CaCO3)) then
-       loc_ohm = carb(ic_ohm_cal,dum_i,dum_j,n_k)
        select case (opt_bio_CaCO3toPOCrainratio)
        case ('prescribed')
           ! fixed, spatially explicit
@@ -965,7 +968,7 @@ CONTAINS
        case ('HofmannandSchellnhuber2009')
           ! Hofmann and Schellnhuber [2009] (Barker et al. [2003]) [CO32-] dependent parameterization
           bio_part_red(is_POC,is_CaCO3,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)* &
-               & par_bio_red_POC_CaCO3*exp(0.0083*(1.0E6*carb(ic_conc_CO3,dum_i,dum_j,n_k) - par_bio_red_POC_CaCO3_CO3REF))
+               & par_bio_red_POC_CaCO3*exp(0.0083*(1.0E6*loc_co3 - par_bio_red_POC_CaCO3_CO3REF))
        case default
           ! fixed, uniform
           bio_part_red(is_POC,is_CaCO3,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_CaCO3
@@ -1211,8 +1214,19 @@ CONTAINS
        ! calculate 44Ca/40Ca fractionation between Ca and CaCO3
        loc_r44Ca = ocn(io_Ca_44Ca,dum_i,dum_j,n_k)/ocn(io_Ca,dum_i,dum_j,n_k)
        loc_R = loc_r44Ca/(1.0 - loc_r44Ca)
-       loc_alpha = 1.0 + par_d44Ca_CaCO3_epsilon/1000.0
-       bio_part_red(is_CaCO3,is_CaCO3_44Ca,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+       SELECT CASE (opt_d44Ca_Ca_CaCO3)
+       CASE ('Fantle')
+          ! D44Ca_calcite-Ca(aq) = -0.066649·omega_calcite - 0.320614
+          loc_alpha = 1.0 + (-0.066649*loc_ohm - 0.320614)/1000.0
+       CASE ('Komar')
+          ! D44Ca_calcite-Ca(aq) = −(1.31 ± 0.12) + (3.69 ± 0.59) [CO2−3](mmol/kg)
+          ! NOTE: here, [CO32-] converted from mmol kg-1 to umol kg-1
+          loc_alpha = 1.0 + (-1.31 + 3.69*loc_co3*1.0E3)/1000.0
+       case default
+          ! fixed fractionation
+          loc_alpha = 1.0 + par_d44Ca_CaCO3_epsilon/1000.0
+       end select
+          bio_part_red(is_CaCO3,is_CaCO3_44Ca,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)       
     end if
     !
     ! d15N [PON]
