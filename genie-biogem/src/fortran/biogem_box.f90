@@ -1469,7 +1469,10 @@ CONTAINS
     ! RE-SCALE FOR DISSOLVED ORGANIC MATTER PRODUCTION
     ! -------------------------------------------------------- !
     ! calculate DOM components and adjust POM accordingly
+    int_fracdom(:) = 0.0
     DO l=1,n_l_sed
+       loc_r_POM_DOM  = 0.0
+       loc_r_POM_RDOM = 0.0
        is = conv_iselected_is(l)
        ! create DOM fraction
        loc_tot_i = conv_POM_DOM_i(0,is)
@@ -1507,6 +1510,12 @@ CONTAINS
           ! create (and add) dissolved tracers
           bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) + loc_bio_part_RDOM(is,loc_k_mld:n_k)
        end do
+       ! save total DOM fraction [NOTE: not a global mean ... just this (i,j) location ...]
+       if ((loc_r_POM_DOM + loc_r_POM_RDOM) > const_real_nullsmall) then
+          int_fracdom(is) = loc_r_POM_DOM*loc_bio_red_DOMfrac + loc_r_POM_RDOM*loc_bio_red_RDOMfrac
+       else
+          int_fracdom(is) = 0.0
+       end if
     end do
     ! decrease particulate fraction
     bio_part(:,dum_i,dum_j,loc_k_mld:n_k) = bio_part(:,dum_i,dum_j,loc_k_mld:n_k) - &

@@ -116,7 +116,7 @@ CONTAINS
                & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
                & par_sed_type_scavenged)
              loc_string = '% time (yr) / global '//TRIM(string_sed(is))//' flux (mol yr-1) / global '// &
-                  & TRIM(string_sed(is))//' density (mol m-2 yr-1)'
+                  & TRIM(string_sed(is))//' density (mol m-2 yr-1) / global ' // TRIM(string_sed(is)) // ' DOM fraction'
           CASE (par_sed_type_age)
              loc_string = '% time (yr) / CaCO3 age (yr)'
           CASE (n_itype_min:n_itype_max)
@@ -1229,10 +1229,11 @@ CONTAINS
              call check_unit(out,__LINE__,__FILE__)
              OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
-             WRITE(unit=out,fmt='(f12.3,2e15.7)',iostat=ios) &
+             WRITE(unit=out,fmt='(f12.3,2e15.7,f9.3)',iostat=ios) &
                   & loc_t, &
                   & loc_sig, &
-                  & loc_sig/loc_ocn_tot_A
+                  & loc_sig/loc_ocn_tot_A, &
+                  & int_fracdom_sig(is)/int_t_sig
              call check_iostat(ios,__LINE__,__FILE__)
              CLOSE(unit=out,iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)

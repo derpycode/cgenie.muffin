@@ -1250,6 +1250,7 @@ CONTAINS
     int_ocn_tot_V_sig       = 0.0
     int_ocn_sig(:)          = 0.0
     int_fexport_sig(:)      = 0.0
+    int_fracdom_sig(:)      = 0.0
     int_ocnatm_sig(:)       = 0.0
     int_focnatm_sig(:)      = 0.0
     int_focnsed_sig(:)      = 0.0

@@ -1017,6 +1017,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_ocn)::int_ocn_sig                             !
   REAL,DIMENSION(n_atm)::int_ocnatm_sig                          !
   REAL,DIMENSION(n_sed)::int_fexport_sig                         !
+  REAL,DIMENSION(n_sed)::int_fracdom_sig                         !
   REAL,DIMENSION(n_atm)::int_focnatm_sig                         !
   REAL,DIMENSION(n_sed)::int_focnsed_sig                         !
   REAL,DIMENSION(n_ocn)::int_fsedocn_sig                         !
@@ -1121,6 +1122,8 @@ MODULE biogem_lib
   CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::orb_pts_var              ! orbital point variable data
   real,DIMENSION(:,:,:),ALLOCATABLE::orb_pts                     ! saved orbital point data
   real,DIMENSION(:),ALLOCATABLE::orb_pts_time                ! orbital point time
+  ! global means
+  REAL,DIMENSION(n_sed)::int_fracdom                         !
 
   ! *** forcing ***
   ! forcing - restoring

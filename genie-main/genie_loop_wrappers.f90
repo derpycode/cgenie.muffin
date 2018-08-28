@@ -732,6 +732,15 @@ contains
   end subroutine diag_biogem_pCO2_wrapper
 
   !!
+  subroutine diag_biogem_ecogem_wrapper
+    implicit none
+    call diag_biogem_ecogem( &
+         & egbg_sfcpart,     &
+         & egbg_sfcremin     &
+         )
+  end subroutine diag_biogem_ecogem_wrapper
+
+  !!
   subroutine diag_biogem_timeslice_wrapper
     implicit none
     call diag_biogem_timeslice(                              &
