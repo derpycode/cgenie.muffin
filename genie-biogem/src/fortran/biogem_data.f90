@@ -270,6 +270,7 @@ CONTAINS
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
+       print*,'CaCO3 44Ca fractionation scheme ID string           : ',trim(opt_d44Ca_Ca_CaCO3)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b
        print*,'fractionation for intercellular C fixation          : ',par_d13C_DIC_Corg_ef
        print*,'fract. for intercell. C fixation of si. phytop.     : ',par_d13C_DIC_Corg_ef_sp
@@ -1249,6 +1250,7 @@ CONTAINS
     int_ocn_tot_V_sig       = 0.0
     int_ocn_sig(:)          = 0.0
     int_fexport_sig(:)      = 0.0
+    int_fracdom_sig(:)      = 0.0
     int_ocnatm_sig(:)       = 0.0
     int_focnatm_sig(:)      = 0.0
     int_focnsed_sig(:)      = 0.0
