@@ -551,6 +551,7 @@ ccc THIS MOSTLY FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM,
 ccc BUT NEEDS BIOGEM TEST REPLACING (AND *CARE* TAKEN)
                   if (koverall.eq.(conv_kocn_kbiogem*kocn_loop))
      &                 call biogem_climate_sol_wrapper
+                  if (flag_ecogem) call diag_biogem_ecogem_wrapper ! extract ECOGEM diagnostics
                   call biogem_forcing_wrapper
                   call biogem_wrapper
                   call biogem_tracercoupling_wrapper
