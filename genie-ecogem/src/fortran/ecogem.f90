@@ -87,6 +87,9 @@ subroutine ecogem(          &
   REAL,DIMENSION(npmax)                    ::BioC,PP
   REAL,DIMENSION(iomax+iChl,npmax)         ::GrazPredEat,GrazPreyEaten
   REAL,DIMENSION(npmax)                    ::BioCiso
+  
+  real		   		     ::loc_total_weights ! JDW total weights
+  real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size 
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
   REAL                                     ::loc_rdts,loc_rdtyr            ! time reciprocals
@@ -458,6 +461,31 @@ subroutine ecogem(          &
                  enddo
                  ! no organic matter production in fundamental niche experiment
                  if (fundamental) dorgmatdt(:,:) = 0.0
+                 
+                 ! ******* JDW size-dependent remineralisation *******
+		 ! calculate weighted mean size for size-dependent remineralisation scheme
+		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
+                 if (sed_select(is_POC_size)) then
+		 
+                 	loc_weighted_mean_size=0.0
+                 	loc_total_weights=0.0
+                 
+                 	do jp=1,npmax
+				if(autotrophy(jp).gt.0.0)then
+				
+				! Biomass weighted
+				loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(jp) ! sum of weights * size
+				loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
+				
+				! POC weighted 
+                 		!loc_weighted_mean_size=loc_weighted_mean_size+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp)))*logesd(jp) ! sum of weights * size            	
+                 		!loc_total_weights=loc_total_weights+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp))) ! sum of weights
+				endIF
+			enddo
+                 	
+                 	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
+                 endif
+                 ! ***************************************************
 
                  !**********************ckc ISOTOPES**********************************************************************
 
@@ -726,7 +754,6 @@ SUBROUTINE diag_ecogem_timeslice( &
      int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr *   uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
      int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) + loc_dtyr *    phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
      int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr *        nutrient(:,:,:,:)        ! mmol m^-3
-
   end if
 
   ! write time-slice data and re-set integration
