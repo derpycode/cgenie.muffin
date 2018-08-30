@@ -7423,6 +7423,10 @@
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
                     </param>
+                    <param name="ctrl_force_T"> 
+                      <value datatype="boolean">.FALSE.</value>
+                      <description>Force ecogem with a temperature field</description>
+                    </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
                         <value datatype="string">Default</value>
@@ -7953,6 +7957,10 @@
                     <param name="par_ncrst_name">
 			<value datatype="string">_restart.nc</value>
                         <description>netCDF restart file name</description>
+                    </param>
+                    <param name="par_ecogem_force_T_file">
+			<value datatype="string">temperature.dat</value>
+		     			<description>Input file for forcing temperature in ecogem</description>
                     </param>
                 </namelist>
             </file>

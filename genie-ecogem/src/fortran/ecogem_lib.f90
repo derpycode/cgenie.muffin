@@ -150,6 +150,11 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/nsubtime! 
   CHARACTER(len=127)::par_ecogem_plankton_file 
   NAMELIST /ini_ecogem_nml/par_ecogem_plankton_file 
+  ! JDW force T fields 
+  logical::ctrl_force_T 
+  namelist /ini_ecogem_nml/ctrl_force_T
+  character(LEN=127)::par_ecogem_force_T_file
+  namelist /ini_ecogem_nml/par_ecogem_force_T_file
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
   CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
   NAMELIST /ini_ecogem_nml/opt_d13C_DIC_Corg
@@ -293,6 +298,10 @@ MODULE ecogem_lib
   real::par_misc_t_tslice  = 0.0
   logical::par_misc_t_intseries = .FALSE.
   logical::par_misc_t_intslice  = .FALSE.
+  
+ ! JDW: force temperature array
+  real,allocatable,dimension(:,:)::T_input! (i,j,k) array for forced temperature JDW
+  
   ! ############################################################################################################################## !  
   ! ### ADD ADDITIONAL TIME-SERIES ARRAY DEFINITIONS HERE ######################################################################## !
   INTEGER :: n_tser

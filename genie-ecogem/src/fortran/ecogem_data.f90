@@ -808,6 +808,27 @@ CONTAINS
   END SUBROUTINE sub_init_phys_ocn
   ! ****************************************************************************************************************************** !
 
+  ! ****************************************************************************************************************************** !
+  ! READ IN TEMPERATURE FORCING FILE - JDW
+  subroutine sub_init_load_forceT()
+  ! local variables
+  integer::i,j,loc_n_elements,loc_n_start,ios
+  character(LEN=127)::loc_filename
+  
+  loc_filename = TRIM(par_indir_name)//TRIM(par_ecogem_force_T_file)
+  !CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
+  
+  ! open file pipe
+  OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  READ(unit=in,fmt=*,IOSTAT=ios) T_input
+
+  ! close file pipe
+  CLOSE(unit=in,iostat=ios)
+  call check_iostat(ios,__LINE__,__FILE__)
+  
+  end subroutine sub_init_load_forceT
+  ! ****************************************************************************************************************************** !
 
 END MODULE ecogem_data
 
