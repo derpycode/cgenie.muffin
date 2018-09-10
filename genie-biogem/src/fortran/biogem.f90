@@ -2376,7 +2376,11 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
                     loc_standard = const_standards(ocn_type(loc_istr))
                     orb_pts(n_orb_pts,nloc,nvar) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
                  case default
-                    orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k)
+                    If (loc_istr == io_T) then
+                       orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k) - const_zeroC
+                    else
+                       orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k)
+                    end if
                  END SELECT
                  exit
               end if
