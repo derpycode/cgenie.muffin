@@ -268,11 +268,16 @@ subroutine ecogem(          &
 
                  ! LIGHT ATTENUATION     
                  if (n_keco.eq.1) then ! Calculate light as mean across (virtual) ML
+                    ! [AR] restrict MLD to (top) layer thickness
+                    if (ctrl_restrict_mld) then
+                       if (topD > mld) mld = topD
+                    end if
                     totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 
                     totchl    = totchl * layerthick / mld ! recalculate chl concentration as if spread evenly across ML
                     k_tot     = (k_w + k_chl*totchl) ! attenuation due to water and pigment
                     if (fundamental) k_tot = k_w ! no self-shading (i.e. no competition for light) in fundamental niche experiment
                     PAR_layer = PAR_in /mld /k_tot*(1-exp(-k_tot*mld)) ! average PAR in  layer
+                    ! [AR] this ... doesn't 'do' anything? k_tot*(1-exp(-k_tot*mld)) is never 0.0 or less(?)
                     PAR_layer = MERGE(PAR_layer,0.0,k_tot*(1-exp(-k_tot*mld)).gt.0.0)
                  else ! Calculate mean light within each layer
                     totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 

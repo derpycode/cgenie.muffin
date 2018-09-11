@@ -107,6 +107,8 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/vmaxDIC_a,vmaxDIC_b,vmaxDIC_c
   namelist/ini_ecogem_nml/qcarbon_a,alphachl_a,PARfrac,chl2nmax,biosynth,k_w,k_chl
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
+  logical::ctrl_restrict_mld    ! restrict MLD
+  NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
   ! Grazing parameters
   real :: ass_eff                   !      maximum assimilation efficiency
   integer :: ns                     !      prey switching exponent

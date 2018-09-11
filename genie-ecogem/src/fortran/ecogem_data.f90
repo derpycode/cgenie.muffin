@@ -120,6 +120,7 @@ CONTAINS
        write(*,68),'  - cost of biosynthesis               (biosynth) :   ',   biosynth
        write(*,68),'  - light attenuation by water              (k_w) :   ',        k_w
        write(*,68),'  - light attenuation by chlorophyll a    (k_chl) :   ',      k_chl
+       write(*,68),'  - restrict MLD for mean light calculation?      :   ',      ctrl_restrict_mld
        write(*,*), '- Grazing parameters --------------------------------'
        write(*,68),'  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
        write(*,67),'  - prey switching exponent (integer)        (ns) :   ',         ns
