@@ -7768,6 +7768,10 @@
 			<value datatype="real">0.03</value>
 	                  <description>Light attenuation by chlorophyll a</description>
                     </param>
+                    <param name="ctrl_restrict_mld">
+			<value datatype="boolean">.false.</value>
+	                  <description>restrict MLD for mean light calculation?</description>
+                    </param>
        <!-- Grazing parameters -->  
                     <param name="trophic_tradeoff">
 			<value datatype="real">1.0</value>
