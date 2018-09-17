@@ -316,9 +316,6 @@ subroutine ecogem(          &
                  call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_T,up_inorg(iDIC,:),chlsynth,totPP)
 
                  call grazing(loc_biomass,gamma_T,GrazMat(:,:,:))
-                 
-                 if (loc_ocn(io_S,i,j,n_k) < 20.0) up_inorg = 0.0
-                 up_inorg = 0.0
 
                  !ckc isotopes uptake, from nutrient uptake, nutrient concentration and fractionation
                  if (c13trace) then 
