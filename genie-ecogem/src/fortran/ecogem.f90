@@ -253,6 +253,11 @@ subroutine ecogem(          &
                  if (topD.lt.mld) imld=k                     ! if top of level is above MLD, include level in ML
                  topD = topD + layerthick                    ! get depth for top of next level
                  templocal = loc_ocn(io_T,i,j,k)
+                 ! cap maximum temperature seen by ECOGEM
+                 !temp_max=35
+                 !if (templocal.gt.(temp_max+273.15)) print*,'\/'
+                 !print*,templocal,temp_max,MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
+                 templocal = MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
 
                  loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
                  loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small

@@ -138,6 +138,7 @@ CONTAINS
        write(*,70),'  - fraction mortality to dissolved   (beta_mort) : a=',beta_mort_a,', b=',beta_mort_b,', c=',beta_mort_c
        write(*,*), '- Other stuff -----------------------------'
        write(*,71),'  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
+       write(*,68),'  - maximum temperature                (temp_max) :   ',temp_max
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b

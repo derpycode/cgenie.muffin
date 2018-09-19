@@ -137,6 +137,9 @@ MODULE ecogem_lib
   ! Temperature dependence
   real ::  temp_A,temp_T0   ! 
   namelist/ini_ecogem_nml/temp_A,temp_T0
+  ! maximum temperature
+  real ::  temp_max
+  namelist/ini_ecogem_nml/temp_max 
   ! CaCO3 production
   real ::  par_bio_red_POC_CaCO3,par_bio_red_POC_CaCO3_pP
   namelist/ini_ecogem_nml/par_bio_red_POC_CaCO3,par_bio_red_POC_CaCO3_pP
