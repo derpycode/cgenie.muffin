@@ -7892,7 +7892,11 @@
                     <param name="temp_T0">
 			<value datatype="real">20.0</value>
 	                  <description>Reference temperature</description>
-                    </param>  
+                    </param>
+                    <param name="temp_max">
+			<value datatype="real">99.9</value>
+	                  <description>Maximum applied temperature</description>
+                    </param>                  
 <!-- INORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POC_CaCO3">
 			<value datatype="real">0.0285</value>
