@@ -347,6 +347,8 @@ CONTAINS
     case default
        ! NOTHING
     end select
+    ! preformed tracers
+    call sub_calc_bio_preformed(dum_i,dum_j)
   end SUBROUTINE sub_calc_bio
   ! ****************************************************************************************************************************** !
 
@@ -366,7 +368,7 @@ CONTAINS
     real::loc_dPO4
     real::loc_dPO4_1,loc_dPO4_2
     real::loc_dPO4_sp,loc_dPO4_nsp
-    real::loc_ohm                                                       !
+    real::loc_ohm,loc_co3                                               !
     real::loc_frac_N2fix
     real::loc_ficefree,loc_intI,loc_kI,loc_kT
     real,dimension(n_ocn,n_k)::loc_bio_uptake                           !
@@ -493,6 +495,10 @@ CONTAINS
        end select
     else
        loc_FeT = 0.0
+    end if
+    if (sed_select(is_CaCO3)) then
+       loc_ohm = carb(ic_ohm_cal,dum_i,dum_j,n_k)
+       loc_co3 = carb(ic_conc_CO3,dum_i,dum_j,n_k)
     end if
     if (ocn_select(io_Cd)) then
        loc_Cd = ocn(io_Cd,dum_i,dum_j,n_k)
@@ -933,7 +939,6 @@ CONTAINS
     !      whereas the initially calculated CaCO3 and opal fluxes do not change
     !      => re-scale CaCO3 and opal ratios so that the prescribed export ratio value better reflects final export composition
     if (sed_select(is_CaCO3)) then
-       loc_ohm = carb(ic_ohm_cal,dum_i,dum_j,n_k)
        select case (opt_bio_CaCO3toPOCrainratio)
        case ('prescribed')
           ! fixed, spatially explicit
@@ -963,7 +968,7 @@ CONTAINS
        case ('HofmannandSchellnhuber2009')
           ! Hofmann and Schellnhuber [2009] (Barker et al. [2003]) [CO32-] dependent parameterization
           bio_part_red(is_POC,is_CaCO3,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)* &
-               & par_bio_red_POC_CaCO3*exp(0.0083*(1.0E6*carb(ic_conc_CO3,dum_i,dum_j,n_k) - par_bio_red_POC_CaCO3_CO3REF))
+               & par_bio_red_POC_CaCO3*exp(0.0083*(1.0E6*loc_co3 - par_bio_red_POC_CaCO3_CO3REF))
        case default
           ! fixed, uniform
           bio_part_red(is_POC,is_CaCO3,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_CaCO3
@@ -1209,8 +1214,19 @@ CONTAINS
        ! calculate 44Ca/40Ca fractionation between Ca and CaCO3
        loc_r44Ca = ocn(io_Ca_44Ca,dum_i,dum_j,n_k)/ocn(io_Ca,dum_i,dum_j,n_k)
        loc_R = loc_r44Ca/(1.0 - loc_r44Ca)
-       loc_alpha = 1.0 + par_d44Ca_CaCO3_epsilon/1000.0
-       bio_part_red(is_CaCO3,is_CaCO3_44Ca,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+       SELECT CASE (opt_d44Ca_Ca_CaCO3)
+       CASE ('Fantle')
+          ! D44Ca_calcite-Ca(aq) = -0.066649·omega_calcite - 0.320614
+          loc_alpha = 1.0 + (-0.066649*loc_ohm - 0.320614)/1000.0
+       CASE ('Komar')
+          ! D44Ca_calcite-Ca(aq) = −(1.31 ± 0.12) + (3.69 ± 0.59) [CO2−3](mmol/kg)
+          ! NOTE: here, [CO32-] converted from mmol kg-1 to umol kg-1
+          loc_alpha = 1.0 + (-1.31 + 3.69*loc_co3*1.0E3)/1000.0
+       case default
+          ! fixed fractionation
+          loc_alpha = 1.0 + par_d44Ca_CaCO3_epsilon/1000.0
+       end select
+          bio_part_red(is_CaCO3,is_CaCO3_44Ca,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)       
     end if
     !
     ! d15N [PON]
@@ -1453,7 +1469,10 @@ CONTAINS
     ! RE-SCALE FOR DISSOLVED ORGANIC MATTER PRODUCTION
     ! -------------------------------------------------------- !
     ! calculate DOM components and adjust POM accordingly
+    int_fracdom(:) = 0.0
     DO l=1,n_l_sed
+       loc_r_POM_DOM  = 0.0
+       loc_r_POM_RDOM = 0.0
        is = conv_iselected_is(l)
        ! create DOM fraction
        loc_tot_i = conv_POM_DOM_i(0,is)
@@ -1491,6 +1510,12 @@ CONTAINS
           ! create (and add) dissolved tracers
           bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) + loc_bio_part_RDOM(is,loc_k_mld:n_k)
        end do
+       ! save total DOM fraction [NOTE: not a global mean ... just this (i,j) location ...]
+       if ((loc_r_POM_DOM + loc_r_POM_RDOM) > const_real_nullsmall) then
+          int_fracdom(is) = loc_r_POM_DOM*loc_bio_red_DOMfrac + loc_r_POM_RDOM*loc_bio_red_RDOMfrac
+       else
+          int_fracdom(is) = 0.0
+       end if
     end do
     ! decrease particulate fraction
     bio_part(:,dum_i,dum_j,loc_k_mld:n_k) = bio_part(:,dum_i,dum_j,loc_k_mld:n_k) - &
@@ -1649,43 +1674,65 @@ CONTAINS
           diag_bio(idiag_bio_fspPOC,dum_i,dum_j) = diag_bio(idiag_bio_fspPOC,dum_i,dum_j)
        endif
     end SELECT
-    ! create pre-formed tracers
+  end SUBROUTINE sub_calc_bio_uptake
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE PREFORMED TRACERS
+  SUBROUTINE sub_calc_bio_preformed(dum_i,dum_j)
+    ! dummy arguments
+    INTEGER,INTENT(in)::dum_i,dum_j
+    ! local variables
+    INTEGER::io
+    integer::loc_k_mld
+    real,dimension(n_ocn)::loc_ocn                             !
+
+    ! *** INITIALIZE VARIABLES ***
+    !
+    loc_ocn = 0.0
+    ! ocean surface tracers
+    loc_ocn(:) = ocn(:,dum_i,dum_j,n_k)
+
+    ! *** create pre-formed tracers ***
+    ! 
     if (ctrl_bio_preformed) then
        if (.not. ocn_select(io_col0)) then
           if (ocn_select(io_PO4) .AND. ocn_select(io_colr)) then
-             bio_remin(io_colr,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_PO4) - ocn(io_colr,dum_i,dum_j,loc_k_mld:n_k)
+             bio_remin(io_colr,dum_i,dum_j,n_k) = loc_ocn(io_PO4) - ocn(io_colr,dum_i,dum_j,n_k)
           end if
           if (ocn_select(io_NO3) .AND. ocn_select(io_colb)) then
-             bio_remin(io_colb,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_NO3) - ocn(io_colb,dum_i,dum_j,loc_k_mld:n_k)
+             bio_remin(io_colb,dum_i,dum_j,n_k) = loc_ocn(io_NO3) - ocn(io_colb,dum_i,dum_j,n_k)
           elseif (ocn_select(io_PO4) .AND. ocn_select(io_colb)) then
-             bio_remin(io_colb,dum_i,dum_j,loc_k_mld:n_k) = -ocn(io_colb,dum_i,dum_j,loc_k_mld:n_k)
+             bio_remin(io_colb,dum_i,dum_j,n_k) = -ocn(io_colb,dum_i,dum_j,n_k)
           end if
        else
           do io=io_col0,io_col9
              if (ocn_select(io)) then
                 select case (io)
                 CASE (io_col0)
-                   if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_DIC) - loc_ocn(io)
+                   if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,n_k)     = loc_ocn(io_DIC)     - loc_ocn(io)
                 CASE (io_col1)
-                   if (ocn_select(io_ALK)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_ALK) - loc_ocn(io)
+                   if (ocn_select(io_ALK)) bio_remin(io,dum_i,dum_j,n_k)     = loc_ocn(io_ALK)     - loc_ocn(io)
                 CASE (io_col2)
-                   if (ocn_select(io_O2)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_O2) - loc_ocn(io)
+                   if (ocn_select(io_O2)) bio_remin(io,dum_i,dum_j,n_k)      = loc_ocn(io_O2)      - loc_ocn(io)
                 CASE (io_col3)
-                   if (ocn_select(io_PO4)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_PO4) - loc_ocn(io)
+                   if (ocn_select(io_PO4)) bio_remin(io,dum_i,dum_j,n_k)     = loc_ocn(io_PO4)     - loc_ocn(io)
                 CASE (io_col4)
-                   if (ocn_select(io_NO3)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_NO3) - loc_ocn(io)
+                   if (ocn_select(io_NO3)) bio_remin(io,dum_i,dum_j,n_k)     = loc_ocn(io_NO3)     - loc_ocn(io)
                 CASE (io_col5)
-                   if (ocn_select(io_Ca)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_Ca) - loc_ocn(io)
+                   if (ocn_select(io_Ca)) bio_remin(io,dum_i,dum_j,n_k)      = loc_ocn(io_Ca)      - loc_ocn(io)
                 CASE (io_col6)
-                   if (ocn_select(io_SiO2)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_SiO2) - loc_ocn(io)
+                   if (ocn_select(io_SiO2)) bio_remin(io,dum_i,dum_j,n_k)    = loc_ocn(io_SiO2)    - loc_ocn(io)
                 CASE (io_col7)
-                   if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = loc_ocn(io_DIC_13C) - loc_ocn(io)
+                   if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,n_k) = loc_ocn(io_DIC_13C) - loc_ocn(io)
                 end select
              end if
           end do
        end if
     end if
-  end SUBROUTINE sub_calc_bio_uptake
+
+  end SUBROUTINE sub_calc_bio_preformed
   ! ****************************************************************************************************************************** !
 
 
@@ -3430,6 +3477,8 @@ CONTAINS
     real::loc_bio_part_CaCO3_ratio
     real::loc_bio_remin_opal_frac1,loc_bio_remin_opal_frac2
     real::loc_bio_part_opal_ratio
+    real::loc_eL_size												   ! local efolding depth varying with ecosystem size structure JDW
+    real::loc_size0													! JDW
 !!!real::loc_r_POM_RDOM                                                ! factor to modify nutrient:C ratio in POM->RDOM
     real::loc_part_tot
 !!$    real,dimension(n_sed,n_k)::loc_bio_part_TMP
@@ -3498,6 +3547,8 @@ CONTAINS
     loc_conv_ls_lo(:,:)   = 0.0
     !
     if (ctrl_bio_remin_redox_save) loc_diag_redox(:,:) = 0.0
+    
+    loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
 
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ! *** k WATER-COLUMN LOOP START ***
@@ -3719,6 +3770,9 @@ CONTAINS
                               & /                                                                                       &
                               & (phys_ocn(ipo_Dbot,dum_i,dum_j,kk+1)/par_bio_remin_z0)**(par_bio_remin_b(dum_i,dum_j)) &
                               & )
+                      case ('KriestOschlies2008') ! efolding depth dependent on mean plankton diameter JDW
+                      	 loc_eL_size=par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta ! n.b. size is in esd
+                      	 loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/loc_eL_size)) 	
                       case default
                          loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL1))
                       end select

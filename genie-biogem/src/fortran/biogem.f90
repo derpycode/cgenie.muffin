@@ -2132,6 +2132,84 @@ end subroutine diag_biogem_pCO2
 
 
 ! ******************************************************************************************************************************** !
+! BIOGEM ECOGEM diagnostics
+subroutine diag_biogem_ecogem( &
+     & dum_egbg_sfcpart,       &
+     & dum_egbg_sfcremin       &
+     & )
+  USE biogem_lib
+  USE biogem_box
+  USE genie_util, ONLY: check_iostat
+  IMPLICIT NONE
+  ! ---------------------------------------------------------- !
+  ! DUMMY ARGUMENTS
+  ! ---------------------------------------------------------- !
+  real,intent(in),   dimension(n_sed,n_i,n_j,n_k)     ::dum_egbg_sfcpart  ! ecology-interface: particulate composition change; ocn grid
+  real,intent(in),   dimension(n_ocn,n_i,n_j,n_k)     ::dum_egbg_sfcremin ! ecology-interface: ocean tracer composition change; ocn grid
+  ! ---------------------------------------------------------- !
+  ! DEFINE LOCAL VARIABLES
+  ! ---------------------------------------------------------- !
+  integer::io,is,l
+  integer::loc_m,loc_tot_m
+  real::loc_tmp_M
+  real::loc_ocn_M
+  real,dimension(n_sed)::loc_DOM_M
+  real,dimension(n_sed)::loc_POM_M
+  ! ---------------------------------------------------------- !
+  ! INITIALIZE LOCAL VARIABLES
+  ! ---------------------------------------------------------- !
+  loc_tmp_M = 0.0
+  loc_ocn_M = sum(phys_ocn(ipo_M,:,:,n_k))
+  loc_DOM_M(:) = 0.0
+  loc_POM_M(:) = 0.0
+  ! ---------------------------------------------------------- !
+  ! CALCULATE GLOBAL FLUXES
+  ! ---------------------------------------------------------- !
+  ! ---------------------------------------------------------- ! DOM
+  if (ocn_select(io_DOM_C)) then
+     DO l=3,n_l_ocn
+        io = conv_iselected_io(l)
+        loc_tot_m = conv_DOM_POM_i(0,io)
+        do loc_m=1,loc_tot_m
+           loc_tmp_M = sum(phys_ocn(ipo_M,:,:,n_k)*dum_egbg_sfcremin(io,:,:,n_k))
+           is = conv_DOM_POM_i(loc_m,io)
+           loc_DOM_M(is) = loc_DOM_M(is) + conv_DOM_POM(is,io)*loc_tmp_M
+        end do
+     end do
+  end if
+  ! ---------------------------------------------------------- ! RDOM
+  if (ocn_select(io_RDOM_C)) then
+     DO l=3,n_l_ocn
+        io = conv_iselected_io(l)
+        loc_tot_m = conv_RDOM_POM_i(0,io)
+        do loc_m=1,loc_tot_m
+           loc_tmp_M = sum(phys_ocn(ipo_M,:,:,n_k)*dum_egbg_sfcremin(io,:,:,n_k))
+           is = conv_DOM_POM_i(loc_m,io)
+           loc_DOM_M(is) = loc_DOM_M(is) + conv_RDOM_POM_i(is,io)*loc_tmp_M
+        end do
+     end do
+  end if
+  ! ---------------------------------------------------------- ! POM
+  DO l=1,n_l_sed
+     is = conv_iselected_is(l)
+     loc_POM_M(is) = sum(phys_ocn(ipo_M,:,:,n_k)*dum_egbg_sfcpart(is,:,:,n_k))
+  end do
+  ! ---------------------------------------------------------- ! SAVE
+  int_fracdom(:) = 0.0
+  DO l=1,n_l_sed
+     is = conv_iselected_is(l)
+     if (loc_DOM_M(is) > const_real_nullsmall) then
+        int_fracdom(is) = loc_DOM_M(is)/(loc_POM_M(is)+loc_DOM_M(is))
+     end if
+  end do
+  ! ---------------------------------------------------------- !
+  ! END
+  ! ---------------------------------------------------------- !
+end subroutine diag_biogem_ecogem
+! ******************************************************************************************************************************** !
+
+
+! ******************************************************************************************************************************** !
 ! RESTART BioGeM (save data)
 SUBROUTINE biogem_save_restart(dum_genie_clock)
   USE biogem_lib
@@ -2298,7 +2376,11 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
                     loc_standard = const_standards(ocn_type(loc_istr))
                     orb_pts(n_orb_pts,nloc,nvar) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
                  case default
-                    orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k)
+                    If (loc_istr == io_T) then
+                       orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k) - const_zeroC
+                    else
+                       orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k)
+                    end if
                  END SELECT
                  exit
               end if
@@ -2371,6 +2453,7 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
               end if
            end if
         end do
+     
      end do
 
   end do
@@ -3059,6 +3142,7 @@ SUBROUTINE diag_biogem_timeseries( &
                  is = conv_iselected_is(l)
                  int_fexport_sig(is) = int_fexport_sig(is) + &
                       & SUM(bio_settle(is,:,:,n_k))
+                 int_fracdom_sig(is) = int_fracdom_sig(is) + loc_dtyr*int_fracdom(is)
               END DO
            end if
            IF (ctrl_data_save_sig_focnatm) THEN

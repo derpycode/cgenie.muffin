@@ -287,6 +287,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
+  real::par_bio_remin_POC_eL0		! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
+  real::par_bio_remin_POC_size0		! JDW size-dependent remin: diameter of smallest ecogem size class (um)
+  real::par_bio_remin_POC_eta		! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
+  NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta
   ! kinetics
   real::par_bio_remin_k_O2
   real::par_bio_remin_k_NO3
@@ -337,6 +341,8 @@ MODULE biogem_lib
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
   CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
   NAMELIST /ini_biogem_nml/opt_d13C_DIC_Corg
+  CHARACTER(len=63)::opt_d44Ca_Ca_CaCO3                          ! CaCO3 44Ca fractionation scheme ID string
+  NAMELIST /ini_biogem_nml/opt_d44Ca_Ca_CaCO3
   real::par_d13C_DIC_Corg_b                                      ! b value for Popp et al. fractionation
   NAMELIST /ini_biogem_nml/par_d13C_DIC_Corg_b
   real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix
@@ -1015,6 +1021,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_ocn)::int_ocn_sig                             !
   REAL,DIMENSION(n_atm)::int_ocnatm_sig                          !
   REAL,DIMENSION(n_sed)::int_fexport_sig                         !
+  REAL,DIMENSION(n_sed)::int_fracdom_sig                         !
   REAL,DIMENSION(n_atm)::int_focnatm_sig                         !
   REAL,DIMENSION(n_sed)::int_focnsed_sig                         !
   REAL,DIMENSION(n_ocn)::int_fsedocn_sig                         !
@@ -1119,6 +1126,8 @@ MODULE biogem_lib
   CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::orb_pts_var              ! orbital point variable data
   real,DIMENSION(:,:,:),ALLOCATABLE::orb_pts                     ! saved orbital point data
   real,DIMENSION(:),ALLOCATABLE::orb_pts_time                ! orbital point time
+  ! global means
+  REAL,DIMENSION(n_sed)::int_fracdom                         !
 
   ! *** forcing ***
   ! forcing - restoring

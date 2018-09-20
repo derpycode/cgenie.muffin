@@ -4339,6 +4339,18 @@
                         <value datatype="real">0.0</value>
                         <description>Hard threshold for sulphate reduction (mol kg-1)</description>
                     </param>
+                    <param name="par_bio_remin_POC_eL0">
+						<value datatype="real">187.5</value>
+                        <description>e-folding depth of smallest ecogem size class (m)</description>
+                    </param>
+                	<param name="par_bio_remin_POC_size0">
+						<value datatype="real">0.6</value>
+                        <description>diameter of smallest ecogem size class (um)</description>
+                    </param>
+                    <param name="par_bio_remin_POC_eta">
+						<value datatype="real">1.17</value>
+                        <description>exponent relating e-folding depth to ecogem size class [Stemmann et al 2004]</description>
+                    </param>
 <!-- kinetics -->
                     <param name="par_bio_remin_k_O2">
                         <value datatype="real">1.0</value>
@@ -4430,6 +4442,10 @@
                     <param name="opt_d13C_DIC_Corg">
 			<value datatype="string">Ridgwell2001</value>
                         <description>Corg 13C fractionation scheme ID string [alt: 'Poppetal']</description>
+                    </param>
+                    <param name="opt_d44Ca_Ca_CaCO3">
+			<value datatype="string">FIXED</value>
+                        <description>CaCO3 44Ca fractionation scheme ID string [alt: 'Fantle']</description>
                     </param>
                     <param name="par_d13C_DIC_Corg_b">
                        <value datatype="real">171.0</value>
