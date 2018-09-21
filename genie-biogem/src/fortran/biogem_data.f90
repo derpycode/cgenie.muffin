@@ -1278,7 +1278,9 @@ CONTAINS
     int_diag_airsea_sig(:)  = 0.0
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
-    int_diag_redox_sig(:)   = 0.0
+    int_diag_redox_sig(:)   = 0
+    int_diag_ecogem_part    = 0.0 
+    int_diag_ecogem_remin   = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
@@ -1374,10 +1376,12 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! INITIALIZE DIAGNOSTICS ARRAYS
   SUBROUTINE sub_init_diag()
-    diag_bio(:,:,:)       = 0.0
-    diag_geochem(:,:,:,:) = 0.0
-!!!   diag_weather(:,:,:)   = 0.0
-    diag_airsea(:,:,:)    = 0.0
+    diag_bio(:,:,:)          = 0.0
+    diag_geochem(:,:,:,:)    = 0.0
+!!!   diag_weather(:,:,:)      = 0.0
+    diag_airsea(:,:,:)       = 0.0
+    diag_ecogem_part(:,:,:)  = 0.0
+    diag_ecogem_remin(:,:,:) = 0.0
   END SUBROUTINE sub_init_diag
   ! ****************************************************************************************************************************** !
 
@@ -1979,15 +1983,24 @@ CONTAINS
             & )
        loc_flag = .FALSE.
     end IF
-    If (par_bio_prodopt == 'NONE') then
-       If (ctrl_data_save_sig_diag_bio) then
+    If ((par_bio_prodopt == 'NONE') .AND. (.NOT. flag_ecogem)) then
+       If (ctrl_data_save_sig_fexport) then
           CALL sub_report_error( &
                & 'biogem_data','sub_check_par', &
                & 'Selected data saving is redundant in the event of no biological scheme being activated.', &
-               & '[ctrl_data_save_sig_diag_bio] HAS BEEN DE-SELECTED; CONTINUING', &
+               & '[ctrl_data_save_sig_fexport] HAS BEEN DE-SELECTED; CONTINUING', &
                & (/const_real_null/),.false. &
                & )
-          ctrl_data_save_sig_diag_bio = .FALSE.
+          ctrl_data_save_sig_fexport = .FALSE.
+       end IF
+       If (ctrl_data_save_slice_bio) then
+          CALL sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'Selected data saving is redundant in the event of no biological scheme being activated', &
+               & '[ctrl_data_save_slice_bio] HAS BEEN DE-SELECTED; CONTINUING', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_data_save_slice_bio = .FALSE.
        end IF
        If (ctrl_data_save_slice_diag_bio) then
           CALL sub_report_error( &
