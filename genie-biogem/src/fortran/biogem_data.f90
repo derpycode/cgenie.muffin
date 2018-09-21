@@ -1983,35 +1983,6 @@ CONTAINS
             & )
        loc_flag = .FALSE.
     end IF
-    If ((par_bio_prodopt == 'NONE') .AND. (.NOT. flag_ecogem)) then
-       If (ctrl_data_save_sig_fexport) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Selected data saving is redundant in the event of no biological scheme being activated.', &
-               & '[ctrl_data_save_sig_fexport] HAS BEEN DE-SELECTED; CONTINUING', &
-               & (/const_real_null/),.false. &
-               & )
-          ctrl_data_save_sig_fexport = .FALSE.
-       end IF
-       If (ctrl_data_save_slice_bio) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Selected data saving is redundant in the event of no biological scheme being activated', &
-               & '[ctrl_data_save_slice_bio] HAS BEEN DE-SELECTED; CONTINUING', &
-               & (/const_real_null/),.false. &
-               & )
-          ctrl_data_save_slice_bio = .FALSE.
-       end IF
-       If (ctrl_data_save_slice_diag_bio) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Selected data saving is redundant in the event of no biological scheme being activated', &
-               & '[ctrl_data_save_slice_diag_bio] HAS BEEN DE-SELECTED; CONTINUING', &
-               & (/const_real_null/),.false. &
-               & )
-          ctrl_data_save_slice_diag_bio = .FALSE.
-       end IF
-    end if
     ! #### ADD CHECKS OF ADDITIONAL BIOLOGICAL OPTIONS HERE ###################################################################### !
     !
     ! ############################################################################################################################ !
