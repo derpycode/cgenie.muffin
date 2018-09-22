@@ -1033,6 +1033,43 @@ CONTAINS
        end if
     end if
     !-----------------------------------------------------------------------
+    !       P:C export cellular quotient ratio
+    !-----------------------------------------------------------------------
+    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+       IF (sed_select(is_POP) .AND. sed_select(is_POC)) THEN
+          ! P/C
+          loc_unitsname = 'n/a'
+          loc_ij(:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                IF (n_k >= goldstein_k1(i,j)) THEN
+                   if (int_bio_settle_timeslice(is_POP,i,j,n_k) > const_real_nullsmall) then
+                      loc_ij(i,j) = int_bio_settle_timeslice(is_POC,i,j,n_k)/int_bio_settle_timeslice(is_POP,i,j,n_k)
+                   end if
+                end IF
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,3,'misc_sur_rPOCtoPOP','average POM export C/P cellular ratio', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('misc_sur_rPOCtoPOP',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+          ! C/P
+          loc_unitsname = 'o/oo'
+          loc_ij(:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                IF (n_k >= goldstein_k1(i,j)) THEN
+                   if (int_bio_settle_timeslice(is_POC,i,j,n_k) > const_real_nullsmall) then
+                      loc_ij(i,j) = 1.0E3*int_bio_settle_timeslice(is_POP,i,j,n_k)/int_bio_settle_timeslice(is_POC,i,j,n_k)
+                   end if
+                end IF
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,3,'misc_sur_rPOPtoPOC','average POM export P/C cellular ratio', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('misc_sur_rPOPtoPOC',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       end IF
+    end if
+    !-----------------------------------------------------------------------
     !       CaCO3:POC surface ocean export 'rain ratio'
     !-----------------------------------------------------------------------
     IF (ctrl_data_save_slice_bio) THEN
@@ -1081,7 +1118,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       POC frac2 surface ocean export ratio
     !-----------------------------------------------------------------------
-    IF (ctrl_data_save_slice_bio) THEN
+    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
        loc_unitsname = 'n/a'
        loc_ij(:,:) = const_real_null
        DO i=1,n_i
@@ -1206,8 +1243,9 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Fe:C export cellular quotient ratio
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_geochem) then
+    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
        IF (sed_select(is_POFe) .AND. sed_select(is_POC)) THEN
+          ! C/Fe
           loc_unitsname = 'n/a'
           loc_ij(:,:) = const_real_null
           DO i=1,n_i
@@ -1222,6 +1260,21 @@ CONTAINS
           call sub_adddef_netcdf(loc_iou,3,'misc_sur_rPOCtoPOFe','average POM export C/Fe cellular ratio', &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar2d('misc_sur_rPOCtoPOFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+          ! Fe/C
+          loc_unitsname = '10^3 o/oo'
+          loc_ij(:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                IF (n_k >= goldstein_k1(i,j)) THEN
+                   if (int_bio_settle_timeslice(is_POC,i,j,n_k) > const_real_nullsmall) then
+                      loc_ij(i,j) = 1.0E6*int_bio_settle_timeslice(is_POFe,i,j,n_k)/int_bio_settle_timeslice(is_POC,i,j,n_k)
+                   end if
+                end IF
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,3,'misc_sur_rPOFetoPOC','average POM export Fe/C cellular ratio', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('misc_sur_rPOFetoPOC',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end IF
     end if
     !-----------------------------------------------------------------------

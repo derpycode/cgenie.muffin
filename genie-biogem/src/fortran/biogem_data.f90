@@ -1979,26 +1979,6 @@ CONTAINS
             & )
        loc_flag = .FALSE.
     end IF
-    If (par_bio_prodopt == 'NONE') then
-       If (ctrl_data_save_sig_diag_bio) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Selected data saving is redundant in the event of no biological scheme being activated.', &
-               & '[ctrl_data_save_sig_diag_bio] HAS BEEN DE-SELECTED; CONTINUING', &
-               & (/const_real_null/),.false. &
-               & )
-          ctrl_data_save_sig_diag_bio = .FALSE.
-       end IF
-       If (ctrl_data_save_slice_diag_bio) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Selected data saving is redundant in the event of no biological scheme being activated', &
-               & '[ctrl_data_save_slice_diag_bio] HAS BEEN DE-SELECTED; CONTINUING', &
-               & (/const_real_null/),.false. &
-               & )
-          ctrl_data_save_slice_diag_bio = .FALSE.
-       end IF
-    end if
     ! #### ADD CHECKS OF ADDITIONAL BIOLOGICAL OPTIONS HERE ###################################################################### !
     !
     ! ############################################################################################################################ !
@@ -2709,6 +2689,8 @@ CONTAINS
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_misc = .true.
        ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
        ctrl_data_save_derived = .true.
        ctrl_data_save_GLOBAL = .true.
        if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
@@ -2740,6 +2722,14 @@ CONTAINS
          & ) THEN
        ctrl_data_save_inversion = .true.
     end IF
+
+    ! determine if no biology at all
+    If ((par_bio_prodopt == 'NONE') .AND. (.NOT. flag_ecogem)) then
+       ctrl_data_save_slice_bio      = .false.
+       ctrl_data_save_slice_diag_bio = .false.
+       ctrl_data_save_sig_fexport    = .false.
+       ctrl_data_save_sig_diag_bio   = .false.
+    end if
 
   END SUBROUTINE sub_adj_par_save
   ! ****************************************************************************************************************************** !
