@@ -1011,6 +1011,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_diag_misc_2D,n_i,n_j)::diag_misc_2D           !
   REAL,DIMENSION(0:n_i,0:n_j)::diag_misc_psi                     !
   real,DIMENSION(:,:,:,:),ALLOCATABLE::diag_redox                ! redox diagnostics
+  REAL,DIMENSION(n_sed,n_i,n_j)::diag_ecogem_part                ! 
+  REAL,DIMENSION(n_ocn,n_i,n_j)::diag_ecogem_remin               ! 
 
   ! *** integrated (time-averaged) time-series storage scalars and vectors ***
   !
@@ -1088,6 +1090,9 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm,n_i,n_j)::int_diag_airsea_timeslice       ! air-sea gas exchange diagnostics
   ! redox
   real,DIMENSION(:,:,:,:),ALLOCATABLE::int_diag_redox_timeslice  ! redox diagnostics 3D time-slice
+  ! ecogem
+  REAL,DIMENSION(n_sed,n_i,n_j)::int_diag_ecogem_part                ! 
+  REAL,DIMENSION(n_ocn,n_i,n_j)::int_diag_ecogem_remin               ! 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
   !
   ! ############################################################################################################################## !
