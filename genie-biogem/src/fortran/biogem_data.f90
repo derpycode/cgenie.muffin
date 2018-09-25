@@ -1278,7 +1278,9 @@ CONTAINS
     int_diag_airsea_sig(:)  = 0.0
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
-    int_diag_redox_sig(:)   = 0.0
+    int_diag_redox_sig(:)   = 0
+    int_diag_ecogem_part    = 0.0 
+    int_diag_ecogem_remin   = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
@@ -1374,10 +1376,12 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! INITIALIZE DIAGNOSTICS ARRAYS
   SUBROUTINE sub_init_diag()
-    diag_bio(:,:,:)       = 0.0
-    diag_geochem(:,:,:,:) = 0.0
-!!!   diag_weather(:,:,:)   = 0.0
-    diag_airsea(:,:,:)    = 0.0
+    diag_bio(:,:,:)          = 0.0
+    diag_geochem(:,:,:,:)    = 0.0
+!!!   diag_weather(:,:,:)      = 0.0
+    diag_airsea(:,:,:)       = 0.0
+    diag_ecogem_part(:,:,:)  = 0.0
+    diag_ecogem_remin(:,:,:) = 0.0
   END SUBROUTINE sub_init_diag
   ! ****************************************************************************************************************************** !
 

@@ -1003,9 +1003,11 @@ CONTAINS
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
     integer::i,j
-    integer::ib
+    integer::io,is,ib
+    integer::l,loc_m,loc_tot_m
     INTEGER::loc_iou,loc_ntrec
     real,DIMENSION(n_i,n_j)::loc_ij,loc_mask_surf
+    real,DIMENSION(n_sed,n_i,n_j)::loc_isij
     CHARACTER(len=255)::loc_unitsname
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
@@ -1320,10 +1322,51 @@ CONTAINS
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar2d('misc_sur_PO4Felimbalance',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end if
-       ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ###################################################################### !
-       !
-       ! ######################################################################################################################### !
     end if
+    !-----------------------------------------------------------------------
+    ! ECOGEM diagnostics
+    !-----------------------------------------------------------------------
+    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio .AND. flag_ecogem) then
+       ! calculate POM equivalnt of DOM
+       loc_isij(:,:,:) = 0.0
+       DO i=1,n_i
+          DO j=1,n_j
+             If (goldstein_k1(i,j) <= n_k) then
+                DO l=3,n_l_ocn
+                   io = conv_iselected_io(l)
+                   loc_tot_m = conv_DOM_POM_i(0,io)
+                   do loc_m=1,loc_tot_m
+                      is = conv_DOM_POM_i(loc_m,io)
+                      loc_isij(is,i,j) = loc_isij(is,i,j) + conv_DOM_POM(is,io)*int_diag_ecogem_remin(io,i,j)
+                   end do
+                end do
+             end If
+          end DO
+       end DO
+       ! calculate DOM ratio (replace values in same local array)
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          DO i=1,n_i
+             DO j=1,n_j
+                If (goldstein_k1(i,j) <= n_k) then
+                   if ((loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j)) > const_real_nullsmall) then
+                      loc_isij(is,i,j) = loc_isij(is,i,j)/(loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j))
+                   else
+                      loc_isij(is,i,j) = 0.0
+                   end if
+                end If
+             end DO
+          end DO
+          call sub_adddef_netcdf(loc_iou,3,'eco_diag_DOMfract_'//trim(string_sed(is)), &
+               & 'ECOGEM dissolved matter production fraction - '//trim(string_sed(is)), &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('eco_diag_DOMfract_'//trim(string_sed(is)),loc_iou, &
+               & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
+       end do
+    end if
+    ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
+    !
+    ! ############################################################################################################################ !
     !-----------------------------------------------------------------------
   END SUBROUTINE sub_save_netcdf_2d_USER
   ! ****************************************************************************************************************************** !
@@ -1831,7 +1874,6 @@ CONTAINS
     !----------------------------------------------------------------
     !       USED-DEFINED (MISC) FIELDS
     !---------------------------------------------------------------- 
-    CALL sub_save_netcdf_2d_USER()
     CALL sub_save_netcdf_2d_USER()
     !--------------------------------------------------------- ! 
     ! CDR-MIP
