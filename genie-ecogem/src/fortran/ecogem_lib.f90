@@ -193,6 +193,9 @@ MODULE ecogem_lib
   ! ------------------- DATA SAVING: TIME-SERIES --------------------------------------------------------------------------------- !
   LOGICAL::ctrl_data_save_timeseries                           ! time-series data save: e.g. JGOFS  
   NAMELIST /ini_ecogem_nml/ ctrl_data_save_timeseries
+  ! ------------------- MISC ----------------------------------------------------------------------------------------------------- !
+  logical::ctrl_limit_neg_biomass
+  NAMELIST /ini_ecogem_nml/ ctrl_limit_neg_biomass
   ! ------------------- TEST" !--------------------------------------------------------------------------------------------------- !
   logical::ctrl_hello_world                                             ! hello world!
   NAMELIST /ini_ecogem_nml/ctrl_hello_world

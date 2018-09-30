@@ -7435,6 +7435,10 @@
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
                     </param>
+                    <param name="ctrl_limit_neg_biomass">
+                      <value datatype="boolean">.FALSE.</value>
+                      <description></description>
+                    </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
                         <value datatype="string">Default</value>
