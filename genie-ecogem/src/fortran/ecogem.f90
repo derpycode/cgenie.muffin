@@ -259,8 +259,8 @@ subroutine ecogem(          &
                  !print*,templocal,temp_max,MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
                  templocal = MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
 
-			     IF(ctrl_limit_neg_biomass)THEN
-			     	IF(ANY(plankton(:,:,i,j,k).lt.0.0)) print*,'\/',i,j
+		IF(ctrl_limit_neg_biomass)THEN
+                        !IF(ANY(plankton(:,:,i,j,k).lt.0.0)) print*,'\/',i,j
                  	loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
                  	loc_biomass(:,:) = merge(plankton(:,:,i,j,k),1.0e-4,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
                  	BioC(:) = loc_biomass(iCarb,:)
