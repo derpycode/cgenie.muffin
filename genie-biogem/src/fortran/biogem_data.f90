@@ -1924,6 +1924,16 @@ CONTAINS
     opt_select(iopt_select_ocnatm_CO2) = opt_select(iopt_select_carbchem) .AND. atm_select(ia_pCO2)
 
     ! *** parameter consistency check - biological productivity ***
+    ! first ... check for ECOGEM selction
+    If ( flag_ecogem .AND. (par_bio_prodopt /= 'NONE') ) then
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'If ECOGEM is selcted, par_bio_prodopt must be NONE', &
+            & 'ALTERING INTERNAL PARAMETER VALUE; CONTINUING', &
+            & (/const_real_null/),.false. &
+            & )
+       par_bio_prodopt = 'NONE'
+    end IF
     ! check first-order consistency between biologial option, and selected dissolved and sedimentary tracers
     ! NOTE: only the existence of inconsistency will be highlighted, not exactly what the problem is ...
     SELECT CASE (par_bio_prodopt)
