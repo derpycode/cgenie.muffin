@@ -4096,7 +4096,7 @@
                         <description>Specific CH4 oxidation rate (d-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_kAER">
-            <value datatype="real">1.57</value>
+            <value datatype="real">0.40</value>
                         <description>Aerobic methanotrophy rate constant (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_Km_O2">
@@ -4116,7 +4116,7 @@
                         <description>AER biological energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_kAOM">
-            <value datatype="real">0.022</value>
+            <value datatype="real">0.035</value>
                         <description>AOM rate constant (yr-1) (see Olson et al., 2016)</description>
                     </param>
                     <param name="par_bio_remin_AOM_Km_SO4">
@@ -6230,6 +6230,10 @@
                         <value datatype="string">default</value>
                         <description>Atmospheric photochemistry scheme</description>
                     </param>
+                   <param name="par_atm_pO2_fixed">
+                        <value datatype="real">0.2095</value>
+                        <description>Atmospheric pO2 for fixed scheme</description>
+                   </param>
                     <param name="par_atm_wetlands_FCH4">
 			<value datatype="real">0.0</value>
                         <description>Wetlands CH4 flux (mol yr-1)</description>

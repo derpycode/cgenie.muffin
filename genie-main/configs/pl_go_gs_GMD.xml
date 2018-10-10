@@ -1,0 +1,97 @@
+<job author="phil holden">
+<!-- 
+     This config file recreates the spin up file for the subjective tuning of plasim-genie described in Holden et al (2016) GMD
+     Namelist variables specified in this file will over-write the default value for that variable, defined in "genie/genie-main/src/xml-config/xml/definition.xml"
+     The "tuned parameters" and "non-default parameters" below are described in detail in Holden et al (2016)
+     Run the model from genie-main with the command "./genie.job -f configs/pl_go_gs_GMD.xml".
+-->
+	<vars>
+		<var name="EXPID">GMD_subjective</var> <!-- Experiment name. A directory with this name will be created and all output piped into this directory -->
+	</vars>
+	<config>
+		<model name="goldstein"/>          <!-- include the module goldstein -->
+		<model name="goldsteinseaice"/>    <!-- include the module goldsteinseaice -->
+		<model name="plasim"/>             <!-- include the module plasim-ents -->
+	</config>
+	<parameters>
+		<control>
+			<param name="koverall_total">11520000</param> <!--total length of simulation, defined by the number of atmosphere timesteps
+			                                                  plasim has a timestep of 45 minutes = 32 timesteps per day, with 360 model days per year
+			                                                  => 32*360*1000=11,520,000 -->
+			<param name="kocn_loop">16</param>            <!-- gearing of ocean (number of atmosphere timesteps per ocean timestep) = 16*45 minutes = 12 hours -->
+			<param name="ksic_loop">16</param>            <!-- gearing of sea ice (number of atmosphere timesteps per sea-ice timestep) = 16*45 minutes = 12 hours -->
+		</control>
+		<model name="goldstein">
+			<param name="igrid">2</param>                 <!-- igrid==2 switch to tell goldstein we are using T21 latitude spacing  -->
+			<param name="yearlen">360</param>             <!-- goldstein year length in days. We apply a 360 day year. -->>
+			<param name="nyear">720</param>               <!-- number of goldstein time steps per year. i.e. 12 hour timestep, 360 day year -->
+			<param name="iwstp">72000</param>             <!-- goldstein restart output frequency in goldstein timesteps. 100 years -->
+			<param name="ianav">7200</param>              <!-- goldstein output frequency for 3D fields. 10 years -->
+			<param name="itstp">720</param>               <!-- goldstein output frequency for integral diagnostics. 1 year -->
+			<param name="npstp">720</param>               <!-- goldstein putput frequency for screen diagnostics. 1 year -->
+			<param name="world">pl32_1</param>            <!-- indentifying label for the files that describe the world. These files are:
+			                                                   a file that describes the land-sea mask, runoff routing and ocean bathymetry "/genie/genie-goldstein/data/input/pl32_1.k1"
+			                                                   a file that defines any paths around islands "/genie/genie-goldstein/data/input/pl32_1.paths"
+			                                                     (we here consider only the ACC)
+			                                                   a file that defines the islands separated by these paths "/genie/genie-goldstein/data/input/pl32_1.psiles"
+			                                                     (we here consider only the ACC, so have two islands being Antartica and the rest of the world -->
+			<param name="tdatafile">pl32_tempann.silo</param>  <!-- name of data file of observational ocean temperature field, found in genie/genie-goldtstein/data/input -->
+			<param name="sdatafile">pl32_saliann.silo</param>  <!-- name of data file of observational ocean sainity field, found in genie/genie-goldtstein/data/input -->
+			<param name="temp1">-5.0</param>                   <!-- initial ocean temperature in northern hemisphere (degC). When set to less than -2, ocean initialised with observations --> 
+			<param name="temp0">-5.0</param>                   <!-- initial ocean temperature in southern hemisphere (degC). When set to less than -2, ocean initialised with observations --> 
+			<paramArray name="diff">
+			   <param index="1">1936.9958</param>              <!-- isopycnal diffusivity (m2s-1) -                         subjectively tuned parameter OHD -->
+			   <param index="2">0.000158338</param>            <!-- diapycnal diffusivity (m2s-1) -                         subjectively tuned parameter OVD -->
+			</paramArray>
+			<param name="adrag">2.0686631</param>              <!-- inverse frictional drag (days) -                        subjectively tuned parameter ADRAG -->
+			<param name="scf">3.788316</param>                 <!-- wind stress scaling (dimensionless) -                   subjectively tuned parameter SCF -->
+			<param name="ediffpow1">0.8200495</param>          <!-- diapycnal diffusivity depth profile (dimensionless) -   subjectively tuned parameter OP1 --> 
+			<param name="ieos">1</param>                       <!-- switch to include thermobaricity in the equation of state (1==on) -->
+			<param name="iediff">1</param>                     <!-- switch to turn on stratification dependent mixing (1==on) -->
+		</model>
+		<model name="goldsteinseaice">
+			<param name="igrid">2</param>                      <!-- for following parameters see the equivalent desciptions for goldstein -->
+			<param name="nyear">720</param>
+			<param name="iwstp">72000</param>
+			<param name="ianav">7200</param>
+			<param name="npstp">720</param>
+			<param name="itstp">720</param>
+			<param name="world">pl32_1</param>
+			<param name="diffsic">15000.</param>              <!-- sea ice diffusivity (m2s-1) - non-default parameter SID -->
+			<param name="scf">3.788316</param>                <!-- wind stress scaling (dimensionless), also in goldstein - subjectively tuned parameter SCF -->
+		</model>
+		<model name="plasim">
+			<param name="nafter">115200</param>               <!-- output frequency for averaged plasim-ents fields = 45 minutes * 115200 = 10 years -->
+			<param name="scale_apm">0.6664018</param>         <!-- dimensionless scaling of the atlantic-pacific moisture flux adjustment - subjectively tuned parameter APM -->
+			<param name="qthresh">0.1</param>                 <!-- dimensionless threshold moisture content for photosynthesis - non default parameter QTHRESH -->
+			<param name="acllwr">0.2</param>                  <!-- cloud emissivity (m2g-1) - non-default parameter ACLLWR -->
+			<param name="co2">280.</param>                    <!-- atmospheric co2 concentration (ppm). This is the default so need not be configured, but 
+			                                                       is included here to allow easy test of climate sensitiviy-->
+			<param name="albseamax">0.4</param>               <!-- latitudinal dependence of ocean albedo (dimensionless) - non-default parameter ALBSEAMAX --> 
+		</model>
+	</parameters>
+	<build>
+		<make-arg name="IGCMATMOSDP">TRUE</make-arg>              <!-- atmosphere double precision (for compiler)-->
+		<make-arg name="GENIEDP">TRUE</make-arg>                  <!-- genie double precision (for compiler) -->
+		<macro handle="GENIENXOPTS" status="defined">
+			<identifier>GENIENX</identifier>
+			<replacement>64</replacement>                     <!-- atmosphere resolution in longitude -->
+		</macro>
+		<macro handle="GENIENYOPTS" status="defined">
+			<identifier>GENIENY</identifier>
+			<replacement>32</replacement>                     <!-- atmosphere resolution in latitude -->
+		</macro>
+		<macro handle="GOLDSTEINNLONSOPTS" status="defined">
+			<identifier>GOLDSTEINNLONS</identifier>
+			<replacement>64</replacement>                     <!-- ocean resolution in longitude -->
+		</macro>
+		<macro handle="GOLDSTEINNLATSOPTS" status="defined">
+			<identifier>GOLDSTEINNLATS</identifier>
+			<replacement>32</replacement>                     <!-- ocean resolution in latitude -->
+		</macro>
+		<macro handle="GOLDSTEINNLEVSOPTS" status="defined">
+			<identifier>GOLDSTEINNLEVS</identifier>
+			<replacement>32</replacement>                     <!-- ocean resolution in depth -->
+		</macro>
+	</build>
+</job>
