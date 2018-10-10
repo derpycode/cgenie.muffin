@@ -1,0 +1,5 @@
+TEST_NAME=180908_GMD_mod_claire_200Tmol_SPIN_regtest
+ASSUMEDGOOD_NAME=180908_GMD_mod_claire_200Tmol_SPIN_assumedgood
+KNOWNGOOD_NAME=180908_GMD_mod_claire_200Tmol_SPIN_knowngood
+TESTFILE=xxxx
+CHECKFLUXES=FALSE
