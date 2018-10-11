@@ -1924,6 +1924,16 @@ CONTAINS
     opt_select(iopt_select_ocnatm_CO2) = opt_select(iopt_select_carbchem) .AND. atm_select(ia_pCO2)
 
     ! *** parameter consistency check - biological productivity ***
+    ! first ... check for ECOGEM selction
+    If ( flag_ecogem .AND. (par_bio_prodopt /= 'NONE') ) then
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'If ECOGEM is selcted, par_bio_prodopt must be NONE', &
+            & 'ALTERING INTERNAL PARAMETER VALUE; CONTINUING', &
+            & (/const_real_null/),.false. &
+            & )
+       par_bio_prodopt = 'NONE'
+    end IF
     ! check first-order consistency between biologial option, and selected dissolved and sedimentary tracers
     ! NOTE: only the existence of inconsistency will be highlighted, not exactly what the problem is ...
     SELECT CASE (par_bio_prodopt)
@@ -2693,6 +2703,8 @@ CONTAINS
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_misc = .true.
        ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
        ctrl_data_save_derived = .true.
        ctrl_data_save_GLOBAL = .true.
        if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
@@ -2724,6 +2736,14 @@ CONTAINS
          & ) THEN
        ctrl_data_save_inversion = .true.
     end IF
+
+    ! determine if no biology at all
+    If ((par_bio_prodopt == 'NONE') .AND. (.NOT. flag_ecogem)) then
+       ctrl_data_save_slice_bio      = .false.
+       ctrl_data_save_slice_diag_bio = .false.
+       ctrl_data_save_sig_fexport    = .false.
+       ctrl_data_save_sig_diag_bio   = .false.
+    end if
 
   END SUBROUTINE sub_adj_par_save
   ! ****************************************************************************************************************************** !
