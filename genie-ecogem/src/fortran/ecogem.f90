@@ -100,6 +100,12 @@ subroutine ecogem(          &
   ! ------------------------------------------------------- !
   ! local array for ocean tracers
   loc_ocn(:,:,:,:) = dum_egbg_sfcocn(:,:,:,:)
+
+  ! JDW Overwrite surface temperature with input
+  if(ctrl_force_T)then 
+	loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface layer?
+  end if	
+  
   ! zero output arrays
   dum_egbg_sfcpart = 0.0
   dum_egbg_sfcdiss = 0.0

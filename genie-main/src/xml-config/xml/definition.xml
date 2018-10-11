@@ -7435,9 +7435,15 @@
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
                     </param>
+<<<<<<< HEAD
                     <param name="ctrl_limit_neg_biomass">
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
+=======
+                    <param name="ctrl_force_T"> 
+                      <value datatype="boolean">.FALSE.</value>
+                      <description>Force ecogem with a temperature field</description>
+>>>>>>> DEV_ecogem_force_T
                     </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
@@ -7977,6 +7983,10 @@
                     <param name="par_ncrst_name">
 			<value datatype="string">_restart.nc</value>
                         <description>netCDF restart file name</description>
+                    </param>
+                    <param name="par_ecogem_force_T_file">
+			<value datatype="string">temperature.dat</value>
+		     			<description>Input file for forcing temperature in ecogem</description>
                     </param>
                 </namelist>
             </file>

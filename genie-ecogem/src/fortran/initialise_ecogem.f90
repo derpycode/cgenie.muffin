@@ -302,6 +302,13 @@ SUBROUTINE initialise_ecogem(    &
 
   ! *** initialise plankton biomass array
   call sub_init_plankton()
+  
+  ! JDW: allocate and load temperature forcing dataset
+  if(ctrl_force_T)then
+  	allocate(T_input(n_i,n_j),STAT=alloc_error)
+	T_input(:,:)=0.0
+	call sub_init_load_forceT()
+  end if
 
   ! ---------------------------------------------------------- ! INITIALIZE netCDF OUTPUT
   IF (ctrl_debug_init > 0) print*,'INITIALIZE netCDF OUTPUT'
