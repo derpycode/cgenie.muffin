@@ -7435,15 +7435,13 @@
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
                     </param>
-<<<<<<< HEAD
                     <param name="ctrl_limit_neg_biomass">
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
-=======
+                    </param>
                     <param name="ctrl_force_T"> 
                       <value datatype="boolean">.FALSE.</value>
                       <description>Force ecogem with a temperature field</description>
->>>>>>> DEV_ecogem_force_T
                     </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
