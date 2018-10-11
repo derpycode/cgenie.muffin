@@ -4339,6 +4339,18 @@
                         <value datatype="real">0.0</value>
                         <description>Hard threshold for sulphate reduction (mol kg-1)</description>
                     </param>
+                    <param name="par_bio_remin_POC_eL0">
+						<value datatype="real">187.5</value>
+                        <description>e-folding depth of smallest ecogem size class (m)</description>
+                    </param>
+                	<param name="par_bio_remin_POC_size0">
+						<value datatype="real">0.6</value>
+                        <description>diameter of smallest ecogem size class (um)</description>
+                    </param>
+                    <param name="par_bio_remin_POC_eta">
+						<value datatype="real">1.17</value>
+                        <description>exponent relating e-folding depth to ecogem size class [Stemmann et al 2004]</description>
+                    </param>
 <!-- kinetics -->
                     <param name="par_bio_remin_k_O2">
                         <value datatype="real">1.0</value>
@@ -7760,6 +7772,10 @@
 			<value datatype="real">0.03</value>
 	                  <description>Light attenuation by chlorophyll a</description>
                     </param>
+                    <param name="ctrl_restrict_mld">
+			<value datatype="boolean">.false.</value>
+	                  <description>restrict MLD for mean light calculation?</description>
+                    </param>
        <!-- Grazing parameters -->  
                     <param name="trophic_tradeoff">
 			<value datatype="real">1.0</value>
@@ -7880,7 +7896,11 @@
                     <param name="temp_T0">
 			<value datatype="real">20.0</value>
 	                  <description>Reference temperature</description>
-                    </param>  
+                    </param>
+                    <param name="temp_max">
+			<value datatype="real">99.9</value>
+	                  <description>Maximum applied temperature</description>
+                    </param>                  
 <!-- INORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POC_CaCO3">
 			<value datatype="real">0.0285</value>

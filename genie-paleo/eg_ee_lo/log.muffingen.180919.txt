@@ -1,0 +1,63 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.63
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GENIE grid will be loaded directly from k1 or mask text file: eg_ee_lo
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+         (Nothing to load.)
+>   4. READING MASK & TOPO GRIDS ...
+       - k1 read.
+       - GENIE grid re-generated.
+>   5. RE-GRIDING MASK ...
+         (Nothing to do ... k1/mask file already loaded.)
+>   6. FILTERING MASK ...
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.074074
+       * Final land area fraction   = 0.074074
+>   8. RE-GRIDING TOPOGRAPHY ...
+         (Nothing to re-grid -- set uniform ocean depth.)
+>   9. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  12. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  13. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+>  14. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * total # true islands = 1
+>  15. GENERATING .paths FILE ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (2,7)
+         -> SE corner :: Add additional path entry @ (2,1)
+         -> NE corner :: Skip path entry @ (11,7)
+         -> SE corner :: Add additional path entry @ (11,1)
+       - .paths file saved
+>  16. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  17. CREATING WIND PRODUCTS ...
+       * No Northern gateway found.
+       * No Southern gateway found.
+       - Generated zonal wind products.
+>  18. LOADING ALBEDO DATA ...
+         (Nothing to load.)
+>  19. CREATING ALBEDO DATA ...
+       - Created generic zonal mean albedo profile.
+       - .albd.dat file saved
+>  21. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

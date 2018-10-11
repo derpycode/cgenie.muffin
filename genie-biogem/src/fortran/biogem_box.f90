@@ -3477,6 +3477,8 @@ CONTAINS
     real::loc_bio_part_CaCO3_ratio
     real::loc_bio_remin_opal_frac1,loc_bio_remin_opal_frac2
     real::loc_bio_part_opal_ratio
+    real::loc_eL_size												   ! local efolding depth varying with ecosystem size structure JDW
+    real::loc_size0													! JDW
 !!!real::loc_r_POM_RDOM                                                ! factor to modify nutrient:C ratio in POM->RDOM
     real::loc_part_tot
 !!$    real,dimension(n_sed,n_k)::loc_bio_part_TMP
@@ -3545,6 +3547,8 @@ CONTAINS
     loc_conv_ls_lo(:,:)   = 0.0
     !
     if (ctrl_bio_remin_redox_save) loc_diag_redox(:,:) = 0.0
+    
+    loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
 
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ! *** k WATER-COLUMN LOOP START ***
@@ -3766,6 +3770,9 @@ CONTAINS
                               & /                                                                                       &
                               & (phys_ocn(ipo_Dbot,dum_i,dum_j,kk+1)/par_bio_remin_z0)**(par_bio_remin_b(dum_i,dum_j)) &
                               & )
+                      case ('KriestOschlies2008') ! efolding depth dependent on mean plankton diameter JDW
+                      	 loc_eL_size=par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta ! n.b. size is in esd
+                      	 loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/loc_eL_size)) 	
                       case default
                          loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL1))
                       end select

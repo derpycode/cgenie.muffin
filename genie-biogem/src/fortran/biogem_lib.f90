@@ -287,6 +287,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
+  real::par_bio_remin_POC_eL0		! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
+  real::par_bio_remin_POC_size0		! JDW size-dependent remin: diameter of smallest ecogem size class (um)
+  real::par_bio_remin_POC_eta		! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
+  NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta
   ! kinetics
   real::par_bio_remin_k_O2
   real::par_bio_remin_k_NO3
@@ -1007,6 +1011,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_diag_misc_2D,n_i,n_j)::diag_misc_2D           !
   REAL,DIMENSION(0:n_i,0:n_j)::diag_misc_psi                     !
   real,DIMENSION(:,:,:,:),ALLOCATABLE::diag_redox                ! redox diagnostics
+  REAL,DIMENSION(n_sed,n_i,n_j)::diag_ecogem_part                ! 
+  REAL,DIMENSION(n_ocn,n_i,n_j)::diag_ecogem_remin               ! 
 
   ! *** integrated (time-averaged) time-series storage scalars and vectors ***
   !
@@ -1084,6 +1090,9 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm,n_i,n_j)::int_diag_airsea_timeslice       ! air-sea gas exchange diagnostics
   ! redox
   real,DIMENSION(:,:,:,:),ALLOCATABLE::int_diag_redox_timeslice  ! redox diagnostics 3D time-slice
+  ! ecogem
+  REAL,DIMENSION(n_sed,n_i,n_j)::int_diag_ecogem_part                ! 
+  REAL,DIMENSION(n_ocn,n_i,n_j)::int_diag_ecogem_remin               ! 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
   !
   ! ############################################################################################################################## !
