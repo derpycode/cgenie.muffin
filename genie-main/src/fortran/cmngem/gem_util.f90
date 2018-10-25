@@ -154,6 +154,14 @@ CONTAINS
     conv_sed_ocn(io_Sr,is_SrCO3)                = 1.0
     conv_sed_ocn(io_Sr_87Sr,is_SrCO3_87Sr)      = 1.0
     conv_sed_ocn(io_Sr_88Sr,is_SrCO3_88Sr)      = 1.0
+    conv_sed_ocn(io_DIC,is_FeCO3)               = 1.0
+    conv_sed_ocn(io_Fe,is_FeCO3)                = 1.0
+    conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)       = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_FeCO3_56Fe)      = 1.0
+    conv_sed_ocn(io_H2S,is_FeS2)                = 1.0
+    conv_sed_ocn(io_Fe,is_FeS2)                 = 1.0
+    conv_sed_ocn(io_H2S_34S,is_FeS2_34S)        = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_FeS2_56Fe)       = 1.0
     ! convert dissolved species -> solid
     conv_ocn_sed(:,:) = 0.0
     conv_ocn_sed(is_POC,io_DIC)              = 1.0/conv_sed_ocn(io_DIC,is_POC)
@@ -164,14 +172,14 @@ CONTAINS
     conv_ocn_sed(is_PON_15N,io_NO3_15N)      = 1.0/conv_sed_ocn(io_NO3_15N,is_PON_15N)
     conv_ocn_sed(is_PON,io_ALK)              = 1.0/conv_sed_ocn(io_ALK,is_PON)
     conv_ocn_sed(is_POFe,io_Fe)              = 1.0/conv_sed_ocn(io_Fe,is_POFe)
-    conv_ocn_sed(is_POFe,io_TDFe)              = 1.0/conv_sed_ocn(io_TDFe,is_POFe)
+    conv_ocn_sed(is_POFe,io_TDFe)            = 1.0/conv_sed_ocn(io_TDFe,is_POFe)
     conv_ocn_sed(is_POC,io_O2)               = 1.0/conv_sed_ocn(io_O2,is_POC)
     conv_ocn_sed(is_POP,io_O2)               = 1.0/conv_sed_ocn(io_O2,is_POP)
     conv_ocn_sed(is_PON,io_O2)               = 1.0/conv_sed_ocn(io_O2,is_PON)
     conv_ocn_sed(is_POCd,io_Cd)              = 1.0/conv_sed_ocn(io_Cd,is_POCd)
     conv_ocn_sed(is_POCd_114Cd,io_Cd_114Cd)  = 1.0/conv_sed_ocn(io_Cd_114Cd,is_POCd_114Cd)
-    conv_ocn_sed(is_POI,io_IO3)                = 1.0
-    conv_ocn_sed(is_POI,io_O2)                = -(3.0/2.0)
+    conv_ocn_sed(is_POI,io_IO3)              = 1.0
+    conv_ocn_sed(is_POI,io_O2)               = -(3.0/2.0)
     conv_ocn_sed(is_CaCO3,io_DIC)            = 1.0/conv_sed_ocn(io_DIC,is_CaCO3)
     conv_ocn_sed(is_CaCO3_13C,io_DIC_13C)    = 1.0/conv_sed_ocn(io_DIC_13C,is_CaCO3_13C)
     conv_ocn_sed(is_CaCO3_14C,io_DIC_14C)    = 1.0/conv_sed_ocn(io_DIC_14C,is_CaCO3_14C)
@@ -235,6 +243,15 @@ CONTAINS
     conv_ocn_sed(is_SrCO3,io_Sr)                = 1.0/conv_sed_ocn(io_Sr,is_SrCO3)
     conv_ocn_sed(is_SrCO3_87Sr,io_Sr_87Sr)      = 1.0/conv_sed_ocn(io_Sr_87Sr,is_SrCO3_87Sr)
     conv_ocn_sed(is_SrCO3_88Sr,io_Sr_88Sr)      = 1.0/conv_sed_ocn(io_Sr_88Sr,is_SrCO3_88Sr)
+    conv_ocn_sed(is_FeCO3,io_DIC)               = 1.0/conv_sed_ocn(io_DIC,is_FeCO3)
+    conv_ocn_sed(is_FeCO3,io_Fe)                = 1.0/conv_sed_ocn(io_Fe,is_FeCO3) 
+    conv_ocn_sed(is_FeCO3_13C,io_DIC_13C)       = 1.0/conv_sed_ocn(io_DIC_13C,is_FeCO3_13C) 
+    conv_ocn_sed(is_FeCO3_56Fe,io_Fe_56Fe)      = 1.0/conv_sed_ocn(io_Fe_56Fe,is_FeCO3_56Fe)
+    conv_ocn_sed(is_FeS2,io_H2S)                = 1.0/conv_sed_ocn(io_H2S,is_FeS2)
+    conv_ocn_sed(is_FeS2,io_Fe)                 = 1.0/conv_sed_ocn(io_Fe,is_FeS2)
+    conv_ocn_sed(is_FeS2_34S,io_H2S_34S)        = 1.0/conv_sed_ocn(io_H2S_34S,is_FeS2_34S)
+    conv_ocn_sed(is_FeS2_56Fe,io_Fe_56Fe)       = 1.0/conv_sed_ocn(io_Fe_56Fe,is_FeS2_56Fe) 
+
     ! ############################################################################################################################ !
     ! DISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between DOM and POM
