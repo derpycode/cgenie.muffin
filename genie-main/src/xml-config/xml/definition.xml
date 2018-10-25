@@ -1205,6 +1205,30 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="sed_select(88)" index="88">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(89)" index="89">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(90)" index="90">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(91)" index="91">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(92)" index="92">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(93)" index="93">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- MISC CONTROLS  -->
                     <param name="par_grid_lon_offset">
