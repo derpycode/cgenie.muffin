@@ -2144,8 +2144,8 @@ subroutine diag_biogem_ecogem( &
   ! ---------------------------------------------------------- !
   ! DUMMY ARGUMENTS
   ! ---------------------------------------------------------- !
-  real,intent(in),   dimension(n_sed,n_i,n_j,n_k)     ::dum_egbg_sfcpart  ! ecology-interface: particulate composition change; ocn grid
-  real,intent(in),   dimension(n_ocn,n_i,n_j,n_k)     ::dum_egbg_sfcremin ! ecology-interface: ocean tracer composition change; ocn grid
+  real,intent(in),dimension(n_sed,n_i,n_j,n_k)::dum_egbg_sfcpart  ! ecology-interface: particulate composition change; ocn grid
+  real,intent(in),dimension(n_ocn,n_i,n_j,n_k)::dum_egbg_sfcremin ! ecology-interface: ocean tracer composition change; ocn grid
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
@@ -2194,7 +2194,7 @@ subroutine diag_biogem_ecogem( &
      is = conv_iselected_is(l)
      loc_POM_M(is) = sum(phys_ocn(ipo_M,:,:,n_k)*dum_egbg_sfcpart(is,:,:,n_k))
   end do
-  ! ---------------------------------------------------------- ! SAVE
+  ! ---------------------------------------------------------- ! SAVE DOM FRACTION
   int_fracdom(:) = 0.0
   DO l=1,n_l_sed
      is = conv_iselected_is(l)
@@ -2202,6 +2202,9 @@ subroutine diag_biogem_ecogem( &
         int_fracdom(is) = loc_DOM_M(is)/(loc_POM_M(is)+loc_DOM_M(is))
      end if
   end do
+  ! ---------------------------------------------------------- ! COPY 2D
+  diag_ecogem_part(:,:,:)  = dum_egbg_sfcpart(:,:,:,n_k)
+  diag_ecogem_remin(:,:,:) = dum_egbg_sfcremin(:,:,:,n_k)
   ! ---------------------------------------------------------- !
   ! END
   ! ---------------------------------------------------------- !
@@ -2376,7 +2379,11 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
                     loc_standard = const_standards(ocn_type(loc_istr))
                     orb_pts(n_orb_pts,nloc,nvar) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
                  case default
-                    orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k)
+                    If (loc_istr == io_T) then
+                       orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k) - const_zeroC
+                    else
+                       orb_pts(n_orb_pts,nloc,nvar) = ocn(loc_istr,loc_i,loc_j,loc_k)
+                    end if
                  END SELECT
                  exit
               end if
@@ -2449,6 +2456,7 @@ SUBROUTINE diag_biogem_rec_orb(dum_genie_clock,dum_sfcatm1)
               end if
            end if
         end do
+     
      end do
 
   end do
@@ -2821,12 +2829,18 @@ SUBROUTINE diag_biogem_timeslice( &
            int_diag_geochem_timeslice(:,:,:,:) = int_diag_geochem_timeslice(:,:,:,:) + diag_geochem(:,:,:,:)
            int_diag_Fe_timeslice(:,:,:,:)      = int_diag_Fe_timeslice(:,:,:,:)      + loc_dtyr*diag_Fe(:,:,:,:)
            int_diag_redox_timeslice(:,:,:,:)   = int_diag_redox_timeslice(:,:,:,:)   + diag_redox(:,:,:,:)
+           ! gemlite
            if (dum_gemlite) then
               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + loc_dtyr*dum_sfxsumrok1(:,:,:)
            else
               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + dum_sfxsumrok1(:,:,:)
            end if
            int_diag_airsea_timeslice(:,:,:)    = int_diag_airsea_timeslice(:,:,:)    + diag_airsea(:,:,:)
+           ! eceogem
+           if (flag_ecogem) then
+              int_diag_ecogem_part(:,:,:)  = int_diag_ecogem_part(:,:,:)  + loc_dtyr*diag_ecogem_part(:,:,:)
+              int_diag_ecogem_remin(:,:,:) = int_diag_ecogem_remin(:,:,:) + loc_dtyr*diag_ecogem_remin(:,:,:)
+           end if
 
         end if if_save3
 
