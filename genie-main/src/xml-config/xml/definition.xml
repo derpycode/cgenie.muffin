@@ -4768,6 +4768,18 @@
 			<value datatype="real">10.0</value>
                         <description>Minimum ohmega threshold for precip</description>
                     </param>
+                    <param name="par_bio_FeS2precip_k">
+			<value datatype="real">3250.43</value>
+                        <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
+                    </param>
+                    <param name="par_d56Fe_FeS2_alpha">
+			<value datatype="real">1.0022</value>
+                        <description>fractionation factor d56/54 Fe in FeS2 precipitation</description>
+                    </param>
+                    <param name="par_d34S_FeS2_alpha">
+			<value datatype="real">1</value>
+                        <description>fractionation factor d34/32 S in FeS2 precipitation</description>
+                    </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
 			<value datatype="string"></value>
