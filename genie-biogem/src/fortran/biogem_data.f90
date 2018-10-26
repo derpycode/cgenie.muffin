@@ -346,7 +346,10 @@ CONTAINS
        print*,'Minimum ohmega threshold for precip                 : ',par_bio_CaCO3precip_abioticohm_min
        print*,'Scale factor for CaCO3 precipitation                : ',par_bio_CaCO3precip_sf
        print*,'Rate law power for CaCO3 precipitation              : ',par_bio_CaCO3precip_exp
-       ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
+	   print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
+	   print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
+       print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
+	   ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
        print*,'Input dir. name                                     : ',trim(par_indir_name)
