@@ -347,6 +347,13 @@ CONTAINS
        print*,'Minimum ohmega threshold for precip                 : ',par_bio_CaCO3precip_abioticohm_min
        print*,'Scale factor for CaCO3 precipitation                : ',par_bio_CaCO3precip_sf
        print*,'Rate law power for CaCO3 precipitation              : ',par_bio_CaCO3precip_exp
+	   print*,'Allow abiotic FeCO3 precipitation?                  : ',ctrl_bio_FeCO3precip
+       print*,'Restrict precipitation to surface layer?            : ',ctrl_bio_FeCO3precip_sur
+       print*,'Precipitate as calcite (otherwise aragonite)        : ',par_bio_FeCO3precip_calcite
+       print*,'Minimum ohmega threshold for precip                 : ',par_bio_FeCO3precip_abioticohm_min
+       print*,'Scale factor for FeCO3 precipitation                : ',par_bio_FeCO3precip_sf
+       print*,'Rate law power for FeCO3 precipitation              : ',par_bio_FeCO3precip_exp
+	  
 	   print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
 	   print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
        print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
