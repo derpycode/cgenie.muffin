@@ -4772,6 +4772,30 @@
 			<value datatype="real">10.0</value>
                         <description>Minimum ohmega threshold for precip</description>
                     </param>
+                    <param name="par_bio_FeCO3precip_sf">
+			<value datatype="real">0.0</value>
+                        <description>Scale factor for FeCO3 precipitation</description>
+                    </param>
+                    <param name="par_bio_FeCO3precip_exp">
+			<value datatype="real">0.0</value>
+                        <description>Rate law power for FeCO3 precipitation</description>
+                    </param>
+                    <param name="ctrl_bio_FeCO3precip">
+			<value datatype="boolean">.false.</value>
+                        <description>Allow abiotic FeCO3 precipitation?</description>
+                    </param>
+                    <param name="ctrl_bio_FeCO3precip_sur">
+			<value datatype="boolean">.false.</value>
+                        <description>Restrict precipitation to surface layer?</description>
+                    </param>
+                    <param name="par_bio_FeCO3precip_calcite">
+			<value datatype="boolean">.true.</value>
+                        <description>Precipitate as calcite</description>
+                    </param>
+                    <param name="par_bio_FeCO3precip_abioticohm_min">
+			<value datatype="real">10.0</value>
+                        <description>Minimum ohmega threshold for precip</description>
+                    </param>
                     <param name="par_bio_FeS2precip_k">
 			<value datatype="real">3250.43</value>
                         <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
