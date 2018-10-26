@@ -283,6 +283,7 @@ CONTAINS
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
        print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
+	   print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
        ! --- IRON CYCLING -------------------------------------------------------------------------------------------------------- !
        print*,'--- IRON CYCLING -----------------------------------'
        print*,'Aeolian Fe solubility                               : ',par_det_Fe_sol
