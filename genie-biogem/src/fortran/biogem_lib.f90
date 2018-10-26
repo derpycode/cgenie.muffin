@@ -468,6 +468,12 @@ MODULE biogem_lib
   logical::par_bio_CaCO3precip_calcite                           ! Precipitate as calcite (otherwise aragonite)
   real::par_bio_CaCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
   NAMELIST /ini_biogem_nml/par_bio_CaCO3precip_calcite,par_bio_CaCO3precip_abioticohm_min
+  real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
+  NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k
+  real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
+  namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
+  real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2 
+  namelist /ini_biogem_nml/par_d34S_FeS2_alpha
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                             !
   CHARACTER(len=255)::par_indir_name                             !
