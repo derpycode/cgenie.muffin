@@ -1434,6 +1434,9 @@ subroutine biogem(        &
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
               end if
+			   if (sed_select(is_FeCO3)) then
+                 call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
+              end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS ***'
