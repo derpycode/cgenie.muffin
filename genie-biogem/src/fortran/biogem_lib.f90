@@ -473,12 +473,9 @@ MODULE biogem_lib
   real::par_bio_FeCO3precip_sf                                   ! Scale factor for FeCO3 precipitation
   real::par_bio_FeCO3precip_exp                                  ! Rate law power for FeCO3 precipitation
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_sf,par_bio_FeCO3precip_exp
-  LOGICAL::ctrl_bio_FeCO3precip                                  ! Allow abiotic FeCO3 precipitation?
-  LOGICAL::ctrl_bio_FeCO3precip_sur                              ! Restrict precipitation to surface layer?
-  NAMELIST /ini_biogem_nml/ctrl_bio_FeCO3precip,ctrl_bio_FeCO3precip_sur
-  logical::par_bio_FeCO3precip_calcite                           ! Precipitate as calcite (otherwise aragonite)
+  real::par_bio_FeCO3precip_abioticohm_cte                       ! ohmega constant for siderite formation
   real::par_bio_FeCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
-  NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_calcite,par_bio_FeCO3precip_abioticohm_min
+  NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
 
   real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
   NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k
