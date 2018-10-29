@@ -1933,7 +1933,11 @@ CONTAINS
 		!calculate pyrite precipitation
 		if ((loc_TDFe > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall) .AND. (loc_SO4 > const_real_nullsmall)) then
        	 loc_FeS2_precipitation_const = par_bio_FeS2precip_k 
-		 loc_FeS2_precipitation       = dum_dt*loc_FeS2_precipitation_const*loc_TDFe*loc_H2S
+		 if (loc_TDFe < loc_H2S) then
+		   loc_FeS2_precipitation = dum_dt*loc_FeS2_precipitation_const*loc_TDFe*loc_H2S
+		 else 
+		   loc_FeS2_precipitation = dum_dt*loc_FeS2_precipitation_const*loc_H2S**2
+		 end if
            ! deal with Fe and S isotopes?
            ! calculate isotopic ratio
 		   loc_alpha_56Fe = par_d56Fe_FeS2_alpha
@@ -2048,7 +2052,7 @@ CONTAINS
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
     real::loc_ohm,loc_ohm_cte
-    real::loc_delta_FeCO3,loc_CO3,loc_Fe,loc_FeCO3_prec 
+    real::loc_delta_FeCO3,loc_CO3,loc_TDFe,loc_Fe,loc_H2S,loc_FeCO3_prec 
     real::loc_alpha
     real::loc_R,loc_r56Fe
     integer::loc_kmax
@@ -2107,10 +2111,21 @@ CONTAINS
 	   ! needs to be altered
 	   loc_ohm_cte = par_bio_FeCO3precip_abioticohm_cte
 	   loc_CO3     = carb(ic_conc_CO3,dum_i,dum_j,n_k)
-	   loc_Fe      = ocn(io_TDFe,dum_i,dum_j,k)
-       loc_ohm     = (loc_CO3*loc_Fe)/loc_ohm_cte
-	   loc_r56Fe   = ocn(io_TDFe_56Fe,dum_i,dum_j,k)/ocn(io_TDFe,dum_i,dum_j,k)
-       
+	   loc_TDFe    = ocn(io_TDFe,dum_i,dum_j,k)
+       loc_r56Fe   = ocn(io_TDFe_56Fe,dum_i,dum_j,k)/ocn(io_TDFe,dum_i,dum_j,k)
+       loc_H2S     = ocn(io_H2S,dum_i,dum_j,k)
+	   
+	   if (ocn_select(io_H2S)) then
+	      loc_H2S     = ocn(io_H2S,dum_i,dum_j,k)
+	      if (loc_H2S < loc_TDFe) then
+	        loc_Fe   = loc_TDFe - loc_H2S
+	        loc_ohm  = (loc_CO3*loc_Fe)/loc_ohm_cte
+	      else 
+	        loc_ohm = 0.0
+	      end if
+	   else
+	        loc_ohm  = (loc_CO3*loc_TDFe)/loc_ohm_cte
+	   end if
 	   if (loc_ohm > par_bio_FeCO3precip_abioticohm_min) then
           loc_FeCO3_prec = &
                & dum_dt*par_bio_FeCO3precip_sf*(par_bio_FeCO3precip_abioticohm_min - 1.0)**par_bio_FeCO3precip_exp
