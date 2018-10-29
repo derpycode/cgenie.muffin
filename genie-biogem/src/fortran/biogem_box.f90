@@ -2119,7 +2119,7 @@ CONTAINS
 		  loc_bio_uptake(io_TDFe,k)  = loc_FeCO3_prec
 		  loc_bio_uptake(io_DIC,k)   = loc_FeCO3_prec
 		  
-		  loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_precipitation
+		  loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
 	   else
 	      loc_FeCO3_prec = 0.0
 		  
@@ -2127,7 +2127,7 @@ CONTAINS
 		  loc_bio_uptake(io_TDFe,k)  = loc_FeCO3_prec
 		  loc_bio_uptake(io_DIC,k)   = loc_FeCO3_prec
 		  
-		  loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_precipitation
+		  loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
        end if
        if (sed_select(is_FeCO3_13C)) then
           ! re-calculate carbonate system isotopic properties
