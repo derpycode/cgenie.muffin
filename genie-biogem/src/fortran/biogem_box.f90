@@ -1902,10 +1902,10 @@ CONTAINS
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
 	
-	real::loc_TDFe,loc_H2S,loc_SO4,loc_r34S,loc_r34S_SO4,loc_r56Fe
-	real::loc_R_34S,loc_R_34S_SO4,loc_R_56Fe
-	real::loc_alpha_34S,loc_alpha_56Fe
-	real::loc_FeS2_precipitation_const,loc_FeS2_precipitation
+	real::loc_TDFe,loc_H2S,loc_SO4,loc_r56Fe
+	real::loc_R_56Fe
+	real::loc_alpha_56Fe
+	real::loc_FeS2_precipitation
 	!!!!!
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
@@ -1925,88 +1925,46 @@ CONTAINS
     ! water column loop
 	! look for co-existing Fe and H2S and see if it can be instantaneously precipitated
     ! 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
-    ! NOTE: loc_FeS2_precipitation_const units are (M-1 yr-1)
+    ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
 	DO k=n_k,dum_k1,-1
 	  loc_TDFe = ocn(io_TDFe,dum_i,dum_j,k)
 	  loc_H2S  = ocn(io_H2S,dum_i,dum_j,k)
 	  loc_SO4  = ocn(io_SO4,dum_i,dum_j,k)
 		!calculate pyrite precipitation
 		if ((loc_TDFe > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall) .AND. (loc_SO4 > const_real_nullsmall)) then
-       	 loc_FeS2_precipitation_const = par_bio_FeS2precip_k 
+       	 
+		 ! This loop assumes that when Fe and H2S are present together, they form FeSaq
+		 ! FeSaq = TDFe when H2S is more abundant than TDFe, and vice versa
 		 if (loc_TDFe < loc_H2S) then
-		   loc_FeS2_precipitation = dum_dt*loc_FeS2_precipitation_const*loc_TDFe*loc_H2S
+		   loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_TDFe*loc_H2S
 		 else 
-		   loc_FeS2_precipitation = dum_dt*loc_FeS2_precipitation_const*loc_H2S**2
+		   loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_H2S**2
 		 end if
-           ! deal with Fe and S isotopes?
+           ! deal with Fe and S isotopes? -> no fractionation of S during pyrite formation
            ! calculate isotopic ratio
-		   loc_alpha_56Fe = par_d56Fe_FeS2_alpha
-		   loc_alpha_34S  = par_d34S_FeS2_alpha
-		   loc_r34S       = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
-		   loc_r34S_SO4   = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
+		   ! loc_alpha_56Fe = par_d56Fe_FeS2_alpha
 		   loc_r56Fe      = ocn(io_TDFe_56Fe,dum_i,dum_j,k)/ocn(io_TDFe,dum_i,dum_j,k)
 		   loc_R_56Fe     = loc_r56Fe/(1.0 - loc_r56Fe)
-		   loc_R_34S      = loc_r34S/(1.0 - loc_r34S)
-		   loc_R_34S_SO4  = loc_r34S_SO4/(1.0 - loc_r34S_SO4)
-           if (loc_FeS2_precipitation > MIN(loc_H2S,loc_TDFe,loc_SO4)) then
-               loc_FeS2_precipitation = MIN(loc_H2S,loc_TDFe,loc_SO4)
-             if (loc_FeS2_precipitation == loc_H2S) then
-			     ! complete H2S utilisation (no S fractionation)
-			     ! But potential Fe fractionation
-			     loc_bio_part(is_FeS2,k)   = -loc_FeS2_precipitation
-			     loc_bio_uptake(io_TDFe,k) = +loc_FeS2_precipitation
-			     loc_bio_uptake(io_H2S,k)  = +7/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_SO4,k)  = +1/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_ALK,k)  = +6.0*loc_FeS2_precipitation
-                 ! isotopes
-			     loc_bio_uptake(io_H2S_34S,k)   = +loc_r34S*7/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_SO4_34S,k)   = +loc_r34S_SO4*1/8*loc_FeS2_precipitation
-                 loc_bio_part(is_FeS2_34S,k)    = -(7/8*loc_r34S+1/8*loc_r34S_SO4)*loc_FeS2_precipitation
-                 loc_bio_uptake(io_TDFe_56Fe,k) = +loc_alpha_56Fe*loc_R_56Fe/(1.0 + loc_alpha_56Fe*loc_R_56Fe)*loc_FeS2_precipitation
-                 loc_bio_part(is_FeS2_56Fe,k)   = -loc_alpha_56Fe*loc_R_56Fe/(1.0 + loc_alpha_56Fe*loc_R_56Fe)*loc_FeS2_precipitation
-             else if (loc_FeS2_precipitation == loc_TDFe) then 
-                 ! complete Fe2 utilisation (no Fe fractionation)
-			     ! But potential S fractionation
-			     loc_bio_part(is_FeS2,k)   = -loc_FeS2_precipitation
-			     loc_bio_uptake(io_TDFe,k) = +loc_FeS2_precipitation
-			     loc_bio_uptake(io_H2S,k)  = +7/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_SO4,k)  = +1/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_ALK,k)  = +6.0*loc_FeS2_precipitation
-                 ! isotopes
-			     loc_bio_uptake(io_H2S_34S,k)   = +loc_alpha_34S*loc_R_34S/(1.0 + loc_alpha_34S*loc_R_34S)*7/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_SO4_34S,k)   = +loc_alpha_34S*loc_R_34S_SO4/(1.0 + loc_alpha_34S*loc_R_34S_SO4)*1/8*loc_FeS2_precipitation
-                 loc_bio_part(is_FeS2_34S,k)    = -(7/8*loc_alpha_34S*loc_R_34S/(1.0 + loc_alpha_34S*loc_R_34S)+1/8*loc_alpha_34S*loc_R_34S_SO4/(1.0 + loc_alpha_34S*loc_R_34S_SO4))*loc_FeS2_precipitation
-                 loc_bio_uptake(io_TDFe_56Fe,k) = +loc_r56Fe*loc_FeS2_precipitation
-                 loc_bio_part(is_FeS2_56Fe,k)   = -loc_r56Fe*loc_FeS2_precipitation
-           	 else
-                 ! In the unlikely case that sulphate is limiting
-			     ! no fractionation
-				 loc_bio_part(is_FeS2,k)   = -loc_FeS2_precipitation
-			     loc_bio_uptake(io_TDFe,k) = +loc_FeS2_precipitation
-			     loc_bio_uptake(io_H2S,k)  = +7/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_SO4,k)  = +1/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_ALK,k)  = +6.0*loc_FeS2_precipitation
-                 ! isotopes
-			     loc_bio_uptake(io_H2S_34S,k)   = +loc_r34S*7/8*loc_FeS2_precipitation
-                 loc_bio_uptake(io_SO4_34S,k)   = +loc_r34S_SO4*1/8*loc_FeS2_precipitation
-                 loc_bio_part(is_FeS2_34S,k)    = +(7/8*loc_r34S+1/8*loc_r34S_SO4)*loc_FeS2_precipitation
-                 loc_bio_uptake(io_TDFe_56Fe,k) = +loc_r56Fe*loc_FeS2_precipitation
-                 loc_bio_part(is_FeS2_56Fe,k)   = -loc_r56Fe*loc_FeS2_precipitation			 
-             end if
+		 if (loc_FeS2_precipitation > MIN(7.0/8.0*loc_H2S,loc_TDFe,1.0/8.0*loc_SO4)) then
+             
+             loc_bio_part(is_FeS2,k) = MIN(7.0/8.0*loc_H2S,loc_TDFe,1.0/8.0*loc_SO4)
+			 if (loc_FeS2_precipitation == loc_TDFe) then
+			     ! complete Fe utilisation 
+			     ! No potential Fe fractionation
+			     ! isotopes
+			      loc_bio_part(is_FeS2_56Fe,k)   = loc_r56Fe*loc_bio_part(is_FeS2,k)
+             else 
+                 ! Potential Fe fractionation
+			     ! isotopes
+			     loc_bio_part(is_FeS2_56Fe,k)  &
+				 & = par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe)*loc_bio_part(is_FeS2,k)
+			 end if
 		
-		  else
-			  loc_FeS2_precipitation    = loc_FeS2_precipitation
-			  loc_bio_part(is_FeS2,k)   = - loc_FeS2_precipitation
-			  loc_bio_uptake(io_TDFe,k) = +loc_FeS2_precipitation
-			  loc_bio_uptake(io_H2S,k)  = +7/8*loc_FeS2_precipitation
-              loc_bio_uptake(io_SO4,k)  = +1/8*loc_FeS2_precipitation
-              loc_bio_uptake(io_ALK,k)  = +6.0*loc_FeS2_precipitation
-              ! isotopes
-			  loc_bio_uptake(io_H2S_34S,k)   = +loc_r34S*7/8*loc_FeS2_precipitation
-              loc_bio_uptake(io_SO4_34S,k)   = +loc_r34S_SO4*1/8*loc_FeS2_precipitation
-              loc_bio_part(is_FeS2_34S,k)    = -(7/8*loc_r34S+1/8*loc_r34S_SO4)*loc_FeS2_precipitation
-              loc_bio_uptake(io_TDFe_56Fe,k) = +loc_r56Fe*loc_FeS2_precipitation
-              loc_bio_part(is_FeS2_56Fe,k)   = -loc_r56Fe*loc_FeS2_precipitation			 
+		 else
+			  loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
+			  ! isotopes
+			  loc_bio_part(is_FeS2_56Fe,k)  &
+				 & = par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe)*loc_bio_part(is_FeS2,k)			 
           end if
 	   end if
 !!!!!
@@ -2031,7 +1989,7 @@ CONTAINS
     ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
     DO l=3,n_l_sed
        is = conv_iselected_is(l)
-       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) - loc_bio_part(is,:)
+       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
     end DO
     ! -------------------------------------------------------- !
     ! END
@@ -2051,10 +2009,10 @@ CONTAINS
     integer::loc_i,loc_tot_i
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
-    real::loc_ohm,loc_ohm_cte
-    real::loc_delta_FeCO3,loc_CO3,loc_TDFe,loc_Fe,loc_H2S,loc_FeCO3_prec 
+    real::loc_ohm
+    real::loc_delta_FeCO3,loc_CO3,loc_TDFe,loc_Fe,loc_H2S,loc_O2,loc_FeCO3_precipitation
     real::loc_alpha
-    real::loc_R,loc_r56Fe
+    real::loc_R, loc_r56Fe,loc_R_56Fe
     integer::loc_kmax
 
     ! *** INITIALIZE VARIABLES ***
@@ -2107,43 +2065,41 @@ CONTAINS
             & carbalk(:,dum_i,dum_j,k)    &
             & )
 			
-	   ! preciptiation is from the carbonate ion!!!!!!!!
-	   ! needs to be altered
-	   loc_ohm_cte = par_bio_FeCO3precip_abioticohm_cte
 	   loc_CO3     = carb(ic_conc_CO3,dum_i,dum_j,n_k)
 	   loc_TDFe    = ocn(io_TDFe,dum_i,dum_j,k)
        loc_r56Fe   = ocn(io_TDFe_56Fe,dum_i,dum_j,k)/ocn(io_TDFe,dum_i,dum_j,k)
+	   loc_R_56Fe  = loc_r56Fe/(1.0 - loc_r56Fe)
        loc_H2S     = ocn(io_H2S,dum_i,dum_j,k)
+	   loc_O2      = ocn(io_O2,dum_i,dum_j,k)
 	   
-	   if (ocn_select(io_H2S)) then
-	      loc_H2S     = ocn(io_H2S,dum_i,dum_j,k)
-	      if (loc_H2S < loc_TDFe) then
-	        loc_Fe   = loc_TDFe - loc_H2S
-	        loc_ohm  = (loc_CO3*loc_Fe)/loc_ohm_cte
-	      else 
-	        loc_ohm = 0.0
+	  if ((loc_TDFe > const_real_nullsmall) .AND. (loc_CO3 > const_real_nullsmall) .AND. (loc_O2 < const_real_nullsmall)) then
+	      if (ocn_select(io_H2S)) then
+	        loc_H2S     = ocn(io_H2S,dum_i,dum_j,k)
+	         if (loc_H2S < loc_TDFe) then
+	           loc_Fe   = loc_TDFe - loc_H2S
+	           loc_ohm  = (loc_CO3*loc_Fe)/par_bio_FeCO3precip_abioticohm_cte
+	         else 
+	           loc_ohm = 0.0
+	         end if
+	      else
+	           loc_ohm  = (loc_CO3*loc_TDFe)/par_bio_FeCO3precip_abioticohm_cte
 	      end if
-	   else
-	        loc_ohm  = (loc_CO3*loc_TDFe)/loc_ohm_cte
-	   end if
-	   if (loc_ohm > par_bio_FeCO3precip_abioticohm_min) then
-          loc_FeCO3_prec = &
-               & dum_dt*par_bio_FeCO3precip_sf*(par_bio_FeCO3precip_abioticohm_min - 1.0)**par_bio_FeCO3precip_exp
-         
-          loc_bio_part(is_FeCO3,k)   = loc_FeCO3_prec 
-		  loc_bio_uptake(io_TDFe,k)  = loc_FeCO3_prec
-		  loc_bio_uptake(io_DIC,k)   = loc_FeCO3_prec
+	      
+		  if (loc_ohm > par_bio_FeCO3precip_abioticohm_min) then
+               loc_FeCO3_precipitation = &
+			   & dum_dt*par_bio_FeCO3precip_sf*(loc_ohm - 1.0)**par_bio_FeCO3precip_exp
+               
+	      else
+	           loc_FeCO3_precipitation      = 0.0 
+		      !loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
+          end if
+		  if (loc_FeCO3_precipitation > MIN(loc_CO3,loc_TDFe)) then
+		      loc_FeCO3_precipitation = MIN(loc_CO3,loc_TDFe)
+		  end if
+		  loc_bio_part(is_FeCO3,k) = loc_FeCO3_precipitation
+		  loc_bio_part(is_FeCO3_56Fe,k) = &
+               & par_d56Fe_FeCO3_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeCO3_alpha*loc_R_56Fe)*loc_bio_part(is_FeCO3,k)
 		  
-		  loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
-	   else
-	      loc_FeCO3_prec = 0.0
-		  
-          loc_bio_part(is_FeCO3,k)   = loc_FeCO3_prec 
-		  loc_bio_uptake(io_TDFe,k)  = loc_FeCO3_prec
-		  loc_bio_uptake(io_DIC,k)   = loc_FeCO3_prec
-		  
-		  loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
-       end if
        if (sed_select(is_FeCO3_13C)) then
           ! re-calculate carbonate system isotopic properties
           if (ocn_select(io_DIC_13C)) then
@@ -2158,12 +2114,12 @@ CONTAINS
           ! calculate 13C/12C fractionation between DIC and FeCO3
           ! NOTE: T-dependent fractionation for calcite following Mook [1986]
           ! NOTE: FeCO3 fractionation w.r.t. CO3-
-          loc_delta_FeCO3 = 0.0
+          loc_delta_FeCO3 = 15.10 - 4232.0/ocn(io_T,dum_i,dum_j,k)
           loc_alpha = 1.0 + loc_delta_FeCO3/1000.0
           loc_R = carbisor(ici_CO3_r13C,dum_i,dum_j,k)/(1.0 - carbisor(ici_CO3_r13C,dum_i,dum_j,k))
-          loc_bio_part(is_FeCO3_13C,k) = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_FeCO3_prec
+          loc_bio_part(is_FeCO3_13C,k) = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_bio_part(is_FeCO3,k)
        end if
-       
+    end if    
        ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
