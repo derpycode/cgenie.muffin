@@ -476,7 +476,9 @@ MODULE biogem_lib
   real::par_bio_FeCO3precip_abioticohm_cte                       ! ohmega constant for siderite formation
   real::par_bio_FeCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
-
+  real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
+  namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
+  
   real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
   NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k
   real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
