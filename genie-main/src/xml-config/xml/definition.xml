@@ -4785,8 +4785,12 @@
                         <description>Ohmega constant for FeCO3 precip</description>
                     </param>
                     <param name="par_bio_FeCO3precip_abioticohm_min">
-			<value datatype="real">10</value>
+			<value datatype="real">1.0</value>
                         <description>Minimum ohmega threshold for precip</description>
+                    </param>
+                    <param name="par_d56Fe_FeCO3_alpha">
+			<value datatype="real">1.00048</value>
+                        <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
                     </param>
                     <param name="par_bio_FeS2precip_k">
 			<value datatype="real">3250.43</value>
