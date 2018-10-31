@@ -351,6 +351,7 @@ CONTAINS
        print*,'Scale factor for FeCO3 precipitation                : ',par_bio_FeCO3precip_sf
        print*,'Rate law power for FeCO3 precipitation              : ',par_bio_FeCO3precip_exp
 	   print*,'Ohnega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
+	   print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
 	   print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
 	   print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
        print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
