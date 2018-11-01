@@ -1338,15 +1338,24 @@ subroutine biogem(        &
                        ! update flux reporting
                        locij_focnatm(ia_pO2,i,j)  = locij_focnatm(ia_pO2,i,j) - 2.0*locij_focnatm(ia_pH2S,i,j)
                        locij_focnatm(ia_pH2S,i,j) = 0.0
-                       ! ### INSERT CODE FOR ISOTOPES ############################################################################### !
-                       !
-                       ! ############################################################################################################ !
+                       ! update isotope mass balance and reporting
+                       if (atm_select(ia_pH2S_34S)) then
+                          locijk_focn(io_SO4_34S,i,j,n_k) = locijk_focn(io_SO4_34S,i,j,n_k) + locij_focnatm(ia_pH2S_34S,i,j)
+                          locij_fatm(ia_pH2S_34S,i,j)     = 0.0
+                          locij_focnatm(ia_pH2S_34S,i,j)  = 0.0
+                       end IF
                     end IF
                  case default
                     ! no flux to atmosphere
                     locij_fatm(ia_pH2S,i,j)    = 0.0
                     locij_focnatm(ia_pH2S,i,j) = 0.0
                     diag_airsea(ia_pH2S,i,j)   = 0.0
+                    ! update isotope mass balance and reporting
+                    if (atm_select(ia_pH2S_34S)) then
+                       locij_fatm(ia_pH2S_34S,i,j)    = 0.0
+                       locij_focnatm(ia_pH2S_34S,i,j) = 0.0
+                       diag_airsea(ia_pH2S_34S,i,j)   = 0.0
+                    end IF
                  end select
               END IF
               IF (opt_select(iopt_select_carbchem)) THEN
@@ -1434,7 +1443,7 @@ subroutine biogem(        &
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
               end if
-			   if (sed_select(is_FeCO3)) then
+              if (sed_select(is_FeCO3)) then
                  call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
               end if
 

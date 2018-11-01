@@ -136,8 +136,8 @@ CONTAINS
     real::loc_alpha_sa,loc_alpha_as
     real::loc_rho
     real::loc_TC
-    real::loc_r13C_ocn,loc_r14C_ocn,loc_r18O_ocn
-    real::loc_r13C_atm,loc_r14C_atm,loc_r18O_atm
+    real::loc_r13C_ocn,loc_r14C_ocn,loc_r18O_ocn,loc_r34S_ocn
+    real::loc_r13C_atm,loc_r14C_atm,loc_r18O_atm,loc_r34S_atm
     real::loc_R_atm,loc_R_ocn
     real::loc_ocn,loc_atm
     real::loc_A
@@ -295,6 +295,15 @@ CONTAINS
                 if (ocn(io_O2,dum_i,dum_j,n_k) > const_real_nullsmall) then
                    loc_r18O_ocn = ocn(io_O2_18O,dum_i,dum_j,n_k)/ocn(io_O2,dum_i,dum_j,n_k)
                    loc_focnatm(ia_pO2_18O) = loc_r18O_ocn*loc_focnatm(ia_pO2)
+                end if
+             CASE (ia_pH2S_34S)
+                if (dum_atm(ia_pH2S) > const_real_nullsmall) then
+                   loc_r34S_atm = dum_atm(ia_pH2S_34S)/dum_atm(ia_pH2S)
+                   loc_fatmocn(ia_pH2S_34S) = loc_r34S_atm*loc_fatmocn(ia_pH2S)
+                end if
+                if (ocn(io_H2S,dum_i,dum_j,n_k) > const_real_nullsmall) then
+                   loc_r34S_ocn = ocn(io_H2S_34S,dum_i,dum_j,n_k)/ocn(io_H2S,dum_i,dum_j,n_k)
+                   loc_focnatm(ia_pH2S_34S) = loc_r34S_ocn*loc_focnatm(ia_pH2S)
                 end if
              case default
                 ! ### INSERT CODE TO DEAL WITH ADDITIONAL ISOTOPES ############################################################### !
@@ -3334,8 +3343,11 @@ CONTAINS
     real::loc_O2,loc_NO3,loc_SO4
     real::loc_kO2,loc_kNO3,loc_kSO4,loc_kmeth
     real::loc_kiO2,loc_kiNO3,loc_kiSO4
+    real::loc_r15N,loc_r34S
     ! ---------------------------------------------------------- ! initialize
-    loc_k   = 0.0
+    loc_k    = 0.0
+    loc_r15N = 0.0
+    loc_r34S = 0.0
     ! ---------------------------------------------------------- !
     ! CREATE REMIN ARRAY
     ! ---------------------------------------------------------- !
@@ -3473,6 +3485,18 @@ CONTAINS
        end if
     else
        dum_conv_ls_lo(:,:) = 0.0
+    end if
+    ! ---------------------------------------------------------- !
+    ! CORRECT FOR ISOTOPES (in SO4 and NO3)
+    ! ---------------------------------------------------------- !
+    ! test for S isotopes selected
+    ! NOTE: value of loc_SO4 already determined
+    if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
+       if (loc_SO4 > const_real_nullsmall) then
+          loc_r34S = dum_ocn(io2l(io_SO4_34S)) / loc_SO4
+          dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_r34S*dum_conv_ls_lo(io2l(io_SO4_34S),:)
+          dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_r34S*dum_conv_ls_lo(io2l(io_H2S_34S),:)
+       end if
     end if
     ! ---------------------------------------------------------- !
     ! END
@@ -5354,6 +5378,10 @@ CONTAINS
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2) - (3.0/2.0)*dum_ocn(io_I)
     end if
     fun_audit_combinetracer(io_I) = 0.0
+    if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
+       fun_audit_combinetracer(io_SO4_34S) = fun_audit_combinetracer(io_SO4_34S) + dum_ocn(io_H2S_34S)
+       fun_audit_combinetracer(io_H2S_34S) = 0.0
+    end if
     ! #### INSERT CODE FOR FURTHER SPECIAL CASES ################################################################################# !
     !
     ! ############################################################################################################################ !
