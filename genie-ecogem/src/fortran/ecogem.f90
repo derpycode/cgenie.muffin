@@ -253,6 +253,11 @@ subroutine ecogem(          &
                  if (topD.lt.mld) imld=k                     ! if top of level is above MLD, include level in ML
                  topD = topD + layerthick                    ! get depth for top of next level
                  templocal = loc_ocn(io_T,i,j,k)
+                 ! cap maximum temperature seen by ECOGEM
+                 !temp_max=35
+                 !if (templocal.gt.(temp_max+273.15)) print*,'\/'
+                 !print*,templocal,temp_max,MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
+                 templocal = MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
 
                  loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
                  loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
@@ -268,11 +273,16 @@ subroutine ecogem(          &
 
                  ! LIGHT ATTENUATION     
                  if (n_keco.eq.1) then ! Calculate light as mean across (virtual) ML
+                    ! [AR] restrict MLD to (top) layer thickness
+                    if (ctrl_restrict_mld) then
+                       if (topD > mld) mld = topD
+                    end if
                     totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 
                     totchl    = totchl * layerthick / mld ! recalculate chl concentration as if spread evenly across ML
                     k_tot     = (k_w + k_chl*totchl) ! attenuation due to water and pigment
                     if (fundamental) k_tot = k_w ! no self-shading (i.e. no competition for light) in fundamental niche experiment
                     PAR_layer = PAR_in /mld /k_tot*(1-exp(-k_tot*mld)) ! average PAR in  layer
+                    ! [AR] this ... doesn't 'do' anything? k_tot*(1-exp(-k_tot*mld)) is never 0.0 or less(?)
                     PAR_layer = MERGE(PAR_layer,0.0,k_tot*(1-exp(-k_tot*mld)).gt.0.0)
                  else ! Calculate mean light within each layer
                     totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 

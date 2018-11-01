@@ -140,7 +140,7 @@ CONTAINS
        if (sed_select(is_POC) .AND. sed_select(is_CaCO3)) then
           loc_filename=fun_data_timeseries_filename( &
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_CaCO3toPOC',string_results_ext)
-          loc_string = '% time (yr) / CaCO3:POC ratio'
+          loc_string = '% time (yr) / CaCO3/POC ratio / POC/CaCO3 ratio'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -152,7 +152,31 @@ CONTAINS
        if (sed_select(is_POC) .AND. sed_select(is_opal)) then
           loc_filename=fun_data_timeseries_filename( &
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opaltoPOC',string_results_ext)
-          loc_string = '% time (yr) / opal:POC ratio'
+          loc_string = '% time (yr) / opal/POC ratio / POC/opal ratio'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       if (sed_select(is_POC) .AND. sed_select(is_POP)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_POPtoPOC',string_results_ext)
+          loc_string = '% time (yr) / POP/POC ratio (o/oo) / POC/POP ratio'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       if (sed_select(is_POC) .AND. sed_select(is_POFe)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_POFetoPOC',string_results_ext)
+          loc_string = '% time (yr) / POFe/POC ratio (1.0E3 o/oo) / POC/POFe ratio'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -937,7 +961,7 @@ CONTAINS
     REAL::loc_t
     real::loc_opsi_scale
     real::loc_ocn_tot_M,loc_ocn_tot_M_sur,loc_ocn_tot_A
-    real::loc_sig,loc_sig_sur,loc_sig_ben
+    real::loc_sig,loc_sig_sur,loc_sig_ben,loc_rsig
     real::loc_tot,loc_tot_sur,loc_tot_ben
     real::loc_frac,loc_frac_sur,loc_frac_ben,loc_standard
     real::loc_d13C,loc_d14C
@@ -1276,12 +1300,14 @@ CONTAINS
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
-          if (int_fexport_sig(is_POC) > const_real_nullsmall) then
-             loc_sig = int_fexport_sig(is_CaCO3)/int_fexport_sig(is_POC)
+          if ((int_fexport_sig(is_POC) > const_real_nullsmall) .AND. (int_fexport_sig(is_CaCO3) > const_real_nullsmall)) then
+             loc_sig  = int_fexport_sig(is_CaCO3)/int_fexport_sig(is_POC)
+             loc_rsig = int_fexport_sig(is_POC)/int_fexport_sig(is_CaCO3)
           else
-             loc_sig = 0.0
+             loc_sig  = 0.0
+             loc_rsig = 0.0
           end if
-          WRITE(unit=out,fmt='(f12.3,f9.6)',iostat=ios) loc_t,loc_sig
+          WRITE(unit=out,fmt='(f12.3,2f12.6)',iostat=ios) loc_t,loc_sig,loc_rsig
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -1292,12 +1318,50 @@ CONTAINS
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
-          if (int_fexport_sig(is_POC) > const_real_nullsmall) then
-             loc_sig = int_fexport_sig(is_opal)/int_fexport_sig(is_POC)
+          if ((int_fexport_sig(is_POC) > const_real_nullsmall) .AND. (int_fexport_sig(is_opal) > const_real_nullsmall)) then
+             loc_sig  = int_fexport_sig(is_opal)/int_fexport_sig(is_POC)
+             loc_rsig = int_fexport_sig(is_POC)/int_fexport_sig(is_opal)
           else
-             loc_sig = 0.0
+             loc_sig  = 0.0
+             loc_rsig = 0.0
           end if
-          WRITE(unit=out,fmt='(f12.3,f9.6)',iostat=ios) loc_t,loc_sig
+          WRITE(unit=out,fmt='(f12.3,2f12.6)',iostat=ios) loc_t,loc_sig,loc_rsig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       if (sed_select(is_POC) .AND. sed_select(is_POP)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_POPtoPOC',string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          if ((int_fexport_sig(is_POC) > const_real_nullsmall) .AND. (int_fexport_sig(is_POP) > const_real_nullsmall)) then
+             loc_sig  = 1.0E3*int_fexport_sig(is_POP)/int_fexport_sig(is_POC)
+             loc_rsig = int_fexport_sig(is_POC)/int_fexport_sig(is_POP)
+          else
+             loc_sig  = 0.0
+             loc_rsig = 0.0
+          end if
+          WRITE(unit=out,fmt='(f12.3,2f12.6)',iostat=ios) loc_t,loc_sig,loc_rsig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       if (sed_select(is_POC) .AND. sed_select(is_POFe)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_POFetoPOC',string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          if ((int_fexport_sig(is_POC) > const_real_nullsmall) .AND. (int_fexport_sig(is_POFe) > const_real_nullsmall)) then
+             loc_sig  = 1.0E6*int_fexport_sig(is_POFe)/int_fexport_sig(is_POC)
+             loc_rsig = int_fexport_sig(is_POC)/int_fexport_sig(is_POFe)
+          else
+             loc_sig  = 0.0
+             loc_rsig = 0.0
+          end if
+          WRITE(unit=out,fmt='(f12.3,2f12.6)',iostat=ios) loc_t,loc_sig,loc_rsig
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
