@@ -1981,7 +1981,7 @@ CONTAINS
           ! no S fractionation
            loc_r34S      = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
            loc_r34S_SO4  = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
-           loc_bio_part(is_FeS2_34S,k) = (( (7.0/4.0*loc_r34S)+(1.0/4.0*loc_r34S_SO4))*loc_bio_part(is_FeS2,k))/2.0
+           loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
            
 	   end if
 !!!!!
