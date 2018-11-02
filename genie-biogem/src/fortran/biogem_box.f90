@@ -1960,14 +1960,10 @@ CONTAINS
              loc_bio_part(is_FeS2,k) = MIN(4.0/7.0*loc_H2S,loc_TDFe,4.0/1.0*loc_SO4)
                        
 			 if (loc_FeS2_precipitation == loc_TDFe) then
-			     ! complete Fe utilisation 
-			     ! No potential Fe fractionation
-			     ! isotopes
-                  
+			        
 			      loc_bio_part(is_FeS2_56Fe,k)= loc_r56Fe*loc_bio_part(is_FeS2,k)
              else 
                  ! Potential Fe fractionation
-			     ! isotopes
 			     loc_bio_part(is_FeS2_56Fe,k)  &
 				 & = par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe)*loc_bio_part(is_FeS2,k)
 			 end if
