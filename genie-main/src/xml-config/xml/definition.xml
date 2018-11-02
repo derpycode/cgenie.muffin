@@ -4524,7 +4524,7 @@
                         <description>methanogenesis fractionation</description>
                     </param>
                     <param name="par_d34S_Corg_SO4_epsilon">
-			<value datatype="real">40.0</value>
+			<value datatype="real">-40.0</value>
                         <description>sulphate reduction S fractionation</description>
                     </param>
 <!-- IRON  -->
