@@ -1938,7 +1938,7 @@ CONTAINS
 	  loc_H2S  = ocn(io_H2S,dum_i,dum_j,k)
 	  loc_SO4  = ocn(io_SO4,dum_i,dum_j,k)
 		!calculate pyrite precipitation
-		if ((loc_TDFe > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall) .AND. (loc_SO4 > const_real_nullsmall)) then
+		if ((loc_TDFe > const_real_nullsmall) .AND. (4.0/7.0*loc_H2S > const_real_nullsmall) .AND. (4.0/1.0*loc_SO4 > const_real_nullsmall)) then
        	 
 		 ! This loop assumes that when Fe and H2S are present together, they form FeSaq
 		 ! FeSaq = TDFe when H2S is more abundant than TDFe, and vice versa
@@ -1955,9 +1955,9 @@ CONTAINS
 		   loc_R_56Fe     = loc_r56Fe/(1.0 - loc_r56Fe)
            
            
-		 if (loc_FeS2_precipitation > MIN(7.0/4.0*loc_H2S,loc_TDFe,1.0/4.0*loc_SO4)) then
+		 if (loc_FeS2_precipitation > MIN(4.0/7.0*loc_H2S,loc_TDFe,4.0/1.0*loc_SO4)) then
              
-             loc_bio_part(is_FeS2,k) = MIN(7.0/4.0*loc_H2S,loc_TDFe,1.0/4.0*loc_SO4)
+             loc_bio_part(is_FeS2,k) = MIN(4.0/7.0*loc_H2S,loc_TDFe,4.0/1.0*loc_SO4)
                        
 			 if (loc_FeS2_precipitation == loc_TDFe) then
 			     ! complete Fe utilisation 
@@ -1981,8 +1981,8 @@ CONTAINS
           ! no S fractionation
            loc_r34S      = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
            loc_r34S_SO4  = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
-           !loc_bio_part(is_FeS2_34S,k) = ((7.0/4.0*loc_r34S)+(1.0/4.0*loc_r34S_SO4))*loc_bio_part(is_FeS2,k)
-		   loc_bio_part(is_FeS2_34S,k) = (( (7.0/4.0*loc_r34S)+(1.0/4.0*loc_r34S_SO4))*loc_bio_part(is_FeS2,k))/2.0
+           loc_bio_part(is_FeS2_34S,k) = (( (7.0/4.0*loc_r34S)+(1.0/4.0*loc_r34S_SO4))*loc_bio_part(is_FeS2,k))/2.0
+           
 	   end if
 !!!!!
        ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
@@ -1995,6 +1995,7 @@ CONTAINS
           end do
        end DO
     end DO
+        
     ! -------------------------------------------------------- !
     ! SET GLOBAL ARRAYS
     ! -------------------------------------------------------- !
