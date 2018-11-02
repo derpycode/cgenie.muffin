@@ -109,10 +109,18 @@ CONTAINS
     conv_sed_ocn(io_Fe,is_CaCO3_Fe)          = 1.0
     conv_sed_ocn(io_Fe,is_opal_Fe)           = 1.0
     conv_sed_ocn(io_Fe,is_det_Fe)            = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_POM_Fe_56Fe)            = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_CaCO3_Fe_56Fe)          = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_opal_Fe_56Fe)           = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_det_Fe_56Fe)            = 1.0
     conv_sed_ocn(io_TDFe,is_POM_Fe)            = 1.0
     conv_sed_ocn(io_TDFe,is_CaCO3_Fe)          = 1.0
     conv_sed_ocn(io_TDFe,is_opal_Fe)           = 1.0
     conv_sed_ocn(io_TDFe,is_det_Fe)            = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_POM_Fe_56Fe)            = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_CaCO3_Fe_56Fe)          = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_opal_Fe_56Fe)           = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_det_Fe_56Fe)            = 1.0
     conv_sed_ocn(io_231Pa,is_POM_231Pa)      = 1.0
     conv_sed_ocn(io_231Pa,is_CaCO3_231Pa)    = 1.0
     conv_sed_ocn(io_231Pa,is_opal_231Pa)     = 1.0
@@ -201,10 +209,18 @@ CONTAINS
     conv_ocn_sed(is_CaCO3_Fe,io_Fe)          = 1.0/conv_sed_ocn(io_Fe,is_CaCO3_Fe)
     conv_ocn_sed(is_opal_Fe,io_Fe)           = 1.0/conv_sed_ocn(io_Fe,is_opal_Fe)
     conv_ocn_sed(is_det_Fe,io_Fe)            = 1.0/conv_sed_ocn(io_Fe,is_det_Fe)
+    conv_ocn_sed(is_POM_Fe_56Fe,io_Fe_56Fe)            = 1.0/conv_sed_ocn(io_Fe_56Fe,is_POM_Fe_56Fe)
+    conv_ocn_sed(is_CaCO3_Fe_56Fe,io_Fe_56Fe)          = 1.0/conv_sed_ocn(io_Fe_56Fe,is_CaCO3_Fe_56Fe)
+    conv_ocn_sed(is_opal_Fe_56Fe,io_Fe_56Fe)           = 1.0/conv_sed_ocn(io_Fe_56Fe,is_opal_Fe_56Fe)
+    conv_ocn_sed(is_det_Fe_56Fe,io_Fe_56Fe)            = 1.0/conv_sed_ocn(io_Fe_56Fe,is_det_Fe_56Fe)
     conv_ocn_sed(is_POM_Fe,io_TDFe)            = 1.0/conv_sed_ocn(io_TDFe,is_POM_Fe)
     conv_ocn_sed(is_CaCO3_Fe,io_TDFe)          = 1.0/conv_sed_ocn(io_TDFe,is_CaCO3_Fe)
     conv_ocn_sed(is_opal_Fe,io_TDFe)           = 1.0/conv_sed_ocn(io_TDFe,is_opal_Fe)
     conv_ocn_sed(is_det_Fe,io_TDFe)            = 1.0/conv_sed_ocn(io_TDFe,is_det_Fe)
+    conv_ocn_sed(is_POM_Fe_56Fe,io_TDFe_56Fe)            = 1.0/conv_sed_ocn(io_TDFe_56Fe,is_POM_Fe_56Fe)
+    conv_ocn_sed(is_CaCO3_Fe_56Fe,io_TDFe_56Fe)          = 1.0/conv_sed_ocn(io_TDFe_56Fe,is_CaCO3_Fe_56Fe)
+    conv_ocn_sed(is_opal_Fe_56Fe,io_TDFe_56Fe)           = 1.0/conv_sed_ocn(io_TDFe_56Fe,is_opal_Fe_56Fe)
+    conv_ocn_sed(is_det_Fe_56Fe,io_TDFe_56Fe)            = 1.0/conv_sed_ocn(io_TDFe_56Fe,is_det_Fe_56Fe)
     conv_ocn_sed(is_POM_231Pa,io_231Pa)      = 1.0/conv_sed_ocn(io_231Pa,is_POM_231Pa)
     conv_ocn_sed(is_CaCO3_231Pa,io_231Pa)    = 1.0/conv_sed_ocn(io_231Pa,is_CaCO3_231Pa)
     conv_ocn_sed(is_opal_231Pa,io_231Pa)     = 1.0/conv_sed_ocn(io_231Pa,is_opal_231Pa)
@@ -257,7 +273,6 @@ CONTAINS
     conv_ocn_sed(is_FeS2_34S,io_H2S_34S)        = 1.0/conv_sed_ocn(io_H2S_34S,is_FeS2_34S)
     conv_ocn_sed(is_FeS2_34S,io_SO4_34S)        = 1.0/conv_sed_ocn(io_SO4_34S,is_FeS2_34S)
     conv_ocn_sed(is_FeS2_56Fe,io_Fe_56Fe)       = 1.0/conv_sed_ocn(io_Fe_56Fe,is_FeS2_56Fe) 
-
     ! ############################################################################################################################ !
     ! DISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between DOM and POM
@@ -274,6 +289,7 @@ CONTAINS
     conv_POM_DOM(io_DOM_Cd,is_POCd)             = 1.0
     conv_POM_DOM(io_DOM_Cd_114Cd,is_POCd_114Cd) = 1.0
     conv_POM_DOM(io_DOM_Fe,is_POFe)             = 1.0
+    conv_POM_DOM(io_DOM_Fe_56Fe,is_POFe_56Fe)   = 1.0
     conv_POM_DOM(io_DOM_I,is_POI)               = 1.0
     ! convert DOM -> POM
     conv_DOM_POM(:,:) = 0.0
@@ -286,36 +302,15 @@ CONTAINS
     conv_DOM_POM(is_POCd,io_DOM_Cd)             = 1.0/conv_POM_DOM(io_DOM_Cd,is_POCd)
     conv_DOM_POM(is_POCd_114Cd,io_DOM_Cd_114Cd) = 1.0/conv_POM_DOM(io_DOM_Cd_114Cd,is_POCd_114Cd)
     conv_DOM_POM(is_POFe,io_DOM_Fe)             = 1.0/conv_POM_DOM(io_DOM_Fe,is_POFe)
+    conv_DOM_POM(is_POFe_56Fe,io_DOM_Fe_56Fe)   = 1.0/conv_POM_DOM(io_DOM_Fe_56Fe,is_POFe_56Fe)
     conv_DOM_POM(is_POI,io_DOM_I)               = 1.0/conv_POM_DOM(io_DOM_I,is_POI)
     ! ############################################################################################################################ !
     ! RDISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between RDOM and POM
     ! convert POM -> RDOM
-    ! NOTE: populate unused elements with zero
-    ! ### INSERT DEFINITIONS FOR ADDITIONAL DOM/POM RELATIONSHIPS HERE ########################################################### !
-    conv_POM_RDOM(:,:) = 0.0
-    conv_POM_RDOM(io_RDOM_C,is_POC)               = 1.0
-    conv_POM_RDOM(io_RDOM_C_13C,is_POC_13C)       = 1.0
-    conv_POM_RDOM(io_RDOM_C_14C,is_POC_14C)       = 1.0
-    conv_POM_RDOM(io_RDOM_N,is_PON)               = 1.0
-    conv_POM_RDOM(io_RDOM_N_15N,is_PON_15N)       = 1.0
-    conv_POM_RDOM(io_RDOM_P,is_POP)               = 1.0
-    conv_POM_RDOM(io_RDOM_Cd,is_POCd)             = 1.0
-    conv_POM_RDOM(io_RDOM_Cd_114Cd,is_POCd_114Cd) = 1.0
-    conv_POM_RDOM(io_RDOM_Fe,is_POFe)             = 1.0
-    conv_POM_RDOM(io_RDOM_I,is_POI)               = 1.0
+    conv_POM_RDOM(:,:) = conv_POM_DOM(:,:)
     ! convert RDOM -> POM
-    conv_RDOM_POM(:,:) = 0.0
-    conv_RDOM_POM(is_POC,io_RDOM_C)               = 1.0/conv_POM_RDOM(io_RDOM_C,is_POC)
-    conv_RDOM_POM(is_POC_13C,io_RDOM_C_13C)       = 1.0/conv_POM_RDOM(io_RDOM_C_13C,is_POC_13C)
-    conv_RDOM_POM(is_POC_14C,io_RDOM_C_14C)       = 1.0/conv_POM_RDOM(io_RDOM_C_14C,is_POC_14C)
-    conv_RDOM_POM(is_PON,io_RDOM_N)               = 1.0/conv_POM_RDOM(io_RDOM_N,is_PON)
-    conv_RDOM_POM(is_PON_15N,io_RDOM_N_15N)       = 1.0/conv_POM_RDOM(io_RDOM_N_15N,is_PON_15N)
-    conv_RDOM_POM(is_POP,io_RDOM_P)               = 1.0/conv_POM_RDOM(io_RDOM_P,is_POP)
-    conv_RDOM_POM(is_POCd,io_RDOM_Cd)             = 1.0/conv_POM_RDOM(io_RDOM_Cd,is_POCd)
-    conv_RDOM_POM(is_POCd_114Cd,io_RDOM_Cd_114Cd) = 1.0/conv_POM_RDOM(io_RDOM_Cd_114Cd,is_POCd_114Cd)
-    conv_RDOM_POM(is_POFe,io_RDOM_Fe)             = 1.0/conv_POM_RDOM(io_RDOM_Fe,is_POFe)
-    conv_RDOM_POM(is_POI,io_RDOM_I)               = 1.0/conv_POM_RDOM(io_RDOM_I,is_POI)
+    conv_RDOM_POM(:,:) = conv_DOM_POM(:,:)
   END SUBROUTINE sub_def_tracerrelationships
   ! ****************************************************************************************************************************** !
 

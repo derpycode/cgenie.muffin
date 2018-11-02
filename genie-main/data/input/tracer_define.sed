@@ -14,6 +14,7 @@
  POCd             09  09  03  'particulate organic cadmium (POCd)'   'wt%'     0.00     100.00
  POCd_114Cd       43  09  17  'd114Cd of POC incorporated cadmium'   'o/oo'   -9.99E+2    9.99E+2
  POFe             10  10  03  'particulate organic iron (POFe)'      'wt%'     0.00     100.002
+ POFe_56Fe        81  10  22  'd56Fe of POC incorporated iron'       'o/oo'   -9.99E+2    9.99E+2
  POI              79  79  03  'particulate organic iodine (POI)'     'wt%'     0.00     100.00
  POBa             80  80  03  'particulate organic iodine (POI)'     'wt%'     0.00     100.00
  POBa_138Ba       81  80  23  'd114Cd of POC incorporated cadmium'   'o/oo'   -9.99E+2    9.99E+2

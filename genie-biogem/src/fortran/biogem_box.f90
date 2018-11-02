@@ -1911,10 +1911,10 @@ CONTAINS
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
 	
-	real::loc_TDFe,loc_H2S,loc_SO4,loc_r56Fe
-	real::loc_R_56Fe
-	real::loc_alpha_56Fe
-	real::loc_FeS2_precipitation
+    real::loc_TDFe,loc_H2S,loc_SO4,loc_r56Fe
+    real::loc_R_56Fe
+    real::loc_alpha_56Fe
+    real::loc_FeS2_precipitation
 	!!!!!
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
@@ -2005,6 +2005,7 @@ CONTAINS
     ! -------------------------------------------------------- !
   end SUBROUTINE sub_calc_precip_FeS2
   ! ****************************************************************************************************************************** !
+
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ABIOTIC FeCO3 precipitation
@@ -2153,6 +2154,9 @@ CONTAINS
     end DO
 
   end SUBROUTINE sub_calc_precip_FeCO3
+  ! ****************************************************************************************************************************** !
+
+
   ! ****************************************************************************************************************************** !
   ! Fe SPECIATION -- goethite
   ! NOTE: this scheme assumes the conservation and transport of: total dissolved Fe and total L
@@ -3344,6 +3348,7 @@ CONTAINS
     real::loc_kO2,loc_kNO3,loc_kSO4,loc_kmeth
     real::loc_kiO2,loc_kiNO3,loc_kiSO4
     real::loc_r15N,loc_r34S
+    real::loc_alpha,loc_R
     ! ---------------------------------------------------------- ! initialize
     loc_k    = 0.0
     loc_r15N = 0.0
@@ -3489,14 +3494,23 @@ CONTAINS
     ! ---------------------------------------------------------- !
     ! CORRECT FOR ISOTOPES (in SO4 and NO3)
     ! ---------------------------------------------------------- !
+    ! test for N isotopes selected
+    ! NOTE: value of loc_NO3 already determined
+    ! ### INSERT CODE TO DEAL WITH N ISOTOPES #################################################################################### !
+    !
+    ! ############################################################################################################################ !
     ! test for S isotopes selected
     ! NOTE: value of loc_SO4 already determined
     if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
        if (loc_SO4 > const_real_nullsmall) then
-          loc_r34S = dum_ocn(io2l(io_SO4_34S)) / loc_SO4
-          dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_r34S*dum_conv_ls_lo(io2l(io_SO4_34S),:)
-          dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_r34S*dum_conv_ls_lo(io2l(io_H2S_34S),:)
+          loc_r34S  = dum_ocn(io2l(io_SO4_34S)) / loc_SO4
+       else
+          loc_r34S  = 0.0
        end if
+       loc_alpha = 1.0 + par_d34S_Corg_SO4_epsilon/1000.0
+       loc_R     = loc_r34S/(1.0 - loc_r34S)
+       dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_SO4_34S),:)
+       dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_H2S_34S),:)
     end if
     ! ---------------------------------------------------------- !
     ! END
@@ -3745,6 +3759,7 @@ CONTAINS
     real,dimension(1:3)::loc_FeFELL
     real::loc_T,loc_SiO2                                                !
     real::loc_Si_eq,loc_u   
+    real::loc_scav_Fe,loc_r56Fe   
     real::tmp_bio_remin    !
     real::loc_bio_remin_dD
     real::loc_bio_remin_max_D                                         !
@@ -4219,15 +4234,21 @@ CONTAINS
                 ! NOTE: calculate Fe speciation first!
                 ! NOTE: for the lookup table, the goethite concentration is assigned to the first array index (otherwise used for [Fe])
                 if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
+                   loc_r56Fe = 0.0
+                   ! calculate Fe speciation
                    SELECT CASE (trim(opt_geochem_Fe))
                    CASE ('ALT')
                       loc_FeFeLL(:) = fun_box_calc_geochem_Fe(                                  &
                            & dum_vocn%mk(io2l(io_Fe),kk) + dum_vocn%mk(io2l(io_FeL),kk), &
                            & dum_vocn%mk(io2l(io_L),kk) + dum_vocn%mk(io2l(io_FeL),kk)   &
                            & )
-                      loc_bio_remin(io2l(io_Fe),kk)  = loc_bio_remin(io2l(io_Fe),kk)  + (loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe),kk))
-                      loc_bio_remin(io2l(io_FeL),kk) = loc_bio_remin(io2l(io_FeL),kk) + (loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL),kk))
-                      loc_bio_remin(io2l(io_L),kk)   = loc_bio_remin(io2l(io_L),kk)   + (loc_FeFeLL(3) - dum_vocn%mk(io2l(io_L),kk))
+                      ! re-partition Fe species
+                      loc_bio_remin(io2l(io_Fe),kk)  = loc_bio_remin(io2l(io_Fe),kk)  + &
+                           & (loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe),kk))
+                      loc_bio_remin(io2l(io_FeL),kk) = loc_bio_remin(io2l(io_FeL),kk) + &
+                           & (loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL),kk))
+                      loc_bio_remin(io2l(io_L),kk)   = loc_bio_remin(io2l(io_L),kk)   + &
+                           & (loc_FeFeLL(3) - dum_vocn%mk(io2l(io_L),kk))
                    CASE ('hybrid')
                       loc_FeFeLL(:) = fun_box_calc_geochem_Fe(dum_vocn%mk(io2l(io_TDFe),kk),dum_vocn%mk(io2l(io_TL),kk))
                    CASE ('lookup_4D')
@@ -4238,26 +4259,45 @@ CONTAINS
                    case default
                       loc_FeFeLL(1) = dum_vocn%mk(io2l(io_Fe),kk)
                    end SELECT
+                   ! calculate mean Fe isotopic composition
+                   If ( (ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe)) .AND. (loc_FeFeLL(1) > const_real_nullsmall) ) then
+                      SELECT CASE (trim(opt_geochem_Fe))
+                      CASE ('hybrid','lookup_4D')
+                         loc_r56Fe = dum_vocn%mk(io2l(io_TDFe_56Fe),kk)/ &
+                              & dum_vocn%mk(io2l(io_TDFe),kk)
+                      case default
+                         loc_r56Fe = (dum_vocn%mk(io2l(io_Fe_56Fe),kk) + dum_vocn%mk(io2l(io_FeL_56Fe),kk))/ &
+                              & (loc_FeFeLL(1) + loc_FeFeLL(2))
+                         ! re-partition Fe isotopes
+                         loc_bio_remin(io2l(io_Fe_56Fe),kk)  = loc_bio_remin(io2l(io_Fe_56Fe),kk)  + &
+                              & (loc_r56Fe*loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe_56Fe),kk))
+                         loc_bio_remin(io2l(io_FeL_56Fe),kk) = loc_bio_remin(io2l(io_FeL_56Fe),kk) + &
+                              & (loc_r56Fe*loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL_56Fe),kk))
+                      end SELECT
+                   end if
+                   ! calculate scavenging (and isotopes)
                    SELECT CASE (trim(opt_geochem_Fe))
                    CASE ('hybrid','lookup_4D')
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
-                         loc_bio_remin(io2l(io_TDFe),kk) = loc_bio_remin(io2l(io_TDFe),kk) - &
-                              fun_box_scav_Fe(                                                  &
-                              & dum_dtyr,                     &
-                              & loc_bio_remin_dt_scav,        &
-                              & loc_FeFeLL(1),  &
-                              & loc_bio_part_TMP(:,kk)       &
+                         loc_scav_Fe = fun_box_scav_Fe( &
+                              & dum_dtyr,               &
+                              & loc_bio_remin_dt_scav,  &
+                              & loc_FeFeLL(1),          &
+                              & loc_bio_part_TMP(:,kk)  &
                               & )
+                         loc_bio_remin(io2l(io_TDFe),kk)      = loc_bio_remin(io2l(io_TDFe),kk)      - loc_scav_Fe
+                         loc_bio_remin(io2l(io_TDFe_56Fe),kk) = loc_bio_remin(io2l(io_TDFe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
                       end if
                    case default
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
-                         loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - &
-                              fun_box_scav_Fe(                                                  &
-                              & dum_dtyr,                     &
-                              & loc_bio_remin_dt_scav,        &
-                              & loc_FeFeLL(1),  &
-                              & loc_bio_part_TMP(:,kk)       &
+                         loc_scav_Fe = fun_box_scav_Fe( & 
+                              & dum_dtyr,               &
+                              & loc_bio_remin_dt_scav,  &
+                              & loc_FeFeLL(1),          &
+                              & loc_bio_part_TMP(:,kk)  &
                               & )
+                         loc_bio_remin(io2l(io_Fe),kk)      = loc_bio_remin(io2l(io_Fe),kk)      - loc_scav_Fe 
+                         loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
                       end if
                    end SELECT
                 end if
@@ -5366,10 +5406,10 @@ CONTAINS
        fun_audit_combinetracer(io_SO4) = fun_audit_combinetracer(io_SO4) + dum_ocn(io_H2S)
     end if
     fun_audit_combinetracer(io_H2S) = 0.0
-    if (ocn_select(io_Fe)) then
+    if (ocn_select(io_Fe) .AND. ocn_select(io_FeL)) then
        fun_audit_combinetracer(io_Fe)  = fun_audit_combinetracer(io_Fe)  + dum_ocn(io_FeL)
     end if
-    if (ocn_select(io_L)) then
+    if (ocn_select(io_L) .AND. ocn_select(io_FeL)) then
        fun_audit_combinetracer(io_L)   = fun_audit_combinetracer(io_L)   + dum_ocn(io_FeL)
     end if
     fun_audit_combinetracer(io_FeL) = 0.0
