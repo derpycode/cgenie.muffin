@@ -1910,16 +1910,14 @@ CONTAINS
     integer::loc_i,loc_tot_i
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
-	
-    real::loc_TDFe,loc_H2S,loc_SO4,loc_r56Fe
+    real::loc_TDFe,loc_H2S,loc_SO4
+    real::loc_r56Fe, loc_r34S, loc_r34S_SO4
     real::loc_R_56Fe
     real::loc_alpha_56Fe
     real::loc_FeS2_precipitation
-	!!!!!
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
-!!!!!  
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        loc_bio_uptake(io,:) = 0.0
@@ -1951,17 +1949,22 @@ CONTAINS
 		 end if
            ! deal with Fe and S isotopes? -> no fractionation of S during pyrite formation
            ! calculate isotopic ratio
-		   ! loc_alpha_56Fe = par_d56Fe_FeS2_alpha
+		   
+           ! loc_alpha_56Fe = par_d56Fe_FeS2_alpha
 		   loc_r56Fe      = ocn(io_TDFe_56Fe,dum_i,dum_j,k)/ocn(io_TDFe,dum_i,dum_j,k)
 		   loc_R_56Fe     = loc_r56Fe/(1.0 - loc_r56Fe)
-		 if (loc_FeS2_precipitation > MIN(7.0/8.0*loc_H2S,loc_TDFe,1.0/8.0*loc_SO4)) then
+           
+           
+		 if (loc_FeS2_precipitation > MIN(7.0/4.0*loc_H2S,loc_TDFe,1.0/4.0*loc_SO4)) then
              
-             loc_bio_part(is_FeS2,k) = MIN(7.0/8.0*loc_H2S,loc_TDFe,1.0/8.0*loc_SO4)
+             loc_bio_part(is_FeS2,k) = MIN(7.0/4.0*loc_H2S,loc_TDFe,1.0/4.0*loc_SO4)
+                       
 			 if (loc_FeS2_precipitation == loc_TDFe) then
 			     ! complete Fe utilisation 
 			     ! No potential Fe fractionation
 			     ! isotopes
-			      loc_bio_part(is_FeS2_56Fe,k)   = loc_r56Fe*loc_bio_part(is_FeS2,k)
+                  
+			      loc_bio_part(is_FeS2_56Fe,k)= loc_r56Fe*loc_bio_part(is_FeS2,k)
              else 
                  ! Potential Fe fractionation
 			     ! isotopes
@@ -1972,9 +1975,14 @@ CONTAINS
 		 else
 			  loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
 			  ! isotopes
-			  loc_bio_part(is_FeS2_56Fe,k)  &
+              loc_bio_part(is_FeS2_56Fe,k)  &
 				 & = par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe)*loc_bio_part(is_FeS2,k)			 
-          end if
+         end if
+          ! no S fractionation
+           loc_r34S      = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
+           loc_r34S_SO4  = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
+           !loc_bio_part(is_FeS2_34S,k) = ((7.0/4.0*loc_r34S)+(1.0/4.0*loc_r34S_SO4))*loc_bio_part(is_FeS2,k)
+		   loc_bio_part(is_FeS2_34S,k) = (( (7.0/4.0*loc_r34S)+(1.0/4.0*loc_r34S_SO4))*loc_bio_part(is_FeS2,k))/2.0
 	   end if
 !!!!!
        ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
