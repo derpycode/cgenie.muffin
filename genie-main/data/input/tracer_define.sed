@@ -52,10 +52,10 @@
  SrCO3            84  84  04  'CaCO3 incorporated strontium'         'wt%'     0.00     100.00
  SrCO3_87Sr       85  84  24  'd87Sr of SrCO3'                       'o/oo'   -9.99E+2    9.99E+2
  SrCO3_88Sr       86  84  25  'd88Sr of SrCO3'                       'o/oo'   -9.99E+2    9.99E+2
- FeCO3            88  88  02  'Fe carbonate'                         'wt%'     0.00     100.00
+ FeCO3            88  88  06  'Fe carbonate'                         'wt%'     0.00     100.00
  FeCO3_13C        89  88  11  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
  FeCO3_56Fe       90  88  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
- FeS2             91  91  02  'Fe carbonate'                         'wt%'     0.00     100.00
+ FeS2             91  91  06  'Fe carbonate'                         'wt%'     0.00     100.00
  FeS2_34S         92  91  15  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
  FeS2_56Fe        93  91  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
  det              22  22  02  'detrital (refractory) material'       'wt%'     0.00     100.00

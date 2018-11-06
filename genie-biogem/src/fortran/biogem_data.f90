@@ -2534,13 +2534,13 @@ CONTAINS
        ctrl_data_save_slice_ocnatm = .true.
        ctrl_data_save_slice_ocn = .true.
        ctrl_data_save_slice_misc = .true.
-       if (flag_sedgem) ctrl_data_save_slice_ocnsed = .true.
+       ctrl_data_save_slice_ocnsed = .true.
        ctrl_data_save_sig_ocnatm = .true.
        ctrl_data_save_sig_ocn = .true.
        ctrl_data_save_sig_ocn_sur = .true.
        ctrl_data_save_sig_misc = .true.
        ctrl_data_save_GLOBAL = .true.
-       if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
+       ctrl_data_save_sig_ocnsed = .true.
     case default
        ! NOTHING
     end select
@@ -2572,7 +2572,7 @@ CONTAINS
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (5)
        ! BASIC + biology + geochem diagnostics
@@ -2591,7 +2591,7 @@ CONTAINS
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (6)
        ! BASIC + tracer diagnostics
@@ -2612,7 +2612,7 @@ CONTAINS
        ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
+       ctrl_data_save_slice_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
@@ -2621,7 +2621,7 @@ CONTAINS
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_data_save_derived = .true.
     case (9)
@@ -2644,7 +2644,7 @@ CONTAINS
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (14)
        ! BASIC + FULL geochem diagnostics
@@ -2657,7 +2657,7 @@ CONTAINS
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (15)
@@ -2677,7 +2677,7 @@ CONTAINS
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (18)
@@ -2689,7 +2689,7 @@ CONTAINS
        ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
+       ctrl_data_save_slice_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
@@ -2698,7 +2698,7 @@ CONTAINS
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_data_save_derived = .true.
        ctrl_bio_remin_redox_save=.true.
@@ -2736,7 +2736,7 @@ CONTAINS
        ctrl_data_save_derived = .true.
        ctrl_data_save_GLOBAL = .true.
        if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case default
