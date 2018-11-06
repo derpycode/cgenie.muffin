@@ -57,8 +57,10 @@ MODULE rokgem_lib
   INTEGER::max_drain_cells                                                               ! maximum number of ocean cells a single land cell routes to
   NAMELIST /ini_rokgem_nml/max_drain_cells
   !--- WEATHERING PARAMETERS ----------------------------------------------------------------------------------------------------- !
-  LOGICAL:: opt_short_circuit_atm                                                        !short circuit atmosphere by not taking CO2 directly, instead have less DIC put into ocean.
+  LOGICAL:: opt_short_circuit_atm                                                        ! short circuit atmosphere by not taking CO2 directly, instead have less DIC put into ocean.
   NAMELIST /ini_rokgem_nml/opt_short_circuit_atm
+  LOGICAL:: opt_weather_runoff                                                           ! scale (global) weathering with runoff
+  NAMELIST /ini_rokgem_nml/opt_weather_runoff
   CHARACTER(len=63)::par_weathopt                                                        ! weathering scheme ID string ('Global_avg','GKWM',or 'GEM_CO2')
   NAMELIST /ini_rokgem_nml/par_weathopt
   CHARACTER(len=63)::opt_weather_CaCO3                                                   ! global CaCO3 weathering scheme ID
