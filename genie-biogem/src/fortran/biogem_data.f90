@@ -2720,7 +2720,7 @@ CONTAINS
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        if (flag_sedgem) ctrl_data_save_slice_ocnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
+       ctrl_data_save_slice_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_ocnatm = .true.
        ctrl_data_save_sig_ocn = .true.
