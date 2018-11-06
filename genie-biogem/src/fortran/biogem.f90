@@ -420,6 +420,12 @@ subroutine biogem(        &
                                 else
                                    loc_remin = par_scav_fremin*loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                                 end if
+                             else if ( &
+                                  & (sed_dep(l2is(ls)) == is_det) .OR. &
+                                  & (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
+                                  & (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
+                                  & ) then
+                                loc_remin = 0.0
                              else
                                 loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                              end if
