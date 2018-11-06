@@ -89,7 +89,8 @@ CONTAINS
        print*,'    routes to                                       : ',max_drain_cells
        !--- WEATHERING PARAMETERS -------------------------------------------------------------------------------------------------- !
        print*,'--- WEATHERING PARAMETERS ---'
-       print*,'short circuit atmosphere                            : ',opt_short_circuit_atm                     
+       print*,'short circuit atmosphere                            : ',opt_short_circuit_atm   
+       print*,'scale (global) weathering with runoff               : ',opt_weather_runoff                   
        print*,'weathering scheme ID string                         : ',trim(par_weathopt)               
        print*,'global CaCO3 weathering scheme ID string            : ',trim(opt_weather_CaCO3)       
        print*,'global CaSiO3 weathering scheme ID string           : ',trim(opt_weather_CaSiO3)
