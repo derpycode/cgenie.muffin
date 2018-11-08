@@ -4070,6 +4070,10 @@
 			<value datatype="real">0.125E-9</value>
                         <description>Ridgwell [2001] -- opal:POC offset for FeT (mol kg-1)</description>
                     </param>
+                    <param name="opt_bio_red_SitoC">
+			<value datatype="string">Ridgwell2001</value>
+                        <description>opal:POC rain ratio option ID string</description>
+                    </param>
 <!-- REMINERALIZATION  -->
                     <param name="par_bio_remin_RDOMfrac">
 			<value datatype="real">0.0</value>
