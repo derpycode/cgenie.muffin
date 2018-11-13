@@ -461,6 +461,7 @@ CONTAINS
     REAL                            :: loc_R0
     REAL                            :: loc_maxR
     REAL                            :: loc_minR
+    REAL                            :: loc_totR
     REAL                            :: loc_avP
     REAL                            :: loc_P(n_i,n_j)
     REAL                            :: loc_P0
@@ -597,13 +598,13 @@ CONTAINS
 
     ! calculate mean runoff (mm s-1)
     ! for equal area grid:
-    loc_R = 0.0
+    loc_totR = 0.0
     loc_maxR = 0.0
     loc_minR = 0.0
     DO i=1,n_i
        DO j=1,n_j
           m = landmask(i,j) * dum_runoff(i,j)
-          loc_R = loc_R + m
+          loc_totR = loc_totR + m
           IF ((m.GT.loc_maxR).AND.(landmask(i,j).EQ.1)) THEN
              loc_maxR = m
           ENDIF
@@ -612,7 +613,7 @@ CONTAINS
           ENDIF
        END DO
     END DO
-    loc_R = loc_R/nlandcells
+    loc_R = loc_totR/nlandcells
 
     ! convert atm pCO2 to ppm
     DO i=1,n_i
@@ -1086,31 +1087,29 @@ CONTAINS
     ! ######################################################################################################################### !
 
     ! Spread out atmosphere variables' fluxes onto land
-    DO k=1,n_atm
-       IF(k.gt.2) THEN
-          loc_force_flux_weather_a_percell(k) = loc_force_flux_weather_a(k)/nlandcells
-          loc_force_flux_weather_a_land(k,:,:) = landmask(:,:) * loc_force_flux_weather_a_percell(k)
-       end IF
+    DO k=3,n_atm
+       loc_force_flux_weather_a_percell(k)  = loc_force_flux_weather_a(k)/nlandcells
+       loc_force_flux_weather_a_land(k,:,:) = landmask(:,:) * loc_force_flux_weather_a_percell(k)
     END DO
     ! no need to route to the atmosphere - just take it straight from the cells above the land (assuming same grid)
     ! convert from Mol/yr to Mol/sec/m^2 and put it into passing array (only take variable altered here - pCO2)
-    dum_sfxatm1(ia_PCO2,:,:) =  loc_force_flux_weather_a_land(ia_PCO2,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
+    dum_sfxatm1(ia_PCO2,:,:)     =  loc_force_flux_weather_a_land(ia_PCO2,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
     dum_sfxatm1(ia_PCO2_13C,:,:) =  loc_force_flux_weather_a_land(ia_PCO2_13C,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
     ! Spread out ocean variables' fluxes onto land
-    DO k=1,n_ocn
-       IF(k.gt.2) THEN
-          loc_force_flux_weather_o_percell(k) = loc_force_flux_weather_o(k)/nlandcells
+    DO k=3,n_ocn
+       IF (opt_weather_runoff) THEN
+          loc_force_flux_weather_o_percell(k)  = loc_force_flux_weather_o(k)/loc_totR
+          loc_force_flux_weather_o_land(k,:,:) = landmask(:,:) * dum_runoff(:,:) * loc_force_flux_weather_o_percell(k)
+       else
+          loc_force_flux_weather_o_percell(k)  = loc_force_flux_weather_o(k)/nlandcells
           loc_force_flux_weather_o_land(k,:,:) = landmask(:,:) * loc_force_flux_weather_o_percell(k)
-       end IF
+       end if
     END DO
     ! route it into the coastal ocean cells (to pass to biogem in coupled model) and save the output to file
-    DO k=1,n_ocn
-       IF(k.gt.2) THEN
-!!$            IF((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C)) THEN
-          CALL sub_coastal_output(  loc_force_flux_weather_o_land(k,:,:),             &
-               &  runoff_drainto(:,:,:),runoff_detail(:,:),                           &
-               &  loc_force_flux_weather_o_ocean(k,:,:)                               )
-       ENDIF
+    DO k=3,n_ocn
+       CALL sub_coastal_output(  loc_force_flux_weather_o_land(k,:,:),             &
+            &  runoff_drainto(:,:,:),runoff_detail(:,:),                           &
+            &  loc_force_flux_weather_o_ocean(k,:,:)                               )
     END DO
     ! convert from Mol/yr to Mol/sec and put it into passing array 
     dum_sfxrok(:,:,:) = loc_force_flux_weather_o_ocean(:,:,:)/conv_yr_s
