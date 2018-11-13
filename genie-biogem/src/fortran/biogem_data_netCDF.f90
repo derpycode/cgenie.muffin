@@ -647,7 +647,7 @@ CONTAINS
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar3d_g('misc_rCdtoCa',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end IF
-       IF (ocn_select(io_Cd) .AND. ocn_select(io_PO4) .AND. ctrl_data_save_slice_diag) THEN
+       IF (ocn_select(io_Cd) .AND. ocn_select(io_PO4)) THEN
           loc_unitsname = 'nmol kg-1 (umol kg-1)-1'
           loc_ijk(:,:,:) = const_real_null
           DO i=1,n_i
@@ -663,7 +663,7 @@ CONTAINS
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar3d_g('misc_rCdtoPO4',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end IF
-       IF (ocn_select(io_Cd) .AND. ocn_select(io_PO4) .AND. ocn_select(io_Ca) .AND. ctrl_data_save_slice_diag) THEN
+       IF (ocn_select(io_Cd) .AND. ocn_select(io_PO4) .AND. ocn_select(io_Ca)) THEN
           loc_unitsname = 'umol kg-1 (mmol kg-1)-1'
           loc_ijk(:,:,:) = const_real_null
           DO i=1,n_i
@@ -1364,6 +1364,26 @@ CONTAINS
                & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
        end do
     end if
+    !-----------------------------------------------------------------------
+    ! nutrient availablity diagnostics
+    !-----------------------------------------------------------------------
+    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+       if ( ocn_select(io_PO4) .AND. ocn_select(io_SiO2) ) then
+          loc_unitsname = 'n/a'
+          loc_ij(:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                IF (n_k >= goldstein_k1(i,j)) THEN
+                   loc_ij(i,j) = int_ocn_timeslice(io_SiO2,i,j,n_k)/int_t_timeslice - &
+                        & par_bio_red_POP_PON*int_ocn_timeslice(io_PO4,i,j,n_k)/int_t_timeslice
+                end IF
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,3,'misc_sur_SiSTAR','Si Star', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('misc_sur_SiSTAR',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       end if
+    end if
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
     !
     ! ############################################################################################################################ !
@@ -1578,7 +1598,7 @@ CONTAINS
     !              <diag_*>                           
     !       save diagnostics data
     !---------------------------------------------------------------- 
-    If (ctrl_data_save_slice_diag .AND. flag_rokgem) then
+    If (ctrl_data_save_slice_diag_geochem .AND. flag_rokgem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO ib=1,n_diag_bio
           loc_ij(:,:) = int_diag_bio_timeslice(ib,:,:)/int_t_timeslice
