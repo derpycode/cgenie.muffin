@@ -1005,10 +1005,18 @@ CONTAINS
             & 'bio_PFeSi'            &
             & )
           if (ocn(io_SiO2,dum_i,dum_j,n_k) > const_real_nullsmall) then
-!!!bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
-!!!     & ((0.25E-9/(loc_FeT+0.125E-9))+1.0)
-             bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
-                  & ((par_part_red_opal_FeTKSp/(loc_FeT+par_part_red_opal_FeToff))+1.0)
+             SELECT CASE (opt_bio_red_SitoC)
+             case ('Ridgwell2001')
+                ! NOTE: OLD == bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
+                !                   & ((0.25E-9/(loc_FeT+0.125E-9))+1.0)
+                bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
+                     & ((par_part_red_opal_FeTKSp/(loc_FeT+par_part_red_opal_FeToff))+1.0)
+             case ('Jones2018')
+                bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
+                     & (par_part_red_opal_FeTKSp + loc_FeT)/max(loc_FeT,par_part_red_opal_FeToff)
+             case default
+                bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal
+             end SELECT
           else
              bio_part_red(is_POC,is_opal,dum_i,dum_j) = 0.0
           end if

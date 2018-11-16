@@ -175,6 +175,7 @@ CONTAINS
        print*,'Base opal:POC export ratio                          : ',par_bio_red_POC_opal
        print*,'Ridgwell [2001] -- opal:POC KSp for FeT (mol kg-1)  : ',par_part_red_opal_FeTKSp
        print*,'Ridgwell [2001] -- opal:POC offset, FeT (mol kg-1)  : ',par_part_red_opal_FeToff
+       print*,'opal:POC rain ratio option ID string                : ',opt_bio_red_SitoC
        ! --- REMINERALIZATION ---------------------------------------------------------------------------------------------------- !
        print*,'--- REMINERALIZATION -------------------------------'
        print*,'Fraction of POM remin concverted to RDOM            : ',par_bio_remin_RDOMfrac

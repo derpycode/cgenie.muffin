@@ -183,6 +183,8 @@ MODULE biogem_lib
   real::par_part_red_opal_FeTKSp                                        ! Ridgwell [2001] -- opal:POC KSp for FeT
   real::par_part_red_opal_FeToff                                        ! Ridgwell [2001] -- opal:POC offset for FeT
   NAMELIST /ini_biogem_nml/par_part_red_opal_FeTKSp,par_part_red_opal_FeToff
+  CHARACTER(len=63)::opt_bio_red_SitoC                                  ! opal:POC rain ratio option ID (e.g. 'fixed' == default)
+  NAMELIST /ini_biogem_nml/opt_bio_red_SitoC
   ! ------------------- REMINERALIZATION ----------------------------------------------------------------------------------------- !
   real::par_bio_remin_RDOMfrac                                          ! fraction of POM remin concverted to RDOM
   NAMELIST /ini_biogem_nml/par_bio_remin_RDOMfrac
