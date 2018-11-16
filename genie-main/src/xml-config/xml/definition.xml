@@ -853,6 +853,22 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="ocn_select(101)" index="101">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(102)" index="102">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(103)" index="103">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(104)" index="104">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- sed_select -->
                    <paramArray name="sed_select" dimension="1" extent="86">
@@ -1230,6 +1246,14 @@
                             <description></description>
                         </param>
                         <param name="sed_select(94)" index="94">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(95)" index="96">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(95)" index="96">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
@@ -3312,6 +3336,18 @@
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
+                        <param name="ocn_init(102)" index="102">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(103)" index="103">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(104)" index="104">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="ocn_dinit" dimension="1" extent="101">
                         <description>tracer restart perturbation (re-initialisation)</description>    
@@ -3716,6 +3752,18 @@
                             <description></description>
                         </param>
                         <param name="ocn_dinit(101)" index="101">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(102)" index="102">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(103)" index="103">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(104)" index="104">
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
@@ -5683,6 +5731,18 @@
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
+                        <param name="par_ocn_force_scale_val(102)" index="102">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(103)" index="103">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(104)" index="104">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="par_ocn_force_scale_time" dimension="1" extent="101">
                         <description>ocean tracer forcing scaling - time</description>    
@@ -6087,6 +6147,18 @@
                             <description></description>
                         </param>
                         <param name="par_ocn_force_scale_time(101)" index="101">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(102)" index="102">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(103)" index="103">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(104)" index="104">
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>

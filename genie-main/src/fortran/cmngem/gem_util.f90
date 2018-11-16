@@ -173,6 +173,9 @@ CONTAINS
     conv_sed_ocn(io_H2S_34S,is_FeS2_34S)        = 7.0/4.0
     conv_sed_ocn(io_SO4_34S,is_FeS2_34S)        = 1.0/4.0
     conv_sed_ocn(io_TDFe_56Fe,is_FeS2_56Fe)     = 1.0
+    conv_sed_ocn(io_Fe,is_FeOOH)                = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)      = 1.0
+    conv_sed_ocn(io_O2,is_FeOOH)                = 1.0
     ! convert dissolved species -> solid
     conv_ocn_sed(:,:) = 0.0
     conv_ocn_sed(is_POC,io_DIC)              = 1.0/conv_sed_ocn(io_DIC,is_POC)
@@ -273,6 +276,9 @@ CONTAINS
     conv_ocn_sed(is_FeS2_34S,io_H2S_34S)        = 1.0/conv_sed_ocn(io_H2S_34S,is_FeS2_34S)
     conv_ocn_sed(is_FeS2_34S,io_SO4_34S)        = 1.0/conv_sed_ocn(io_SO4_34S,is_FeS2_34S)
     conv_ocn_sed(is_FeS2_56Fe,io_TDFe_56Fe)       = 1.0/conv_sed_ocn(io_TDFe_56Fe,is_FeS2_56Fe) 
+    conv_sed_ocn(is_FeOOH,io_Fe)                = 1.0/conv_sed_ocn(io_Fe,is_FeOOH)
+    conv_sed_ocn(is_FeOOH_56Fe,io_Fe_56Fe)      = 1.0/conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)
+    conv_sed_ocn(is_FeOOH,io_O2)                = 1.0/conv_sed_ocn(io_O2,is_FeOOH)
     ! ############################################################################################################################ !
     ! DISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between DOM and POM

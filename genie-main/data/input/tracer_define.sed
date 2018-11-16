@@ -58,6 +58,8 @@
  FeS2             91  91  06  'Fe carbonate'                         'wt%'     0.00     100.00
  FeS2_34S         92  91  15  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
  FeS2_56Fe        93  91  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ FeOOH            95  95  06  'Fe (hydr)oxides'                      'wt%'     0.00     100.00
+ FeOOH_56Fe       96  95  22  'd56Fe of FeOOH'                       'o/oo'   -9.99E+2    9.99E+2
  det              22  22  02  'detrital (refractory) material'       'wt%'     0.00     100.00
  detLi            55  55  06  'detrital Li'                          'wt%'     0.00     100.00
  detLi_7Li        56  55  18  'detrital 7Li'                         'o/oo'   -9.99E+2    9.99E+2

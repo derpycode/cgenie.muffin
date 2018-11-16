@@ -154,7 +154,10 @@ ocn_select = {
     "gm_ocn_select_98" : ["98",""],
     "gm_ocn_select_99" : ["99",""],
     "gm_ocn_select_100" : ["100",""],
-    "gm_ocn_select_101" : ["101",""]
+    "gm_ocn_select_101" : ["101",""],
+    "gm_ocn_select_102" : ["102",""],
+    "gm_ocn_select_103" : ["103",""],
+    "gm_ocn_select_104" : ["104",""]
     }
 sed_select = {
     "gm_sed_select_1" : ["1",""],
@@ -250,7 +253,9 @@ sed_select = {
     "gm_sed_select_91" : ["91",""],
     "gm_sed_select_92" : ["92",""],
     "gm_sed_select_93" : ["93",""],
-    "gm_sed_select_94" : ["94",""]
+    "gm_sed_select_94" : ["94",""],
+    "gm_sed_select_95" : ["95",""],
+    "gm_sed_select_96" : ["96",""]
     }
 # atchem
 atm_init = {
@@ -397,7 +402,10 @@ ocn_init = {
     "bg_ocn_init_98" : ["98",""],
     "bg_ocn_init_99" : ["99",""],
     "bg_ocn_init_100" : ["100",""],
-    "bg_ocn_init_101" : ["101",""]
+    "bg_ocn_init_101" : ["101",""],
+    "bg_ocn_init_102" : ["102",""],
+    "bg_ocn_init_103" : ["103",""],
+    "bg_ocn_init_104" : ["104",""]
     }
 ocn_dinit = {
     "bg_ocn_dinit_1" : ["1",""],
@@ -500,7 +508,10 @@ ocn_dinit = {
     "bg_ocn_dinit_98" : ["98",""],
     "bg_ocn_dinit_99" : ["99",""],
     "bg_ocn_dinit_100" : ["100",""],
-    "bg_ocn_dinit_101" : ["101",""]
+    "bg_ocn_dinit_101" : ["101",""],
+    "bg_ocn_dinit_102" : ["102",""],
+    "bg_ocn_dinit_103" : ["103",""],
+    "bg_ocn_dinit_104" : ["104",""]
     }
 par_atm_force_scale_val = {
     "bg_par_atm_force_scale_val_1" : ["1",""],
@@ -645,7 +656,10 @@ par_ocn_force_scale_val = {
     "bg_par_ocn_force_scale_val_98" : ["98",""],
     "bg_par_ocn_force_scale_val_99" : ["99",""],
     "bg_par_ocn_force_scale_val_100" : ["100",""],
-    "bg_par_ocn_force_scale_val_101" : ["101",""]
+    "bg_par_ocn_force_scale_val_101" : ["101",""],
+    "bg_par_ocn_force_scale_val_102" : ["102",""],
+    "bg_par_ocn_force_scale_val_103" : ["103",""],
+    "bg_par_ocn_force_scale_val_104" : ["104",""]
     }
 par_ocn_force_scale_time = {
     "bg_par_ocn_force_scale_time_1" : ["1",""],
@@ -748,7 +762,10 @@ par_ocn_force_scale_time = {
     "bg_par_ocn_force_scale_time_98" : ["98",""],
     "bg_par_ocn_force_scale_time_99" : ["99",""],
     "bg_par_ocn_force_scale_time_100" : ["100",""],
-    "bg_par_ocn_force_scale_time_101" : ["101",""]
+    "bg_par_ocn_force_scale_time_101" : ["101",""],
+    "bg_par_ocn_force_scale_time_102" : ["102",""],
+    "bg_par_ocn_force_scale_time_103" : ["103",""],
+    "bg_par_ocn_force_scale_time_104" : ["104",""]
     }
 # embm
 diffamp = {
