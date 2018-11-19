@@ -1918,7 +1918,7 @@ CONTAINS
     integer::loc_i,loc_tot_i
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
-    real::loc_TDFe,loc_H2S,loc_SO4
+    real::loc_Fe2,loc_H2S,loc_SO4
     real::loc_r56Fe, loc_r34S, loc_r34S_SO4
     real::loc_R_56Fe
     real::loc_alpha_56Fe
@@ -1942,16 +1942,16 @@ CONTAINS
     ! 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
 	DO k=n_k,dum_k1,-1
-	  loc_TDFe = ocn(io_TDFe,dum_i,dum_j,k)
+	  loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
 	  loc_H2S  = ocn(io_H2S,dum_i,dum_j,k)
 	  loc_SO4  = ocn(io_SO4,dum_i,dum_j,k)
 		!calculate pyrite precipitation
-		if ((loc_TDFe > const_real_nullsmall) .AND. (4.0/7.0*loc_H2S > const_real_nullsmall) .AND. (4.0/1.0*loc_SO4 > const_real_nullsmall)) then
+		if ((loc_Fe2 > const_real_nullsmall) .AND. (4.0/7.0*loc_H2S > const_real_nullsmall) .AND. (4.0/1.0*loc_SO4 > const_real_nullsmall)) then
        	 
 		 ! This loop assumes that when Fe and H2S are present together, they form FeSaq
 		 ! FeSaq = TDFe when H2S is more abundant than TDFe, and vice versa
-		 if (loc_TDFe < loc_H2S) then
-		   loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_TDFe*loc_H2S
+		 if (loc_Fe2 < loc_H2S) then
+		   loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_Fe2*loc_H2S
 		 else 
 		   loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_H2S**2
 		 end if
@@ -1959,15 +1959,15 @@ CONTAINS
            ! calculate isotopic ratio
 		   
            ! loc_alpha_56Fe = par_d56Fe_FeS2_alpha
-		   loc_r56Fe      = ocn(io_TDFe_56Fe,dum_i,dum_j,k)/ocn(io_TDFe,dum_i,dum_j,k)
+		   loc_r56Fe      = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
 		   loc_R_56Fe     = loc_r56Fe/(1.0 - loc_r56Fe)
            
            
-		 if (loc_FeS2_precipitation > MIN(4.0/7.0*loc_H2S,loc_TDFe,4.0/1.0*loc_SO4)) then
+		 if (loc_FeS2_precipitation > MIN(4.0/7.0*loc_H2S,loc_Fe2,4.0/1.0*loc_SO4)) then
              
-             loc_bio_part(is_FeS2,k) = MIN(4.0/7.0*loc_H2S,loc_TDFe,4.0/1.0*loc_SO4)
+             loc_bio_part(is_FeS2,k) = MIN(4.0/7.0*loc_H2S,loc_Fe2,4.0/1.0*loc_SO4)
                        
-			 if (loc_FeS2_precipitation == loc_TDFe) then
+			 if (loc_FeS2_precipitation == loc_Fe2) then
 			        
 			      loc_bio_part(is_FeS2_56Fe,k)= loc_r56Fe*loc_bio_part(is_FeS2,k)
              else 
@@ -2033,7 +2033,7 @@ CONTAINS
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
     real::loc_ohm
-    real::loc_delta_FeCO3,loc_CO3,loc_TDFe,loc_Fe,loc_H2S,loc_O2,loc_FeCO3_precipitation
+    real::loc_delta_FeCO3,loc_CO3,loc_Fe2,loc_Fe,loc_H2S,loc_O2,loc_FeCO3_precipitation
     real::loc_alpha
     real::loc_R, loc_r56Fe,loc_R_56Fe
     integer::loc_kmax
@@ -2089,23 +2089,23 @@ CONTAINS
             & )
 			
 	   loc_CO3     = carb(ic_conc_CO3,dum_i,dum_j,n_k)
-	   loc_TDFe    = ocn(io_TDFe,dum_i,dum_j,k)
-       loc_r56Fe   = ocn(io_TDFe_56Fe,dum_i,dum_j,k)/ocn(io_TDFe,dum_i,dum_j,k)
+	   loc_Fe2    = ocn(io_Fe2,dum_i,dum_j,k)
+       loc_r56Fe   = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
 	   loc_R_56Fe  = loc_r56Fe/(1.0 - loc_r56Fe)
        loc_H2S     = ocn(io_H2S,dum_i,dum_j,k)
 	   loc_O2      = ocn(io_O2,dum_i,dum_j,k)
 	   
-	  if ((loc_TDFe > const_real_nullsmall) .AND. (loc_CO3 > const_real_nullsmall) .AND. (loc_O2 < const_real_nullsmall)) then
+	  if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_CO3 > const_real_nullsmall) .AND. (loc_O2 < const_real_nullsmall)) then
 	      if (ocn_select(io_H2S)) then
 	        loc_H2S     = ocn(io_H2S,dum_i,dum_j,k)
-	         if (loc_H2S < loc_TDFe) then
-	           loc_Fe   = loc_TDFe - loc_H2S
+	         if (loc_H2S < loc_Fe2) then
+	           loc_Fe   = loc_Fe2 - loc_H2S
 	           loc_ohm  = (loc_CO3*loc_Fe)/par_bio_FeCO3precip_abioticohm_cte
 	         else 
 	           loc_ohm = 0.0
 	         end if
 	      else
-	           loc_ohm  = (loc_CO3*loc_TDFe)/par_bio_FeCO3precip_abioticohm_cte
+	           loc_ohm  = (loc_CO3*loc_Fe2)/par_bio_FeCO3precip_abioticohm_cte
 	      end if
 	      
 		  if (loc_ohm > par_bio_FeCO3precip_abioticohm_min) then
@@ -2116,8 +2116,8 @@ CONTAINS
 	           loc_FeCO3_precipitation      = 0.0 
 		      !loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
           end if
-		  if (loc_FeCO3_precipitation > MIN(loc_CO3,loc_TDFe)) then
-		      loc_FeCO3_precipitation = MIN(loc_CO3,loc_TDFe)
+		  if (loc_FeCO3_precipitation > MIN(loc_CO3,loc_Fe2)) then
+		      loc_FeCO3_precipitation = MIN(loc_CO3,loc_Fe2)
 		  end if
 		  loc_bio_part(is_FeCO3,k) = loc_FeCO3_precipitation
 		  loc_bio_part(is_FeCO3_56Fe,k) = &
