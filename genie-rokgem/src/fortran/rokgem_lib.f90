@@ -132,7 +132,7 @@ MODULE rokgem_lib
   real:: par_weather_CaSiO3_fracFeS2                                                     ! global (silicate) pyrite relative abundance
   REAL:: par_weather_CaSiO3_fracFeS2_d34S                                                ! global pyrite d34S
   REAL:: par_weather_CaSiO3_fracFeS2_d56Fe                                               ! global pyrite d56Fe
-  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracFeS2,par_weather_CaSiO3_fracFeS2_d34S
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracFeS2,par_weather_CaSiO3_fracFeS2_d34S,par_weather_CaSiO3_fracFeS2_d56Fe
   real:: par_weather_CaCO3_fracCaSO4                                                     ! global (carbonate) gypsum relative abundance
   REAL:: par_weather_CaCO3_fracCaSO4_d34S                                                ! global gypsum d34S
   REAL:: par_weather_CaCO3_fracCaSO4_d44Ca                                               ! global gypsum d44Ca
