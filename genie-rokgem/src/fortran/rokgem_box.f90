@@ -1026,6 +1026,7 @@ CONTAINS
     !       pyrite + oxygen + water —–> iron ions + sulphuric acid + hydrogen ions
     ! currently, in biogem_box: 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
     ! NOTE: set Fe flux as Fe2 (not TDFe  for now / here)
+    ! NOTE: remember he alkalinity associated with adding SO42- to the ocean ...
     ! S
     loc_force_flux_weather_o(io_H2S) = loc_force_flux_weather_o(io_H2S) + &
          & (7.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
@@ -1039,6 +1040,8 @@ CONTAINS
     loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_SO4_34S) + &
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracFeS2_d34S,loc_standard)* &
          & (1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+    loc_force_flux_weather_o(io_ALK) = loc_force_flux_weather_o(io_ALK) + &
+         & -2.0*(1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
     ! Fe
     loc_force_flux_weather_o(io_Fe2) = loc_force_flux_weather_o(io_Fe2) + &
          & par_weather_CaSiO3_fracFeS2*weather_fCaSiO3
