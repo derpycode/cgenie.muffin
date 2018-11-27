@@ -971,54 +971,93 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !
-    ! if NO3 is employed;
-    ! calculate alkalnity corrections associated with the formation and destruction of organic matter from NO3
-    ! otherwise, convert PO4 units to NO3 via the P:N Redfield ratio and then calculate the ALK correction from NO3
+    ! N
+    ! NOTE: leave alone the conv_ocn_sed (organic matter formation) connections
+    !       (e.g. if NH4 selected -- still assume default assimilation (and uptake) of NO3 to form PON)
+    if (ocn_select(io_NH4)) then
+       conv_sed_ocn(io_NO3,is_PON) = 0.0
+       conv_sed_ocn(io_NH4,is_PON) = 1.0
+    elseif (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_NO3,is_PON) = 1.0
+       conv_sed_ocn(io_NH4,is_PON) = 0.0
+    else
+       conv_sed_ocn(io_NO3,is_PON) = 0.0
+       conv_sed_ocn(io_NH4,is_PON) = 0.0
+    end if
+    ! ALK
+    ! if NO3 is employed: calculate alkalnity corrections associated with the formation and destruction of organic matter from NO3
+    ! otherwise: convert PO4 units to NO3 via the P:N Redfield ratio and then calculate the ALK correction from NO3
     ! NOTE: ensure that both corrections are mutually exclusive (i.e., make sure that there can be no double ALK correction)
-    ! NOTE: catch incidence of par_bio_red_PON_ALK set to 0.0
-    if (abs(par_bio_red_PON_ALK) > const_real_nullsmall) then
-       if (ocn_select(io_NO3)) then
-          conv_sed_ocn(io_ALK,is_PON) = par_bio_red_PON_ALK
-          conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
-          conv_sed_ocn(io_ALK,is_POP) = 0.0
-          conv_ocn_sed(is_POP,io_ALK) = 0.0
-       else
-          conv_sed_ocn(io_ALK,is_PON) = 0.0
-          conv_ocn_sed(is_PON,io_ALK) = 0.0
-          if (ctrl_bio_red_ALKwithPOC) then
-             conv_sed_ocn(io_ALK,is_POC) = (1.0/par_bio_red_POP_POC)*par_bio_red_POP_PON*par_bio_red_PON_ALK
-             conv_ocn_sed(is_POC,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POC)
-          else
-             conv_sed_ocn(io_ALK,is_POP) = par_bio_red_POP_PON*par_bio_red_PON_ALK
-             conv_ocn_sed(is_POP,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POP)
-          end if
-       end if
+    ! NOTE: catch any incidence of Redfield ratios (par_bio_red_xxx) set to 0.0
+    ! NOTE: some of the zero values here are already the (hard-coded) defaults ... they are repeated here to be completely explicit
+    if (ocn_select(io_NH4)) then
+       conv_sed_ocn(io_ALK,is_PON) = conv_sed_ocn(io_NH4,is_PON)
+       conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
+       conv_sed_ocn(io_ALK,is_POP) = 0.0
+       conv_ocn_sed(is_POP,io_ALK) = 0.0
+       conv_sed_ocn(io_ALK,is_POC) = 0.0
+       conv_ocn_sed(is_POC,io_ALK) = 0.0
+    elseif (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_ALK,is_PON) = -conv_sed_ocn(io_NO3,is_PON)
+       conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
+       conv_sed_ocn(io_ALK,is_POP) = 0.0
+       conv_ocn_sed(is_POP,io_ALK) = 0.0
+       conv_sed_ocn(io_ALK,is_POC) = 0.0
+       conv_ocn_sed(is_POC,io_ALK) = 0.0
     else
        conv_sed_ocn(io_ALK,is_PON) = 0.0
        conv_ocn_sed(is_PON,io_ALK) = 0.0
-       conv_sed_ocn(io_ALK,is_POP) = 0.0
-       conv_ocn_sed(is_POP,io_ALK) = 0.0
+       if (abs(par_bio_red_POP_POC*par_bio_red_POP_PON*par_bio_red_PON_ALK) > const_real_nullsmall) then
+          if (ctrl_bio_red_ALKwithPOC) then
+             conv_sed_ocn(io_ALK,is_POC) = (1.0/par_bio_red_POP_POC)*par_bio_red_POP_PON*par_bio_red_PON_ALK
+             conv_ocn_sed(is_POC,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POC)
+             conv_sed_ocn(io_ALK,is_POP) = 0.0
+             conv_ocn_sed(is_POP,io_ALK) = 0.0
+          else
+             conv_sed_ocn(io_ALK,is_POC) = 0.0
+             conv_ocn_sed(is_POC,io_ALK) = 0.0
+             conv_sed_ocn(io_ALK,is_POP) = par_bio_red_POP_PON*par_bio_red_PON_ALK
+             conv_ocn_sed(is_POP,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POP)
+          end if
+       else
+          conv_sed_ocn(io_ALK,is_POC) = 0.0
+          conv_ocn_sed(is_POC,io_ALK) = 0.0
+          conv_sed_ocn(io_ALK,is_POP) = 0.0
+          conv_ocn_sed(is_POP,io_ALK) = 0.0
+       end if
     end if
+    ! O2 (of P, N, C)
     ! update O2 demand associated with organic matter (taken as the carbon component)
     ! reduce O2 demand associated with C (and H) oxidation => treat N and P explicitly
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
     !       (and as implemented, ber N, this ends up as (5/2)/2 = 5.0/4.0
+    ! NOTE: to balance the uptake of NO3 into organic matter
+    !       [2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O]
+    !       with the release of N as ammonium and subsequent oxidation to NO3 ...
+    !       [NH4+ + 2O2 -> NO3- + 2H+ + H2O]
+    !       the remin of PON needs to be adjusted in order that everything is conserved:
+    !       2PON + 3H2O + 2H+ --> 2NH4+ + (3/2)O2
+    !       and per N:
+    !       PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
+    if (ctrl_bio_red_O2withPOC) then
+       conv_sed_ocn(io_O2,is_POP) = 0.0
+       conv_ocn_sed(is_POP,io_O2) = 0.0
+    else
+       conv_sed_ocn(io_O2,is_POP) = -4.0/2.0
+       conv_ocn_sed(is_POP,io_O2) = 1.0/conv_sed_ocn(io_O2,is_POP)
+    endif
+    if (ocn_select(io_NH4)) then
+       conv_sed_ocn(io_O2,is_PON) = (3.0/4.0)
+       conv_ocn_sed(is_PON,io_O2) = -(4.0/5.0)
+    elseif (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
+       conv_ocn_sed(is_PON,io_O2) = 1.0/conv_sed_ocn(io_O2,is_PON)
+    else
+       conv_sed_ocn(io_O2,is_PON) = 0.0
+       conv_ocn_sed(is_PON,io_O2) = 0.0
+    endif
     if (abs(par_bio_red_POP_POC*par_bio_red_POP_PO2) > const_real_nullsmall) then
-       if (ctrl_bio_red_O2withPOC) then
-          conv_sed_ocn(io_O2,is_POP) = 0.0
-          conv_ocn_sed(is_POP,io_O2) = 0.0
-       else
-          conv_sed_ocn(io_O2,is_POP) = -4.0/2.0
-          conv_ocn_sed(is_POP,io_O2) = 1.0/conv_sed_ocn(io_O2,is_POP)
-       endif
-       if (ocn_select(io_NO3)) then
-          conv_sed_ocn(io_O2,is_PON) = -5.0/4.0
-          conv_ocn_sed(is_PON,io_O2) = 1.0/conv_sed_ocn(io_O2,is_PON)
-       else
-          conv_sed_ocn(io_O2,is_PON) = 0.0
-          conv_ocn_sed(is_PON,io_O2) = 0.0
-       endif
        conv_sed_ocn(io_O2,is_POC) = par_bio_red_POP_PO2/par_bio_red_POP_POC - &
             & conv_sed_ocn(io_O2,is_POP)/par_bio_red_POP_POC - &
             & conv_sed_ocn(io_O2,is_PON)*par_bio_red_POP_PON/par_bio_red_POP_POC
@@ -1041,7 +1080,7 @@ CONTAINS
     !       [2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O]
     !       with the release of N as ammonium and subsequent oxidation to NO3 ...
     !       [NH4+ + 2O2 -> NO3- + 2H+ + H2O]
-    !       the remind of PON needs to be adjusted in order that everything is conserved:
+    !       the remin of PON needs to be adjusted in order that everything is conserved:
     !       2PON + 3H2O + 2H+ --> 2NH4+ + (3/2)O2
     !       and per N:
     !       PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
@@ -1061,11 +1100,13 @@ CONTAINS
           conv_sed_ocn_N(io_NH4,is_PON) = 1.0
           conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_N(io_O2,is_PON)  = (3.0/4.0)
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
           conv_sed_ocn_N(io_N2,is_PON)  = 0.5
           conv_sed_ocn_N(io_ALK,is_PON) = 0.0
           conv_sed_ocn_N(io_O2,is_PON)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
        ! P,C
        if (ocn_select(io_NO2)) then
@@ -1077,7 +1118,7 @@ CONTAINS
           conv_sed_ocn_N(io_NO2,is_POC) = -2.0*conv_sed_ocn(io_O2,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = 0.0
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_N(io_NO3,is_POP) = -(8.0/5.0)
           conv_sed_ocn_N(io_N2,is_POP)  = -0.5*conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_ALK,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
@@ -1086,6 +1127,8 @@ CONTAINS
           conv_sed_ocn_N(io_N2,is_POC)  = -0.5*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
     else
        conv_sed_ocn_N(:,:) = 0.0
@@ -1099,11 +1142,13 @@ CONTAINS
           conv_sed_ocn_S(io_NH4,is_PON) = 1.0
           conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_S(io_O2,is_PON)  = 0.0
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
           conv_sed_ocn_S(io_N2,is_PON)  = 0.5
           conv_sed_ocn_S(io_ALK,is_PON) = 0.0
           conv_sed_ocn_S(io_O2,is_PON)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
        ! P,C
        conv_sed_ocn_S(io_SO4,is_POP) = 0.5*conv_sed_ocn_S(io_O2,is_POP)
@@ -1140,11 +1185,13 @@ CONTAINS
           conv_sed_ocn_meth(io_NH4,is_PON) = 1.0
           conv_sed_ocn_meth(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
           conv_sed_ocn_meth(io_N2,is_PON)  = 0.5
           conv_sed_ocn_meth(io_ALK,is_PON) = 0.0
           conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
        ! P,C
        conv_sed_ocn_meth(io_O2,is_POP)  = 0.0
