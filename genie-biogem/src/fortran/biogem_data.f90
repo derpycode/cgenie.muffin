@@ -175,6 +175,7 @@ CONTAINS
        print*,'Base opal:POC export ratio                          : ',par_bio_red_POC_opal
        print*,'Ridgwell [2001] -- opal:POC KSp for FeT (mol kg-1)  : ',par_part_red_opal_FeTKSp
        print*,'Ridgwell [2001] -- opal:POC offset, FeT (mol kg-1)  : ',par_part_red_opal_FeToff
+       print*,'opal:POC rain ratio option ID string                : ',opt_bio_red_SitoC
        ! --- REMINERALIZATION ---------------------------------------------------------------------------------------------------- !
        print*,'--- REMINERALIZATION -------------------------------'
        print*,'Fraction of POM remin concverted to RDOM            : ',par_bio_remin_RDOMfrac
@@ -270,6 +271,7 @@ CONTAINS
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
+       print*,'CaCO3 44Ca fractionation scheme ID string           : ',trim(opt_d44Ca_Ca_CaCO3)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b
        print*,'fractionation for intercellular C fixation          : ',par_d13C_DIC_Corg_ef
        print*,'fract. for intercell. C fixation of si. phytop.     : ',par_d13C_DIC_Corg_ef_sp
@@ -969,54 +971,93 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !
-    ! if NO3 is employed;
-    ! calculate alkalnity corrections associated with the formation and destruction of organic matter from NO3
-    ! otherwise, convert PO4 units to NO3 via the P:N Redfield ratio and then calculate the ALK correction from NO3
+    ! N
+    ! NOTE: leave alone the conv_ocn_sed (organic matter formation) connections
+    !       (e.g. if NH4 selected -- still assume default assimilation (and uptake) of NO3 to form PON)
+    if (ocn_select(io_NH4)) then
+       conv_sed_ocn(io_NO3,is_PON) = 0.0
+       conv_sed_ocn(io_NH4,is_PON) = 1.0
+    elseif (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_NO3,is_PON) = 1.0
+       conv_sed_ocn(io_NH4,is_PON) = 0.0
+    else
+       conv_sed_ocn(io_NO3,is_PON) = 0.0
+       conv_sed_ocn(io_NH4,is_PON) = 0.0
+    end if
+    ! ALK
+    ! if NO3 is employed: calculate alkalnity corrections associated with the formation and destruction of organic matter from NO3
+    ! otherwise: convert PO4 units to NO3 via the P:N Redfield ratio and then calculate the ALK correction from NO3
     ! NOTE: ensure that both corrections are mutually exclusive (i.e., make sure that there can be no double ALK correction)
-    ! NOTE: catch incidence of par_bio_red_PON_ALK set to 0.0
-    if (abs(par_bio_red_PON_ALK) > const_real_nullsmall) then
-       if (ocn_select(io_NO3)) then
-          conv_sed_ocn(io_ALK,is_PON) = par_bio_red_PON_ALK
-          conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
-          conv_sed_ocn(io_ALK,is_POP) = 0.0
-          conv_ocn_sed(is_POP,io_ALK) = 0.0
-       else
-          conv_sed_ocn(io_ALK,is_PON) = 0.0
-          conv_ocn_sed(is_PON,io_ALK) = 0.0
-          if (ctrl_bio_red_ALKwithPOC) then
-             conv_sed_ocn(io_ALK,is_POC) = (1.0/par_bio_red_POP_POC)*par_bio_red_POP_PON*par_bio_red_PON_ALK
-             conv_ocn_sed(is_POC,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POC)
-          else
-             conv_sed_ocn(io_ALK,is_POP) = par_bio_red_POP_PON*par_bio_red_PON_ALK
-             conv_ocn_sed(is_POP,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POP)
-          end if
-       end if
+    ! NOTE: catch any incidence of Redfield ratios (par_bio_red_xxx) set to 0.0
+    ! NOTE: some of the zero values here are already the (hard-coded) defaults ... they are repeated here to be completely explicit
+    if (ocn_select(io_NH4)) then
+       conv_sed_ocn(io_ALK,is_PON) = conv_sed_ocn(io_NH4,is_PON)
+       conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
+       conv_sed_ocn(io_ALK,is_POP) = 0.0
+       conv_ocn_sed(is_POP,io_ALK) = 0.0
+       conv_sed_ocn(io_ALK,is_POC) = 0.0
+       conv_ocn_sed(is_POC,io_ALK) = 0.0
+    elseif (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_ALK,is_PON) = -conv_sed_ocn(io_NO3,is_PON)
+       conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
+       conv_sed_ocn(io_ALK,is_POP) = 0.0
+       conv_ocn_sed(is_POP,io_ALK) = 0.0
+       conv_sed_ocn(io_ALK,is_POC) = 0.0
+       conv_ocn_sed(is_POC,io_ALK) = 0.0
     else
        conv_sed_ocn(io_ALK,is_PON) = 0.0
        conv_ocn_sed(is_PON,io_ALK) = 0.0
-       conv_sed_ocn(io_ALK,is_POP) = 0.0
-       conv_ocn_sed(is_POP,io_ALK) = 0.0
+       if (abs(par_bio_red_POP_POC*par_bio_red_POP_PON*par_bio_red_PON_ALK) > const_real_nullsmall) then
+          if (ctrl_bio_red_ALKwithPOC) then
+             conv_sed_ocn(io_ALK,is_POC) = (1.0/par_bio_red_POP_POC)*par_bio_red_POP_PON*par_bio_red_PON_ALK
+             conv_ocn_sed(is_POC,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POC)
+             conv_sed_ocn(io_ALK,is_POP) = 0.0
+             conv_ocn_sed(is_POP,io_ALK) = 0.0
+          else
+             conv_sed_ocn(io_ALK,is_POC) = 0.0
+             conv_ocn_sed(is_POC,io_ALK) = 0.0
+             conv_sed_ocn(io_ALK,is_POP) = par_bio_red_POP_PON*par_bio_red_PON_ALK
+             conv_ocn_sed(is_POP,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POP)
+          end if
+       else
+          conv_sed_ocn(io_ALK,is_POC) = 0.0
+          conv_ocn_sed(is_POC,io_ALK) = 0.0
+          conv_sed_ocn(io_ALK,is_POP) = 0.0
+          conv_ocn_sed(is_POP,io_ALK) = 0.0
+       end if
     end if
+    ! O2 (of P, N, C)
     ! update O2 demand associated with organic matter (taken as the carbon component)
     ! reduce O2 demand associated with C (and H) oxidation => treat N and P explicitly
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
     !       (and as implemented, ber N, this ends up as (5/2)/2 = 5.0/4.0
+    ! NOTE: to balance the uptake of NO3 into organic matter
+    !       [2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O]
+    !       with the release of N as ammonium and subsequent oxidation to NO3 ...
+    !       [NH4+ + 2O2 -> NO3- + 2H+ + H2O]
+    !       the remin of PON needs to be adjusted in order that everything is conserved:
+    !       2PON + 3H2O + 2H+ --> 2NH4+ + (3/2)O2
+    !       and per N:
+    !       PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
+    if (ctrl_bio_red_O2withPOC) then
+       conv_sed_ocn(io_O2,is_POP) = 0.0
+       conv_ocn_sed(is_POP,io_O2) = 0.0
+    else
+       conv_sed_ocn(io_O2,is_POP) = -4.0/2.0
+       conv_ocn_sed(is_POP,io_O2) = 1.0/conv_sed_ocn(io_O2,is_POP)
+    endif
+    if (ocn_select(io_NH4)) then
+       conv_sed_ocn(io_O2,is_PON) = (3.0/4.0)
+       conv_ocn_sed(is_PON,io_O2) = -(4.0/5.0)
+    elseif (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
+       conv_ocn_sed(is_PON,io_O2) = 1.0/conv_sed_ocn(io_O2,is_PON)
+    else
+       conv_sed_ocn(io_O2,is_PON) = 0.0
+       conv_ocn_sed(is_PON,io_O2) = 0.0
+    endif
     if (abs(par_bio_red_POP_POC*par_bio_red_POP_PO2) > const_real_nullsmall) then
-       if (ctrl_bio_red_O2withPOC) then
-          conv_sed_ocn(io_O2,is_POP) = 0.0
-          conv_ocn_sed(is_POP,io_O2) = 0.0
-       else
-          conv_sed_ocn(io_O2,is_POP) = -4.0/2.0
-          conv_ocn_sed(is_POP,io_O2) = 1.0/conv_sed_ocn(io_O2,is_POP)
-       endif
-       if (ocn_select(io_NO3)) then
-          conv_sed_ocn(io_O2,is_PON) = -5.0/4.0
-          conv_ocn_sed(is_PON,io_O2) = 1.0/conv_sed_ocn(io_O2,is_PON)
-       else
-          conv_sed_ocn(io_O2,is_PON) = 0.0
-          conv_ocn_sed(is_PON,io_O2) = 0.0
-       endif
        conv_sed_ocn(io_O2,is_POC) = par_bio_red_POP_PO2/par_bio_red_POP_POC - &
             & conv_sed_ocn(io_O2,is_POP)/par_bio_red_POP_POC - &
             & conv_sed_ocn(io_O2,is_PON)*par_bio_red_POP_PON/par_bio_red_POP_POC
@@ -1039,7 +1080,7 @@ CONTAINS
     !       [2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O]
     !       with the release of N as ammonium and subsequent oxidation to NO3 ...
     !       [NH4+ + 2O2 -> NO3- + 2H+ + H2O]
-    !       the remind of PON needs to be adjusted in order that everything is conserved:
+    !       the remin of PON needs to be adjusted in order that everything is conserved:
     !       2PON + 3H2O + 2H+ --> 2NH4+ + (3/2)O2
     !       and per N:
     !       PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
@@ -1059,11 +1100,13 @@ CONTAINS
           conv_sed_ocn_N(io_NH4,is_PON) = 1.0
           conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_N(io_O2,is_PON)  = (3.0/4.0)
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
           conv_sed_ocn_N(io_N2,is_PON)  = 0.5
           conv_sed_ocn_N(io_ALK,is_PON) = 0.0
           conv_sed_ocn_N(io_O2,is_PON)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
        ! P,C
        if (ocn_select(io_NO2)) then
@@ -1075,7 +1118,7 @@ CONTAINS
           conv_sed_ocn_N(io_NO2,is_POC) = -2.0*conv_sed_ocn(io_O2,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = 0.0
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_N(io_NO3,is_POP) = -(8.0/5.0)
           conv_sed_ocn_N(io_N2,is_POP)  = -0.5*conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_ALK,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
@@ -1084,6 +1127,8 @@ CONTAINS
           conv_sed_ocn_N(io_N2,is_POC)  = -0.5*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
     else
        conv_sed_ocn_N(:,:) = 0.0
@@ -1097,11 +1142,13 @@ CONTAINS
           conv_sed_ocn_S(io_NH4,is_PON) = 1.0
           conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_S(io_O2,is_PON)  = 0.0
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
           conv_sed_ocn_S(io_N2,is_PON)  = 0.5
           conv_sed_ocn_S(io_ALK,is_PON) = 0.0
           conv_sed_ocn_S(io_O2,is_PON)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
        ! P,C
        conv_sed_ocn_S(io_SO4,is_POP) = 0.5*conv_sed_ocn_S(io_O2,is_POP)
@@ -1138,11 +1185,13 @@ CONTAINS
           conv_sed_ocn_meth(io_NH4,is_PON) = 1.0
           conv_sed_ocn_meth(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
-       else
+       elseif (ocn_select(io_N2)) then
           conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
           conv_sed_ocn_meth(io_N2,is_PON)  = 0.5
           conv_sed_ocn_meth(io_ALK,is_PON) = 0.0
           conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
+       else
+          ! [DEFAULT, oxic remin relationship]
        endif
        ! P,C
        conv_sed_ocn_meth(io_O2,is_POP)  = 0.0
@@ -1249,6 +1298,7 @@ CONTAINS
     int_ocn_tot_V_sig       = 0.0
     int_ocn_sig(:)          = 0.0
     int_fexport_sig(:)      = 0.0
+    int_fracdom_sig(:)      = 0.0
     int_ocnatm_sig(:)       = 0.0
     int_focnatm_sig(:)      = 0.0
     int_focnsed_sig(:)      = 0.0
@@ -1276,7 +1326,9 @@ CONTAINS
     int_diag_airsea_sig(:)  = 0.0
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
-    int_diag_redox_sig(:)   = 0.0
+    int_diag_redox_sig(:)   = 0
+    int_diag_ecogem_part    = 0.0 
+    int_diag_ecogem_remin   = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
@@ -1372,10 +1424,12 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! INITIALIZE DIAGNOSTICS ARRAYS
   SUBROUTINE sub_init_diag()
-    diag_bio(:,:,:)       = 0.0
-    diag_geochem(:,:,:,:) = 0.0
-!!!   diag_weather(:,:,:)   = 0.0
-    diag_airsea(:,:,:)    = 0.0
+    diag_bio(:,:,:)          = 0.0
+    diag_geochem(:,:,:,:)    = 0.0
+!!!   diag_weather(:,:,:)      = 0.0
+    diag_airsea(:,:,:)       = 0.0
+    diag_ecogem_part(:,:,:)  = 0.0
+    diag_ecogem_remin(:,:,:) = 0.0
   END SUBROUTINE sub_init_diag
   ! ****************************************************************************************************************************** !
 
@@ -1918,6 +1972,16 @@ CONTAINS
     opt_select(iopt_select_ocnatm_CO2) = opt_select(iopt_select_carbchem) .AND. atm_select(ia_pCO2)
 
     ! *** parameter consistency check - biological productivity ***
+    ! first ... check for ECOGEM selction
+    If ( flag_ecogem .AND. (par_bio_prodopt /= 'NONE') ) then
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'If ECOGEM is selcted, par_bio_prodopt must be NONE', &
+            & 'ALTERING INTERNAL PARAMETER VALUE; CONTINUING', &
+            & (/const_real_null/),.false. &
+            & )
+       par_bio_prodopt = 'NONE'
+    end IF
     ! check first-order consistency between biologial option, and selected dissolved and sedimentary tracers
     ! NOTE: only the existence of inconsistency will be highlighted, not exactly what the problem is ...
     SELECT CASE (par_bio_prodopt)
@@ -1977,26 +2041,6 @@ CONTAINS
             & )
        loc_flag = .FALSE.
     end IF
-    If (par_bio_prodopt == 'NONE') then
-       If (ctrl_data_save_sig_diag_bio) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Selected data saving is redundant in the event of no biological scheme being activated.', &
-               & '[ctrl_data_save_sig_diag_bio] HAS BEEN DE-SELECTED; CONTINUING', &
-               & (/const_real_null/),.false. &
-               & )
-          ctrl_data_save_sig_diag_bio = .FALSE.
-       end IF
-       If (ctrl_data_save_slice_diag_bio) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Selected data saving is redundant in the event of no biological scheme being activated', &
-               & '[ctrl_data_save_slice_diag_bio] HAS BEEN DE-SELECTED; CONTINUING', &
-               & (/const_real_null/),.false. &
-               & )
-          ctrl_data_save_slice_diag_bio = .FALSE.
-       end IF
-    end if
     ! #### ADD CHECKS OF ADDITIONAL BIOLOGICAL OPTIONS HERE ###################################################################### !
     !
     ! ############################################################################################################################ !
@@ -2707,6 +2751,8 @@ CONTAINS
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_misc = .true.
        ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
        ctrl_data_save_derived = .true.
        ctrl_data_save_GLOBAL = .true.
        if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
@@ -2738,6 +2784,14 @@ CONTAINS
          & ) THEN
        ctrl_data_save_inversion = .true.
     end IF
+
+    ! determine if no biology at all
+    If ((par_bio_prodopt == 'NONE') .AND. (.NOT. flag_ecogem)) then
+       ctrl_data_save_slice_bio      = .false.
+       ctrl_data_save_slice_diag_bio = .false.
+       ctrl_data_save_sig_fexport    = .false.
+       ctrl_data_save_sig_diag_bio   = .false.
+    end if
 
   END SUBROUTINE sub_adj_par_save
   ! ****************************************************************************************************************************** !
