@@ -612,6 +612,41 @@ CONTAINS
     end SELECT
     diag_bio(idiag_bio_kT,dum_i,dum_j) = dum_dt*loc_kT
 
+    ! *** SET DOM FRACTION ******************************************************************************************************* !
+    SELECT CASE (par_bio_prodopt)
+    case (                        &
+         & 'bio_P',               &
+         & 'bio_PFe',             &
+         & 'bio_PFeSi'            &
+         & )
+!!!loc_bio_red_DOMfrac = (1.0 - 0.5/(par_bio_kT0*exp(loc_TC/par_bio_kT_eT)))*par_bio_red_DOMfrac
+       loc_bio_red_DOMfrac = par_bio_red_DOMfrac
+    case default
+       loc_bio_red_DOMfrac = par_bio_red_DOMfrac
+    end SELECT
+
+    ! *** SET RDOM FRACTION ****************************************************************************************************** !
+    SELECT CASE (par_bio_prodopt)
+    case (                        &
+         & 'bio_P',               &
+         & 'bio_PFe',             &
+         & 'bio_PFeSi'            &
+         & )
+!!!loc_bio_red_RDOMfrac = (1.0 - 0.5/(par_bio_kT0*exp(loc_TC/par_bio_kT_eT)))*par_bio_red_RDOMfrac
+       loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
+    case default
+       loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
+    end SELECT
+
+    ! *** ADJUST FOR TOTAL DOM + RDOM ******************************************************************************************** !
+    ! check for total DOM fraction exceeding 1.0 and re-scale (proportionally and to sum to 1.0)
+    loc_bio_red_DOMtotal = loc_bio_red_DOMfrac + loc_bio_red_RDOMfrac
+    if (loc_bio_red_DOMtotal > 1.0) then
+       loc_bio_red_DOMfrac = loc_bio_red_DOMfrac/loc_bio_red_DOMtotal
+       loc_bio_red_RDOMfrac = 1.0 - loc_bio_red_DOMfrac
+       loc_bio_red_DOMtotal = 1.0
+    end if
+
     ! *** CALCULATE PO4 DEPLETION ***
     ! NOTE: production is calculated as the concentration of newly-formed particulate material in the surface ocean layer
     !       that occurs within any single time step
@@ -897,41 +932,6 @@ CONTAINS
     end select
     ! ############################################################################################################################ !
 
-    ! *** SET DOM FRACTION ******************************************************************************************************* !
-    SELECT CASE (par_bio_prodopt)
-    case (                        &
-         & 'bio_P',               &
-         & 'bio_PFe',             &
-         & 'bio_PFeSi'            &
-         & )
-!!!loc_bio_red_DOMfrac = (1.0 - 0.5/(par_bio_kT0*exp(loc_TC/par_bio_kT_eT)))*par_bio_red_DOMfrac
-       loc_bio_red_DOMfrac = par_bio_red_DOMfrac
-    case default
-       loc_bio_red_DOMfrac = par_bio_red_DOMfrac
-    end SELECT
-
-    ! *** SET RDOM FRACTION ****************************************************************************************************** !
-    SELECT CASE (par_bio_prodopt)
-    case (                        &
-         & 'bio_P',               &
-         & 'bio_PFe',             &
-         & 'bio_PFeSi'            &
-         & )
-!!!loc_bio_red_RDOMfrac = (1.0 - 0.5/(par_bio_kT0*exp(loc_TC/par_bio_kT_eT)))*par_bio_red_RDOMfrac
-       loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
-    case default
-       loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
-    end SELECT
-
-    ! *** ADJUST FOR TOTAL DOM + RDOM ******************************************************************************************** !
-    ! check for total DOM fraction exceeding 1.0 and re-scale (proportionally and to sum to 1.0)
-    loc_bio_red_DOMtotal = loc_bio_red_DOMfrac + loc_bio_red_RDOMfrac
-    if (loc_bio_red_DOMtotal > 1.0) then
-       loc_bio_red_DOMfrac = loc_bio_red_DOMfrac/loc_bio_red_DOMtotal
-       loc_bio_red_RDOMfrac = 1.0 - loc_bio_red_DOMfrac
-       loc_bio_red_DOMtotal = 1.0
-    end if
-
     ! *** ADJUST PARTICULATE COMPOSITION 'REDFIELD' RATIOS *********************************************************************** !
     !
     ! CaCO3
@@ -996,10 +996,18 @@ CONTAINS
             & 'bio_PFeSi'            &
             & )
           if (ocn(io_SiO2,dum_i,dum_j,n_k) > const_real_nullsmall) then
-!!!bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
-!!!     & ((0.25E-9/(loc_FeT+0.125E-9))+1.0)
-             bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
-                  & ((par_part_red_opal_FeTKSp/(loc_FeT+par_part_red_opal_FeToff))+1.0)
+             SELECT CASE (opt_bio_red_SitoC)
+             case ('Ridgwell2001')
+                ! NOTE: OLD == bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
+                !                   & ((0.25E-9/(loc_FeT+0.125E-9))+1.0)
+                bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
+                     & ((par_part_red_opal_FeTKSp/(loc_FeT+par_part_red_opal_FeToff))+1.0)
+             case ('Jones2018')
+                bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal* &
+                     & (par_part_red_opal_FeTKSp + loc_FeT)/max(loc_FeT,par_part_red_opal_FeToff)
+             case default
+                bio_part_red(is_POC,is_opal,dum_i,dum_j) = (1.0 - loc_bio_red_DOMtotal)*par_bio_red_POC_opal
+             end SELECT
           else
              bio_part_red(is_POC,is_opal,dum_i,dum_j) = 0.0
           end if
