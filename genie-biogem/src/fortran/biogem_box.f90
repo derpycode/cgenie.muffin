@@ -2013,6 +2013,15 @@ CONTAINS
        is = conv_iselected_is(l)
        bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
     end DO
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_FeS2,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_geochem(idiag_geochem_dFe_FeS2,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    diag_geochem(idiag_geochem_dH2S_FeS2,dum_i,dum_j,:) = loc_bio_uptake(io_H2S,:)
+    diag_geochem(idiag_geochem_dSO4_FeS2,dum_i,dum_j,:) = loc_bio_uptake(io_SO4,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -2153,19 +2162,32 @@ CONTAINS
           end do
        end DO
     end DO
-
-    ! *** SET MODIFICATION OF TRACER CONCENTRATIONS ***
+    
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
     end do
 
-    ! *** SET MODIFICATION OF PARTICULATE CONCENTRATIONS ***
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
     DO l=3,n_l_sed
        is = conv_iselected_is(l)
        bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
     end DO
-
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_FeCO3,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_geochem(idiag_geochem_dFe_FeCO3,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    diag_geochem(idiag_geochem_dDIC_FeCO3,dum_i,dum_j,:) = loc_bio_uptake(io_DIC,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
   end SUBROUTINE sub_calc_precip_FeCO3
   ! ****************************************************************************************************************************** !
 
