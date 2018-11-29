@@ -1,0 +1,2549 @@
+**** TESTING - configs/eb_go_gs_ac_bg_test.xml ****
+make[1]: Entering directory `/home/portabello/cgenie.muffin/genie-main'
+makefile:140: target `clean_plasim' given more than once in the same rule.
+makefile:166: target `/home/portabello/cgenie.muffin/genie-plasim/' given more than once in the same rule.
+makefile:175: target `/home/portabello/cgenie.muffin/genie-plasim/lib/libplasim.a' given more than once in the same rule.
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	genie_control.f90 -o genie_control.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	genie_global.f90 -o genie_global.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	local_netcdf.f90 -o local_netcdf.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	genie_util.f90 -o genie_util.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	local_output.f90 -o local_output.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+\cd /home/portabello/cgenie.muffin/genie-lib/libnc1; make libnc1.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-lib/libnc1'
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 close_file_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 find_dim_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get1d_data_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get1d_data_point_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get2d_data_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get2d_data_slice_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get1d_slice_comp_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get2d_slice_comp_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get3d_data_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get3d_data_slice_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get3d_slice_comp_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 get4d_data_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 length_of_char_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 open_file_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 read1d_comp_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 read2d_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 read3d_slice_nc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 writenc6.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80  -fdefault-real-8 extras.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ar rcvs libnc1.a close_file_nc.o find_dim_nc.o get1d_data_nc.o get1d_data_point_nc.o get2d_data_nc.o get2d_data_slice_nc.o get1d_slice_comp_nc.o get2d_slice_comp_nc.o get3d_data_nc.o get3d_data_slice_nc.o get3d_slice_comp_nc.o get4d_data_nc.o length_of_char_nc.o open_file_nc.o read1d_comp_nc.o read2d_nc.o read3d_slice_nc.o writenc6.o extras.o
+a - close_file_nc.o
+a - find_dim_nc.o
+a - get1d_data_nc.o
+a - get1d_data_point_nc.o
+a - get2d_data_nc.o
+a - get2d_data_slice_nc.o
+a - get1d_slice_comp_nc.o
+a - get2d_slice_comp_nc.o
+a - get3d_data_nc.o
+a - get3d_data_slice_nc.o
+a - get3d_slice_comp_nc.o
+a - get4d_data_nc.o
+a - length_of_char_nc.o
+a - open_file_nc.o
+a - read1d_comp_nc.o
+a - read2d_nc.o
+a - read3d_slice_nc.o
+a - writenc6.o
+a - extras.o
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-lib/libnc1'
+\cd /home/portabello/cgenie.muffin/genie-lib/libutil1; make libutil1.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-lib/libutil1'
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8 lnsig.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8 lnsig1.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ar rcvs libutil1.a lnsig.o lnsig1.o
+a - lnsig.o
+a - lnsig1.o
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-lib/libutil1'
+\cd /home/portabello/cgenie.muffin/genie-main/src/fortran/cmngem; make libcmngem.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-main/src/fortran/cmngem'
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic gem_cmn.f90 -o gem_cmn.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic gem_util.f90 -o gem_util.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gem_util.f90: In function ‘fun_calc_isotope_abundancer012ocn’:
+gem_util.f90:991: warning: ‘__result_fun_calc_isotope_abu’ may be used uninitialized in this function
+gem_util.f90: In function ‘fun_calc_isotope_abundancer012sed’:
+gem_util.f90:1032: warning: ‘__result_fun_calc_isotope_abu’ may be used uninitialized in this function
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic gem_geochem.f90 -o gem_geochem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic gem_carbchem.f90 -o gem_carbchem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic gem_netcdf.f90 -o gem_netcdf.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic gem_data.f90 -o gem_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic initialise_gem.f90 -o initialise_gem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -fdefault-real-8  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic end_gem.f90 -o end_gem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ar rcvs libcmngem.a  gem_cmn.o  gem_util.o  gem_geochem.o  gem_carbchem.o  gem_netcdf.o  gem_data.o  initialise_gem.o  end_gem.o
+a - gem_cmn.o
+a - gem_util.o
+a - gem_geochem.o
+a - gem_carbchem.o
+a - gem_netcdf.o
+a - gem_data.o
+a - initialise_gem.o
+a - end_gem.o
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-main/src/fortran/cmngem'
+\cp /home/portabello/cgenie.muffin/genie-main/src/fortran/cmngem/*.mod /home/portabello/cgenie.muffin/genie-main/include
+\cd /home/portabello/cgenie.muffin/genie-goldstein/lib/..; make libgoldstein.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-goldstein'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-goldstein/src/fortran'
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c co.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diag.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diag2.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diagend.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diagopsi.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diagosc.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c drgset.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c ediff.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c end_goldstein.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c eos.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c gold_ocnsic_avg.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c goldstein.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c initialise_goldstein.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c inm.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c inm_netcdf.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c invert.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c island.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c jbar.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c krausturner.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c matinv_gold.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c netcdf.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c outm.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c outm_netcdf.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c outm_surf_ocn_sic.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c surf_ocn_sic.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c tstepo.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c tstipo.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c tstepo_flux.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c ubarsolv.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c velc.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c wind.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c goldstein_delayfluxes.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c get_hosing.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c err_gold.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c rmsnorm_goldstein_S.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c rmsnorm_goldstein_T.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diag_goldstein_T_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diag_goldstein_Tsurf_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diag_goldstein_S_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diag_goldstein_Ssurf_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diag_goldstein_circulation_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c gwt.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldstein/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-goldstein/lib'
+ar rcvs libgoldstein.a ../src/fortran/co.o ../src/fortran/diag2.o ../src/fortran/diagend.o ../src/fortran/diag_goldstein_circulation_annual_av.o ../src/fortran/diag_goldstein_S_annual_av.o ../src/fortran/diag_goldstein_Ssurf_annual_av.o ../src/fortran/diag_goldstein_T_annual_av.o ../src/fortran/diag_goldstein_Tsurf_annual_av.o ../src/fortran/diag.o ../src/fortran/diagopsi.o ../src/fortran/diagosc.o ../src/fortran/drgset.o ../src/fortran/ediff.o ../src/fortran/end_goldstein.o ../src/fortran/eos.o ../src/fortran/err_gold.o ../src/fortran/get_hosing.o ../src/fortran/gold_ocnsic_avg.o ../src/fortran/goldstein_delayfluxes.o ../src/fortran/goldstein.o ../src/fortran/gwt.o ../src/fortran/initialise_goldstein.o ../src/fortran/inm_netcdf.o ../src/fortran/inm.o ../src/fortran/invert.o ../src/fortran/island.o ../src/fortran/jbar.o ../src/fortran/krausturner.o ../src/fortran/matinv_gold.o ../src/fortran/netcdf.o ../src/fortran/outm_netcdf.o ../src/fortran/outm.o ../src/fortran/outm_surf_ocn_sic.o ../src/fortran/rmsnorm_goldstein_S.o ../src/fortran/rmsnorm_goldstein_T.o ../src/fortran/surf_ocn_sic.o ../src/fortran/tstepo_flux.o ../src/fortran/tstepo.o ../src/fortran/tstipo.o ../src/fortran/ubarsolv.o ../src/fortran/velc.o ../src/fortran/wind.o
+a - ../src/fortran/co.o
+a - ../src/fortran/diag2.o
+a - ../src/fortran/diagend.o
+a - ../src/fortran/diag_goldstein_circulation_annual_av.o
+a - ../src/fortran/diag_goldstein_S_annual_av.o
+a - ../src/fortran/diag_goldstein_Ssurf_annual_av.o
+a - ../src/fortran/diag_goldstein_T_annual_av.o
+a - ../src/fortran/diag_goldstein_Tsurf_annual_av.o
+a - ../src/fortran/diag.o
+a - ../src/fortran/diagopsi.o
+a - ../src/fortran/diagosc.o
+a - ../src/fortran/drgset.o
+a - ../src/fortran/ediff.o
+a - ../src/fortran/end_goldstein.o
+a - ../src/fortran/eos.o
+a - ../src/fortran/err_gold.o
+a - ../src/fortran/get_hosing.o
+a - ../src/fortran/gold_ocnsic_avg.o
+a - ../src/fortran/goldstein_delayfluxes.o
+a - ../src/fortran/goldstein.o
+a - ../src/fortran/gwt.o
+a - ../src/fortran/initialise_goldstein.o
+a - ../src/fortran/inm_netcdf.o
+a - ../src/fortran/inm.o
+a - ../src/fortran/invert.o
+a - ../src/fortran/island.o
+a - ../src/fortran/jbar.o
+a - ../src/fortran/krausturner.o
+a - ../src/fortran/matinv_gold.o
+a - ../src/fortran/netcdf.o
+a - ../src/fortran/outm_netcdf.o
+a - ../src/fortran/outm.o
+a - ../src/fortran/outm_surf_ocn_sic.o
+a - ../src/fortran/rmsnorm_goldstein_S.o
+a - ../src/fortran/rmsnorm_goldstein_T.o
+a - ../src/fortran/surf_ocn_sic.o
+a - ../src/fortran/tstepo_flux.o
+a - ../src/fortran/tstepo.o
+a - ../src/fortran/tstipo.o
+a - ../src/fortran/ubarsolv.o
+a - ../src/fortran/velc.o
+a - ../src/fortran/wind.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldstein/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldstein'
+if [ -d /home/portabello/cgenie.muffin/genie-goldstein/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-goldstein/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-embm/lib/..; make libembm.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-embm'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-embm/src/fortran'
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diag3.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diaga.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c diagend_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c diagosc_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c end_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c initialise_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c inm_embm.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c inm_netcdf_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c netcdf_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c outm_embm.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c outm_netcdf_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c outm_surf.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c ocean_alb.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c radfor.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c readroff.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c surflux.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c tstepa.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c tstipa.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c err_embm.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c rmsnorm_embm_T.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c rmsnorm_embm_q.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c field_interp.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c diag_embm_T_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c diag_embm_q_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
+	-c diag_embm_r_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-embm/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-embm/lib'
+ar rcvs libembm.a ../src/fortran/diag3.o ../src/fortran/diaga.o ../src/fortran/diag_embm_q_annual_av.o ../src/fortran/diag_embm_r_annual_av.o ../src/fortran/diag_embm_T_annual_av.o ../src/fortran/diagend_embm.o ../src/fortran/diagosc_embm.o ../src/fortran/embm.o ../src/fortran/end_embm.o ../src/fortran/err_embm.o ../src/fortran/field_interp.o ../src/fortran/initialise_embm.o ../src/fortran/inm_embm.o ../src/fortran/inm_netcdf_embm.o ../src/fortran/netcdf_embm.o ../src/fortran/ocean_alb.o ../src/fortran/outm_embm.o ../src/fortran/outm_netcdf_embm.o ../src/fortran/outm_surf.o ../src/fortran/radfor.o ../src/fortran/readroff.o ../src/fortran/rmsnorm_embm_q.o ../src/fortran/rmsnorm_embm_T.o ../src/fortran/surflux.o ../src/fortran/tstepa.o ../src/fortran/tstipa.o
+a - ../src/fortran/diag3.o
+a - ../src/fortran/diaga.o
+a - ../src/fortran/diag_embm_q_annual_av.o
+a - ../src/fortran/diag_embm_r_annual_av.o
+a - ../src/fortran/diag_embm_T_annual_av.o
+a - ../src/fortran/diagend_embm.o
+a - ../src/fortran/diagosc_embm.o
+a - ../src/fortran/embm.o
+a - ../src/fortran/end_embm.o
+a - ../src/fortran/err_embm.o
+a - ../src/fortran/field_interp.o
+a - ../src/fortran/initialise_embm.o
+a - ../src/fortran/inm_embm.o
+a - ../src/fortran/inm_netcdf_embm.o
+a - ../src/fortran/netcdf_embm.o
+a - ../src/fortran/ocean_alb.o
+a - ../src/fortran/outm_embm.o
+a - ../src/fortran/outm_netcdf_embm.o
+a - ../src/fortran/outm_surf.o
+a - ../src/fortran/radfor.o
+a - ../src/fortran/readroff.o
+a - ../src/fortran/rmsnorm_embm_q.o
+a - ../src/fortran/rmsnorm_embm_T.o
+a - ../src/fortran/surflux.o
+a - ../src/fortran/tstepa.o
+a - ../src/fortran/tstipa.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-embm/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-embm'
+if [ -d /home/portabello/cgenie.muffin/genie-embm/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-embm/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-plasim/lib/..; make libplasim.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-plasim'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-plasim/src/fortran'
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c geniemod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c plasimmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c calmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c oceanmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c icemod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+icemod.f90:51.37:
+
+      integer :: nflukoavg  = 115200 !timesteps for averaging flux correction
+                                     1
+Warning: Nonconforming tab character at (1)
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c seamod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c cpl_stub.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c fftmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c fluxmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c gaussmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c landmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+landmod.f90:1177.14:
+
+      real d91,d92,d93,d94 !for genie runoff
+              1
+Warning: Unused variable 'd91' declared at (1)
+landmod.f90:1177.18:
+
+      real d91,d92,d93,d94 !for genie runoff
+                  1
+Warning: Unused variable 'd92' declared at (1)
+landmod.f90:1177.22:
+
+      real d91,d92,d93,d94 !for genie runoff
+                      1
+Warning: Unused variable 'd93' declared at (1)
+landmod.f90:1177.26:
+
+      real d91,d92,d93,d94 !for genie runoff
+                          1
+Warning: Unused variable 'd94' declared at (1)
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c legmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c miscmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c mpimod_stub.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c outmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+outmod.f90:308.18:
+
+      use landmod !needed for orography (includes pumamod)
+                  1
+Warning: Nonconforming tab character at (1)
+outmod.f90:323.24:
+
+      integer varidatsa   !surface air temperature
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:324.24:
+
+      integer varidats0   !surface temperature
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:325.26:
+
+      integer varidatsoil  !soil temperature
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:326.25:
+
+      integer varidahfls  !heat flux from soil
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:327.24:
+
+      integer varidaprl   !large scale precipitation
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:328.24:
+
+      integer varidaprc   !convective precipitation
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:329.24:
+
+      integer varidaprt   !total precipitation
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:330.23:
+
+      integer varidacc   !cloud cover
+                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:331.25:
+
+      integer varidaevap  !evaporation
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:332.25:
+
+      integer varidaroff  !runoff
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:333.25:
+
+      integer varidawatc  !water content of soil
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:334.24:
+
+      integer varidaqvi   !vertically integrated spec hum
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:335.25:
+
+      integer varidashfl  !sensible heat flux
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:336.25:
+
+      integer varidalhfl  !latent heat flux
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:337.25:
+
+      integer varidassol  !surface solar radiation
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:338.25:
+
+      integer varidasthr  !surface thermal radiation
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:339.26:
+
+      integer varidassolu  !surface solar upward
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:340.26:
+
+      integer varidasthru  !surface thermal upward
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:343.25:
+
+      integer varidataux  !u-stress
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:344.25:
+
+      integer varidatauy  !v-stress
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:345.24:
+
+      integer varidaveg   !vegetation cover
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:346.25:
+
+      integer varidacveg  !vegetation carbon
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:347.26:
+
+      integer varidacsoil  !soil carbon
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:348.27:
+
+      integer varidaforest  !forest cover
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:349.25:
+
+      integer varidawmax  !field capacity
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:350.24:
+
+      integer varidalai   !leaf area index
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:351.23:
+
+      integer varidaz0   !surface roughness
+                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:352.24:
+
+      integer varidaalb   !albedo
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:353.24:
+
+      integer varidagpp   !gross primary production
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:354.24:
+
+      integer varidanpp   !net primary production
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:355.25:
+
+      integer varidaresh  !heterotrophic respiration
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:356.27:
+
+      integer varidalitter  !litter production
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:357.25:
+
+      integer varidagppl  !light limited GPP
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:358.25:
+
+      integer varidagppw  !water limited GPP
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:359.25:
+
+      integer variddglac  !glacier mask
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:360.25:
+
+      integer varidaicec  !sea ice cover
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:361.25:
+
+      integer varidaiced  !sea ice thickness
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:362.25:
+
+      integer varidasnow  !snow depth
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:363.24:
+
+      integer variddoro   !orography
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:364.23:
+
+      integer variddls   !land-sea mask
+                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:365.25:
+
+      integer variddarea  !grid cell area
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:366.22:
+
+      integer varidap   !pressure
+                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:367.27:
+
+      integer varidddummy   !for debug
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:368.27:
+
+      integer varidadummy   !for debug
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:370.26:
+
+      integer varidapr_s1  !DJF pptn
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:372.27:
+
+      integer varidatsa_s1  !DJF temperature
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:374.26:
+
+      integer varidapr_s2  !MAM pptn
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:376.27:
+
+      integer varidatsa_s2  !MAM temperature
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:378.26:
+
+      integer varidapr_s3  !JJA pptn
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:380.27:
+
+      integer varidatsa_s3  !JJA temperature
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:382.26:
+
+      integer varidapr_s4  !SON pptn
+                          1
+Warning: Nonconforming tab character at (1)
+outmod.f90:384.27:
+
+      integer varidatsa_s4  !SON temperature
+                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:614.44:
+
+      data(:)=atsa(:)/real(naccuout)-273.15  !surface air temperature (Celcius)
+                                            1
+Warning: Nonconforming tab character at (1)
+outmod.f90:616.44:
+
+      data(:)=ats0(:)/real(naccuout)-273.15  !surface temperature (Celcius)
+                                            1
+Warning: Nonconforming tab character at (1)
+outmod.f90:618.53:
+
+      data(:)=atsoil(:)/real(naccuout)-273.15*dls(:) !soil temperature (Celcius)
+                                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:620.38:
+
+      data(:)=ahfls(:)/real(naccuout)                 !heat flux from soil
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:622.37:
+
+      data(:)=aprl(:)/real(naccuout)   !large scale precipitation
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:624.37:
+
+      data(:)=aprc(:)/real(naccuout)   !convective precipitation
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:626.47:
+
+      data(:)=(aprl(:)+aprc(:))/real(naccuout)  !total precipitation
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:628.36:
+
+      data(:)=acc(:)/real(naccuout)   !cloud cover
+                                    1
+Warning: Nonconforming tab character at (1)
+outmod.f90:630.38:
+
+      data(:)=aevap(:)/real(naccuout)   !evaporation
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:632.38:
+
+      data(:)=aroff(:)/real(naccuout)   !runoff
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:634.38:
+
+      data(:)=awatc(:)/real(naccuout)   !soil moisture
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:636.37:
+
+      data(:)=aqvi(:)/real(naccuout)   !vertically int spec hum
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:638.38:
+
+      data(:)=ashfl(:)/real(naccuout)   !sensible heat flux
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:640.38:
+
+      data(:)=alhfl(:)/real(naccuout)   !latent heat flux
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:642.38:
+
+      data(:)=assol(:)/real(naccuout)   !surface solar radiation
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:644.38:
+
+      data(:)=asthr(:)/real(naccuout)   !surface thermal radiation
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:646.39:
+
+      data(:)=assolu(:)/real(naccuout)   !surface solar upward
+                                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:648.39:
+
+      data(:)=asthru(:)/real(naccuout)   !surface thermal upward
+                                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:654.38:
+
+      data(:)=ataux(:)/real(naccuout)   !u-stress (acc)
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:656.38:
+
+      data(:)=atauy(:)/real(naccuout)   !v-stress (acc)
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:658.37:
+
+      data(:)=aveg(:)/real(naccuout)   !vegetation cover
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:660.38:
+
+      data(:)=acveg(:)/real(naccuout)   !vegetation carbon
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:662.39:
+
+      data(:)=acsoil(:)/real(naccuout)   !soil carbon
+                                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:664.40:
+
+      data(:)=aforest(:)/real(naccuout)   !forest cover
+                                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:666.45:
+
+      data(:)=awmax(:)*dls(:)/real(naccuout)  !field capacity (land only)
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:668.37:
+
+      data(:)=alai(:)/real(naccuout)   !leaf area index
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:670.36:
+
+      data(:)=az0(:)/real(naccuout)   !surface roughness
+                                    1
+Warning: Nonconforming tab character at (1)
+outmod.f90:672.37:
+
+      data(:)=aalb(:)/real(naccuout)   !albedo
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:674.37:
+
+      data(:)=agpp(:)/real(naccuout)   !gross primary production
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:676.37:
+
+      data(:)=anpp(:)/real(naccuout)   !net primary production
+                                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:678.38:
+
+      data(:)=aresh(:)/real(naccuout)   !heterotrophic respiration
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:680.40:
+
+      data(:)=alitter(:)/real(naccuout)   !litter production
+                                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:682.38:
+
+      data(:)=agppl(:)/real(naccuout)   !light limited GPP
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:684.38:
+
+      data(:)=agppw(:)/real(naccuout)   !water limited GPP
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:686.23:
+
+      data(:)=dglac(:)     !glacier mask
+                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:688.38:
+
+      data(:)=aicec(:)/real(naccuout)   !sea ice cover
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:690.38:
+
+      data(:)=aiced(:)/real(naccuout)   !sea ice thickness
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:692.38:
+
+      data(:)=asnow(:)/real(naccuout)   !snow depth
+                                      1
+Warning: Nonconforming tab character at (1)
+outmod.f90:694.35:
+
+      data(:)=ap(:)/real(naccuout)   !surface pressure
+                                   1
+Warning: Nonconforming tab character at (1)
+outmod.f90:696.25:
+
+      data(:)=doro(:)/ga    !orography (convert from m2/s2 to m)
+                         1
+Warning: Nonconforming tab character at (1)
+outmod.f90:698.21:
+
+      data(:)=dls(:)     !land-sea mask
+                     1
+Warning: Nonconforming tab character at (1)
+outmod.f90:700.23:
+
+      data(:)=darea(:)     !grid cell area
+                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:702.24:
+
+      data(:)=ddummy(:)     !debug
+                        1
+Warning: Nonconforming tab character at (1)
+outmod.f90:704.39:
+
+      data(:)=adummy(:)/real(naccuout)     !debug
+                                       1
+Warning: Nonconforming tab character at (1)
+outmod.f90:708.45:
+
+       data(:)=4.0*apr_s(:,1)/real(naccuout)    !DJF avg pptn
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:712.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:714.45:
+
+       data(:)=4.0*apr_s(:,2)/real(naccuout)    !MAM avg pptn
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:718.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:720.45:
+
+       data(:)=4.0*apr_s(:,3)/real(naccuout)    !JJA avg pptn
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:724.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:726.45:
+
+       data(:)=4.0*apr_s(:,4)/real(naccuout)    !SON avg pptn
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:730.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:732.46:
+
+       data(:)=4.0*atsa_s(:,1)/real(naccuout)    !DJF avg air temp
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:736.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:738.46:
+
+       data(:)=4.0*atsa_s(:,2)/real(naccuout)    !MAM avg air temp
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:742.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:744.46:
+
+       data(:)=4.0*atsa_s(:,3)/real(naccuout)    !JJA avg air temp
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:748.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:750.46:
+
+       data(:)=4.0*atsa_s(:,4)/real(naccuout)    !SON avg air temp
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:754.48:
+
+       data(:)=sqrt(4.0*data(:)/real(naccuout))    !and SD
+                                                1
+Warning: Nonconforming tab character at (1)
+outmod.f90:756.45:
+
+       data(:)=4.0*acc_s(:,1)/real(naccuout)    !DJF clouds
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:758.45:
+
+       data(:)=4.0*acc_s(:,2)/real(naccuout)    !MAM clouds
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:760.45:
+
+       data(:)=4.0*acc_s(:,3)/real(naccuout)    !JJA clouds
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:762.45:
+
+       data(:)=4.0*acc_s(:,4)/real(naccuout)    !SON clouds
+                                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:764.47:
+
+       data(:)=4.0*aevap_s(:,1)/real(naccuout)    !DJF evaporation
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:766.47:
+
+       data(:)=4.0*aevap_s(:,2)/real(naccuout)    !MAM evaporation
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:768.47:
+
+       data(:)=4.0*aevap_s(:,3)/real(naccuout)    !JJA evaporation
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:770.47:
+
+       data(:)=4.0*aevap_s(:,4)/real(naccuout)    !SON evaporation
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:772.46:
+
+       data(:)=4.0*asst_s(:,1)/real(naccuout)    !DJF SST
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:774.46:
+
+       data(:)=4.0*asst_s(:,2)/real(naccuout)    !MAM SST
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:776.46:
+
+       data(:)=4.0*asst_s(:,3)/real(naccuout)    !JJA SST
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:778.46:
+
+       data(:)=4.0*asst_s(:,4)/real(naccuout)    !SON SST
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:780.46:
+
+       data(:)=4.0*asia_s(:,1)/real(naccuout)    !DJF SIA
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:782.46:
+
+       data(:)=4.0*asia_s(:,2)/real(naccuout)    !MAM SIA
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:784.46:
+
+       data(:)=4.0*asia_s(:,3)/real(naccuout)    !JJA SIA
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:786.46:
+
+       data(:)=4.0*asia_s(:,4)/real(naccuout)    !SON SIA
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:789.47:
+
+       data(:)=4.0*assol_s(:,1)/real(naccuout)    !DJF incoming solar
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:791.47:
+
+       data(:)=4.0*assol_s(:,2)/real(naccuout)    !MAM incoming solar
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:793.47:
+
+       data(:)=4.0*assol_s(:,3)/real(naccuout)    !JJA incoming solar
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:795.47:
+
+       data(:)=4.0*assol_s(:,4)/real(naccuout)    !SON incoming solar
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:798.47:
+
+       data(:)=4.0*asthr_s(:,1)/real(naccuout)    !DJF incoming thermal
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:800.47:
+
+       data(:)=4.0*asthr_s(:,2)/real(naccuout)    !MAM incoming thermal
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:802.47:
+
+       data(:)=4.0*asthr_s(:,3)/real(naccuout)    !JJA incoming thermal
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:804.47:
+
+       data(:)=4.0*asthr_s(:,4)/real(naccuout)    !SON incoming thermal
+                                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:844.49:
+
+      data3(:,:)=4.0*a3u_s(:,:,1)/real(naccuout)    !DJF 3D uspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:846.49:
+
+      data3(:,:)=4.0*a3u_s(:,:,2)/real(naccuout)    !MAM 3D uspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:848.49:
+
+      data3(:,:)=4.0*a3u_s(:,:,3)/real(naccuout)    !JJA 3D uspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:850.49:
+
+      data3(:,:)=4.0*a3u_s(:,:,4)/real(naccuout)    !SON 3D uspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:852.49:
+
+      data3(:,:)=4.0*a3v_s(:,:,1)/real(naccuout)    !DJF 3D vspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:854.49:
+
+      data3(:,:)=4.0*a3v_s(:,:,2)/real(naccuout)    !MAM 3D vspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:856.49:
+
+      data3(:,:)=4.0*a3v_s(:,:,3)/real(naccuout)    !JJA 3D vspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:858.49:
+
+      data3(:,:)=4.0*a3v_s(:,:,4)/real(naccuout)    !SON 3D vspeed
+                                                 1
+Warning: Nonconforming tab character at (1)
+outmod.f90:1430.29:
+
+      season = nstep / ntspd    ! no days since simulation start
+                             1
+Warning: Nonconforming tab character at (1)
+outmod.f90:1431.43:
+
+      season = mod(season,n_days_per_year)  ! day of year
+                                           1
+Warning: Nonconforming tab character at (1)
+outmod.f90:1432.46:
+
+      month = (season / n_days_per_month) + 1  ! month
+                                              1
+Warning: Nonconforming tab character at (1)
+outmod.f90:1433.31:
+
+      season = (month / 3) + 1    ! season
+                               1
+Warning: Nonconforming tab character at (1)
+outmod.f90:1434.33:
+
+      if(season.eq.5) season = 1   ! 1=DJF, 2=MAM, 3=JJA, 4=SON
+                                 1
+Warning: Nonconforming tab character at (1)
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c plasim.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+plasim.f90:518.17:
+
+       delta_flux,                                               &
+                 1
+Warning: Unused dummy argument 'delta_flux' at (1)
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c radmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c rainmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c restartmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c simba.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+simba.f90:22.5:
+
+real :: k7=0.461
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:23.5:
+
+real :: k8=0.45
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:24.5:
+
+real :: k9=0.15
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:25.5:
+
+real :: k10=0.02
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:26.5:
+
+real :: k11a=309.15
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:27.5:
+
+real :: k11b=283.15
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:28.5:
+
+real :: k12=268.25
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:29.5:
+
+real :: k13=29.0
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:30.5:
+
+real :: k14=145.0
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:31.5:
+
+real :: k16=11.5
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:32.5:
+
+real :: k17=0.35
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:33.5:
+
+real :: k18=1.3985e-7 !converted from yr-1 to s-1
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:34.5:
+
+real :: k20=54830.0
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:35.5:
+
+real :: k24=6.9123e-9 !converted from yr-1 to s-1
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:36.5:
+
+real :: k26=4.2117e-9 !converted from yr-1 to s-1
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:37.5:
+
+real :: k29=4.0188e-9 !converted from yr-1 to s-1
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:38.5:
+
+real :: k31=308.56
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:39.5:
+
+real :: k32=227.13
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:40.5:
+
+real :: kz=0.0452
+     1
+Warning: Nonconforming tab character at (1)
+simba.f90:108.7:
+
+     &  ,k20,k24,k29,k31,kz,tadj
+       1
+Warning: Nonconforming tab character at (1)
+simba.f90:169.8:
+
+real f1  !co2 limitation on photosynthesis
+        1
+Warning: Nonconforming tab character at (1)
+simba.f90:170.9:
+
+real f2  !water stress limitation on photosynthesis
+         1
+Warning: Nonconforming tab character at (1)
+simba.f90:171.14:
+
+real f3a,f3b  !temperature limitation on photosynthesis
+              1
+Warning: Nonconforming tab character at (1)
+simba.f90:172.9:
+
+real f4  !vegetation respiration
+         1
+Warning: Nonconforming tab character at (1)
+simba.f90:173.14:
+
+real epsilon  !self shading
+              1
+Warning: Nonconforming tab character at (1)
+simba.f90:261.50:
+
+    dnpp(jhor) = pgrow(jhor)*dnpp(jhor)*zglacfree  !retain puma limitation of g
+                                                  1
+Warning: Nonconforming tab character at (1)
+simba.f90:262.50:
+
+    dnogrow(jhor)  = (1.0-pgrow(jhor))*dnpp(jhor)  !limitation imposed by pgrow
+                                                  1
+Warning: Nonconforming tab character at (1)
+simba.f90:265.45:
+
+    epsilon = 1.0/(1.0+exp(k16-dcveg(jhor)))   !self-shading
+                                             1
+Warning: Nonconforming tab character at (1)
+simba.f90:299.35:
+
+    if (dsnow(jhor) > 1.0e-3) then    !! PBH only if snow depth > 1 mm
+                                   1
+Warning: Nonconforming tab character at (1)
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c surfmod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c tpcore.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+tpcore.f90:800.3:
+
+123   continue
+   1
+Warning: Label 123 at (1) defined but not used
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c tracermod.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f95-cpp-input -ffree-line-length-none -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main \
+	 -c trc_routines.f90
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+trc_routines.f90:226.1:
+
+ c1 = 4.*(AL(i,km1)-qm-d2*dp) / (d2*(2.*d2*d2+d1*(d2+3.*d1)))
+ 1
+Warning: Nonconforming tab character at (1)
+trc_routines.f90:227.1:
+
+ c3 = dp - 0.5*c1*(d2*(5.*d1+d2)-3.*d1**2)
+ 1
+Warning: Nonconforming tab character at (1)
+trc_routines.f90:779.63:
+
+      SUBROUTINE qckxyz(Q,qtmp,IMR,JNP,NLAY,j1,j2,cosp,acosp,IC)
+                                                               1
+Warning: Unused dummy argument 'ic' at (1)
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-plasim/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-plasim/lib'
+ar rcvs libplasim.a ../src/fortran/calmod.o ../src/fortran/cpl_stub.o ../src/fortran/fftmod.o ../src/fortran/fluxmod.o ../src/fortran/gaussmod.o ../src/fortran/geniemod.o ../src/fortran/icemod.o ../src/fortran/landmod.o ../src/fortran/legmod.o ../src/fortran/miscmod.o ../src/fortran/mpimod_stub.o ../src/fortran/oceanmod.o ../src/fortran/outmod.o ../src/fortran/plasimmod.o ../src/fortran/plasim.o ../src/fortran/radmod.o ../src/fortran/rainmod.o ../src/fortran/restartmod.o ../src/fortran/seamod.o ../src/fortran/simba.o ../src/fortran/surfmod.o ../src/fortran/tpcore.o ../src/fortran/tracermod.o ../src/fortran/trc_routines.o
+a - ../src/fortran/calmod.o
+a - ../src/fortran/cpl_stub.o
+a - ../src/fortran/fftmod.o
+a - ../src/fortran/fluxmod.o
+a - ../src/fortran/gaussmod.o
+a - ../src/fortran/geniemod.o
+a - ../src/fortran/icemod.o
+a - ../src/fortran/landmod.o
+a - ../src/fortran/legmod.o
+a - ../src/fortran/miscmod.o
+a - ../src/fortran/mpimod_stub.o
+a - ../src/fortran/oceanmod.o
+a - ../src/fortran/outmod.o
+a - ../src/fortran/plasimmod.o
+a - ../src/fortran/plasim.o
+a - ../src/fortran/radmod.o
+a - ../src/fortran/rainmod.o
+a - ../src/fortran/restartmod.o
+a - ../src/fortran/seamod.o
+a - ../src/fortran/simba.o
+a - ../src/fortran/surfmod.o
+a - ../src/fortran/tpcore.o
+a - ../src/fortran/tracermod.o
+a - ../src/fortran/trc_routines.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-plasim/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-plasim'
+if [ -d /home/portabello/cgenie.muffin/genie-plasim/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-plasim/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-goldsteinseaice/lib/..; make libgoldsteinseaice.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-goldsteinseaice'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-goldsteinseaice/src/fortran'
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diagend_seaice.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diagosc_sic.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diagsic.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c diag4.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c end_seaice.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c gold_seaice.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c initialise_seaice.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c inm_netcdf_sic.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c inm_seaice.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c netcdf_sic.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c outm_netcdf_sic.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c outm_seaice.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c tstepsic.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
+	-c tstipsic.f
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c diag_goldsteinseaice_ice_annual_av.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Debatmos \
+	-c surflux_goldstein_seaice.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+surflux_goldstein_seaice.F:212.4:
+
+ 600    format(2i4,10f12.4)                                                     
+    1
+Warning: Label 600 at (1) defined but not used
+surflux_goldstein_seaice.F:72.20:
+
+      real debug(10)                                                            
+                    1
+Warning: Unused variable 'debug' declared at (1)
+surflux_goldstein_seaice.F:10.20:
+
+     & net_heat_flux,  !net used over open ocean - could this be removed from th
+                    1
+Warning: Unused dummy argument 'net_heat_flux' at (1)
+surflux_goldstein_seaice.F:11.16:
+
+     & windspeed, !??is windspeed needed any more? transfer coefficients are pas
+                1
+Warning: Unused dummy argument 'windspeed' at (1)
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldsteinseaice/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-goldsteinseaice/lib'
+ar rcvs libgoldsteinseaice.a ../src/fortran/diag4.o ../src/fortran/diagend_seaice.o ../src/fortran/diag_goldsteinseaice_ice_annual_av.o ../src/fortran/diagosc_sic.o ../src/fortran/diagsic.o ../src/fortran/end_seaice.o ../src/fortran/gold_seaice.o ../src/fortran/initialise_seaice.o ../src/fortran/inm_netcdf_sic.o ../src/fortran/inm_seaice.o ../src/fortran/netcdf_sic.o ../src/fortran/outm_netcdf_sic.o ../src/fortran/outm_seaice.o ../src/fortran/surflux_goldstein_seaice.o ../src/fortran/tstepsic.o ../src/fortran/tstipsic.o
+a - ../src/fortran/diag4.o
+a - ../src/fortran/diagend_seaice.o
+a - ../src/fortran/diag_goldsteinseaice_ice_annual_av.o
+a - ../src/fortran/diagosc_sic.o
+a - ../src/fortran/diagsic.o
+a - ../src/fortran/end_seaice.o
+a - ../src/fortran/gold_seaice.o
+a - ../src/fortran/initialise_seaice.o
+a - ../src/fortran/inm_netcdf_sic.o
+a - ../src/fortran/inm_seaice.o
+a - ../src/fortran/netcdf_sic.o
+a - ../src/fortran/outm_netcdf_sic.o
+a - ../src/fortran/outm_seaice.o
+a - ../src/fortran/surflux_goldstein_seaice.o
+a - ../src/fortran/tstepsic.o
+a - ../src/fortran/tstipsic.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldsteinseaice/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldsteinseaice'
+if [ -d /home/portabello/cgenie.muffin/genie-goldsteinseaice/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-goldsteinseaice/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-ents/lib/..; make libents.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-ents'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ents/src/fortran'
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c in_ents_ascii.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c out_ents.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c setup_ents.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c initialise_ents.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c screen_diags.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c carbon.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c carbt_diags.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c sealevel.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c physt_diags.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c annav_diags.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c ents.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c entsdiagosc.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c ConvertFunc.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c netcdf_db_ents.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c netcdf_ents.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c netcdf_ts_ents.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8   \
+	   \
+	-c in_ents_netcdf.F
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ents/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ents/lib'
+ar rcvs libents.a ../src/fortran/annav_diags.o ../src/fortran/carbon.o ../src/fortran/carbt_diags.o ../src/fortran/ConvertFunc.o ../src/fortran/entsdiagosc.o ../src/fortran/ents.o ../src/fortran/in_ents_ascii.o ../src/fortran/in_ents_netcdf.o ../src/fortran/initialise_ents.o ../src/fortran/netcdf_db_ents.o ../src/fortran/netcdf_ents.o ../src/fortran/netcdf_ts_ents.o ../src/fortran/out_ents.o ../src/fortran/physt_diags.o ../src/fortran/screen_diags.o ../src/fortran/sealevel.o ../src/fortran/setup_ents.o
+a - ../src/fortran/annav_diags.o
+a - ../src/fortran/carbon.o
+a - ../src/fortran/carbt_diags.o
+a - ../src/fortran/ConvertFunc.o
+a - ../src/fortran/entsdiagosc.o
+a - ../src/fortran/ents.o
+a - ../src/fortran/in_ents_ascii.o
+a - ../src/fortran/in_ents_netcdf.o
+a - ../src/fortran/initialise_ents.o
+a - ../src/fortran/netcdf_db_ents.o
+a - ../src/fortran/netcdf_ents.o
+a - ../src/fortran/netcdf_ts_ents.o
+a - ../src/fortran/out_ents.o
+a - ../src/fortran/physt_diags.o
+a - ../src/fortran/screen_diags.o
+a - ../src/fortran/sealevel.o
+a - ../src/fortran/setup_ents.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ents/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-ents'
+if [ -d /home/portabello/cgenie.muffin/genie-ents/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-ents/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-atchem/lib/..; make libatchem.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-atchem'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-atchem/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_atchem.f90 | sed '\''s/end_atchem\.o/& end_atchem.dep/g'\'' > end_atchem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py atchem.f90 | sed '\''s/atchem\.o/& atchem.dep/g'\'' > atchem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_comp_atchem.f90 | sed '\''s/cpl_comp_atchem\.o/& cpl_comp_atchem.dep/g'\'' > cpl_comp_atchem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_flux_atchem.f90 | sed '\''s/cpl_flux_atchem\.o/& cpl_flux_atchem.dep/g'\'' > cpl_flux_atchem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_atchem.f90 | sed '\''s/initialise_atchem\.o/& initialise_atchem.dep/g'\'' > initialise_atchem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py atchem_data.f90 | sed '\''s/atchem_data\.o/& atchem_data.dep/g'\'' > atchem_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py atchem_data_netCDF.f90 | sed '\''s/atchem_data_netCDF\.o/& atchem_data_netCDF.dep/g'\'' > atchem_data_netCDF.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py atchem_box.f90 | sed '\''s/atchem_box\.o/& atchem_box.dep/g'\'' > atchem_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py atchem_lib.f90 | sed '\''s/atchem_lib\.o/& atchem_lib.dep/g'\'' > atchem_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-atchem/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-atchem/src/fortran'
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  atchem_lib.f90 -o atchem_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  atchem_box.f90 -o atchem_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  atchem_data_netCDF.f90 -o atchem_data_netCDF.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  atchem_data.f90 -o atchem_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_atchem.f90 -o initialise_atchem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_flux_atchem.f90 -o cpl_flux_atchem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_comp_atchem.f90 -o cpl_comp_atchem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  atchem.f90 -o atchem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_atchem.f90 -o end_atchem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-atchem/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-atchem/lib'
+ar rcvs libatchem.a ../src/fortran/atchem_box.o ../src/fortran/atchem_data_netCDF.o ../src/fortran/atchem_data.o ../src/fortran/atchem_lib.o ../src/fortran/atchem.o ../src/fortran/cpl_comp_atchem.o ../src/fortran/cpl_flux_atchem.o ../src/fortran/end_atchem.o ../src/fortran/initialise_atchem.o
+a - ../src/fortran/atchem_box.o
+a - ../src/fortran/atchem_data_netCDF.o
+a - ../src/fortran/atchem_data.o
+a - ../src/fortran/atchem_lib.o
+a - ../src/fortran/atchem.o
+a - ../src/fortran/cpl_comp_atchem.o
+a - ../src/fortran/cpl_flux_atchem.o
+a - ../src/fortran/end_atchem.o
+a - ../src/fortran/initialise_atchem.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-atchem/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-atchem'
+if [ -d /home/portabello/cgenie.muffin/genie-atchem/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-atchem/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-biogem/lib/..; make libbiogem.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-biogem'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-biogem/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_biogem.f90 | sed '\''s/end_biogem\.o/& end_biogem.dep/g'\'' > end_biogem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py biogem.f90 | sed '\''s/biogem\.o/& biogem.dep/g'\'' > biogem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_comp_biogem.f90 | sed '\''s/cpl_comp_biogem\.o/& cpl_comp_biogem.dep/g'\'' > cpl_comp_biogem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_biogem.f90 | sed '\''s/initialise_biogem\.o/& initialise_biogem.dep/g'\'' > initialise_biogem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py biogem_data.f90 | sed '\''s/biogem_data\.o/& biogem_data.dep/g'\'' > biogem_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py biogem_data_ascii.f90 | sed '\''s/biogem_data_ascii\.o/& biogem_data_ascii.dep/g'\'' > biogem_data_ascii.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py biogem_data_netCDF.f90 | sed '\''s/biogem_data_netCDF\.o/& biogem_data_netCDF.dep/g'\'' > biogem_data_netCDF.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py biogem_box.f90 | sed '\''s/biogem_box\.o/& biogem_box.dep/g'\'' > biogem_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py biogem_lib.f90 | sed '\''s/biogem_lib\.o/& biogem_lib.dep/g'\'' > biogem_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-biogem/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-biogem/src/fortran'
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_lib.f90 -o biogem_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_box.f90 -o biogem_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+biogem_box.f90:2950.33:
+
+    real::loc_IO3_reduction_const,loc_IO3_reduction
+                                 1
+Warning: Unused variable 'loc_io3_reduction_const' declared at (1)
+biogem_box.f90:2864.31:
+
+    real::loc_I_oxidation_const,loc_I_oxidation
+                               1
+Warning: Unused variable 'loc_i_oxidation_const' declared at (1)
+biogem_box.f90:2747.25:
+
+    real::loc_CH4,loc_DIC,loc_HCO3
+                         1
+Warning: Unused variable 'loc_dic' declared at (1)
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_data_netCDF.f90 -o biogem_data_netCDF.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_data_ascii.f90 -o biogem_data_ascii.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_data.f90 -o biogem_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_biogem.f90 -o initialise_biogem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_comp_biogem.f90 -o cpl_comp_biogem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem.f90 -o biogem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_biogem.f90 -o end_biogem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-biogem/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-biogem/lib'
+ar rcvs libbiogem.a ../src/fortran/biogem_box.o ../src/fortran/biogem_data_ascii.o ../src/fortran/biogem_data_netCDF.o ../src/fortran/biogem_data.o ../src/fortran/biogem_lib.o ../src/fortran/biogem.o ../src/fortran/cpl_comp_biogem.o ../src/fortran/end_biogem.o ../src/fortran/initialise_biogem.o
+a - ../src/fortran/biogem_box.o
+a - ../src/fortran/biogem_data_ascii.o
+a - ../src/fortran/biogem_data_netCDF.o
+a - ../src/fortran/biogem_data.o
+a - ../src/fortran/biogem_lib.o
+a - ../src/fortran/biogem.o
+a - ../src/fortran/cpl_comp_biogem.o
+a - ../src/fortran/end_biogem.o
+a - ../src/fortran/initialise_biogem.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-biogem/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-biogem'
+if [ -d /home/portabello/cgenie.muffin/genie-biogem/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-biogem/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-sedgem/lib/..; make libsedgem.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-sedgem'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-sedgem/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_sedgem.f90 | sed '\''s/end_sedgem\.o/& end_sedgem.dep/g'\'' > end_sedgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem.f90 | sed '\''s/sedgem\.o/& sedgem.dep/g'\'' > sedgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_sedgem.f90 | sed '\''s/initialise_sedgem\.o/& initialise_sedgem.dep/g'\'' > initialise_sedgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_data.f90 | sed '\''s/sedgem_data\.o/& sedgem_data.dep/g'\'' > sedgem_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_data_netCDF.f90 | sed '\''s/sedgem_data_netCDF\.o/& sedgem_data_netCDF.dep/g'\'' > sedgem_data_netCDF.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_box.f90 | sed '\''s/sedgem_box\.o/& sedgem_box.dep/g'\'' > sedgem_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_nnutils.f90 | sed '\''s/sedgem_nnutils\.o/& sedgem_nnutils.dep/g'\'' > sedgem_nnutils.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_box_benthic.f90 | sed '\''s/sedgem_box_benthic\.o/& sedgem_box_benthic.dep/g'\'' > sedgem_box_benthic.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_box_ridgwelletal2003_sedflx.f90 | sed '\''s/sedgem_box_ridgwelletal2003_sedflx\.o/& sedgem_box_ridgwelletal2003_sedflx.dep/g'\'' > sedgem_box_ridgwelletal2003_sedflx.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_box_archer1991_sedflx.f90 | sed '\''s/sedgem_box_archer1991_sedflx\.o/& sedgem_box_archer1991_sedflx.dep/g'\'' > sedgem_box_archer1991_sedflx.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_flux_sedgem.f90 | sed '\''s/cpl_flux_sedgem\.o/& cpl_flux_sedgem.dep/g'\'' > cpl_flux_sedgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_comp_sedgem.f90 | sed '\''s/cpl_comp_sedgem\.o/& cpl_comp_sedgem.dep/g'\'' > cpl_comp_sedgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py sedgem_lib.f90 | sed '\''s/sedgem_lib\.o/& sedgem_lib.dep/g'\'' > sedgem_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-sedgem/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-sedgem/src/fortran'
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_lib.f90 -o sedgem_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_comp_sedgem.f90 -o cpl_comp_sedgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_flux_sedgem.f90 -o cpl_flux_sedgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_box_archer1991_sedflx.f90 -o sedgem_box_archer1991_sedflx.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_box_ridgwelletal2003_sedflx.f90 -o sedgem_box_ridgwelletal2003_sedflx.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_box_benthic.f90 -o sedgem_box_benthic.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+sedgem_box_benthic.f90:3373.44:
+
+    dum_ktempM, dum_QtempM, dum_D1M, dum_D2M, dum_alphaM, e_P, dedz_P, f_P, dfd
+                                            1
+Warning: Unused dummy argument 'dum_d2m' at (1)
+sedgem_box_benthic.f90:1053.44:
+
+    SUBROUTINE sub_huelseetal2016_zTOC(dum_D, dum_POC1_flux_swi, dum_POC2_flux_
+                                            1
+Warning: Unused dummy argument 'dum_d' at (1)
+sedgem_box_benthic.f90:1053.142:
+
+m_POC2_flux_swi, dum_POC3_flux_swi, dum_sed_pres_fracC, dum_sed_pres_insane, du
+                                                                           1                                                                   
+Warning: Unused dummy argument 'dum_sed_pres_insane' at (1)
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_nnutils.f90 -o sedgem_nnutils.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_box.f90 -o sedgem_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_data_netCDF.f90 -o sedgem_data_netCDF.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem_data.f90 -o sedgem_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_sedgem.f90 -o initialise_sedgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  sedgem.f90 -o sedgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_sedgem.f90 -o end_sedgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-sedgem/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-sedgem/lib'
+ar rcvs libsedgem.a ../src/fortran/cpl_comp_sedgem.o ../src/fortran/cpl_flux_sedgem.o ../src/fortran/end_sedgem.o ../src/fortran/initialise_sedgem.o ../src/fortran/sedgem_box_archer1991_sedflx.o ../src/fortran/sedgem_box_benthic.o ../src/fortran/sedgem_box.o ../src/fortran/sedgem_box_ridgwelletal2003_sedflx.o ../src/fortran/sedgem_data_netCDF.o ../src/fortran/sedgem_data.o ../src/fortran/sedgem_lib.o ../src/fortran/sedgem_nnutils.o ../src/fortran/sedgem.o
+a - ../src/fortran/cpl_comp_sedgem.o
+a - ../src/fortran/cpl_flux_sedgem.o
+a - ../src/fortran/end_sedgem.o
+a - ../src/fortran/initialise_sedgem.o
+a - ../src/fortran/sedgem_box_archer1991_sedflx.o
+a - ../src/fortran/sedgem_box_benthic.o
+a - ../src/fortran/sedgem_box.o
+a - ../src/fortran/sedgem_box_ridgwelletal2003_sedflx.o
+a - ../src/fortran/sedgem_data_netCDF.o
+a - ../src/fortran/sedgem_data.o
+a - ../src/fortran/sedgem_lib.o
+a - ../src/fortran/sedgem_nnutils.o
+a - ../src/fortran/sedgem.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-sedgem/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-sedgem'
+if [ -d /home/portabello/cgenie.muffin/genie-sedgem/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-sedgem/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-rokgem/lib/..; make librokgem.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-rokgem'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-rokgem/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_rokgem.f90 | sed '\''s/end_rokgem\.o/& end_rokgem.dep/g'\'' > end_rokgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py rokgem.f90 | sed '\''s/rokgem\.o/& rokgem.dep/g'\'' > rokgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_comp_rokocn.f90 | sed '\''s/cpl_comp_rokocn\.o/& cpl_comp_rokocn.dep/g'\'' > cpl_comp_rokocn.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_flux_rokocn.f90 | sed '\''s/cpl_flux_rokocn\.o/& cpl_flux_rokocn.dep/g'\'' > cpl_flux_rokocn.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_flux_rokatm.f90 | sed '\''s/cpl_flux_rokatm\.o/& cpl_flux_rokatm.dep/g'\'' > cpl_flux_rokatm.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_rokgem.f90 | sed '\''s/initialise_rokgem\.o/& initialise_rokgem.dep/g'\'' > initialise_rokgem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py rokgem_box.f90 | sed '\''s/rokgem_box\.o/& rokgem_box.dep/g'\'' > rokgem_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py rokgem_data_netCDF.f90 | sed '\''s/rokgem_data_netCDF\.o/& rokgem_data_netCDF.dep/g'\'' > rokgem_data_netCDF.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py rokgem_data.f90 | sed '\''s/rokgem_data\.o/& rokgem_data.dep/g'\'' > rokgem_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py rokgem_lib.f90 | sed '\''s/rokgem_lib\.o/& rokgem_lib.dep/g'\'' > rokgem_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-rokgem/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-rokgem/src/fortran'
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  rokgem_lib.f90 -o rokgem_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  rokgem_data.f90 -o rokgem_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  rokgem_data_netCDF.f90 -o rokgem_data_netCDF.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  rokgem_box.f90 -o rokgem_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_rokgem.f90 -o initialise_rokgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_flux_rokatm.f90 -o cpl_flux_rokatm.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_flux_rokocn.f90 -o cpl_flux_rokocn.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_comp_rokocn.f90 -o cpl_comp_rokocn.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  rokgem.f90 -o rokgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_rokgem.f90 -o end_rokgem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-rokgem/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-rokgem/lib'
+ar rcvs librokgem.a ../src/fortran/cpl_comp_rokocn.o ../src/fortran/cpl_flux_rokatm.o ../src/fortran/cpl_flux_rokocn.o ../src/fortran/end_rokgem.o ../src/fortran/initialise_rokgem.o ../src/fortran/rokgem_box.o ../src/fortran/rokgem_data_netCDF.o ../src/fortran/rokgem_data.o ../src/fortran/rokgem_lib.o ../src/fortran/rokgem.o
+a - ../src/fortran/cpl_comp_rokocn.o
+a - ../src/fortran/cpl_flux_rokatm.o
+a - ../src/fortran/cpl_flux_rokocn.o
+a - ../src/fortran/end_rokgem.o
+a - ../src/fortran/initialise_rokgem.o
+a - ../src/fortran/rokgem_box.o
+a - ../src/fortran/rokgem_data_netCDF.o
+a - ../src/fortran/rokgem_data.o
+a - ../src/fortran/rokgem_lib.o
+a - ../src/fortran/rokgem.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-rokgem/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-rokgem'
+if [ -d /home/portabello/cgenie.muffin/genie-rokgem/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-rokgem/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-ecogem/lib/..; make libecogem.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-ecogem'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ecogem/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_ecogem.f90 | sed '\''s/end_ecogem\.o/& end_ecogem.dep/g'\'' > end_ecogem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ecogem.f90 | sed '\''s/ecogem\.o/& ecogem.dep/g'\'' > ecogem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_ecogem.f90 | sed '\''s/initialise_ecogem\.o/& initialise_ecogem.dep/g'\'' > initialise_ecogem.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ecogem_data_netCDF.f90 | sed '\''s/ecogem_data_netCDF\.o/& ecogem_data_netCDF.dep/g'\'' > ecogem_data_netCDF.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ecogem_data.f90 | sed '\''s/ecogem_data\.o/& ecogem_data.dep/g'\'' > ecogem_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ecogem_box.f90 | sed '\''s/ecogem_box\.o/& ecogem_box.dep/g'\'' > ecogem_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ecogem_lib.f90 | sed '\''s/ecogem_lib\.o/& ecogem_lib.dep/g'\'' > ecogem_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ecogem/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ecogem/src/fortran'
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem_lib.f90 -o ecogem_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem_box.f90 -o ecogem_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ecogem_box.f90:458.38:
+
+                              diameter,    &
+                                      1
+Warning: Unused dummy argument 'diameter' at (1)
+ecogem_box.f90:457.36:
+
+                              nutiso,  &
+                                    1
+Warning: Unused dummy argument 'nutiso' at (1)
+ecogem_box.f90:456.34:
+
+                              nuts,    &
+                                  1
+Warning: Unused dummy argument 'nuts' at (1)
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem_data.f90 -o ecogem_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ecogem_data.f90:696.54:
+
+    REAL              :: loc_tser_lat,loc_tser_lon,tmp
+                                                      1
+Warning: Unused variable 'tmp' declared at (1)
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem_data_netCDF.f90 -o ecogem_data_netCDF.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ecogem_data_netCDF.f90:778.45:
+
+    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
+                                             1
+Warning: Unused variable 'ko' declared at (1)
+ecogem_data_netCDF.f90:780.37:
+
+    CHARACTER(len=255)::loc_unitsname
+                                     1
+Warning: Unused variable 'loc_unitsname' declared at (1)
+ecogem_data_netCDF.f90:778.39:
+
+    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
+                                       1
+Warning: Unused variable 'pj' declared at (1)
+ecogem_data_netCDF.f90:483.45:
+
+    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
+                                             1
+Warning: Unused variable 'ko' declared at (1)
+ecogem_data_netCDF.f90:484.43:
+
+    real,DIMENSION(n_i,n_j)::loc_ij,loc2_ij,loc_mask
+                                           1
+Warning: Unused variable 'loc2_ij' declared at (1)
+ecogem_data_netCDF.f90:485.37:
+
+    CHARACTER(len=255)::loc_unitsname
+                                     1
+Warning: Unused variable 'loc_unitsname' declared at (1)
+ecogem_data_netCDF.f90:483.39:
+
+    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
+                                       1
+Warning: Unused variable 'pj' declared at (1)
+ecogem_data_netCDF.f90:428.14:
+
+    integer::i, j, loc_i, loc_iou, loc_ntrec
+              1
+Warning: Unused variable 'i' declared at (1)
+ecogem_data_netCDF.f90:428.17:
+
+    integer::i, j, loc_i, loc_iou, loc_ntrec
+                 1
+Warning: Unused variable 'j' declared at (1)
+ecogem_data_netCDF.f90:325.14:
+
+    integer::i, j, k, loc_i, loc_iou, loc_ntrec
+              1
+Warning: Unused variable 'i' declared at (1)
+ecogem_data_netCDF.f90:325.17:
+
+    integer::i, j, k, loc_i, loc_iou, loc_ntrec
+                 1
+Warning: Unused variable 'j' declared at (1)
+ecogem_data_netCDF.f90:325.20:
+
+    integer::i, j, k, loc_i, loc_iou, loc_ntrec
+                    1
+Warning: Unused variable 'k' declared at (1)
+ecogem_data_netCDF.f90:267.20:
+
+    integer::loc_err,loc_id
+                    1
+Warning: Unused variable 'loc_err' declared at (1)
+ecogem_data_netCDF.f90:267.27:
+
+    integer::loc_err,loc_id
+                           1
+Warning: Unused variable 'loc_id' declared at (1)
+ecogem_data_netCDF.f90:272.47:
+
+    integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
+                                               1
+Warning: Unused variable 'loc_id_lat_e' declared at (1)
+ecogem_data_netCDF.f90:271.45:
+
+    integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
+                                             1
+Warning: Unused variable 'loc_id_latm' declared at (1)
+ecogem_data_netCDF.f90:272.34:
+
+    integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
+                                  1
+Warning: Unused variable 'loc_id_lon_e' declared at (1)
+ecogem_data_netCDF.f90:271.33:
+
+    integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
+                                 1
+Warning: Unused variable 'loc_id_lonm' declared at (1)
+ecogem_data_netCDF.f90:273.33:
+
+    integer        :: loc_id_misc
+                                 1
+Warning: Unused variable 'loc_id_misc' declared at (1)
+ecogem_data_netCDF.f90:270.55:
+
+    integer        :: loc_it(6),loc_id_time,loc_id_site
+                                                       1
+Warning: Unused variable 'loc_id_site' declared at (1)
+ecogem_data_netCDF.f90:271.55:
+
+    integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
+                                                       1
+Warning: Unused variable 'loc_id_zt' declared at (1)
+ecogem_data_netCDF.f90:272.59:
+
+    integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
+                                                           1
+Warning: Unused variable 'loc_id_zt_e' declared at (1)
+ecogem_data_netCDF.f90:169.20:
+
+    integer::loc_err,loc_id
+                    1
+Warning: Unused variable 'loc_err' declared at (1)
+ecogem_data_netCDF.f90:169.27:
+
+    integer::loc_err,loc_id
+                           1
+Warning: Unused variable 'loc_id' declared at (1)
+ecogem_data_netCDF.f90:175.33:
+
+    integer        :: loc_id_misc
+                                 1
+Warning: Unused variable 'loc_id_misc' declared at (1)
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_ecogem.f90 -o initialise_ecogem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+initialise_ecogem.f90:31.17:
+
+  integer :: stat
+                 1
+Warning: Unused variable 'stat' declared at (1)
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem.f90 -o ecogem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ecogem.f90:73.55:
+
+  REAL,DIMENSION(n_i,n_j,n_k)              ::frac_ratio !for iCarb multiplier
+                                                       1
+Warning: Unused variable 'frac_ratio' declared at (1)
+ecogem.f90:36.73:
+
+  INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,
+                                                                         1
+Warning: Unused variable 'is' declared at (1)
+ecogem.f90:36.61:
+
+  INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,
+                                                             1
+Warning: Unused variable 'jp' declared at (1)
+ecogem.f90:36.64:
+
+  INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,
+                                                                1
+Warning: Unused variable 'ko' declared at (1)
+ecogem.f90:36.52:
+
+  INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,
+                                                    1
+Warning: Unused variable 'l' declared at (1)
+ecogem.f90:72.52:
+
+  REAL                                     ::PDBstnd !ckc VPDB d13C standard
+                                                    1
+Warning: Unused variable 'pdbstnd' declared at (1)
+ecogem.f90:733.20:
+
+     & dum_egbg_fxsw,       & ! input
+                    1
+Warning: Unused dummy argument 'dum_egbg_fxsw' at (1)
+ecogem.f90:737.23:
+
+     & dum_egbg_sfcdiss     &
+                       1
+Warning: Dummy argument 'dum_egbg_sfcdiss' at (1) was declared INTENT(OUT) but was not set
+ecogem.f90:735.22:
+
+     & dum_egbg_sfcocn,     & ! input  -- tracer concentrations
+                      1
+Warning: Unused dummy argument 'dum_egbg_sfcocn' at (1)
+ecogem.f90:736.23:
+
+     & dum_egbg_sfcpart,    &
+                       1
+Warning: Dummy argument 'dum_egbg_sfcpart' at (1) was declared INTENT(OUT) but was not set
+ecogem.f90:731.20:
+
+     & dum_endseries,       & ! input
+                    1
+Warning: Unused dummy argument 'dum_endseries' at (1)
+ecogem.f90:729.26:
+
+     & dum_genie_intseries, & ! input
+                          1
+Warning: Unused dummy argument 'dum_genie_intseries' at (1)
+ecogem.f90:727.24:
+
+     & dum_genie_tseries,   & ! input
+                        1
+Warning: Unused dummy argument 'dum_genie_tseries' at (1)
+ecogem.f90:734.14:
+
+     & dum_mld,             & ! input
+              1
+Warning: Unused dummy argument 'dum_mld' at (1)
+ecogem.f90:770.22:
+
+  integer :: dum_ntrec
+                      1
+Warning: Unused variable 'dum_ntrec' declared at (1)
+ecogem.f90:765.14:
+
+  integer :: i,j,k,l,io,ia,is
+              1
+Warning: Unused variable 'i' declared at (1)
+ecogem.f90:765.26:
+
+  integer :: i,j,k,l,io,ia,is
+                          1
+Warning: Unused variable 'ia' declared at (1)
+ecogem.f90:765.23:
+
+  integer :: i,j,k,l,io,ia,is
+                       1
+Warning: Unused variable 'io' declared at (1)
+ecogem.f90:765.29:
+
+  integer :: i,j,k,l,io,ia,is
+                             1
+Warning: Unused variable 'is' declared at (1)
+ecogem.f90:765.16:
+
+  integer :: i,j,k,l,io,ia,is
+                1
+Warning: Unused variable 'j' declared at (1)
+ecogem.f90:765.20:
+
+  integer :: i,j,k,l,io,ia,is
+                    1
+Warning: Unused variable 'l' declared at (1)
+ecogem.f90:766.19:
+
+  integer :: loc_k1                                                !
+                   1
+Warning: Unused variable 'loc_k1' declared at (1)
+ecogem.f90:862.12:
+
+  integer::l
+            1
+Warning: Unused variable 'l' declared at (1)
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_ecogem.f90 -o end_ecogem.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+end_ecogem.f90:11.22:
+
+  integer        :: ii,io,jp
+                      1
+Warning: Unused variable 'ii' declared at (1)
+end_ecogem.f90:11.25:
+
+  integer        :: ii,io,jp
+                         1
+Warning: Unused variable 'io' declared at (1)
+end_ecogem.f90:11.28:
+
+  integer        :: ii,io,jp
+                            1
+Warning: Unused variable 'jp' declared at (1)
+end_ecogem.f90:10.18:
+
+  integer::loc_iou 
+                  1
+Warning: Unused variable 'loc_iou' declared at (1)
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ecogem/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ecogem/lib'
+ar rcvs libecogem.a ../src/fortran/ecogem_box.o ../src/fortran/ecogem_data_netCDF.o ../src/fortran/ecogem_data.o ../src/fortran/ecogem_lib.o ../src/fortran/ecogem.o ../src/fortran/end_ecogem.o ../src/fortran/initialise_ecogem.o
+a - ../src/fortran/ecogem_box.o
+a - ../src/fortran/ecogem_data_netCDF.o
+a - ../src/fortran/ecogem_data.o
+a - ../src/fortran/ecogem_lib.o
+a - ../src/fortran/ecogem.o
+a - ../src/fortran/end_ecogem.o
+a - ../src/fortran/initialise_ecogem.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ecogem/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-ecogem'
+if [ -d /home/portabello/cgenie.muffin/genie-ecogem/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-ecogem/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-goldlite/lib/..; make libgoldlite.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-goldlite'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-goldlite/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_goldlite.f90 | sed '\''s/end_goldlite\.o/& end_goldlite.dep/g'\'' > end_goldlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py goldlite.f90 | sed '\''s/goldlite\.o/& goldlite.dep/g'\'' > goldlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_goldlite.f90 | sed '\''s/initialise_goldlite\.o/& initialise_goldlite.dep/g'\'' > initialise_goldlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py goldlite_data.f90 | sed '\''s/goldlite_data\.o/& goldlite_data.dep/g'\'' > goldlite_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py goldlite_box.f90 | sed '\''s/goldlite_box\.o/& goldlite_box.dep/g'\'' > goldlite_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py goldlite_lib.f90 | sed '\''s/goldlite_lib\.o/& goldlite_lib.dep/g'\'' > goldlite_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldlite/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-goldlite/src/fortran'
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  goldlite_lib.f90 -o goldlite_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  goldlite_box.f90 -o goldlite_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  goldlite_data.f90 -o goldlite_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_goldlite.f90 -o initialise_goldlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  goldlite.f90 -o goldlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_goldlite.f90 -o end_goldlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldlite/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-goldlite/lib'
+ar rcvs libgoldlite.a ../src/fortran/end_goldlite.o ../src/fortran/goldlite_box.o ../src/fortran/goldlite_data.o ../src/fortran/goldlite_lib.o ../src/fortran/goldlite.o ../src/fortran/initialise_goldlite.o
+a - ../src/fortran/end_goldlite.o
+a - ../src/fortran/goldlite_box.o
+a - ../src/fortran/goldlite_data.o
+a - ../src/fortran/goldlite_lib.o
+a - ../src/fortran/goldlite.o
+a - ../src/fortran/initialise_goldlite.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldlite/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-goldlite'
+if [ -d /home/portabello/cgenie.muffin/genie-goldlite/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-goldlite/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-gemlite/lib/..; make libgemlite.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-gemlite'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-gemlite/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_gemlite.f90 | sed '\''s/end_gemlite\.o/& end_gemlite.dep/g'\'' > end_gemlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py gemlite.f90 | sed '\''s/gemlite\.o/& gemlite.dep/g'\'' > gemlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py cpl_comp_gemlite.f90 | sed '\''s/cpl_comp_gemlite\.o/& cpl_comp_gemlite.dep/g'\'' > cpl_comp_gemlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_gemlite.f90 | sed '\''s/initialise_gemlite\.o/& initialise_gemlite.dep/g'\'' > initialise_gemlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py gemlite_data.f90 | sed '\''s/gemlite_data\.o/& gemlite_data.dep/g'\'' > gemlite_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py gemlite_box.f90 | sed '\''s/gemlite_box\.o/& gemlite_box.dep/g'\'' > gemlite_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py gemlite_lib.f90 | sed '\''s/gemlite_lib\.o/& gemlite_lib.dep/g'\'' > gemlite_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-gemlite/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-gemlite/src/fortran'
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  gemlite_lib.f90 -o gemlite_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  gemlite_box.f90 -o gemlite_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  gemlite_data.f90 -o gemlite_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_gemlite.f90 -o initialise_gemlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  cpl_comp_gemlite.f90 -o cpl_comp_gemlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  gemlite.f90 -o gemlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_gemlite.f90 -o end_gemlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-gemlite/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-gemlite/lib'
+ar rcvs libgemlite.a ../src/fortran/cpl_comp_gemlite.o ../src/fortran/end_gemlite.o ../src/fortran/gemlite_box.o ../src/fortran/gemlite_data.o ../src/fortran/gemlite_lib.o ../src/fortran/gemlite.o ../src/fortran/initialise_gemlite.o
+a - ../src/fortran/cpl_comp_gemlite.o
+a - ../src/fortran/end_gemlite.o
+a - ../src/fortran/gemlite_box.o
+a - ../src/fortran/gemlite_data.o
+a - ../src/fortran/gemlite_lib.o
+a - ../src/fortran/gemlite.o
+a - ../src/fortran/initialise_gemlite.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-gemlite/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-gemlite'
+if [ -d /home/portabello/cgenie.muffin/genie-gemlite/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-gemlite/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+\cd /home/portabello/cgenie.muffin/genie-ocnlite/lib/..; make libocnlite.a
+make[2]: Entering directory `/home/portabello/cgenie.muffin/genie-ocnlite'
+\cd src/fortran ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ocnlite/src/fortran'
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py end_ocnlite.f90 | sed '\''s/end_ocnlite\.o/& end_ocnlite.dep/g'\'' > end_ocnlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ocnlite.f90 | sed '\''s/ocnlite\.o/& ocnlite.dep/g'\'' > ocnlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py initialise_ocnlite.f90 | sed '\''s/initialise_ocnlite\.o/& initialise_ocnlite.dep/g'\'' > initialise_ocnlite.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ocnlite_data.f90 | sed '\''s/ocnlite_data\.o/& ocnlite_data.dep/g'\'' > ocnlite_data.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ocnlite_box.f90 | sed '\''s/ocnlite_box\.o/& ocnlite_box.dep/g'\'' > ocnlite_box.dep'
+/usr/bin/python
+/bin/sh -ec 'which python; python ../../../genie-main//finc.py ocnlite_lib.f90 | sed '\''s/ocnlite_lib\.o/& ocnlite_lib.dep/g'\'' > ocnlite_lib.dep'
+/usr/bin/python
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ocnlite/src/fortran'
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ocnlite/src/fortran'
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ocnlite_lib.f90 -o ocnlite_lib.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ocnlite_box.f90 -o ocnlite_box.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ocnlite_data.f90 -o ocnlite_data.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_ocnlite.f90 -o initialise_ocnlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ocnlite.f90 -o ocnlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic    -x f95-cpp-input -ffree-line-length-none  \
+	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  end_ocnlite.f90 -o end_ocnlite.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ocnlite/src/fortran'
+\cd lib ; make all
+make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-ocnlite/lib'
+ar rcvs libocnlite.a ../src/fortran/end_ocnlite.o ../src/fortran/initialise_ocnlite.o ../src/fortran/ocnlite_box.o ../src/fortran/ocnlite_data.o ../src/fortran/ocnlite_lib.o ../src/fortran/ocnlite.o
+a - ../src/fortran/end_ocnlite.o
+a - ../src/fortran/initialise_ocnlite.o
+a - ../src/fortran/ocnlite_box.o
+a - ../src/fortran/ocnlite_data.o
+a - ../src/fortran/ocnlite_lib.o
+a - ../src/fortran/ocnlite.o
+make[3]: Leaving directory `/home/portabello/cgenie.muffin/genie-ocnlite/lib'
+make[2]: Leaving directory `/home/portabello/cgenie.muffin/genie-ocnlite'
+if [ -d /home/portabello/cgenie.muffin/genie-ocnlite/lib/../mod ] ; then \
+		\cp /home/portabello/cgenie.muffin/genie-ocnlite/lib/../mod/*.mod /home/portabello/cgenie.muffin/genie-main/include; \
+	fi
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	 -I/home/portabello/cgenie.muffin/genie-main/include \
+	 write_netcdf_genie.f90 -o write_netcdf_genie.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-I/home/portabello/cgenie.muffin/genie-main/include \
+	genie_ini_wrappers.f90 -o genie_ini_wrappers.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-I/home/portabello/cgenie.muffin/genie-main/include \
+	genie_loop_wrappers.f90 -o genie_loop_wrappers.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
+	-I/home/portabello/cgenie.muffin/genie-main/include \
+	genie_end_wrappers.f90 -o genie_end_wrappers.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f77-cpp-input -ffixed-line-length-80 \
+	 -I/home/portabello/cgenie.muffin/genie-main/include \
+	initialise_genie.F -o initialise_genie.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f77-cpp-input -ffixed-line-length-80 end_genie.f -o end_genie.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f77-cpp-input -ffixed-line-length-80 extrap.f -o extrap.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f77-cpp-input -ffixed-line-length-80 \
+	-I/home/portabello/cgenie.muffin/genie-main/include  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include \
+	genie.F -o genie.o
+Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+gfortran  -fopenmp genie_control.o genie_global.o local_netcdf.o genie_util.o local_output.o write_netcdf_genie.o genie_ini_wrappers.o genie_loop_wrappers.o genie_end_wrappers.o initialise_genie.o end_genie.o extrap.o genie.o -o genie.exe \
+        -L/home/portabello/cgenie.muffin/genie-goldstein/lib -L/home/portabello/cgenie.muffin/genie-embm/lib -L/home/portabello/cgenie.muffin/genie-plasim/lib -L/home/portabello/cgenie.muffin/genie-goldsteinseaice/lib -L/home/portabello/cgenie.muffin/genie-ents/lib -L/home/portabello/cgenie.muffin/genie-atchem/lib -L/home/portabello/cgenie.muffin/genie-plasim/lib -L/home/portabello/cgenie.muffin/genie-biogem/lib -L/home/portabello/cgenie.muffin/genie-sedgem/lib -L/home/portabello/cgenie.muffin/genie-rokgem/lib -L/home/portabello/cgenie.muffin/genie-ecogem/lib -L/home/portabello/cgenie.muffin/genie-goldlite/lib -L/home/portabello/cgenie.muffin/genie-gemlite/lib -L/home/portabello/cgenie.muffin/genie-ocnlite/lib -lgoldstein -lembm -lplasim -lgoldsteinseaice -lents -latchem -lplasim -lbiogem -lsedgem -lrokgem -lecogem -lgoldlite -lgemlite -locnlite -L/home/portabello/cgenie.muffin/genie-main/src/fortran//cmngem -lcmngem -L/home/portabello/cgenie.muffin/genie-lib/libnc1 -L/home/portabello/cgenie.muffin/genie-lib/libutil1 -lnc1 -lutil1 \
+	-L/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/lib -lnetcdf -lnetcdff   
+make[1]: Leaving directory `/home/portabello/cgenie.muffin/genie-main'
+STARTING EXPERIMENT:
+Fri Jun 15 12:37:29 PDT 2018
+./genie.exe: error while loading shared libraries: libnetcdf.so.11: cannot open shared object file: No such file or directory
+
+real	0m0.000s
+user	0m0.000s
+sys	0m0.001s
+cp: cannot stat `fort.2': No such file or directory
+ERROR: !!!!!!!!!! ERROR PROCESSING !!!!!!!!!!

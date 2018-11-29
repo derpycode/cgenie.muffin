@@ -1,0 +1,95 @@
+
+ 01                 02    03
+ \/                 \/    \/
+
+-START-OF-DATA-
+ Phytoplankton     0.10   1
+ Phytoplankton     0.15   1
+ Phytoplankton     0.20   1
+ Phytoplankton     0.25   1
+ Phytoplankton     0.30   1
+ Phytoplankton     0.45   1
+ Phytoplankton     0.60   1
+ Phytoplankton     0.80   1
+ Phytoplankton     1.10   1
+ Phytoplankton     1.50   1
+ Phytoplankton     2.00   1
+ Phytoplankton     2.70   1
+ Phytoplankton     3.60   1
+ Phytoplankton     5.00   1
+ Phytoplankton     6.70   1
+ Phytoplankton     9.00   1
+ Phytoplankton    12.20   1
+ Phytoplankton    16.40   1
+ Phytoplankton    22.20   1
+ Phytoplankton    30.00   1
+ Phytoplankton    40.40   1
+ Phytoplankton    54.60   1
+ Phytoplankton    74.00   1
+ Phytoplankton   100.00   1
+ Phytoplankton   134.00   1
+ Phytoplankton   181.00   1
+ Phytoplankton   244.70   1
+ Phytoplankton   330.40   1
+ Phytoplankton   446.00   1
+ Phytoplankton   624.00   1
+ Phytoplankton   874.20   1
+ Phytoplankton  1224.00   1
+ Zooplankton       0.15   1
+ Zooplankton       0.20   1
+ Zooplankton       0.25   1
+ Zooplankton       0.30   1
+ Zooplankton       0.45   1
+ Zooplankton       0.60   1
+ Zooplankton       0.80   1
+ Zooplankton       1.10   1
+ Zooplankton       1.50   1
+ Zooplankton       2.00   1
+ Zooplankton       2.70   1
+ Zooplankton       3.60   1
+ Zooplankton       5.00   1
+ Zooplankton       6.70   1
+ Zooplankton       9.00   1
+ Zooplankton      12.20   1
+ Zooplankton      16.40   1
+ Zooplankton      22.20   1
+ Zooplankton      30.00   1
+ Zooplankton      40.40   1
+ Zooplankton      54.60   1
+ Zooplankton      74.00   1
+ Zooplankton     100.00   1
+ Zooplankton     134.00   1
+ Zooplankton     181.00   1
+ Zooplankton     244.70   1
+ Zooplankton     330.40   1
+ Zooplankton     446.00   1
+ Zooplankton     624.00   1
+ Zooplankton     874.20   1
+ Zooplankton    1224.00   1
+ Zooplankton    2800.00   1
+-END-OF-DATA-
+
+ /\                 /\    /\
+ 01                 02    03
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: plankton functional type name
+COLUMN #02: plankton diameter (micrometers)
+COLUMN #03: number of randomised replicates
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+                                 Zooplankton
+                                 Mixotroph
+
+
+
+

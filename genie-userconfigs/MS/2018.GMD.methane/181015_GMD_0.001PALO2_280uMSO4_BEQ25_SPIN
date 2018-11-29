@@ -1,0 +1,183 @@
+#
+#
+# --- CLIMATE ---------------------------------------------------------
+#
+# solar constant (0 Ma)
+#ma_genie_solar_constant=1368.00
+# radiative forcing as a function of atmospheric composition [y/n]
+ea_36=n
+# radiative forcing for CO2
+ea_radfor_scl_co2=1.0
+# radiative forcing for CH4
+ea_radfor_scl_ch4=1.0
+# ocean salinity
+go_saln0=34.9
+#
+# --- ATMOSPHERIC PHOTOCHEMISTRY --------------------------------------
+#
+# atmospheric photochemical scheme ID string
+ac_par_atm_CH4_photochem="claire06"
+#
+# --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
+#
+# biological scheme ID string
+bg_par_bio_prodopt="bio_P"
+# maximum rate of conversion of dissolved PO4 into organic matter by phytoplankton (mol kg-1 yr-1)
+bg_par_bio_k0_PO4=1.9582242E-06
+# [PO4] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_PO4=2.1989611E-07
+# biological uptake time-scale
+bg_par_bio_tau=63.3827
+#
+# --- ORGANIC MATTER EXPORT RATIOS ------------------------------------
+#
+# production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# --- INORGANIC MATTER EXPORT RATIOS ----------------------------------
+#
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+bg_par_bio_red_POC_CaCO3=0.0485
+# exponent for modifier of CaCO3:POC export ratio
+bg_par_bio_red_POC_CaCO3_pP=0.7440
+#
+# SET NO PELAGIC CARBONATE PRODUCTION
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+#bg_par_bio_red_POC_CaCO3=0.0
+# exponent for modifier of CaCO3:POC export ratio
+#bg_par_bio_red_POC_CaCO3_pP=0.0
+#
+# --- REMINERALIZATION ------------------------------------------------
+#
+# set remineralization scheme [e.g., hard thresholds 'true' // 'false']
+bg_ctrl_bio_remin_thresh=.false.
+# half-saturation constant for oxic remin
+bg_par_bio_remin_c0_O2=1.0E-07
+# inhibition constant for oxic remin
+bg_par_bio_remin_ci_O2=1.0E-06
+# half-saturation constant for sulphate reduction
+bg_par_bio_remin_c0_SO4=5.0E-04
+# inhibition constant for sulphate reduction
+bg_par_bio_remin_ci_SO4=5.0E-04
+# DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=0.5
+# initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=0.0557
+# depth of remineralization or particulate organic matter
+bg_par_bio_remin_POC_eL1=589.9451
+#bg_par_bio_remin_POC_eL1=294.9725
+# remineralization length #2 for POC
+bg_par_bio_remin_POC_eL2=1000000.0
+# initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.45
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1.8905e+003
+# remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+# sulfide oxidation rate form
+bg_opt_bio_remin_oxidize_H2StoSO4="OLD"
+# sulfide oxidation rate constant [only used if rate law is linear]
+#bg_par_bio_remin_kH2StoSO4=1.0E07
+# aerobic CH4 oxidation scheme
+bg_par_bio_remin_CH4ox="CH4ox_MM"
+# rate constant for aerobic methanotrophy
+bg_par_bio_remin_AER_kAER=0.40
+# O2 half-saturation constant for aerobic methanotrophy
+bg_par_bio_remin_AER_Km_O2=20.E-06
+# rate constant for AOM
+bg_par_bio_remin_AOM_kAOM=0.035
+# SO4 half-saturation constant for AOM
+bg_par_bio_remin_AOM_Km_SO4=500.0E-06
+# enable/disable thermodynamic terms
+bg_par_bio_remin_AER_thermo="on"
+bg_par_bio_remin_AOM_thermo="on"
+# biological energy quanta (BEQ) for CH4 oxidation
+bg_par_bio_remin_AER_BEQ=25.0
+bg_par_bio_remin_AOM_BEQ=25.0
+# methanogenesis 13C fractionation
+bg_par_d13C_Corg_CH4_epsilon=-35.0
+#
+# --- TRACE METALS ----------------------------------------------------
+#
+#
+# --- SEDIMENTS -------------------------------------------------------
+#
+#
+# --- WEATHERING ------------------------------------------------------
+#
+#
+# --- DATA SAVING -----------------------------------------------------
+#
+# save frequency definitions
+bg_par_infile_slice_name=save_timeslice.dat
+bg_par_infile_sig_name=save_sig.dat
+# SELECT: time-slice data save: Atmospheric (interface) composition (2D)?
+bg_ctrl_data_save_slice_ocnatm=.false.
+# SELECT: time-slice data save: Ocean composition (3D)?
+bg_ctrl_data_save_slice_ocn=.true.
+# SELECT: time-slice data save: Sediment (interface) composition (2D)?
+bg_ctrl_data_save_slice_ocnsed=.true.
+# SELECT: time-slice data save: Air-sea gas exchange (2D)?
+bg_ctrl_data_save_slice_fairsea=.true.
+# SELECT: time-slice data save: Ocean-atmosphere flux (2D)?
+bg_ctrl_data_save_slice_focnatm=.true.
+# SELECT: time-slice data save: Ocean-sediment flux (2D)?
+bg_ctrl_data_save_slice_focnsed=.false.
+# SELECT: time-slice data save: Sediment-ocean flux (2D)?
+bg_ctrl_data_save_slice_fsedocn=.false.
+# SELECT: time-slice data save: Biological fluxes (3D)?
+bg_ctrl_data_save_slice_bio=.true.
+# SELECT: additional biogeochem diagnostics
+bg_ctrl_data_save_slice_diag=.true.
+bg_ctrl_data_save_slice_misc=.true.
+bg_ctrl_data_save_derived=.true.
+bg_ctrl_data_save_sig_diag_redox_old=.false.
+bg_ctrl_data_save_slice_diag_redox_old=.false.
+bg_ctrl_bio_remin_redox_save=.true.
+bg_ctrl_carbchemupdate_full=.true.
+# misc
+bg_par_data_save_level=8
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=1
+#
+# --- FORCINGS --------------------------------------------------------
+#
+# specify forcings
+#bg_ctrl_force_oldformat=.false.
+bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2_RpO2"
+bg_par_atm_force_scale_val_3=278.0E-06      # restoring forcing for pCO2 [atm]
+bg_par_atm_force_scale_val_4=-6.5           # restoring forcing for d13C CO2 [o/oo]
+bg_par_atm_force_scale_val_6=0.21E-03       # restoring forcing for pO2 [atm]
+ac_par_atm_wetlands_FCH4=3.0E12             # wetland CH4 flux [mol/yr]
+ac_par_atm_wetlands_FCH4_d13C=-60.0         # wetland d13C CH4 [o/oo]
+#
+# --- INITIAL CONDITIONS ---------------------------------------------
+#
+# ATMOSPHERIC CHEMISTRY
+ac_atm_init_3=278.0E-06             # pCO2 [atm]
+ac_atm_init_4=-6.5                  # d13C CO2 [o/oo]
+ac_atm_init_6=0.21E-03              # pO2 [atm]
+ac_atm_init_10=500.0E-06            # pCH4 [atm]
+ac_atm_init_11=-60.0                # d13C CH4 [o/oo]
+#
+# OCEAN CHEMISTRY
+bg_ocn_init_3=2.244E-03             # DIC [mol/kg]
+bg_ocn_init_4=0.4                   # d13C DIC [o/oo]
+bg_ocn_init_8=2.159E-06             # PO4 [mol/kg]
+bg_ocn_init_10=0.0                  # O2 [mol/kg]
+bg_ocn_init_12=2.363E-03            # ALK [mol/kg]
+bg_ocn_init_15=0.0                  # DOM_C [mol/kg]
+bg_ocn_init_20=0.0                  # DOM_P [mol/kg]
+bg_ocn_init_25=50.0E-06             # CH4 [mol/kg]
+bg_ocn_init_26=-60.0                # d13C CH4 [o/oo]
+bg_ocn_init_35=1.025E-02            # Ca [mol/kg]
+bg_ocn_init_38=280.0E-06            # SO4 [mol/kg]
+bg_ocn_init_40=0.0                  # H2S [mol/kg]
+bg_ocn_init_50=5.282E-02            # Mg [mol/kg]
+#
+# --- MISC ------------------------------------------------------------
+#
+# turn off tracer 'auditing'
+bg_ctrl_audit=.false.
+#
+

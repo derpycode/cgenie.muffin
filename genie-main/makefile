@@ -18,7 +18,7 @@ LOCALFLAGS = $(FFLAGS) $(BOUNDS_FLAGS) $(FLAGR8)
 OTHER_FILES = makefile makefile.arc testing.mak user.mak
 
 EXE_MAIN = genie.exe
-EXECUTABLES = $(EXE_MAIN) nccompare
+EXECUTABLES = $(EXE_MAIN) #nccompare
 
 OBJ_MAIN = genie.$(OBJ_EXT)
 OBJS4 = initialise_genie.$(OBJ_EXT)

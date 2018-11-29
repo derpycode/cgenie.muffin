@@ -1,0 +1,5 @@
+TEST_NAME=genie_eb_go_gs_ac_bg_regtest
+ASSUMEDGOOD_NAME=genie_eb_go_gs_ac_bg_assumedgood
+KNOWNGOOD_NAME=genie_eb_go_gs_ac_bg_knowngood
+TESTFILE=biogem/fields_biogem_3d.nc
+CHECKFLUXES=FALSE
