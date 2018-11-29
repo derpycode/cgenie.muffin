@@ -669,7 +669,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_data                           = 30 ! data (I/O)
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
   INTEGER,PARAMETER::n_diag_bio                           = 21 !
-  INTEGER,PARAMETER::n_diag_geochem                       = 10 !
+  INTEGER,PARAMETER::n_diag_geochem                       = 15 !
   INTEGER,PARAMETER::n_diag_Fe                            = 07 !
   INTEGER,PARAMETER::n_diag_misc_2D                       = 07 !
   INTEGER::n_diag_redox                                   =  0 !
@@ -780,6 +780,11 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_geochem_dCH4                  = 08    !
   INTEGER,PARAMETER::idiag_geochem_dCH4_AOM              = 09    !
   INTEGER,PARAMETER::idiag_geochem_dH2S_POMS             = 10    !
+  INTEGER,PARAMETER::idiag_geochem_dFe_FeS2              = 11    !
+  INTEGER,PARAMETER::idiag_geochem_dH2S_FeS2             = 12    !
+  INTEGER,PARAMETER::idiag_geochem_dSO4_FeS2             = 13    !
+  INTEGER,PARAMETER::idiag_geochem_dFe_FeCO3             = 14    !
+  INTEGER,PARAMETER::idiag_geochem_dDIC_FeCO3            = 15    !
   ! diagnostics - geochemistry -- Fe
   INTEGER,PARAMETER::idiag_Fe_Fe                         = 01    !
   INTEGER,PARAMETER::idiag_Fe_FeL                        = 02    !
@@ -885,7 +890,12 @@ MODULE biogem_lib
        & 'dH2S          ', &
        & 'dCH4          ', &
        & 'dCH4_AOM      ', &
-       & 'H2StoPOMS_dH2S' /)
+       & 'H2StoPOMS_dH2S', &
+       & 'dFe_FeS2      ', &
+       & 'dH2S_FeS2     ', &
+       & 'dSO4_FeS2     ', &
+       & 'dFe_FeCO3     ', &
+       & 'dDIC_FeCO3    '/)
   ! diagnostics - geochemistry -- Fe
   CHARACTER(len=14),DIMENSION(n_diag_Fe),PARAMETER::string_diag_Fe = (/ &
        & 'Fe            ', &
