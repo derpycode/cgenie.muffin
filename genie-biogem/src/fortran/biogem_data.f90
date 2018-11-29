@@ -2414,6 +2414,22 @@ CONTAINS
             & (/const_real_null/),.true. &
             & )
     ENDIF
+    If (sed_select(is_FeS2) .AND. (.NOT. sed_select(is_det))) then
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'If the sediment FeS2 tracer is requested, then the detrital tracer must be selected ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
+    If (sed_select(is_FeCO3) .AND. (.NOT. sed_select(is_det))) then
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'If the sediment FeCO3 tracer is requested, then the detrital tracer must be selected ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
     !
     If (sed_select(is_POC) .AND. (.NOT. sed_select(is_POC_frac2))) then
        CALL sub_report_error( &
