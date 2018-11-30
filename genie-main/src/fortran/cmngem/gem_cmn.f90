@@ -21,7 +21,7 @@ MODULE gem_cmn
   ! NOTE: these definitions must come FIRST, because the namelist arrays are dimensioned by these parameters ...
   ! WARNING: these values must be duplicated in genie_control.f90
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
-  INTEGER,PARAMETER::n_atm =  19
+  INTEGER,PARAMETER::n_atm =  21
   INTEGER,PARAMETER::n_ocn = 101
   INTEGER,PARAMETER::n_sed =  87
 
@@ -190,6 +190,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::ia_pH2S_34S                          = 17    ! pH2S
   INTEGER,PARAMETER::ia_pCFC11                            = 18    ! halo-carbon
   INTEGER,PARAMETER::ia_pCFC12                            = 19    ! halo-carbon
+  INTEGER,PARAMETER::ia_pcolr                             = 20    ! RED numerical (color) tracer
+  INTEGER,PARAMETER::ia_pcolr_13C                         = 21    ! 13C (RED)
   ! sediment tracer indicesqsub -j y -o cgenie_output -V -S /bin/bash
   INTEGER,PARAMETER::is_NULL1                             = 01    ! 
   INTEGER,PARAMETER::is_NULL2                             = 02    ! 
