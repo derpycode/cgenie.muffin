@@ -1249,11 +1249,11 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
-                        <param name="sed_select(95)" index="96">
+                        <param name="sed_select(95)" index="95">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
-                        <param name="sed_select(95)" index="96">
+                        <param name="sed_select(96)" index="96">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
@@ -4837,7 +4837,7 @@
                         <description>Rate law power for FeCO3 precipitation</description>
                     </param>
                     <param name="par_bio_FeCO3precip_abioticohm_cte">
-			<value datatype="real">3.5e-10</value>
+			<value datatype="real">1.58e-11</value>
                         <description>Ohmega constant for FeCO3 precip</description>
                     </param>
                     <param name="par_bio_FeCO3precip_abioticohm_min">
@@ -4845,8 +4845,32 @@
                         <description>Minimum ohmega threshold for precip</description>
                     </param>
                     <param name="par_d56Fe_FeCO3_alpha">
-			<value datatype="real">1.00048</value>
+			<value datatype="real">1.0005</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
+                    </param>
+                    <param name="par_bio_remin_kFe2toFe">
+			<value datatype="real">1.0e+09</value>
+                        <description>kinetic constant for Fe2 re-oxidation in M-1 yr-1</description>
+                    </param>
+                    <param name="par_d56Fe_Fe2ox_alpha">
+			<value datatype="real">0.9991</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_bio_FeS_sf">
+			<value datatype="real">1.0e+04</value>
+                        <description>Scale factor for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_exp">
+			<value datatype="real">1.0</value>
+                        <description>Rate law power for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_abioticohm_min">
+			<value datatype="real">8.3e-6</value>
+                        <description>Ohmega constant for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_abioticohm_min">
+			<value datatype="real">1.0</value>
+                        <description>Minimum ohmega threshold for precip</description>
                     </param>
                     <param name="par_bio_FeS2precip_k">
 			<value datatype="real">3250.43</value>
