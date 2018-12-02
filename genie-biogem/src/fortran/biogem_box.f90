@@ -3152,7 +3152,16 @@ CONTAINS
        loc_kmeth = 0.0
     end if
     ! ---------------------------------------------------------- ! remove normalization for kinetic scheme
-    if (ctrl_bio_remin_POC_kinetic .OR. (loc_k < const_real_nullsmall)) loc_k = 1.0
+    if (ctrl_bio_remin_POC_kinetic) loc_k = 1.0
+    ! ---------------------------------------------------------- ! check *some* remin occurs in non-kinetic scheme
+    ! NOTE: if a hard threshold is selected (subsequent test), CH4 production is assumed if no oxidants remain
+    !       (or no remin will occur ...)
+    ! here: parameters adjusted in factor (par_bio_remin_k_O2*loc_kO2/loc_k) to make this unity
+    ! if no remin would otherwise occur
+    if ((.NOT. ctrl_bio_remin_POC_kinetic) .AND. (loc_k < const_real_nullsmall)) then
+       loc_kO2 = 1.0
+       loc_k   = 1.0/par_bio_remin_k_O2
+    end if
     ! ---------------------------------------------------------- ! modify for hard threshold scheme
     if (ctrl_bio_remin_thresh) then
        if (loc_O2 > par_bio_remin_cthresh_O2) then
