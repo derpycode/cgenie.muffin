@@ -6230,6 +6230,18 @@
                         <value datatype="string">default</value>
                         <description>Atmospheric photochemistry scheme</description>
                     </param>
+                   <param name="par_pCH4_oxidation_C0">
+                        <value datatype="real">700.0E-09</value>
+                        <description>reference atmospheric pCH4 [atm]</description>
+                   </param>
+                   <param name="par_pCH4_oxidation_tau0">
+                        <value datatype="real">7.6</value>
+                        <description>baseline atmospheric CH4 lifetime [yr]</description>
+                   </param>
+                   <param name="par_pCH4_oxidation_N">
+                        <value datatype="real">0.338</value>
+                        <description>atmospheric CH4 oxidation exponent</description>
+                   </param>
                    <param name="par_atm_pO2_fixed">
                         <value datatype="real">0.2095</value>
                         <description>Atmospheric pO2 for fixed scheme</description>
