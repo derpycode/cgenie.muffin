@@ -1446,13 +1446,19 @@ subroutine biogem(        &
               if (ctrl_bio_CaCO3precip .AND. sed_select(is_CaCO3)) then
                  call sub_calc_bio_uptake_abio(i,j,loc_k1,loc_dtyr)
               end if
+              ! *** Fe-S cycling ***
+              if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
+                 call sub_calc_form_FeS(i,j,loc_k1,loc_dtyr)
+              end if
+              ! if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
+                 ! call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+              ! end if
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
               end if
               if (sed_select(is_FeCO3)) then
                  call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
               end if
-
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS ***'
               ! *** MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS ***
