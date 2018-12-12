@@ -356,6 +356,13 @@ CONTAINS
 	   print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
 	   print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
        print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
+       print*,'Minimum ohmega threshold for precip                 : ',par_bio_FeS_abioticohm_min
+       print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
+       print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
+	   print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
+	   print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
+       print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha
+       
 	   ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
