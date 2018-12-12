@@ -487,6 +487,18 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
   real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2 
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
+  
+  real::par_bio_remin_kFe2toFe                                   ! k-value Fe oxidation
+  real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
+  NAMELIST /ini_biogem_nml/par_bio_remin_kFe2toFe,par_d56Fe_Fe2ox_alpha
+ 
+  real::par_bio_FeS_sf                                           ! Scale factor for FeS formation
+  real::par_bio_FeS_exp                                          ! Rate law power for FeS formation
+  NAMELIST /ini_biogem_nml/par_bio_FeS_sf,par_bio_FeS_exp
+  real::par_bio_FeS_abioticohm_cte                               ! ohmega constant for FeS formation
+  real::par_bio_FeS_abioticohm_min                               ! Minimum ohmega threshold for precip
+  NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte 
+
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                             !
   CHARACTER(len=255)::par_indir_name                             !
