@@ -2154,16 +2154,18 @@ CONTAINS
     ! check Fe cycle self-consistency
     if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
        SELECT CASE (trim(opt_geochem_Fe))
+       CASE ('OLD','ALT')
+          ! NOTE: do not need to explicitly check for io_Fe (again!)
+          if ((.NOT. ocn_select(io_L)) .OR. (.NOT. ocn_select(io_FeL))) THEN
+             loc_flag = .TRUE.
+          end if
        CASE ('hybrid','lookup_4D')
           ! NOTE: do not need to explicitly check for io_TDFe (again!)
           if (.NOT. ocn_select(io_TL)) THEN
              loc_flag = .TRUE.
           end if
        case default
-          ! NOTE: do not need to explicitly check for io_Fe (again!)
-          if ((.NOT. ocn_select(io_L)) .OR. (.NOT. ocn_select(io_FeL))) THEN
-             loc_flag = .TRUE.
-          end if
+          ! DO BUCKING NOTHING! :)
        end select
        if (loc_flag) then
           CALL sub_report_error( &
