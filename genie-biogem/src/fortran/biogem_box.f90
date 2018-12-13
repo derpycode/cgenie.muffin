@@ -477,6 +477,8 @@ CONTAINS
     end if
     if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
        SELECT CASE (trim(opt_geochem_Fe))
+       CASE ('OLD','ALT')
+          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_FeL,dum_i,dum_j,n_k)
        CASE ('hybrid')
           ! NOTE: do not need to sum separate tracers, as io_TDFe *is* total dissolved and assumed bioavailable Fe
           loc_FeT = ocn(io_TDFe,dum_i,dum_j,n_k)
@@ -487,7 +489,7 @@ CONTAINS
                & ocn(io_TDFe,dum_i,dum_j,n_k), ocn(io_TL,dum_i,dum_j,n_k) /) &
                & )
        case default
-          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_FeL,dum_i,dum_j,n_k)
+          ! NOTHING!
        end SELECT
        select case (par_bio_prodopt)
        CASE (                        &
@@ -1616,9 +1618,7 @@ CONTAINS
     !       MUST BE REFORMULATED IN THE COMPACT TRACER NOTATION
     if (ocn_select(io_Fe)) then
        SELECT CASE (trim(opt_geochem_Fe))
-       CASE ('ALT','hybrid','lookup_4D')
-          ! DO NOTHING
-       case default
+       CASE ('OLD')
           DO k=n_k,loc_k_mld,-1
              if (ocn(io_Fe,dum_i,dum_j,k) > const_real_nullsmall) then
                 call sub_calc_scav_Fe(                                                  &
@@ -1630,6 +1630,10 @@ CONTAINS
                      & )
              end if
           end DO
+       CASE ('ALT','hybrid','lookup_4D')
+          ! DO NOTHING
+       case default
+          ! DO NOTHING
        end SELECT
     end if
 
@@ -4211,7 +4215,7 @@ CONTAINS
                      & loc_bio_remin_dt_scav = loc_bio_remin_dD/loc_bio_remin_sinkingrate_scav
                 ! calculate Fe scavenging
                 SELECT CASE (trim(opt_geochem_Fe))
-                CASE ('ALT')
+                CASE ('ALT','OLD')
                    loc_FeFeLL(:) = fun_box_calc_geochem_Fe(                         &
                         & dum_vocn%mk(io2l(io_Fe),k) + dum_vocn%mk(io2l(io_FeL),k), &
                         & dum_vocn%mk(io2l(io_L),k) + dum_vocn%mk(io2l(io_FeL),k)   &
@@ -4232,6 +4236,16 @@ CONTAINS
                    loc_FeFeLL(:) = 0.0
                 end SELECT
                 SELECT CASE (trim(opt_geochem_Fe))
+                CASE ('ALT','OLD')
+                   if (loc_FeFeLL(1) > const_real_nullsmall) then
+                      loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - &
+                           fun_box_scav_Fe(                                                  &
+                           & dum_dtyr,                     &
+                           & loc_bio_remin_dt_scav,        &
+                           & loc_FeFeLL(1),  &
+                           & loc_bio_part_TMP(:,k)       &
+                           & )
+                   end if
                 CASE ('hybrid','lookup_4D')
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
                       loc_bio_remin(io2l(io_TDFe),k) = loc_bio_remin(io2l(io_TDFe),k) - &
@@ -4243,15 +4257,7 @@ CONTAINS
                            & )
                    end if
                 CASE default
-                   if (loc_FeFeLL(1) > const_real_nullsmall) then
-                      loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - &
-                           fun_box_scav_Fe(                                                  &
-                           & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
-                           & loc_FeFeLL(1),  &
-                           & loc_bio_part_TMP(:,k)       &
-                           & )
-                   end if
+                   ! NOTHING
                 end SELECT
              end if
           end If
@@ -4385,8 +4391,9 @@ CONTAINS
                               & /                                                                                       &
                               & (phys_ocn(ipo_Dbot,dum_i,dum_j,kk+1)/par_bio_remin_z0)**(par_bio_remin_b(dum_i,dum_j)) &
                               & )
-                      case ('KriestOschlies2008') ! efolding depth dependent on mean plankton diameter JDW
-                      	 loc_eL_size=par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta ! n.b. size is in esd
+                      case ('KriestOschlies2008') ! efolding depth dependent on mean plankton diameter JDW ! n.b. size is in esd
+                      	 loc_eL_size = &
+                              & par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta
                       	 loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/loc_eL_size)) 	
                       case default
                          loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL1))
@@ -4555,6 +4562,8 @@ CONTAINS
                    loc_r56Fe = 0.0
                    ! calculate Fe speciation
                    SELECT CASE (trim(opt_geochem_Fe))
+                   case ('OLD')
+                      loc_FeFeLL(1) = dum_vocn%mk(io2l(io_Fe),kk)
                    CASE ('ALT')
                       loc_FeFeLL(:) = fun_box_calc_geochem_Fe(                                  &
                            & dum_vocn%mk(io2l(io_Fe),kk) + dum_vocn%mk(io2l(io_FeL),kk), &
@@ -4575,15 +4584,12 @@ CONTAINS
                            &  ocn(io_TDFe,dum_i,dum_j,kk), ocn(io_TL,dum_i,dum_j,kk) /) &
                            & )
                    case default
-                      loc_FeFeLL(1) = dum_vocn%mk(io2l(io_Fe),kk)
+                      ! NOTHING!
                    end SELECT
                    ! calculate mean Fe isotopic composition
                    If ( (ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe)) .AND. (loc_FeFeLL(1) > const_real_nullsmall) ) then
                       SELECT CASE (trim(opt_geochem_Fe))
-                      CASE ('hybrid','lookup_4D')
-                         loc_r56Fe = dum_vocn%mk(io2l(io_TDFe_56Fe),kk)/ &
-                              & dum_vocn%mk(io2l(io_TDFe),kk)
-                      case default
+                      CASE ('OLD','ALT')
                          loc_r56Fe = (dum_vocn%mk(io2l(io_Fe_56Fe),kk) + dum_vocn%mk(io2l(io_FeL_56Fe),kk))/ &
                               & (loc_FeFeLL(1) + loc_FeFeLL(2))
                          ! re-partition Fe isotopes
@@ -4591,10 +4597,26 @@ CONTAINS
                               & (loc_r56Fe*loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe_56Fe),kk))
                          loc_bio_remin(io2l(io_FeL_56Fe),kk) = loc_bio_remin(io2l(io_FeL_56Fe),kk) + &
                               & (loc_r56Fe*loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL_56Fe),kk))
+                      CASE ('hybrid','lookup_4D')
+                         loc_r56Fe = dum_vocn%mk(io2l(io_TDFe_56Fe),kk)/ &
+                              & dum_vocn%mk(io2l(io_TDFe),kk)
+                      case default
+                      ! NOTHING!
                       end SELECT
                    end if
                    ! calculate scavenging (and isotopes)
                    SELECT CASE (trim(opt_geochem_Fe))
+                   CASE ('OLD','ALT')
+                      if (loc_FeFeLL(1) > const_real_nullsmall) then
+                         loc_scav_Fe = fun_box_scav_Fe( & 
+                              & dum_dtyr,               &
+                              & loc_bio_remin_dt_scav,  &
+                              & loc_FeFeLL(1),          &
+                              & loc_bio_part_TMP(:,kk)  &
+                              & )
+                         loc_bio_remin(io2l(io_Fe),kk)      = loc_bio_remin(io2l(io_Fe),kk)      - loc_scav_Fe 
+                         loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
+                      end if
                    CASE ('hybrid','lookup_4D')
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
                          loc_scav_Fe = fun_box_scav_Fe( &
@@ -4607,16 +4629,7 @@ CONTAINS
                          loc_bio_remin(io2l(io_TDFe_56Fe),kk) = loc_bio_remin(io2l(io_TDFe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
                       end if
                    case default
-                      if (loc_FeFeLL(1) > const_real_nullsmall) then
-                         loc_scav_Fe = fun_box_scav_Fe( & 
-                              & dum_dtyr,               &
-                              & loc_bio_remin_dt_scav,  &
-                              & loc_FeFeLL(1),          &
-                              & loc_bio_part_TMP(:,kk)  &
-                              & )
-                         loc_bio_remin(io2l(io_Fe),kk)      = loc_bio_remin(io2l(io_Fe),kk)      - loc_scav_Fe 
-                         loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
-                      end if
+                   ! NOTHING!
                    end SELECT
                 end if
 
