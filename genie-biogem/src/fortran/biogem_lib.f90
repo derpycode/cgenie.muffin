@@ -480,25 +480,23 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
   real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
-  
   real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
   NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k
   real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
   real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2 
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
-  
   real::par_bio_remin_kFe2toFe                                   ! k-value Fe oxidation
   real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
   NAMELIST /ini_biogem_nml/par_bio_remin_kFe2toFe,par_d56Fe_Fe2ox_alpha
- 
   real::par_bio_FeS_sf                                           ! Scale factor for FeS formation
   real::par_bio_FeS_exp                                          ! Rate law power for FeS formation
   NAMELIST /ini_biogem_nml/par_bio_FeS_sf,par_bio_FeS_exp
   real::par_bio_FeS_abioticohm_cte                               ! ohmega constant for FeS formation
   real::par_bio_FeS_abioticohm_min                               ! Minimum ohmega threshold for precip
   NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte 
-
+  LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
+  NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                             !
   CHARACTER(len=255)::par_indir_name                             !

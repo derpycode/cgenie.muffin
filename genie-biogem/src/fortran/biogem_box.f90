@@ -2235,7 +2235,7 @@ CONTAINS
 	! look for co-existing Fe and H2S and see if it can be instantaneously precipitated
     ! 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
-                       
+
 	DO k=n_k,dum_k1,-1
 	  loc_FeS  = ocn(io_FeS,dum_i,dum_j,k)
       ! loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k))
@@ -4217,11 +4217,16 @@ CONTAINS
           ! zero local (temporary) particulate field array, and seed value at location in water column identified
           loc_bio_part_TMP(:,:) = 0.0
           loc_bio_part_TMP(:,k) = loc_bio_part_OLD(:,k)
-          ! surface particle scavenging
+
+          ! -------------------------------------------------- !
+          ! SURFACE PARTICLE PROCESSES
+          ! -------------------------------------------------- !
           ! NOTE: special case (remin loop if for n_k-1 down)
-          ! NOTE: calculate Fe speciation first!
-          ! NOTE: for the lookup table, the goethite concentration is assigned to the first array index (otherwise used for [Fe])
           If (k == n_k) then
+             ! ----------------------------------------------- ! surface particle scavenging
+             ! NOTE: special case (remin loop if for n_k-1 down)
+             ! NOTE: calculate Fe speciation first!
+             ! NOTE: for the lookup table, the goethite concentration is assigned to the first array index (otherwise used for [Fe])
              if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                 ! calculate surface residence time (yr) of particulates in ocean layer (from layer thickness and sinking speed)
                 loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,kk)
@@ -4273,6 +4278,22 @@ CONTAINS
                 CASE default
                    ! NOTHING
                 end SELECT
+             end if
+             ! ----------------------------------------------- ! ADDITIONAL (OCENA SURFACE) PARTICLE TRANSFORMATIONS
+             ! ----------------------------------------------- ! surface Fe oxy-hydroxides particle transformations
+             if (sed_select(is_FeOOH)) then
+                ! ### INSERT CODE ################################################################################################ !
+                ! ################################################################################################################ !
+             end if
+             ! ----------------------------------------------- ! surface pyrite particle transformations
+             if (sed_select(is_FeS2)) then
+                ! ### INSERT CODE ################################################################################################ !
+                ! ################################################################################################################ !
+             end if
+             ! ----------------------------------------------- ! surface siderite particle transformations
+             if (sed_select(is_FeCO3)) then
+                ! ### INSERT CODE ################################################################################################ !
+                ! ################################################################################################################ !
              end if
           end If
 
@@ -4454,7 +4475,18 @@ CONTAINS
                       loc_bio_part_TMP(l,kk) = 0.0
                    end if
                 end if
-
+                ! -------------------------------------------- ! ADDITIONAL (OCEAN SURFACE) PARTICLE TRANSFORMATIONS
+                ! additional particle transformations
+                ! NOTE: the layer where the particles originate is kk+1, 
+                !       and the current layer (where particle transformations are aplied), is kk
+                ! NOTE: tracer concentrations are accessed from the vbectorised array, e.g.
+                !       loc_SiO2 = dum_vocn%mk(conv_io_lselected(io_SiO2),kk)
+                ! NOTE: the particle tracer concentration in layer kk, before any particle transformation, is:
+                !       loc_bio_part_TMP(l,kk+1)*loc_bio_remin_layerratio
+                !       (i.e., the concentration in layer kk+1, multiplied by a dilution factor (as deeper layers are thicker)
+                !       where l is derived from the is particle index: 
+                !       l = is2l(is)
+                ! NOTE: the time (years) spent by a particle in the layer (kk) is given by the variable: loc_bio_remin_dt
                 ! -------------------------------------------- ! Fe oxy-hydroxides
                 if (sed_select(is_FeOOH)) then
                    ! default, no dissolution (particle reduction/oxidation)
@@ -4541,16 +4573,16 @@ CONTAINS
                         & (is == is_FeOOH) .OR. &
                         & (sed_dep(is) == is_FeOOH) &
                         & ) then
-                      ! ----------------------------------- ! Fe oxy-hydroxides
-                                                            ! (plus isotopes)
+                      ! -------------------------------------- ! Fe oxy-hydroxides
+                                                               ! (plus isotopes)
                       loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                            & loc_bio_remin_layerratio*loc_bio_part_FeOOH_ratio
                    else if ( &
                         & (is == is_FeS2) .OR. &
                         & (sed_dep(is) == is_FeS2) &
                         & ) then
-                      ! ----------------------------------- ! pyrite
-                                                            ! (plus isotopes)
+                      ! -------------------------------------- ! pyrite
+                                                               ! (plus isotopes)
                       loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                            & loc_bio_remin_layerratio*loc_bio_part_FeS2_ratio
                    else if ( &
@@ -4558,7 +4590,7 @@ CONTAINS
                         & (sed_dep(is) == is_FeCO3) &
                         & ) then
                       ! -------------------------------------- ! siderite
-                                                            ! (plus isotopes)
+                                                               ! (plus isotopes)
                       loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                            & loc_bio_remin_layerratio*loc_bio_part_FeCO3_ratio
                    else if ( &
@@ -4571,13 +4603,15 @@ CONTAINS
                       loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                            & loc_bio_remin_layerratio
                    end if
-                   ! exceptions:
+                   ! ----------------------------------------- ! exceptions
                    ! (1) do not remineralize S in S-linked POM (assumed a refractory fraction)
                    if (is == is_POM_S) loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)*loc_bio_remin_layerratio
 
                 end do
 
-                ! *** Calculate increase in tracer concentrations due to particle remineralization ***
+                ! -------------------------------------------- !
+                ! CALCULATE INCREASE IN TRACER CONCENTRATIONS DUE TO PARTICLE REMINERALIZATION
+                ! -------------------------------------------- !
                 ! add 'missing' (remineralized) particulate sediment tracers to respective remineralization array components
                 ! NOTE: ensure the particulate concentration in the upper layer is scaled w.r.t.
                 !       the difference in relative layer thickness

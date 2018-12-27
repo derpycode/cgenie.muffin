@@ -348,21 +348,21 @@ CONTAINS
        print*,'Minimum ohmega threshold for precip                 : ',par_bio_CaCO3precip_abioticohm_min
        print*,'Scale factor for CaCO3 precipitation                : ',par_bio_CaCO3precip_sf
        print*,'Rate law power for CaCO3 precipitation              : ',par_bio_CaCO3precip_exp
-	   print*,'Minimum ohmega threshold for precip                 : ',par_bio_FeCO3precip_abioticohm_min
+       print*,'Minimum ohmega threshold for precip                 : ',par_bio_FeCO3precip_abioticohm_min
        print*,'Scale factor for FeCO3 precipitation                : ',par_bio_FeCO3precip_sf
        print*,'Rate law power for FeCO3 precipitation              : ',par_bio_FeCO3precip_exp
-	   print*,'Ohnega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
-	   print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
-	   print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
-	   print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
+       print*,'Ohnega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
+       print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
+       print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
+       print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
        print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
        print*,'Minimum ohmega threshold for precip                 : ',par_bio_FeS_abioticohm_min
        print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
-	   print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
-	   print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
+       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
+       print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
        print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha
-       
+       print*,'pyrite precip stiochiometry                         : ',ctrl_bio_FeS2precip_explicit
 	   ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -987,6 +987,36 @@ CONTAINS
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     loc_conv_sed_ocn(:,:) = 0.0
+    ! -------------------------------------------------------- !
+    ! UPDATE INORGANIC STIOCHIOMETRIES
+    ! -------------------------------------------------------- !
+    ! ALT relationships for pyrite formation
+    ! NOTE: reciprocal array conv_ocn_sed is not used and altered values do not need to be set
+    if (ctrl_bio_FeS2precip_explicit) then
+       ! explicit reaction (the default defined in gem_util) uses dissolved FeS but not Fe2
+       conv_sed_ocn(io_H2S,is_FeS2)                = 3.0/4.0
+       conv_sed_ocn(io_SO4,is_FeS2)                = 1.0/4.0
+       conv_sed_ocn(io_FeS,is_FeS2)                = 1.0
+       conv_sed_ocn(io_Fe2,is_FeS2)                = 0.0
+       conv_sed_ocn(io_ALK,is_FeS2)                = -2.0/4.0
+       conv_sed_ocn(io_H2S_34S,is_FeS2_34S)        = 3.0/4.0
+       conv_sed_ocn(io_FeS_34S,is_FeS2_34S)        = 0.0
+       conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 1.0
+       conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 0.0
+    else
+       ! alt reaction uses dissolved Fe2 but not FeS
+       conv_sed_ocn(io_H2S,is_FeS2)                = 7.0/4.0
+       conv_sed_ocn(io_SO4,is_FeS2)                = 1.0/4.0
+       conv_sed_ocn(io_FeS,is_FeS2)                = 0.0
+       conv_sed_ocn(io_Fe2,is_FeS2)                = 1.0
+       conv_sed_ocn(io_ALK,is_FeS2)                = -2.0/4.0
+       conv_sed_ocn(io_H2S_34S,is_FeS2_34S)        = 7.0/4.0
+       conv_sed_ocn(io_FeS_34S,is_FeS2_34S)        = 0.0
+       conv_sed_ocn(io_SO4_34S,is_FeS2_34S)        = 1.0/4.0
+       conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 0.0
+       conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 1.0
+    end if
+
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !

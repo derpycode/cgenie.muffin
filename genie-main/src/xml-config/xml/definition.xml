@@ -4884,6 +4884,10 @@
 			<value datatype="real">1</value>
                         <description>fractionation factor d34/32 S in FeS2 precipitation</description>
                     </param>
+                    <param name="ctrl_bio_FeS2precip_explicit">
+			<value datatype="boolean">.true.</value>
+                        <description>Explicit FeS2 precip stiochiometry?</description>
+                    </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
 			<value datatype="string"></value>

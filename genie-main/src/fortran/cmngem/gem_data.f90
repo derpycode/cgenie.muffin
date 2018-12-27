@@ -40,13 +40,14 @@ CONTAINS
 if (ctrl_debug_init > 0) then
     ! --- TRACER SELECTION  ------------------------------------------------------------------------------------------------------ !
     ! NOTE: reported at end of initialise_gem when tracer name information is available
-    ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
-    print*,'--- MISC CONTROLS ---'
-    print*,'assumed longitudinal offset of the grid             : ',par_grid_lon_offset
+    ! --- GEOCHEM CONTROLS ------------------------------------------------------------------------------------------------------- !
     print*,'carbonate dissociation constants set                : ',trim(par_carbconstset_name)
     print*,'pH solution tolerance                               : ',par_carbchem_pH_tolerance
     print*,'pH solution maximum number of iterations            : ',par_carbchem_pH_iterationmax
     print*,'Exit upon pH solution failure?                      : ',ctrl_carbchem_fail
+    ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
+    print*,'--- MISC CONTROLS ---'
+    print*,'assumed longitudinal offset of the grid             : ',par_grid_lon_offset
     print*,'Debug (initialization) level                        : ',ctrl_debug_init
     print*,'Debug (loop) level                                  : ',ctrl_debug_loop
     print*,'Debug (end) level                                   : ',ctrl_debug_end
