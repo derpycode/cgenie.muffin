@@ -356,13 +356,22 @@ CONTAINS
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
        print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
+       print*,'MM type limiting factor for FeS2 precipitation      : ',K_lim_PYR
        print*,'Minimum ohmega threshold for precip                 : ',par_bio_FeS_abioticohm_min
        print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
-       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
-       print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
-       print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha
        print*,'pyrite precip stiochiometry                         : ',ctrl_bio_FeS2precip_explicit
+       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
+       
+       print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
+       print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha 
+       print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha 
+       print*,'let FeOOH precipitate explictely?                   : ',ctrl_bio_FeOOHprecip_explicit 
+       print*,'kinetic constant for Fe reduction                   : ',par_bio_remin_kFetoFe2
+       print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
+       print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
+       print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
+       
 	   ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -993,14 +1002,14 @@ CONTAINS
     ! ALT relationships for pyrite formation
     ! NOTE: reciprocal array conv_ocn_sed is not used and altered values do not need to be set
     if (ctrl_bio_FeS2precip_explicit) then
-       ! explicit reaction (the default defined in gem_util) uses dissolved FeS but not Fe2
+       ! explicit reaction (the default defined in gem_util) uses dissolved Fe2 but not FeS
        conv_sed_ocn(io_H2S,is_FeS2)                = 3.0/4.0
        conv_sed_ocn(io_SO4,is_FeS2)                = 1.0/4.0
        conv_sed_ocn(io_FeS,is_FeS2)                = 1.0
        conv_sed_ocn(io_Fe2,is_FeS2)                = 0.0
        conv_sed_ocn(io_ALK,is_FeS2)                = -2.0/4.0
        conv_sed_ocn(io_H2S_34S,is_FeS2_34S)        = 3.0/4.0
-       conv_sed_ocn(io_FeS_34S,is_FeS2_34S)        = 0.0
+       conv_sed_ocn(io_FeS_34S,is_FeS2_34S)        = 1.0
        conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 1.0
        conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 0.0
     else
