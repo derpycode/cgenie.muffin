@@ -486,9 +486,21 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
   real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2 
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
+  real::K_lim_PYR                                                ! MM type limiting factor for FeS2 precipitation 
+  namelist /ini_biogem_nml/K_lim_PYR
+  
   real::par_bio_remin_kFe2toFe                                   ! k-value Fe oxidation
   real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
   NAMELIST /ini_biogem_nml/par_bio_remin_kFe2toFe,par_d56Fe_Fe2ox_alpha
+  real::par_bio_remin_kFetoFe2                                   ! k-value Fe reduction
+  real::par_bio_remin_kFeOOHtoFe2                                   ! k-value FeOOH reduction
+  real::par_d56Fe_Fered_alpha                                    ! 56/54Fe fractionation for iron reduction with S
+  real::par_d34S_Fered_alpha                                     ! 34/32S fractionation for sulphide oxidation with Fe
+  NAMELIST /ini_biogem_nml/par_bio_remin_kFetoFe2,par_bio_remin_kFeOOHtoFe2,par_d56Fe_Fered_alpha,par_d34S_Fered_alpha
+  real::par_d56Fe_FeOOH_alpha                                    ! 56/54Fe fractionation for FeOOH precipitation
+  LOGICAL::ctrl_bio_FeOOHprecip_explicit                         ! let FeOOH precipitate explictely?
+  NAMELIST /ini_biogem_nml/par_d56Fe_FeOOH_alpha,ctrl_bio_FeOOHprecip_explicit
+ 
   real::par_bio_FeS_sf                                           ! Scale factor for FeS formation
   real::par_bio_FeS_exp                                          ! Rate law power for FeS formation
   NAMELIST /ini_biogem_nml/par_bio_FeS_sf,par_bio_FeS_exp
