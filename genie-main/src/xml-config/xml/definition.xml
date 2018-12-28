@@ -4848,6 +4848,30 @@
 			<value datatype="real">1.0005</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
                     </param>
+                    <param name="ctrl_bio_FeOOHprecip_explicit">
+			<value datatype="boolean">.true.</value>
+                        <description>precipitate FeOOH explicit?</description>
+                    </param>
+                    <param name="par_bio_remin_kFetoFe2">
+			<value datatype="real">7.0e+07</value>
+                        <description>kinetic constant for Fe reduction using sulphide in M-1 yr-1</description>
+                    </param>
+                    <param name="par_bio_remin_kFeOOHtoFe2">
+			<value datatype="real">4032.3</value>
+                        <description>kinetic constant for FeOOH reduction using sulphide in M-1 yr-1</description>
+                    </param>
+                    <param name="par_d34S_Fered_alpha">
+			<value datatype="real">0.9982</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_d56Fe_Fered_alpha">
+			<value datatype="real">1.002</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_d56Fe_FeOOH_alpha">
+			<value datatype="real">1.000</value>
+                        <description>fractionation factor d56/54 Fe during FeOOH precipitation</description>
+                    </param>
                     <param name="par_bio_remin_kFe2toFe">
 			<value datatype="real">1.0e+09</value>
                         <description>kinetic constant for Fe2 re-oxidation in M-1 yr-1</description>
@@ -4876,6 +4900,10 @@
 			<value datatype="real">3250.43</value>
                         <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
                     </param>
+                    <param name="K_lim_PYR">
+			<value datatype="real">0.0</value>
+                        <description>MM type limiting factor for FeS2 precipitation</description>
+                    </param>
                     <param name="par_d56Fe_FeS2_alpha">
 			<value datatype="real">1.0022</value>
                         <description>fractionation factor d56/54 Fe in FeS2 precipitation</description>
@@ -4885,7 +4913,7 @@
                         <description>fractionation factor d34/32 S in FeS2 precipitation</description>
                     </param>
                     <param name="ctrl_bio_FeS2precip_explicit">
-			<value datatype="boolean">.true.</value>
+			<value datatype="boolean">.false.</value>
                         <description>Explicit FeS2 precip stiochiometry?</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
