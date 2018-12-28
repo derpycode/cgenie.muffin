@@ -166,19 +166,19 @@ CONTAINS
     conv_sed_ocn(io_Fe2,is_FeCO3)               = 1.0
     conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)       = 1.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeCO3_56Fe)     = 1.0
-    conv_sed_ocn(io_H2S,is_FeS2)                = 3.0/4.0!7.0/4.0
+    conv_sed_ocn(io_H2S,is_FeS2)                = 7.0/4.0
     conv_sed_ocn(io_SO4,is_FeS2)                = 1.0/4.0
-    conv_sed_ocn(io_FeS,is_FeS2)                = 1.0
-    conv_sed_ocn(io_Fe2,is_FeS2)                = 0.0!1.0
+    conv_sed_ocn(io_FeS,is_FeS2)                = 0.0
+    conv_sed_ocn(io_Fe2,is_FeS2)                = 1.0
     conv_sed_ocn(io_ALK,is_FeS2)                = -2.0/4.0
-    conv_sed_ocn(io_H2S_34S,is_FeS2_34S)        = 3.0/4.0!7.0/4.0
-    conv_sed_ocn(io_FeS_34S,is_FeS2_34S)        = 1.0
+    conv_sed_ocn(io_H2S_34S,is_FeS2_34S)        = 7.0/4.0
+    conv_sed_ocn(io_FeS_34S,is_FeS2_34S)        = 0.0
     conv_sed_ocn(io_SO4_34S,is_FeS2_34S)        = 1.0/4.0
-    conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 1.0
-    conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 0.0!1.0
+    conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 0.0
+    conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 1.0
     conv_sed_ocn(io_Fe,is_FeOOH)                = 1.0
     conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)      = 1.0
-    conv_sed_ocn(io_O2,is_FeOOH)                = 1.0
+    conv_sed_ocn(io_O2,is_FeOOH)                = 0.0!1.0
     ! convert dissolved species -> solid
     conv_ocn_sed(:,:) = 0.0
     conv_ocn_sed(is_POC,io_DIC)              = 1.0/conv_sed_ocn(io_DIC,is_POC)
