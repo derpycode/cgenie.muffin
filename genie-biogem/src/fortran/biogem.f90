@@ -1447,12 +1447,24 @@ subroutine biogem(        &
               if (ctrl_bio_CaCO3precip .AND. sed_select(is_CaCO3)) then
                  call sub_calc_bio_uptake_abio(i,j,loc_k1,loc_dtyr)
               end if
+              ! *** simple oxic iron cycle ***
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
+                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+              end if
+              if (sed_select(is_FeOOH) .AND. ocn_select(io_Fe)) then
+                 call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
+              end if
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
-                 call sub_calc_form_FeS(i,j,loc_k1,loc_dtyr)
+                if (ctrl_bio_FeS2precip_explicit) then
+                   call sub_calc_form_FeS(i,j,loc_k1,loc_dtyr)
+                end if   
               end if
-              ! if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
-                 ! call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
+                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
+              end if
+               ! if (ocn_select(io_Fe2) .AND. sed_select(is_FeOOH) .AND. ocn_select(io_H2S)) then
+                 ! call sub_box_reduce_FeOOH(i,j,loc_k1,loc_dtyr)
               ! end if
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
