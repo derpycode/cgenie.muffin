@@ -289,9 +289,9 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
-  real::par_bio_remin_POC_eL0		! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
-  real::par_bio_remin_POC_size0		! JDW size-dependent remin: diameter of smallest ecogem size class (um)
-  real::par_bio_remin_POC_eta		! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
+  real::par_bio_remin_POC_eL0                                    ! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
+  real::par_bio_remin_POC_size0                                  ! JDW size-dependent remin: diameter of smallest ecogem size class (um)
+  real::par_bio_remin_POC_eta                                    ! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
   NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta
   ! kinetics
   real::par_bio_remin_k_O2
@@ -625,8 +625,6 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_audit,ctrl_audit_fatal
   real::par_misc_audit_relerr                                    ! threshold of relative inventory change to trigger audit error
   NAMELIST /ini_biogem_nml/par_misc_audit_relerr
-  LOGICAL::ctrl_debug_reportwarnings                             ! report all run-time warnings?
-  NAMELIST /ini_biogem_nml/ctrl_debug_reportwarnings
   LOGICAL::ctrl_debug_lvl0                                       ! report 'level #0' debug?
   LOGICAL::ctrl_debug_lvl1                                       ! report 'level #1' debug?
   LOGICAL::ctrl_debug_lvl2                                       ! report 'level #2' debug?

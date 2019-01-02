@@ -14,8 +14,10 @@ subroutine biogem(        &
      & )
   use omp_lib
   use gem_carbchem
+  use gem_geochem
   USE biogem_lib
   USE biogem_box
+  USE biogem_box_geochem
   USE biogem_data
   USE biogem_data_ascii
   IMPLICIT NONE
@@ -2797,7 +2799,7 @@ SUBROUTINE diag_biogem_timeslice( &
                        IF (n_k >= loc_k1) THEN
                           DO k=loc_k1,n_k
                              loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
-                                  & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k) &
+                                  & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k),par_K_FeL &
                                   & )
                              diag_Fe(idiag_Fe_Fe,i,j,k)  = loc_FeFeLL(1)
                              diag_Fe(idiag_Fe_FeL,i,j,k) = loc_FeFeLL(2)

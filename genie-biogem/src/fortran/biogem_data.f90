@@ -455,7 +455,6 @@ CONTAINS
        print*,'Audit tracer inventory?                             : ',ctrl_audit
        print*,'Halt on audit fail?                                 : ',ctrl_audit_fatal
        print*,'Max allowed relative tracer inventory change        : ',par_misc_audit_relerr
-       print*,'Report all run-time warnings?                       : ',ctrl_debug_reportwarnings
        print*,'Report level #0 debug?                              : ',ctrl_debug_lvl0
        print*,'Report level #1 debug?                              : ',ctrl_debug_lvl1
        print*,'Report level #2 debug?                              : ',ctrl_debug_lvl2
@@ -984,6 +983,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! UPDATE RELATIONSHIPS BETWEEN TRACERS
   ! NOTE: the reverse transformation array <conv_ocn_sed> was never used and hence is no longer updated here
+  !       (01/01/2019 UPDATE: as has now been removed entirely ...) 
   ! NOTE: update the basic oxic transformation (<conv_sed_ocn>) first:
   !       this is used to create particulate matter (e.g. biological uptake) as well as in the tracer auditing calculations
   SUBROUTINE sub_data_update_tracerrelationships()

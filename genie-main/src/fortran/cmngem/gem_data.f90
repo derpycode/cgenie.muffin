@@ -51,6 +51,7 @@ if (ctrl_debug_init > 0) then
     print*,'Debug (initialization) level                        : ',ctrl_debug_init
     print*,'Debug (loop) level                                  : ',ctrl_debug_loop
     print*,'Debug (end) level                                   : ',ctrl_debug_end
+    print*,'Report all run-time warnings?                       : ',ctrl_debug_reportwarnings
     ! --- I/O: DIRECTORY DEFINITIONS --------------------------------------------------------------------------------------------- !
     print*,'--- I/O: DIRECTORY DEFINITIONS ---'
     print*,'Input dir. name                                     : ',trim(par_gem_indir_name)

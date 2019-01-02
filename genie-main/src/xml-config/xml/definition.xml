@@ -1291,6 +1291,10 @@
                         <value datatype="integer">0</value>
                         <description></description>
                     </param>
+                    <param name="ctrl_debug_reportwarnings">
+                        <value datatype="boolean">.false.</value>
+                        <description>Report all run-time warnings?</description>
+                    </param>
 <!-- I/O DIRECTORY DEFINITIONS -->
                     <param name="par_gem_indir_name">
                         <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-main<sep/>data<sep/>input</value>
@@ -5206,10 +5210,6 @@
                     <param name="par_misc_audit_relerr">
 			<value datatype="real">1.0E-08</value>
                         <description>threshold of relative inventory change to trigger audit error</description>
-                    </param>
-                    <param name="ctrl_debug_reportwarnings">
-			<value datatype="boolean">.false.</value>
-                        <description>report all run-time warnings?</description>
                     </param>
                     <param name="ctrl_debug_lvl0">
 			<value datatype="boolean">.true.</value>
