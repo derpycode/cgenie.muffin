@@ -1,0 +1,10 @@
+OUTROOT=/home/portabello/cgenie_output
+CODEDIR=/home/portabello/cgenie.muffin
+RUNTIME_ROOT=../../cgenie.muffin
+RUNTIME_OUTDIR=.
+EXPID=181214_GMD_mod_schmidtEXP_10Tmol_SPIN
+FIXEDATMOSFILE=data_fixedatmos
+GLIMMERFILE=data_glimmer.config
+igcm_module=genie-igcm
+BFGROOT=EMPTY
+MODULE_NAMES='embm goldstein goldsteinseaice biogem atchem '

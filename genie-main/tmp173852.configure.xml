@@ -4070,10 +4070,6 @@
 			<value datatype="real">0.125E-9</value>
                         <description>Ridgwell [2001] -- opal:POC offset for FeT (mol kg-1)</description>
                     </param>
-                    <param name="opt_bio_red_SitoC">
-			<value datatype="string">Ridgwell2001</value>
-                        <description>opal:POC rain ratio option ID string</description>
-                    </param>
 <!-- REMINERALIZATION  -->
                     <param name="par_bio_remin_RDOMfrac">
 			<value datatype="real">0.0</value>
@@ -4343,18 +4339,6 @@
                         <value datatype="real">0.0</value>
                         <description>Hard threshold for sulphate reduction (mol kg-1)</description>
                     </param>
-                    <param name="par_bio_remin_POC_eL0">
-						<value datatype="real">187.5</value>
-                        <description>e-folding depth of smallest ecogem size class (m)</description>
-                    </param>
-                	<param name="par_bio_remin_POC_size0">
-						<value datatype="real">0.6</value>
-                        <description>diameter of smallest ecogem size class (um)</description>
-                    </param>
-                    <param name="par_bio_remin_POC_eta">
-						<value datatype="real">1.17</value>
-                        <description>exponent relating e-folding depth to ecogem size class [Stemmann et al 2004]</description>
-                    </param>
 <!-- kinetics -->
                     <param name="par_bio_remin_k_O2">
                         <value datatype="real">1.0</value>
@@ -4446,10 +4430,6 @@
                     <param name="opt_d13C_DIC_Corg">
 			<value datatype="string">Ridgwell2001</value>
                         <description>Corg 13C fractionation scheme ID string [alt: 'Poppetal']</description>
-                    </param>
-                    <param name="opt_d44Ca_Ca_CaCO3">
-			<value datatype="string">FIXED</value>
-                        <description>CaCO3 44Ca fractionation scheme ID string [alt: 'Fantle']</description>
                     </param>
                     <param name="par_d13C_DIC_Corg_b">
                        <value datatype="real">171.0</value>
@@ -6262,19 +6242,19 @@
                         <value datatype="real">0.338</value>
                         <description>atmospheric CH4 oxidation exponent</description>
                    </param>
-                   <param name="par_pCH4_oxidation_a1">
+                   <param name="par_pCH4_oxidation_a1"
                         <value datatype="real">-7.929E01</value>
                         <description>first linear term for 2-term exponential fit</description>
                    </param>
-                   <param name="par_pCH4_oxidation_a2">
+                   <param name="par_pCH4_oxidation_a2"
                         <value datatype="real">-1.090E-02</value>
                         <description>first exponential term for 2-term exponential fit</description>
                    </param>
-                   <param name="par_pCH4_oxidation_b1">
+                   <param name="par_pCH4_oxidation_b1"
                         <value datatype="real">8.823E01</value>
                         <description>second linear term for 2-term exponential fit</description>
                    </param>
-                   <param name="par_pCH4_oxidation_b2">
+                   <param name="par_pCH4_oxidation_b2"
                         <value datatype="real">-2.690E-03</value>
                         <description>second exponential term for 2-term exponential fit</description>
                    </param>
@@ -7011,10 +6991,6 @@
 			<value datatype="boolean">.TRUE.</value>
 	                  <description>short circuit atmosphere by not taking CO2 directly, instead have less DIC put into ocean.</description>
                     </param>
-	           <param name="opt_weather_runoff">
-			<value datatype="boolean">.FALSE.</value>
-                        <description>scale (global) weathering with runoff</description>
-                    </param>
 	           <param name="par_weathopt">
 			<value datatype="string">Global_avg</value>
                         <description>weathering scheme ID string ('Global_avg','GKWM',or 'GEM-CO2')</description>
@@ -7204,36 +7180,20 @@
                     </param>
                     <param name="par_weather_CaSiO3_fracFeS2_d34S">
 			<value datatype="real">0.0</value>
-			      <description>global pyrite d34S (o/oo)</description>
-                    </param>
-                    <param name="par_weather_CaSiO3_fracFeS2_d56Fe">
-			<value datatype="real">0.0</value>
-			      <description>global pyrite d56Fe (o/oo)</description>
-                    </param>    
+			      <description>global silicate d34S (o/oo)</description>
+                    </param>               
                     <param name="par_weather_CaCO3_fracCaSO4">
 			<value datatype="real">0.0</value>
 			      <description>global carbonate gypsum abundance</description>
                     </param>
                     <param name="par_weather_CaCO3_fracCaSO4_d34S">
 			<value datatype="real">0.0</value>
-			      <description>global gypsum d34S (o/oo)</description>
+			      <description>global carbonate d34S (o/oo)</description>
                     </param>
                     <param name="par_weather_CaCO3_fracCaSO4_d44Ca">
 			<value datatype="real">0.0</value>
-			      <description>global gypsum d44Ca (o/oo)</description>
-                    </param>
-                    <param name="par_weather_CaCO3_fracFeCO3">
-			<value datatype="real">0.0</value>
-			      <description>global carbonate siderite abundance</description>
-                    </param>
-                    <param name="par_weather_CaCO3_fracFeCO3_d56Fe">
-			<value datatype="real">0.0</value>
-			      <description>global siderite d56Fe (o/oo)</description>
-                    </param>
-                    <param name="par_weather_CaCO3_fracFeCO3_d13C">
-			<value datatype="real">0.0</value>
-			      <description>global siderite d13C (o/oo)</description>
-                    </param>
+			      <description>global carbonate d44Ca (o/oo)</description>
+                    </param>                   
                     <param name="par_weather_CaSiO3_fracLi">
 			<value datatype="real">10.00E-6</value>
 			      <description>global silicate Li abundance</description>
@@ -7309,14 +7269,6 @@
                     <param name="par_weather_CaCO3_d88Sr">
 			<value datatype="real">0.16</value>
                         <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
-                    </param>
-                    <param name="par_weather_CaSiO3_fracCa5PO43">
-			<value datatype="real">0.0</value>
-			      <description>global silicate apatite abundance</description>
-                    </param>
-                    <param name="par_weather_CaSiO3_fracCa5PO43_d44Ca">
-			<value datatype="real">0.0</value>
-			      <description>global apatite d44Ca (o/oo)</description>
                     </param>
                     <param name="par_weather_Ca0PO41">
 				<value datatype="real">0.0</value>
@@ -7498,14 +7450,6 @@
                     <param name="fundamental">
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
-                    </param>
-                    <param name="ctrl_limit_neg_biomass">
-                      <value datatype="boolean">.FALSE.</value>
-                      <description></description>
-                    </param>
-                    <param name="ctrl_force_T"> 
-                      <value datatype="boolean">.FALSE.</value>
-                      <description>Force ecogem with a temperature field</description>
                     </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
@@ -7840,10 +7784,6 @@
 			<value datatype="real">0.03</value>
 	                  <description>Light attenuation by chlorophyll a</description>
                     </param>
-                    <param name="ctrl_restrict_mld">
-			<value datatype="boolean">.false.</value>
-	                  <description>restrict MLD for mean light calculation?</description>
-                    </param>
        <!-- Grazing parameters -->  
                     <param name="trophic_tradeoff">
 			<value datatype="real">1.0</value>
@@ -7964,11 +7904,7 @@
                     <param name="temp_T0">
 			<value datatype="real">20.0</value>
 	                  <description>Reference temperature</description>
-                    </param>
-                    <param name="temp_max">
-			<value datatype="real">99.9</value>
-	                  <description>Maximum applied temperature</description>
-                    </param>                  
+                    </param>  
 <!-- INORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POC_CaCO3">
 			<value datatype="real">0.0285</value>
@@ -8045,10 +7981,6 @@
                     <param name="par_ncrst_name">
 			<value datatype="string">_restart.nc</value>
                         <description>netCDF restart file name</description>
-                    </param>
-                    <param name="par_ecogem_force_T_file">
-			<value datatype="string">temperature.dat</value>
-		     			<description>Input file for forcing temperature in ecogem</description>
                     </param>
                 </namelist>
             </file>
