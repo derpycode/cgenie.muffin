@@ -1261,7 +1261,7 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
-                        <param name="sed_select(95)" index="96">
+                        <param name="sed_select(95)" index="95">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
@@ -1314,6 +1314,10 @@
                     <param name="ctrl_debug_loop">
                         <value datatype="integer">0</value>
                         <description></description>
+                    </param>
+                    <param name="ctrl_debug_reportwarnings">
+                        <value datatype="boolean">.false.</value>
+                        <description>Report all run-time warnings?</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS -->
                     <param name="par_gem_indir_name">
@@ -4885,7 +4889,7 @@
                         <description>Rate law power for FeCO3 precipitation</description>
                     </param>
                     <param name="par_bio_FeCO3precip_abioticohm_cte">
-			<value datatype="real">3.5e-10</value>
+			<value datatype="real">1.58e-11</value>
                         <description>Ohmega constant for FeCO3 precip</description>
                     </param>
                     <param name="par_bio_FeCO3precip_abioticohm_min">
@@ -4893,12 +4897,64 @@
                         <description>Minimum ohmega threshold for precip</description>
                     </param>
                     <param name="par_d56Fe_FeCO3_alpha">
-			<value datatype="real">1.00048</value>
+			<value datatype="real">1.0005</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
+                    </param>
+                    <param name="ctrl_bio_FeOOHprecip_explicit">
+			<value datatype="boolean">.true.</value>
+                        <description>precipitate FeOOH explicit?</description>
+                    </param>
+                    <param name="par_bio_remin_kFetoFe2">
+			<value datatype="real">7.0e+07</value>
+                        <description>kinetic constant for Fe reduction using sulphide in M-1 yr-1</description>
+                    </param>
+                    <param name="par_bio_remin_kFeOOHtoFe2">
+			<value datatype="real">4032.3</value>
+                        <description>kinetic constant for FeOOH reduction using sulphide in M-1 yr-1</description>
+                    </param>
+                    <param name="par_d34S_Fered_alpha">
+			<value datatype="real">0.9982</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_d56Fe_Fered_alpha">
+			<value datatype="real">1.002</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_d56Fe_FeOOH_alpha">
+			<value datatype="real">1.000</value>
+                        <description>fractionation factor d56/54 Fe during FeOOH precipitation</description>
+                    </param>
+                    <param name="par_bio_remin_kFe2toFe">
+			<value datatype="real">1.0e+09</value>
+                        <description>kinetic constant for Fe2 re-oxidation in M-1 yr-1</description>
+                    </param>
+                    <param name="par_d56Fe_Fe2ox_alpha">
+			<value datatype="real">0.9991</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_bio_FeS_sf">
+			<value datatype="real">1.0e+04</value>
+                        <description>Scale factor for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_exp">
+			<value datatype="real">1.0</value>
+                        <description>Rate law power for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_abioticohm_min">
+			<value datatype="real">8.3e-6</value>
+                        <description>Ohmega constant for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_abioticohm_min">
+			<value datatype="real">1.0</value>
+                        <description>Minimum ohmega threshold for precip</description>
                     </param>
                     <param name="par_bio_FeS2precip_k">
 			<value datatype="real">3250.43</value>
                         <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
+                    </param>
+                    <param name="K_lim_PYR">
+			<value datatype="real">0.0</value>
+                        <description>MM type limiting factor for FeS2 precipitation</description>
                     </param>
                     <param name="par_d56Fe_FeS2_alpha">
 			<value datatype="real">1.0022</value>
@@ -4907,6 +4963,10 @@
                     <param name="par_d34S_FeS2_alpha">
 			<value datatype="real">1</value>
                         <description>fractionation factor d34/32 S in FeS2 precipitation</description>
+                    </param>
+                    <param name="ctrl_bio_FeS2precip_explicit">
+			<value datatype="boolean">.false.</value>
+                        <description>Explicit FeS2 precip stiochiometry?</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
@@ -5198,10 +5258,6 @@
                     <param name="par_misc_audit_relerr">
 			<value datatype="real">1.0E-08</value>
                         <description>threshold of relative inventory change to trigger audit error</description>
-                    </param>
-                    <param name="ctrl_debug_reportwarnings">
-			<value datatype="boolean">.false.</value>
-                        <description>report all run-time warnings?</description>
                     </param>
                     <param name="ctrl_debug_lvl0">
 			<value datatype="boolean">.true.</value>

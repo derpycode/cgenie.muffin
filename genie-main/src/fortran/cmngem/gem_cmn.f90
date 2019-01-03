@@ -49,6 +49,8 @@ MODULE gem_cmn
   NAMELIST /ini_gem_nml/ctrl_carbchem_fail
   integer::ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end               ! 
   NAMELIST /ini_gem_nml/ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end
+  logical::ctrl_debug_reportwarnings                                    ! Report all run-time warnings?
+  NAMELIST /ini_gem_nml/ctrl_debug_reportwarnings
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
   CHARACTER(len=127)::par_gem_indir_name                                ! 
   NAMELIST /ini_gem_nml/par_gem_indir_name
@@ -413,45 +415,45 @@ MODULE gem_cmn
   INTEGER,DIMENSION(n_ocn)::io2l
   INTEGER,DIMENSION(n_sed)::is2l
   ! tracer conversion - transformation ratios
-  real,DIMENSION(n_sed,n_ocn)::conv_ocn_sed
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn
-  real,DIMENSION(n_atm,n_ocn)::conv_ocn_atm
   real,DIMENSION(n_ocn,n_atm)::conv_atm_ocn
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_O                           ! tracer conversion array for oxic conditions
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N                           ! tracer conversion array for N-reduction redox conditions
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_S                           ! tracer conversion array for S-reduction redox conditions
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_meth                        ! tracer conversion array for methanogenesis
   real,DIMENSION(n_sed,n_ocn)::conv_DOM_POM
   real,DIMENSION(n_ocn,n_sed)::conv_POM_DOM
   real,DIMENSION(n_sed,n_ocn)::conv_RDOM_POM
   real,DIMENSION(n_ocn,n_sed)::conv_POM_RDOM
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N                           ! tracer conversion array for N-reduction redox conditions
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_S                           ! tracer conversion array for S-reduction redox conditions
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_meth                        ! tracer conversion array for methanogenesis
   ! tracer conversion -- transformation ratios -- compaxt index format
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo
   real,DIMENSION(:,:),ALLOCATABLE::conv_lD_lP
   real,DIMENSION(:,:),ALLOCATABLE::conv_lP_lD
   real,DIMENSION(:,:),ALLOCATABLE::conv_lRD_lP
   real,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD
+  real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_O                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_N                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_S                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_meth                        ! 
   ! tracer conversion - indices for non-zero transformation ratio values
   ! NOTE: the zero index place in the array is used in algorithms identifying null relationships (or something)
-  integer,DIMENSION(0:n_sed,0:n_ocn)::conv_ocn_sed_i
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! tracer (remin) conversion array for oxygenic conditions
-  integer,DIMENSION(0:n_atm,0:n_ocn)::conv_ocn_atm_i
   integer,DIMENSION(0:n_ocn,0:n_atm)::conv_atm_ocn_i
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! 
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_O                  ! tracer conversion array for oxic conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_S                  ! tracer conversion array for S-reduction redox conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_meth               ! tracer conversion array for methanogenesis
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_DOM_POM_i
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_POM_DOM_i
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_RDOM_POM_i
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_POM_RDOM_i
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_S                  ! tracer conversion array for S-reduction redox conditions
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_meth               ! tracer conversion array for methanogenesis
   ! tracer conversion -- transformation ratios -- compaxt index format
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i                ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_lD_lP_i                ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lD_i                ! 
-  integer,DIMENSION(:,:),ALLOCATABLE::conv_lRD_lP_i                ! 
-  integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD_i                ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lRD_lP_i               ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD_i               ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_O              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_N              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_S              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_meth           ! 

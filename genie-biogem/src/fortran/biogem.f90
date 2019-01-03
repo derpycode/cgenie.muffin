@@ -14,8 +14,10 @@ subroutine biogem(        &
      & )
   use omp_lib
   use gem_carbchem
+  use gem_geochem
   USE biogem_lib
   USE biogem_box
+  USE biogem_box_geochem
   USE biogem_data
   USE biogem_data_ascii
   IMPLICIT NONE
@@ -1443,12 +1445,33 @@ subroutine biogem(        &
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN ABIOTIC PRECIPITATION ***'
               ! *** OCEAN ABIOTIC PRECIPITATION ***
+              ! *** Ca-CO3 cycling ***
               if (ctrl_bio_CaCO3precip .AND. sed_select(is_CaCO3)) then
                  call sub_calc_bio_uptake_abio(i,j,loc_k1,loc_dtyr)
               end if
+              ! *** simple oxic iron cycle ***
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
+                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+              end if
+              if (sed_select(is_FeOOH) .AND. ocn_select(io_Fe)) then
+                 call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
+              end if
+              ! *** Fe-S cycling ***
+              if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
+                if (ctrl_bio_FeS2precip_explicit) then
+                   call sub_calc_form_FeS(i,j,loc_k1,loc_dtyr)
+                end if   
+              end if
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
+                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
+              end if
+               ! if (ocn_select(io_Fe2) .AND. sed_select(is_FeOOH) .AND. ocn_select(io_H2S)) then
+                 ! call sub_box_reduce_FeOOH(i,j,loc_k1,loc_dtyr)
+              ! end if
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
               end if
+              ! *** Fe-CO3 cycling ***
               if (sed_select(is_FeCO3)) then
                  call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
               end if
@@ -2776,7 +2799,7 @@ SUBROUTINE diag_biogem_timeslice( &
                        IF (n_k >= loc_k1) THEN
                           DO k=loc_k1,n_k
                              loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
-                                  & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k) &
+                                  & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k),par_K_FeL &
                                   & )
                              diag_Fe(idiag_Fe_Fe,i,j,k)  = loc_FeFeLL(1)
                              diag_Fe(idiag_Fe_FeL,i,j,k) = loc_FeFeLL(2)

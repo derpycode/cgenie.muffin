@@ -10,7 +10,6 @@ MODULE biogem_data_ascii
 
   USE biogem_lib
   USE biogem_box
-  USE biogem_data_netCDF
   IMPLICIT NONE
   SAVE
 
@@ -3196,6 +3195,85 @@ CONTAINS
     end if
 
   END SUBROUTINE sub_echo_maxmin
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! Copy of GOLDSTEIn overturning streamfunction calculation
+  SUBROUTINE sub_calc_psi(dum_u,dum_opsi,dum_opsia,dum_opsip,dum_zpsi,dum_opsia_minmax,dum_opsip_minmax)
+    ! dummy arguments
+    REAL,INTENT(in),DIMENSION(3,n_i,n_j,n_k)::dum_u
+    REAL,INTENT(out),DIMENSION(0:n_j,0:n_k)::dum_opsi,dum_opsia,dum_opsip,dum_zpsi
+    REAL,INTENT(out),DIMENSION(2)::dum_opsia_minmax,dum_opsip_minmax
+    ! local variables
+    INTEGER::i,j,k
+    REAL::loc_ominp,loc_omaxp
+    REAL::loc_omina,loc_omaxa
+    REAL,DIMENSION(n_j,n_k)::loc_ou,loc_zu
+    REAL,DIMENSION(0:n_j,0:n_k)::loc_opsi,loc_opsia,loc_opsip,loc_zpsi
+    ! Calculate meridional overturning streamfunction opsi on C grid only
+    loc_opsi(:,:)  = 0.0
+    loc_opsia(:,:) = 0.0
+    loc_opsip(:,:) = 0.0
+    DO j=1,n_j-1
+       DO k=1,n_k-1
+          loc_ou(j,k) = 0.0
+          DO i=1,n_i
+             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
+          END DO
+          loc_opsi(j,k) = loc_opsi(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
+       END DO
+    END DO
+    ! Pacific overturning streamfunction
+    loc_ominp = 0.0
+    loc_omaxp = 0.0
+    DO j=goldstein_jsf+1,n_j-1
+       DO k=1,n_k-1
+          loc_ou(j,k) = 0.0
+          DO i=goldstein_ips(j),goldstein_ipf(j)
+             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
+          ENDDO
+          loc_opsip(j,k) = loc_opsip(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
+          IF(loc_opsip(j,k) < loc_ominp) loc_ominp = loc_opsip(j,k)
+          IF(loc_opsip(j,k) > loc_omaxp) loc_omaxp = loc_opsip(j,k)
+       ENDDO
+    ENDDO
+    dum_opsip_minmax(1) = loc_ominp
+    dum_opsip_minmax(2) = loc_omaxp
+    ! Atlantic overturning streamfunction
+    ! NOTE: Atlantic calculation hacked so that only the deeper 1/2 of the maximum is calculated
+    loc_omina = 0.0
+    loc_omaxa = 0.0
+    DO j=goldstein_jsf+1,n_j-1
+       DO k=1,n_k-1
+          loc_ou(j,k) = 0.0
+          DO i=goldstein_ias(j),goldstein_iaf(j)
+             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
+          ENDDO
+          loc_opsia(j,k) = loc_opsia(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
+          IF((loc_opsia(j,k) < loc_omina) .AND. (k <= n_k/2)) loc_omina = loc_opsia(j,k)
+          IF((loc_opsia(j,k) > loc_omaxa) .AND. (k <= n_k/2)) loc_omaxa = loc_opsia(j,k)
+       ENDDO
+    ENDDO
+    dum_opsia_minmax(1) = loc_omina
+    dum_opsia_minmax(2) = loc_omaxa
+    !
+    loc_zpsi(:,:) = 0.0
+    DO i=1,n_i-1
+       DO k=1,n_k-1
+          loc_zu(i,k) = 0
+          DO j=1,n_j
+             loc_zu(i,k) = loc_zu(i,k) + dum_u(1,i,j,k)/goldstein_c(j)*goldstein_ds
+          ENDDO
+          loc_zpsi(i,k) = loc_zpsi(i,k-1) - goldstein_dz(k)*loc_zu(i,k)
+       ENDDO
+    ENDDO
+    ! set results arrays
+    dum_opsi(1:n_j,1:n_k)  = loc_opsi(1:n_j,1:n_k)
+    dum_opsia(1:n_j,1:n_k) = loc_opsia(1:n_j,1:n_k)
+    dum_opsip(1:n_j,1:n_k) = loc_opsip(1:n_j,1:n_k)
+    dum_zpsi(1:n_j,1:n_k)  = loc_zpsi(1:n_j,1:n_k)
+  END SUBROUTINE sub_calc_psi
   ! ****************************************************************************************************************************** !
 
 
