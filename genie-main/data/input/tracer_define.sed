@@ -31,6 +31,9 @@
  POM_S_34S        74  73  15  'POM scavenged S-34S'                  'o/oo'   -9.99E+2    9.99E+2
  POM_BaSO4        82  03  07  'POM scavenged BaSO4'                  'wt%'     0.00     100.00
  POM_BaSO4_138Ba  83  82  23  'POM scavenged BaSO4-138Ba'            'o/oo'   -9.99E+2    9.99E+2
+ POM_Os           97  03  07  'POM scavenged Os'                     'wt%'     0.00     100.00
+ POM_Os_187Os     98  97  26  'POM scavenged Os-187Os'               'o/oo'   -9.99E+2    9.99E+2
+ POM_Os_188Os     99  97  27  'POM scavenged Os-188Os'               'o/oo'   -9.99E+2    9.99E+2
  CaCO3            14  14  01  'calcium carbonate (CaCO3)'            'wt%'     0.00     100.00
  CaCO3_13C        15  14  11  'd13C of CaCO3'                        'o/oo'   -9.99E+2    9.99E+2
  CaCO3_14C        16  14  12  'd14C of CaCO3'                        'o/oo'   -9.99E+5    9.99E+5

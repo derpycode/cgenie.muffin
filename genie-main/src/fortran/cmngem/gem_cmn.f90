@@ -22,8 +22,8 @@ MODULE gem_cmn
   ! WARNING: these values must be duplicated in genie_control.f90
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
   INTEGER,PARAMETER::n_atm =  19
-  INTEGER,PARAMETER::n_ocn = 104
-  INTEGER,PARAMETER::n_sed =  96
+  INTEGER,PARAMETER::n_ocn = 107
+  INTEGER,PARAMETER::n_sed =  99
 
 
   ! ****************************************************************************************************************************** !
@@ -171,10 +171,13 @@ MODULE gem_cmn
   INTEGER,PARAMETER::io_Sr                                = 98  ! 
   INTEGER,PARAMETER::io_Sr_87Sr                           = 99  ! 
   INTEGER,PARAMETER::io_Sr_88Sr                           = 100  ! 
-  INTEGER,PARAMETER::io_FeS                               = 101    ! 
-  INTEGER,PARAMETER::io_FeS_56Fe                          = 102    ! 
-  INTEGER,PARAMETER::io_FeS_34S                           = 103    ! 
-  INTEGER,PARAMETER::io_H20                               = 104  ! 
+  INTEGER,PARAMETER::io_FeS                               = 101   ! 
+  INTEGER,PARAMETER::io_FeS_56Fe                          = 102   ! 
+  INTEGER,PARAMETER::io_FeS_34S                           = 103   ! 
+  INTEGER,PARAMETER::io_Os                                = 104   ! 
+  INTEGER,PARAMETER::io_Os_187Os                          = 105   ! 
+  INTEGER,PARAMETER::io_Os_188Os                          = 106   ! 
+  INTEGER,PARAMETER::io_H20                               = 107   ! 
   ! atmospheric tracer indices
   INTEGER,PARAMETER::ia_T                                 = 01    ! temperature
   INTEGER,PARAMETER::ia_q                                 = 02    ! specific humidity
@@ -224,6 +227,9 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_POM_S_34S                         = 74    !  
   INTEGER,PARAMETER::is_POM_BaSO4                         = 82    ! 
   INTEGER,PARAMETER::is_POM_BaSO4_138Ba                   = 83    !  
+  INTEGER,PARAMETER::is_POM_Os                            = 97    ! 
+  INTEGER,PARAMETER::is_POM_Os_187Os                      = 98    !  
+  INTEGER,PARAMETER::is_POM_Os_188Os                      = 99    !  
   INTEGER,PARAMETER::is_CaCO3                             = 14    ! 
   INTEGER,PARAMETER::is_CaCO3_13C                         = 15    ! 
   INTEGER,PARAMETER::is_CaCO3_14C                         = 16    ! 

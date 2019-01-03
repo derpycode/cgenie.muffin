@@ -159,7 +159,11 @@ CONTAINS
     conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 1.0
     conv_sed_ocn(io_Fe,is_FeOOH)                = 1.0
     conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)      = 1.0
-!!!    conv_sed_ocn(io_O2,is_FeOOH)                = 0.0 !1.0
+    conv_sed_ocn(io_O2,is_FeOOH)                = 0.0 !1.0
+    conv_sed_ocn(io_O2,is_FeOOH)                = 1.0
+    conv_sed_ocn(io_Os,is_POM_Os)               = 1.0
+    conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)   = 1.0
+    conv_sed_ocn(io_Os_188Os,is_POM_Os_188Os)   = 1.0
     ! ############################################################################################################################ !
     ! DISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between DOM and POM

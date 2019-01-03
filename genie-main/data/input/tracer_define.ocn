@@ -96,6 +96,9 @@
  TDFe             90  90  01  'total dissolved Fe'                      'mol kg-1'   -9.99E+2    9.99E-1
  TDFe_56Fe        91  90  22  '56Fe of total dissolved Fe'              'o/oo'       -9.99E+2    9.99E+2
  TL               42  42  01  'total dissolved ligand'                  'mol kg-1'   -9.99E+2    9.99E-1
+ FeS             101 101  01  'dissolved Iron(II) sulfide'              'mol kg-1'   -9.99E+2    9.99E-1
+ FeS_56Fe        102 101  22  'd56Fe of FeS'                            'o/oo'       -9.99E+2    9.99E+2
+ FeS_34S         103 101  15  'd34S of FeS'                             'o/oo'       -9.99E+2    9.99E+2
  I                92  92  01  'iodide'                                  'mol kg-1'   -9.99E+2    9.99E-1
  IO3              93  93  01  'iodate'                                  'mol kg-1'   -9.99E+2    9.99E-1
  Ba               96  96  01  'dissolved barium (Ba)'                   'mol kg-1'   -9.99E+2    9.99E-1
@@ -103,10 +106,10 @@
  Sr               98  98  01  'dissolved strontium (Sr)'                'mol kg-1'   -9.99E+2    9.99E-1
  Sr_87Sr          99  98  24  '87Sr of Sr'                              'o/oo'       -9.99E+2    9.99E+2
  Sr_88Sr         100  98  25  '88Sr of Sr'                              'o/oo'       -9.99E+2    9.99E+2
- FeS             101 101  01  'dissolved Iron(II) sulfide'              'mol kg-1'   -9.99E+2    9.99E-1
- FeS_56Fe        102 101  22  'd56Fe of FeS'                            'o/oo'       -9.99E+2    9.99E+2
- FeS_34S         103 101  15  'd34S of FeS'                             'o/oo'       -9.99E+2    9.99E+2
- H2O             104 101  01  'water! (H2O) (why?)'                     'mol kg-1'   0.0       55.55
+ Os              104 104  01  'dissolved osmium (Os)'                   'mol kg-1'   -9.99E+2    9.99E-1
+ Os_187Os        105 104  26  '187Os of Os'                             'o/oo'       -9.99E+2    9.99E+2
+ Os_188Os        106 104  27  '188Os of Os'                             'o/oo'       -9.99E+2    9.99E+2
+ H2O             107 107  01  'water! (H2O) (why?)'                     'mol kg-1'    0.0       55.55
 -END-OF-DATA-
 
  /\               /\  /\  /\  /\                                        /\          /\         /\
