@@ -117,6 +117,43 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   
   ! ****************************************************************************************************************************** !
+  ! OXIDIZE CH4 -- 2-TERM EXPONENTIAL FIT TO 2-D PHOTOCHEMISTRY MODEL OF SCHMIDT & SHINDELL [2003] (CTR|12-2018)
+  SUBROUTINE sub_calc_oxidize_CH4_schmidt03_exp(dum_i,dum_j,dum_dtyr)
+    IMPLICIT NONE
+    ! dummy arguments
+    INTEGER,INTENT(in)::dum_i,dum_j
+    real,intent(in)::dum_dtyr
+    ! local variables
+    real::loc_tau
+    real::loc_fracdecay
+    real::loc_CH4
+    
+    ! *** CALCULATE LOCAL CONSTANTS ***
+    ! atmospheric lifetime from Schmidt & Shindell [2003]
+    ! NOTE1: restrict lifetime calculation to 1.0*CH4(0) at the lower end (limit of calibration curve)
+    ! NOTE2: strictly, calibration curve ends at 200.0*CH4(0) in Schmidt & Shindell [2003]
+    ! NOTE3: 2-term exponential fit saturated at 160.0*CH4(0)
+    ! NOTE4: 2-D model includes HOx-NOx-Ox-CO-CH4 chemistry
+    loc_CH4 = atm(ia_pCH4,dum_i,dum_j)
+    if (loc_CH4 < par_pCH4_oxidation_C0) loc_CH4 = par_pCH4_oxidation_C0
+    loc_tau = min(                                                                                     &
+                  &   par_pCH4_oxidation_a1*exp((loc_CH4/par_pCH4_oxidation_C0)*par_pCH4_oxidation_a2) &
+                  & + par_pCH4_oxidation_b1*exp((loc_CH4/par_pCH4_oxidation_C0)*par_pCH4_oxidation_b2) &
+                  & , 43.51)
+    loc_fracdecay = dum_dtyr/loc_tau
+    
+    ! *** ATMOSPHERIC CH4->CO2 ***
+    atm(ia_pO2,dum_i,dum_j)      = atm(ia_pO2,dum_i,dum_j)      - 2.0*loc_fracdecay*atm(ia_pCH4,dum_i,dum_j)
+    atm(ia_pCO2,dum_i,dum_j)     = atm(ia_pCO2,dum_i,dum_j)     + loc_fracdecay*atm(ia_pCH4,dum_i,dum_j)
+    atm(ia_pCO2_13C,dum_i,dum_j) = atm(ia_pCO2_13C,dum_i,dum_j) + loc_fracdecay*atm(ia_pCH4_13C,dum_i,dum_j)
+    atm(ia_pCO2_14C,dum_i,dum_j) = atm(ia_pCO2_14C,dum_i,dum_j) + loc_fracdecay*atm(ia_pCH4_14C,dum_i,dum_j)
+    atm(ia_pCH4,dum_i,dum_j)     = (1.0 - loc_fracdecay)*atm(ia_pCH4,dum_i,dum_j)
+    atm(ia_pCH4_13C,dum_i,dum_j) = (1.0 - loc_fracdecay)*atm(ia_pCH4_13C,dum_i,dum_j)
+    atm(ia_pCH4_14C,dum_i,dum_j) = (1.0 - loc_fracdecay)*atm(ia_pCH4_14C,dum_i,dum_j)
+
+END SUBROUTINE sub_calc_oxidize_CH4_schmidt03_exp
+  
+  ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], NO H ESCAPE (CTR|01-2018)
    SUBROUTINE sub_calc_oxidize_CH4_claire(dum_dtyr,dum_conv_atm_mol)
      IMPLICIT NONE
