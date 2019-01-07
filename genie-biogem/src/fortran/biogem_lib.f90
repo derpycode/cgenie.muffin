@@ -617,6 +617,12 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_invert_explicit
   logical::ctrl_force_ocn_age                                   ! automatic ocean age tracer
   NAMELIST /ini_biogem_nml/ctrl_force_ocn_age
+  ! ---------------- TRANSPORT MATRIX---------------------------!
+  LOGICAL::ctrl_data_diagnose_TM !                              ! diagnose matrix in run?
+  NAMELIST /ini_biogem_nml/ctrl_data_diagnose_TM
+  REAL::par_data_TM_avg_n                                       ! number of intervals to diagnose average matrix in 1 year
+  REAL::par_data_TM_start                                       ! year to start diagnosing matrix
+  NAMELIST /ini_biogem_nml/par_data_TM_avg_n,par_data_TM_start
   ! ############################################################################################################################## !
   ! ****************************************************************************************************************************** !
 
@@ -945,6 +951,13 @@ MODULE biogem_lib
   logical::par_misc_t_endseries = .FALSE.
   logical::par_misc_t_endslice  = .FALSE.
 
+  !*** transport matrix ***
+  INTEGER::matrix_vocn_n = 0
+  INTEGER::matrix_K = n_k
+  INTEGER::matrix_go = 0
+  INTEGER::matrix_season = 1
+  INTEGER::matrix_avg_count = 0
+
   ! ocean tracer array
   !
   integer::n_vocn
@@ -962,6 +975,7 @@ MODULE biogem_lib
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vphys_ocn             !
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vbio_part             !
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vdbio_part            !
+  type(fieldocn),DIMENSION(:),ALLOCATABLE::matrix_exp            ! matrix dye output
   !
   ! atmosphere tracer array
   !

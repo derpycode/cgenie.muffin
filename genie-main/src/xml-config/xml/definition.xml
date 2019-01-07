@@ -6067,6 +6067,16 @@
 			<value datatype="boolean">.false.</value>
                         <description>Automatic ocean age tracer?</description>
                     </param>
+<!-- TRANSPORT MATRIX  -->
+		<param name="ctrl_data_diagnose_TM">
+			<value datatype="boolean">.false.</value>
+		</param>
+		<param name="par_data_TM_start">
+                     	<value datatype="real">0.0</value>
+		</param>
+		<param name="par_data_TM_avg_n">
+                     	<value datatype="real">1.0</value>
+		</param>    
                 </namelist>
             </file>
         </model>
