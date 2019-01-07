@@ -1020,18 +1020,42 @@ CONTAINS
 
     ! ######################################################################################################################### !
     ! PYRITE
-    ! bulk silicate S flux (and isotopic signature)
+    ! bulk silicate S and Fe fluxes (and isotopic signature) from pyrite (FeS2)
+    ! NOTE: pyrite weathering should to balance stchiometry of pyrite formation
+    !       2FeS2  + 7O2 +2H2O —–> 2Fe2+   H2SO4+ 2H+
+    !       pyrite + oxygen + water —–> iron ions + sulphuric acid + hydrogen ions
+    ! currently, in biogem_box: 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
+    ! NOTE: set Fe flux as Fe2 (not TDFe  for now / here)
+    ! NOTE: remember he alkalinity associated with adding SO42- to the ocean ...
+    ! S
     loc_force_flux_weather_o(io_H2S) = loc_force_flux_weather_o(io_H2S) + &
-         & 2.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3
+         & (7.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
     loc_standard = const_standards(ocn_type(io_H2S_34S))
     loc_force_flux_weather_o(io_H2S_34S) = loc_force_flux_weather_o(io_H2S_34S) + &
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracFeS2_d34S,loc_standard)* &
-         & 2.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3
+         & (7.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+    loc_force_flux_weather_o(io_SO4) = loc_force_flux_weather_o(io_SO4) + &
+         & (1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+    loc_standard = const_standards(ocn_type(io_SO4_34S))
+    loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_SO4_34S) + &
+         & fun_calc_isotope_fraction(par_weather_CaSiO3_fracFeS2_d34S,loc_standard)* &
+         & (1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+    loc_force_flux_weather_o(io_ALK) = loc_force_flux_weather_o(io_ALK) + &
+         & -2.0*(1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+    ! Fe
+    loc_force_flux_weather_o(io_Fe2) = loc_force_flux_weather_o(io_Fe2) + &
+         & par_weather_CaSiO3_fracFeS2*weather_fCaSiO3
+    loc_standard = const_standards(ocn_type(io_Fe2_56Fe))
+    loc_force_flux_weather_o(io_Fe2_56Fe) = loc_force_flux_weather_o(io_Fe2_56Fe) + &
+         & fun_calc_isotope_fraction(par_weather_CaSiO3_fracFeS2_d56Fe,loc_standard)* &
+         & par_weather_CaSiO3_fracFeS2*weather_fCaSiO3
     ! O2 consumption associated with pyrite weathering (and conversion of H2S -> H2SO4)
+    ! NOTE: pyrite weathering should be the only source of H2S
     IF (.NOT. opt_short_circuit_atm) THEN
-       loc_force_flux_weather_a(ia_pO2)     = loc_force_flux_weather_a(ia_pO2) - 2.0*loc_force_flux_weather_o(io_H2S)
-       loc_force_flux_weather_o(io_SO4)     = loc_force_flux_weather_o(io_H2S)
-       loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_H2S_34S)
+       loc_force_flux_weather_a(ia_pO2)     = loc_force_flux_weather_a(ia_pO2)     - 2.0*loc_force_flux_weather_o(io_H2S)
+       loc_force_flux_weather_o(io_SO4)     = loc_force_flux_weather_o(io_SO4)     + loc_force_flux_weather_o(io_H2S)
+       loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_SO4_34S) + loc_force_flux_weather_o(io_H2S_34S)
+       loc_force_flux_weather_o(io_ALK)     = loc_force_flux_weather_o(io_ALK)     - 2.0*loc_force_flux_weather_o(io_H2S)
        loc_force_flux_weather_o(io_H2S)     = 0.0
        loc_force_flux_weather_o(io_H2S_34S) = 0.0
     ENDIF
@@ -1039,6 +1063,7 @@ CONTAINS
 
     ! ######################################################################################################################### !
     ! GYPSUM
+    ! NOTE: no net ALK input (Ca2+ PLUS SO42-)
     ! bulk carbonate/evapourite (gypsum) S flux (and isotopic signature)
     loc_force_flux_weather_o(io_SO4) = loc_force_flux_weather_o(io_SO4) + &
          & par_weather_CaCO3_fracCaSO4*weather_fCaCO3
@@ -1056,15 +1081,44 @@ CONTAINS
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
+    ! SIDERITE
+    ! NOTE: set Fe flux as Fe2 (not TDFe  for now / here)
+    ! NOTE: not net ALK input
+    ! bulk siderite (FeCO3) -- Fe
+    loc_force_flux_weather_o(io_Fe2) = loc_force_flux_weather_o(io_Fe2) + &
+         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
+    loc_standard = const_standards(ocn_type(io_Fe2_56Fe))
+    loc_force_flux_weather_o(io_Fe2_56Fe) = loc_force_flux_weather_o(io_Fe2_56Fe) + &
+         & fun_calc_isotope_fraction(par_weather_CaCO3_fracFeCO3_d56Fe,loc_standard)* &
+         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
+    ! bulk siderite (FeCO3) -- CO32-
+    loc_force_flux_weather_o(io_DIC) = loc_force_flux_weather_o(io_DIC) + &
+         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
+    loc_standard = const_standards(ocn_type(io_DIC_13C))
+    loc_force_flux_weather_o(io_DIC_13C) = loc_force_flux_weather_o(io_DIC_13C) + &
+         & fun_calc_isotope_fraction(par_weather_CaCO3_fracFeCO3_d13C,loc_standard)* &
+         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
+    ! ######################################################################################################################### !
+
+    ! ######################################################################################################################### !
     ! APATITE
-    ! 
+    ! NOTE: include ALK
+    ! bulk apatite (Ca5PO43)
+    loc_force_flux_weather_o(io_PO4) = loc_force_flux_weather_o(io_PO4) + &
+         & 3.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
+    loc_force_flux_weather_o(io_Ca) = loc_force_flux_weather_o(io_Ca) + &
+         & 5.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
+    loc_force_flux_weather_o(io_ALK) = loc_force_flux_weather_o(io_ALK) + &
+         & 2.0*5.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
+    ! *** CALCIUM ISOTOPES ***
+    loc_standard = const_standards(ocn_type(io_Ca_44Ca))
+    ! apatite 44Ca weathering flux
+    loc_epsilon = par_weather_CaSiO3_fracCa5PO43_d44Ca
+    loc_force_flux_weather_o(io_Ca_44Ca) = loc_force_flux_weather_o(io_Ca_44Ca) + &
+         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*5.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
+    ! add simple/direct P input (no Ca assumed/included)
     loc_force_flux_weather_o(io_PO4) = loc_force_flux_weather_o(io_PO4) + &
          & par_weather_Ca0PO41
-    !!!loc_force_flux_weather_o(io_PO4) = loc_force_flux_weather_o(io_PO4) + &
-    !!!     & 3.0*par_weather_CaCO3_fracCa5PO43*weather_fCaSiO3
-    !!!loc_force_flux_weather_o(io_Ca) = loc_force_flux_weather_o(io_Ca) + &
-    !!!     & 5.0*par_weather_CaCO3_fracCa5PO43*weather_fCaSiO3
-    !!! *** CALCIUM ISOTOPES ***        
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !

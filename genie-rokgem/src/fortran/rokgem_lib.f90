@@ -130,12 +130,17 @@ MODULE rokgem_lib
   REAL:: par_weather_CaSiO3_fracSi_d30Si                                                 ! global silicate d30Si
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracSi,par_weather_CaSiO3_fracSi_d30Si
   real:: par_weather_CaSiO3_fracFeS2                                                     ! global (silicate) pyrite relative abundance
-  REAL:: par_weather_CaSiO3_fracFeS2_d34S                                                ! global silicate d34S
-  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracFeS2,par_weather_CaSiO3_fracFeS2_d34S
+  REAL:: par_weather_CaSiO3_fracFeS2_d34S                                                ! global pyrite d34S
+  REAL:: par_weather_CaSiO3_fracFeS2_d56Fe                                               ! global pyrite d56Fe
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracFeS2,par_weather_CaSiO3_fracFeS2_d34S,par_weather_CaSiO3_fracFeS2_d56Fe
   real:: par_weather_CaCO3_fracCaSO4                                                     ! global (carbonate) gypsum relative abundance
-  REAL:: par_weather_CaCO3_fracCaSO4_d34S                                               ! global carbonate d34S
-  REAL:: par_weather_CaCO3_fracCaSO4_d44Ca                                               ! global carbonate d44Ca
+  REAL:: par_weather_CaCO3_fracCaSO4_d34S                                                ! global gypsum d34S
+  REAL:: par_weather_CaCO3_fracCaSO4_d44Ca                                               ! global gypsum d44Ca
   NAMELIST /ini_rokgem_nml/par_weather_CaCO3_fracCaSO4,par_weather_CaCO3_fracCaSO4_d34S,par_weather_CaCO3_fracCaSO4_d44Ca  
+  real:: par_weather_CaCO3_fracFeCO3                                                     ! global (carbonate) siderite relative abundance
+  REAL:: par_weather_CaCO3_fracFeCO3_d56Fe                                               ! global siderite d56Fe
+  REAL:: par_weather_CaCO3_fracFeCO3_d13C                                                ! global siderite d13C
+  NAMELIST /ini_rokgem_nml/par_weather_CaCO3_fracFeCO3,par_weather_CaCO3_fracFeCO3_d56Fe,par_weather_CaCO3_fracFeCO3_d13C
   real:: par_weather_CaSiO3_fracLi                                                       ! global silicate Li relativeabundance
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracLi
   real:: par_weather_Li_Rscale                                                           ! global silicate Li weathering scaling 
@@ -165,6 +170,9 @@ MODULE rokgem_lib
   REAL::par_weather_CaSiO3b_d88Sr                                                         ! basaltic d88Sr (o/oo)
   REAL::par_weather_CaSiO3g_d88Sr                                                        ! granitic d88r (o/oo) 
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3b_d88Sr,par_weather_CaSiO3g_d88Sr
+  real:: par_weather_CaSiO3_fracCa5PO43                                                  ! global silicate apatite relative abundance
+  REAL:: par_weather_CaSiO3_fracCa5PO43_d44Ca                                            ! global apatite d44Ca
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracCa5PO43,par_weather_CaSiO3_fracCa5PO43_d44Ca
   REAL::par_weather_Ca0PO41                                                              ! global apatite weathering rate (mol PO4 yr-1)
   NAMELIST /ini_rokgem_nml/par_weather_Ca0PO41  
   REAL::par_weather_SiO2                                                                 ! global quartz weathering rate (mol Si yr-1)

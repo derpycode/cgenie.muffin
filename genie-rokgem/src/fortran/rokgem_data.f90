@@ -140,11 +140,15 @@ CONTAINS
        print*,'mean carbonate d13C (o/oo)                          : ',par_weather_CaCO3_d13C
        print*,'global silicate Si abundance                        : ',par_weather_CaSiO3_fracSi
        print*,'global silicate d30Si (o/oo)                        : ',par_weather_CaSiO3_fracSi_d30Si
-       print*,'global silicate FeS2 abundance                      : ',par_weather_CaSiO3_fracFeS2
-       print*,'global silicate d34S (o/oo)                         : ',par_weather_CaSiO3_fracFeS2_d34S
+       print*,'global silicate pyrite abundance                    : ',par_weather_CaSiO3_fracFeS2
+       print*,'global pyrite d34S (o/oo)                           : ',par_weather_CaSiO3_fracFeS2_d34S
+       print*,'global pyrite d56Fe (o/oo)                          : ',par_weather_CaSiO3_fracFeS2_d34S
        print*,'global carbonate CaSO4 abundance                    : ',par_weather_CaCO3_fracCaSO4
-       print*,'global carbonate d34S (o/oo)                        : ',par_weather_CaCO3_fracCaSO4_d34S
-       print*,'global carbonate d44Ca (o/oo)                       : ',par_weather_CaCO3_fracCaSO4_d44Ca       
+       print*,'global gypsum d34S (o/oo)                           : ',par_weather_CaCO3_fracCaSO4_d34S
+       print*,'global gypsum d44Ca (o/oo)                          : ',par_weather_CaCO3_fracCaSO4_d44Ca
+       print*,'global carbonate FeCO3 abundance                    : ',par_weather_CaCO3_fracFeCO3
+       print*,'global siderite d56Fe (o/oo)                        : ',par_weather_CaCO3_fracFeCO3_d56Fe
+       print*,'global siderite d13C (o/oo)                         : ',par_weather_CaCO3_fracFeCO3_d13C      
        print*,'global silicate Li abundance                        : ',par_weather_CaSiO3_fracLi
        print*,'global silicate Li weathering scaling               : ',par_weather_Li_Rscale
        print*,'global silicate Li weathering offset                : ',par_weather_Li_Roffset
@@ -163,7 +167,9 @@ CONTAINS
        print*,'global silicate d88Sr (o/oo)                        : ',par_weather_CaSiO3_d88Sr
        print*,'basaltic silicate d88Sr (o/oo)                      : ',par_weather_CaSiO3b_d88Sr
        print*,'granitic silicate d88Sr (o/oo)                      : ',par_weather_CaSiO3g_d88Sr
-       print*,'global carbonate d88r (o/oo)                        : ',par_weather_CaCO3_d88Sr
+       print*,'global carbonate d88r (o/oo)                        : ',par_weather_CaCO3_d88Sr    
+       print*,'global silicate apatite abundance                   : ',par_weather_CaSiO3_fracCa5PO43
+       print*,'global apatite d44Ca (o/oo)                         : ',par_weather_CaSiO3_fracCa5PO43_d44Ca
        print*,'global apatite weathering rate (mol PO4 yr-1)       : ',par_weather_Ca0PO41
        print*,'global quartz weathering rate (mol Si yr-1)         : ',par_weather_SiO2
        print*,'global quartz d30Si (o/oo)                          : ',par_weather_SiO2_d30Si
