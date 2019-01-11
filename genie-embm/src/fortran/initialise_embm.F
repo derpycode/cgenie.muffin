@@ -1124,7 +1124,7 @@ c T diffusion by input params and make sure q diff is no bigger
 c only if constant lat grid (i.e. allowing compatibility with 36x36 version)
 
 crma      if(ldeg)then
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
          diffa(2,1,j) = min(diffa(2,1,j),diffa(1,1,j))
       endif
          if (debug_init.and.(j.gt.1))write(6,'(i4,4e15.5)')j,
@@ -1335,7 +1335,7 @@ c in north Atlantic (north of 24 deg N) NB INCLUDES DRY POINTS
 
       endif
 
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
 
       area_pac1a = 0.
       area_atl1a = 0.
@@ -1459,7 +1459,7 @@ crma If 36x36s ...
 
 ccc If 64x32 or 64x32l ...
 
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
 
       do j=j1as,(j1bs-1)
          do i=ips(j),ipf(j)

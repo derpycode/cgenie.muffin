@@ -185,14 +185,17 @@ elif [ $LONS -eq 12 ] && [ $LEVS -eq 8 ]; then
 elif [ $LONS -eq 36 ] && [ $LEVS -eq 32 ]; then
     let N_TIMESTEPS=96
     let dbiostp=1
+elif [ $LONS -eq 48 ] && [ $LEVS -eq 16 ]; then
+    let N_TIMESTEPS=96
+    let dbiostp=2
 else
     let N_TIMESTEPS=96
     let dbiostp=1
 fi
 if [ $IGRID -eq 1 ]; then
     echo "   Making non-equal area grid modifications to time-stepping, igrid: " $IGRID
-    N_TIMESTEPS="$(echo "4*$N_TIMESTEPS" | bc -l)"
-    dbiostp="$(echo "4*$dbiostp" | bc -l)"
+    N_TIMESTEPS="$(echo "2*$N_TIMESTEPS" | bc -l)"
+    dbiostp="$(echo "1*$dbiostp" | bc -l)"
     let datmstp=5
 else
     let datmstp=5
