@@ -194,8 +194,8 @@ else
 fi
 if [ $IGRID -eq 1 ]; then
     echo "   Making non-equal area grid modifications to time-stepping, igrid: " $IGRID
-    N_TIMESTEPS="$(echo "2*$N_TIMESTEPS" | bc -l)"
-    dbiostp="$(echo "1*$dbiostp" | bc -l)"
+    N_TIMESTEPS="$(echo "4*$N_TIMESTEPS" | bc -l)"
+    dbiostp="$(echo "4*$dbiostp" | bc -l)"
     let datmstp=5
 else
     let datmstp=5
@@ -205,6 +205,7 @@ echo "   Setting time-stepping [GOLDSTEIN, BIOGEM:GOLDSTEIN]: " $N_TIMESTEPS $db
 # c-goldstein; e.g. ma_genie_timestep = 365.25*24.0/(5*96) * 3600.0 (GOLDSTEIN year length)
 #                => ma_genie_timestep=65745.0
 dstp="$(echo "3600.0*24.0*365.25/$datmstp/$N_TIMESTEPS" | bc -l)"
+echo "   Setting primary model time step: " $dstp
 # write primary model time step
 echo ma_genie_timestep=$dstp >> $CONFIGPATH/$CONFIGNAME
 # write relative time-stepping

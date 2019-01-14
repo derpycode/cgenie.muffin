@@ -1047,7 +1047,7 @@ c disastrous).
 c           uatm(2,i,j) = uatm(2,i,j)*0.0
          enddo
          if (par_wind_polar_avg.ne.1.and.par_wind_polar_avg.ne.2) then 
-         uatm(2,i,jmax) = 0.
+            uatm(2,i,jmax) = 0.
          endif
       enddo
       else
@@ -1059,6 +1059,7 @@ c           uatm(2,i,j) = uatm(2,i,j)*0.0
             enddo
          enddo
       endif
+c [endif of: if (.not.flag_wind) then]
 
 c parameters for extra heat diffusion where pptn high
 

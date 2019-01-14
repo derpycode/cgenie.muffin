@@ -867,7 +867,7 @@ c-----------------------------------------------------------------------
 c AY (18/12/03) : standard c-GOLDSTEIN sea-ice routine
 c                 would be nice to include dummy routine as well
                if(sica(i,j).gt.0.0)then
-c              * Sea-ice present *                 
+c              * Sea-ice present *       
 
 c let albedo over sea ice vary as a function of tair (Holland et al. 1993)
 
