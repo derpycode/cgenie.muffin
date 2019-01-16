@@ -399,7 +399,8 @@ CONTAINS
     real::loc_r_POM_DOM,loc_r_POM_RDOM                                  !
     real::loc_bio_red_POC_POFe_sp,loc_bio_red_POC_POFe_nsp
     real::loc_d13C_DIC_Corg_ef
-    real::loc_bio_NP,loc_dNH4,loc_dNO3
+    real::loc_bio_NP,loc_red
+    real::loc_dN2,loc_dNH4,loc_dNO3
     integer::loc_k_mld
     real,dimension(n_ocn)::loc_ocn                             !
 
@@ -1474,11 +1475,9 @@ CONTAINS
          & )
        ! diazatrophs -- simply (but then assuming, ultimately: PON --> 0.5N2): 
        ! N2 --> 2PON
-       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + par_bio_NPdiaz*loc_dPO4_2
-       loc_bio_uptake(io_N2,n_k) = loc_bio_uptake(io_N2,n_k) + 0.5*par_bio_NPdiaz*loc_dPO4_2
-       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-       ! ADD ISOTOPES from N2
-       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       loc_dN2 = par_bio_NPdiaz*loc_dPO4_2
+       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + loc_dN2
+       loc_bio_uptake(io_N2,n_k) = loc_bio_uptake(io_N2,n_k) + 0.5*loc_dN2
        ! ammonia assimilation (consistent with the assumed remin conservation equation):
        ! NH4+ + (3/4)O2 --> PON + (3/2)H2O + H+
        If (par_bio_red_POP_PON*loc_dPO4_1 < ocn(io_NH4,dum_i,dum_j,n_k)) then
@@ -1490,9 +1489,6 @@ CONTAINS
        loc_bio_uptake(io_NH4,n_k) = loc_bio_uptake(io_NH4,n_k) + loc_dNH4
        loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + (3.0/4.0)*loc_dNH4
        loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + loc_dNH4
-       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-       ! ADD ISOTOPES from NH4
-       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
        loc_dNO3 = par_bio_red_POP_PON*loc_dPO4_1 - loc_dNH4
        ! nitrate uptake, assuming:
        ! H+ + NO3- --> PON + (5/4)O2 + (1/2)H2O 
@@ -1500,9 +1496,42 @@ CONTAINS
        loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) + loc_dNO3
        loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - (5.0/4.0)*loc_dNO3
        loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) - loc_dNO3
-       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-       ! ADD ISOTOPES from NO3
-       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       ! isotopes
+       if (sed_select(is_PON_15N)) then
+          ! N2
+          if (ocn(io_N2,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_N2_15N,dum_i,dum_j,n_k)/ocn(io_N2,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dN2_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dN2
+          loc_bio_uptake(io_N2_15N,n_k) = loc_bio_uptake(io_N2_15N,n_k) + 0.5*loc_red*loc_dN2
+          ! NH4
+          if (ocn(io_NH4,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,n_k)/ocn(io_NH4,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dNH4_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dNH4
+          loc_bio_uptake(io_NH4_15N,n_k) = loc_bio_uptake(io_NH4_15N,n_k) + loc_red*loc_dNH4
+          ! NO3
+          if (ocn(io_NO3,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_NO3_15N,dum_i,dum_j,n_k)/ocn(io_NO3,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dNO3_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dNO3
+          loc_bio_uptake(io_NO3_15N,n_k) = loc_bio_uptake(io_NO3_15N,n_k) + loc_red*loc_dNO3
+       end if
     CASE ( &
          & '2N2T_PN_Tdep',   &
          & '3N2T_PNFe_Tdep'  &

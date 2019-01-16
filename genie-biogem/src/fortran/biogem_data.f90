@@ -284,7 +284,10 @@ CONTAINS
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
        print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
-	   print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
+       print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
+       print*,'N2 fixation 15N fractionation                       : ',par_bio_uptake_dN2_epsilon
+       print*,'NH4 assimilation 15N fractionation                  : ',par_bio_uptake_dNH4_epsilon
+       print*,'NO3 uptake 15N fractionation                        : ',par_bio_uptake_dNO3_epsilon
        ! --- IRON CYCLING -------------------------------------------------------------------------------------------------------- !
        print*,'--- IRON CYCLING -----------------------------------'
        print*,'Aeolian Fe solubility                               : ',par_det_Fe_sol
@@ -361,8 +364,7 @@ CONTAINS
        print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
        print*,'pyrite precip stiochiometry                         : ',ctrl_bio_FeS2precip_explicit
-       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
-       
+       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte       
        print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
        print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha 
        print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha 
@@ -370,8 +372,7 @@ CONTAINS
        print*,'kinetic constant for Fe reduction                   : ',par_bio_remin_kFetoFe2
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
-       print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
-       
+       print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha       
 	   ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)

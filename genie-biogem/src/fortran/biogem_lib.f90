@@ -365,10 +365,14 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d44Ca_CaCO3_epsilon
   real::par_d88Sr_SrCO3_epsilon                                  ! 88/86Sr fractionation between Sr and SrCO3 
   namelist /ini_biogem_nml/par_d88Sr_SrCO3_epsilon
-  real::par_d13C_Corg_CH4_epsilon                                ! 'methanogenesis fractionation
+  real::par_d13C_Corg_CH4_epsilon                                ! methanogenesis fractionation
   namelist /ini_biogem_nml/par_d13C_Corg_CH4_epsilon
-  real::par_d34S_Corg_SO4_epsilon                                ! 'sulphate reduction fractionation (in S isotopes)
+  real::par_d34S_Corg_SO4_epsilon                                ! sulphate reduction fractionation (in S isotopes)
   namelist /ini_biogem_nml/par_d34S_Corg_SO4_epsilon
+  real::par_bio_uptake_dN2_epsilon                               ! N2 fixation 15N fractionation 
+  real::par_bio_uptake_dNH4_epsilon                              ! NH4 assimilation 15N fractionation
+  real::par_bio_uptake_dNO3_epsilon                              ! NO3 uptake 15N fractionation  
+  namelist /ini_biogem_nml/par_bio_uptake_dN2_epsilon,par_bio_uptake_dNH4_epsilon,par_bio_uptake_dNO3_epsilon
   ! ------------------- IRON CYCLING --------------------------------------------------------------------------------------------- !
   real::par_det_Fe_sol                                           ! fractional solubility of Fe in dust
   real::par_det_Fe_sol_exp                                       ! exponent for aeolian Fe solubility
@@ -488,7 +492,6 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
   real::K_lim_PYR                                                ! MM type limiting factor for FeS2 precipitation 
   namelist /ini_biogem_nml/K_lim_PYR
-  
   real::par_bio_remin_kFe2toFe                                   ! k-value Fe oxidation
   real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
   NAMELIST /ini_biogem_nml/par_bio_remin_kFe2toFe,par_d56Fe_Fe2ox_alpha
@@ -500,7 +503,6 @@ MODULE biogem_lib
   real::par_d56Fe_FeOOH_alpha                                    ! 56/54Fe fractionation for FeOOH precipitation
   LOGICAL::ctrl_bio_FeOOHprecip_explicit                         ! let FeOOH precipitate explictely?
   NAMELIST /ini_biogem_nml/par_d56Fe_FeOOH_alpha,ctrl_bio_FeOOHprecip_explicit
- 
   real::par_bio_FeS_sf                                           ! Scale factor for FeS formation
   real::par_bio_FeS_exp                                          ! Rate law power for FeS formation
   NAMELIST /ini_biogem_nml/par_bio_FeS_sf,par_bio_FeS_exp

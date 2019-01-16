@@ -4631,6 +4631,18 @@
 			<value datatype="real">-40.0</value>
                         <description>sulphate reduction S fractionation</description>
                     </param>
+                    <param name="par_bio_uptake_dN2_epsilon">
+			<value datatype="real">0.0</value>
+                        <description>N2 fixation 15N fractionation</description>
+                    </param>
+                    <param name="par_bio_uptake_dNH4_epsilon">
+			<value datatype="real">0.0</value>
+                        <description>NH4 assimilation 15N fractionation</description>
+                    </param>
+                    <param name="par_bio_uptake_dNO3_epsilon">
+			<value datatype="real">0.0</value>
+                        <description>NO3 uptake 15N fractionation</description> 
+                    </param>
 <!-- IRON  -->
                     <param name="par_det_Fe_sol">
 			<value datatype="real">1.0</value>
