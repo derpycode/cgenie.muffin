@@ -813,6 +813,7 @@ CONTAINS
        ! calculate PO4 depletion; loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
        ! (after Fennel et al., 2005)
        ! NOTE: tidied up and also adjusted to allow N2 fixation when no fixed N of any sort exists
+       ! NOTE: assume that dissolved N2 is never limiting
        if (loc_PO4 > const_real_nullsmall) then
           if (loc_N > const_real_nullsmall) then
              loc_dPO4_1 =                 &
@@ -843,7 +844,7 @@ CONTAINS
        end if
        ! calculate total production (= PO4 uptate)
        loc_dPO4 = loc_dPO4_1 + loc_dPO4_2
-       ! calculate fraction of total production supported by N2 fixation
+       ! calculate fraction of total (phosphate based) production supported by N2 fixation
        if(loc_dPO4 > const_real_nullsmall) loc_frac_N2fix = loc_dPO4_2/loc_dPO4
     CASE ( &
          & 'bio_POCflux' &
@@ -1218,7 +1219,9 @@ CONTAINS
                & carbisor(ici_CO2_r14C,dum_i,dum_j,n_k),loc_d13C_DIC_Corg_ef,.true.)
        end select
     end if
-    !
+    ! ---------------------------------------------------------- !
+    ! CaCO3 isotopes
+    ! ---------------------------------------------------------- !
     ! d13C [CaCO3]
     if (sed_select(is_CaCO3_13C)) then
        ! calculate 13C/12C fractionation between DIC and CaCO3
@@ -1252,22 +1255,6 @@ CONTAINS
           loc_alpha = 1.0 + par_d44Ca_CaCO3_epsilon/1000.0
        end select
           bio_part_red(is_CaCO3,is_CaCO3_44Ca,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)       
-    end if
-    !
-    ! d15N [PON]
-    if (sed_select(is_PON_15N)) then
-       ! calculate the 15N/14N fractionation between NO3 and PON
-       ! NOTE: ASSUME NO FRACTIONATION
-       ! NOTE; check first for non-zero nitrate concentration to prevent potential unpleasantness ...
-       if (ocn(io_NO3,dum_i,dum_j,n_k) > const_real_nullsmall) then
-          loc_r15N = ocn(io_NO3_15N,dum_i,dum_j,n_k)/ocn(io_NO3,dum_i,dum_j,n_k)
-       else
-          loc_r15N = 0.0
-       end if
-       ! ****************************
-       loc_alpha = 0.0
-       ! ****************************
-       bio_part_red(is_PON,is_PON_15N,dum_i,dum_j) = loc_alpha*loc_r15N
     end if
     !
     ! d30Si [opal]
@@ -1417,7 +1404,7 @@ CONTAINS
        ! ----------------------------------------------------- ! Kick the can down the road & deal with all the complex N shit later
                                                                ! settings zeros (and no N in POM) for now
                                                                ! (e.g. as isotopes will be complex to unravel after the fact)
-       ! NOTE: AR 19/01/16
+                                                               ! NOTE: AR 19/01/16
        if (is == is_PON) then
           SELECT CASE (par_bio_prodopt)
           CASE ( &
