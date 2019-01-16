@@ -399,7 +399,7 @@ CONTAINS
     real::loc_r_POM_DOM,loc_r_POM_RDOM                                  !
     real::loc_bio_red_POC_POFe_sp,loc_bio_red_POC_POFe_nsp
     real::loc_d13C_DIC_Corg_ef
-    real::loc_bio_NP
+    real::loc_bio_NP,loc_dNH4,loc_dNO3
     integer::loc_k_mld
     real,dimension(n_ocn)::loc_ocn                             !
 
@@ -534,7 +534,7 @@ CONTAINS
     else
        loc_SiO2 = 0.0
     end if
-    if (ocn_select(io_NO3).and. ocn_select(io_NH4)) then
+    if (ocn_select(io_NO3) .and. ocn_select(io_NH4)) then
        loc_N = ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k)
        loc_kN = loc_N/(loc_N + par_bio_c0_N)
     else
@@ -811,26 +811,28 @@ CONTAINS
        ! 2 x nutrient, 2 x 'taxa': PO4, NO3 Michaelis-Menton
        ! calculate PO4 depletion; loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
        ! (after Fennel et al., 2005)
-       if ((ocn(io_PO4,dum_i,dum_j,n_k) > const_real_nullsmall) .and. &
-            & (ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k) > const_real_nullsmall)) then
-          loc_dPO4_1 = &
-               & dum_dt* &
-               & loc_ficefree* &
-               & loc_kI* &
-               & min(loc_kPO4, &
-               &     (ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k))/ &
-               &     (par_bio_c0_N + ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k))) * &
-               &     par_bio_mu1*ocn(io_PO4,dum_i,dum_j,n_k)
+       ! NOTE: tidied up and also adjusted to allow N2 fixation when no fixed N of any sort exists
+       if (loc_PO4 > const_real_nullsmall) then
+          if (loc_N > const_real_nullsmall) then
+             loc_dPO4_1 =                 &
+                  & dum_dt*               &
+                  & loc_ficefree*         &
+                  & loc_kI*               &
+                  & min(loc_kPO4,loc_kN)* &
+                  & par_bio_mu1*          &
+                  & min(loc_PO4,loc_N/par_bio_red_POP_PON)
+          else
+             loc_dPO4_1 = 0.0
+          endif
           ! Need to add productivity from nitrogen fixation if conditions are right
-          if ((ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k) < par_bio_N2fixthresh) .and. &
-               & ((ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k))/ocn(io_PO4,dum_i,dum_j,n_k) &
-               & <  par_bio_red_POP_PON)) then
-             loc_dPO4_2 = &
-                  & dum_dt* &
+          if (loc_N < par_bio_N2fixthresh .and. (loc_N/loc_PO4) < par_bio_red_POP_PON) then
+             loc_dPO4_2 =         &
+                  & dum_dt*       &
                   & loc_ficefree* &
-                  & loc_kI* &
-                  & par_bio_mu2*ocn(io_PO4,dum_i,dum_j,n_k)* &
-                  & loc_kPO4
+                  & loc_kI*       &
+                  & loc_kPO4*     &
+                  & par_bio_mu2*  &
+                  & loc_PO4
           else
              loc_dPO4_2 = 0.0
           endif
@@ -856,6 +858,7 @@ CONTAINS
        ! 2 x nutrient, 2 x 'taxa': PO4, DIN Michaelis-Menten - Fanny (July 2010)
        ! biomass=limiting nutrient, dynamical threshold and higher N:P ratio for nitrogen fixers
        ! loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
+       ! NOTE: as it stands: if there is no fixed nitrogen of any sort, there will be no N2 fixation either(!)
        if (loc_PO4 > const_real_nullsmall .and. loc_N > const_real_nullsmall) then
           loc_dPO4_1 =                          &
                & dum_dt*                        &
@@ -900,6 +903,7 @@ CONTAINS
        ! 3 x nutrient, 2 x 'taxa': PO4, DIN, Fe Michaelis-Menten - Fanny (July 2010)
        ! calculate PO4 depletion; loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
        ! (similar to 2N2T_TPN with Fe limitation)
+       ! NOTE: as it stands: if there is no fixed nitrogen of any sort, there will be no N2 fixation either(!)
        if (loc_PO4 > const_real_nullsmall .and. loc_N > const_real_nullsmall   &
             & .and. loc_FeT > const_real_nullsmall) then
           loc_dPO4_1 =                            &
@@ -1409,6 +1413,18 @@ CONTAINS
                   & + par_bio_c0_Fe_Diaz/par_bio_c0_PO4*loc_dPO4_2
           END select
        end if
+       ! ----------------------------------------------------- ! Kick the can down the road & deal with all the complex N shit later
+                                                               ! settings zeros (and no N in POM) for now
+                                                               ! (e.g. as isotopes will be complex to unravel after the fact)
+       ! NOTE: AR 19/01/16
+       if (is == is_PON) then
+          SELECT CASE (par_bio_prodopt)
+          CASE ( &
+               & '2N2T_PO4MM_NO3' &
+               & )
+             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = 0.0
+          END select
+       end if
     end DO
     ! -------------------------------------------------------- !
     ! CALCULATE ASSOCIATED ISOTOPIC EXPORT
@@ -1424,7 +1440,6 @@ CONTAINS
                & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,loc_k_mld:n_k)
        end select
     end do
-
     ! -------------------------------------------------------- !
     ! CALCULATE INORGANIC UPTAKE
     ! -------------------------------------------------------- !
@@ -1451,10 +1466,44 @@ CONTAINS
        loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k) - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
        loc_bio_uptake(io_I,loc_k_mld:n_k)   = 0.0
     end if
+    ! N cycle
     ! non-standard productivity schemes
     SELECT CASE (par_bio_prodopt)
     CASE ( &
-         & '2N2T_PO4MM_NO3', &
+         & '2N2T_PO4MM_NO3' &
+         & )
+       ! diazatrophs -- simply (but then assuming, ultimately: PON --> 0.5N2): 
+       ! N2 --> 2PON
+       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + par_bio_NPdiaz*loc_dPO4_2
+       loc_bio_uptake(io_N2,n_k) = loc_bio_uptake(io_N2,n_k) + 0.5*par_bio_NPdiaz*loc_dPO4_2
+       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       ! ADD ISOTOPES from N2
+       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       ! ammonia assimilation (consistent with the assumed remin conservation equation):
+       ! NH4+ + (3/4)O2 --> PON + (3/2)H2O + H+
+       If (par_bio_red_POP_PON*loc_dPO4_1 < ocn(io_NH4,dum_i,dum_j,n_k)) then
+          loc_dNH4 = par_bio_red_POP_PON*loc_dPO4_1
+       else
+          loc_dNH4 = ocn(io_NH4,dum_i,dum_j,n_k)
+       end if
+       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + loc_dNH4
+       loc_bio_uptake(io_NH4,n_k) = loc_bio_uptake(io_NH4,n_k) + loc_dNH4
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + (3.0/4.0)*loc_dNH4
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + loc_dNH4
+       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       ! ADD ISOTOPES from NH4
+       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       loc_dNO3 = par_bio_red_POP_PON*loc_dPO4_1 - loc_dNH4
+       ! nitrate uptake, assuming:
+       ! H+ + NO3- --> PON + (5/4)O2 + (1/2)H2O 
+       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + loc_dNO3
+       loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) + loc_dNO3
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - (5.0/4.0)*loc_dNO3
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) - loc_dNO3
+       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       ! ADD ISOTOPES from NO3
+       ! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    CASE ( &
          & '2N2T_PN_Tdep',   &
          & '3N2T_PNFe_Tdep'  &
          & )
