@@ -1,5 +1,0 @@
-TEST_NAME=fixed_photochem_test_regtest
-ASSUMEDGOOD_NAME=fixed_photochem_test_assumedgood
-KNOWNGOOD_NAME=fixed_photochem_test_knowngood
-TESTFILE=xxxx
-CHECKFLUXES=FALSE
