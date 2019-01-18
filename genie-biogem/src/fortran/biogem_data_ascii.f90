@@ -914,14 +914,14 @@ CONTAINS
           END DO
        END IF
     end if
-    ! N STAR
+    ! DINex
     IF (ctrl_data_save_sig_diag) THEN
        if (ocn_select(io_NO3) .AND. ocn_select(io_NH4)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_Nstar',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_DINex',string_results_ext &
                & )
-          loc_string = '% time (yr) / global mean N* (mol kg-1)'// &
-               & ' / surface mean N* (mol kg-1) / benthic mean N* (mol kg-1)'
+          loc_string = '% time (yr) / global mean DINex (mol kg-1)'// &
+               & ' / surface mean DINex (mol kg-1) / benthic mean DINex (mol kg-1)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2382,11 +2382,11 @@ CONTAINS
           END DO
        END IF
     end if
-    ! N STAR
+    ! DINex
     IF (ctrl_data_save_sig_diag) THEN
        if (ocn_select(io_NO3) .AND. ocn_select(io_NH4)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_Nstar',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_DINex',string_results_ext &
                & )
           loc_sig = ((int_ocn_sig(io_NO3)+int_ocn_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_sig(io_PO4)))/int_t_sig
           loc_sig_sur = ((int_ocn_sur_sig(io_NO3)+int_ocn_sur_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_sur_sig(io_PO4)))/int_t_sig
