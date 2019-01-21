@@ -1142,10 +1142,22 @@ CONTAINS
     !       e.g. P + (8/5)NO3- + (8/5)H+ -> PO4 + (4/5)N2 + (4/5)H2O
     ! NOTE: assumption for NO2: 2NO3- <-> O2 + 2NO2-
     !                       or: O2 == 2NO3- - 2NO2-
+    ! Wikipedia summary ...
+    ! NO3− + 2 H+ + 2 e−→ NO2− + H2O (Nitrate reductase)
+    ! NO2− + 2 H+ + e− → NO + H2O (Nitrite reductase)
+    ! 2NO + 2 H+ + 2 e− → N2O + H2O (Nitric oxide reductase)
+    ! N2O + 2 H+ + 2 e− → N2 + H2O (Nitrous oxide reductase)
+    ! and ...
+    ! Reduction under anoxic conditions can also occur through process called anaerobic ammonium oxidation (anammox):
+    ! NH4+ + NO2− → N2 + 2 H2O
+    ! NOTE: will have to assume NO2- as part of the ALK balance ... ?
+    !       (then this must be taken inot account when NO or N2O is formed)
+    !
     if (ocn_select(io_NO3)) then
        conv_sed_ocn_N(:,:)  = conv_sed_ocn(:,:)
        ! N
        if (ocn_select(io_NH4)) then
+          ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
           conv_sed_ocn_N(io_NH4,is_PON) = 1.0
           conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
@@ -1164,26 +1176,42 @@ CONTAINS
        conv_sed_ocn_N(io_N2_15N,is_PON_15N)  = conv_sed_ocn_N(io_N2,is_PON)
        ! P,C
        if (ocn_select(io_NO2)) then
-          conv_sed_ocn_N(io_NO3,is_POP) = -4.0
-          conv_sed_ocn_N(io_NO2,is_POP) = 4.0
+          ! O2 == 2NO3- - 2NO2-
+          conv_sed_ocn_N(io_NO3,is_POP) = 2.0*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_NO2,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_ALK,is_POP) = 0.0
           conv_sed_ocn_N(io_O2,is_POP)  = 0.0
           conv_sed_ocn_N(io_NO3,is_POC) = 2.0*conv_sed_ocn(io_O2,is_POC)
-          conv_sed_ocn_N(io_NO2,is_POC) = -2.0*conv_sed_ocn(io_O2,is_POC)
+          conv_sed_ocn_N(io_NO2,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = 0.0
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
+       elseif (ocn_select(io_NH4)) then
+          ! O2 == (1/2)NO3- + (1/2)H2O + H+ - (1/2)NH4+
+          conv_sed_ocn_N(io_NO3,is_POP) = (1.0/2.0)*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_NH4,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
+          conv_sed_ocn_N(io_ALK,is_POP) = conv_sed_ocn_N(io_NH4,is_POP) - conv_sed_ocn_N(io_NO3,is_POP)
+          conv_sed_ocn_N(io_O2,is_POP)  = 0.0
+          conv_sed_ocn_N(io_NO3,is_POC) = (1.0/2.0)*conv_sed_ocn_N(io_O2,is_POC)
+          conv_sed_ocn_N(io_NH4,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N(io_ALK,is_POC) = conv_sed_ocn_N(io_NH4,is_POC) - conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_N(io_NO3,is_POP) = -(8.0/5.0)
-          conv_sed_ocn_N(io_N2,is_POP)  = -0.5*conv_sed_ocn_N(io_NO3,is_POP)
+          ! O2 == (4/5)NO3- + (4/5)H+ - (2/5)N2 - (2/5)H2O
+          conv_sed_ocn_N(io_NO3,is_POP) = -(4.0/5.0)*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_N2,is_POP)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_ALK,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_O2,is_POP)  = 0.0
           conv_sed_ocn_N(io_NO3,is_POC) = (4.0/5.0)*conv_sed_ocn(io_O2,is_POC)
-          conv_sed_ocn_N(io_N2,is_POC)  = -0.5*conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N(io_N2,is_POC)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        else
           ! [DEFAULT, oxic remin relationship]
        endif
+       ! N isotopes (denitrification)
+       !!!
+       ! ALK (associated with PON)
+       ! [explicit ... already dealt with under 'N' above]
     else
        conv_sed_ocn_N(:,:) = 0.0
     end if
@@ -1194,7 +1222,7 @@ CONTAINS
        if (ocn_select(io_NH4)) then
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
           conv_sed_ocn_S(io_NH4,is_PON) = 1.0
-          conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
+          conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_S(io_NH4,is_PON)
           conv_sed_ocn_S(io_O2,is_PON)  = 0.0
        elseif (ocn_select(io_N2)) then
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
@@ -1209,24 +1237,30 @@ CONTAINS
        conv_sed_ocn_S(io_NH4_15N,is_PON_15N) = conv_sed_ocn_S(io_NH4,is_PON)
        conv_sed_ocn_S(io_N2_15N,is_PON_15N)  = conv_sed_ocn_S(io_N2,is_PON)
        ! P,C
-       conv_sed_ocn_S(io_SO4,is_POP) = 0.5*conv_sed_ocn_S(io_O2,is_POP)
-       conv_sed_ocn_S(io_H2S,is_POP) = -0.5*conv_sed_ocn_S(io_O2,is_POP)
+       conv_sed_ocn_S(io_SO4,is_POP) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POP)
+       conv_sed_ocn_S(io_H2S,is_POP) = -(1.0/2.0)*conv_sed_ocn_S(io_O2,is_POP)
        conv_sed_ocn_S(io_O2,is_POP)  = 0.0
-       conv_sed_ocn_S(io_SO4,is_POC) = 0.5*conv_sed_ocn(io_O2,is_POC)
-       conv_sed_ocn_S(io_H2S,is_POC) = -0.5*conv_sed_ocn(io_O2,is_POC)
+       conv_sed_ocn_S(io_SO4,is_POC) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
+       conv_sed_ocn_S(io_H2S,is_POC) = -(1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
        conv_sed_ocn_S(io_O2,is_POC)  = 0.0
        ! S isotopes
        conv_sed_ocn_S(io_SO4_34S,is_POP) = conv_sed_ocn_S(io_SO4,is_POP)
        conv_sed_ocn_S(io_H2S_34S,is_POP) = conv_sed_ocn_S(io_H2S,is_POP)
        conv_sed_ocn_S(io_SO4_34S,is_POC) = conv_sed_ocn_S(io_SO4,is_POC)
        conv_sed_ocn_S(io_H2S_34S,is_POC) = conv_sed_ocn_S(io_H2S,is_POC)
-       ! 
-       if (ctrl_bio_red_ALKwithPOC) then
-          conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP)
-          conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC) + conv_sed_ocn(io_ALK,is_POC)
+       ! ALK (associated with PON)
+       if (sed_select(is_PON)) then
+          ! [explicit ... already dealt with under 'N' above]
+          conv_sed_ocn_S(io_ALK,is_POP) = 0.0
+          conv_sed_ocn_S(io_ALK,is_POC) = 0.0
        else
-          conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP) + conv_sed_ocn(io_ALK,is_POP)
-          conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC)
+          if (ctrl_bio_red_ALKwithPOC) then
+             conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP)
+             conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC) + conv_sed_ocn(io_ALK,is_POC)
+          else
+             conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP) + conv_sed_ocn(io_ALK,is_POP)
+             conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC)
+          end if
        end if
     else
        conv_sed_ocn_S(:,:) = 0.0
