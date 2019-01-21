@@ -1162,15 +1162,10 @@ CONTAINS
           conv_sed_ocn_N(io_NH4,is_PON) = 1.0
           conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_N(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_N(io_NH4,is_PON)
-       elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_N(io_NO3,is_PON) = 0.0
-          conv_sed_ocn_N(io_N2,is_PON)  = (1.0/2.0)
-          conv_sed_ocn_N(io_ALK,is_PON) = 0.0
-          conv_sed_ocn_N(io_O2,is_PON)  = 0.0
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes
+       ! N isotopes (from PON remin)
        conv_sed_ocn_N(io_NO3_15N,is_PON_15N) = conv_sed_ocn_N(io_NO3,is_PON)
        conv_sed_ocn_N(io_NH4_15N,is_PON_15N) = conv_sed_ocn_N(io_NH4,is_PON)
        conv_sed_ocn_N(io_N2_15N,is_PON_15N)  = conv_sed_ocn_N(io_N2,is_PON)
@@ -1185,16 +1180,6 @@ CONTAINS
           conv_sed_ocn_N(io_NO2,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = 0.0
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
-       elseif (ocn_select(io_NH4)) then
-          ! O2 == (1/2)NO3- + (1/2)H2O + H+ - (1/2)NH4+
-          conv_sed_ocn_N(io_NO3,is_POP) = (1.0/2.0)*conv_sed_ocn_N(io_O2,is_POP)
-          conv_sed_ocn_N(io_NH4,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
-          conv_sed_ocn_N(io_ALK,is_POP) = conv_sed_ocn_N(io_NH4,is_POP) - conv_sed_ocn_N(io_NO3,is_POP)
-          conv_sed_ocn_N(io_O2,is_POP)  = 0.0
-          conv_sed_ocn_N(io_NO3,is_POC) = (1.0/2.0)*conv_sed_ocn_N(io_O2,is_POC)
-          conv_sed_ocn_N(io_NH4,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
-          conv_sed_ocn_N(io_ALK,is_POC) = conv_sed_ocn_N(io_NH4,is_POC) - conv_sed_ocn_N(io_NO3,is_POC)
-          conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        elseif (ocn_select(io_N2)) then
           ! O2 == (4/5)NO3- + (4/5)H+ - (2/5)N2 - (2/5)H2O
           conv_sed_ocn_N(io_NO3,is_POP) = -(4.0/5.0)*conv_sed_ocn_N(io_O2,is_POP)
@@ -1208,7 +1193,7 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes (denitrification)
+       ! N isotopes (from denitrification)
        !!!
        ! ALK
        ! [N transformations are explicit and hence ALK is associated with neither P nor C (excepting nitrate reduction)]
@@ -1225,11 +1210,6 @@ CONTAINS
           conv_sed_ocn_S(io_NH4,is_PON) = 1.0
           conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_S(io_NH4,is_PON)
           conv_sed_ocn_S(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_S(io_NH4,is_PON)
-       elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_S(io_NO3,is_PON) = 0.0
-          conv_sed_ocn_S(io_N2,is_PON)  = (1.0/2.0)
-          conv_sed_ocn_S(io_ALK,is_PON) = 0.0
-          conv_sed_ocn_S(io_O2,is_PON)  = 0.0
        else
           ! [DEFAULT, oxic remin relationship]
        endif
@@ -1284,11 +1264,6 @@ CONTAINS
           conv_sed_ocn_meth(io_NH4,is_PON) = 1.0
           conv_sed_ocn_meth(io_ALK,is_PON) = conv_sed_ocn_meth(io_NH4,is_PON)
           conv_sed_ocn_meth(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_meth(io_NH4,is_PON)
-       elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
-          conv_sed_ocn_meth(io_N2,is_PON)  = (1.0/2.0)
-          conv_sed_ocn_meth(io_ALK,is_PON) = 0.0
-          conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
        else
           ! [DEFAULT, oxic remin relationship]
        endif
