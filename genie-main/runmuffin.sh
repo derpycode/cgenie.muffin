@@ -185,6 +185,9 @@ elif [ $LONS -eq 12 ] && [ $LEVS -eq 8 ]; then
 elif [ $LONS -eq 36 ] && [ $LEVS -eq 32 ]; then
     let N_TIMESTEPS=96
     let dbiostp=1
+elif [ $LONS -eq 48 ] && [ $LEVS -eq 16 ]; then
+    let N_TIMESTEPS=96
+    let dbiostp=2
 else
     let N_TIMESTEPS=96
     let dbiostp=1
@@ -202,6 +205,7 @@ echo "   Setting time-stepping [GOLDSTEIN, BIOGEM:GOLDSTEIN]: " $N_TIMESTEPS $db
 # c-goldstein; e.g. ma_genie_timestep = 365.25*24.0/(5*96) * 3600.0 (GOLDSTEIN year length)
 #                => ma_genie_timestep=65745.0
 dstp="$(echo "3600.0*24.0*365.25/$datmstp/$N_TIMESTEPS" | bc -l)"
+echo "   Setting primary model time step: " $dstp
 # write primary model time step
 echo ma_genie_timestep=$dstp >> $CONFIGPATH/$CONFIGNAME
 # write relative time-stepping

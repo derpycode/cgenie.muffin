@@ -166,6 +166,8 @@ CONTAINS
           !       with the corresponding ocean tracer index given in the i=1 index position of the conv_atm_ocn_i array
           io = conv_atm_ocn_i(1,ia)
           SELECT CASE (atm_type(ia))
+          CASE (0)
+             ! [do nothing]
           CASE (1)
              ! calculate bulk gas exchange
              ! set local ocean and atmosphere tracer variables
@@ -4746,7 +4748,7 @@ CONTAINS
                & force_restore_atm_I(dum_ia,i,j) + &
                & force_restore_atm_sig_x(dum_ia)*(force_restore_atm_II(dum_ia,i,j) - force_restore_atm_I(dum_ia,i,j))
           SELECT CASE (atm_type(dum_ia))
-          CASE (1)
+          CASE (0,1)
              force_restore_atm(dum_ia,i,j) = loc_force_restore_atm
           case (n_itype_min:n_itype_max)
              loc_tot  = force_restore_atm(atm_dep(dum_ia),i,j)
@@ -4790,7 +4792,7 @@ CONTAINS
                & force_flux_atm_I(dum_ia,i,j) + &
                & force_flux_atm_sig_x(dum_ia)*(force_flux_atm_II(dum_ia,i,j) - force_flux_atm_I(dum_ia,i,j))
           SELECT CASE (atm_type(dum_ia))
-          CASE (1)
+          CASE (0,1)
              force_flux_atm(dum_ia,i,j) = loc_force_flux_atm
              loc_force_flux_atm_tot = loc_force_flux_atm_tot + loc_force_flux_atm
           case (n_itype_min:n_itype_max)
@@ -4818,7 +4820,7 @@ CONTAINS
        DO i=1,n_i
           DO j=1,n_j
              SELECT CASE (atm_type(dum_ia))
-             CASE (1)
+             CASE (0,1)
                 force_flux_atm(dum_ia,i,j) = force_flux_atm(dum_ia,i,j)*force_flux_atm_sig_x(dum_ia)*loc_force_flux_atm_rtot
              END SELECT
           END DO
