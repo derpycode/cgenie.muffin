@@ -2104,9 +2104,11 @@ CONTAINS
     case (                    &
          & '3N2T_PNFe_Tdep'   &
          & )
-       IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
-       IF (.NOT. ocn_select(io_FeL)) loc_flag = .TRUE.
-       IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.
+       if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
+          IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
+          IF (.NOT. ocn_select(io_FeL)) loc_flag = .TRUE.
+          IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.       
+       end if
        IF (.NOT. sed_select(is_POFe)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_POM_Fe)) loc_flag = .TRUE.
     end select
