@@ -2520,6 +2520,10 @@
 			<value datatype="boolean">.false.</value>
                         <description></description>
                     </param>
+                    <param name="par_dsc">
+                        <value datatype="real">5000.0</value>
+                        <description>ocean depth scale (m)</description>
+                    </param>
                 </namelist>
             </file>
         </model>

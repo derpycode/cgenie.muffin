@@ -309,9 +309,12 @@ c AR (18/01/08) : run-time seasonality option
 c AR (13/06/08) : diagend CALL option
 c AR (14/11/02) : option to reset ocean T
 c AR (17/11/30) : option to diagnose (only) MLD
+c AR (19/01/29) : added ocean depth (max)
 
       logical dosc,diso,ctrl_diagend,debug_init,debug_end,debug_loop,
      1 rst_reset_T,ctrl_diagmld
       common /goldstein_ctrl/dosc,diso,ctrl_diagend,
      : debug_init,debug_end,debug_loop,
      : rst_reset_T,ctrl_diagmld
+      real par_dsc
+      common /goldstein_ctrl/par_dsc
