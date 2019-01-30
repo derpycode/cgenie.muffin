@@ -2089,16 +2089,6 @@ CONTAINS
        IF (.NOT. ocn_select(io_NH4)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_PON)) loc_flag = .TRUE.
     end select
-    SELECT CASE (par_bio_prodopt)
-    case (                    &
-         & '3N2T_PNFe_Tdep'   &
-         & )
-       IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
-       IF (.NOT. ocn_select(io_FeL)) loc_flag = .TRUE.
-       IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.
-       IF (.NOT. sed_select(is_POFe)) loc_flag = .TRUE.
-       IF (.NOT. sed_select(is_POM_Fe)) loc_flag = .TRUE.
-    end select
     if (loc_flag) then
        CALL sub_report_error( &
             & 'biogem_data','sub_check_par', &
