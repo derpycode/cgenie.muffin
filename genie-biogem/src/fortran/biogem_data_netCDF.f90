@@ -781,7 +781,7 @@ CONTAINS
           call sub_putvar3d_g('carb_d13C_CO32',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end if
     end If
-    If (ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_tracer) then
+    If (ctrl_data_save_slice_ocn .AND. (ctrl_data_save_slice_diag_bio .OR. ctrl_data_save_slice_diag_geochem)) then
        !-----------------------------------------------------------------------
        !       N-star
        !-----------------------------------------------------------------------
@@ -830,6 +830,29 @@ CONTAINS
           call sub_adddef_netcdf(loc_iou,4,'misc_Pstar','P-star', &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar3d_g('misc_Pstar',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       end IF
+       !-----------------------------------------------------------------------
+       !       DINex
+       !-----------------------------------------------------------------------
+       IF (ocn_select(io_PO4) .AND. ocn_select(io_NO3) .AND. ocn_select(io_NH4)) THEN
+          loc_unitsname = 'umol kg-1'
+          loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) =                                                           &
+                        & 1.0E6*                                                              &
+                        & (                                                                   &
+                        &   int_ocn_timeslice(io_NO3,i,j,k)+int_ocn_timeslice(io_NH4,i,j,k) - &
+                        &   par_bio_red_POP_PON*int_ocn_timeslice(io_PO4,i,j,k)               &
+                        & )                                                                   &
+                        & /int_t_timeslice
+                END DO
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,4,'misc_DINex','DIN excess', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar3d_g('misc_DINex',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end IF
     end If
     If (ctrl_data_save_slice_ocn) then
