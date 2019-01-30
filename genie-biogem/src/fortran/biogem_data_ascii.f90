@@ -914,6 +914,23 @@ CONTAINS
           END DO
        END IF
     end if
+    ! DINex
+    IF (ctrl_data_save_sig_diag) THEN
+       if (ocn_select(io_NO3) .AND. ocn_select(io_NH4)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_DINex',string_results_ext &
+               & )
+          loc_string = '% time (yr) / global mean DINex (mol kg-1)'// &
+               & ' / surface mean DINex (mol kg-1) / benthic mean DINex (mol kg-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       END IF
+    end if
     ! Save 3D water column DIC d13C data for specific ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN
        loc_filename=fun_data_timeseries_filename( &
@@ -2364,6 +2381,28 @@ CONTAINS
              end if
           END DO
        END IF
+    end if
+    ! DINex
+    IF (ctrl_data_save_sig_diag) THEN
+       if (ocn_select(io_NO3) .AND. ocn_select(io_NH4)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_DINex',string_results_ext &
+               & )
+          loc_sig = ((int_ocn_sig(io_NO3)+int_ocn_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_sig(io_PO4)))/int_t_sig
+          loc_sig_sur = ((int_ocn_sur_sig(io_NO3)+int_ocn_sur_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_sur_sig(io_PO4)))/int_t_sig
+          loc_sig_ben = ((int_ocn_ben_sig(io_NO3)+int_ocn_ben_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_ben_sig(io_PO4)))/int_t_sig
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,3e15.7)',iostat=ios) &
+               & loc_t,                                  &
+               & loc_sig,                                &
+               & loc_sig_sur,                            &
+               & loc_sig_ben
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
     end if
     ! Save 3D data from a particular ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN

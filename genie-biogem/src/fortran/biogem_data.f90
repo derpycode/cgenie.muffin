@@ -284,7 +284,10 @@ CONTAINS
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
        print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
-	   print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
+       print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
+       print*,'N2 fixation 15N fractionation                       : ',par_bio_uptake_dN2_epsilon
+       print*,'NH4 assimilation 15N fractionation                  : ',par_bio_uptake_dNH4_epsilon
+       print*,'NO3 uptake 15N fractionation                        : ',par_bio_uptake_dNO3_epsilon
        ! --- IRON CYCLING -------------------------------------------------------------------------------------------------------- !
        print*,'--- IRON CYCLING -----------------------------------'
        print*,'Aeolian Fe solubility                               : ',par_det_Fe_sol
@@ -361,8 +364,7 @@ CONTAINS
        print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
        print*,'pyrite precip stiochiometry                         : ',ctrl_bio_FeS2precip_explicit
-       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
-       
+       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte       
        print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
        print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha 
        print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha 
@@ -370,8 +372,7 @@ CONTAINS
        print*,'kinetic constant for Fe reduction                   : ',par_bio_remin_kFetoFe2
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
-       print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
-       
+       print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha       
 	   ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -1141,48 +1142,61 @@ CONTAINS
     !       e.g. P + (8/5)NO3- + (8/5)H+ -> PO4 + (4/5)N2 + (4/5)H2O
     ! NOTE: assumption for NO2: 2NO3- <-> O2 + 2NO2-
     !                       or: O2 == 2NO3- - 2NO2-
+    ! Wikipedia summary ...
+    ! NO3− + 2 H+ + 2 e−→ NO2− + H2O (Nitrate reductase)
+    ! NO2− + 2 H+ + e− → NO + H2O (Nitrite reductase)
+    ! 2NO + 2 H+ + 2 e− → N2O + H2O (Nitric oxide reductase)
+    ! N2O + 2 H+ + 2 e− → N2 + H2O (Nitrous oxide reductase)
+    ! and ...
+    ! Reduction under anoxic conditions can also occur through process called anaerobic ammonium oxidation (anammox):
+    ! NH4+ + NO2− → N2 + 2 H2O
+    ! NOTE: will have to assume NO2- as part of the ALK balance ... ?
+    !       (then this must be taken inot account when NO or N2O is formed)
+    !
     if (ocn_select(io_NO3)) then
        conv_sed_ocn_N(:,:)  = conv_sed_ocn(:,:)
        ! N
        if (ocn_select(io_NH4)) then
+          ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
           conv_sed_ocn_N(io_NH4,is_PON) = 1.0
           conv_sed_ocn_N(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
-          conv_sed_ocn_N(io_O2,is_PON)  = (3.0/4.0)
-       elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_N(io_NO3,is_PON) = 0.0
-          conv_sed_ocn_N(io_N2,is_PON)  = 0.5
-          conv_sed_ocn_N(io_ALK,is_PON) = 0.0
-          conv_sed_ocn_N(io_O2,is_PON)  = 0.0
+          conv_sed_ocn_N(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_N(io_NH4,is_PON)
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes
+       ! N isotopes (from PON remin)
        conv_sed_ocn_N(io_NO3_15N,is_PON_15N) = conv_sed_ocn_N(io_NO3,is_PON)
        conv_sed_ocn_N(io_NH4_15N,is_PON_15N) = conv_sed_ocn_N(io_NH4,is_PON)
        conv_sed_ocn_N(io_N2_15N,is_PON_15N)  = conv_sed_ocn_N(io_N2,is_PON)
        ! P,C
        if (ocn_select(io_NO2)) then
-          conv_sed_ocn_N(io_NO3,is_POP) = -4.0
-          conv_sed_ocn_N(io_NO2,is_POP) = 4.0
+          ! O2 == 2NO3- - 2NO2-
+          conv_sed_ocn_N(io_NO3,is_POP) = 2.0*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_NO2,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_ALK,is_POP) = 0.0
           conv_sed_ocn_N(io_O2,is_POP)  = 0.0
-          conv_sed_ocn_N(io_NO3,is_POC) = 2.0*conv_sed_ocn(io_O2,is_POC)
-          conv_sed_ocn_N(io_NO2,is_POC) = -2.0*conv_sed_ocn(io_O2,is_POC)
+          conv_sed_ocn_N(io_NO3,is_POC) = 2.0*conv_sed_ocn_N(io_O2,is_POC)
+          conv_sed_ocn_N(io_NO2,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = 0.0
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_N(io_NO3,is_POP) = -(8.0/5.0)
-          conv_sed_ocn_N(io_N2,is_POP)  = -0.5*conv_sed_ocn_N(io_NO3,is_POP)
+          ! O2 == (4/5)NO3- + (4/5)H+ - (2/5)N2 - (2/5)H2O
+          conv_sed_ocn_N(io_NO3,is_POP) = -(4.0/5.0)*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_N2,is_POP)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_ALK,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_O2,is_POP)  = 0.0
-          conv_sed_ocn_N(io_NO3,is_POC) = (4.0/5.0)*conv_sed_ocn(io_O2,is_POC)
-          conv_sed_ocn_N(io_N2,is_POC)  = -0.5*conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N(io_NO3,is_POC) = (4.0/5.0)*conv_sed_ocn_N(io_O2,is_POC)
+          conv_sed_ocn_N(io_N2,is_POC)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        else
           ! [DEFAULT, oxic remin relationship]
        endif
+       ! N isotopes (from denitrification)
+       !!!
+       ! ALK
+       ! [N transformations are explicit and hence ALK is associated with neither P nor C (excepting nitrate reduction)]
     else
        conv_sed_ocn_N(:,:) = 0.0
     end if
@@ -1191,15 +1205,11 @@ CONTAINS
        conv_sed_ocn_S(:,:) = conv_sed_ocn(:,:)
        ! N
        if (ocn_select(io_NH4)) then
+          ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
           conv_sed_ocn_S(io_NH4,is_PON) = 1.0
-          conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
-          conv_sed_ocn_S(io_O2,is_PON)  = 0.0
-       elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_S(io_NO3,is_PON) = 0.0
-          conv_sed_ocn_S(io_N2,is_PON)  = 0.5
-          conv_sed_ocn_S(io_ALK,is_PON) = 0.0
-          conv_sed_ocn_S(io_O2,is_PON)  = 0.0
+          conv_sed_ocn_S(io_ALK,is_PON) = conv_sed_ocn_S(io_NH4,is_PON)
+          conv_sed_ocn_S(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_S(io_NH4,is_PON)
        else
           ! [DEFAULT, oxic remin relationship]
        endif
@@ -1208,23 +1218,28 @@ CONTAINS
        conv_sed_ocn_S(io_NH4_15N,is_PON_15N) = conv_sed_ocn_S(io_NH4,is_PON)
        conv_sed_ocn_S(io_N2_15N,is_PON_15N)  = conv_sed_ocn_S(io_N2,is_PON)
        ! P,C
-       conv_sed_ocn_S(io_SO4,is_POP) = 0.5*conv_sed_ocn_S(io_O2,is_POP)
-       conv_sed_ocn_S(io_H2S,is_POP) = -0.5*conv_sed_ocn_S(io_O2,is_POP)
+       conv_sed_ocn_S(io_SO4,is_POP) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POP)
+       conv_sed_ocn_S(io_H2S,is_POP) = -(1.0/2.0)*conv_sed_ocn_S(io_O2,is_POP)
        conv_sed_ocn_S(io_O2,is_POP)  = 0.0
-       conv_sed_ocn_S(io_SO4,is_POC) = 0.5*conv_sed_ocn(io_O2,is_POC)
-       conv_sed_ocn_S(io_H2S,is_POC) = -0.5*conv_sed_ocn(io_O2,is_POC)
+       conv_sed_ocn_S(io_SO4,is_POC) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
+       conv_sed_ocn_S(io_H2S,is_POC) = -(1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
        conv_sed_ocn_S(io_O2,is_POC)  = 0.0
        ! S isotopes
        conv_sed_ocn_S(io_SO4_34S,is_POP) = conv_sed_ocn_S(io_SO4,is_POP)
        conv_sed_ocn_S(io_H2S_34S,is_POP) = conv_sed_ocn_S(io_H2S,is_POP)
        conv_sed_ocn_S(io_SO4_34S,is_POC) = conv_sed_ocn_S(io_SO4,is_POC)
        conv_sed_ocn_S(io_H2S_34S,is_POC) = conv_sed_ocn_S(io_H2S,is_POC)
-       ! 
+       ! ALK
+       if (sed_select(is_PON)) then
+          ! [N transformations are explicit and hence ALK is associated with neither P nor C (excepting sulphate reduction)]
+          conv_sed_ocn_S(io_ALK,is_POP) = 0.0
+          conv_sed_ocn_S(io_ALK,is_POC) = 0.0
+       end if
        if (ctrl_bio_red_ALKwithPOC) then
           conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP)
-          conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC) + conv_sed_ocn(io_ALK,is_POC)
+          conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC) + conv_sed_ocn_S(io_ALK,is_POC)
        else
-          conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP) + conv_sed_ocn(io_ALK,is_POP)
+          conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP) + conv_sed_ocn_S(io_ALK,is_POP)
           conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC)
        end if
     else
@@ -1244,15 +1259,11 @@ CONTAINS
        loc_alpha = 1.0 + par_d13C_Corg_CH4_epsilon/1000.0
        ! N
        if (ocn_select(io_NH4)) then
+          ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
           conv_sed_ocn_meth(io_NH4,is_PON) = 1.0
-          conv_sed_ocn_meth(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
-          conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
-       elseif (ocn_select(io_N2)) then
-          conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
-          conv_sed_ocn_meth(io_N2,is_PON)  = 0.5
-          conv_sed_ocn_meth(io_ALK,is_PON) = 0.0
-          conv_sed_ocn_meth(io_O2,is_PON)  = 0.0
+          conv_sed_ocn_meth(io_ALK,is_PON) = conv_sed_ocn_meth(io_NH4,is_PON)
+          conv_sed_ocn_meth(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_meth(io_NH4,is_PON)
        else
           ! [DEFAULT, oxic remin relationship]
        endif
@@ -1262,7 +1273,7 @@ CONTAINS
        conv_sed_ocn_meth(io_N2_15N,is_PON_15N)  = conv_sed_ocn_meth(io_N2,is_PON)
        ! P,C
        conv_sed_ocn_meth(io_O2,is_POP)  = 0.0
-       conv_sed_ocn_meth(io_CH4,is_POC) = -0.5*par_bio_red_POP_PO2/par_bio_red_POP_POC
+       conv_sed_ocn_meth(io_CH4,is_POC) = -(1.0/2.0)*par_bio_red_POP_PO2/par_bio_red_POP_POC
        conv_sed_ocn_meth(io_DIC,is_POC) = 1.0 - conv_sed_ocn_meth(io_CH4,is_POC)
        conv_sed_ocn_meth(io_O2,is_POC)  = 0.0
        ! C isotopes
@@ -2088,6 +2099,18 @@ CONTAINS
        IF (.NOT. ocn_select(io_N2)) loc_flag = .TRUE.
        IF (.NOT. ocn_select(io_NH4)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_PON)) loc_flag = .TRUE.
+    end select
+    SELECT CASE (par_bio_prodopt)
+    case (                    &
+         & '3N2T_PNFe_Tdep'   &
+         & )
+       if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
+          IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
+          IF (.NOT. ocn_select(io_FeL)) loc_flag = .TRUE.
+          IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.       
+       end if
+       IF (.NOT. sed_select(is_POFe)) loc_flag = .TRUE.
+       IF (.NOT. sed_select(is_POM_Fe)) loc_flag = .TRUE.
     end select
     if (loc_flag) then
        CALL sub_report_error( &
