@@ -216,6 +216,7 @@ CONTAINS
        print*,'Report errors?                                      : ',ctrl_misc_report_err
        print*,'i sediment coordinate for debug reporting           : ',par_misc_debug_i
        print*,'j sediment coordinate for debug reporting           : ',par_misc_debug_j
+       print*,'Report level #1 debug?                              : ',ctrl_debug_lvl1
        ! --- DATA SAVING: MISC --------------------------------------------------------------------------------------------------- !
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst

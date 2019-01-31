@@ -449,6 +449,14 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="atm_select(20)" index="20">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="atm_select(21)" index="21">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- ocn_select -->
                    <paramArray name="ocn_select" dimension="1" extent="100">
@@ -5133,6 +5141,14 @@
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
+                        <param name="par_atm_force_scale_val(20)" index="20">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_atm_force_scale_val(21)" index="21">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="par_atm_force_scale_time" dimension="1" extent="19">
                         <description>atmospheric tracer forcing scaling - time</description>    
@@ -5209,6 +5225,14 @@
                             <description></description>
                         </param>
                         <param name="par_atm_force_scale_time(19)" index="19">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_atm_force_scale_time(20)" index="20">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_atm_force_scale_time(21)" index="21">
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
@@ -6168,6 +6192,14 @@
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
+                        <param name="atm_init(20)" index="20">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="atm_init(21)" index="21">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="atm_dinit" dimension="1" extent="19">
                         <description>tracer perturbation</description>    
@@ -6244,6 +6276,14 @@
                             <description></description>
                         </param>
                         <param name="atm_dinit(19)" index="19">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="atm_dinit(20)" index="20">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="atm_dinit(21)" index="21">
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>

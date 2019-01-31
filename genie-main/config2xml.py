@@ -51,7 +51,9 @@ atm_select = {
     "gm_atm_select_16" : ["16",""],
     "gm_atm_select_17" : ["17",""],
     "gm_atm_select_18" : ["18",""],
-    "gm_atm_select_19" : ["19",""]
+    "gm_atm_select_19" : ["19",""],
+    "gm_atm_select_20" : ["20",""],
+    "gm_atm_select_21" : ["21",""]
     }
 ocn_select = {
     "gm_ocn_select_1" : ["1",""],
@@ -265,7 +267,9 @@ atm_init = {
     "ac_atm_init_16" : ["16",""],
     "ac_atm_init_17" : ["17",""],
     "ac_atm_init_18" : ["18",""],
-    "ac_atm_init_19" : ["19",""]
+    "ac_atm_init_19" : ["19",""],
+    "ac_atm_init_20" : ["20",""],
+    "ac_atm_init_21" : ["21",""]
     }
 atm_dinit = {
     "ac_atm_dinit_1" : ["1",""],
@@ -286,7 +290,9 @@ atm_dinit = {
     "ac_atm_dinit_16" : ["16",""],
     "ac_atm_dinit_17" : ["17",""],
     "ac_atm_dinit_18" : ["18",""],
-    "ac_atm_dinit_19" : ["19",""]
+    "ac_atm_dinit_19" : ["19",""],
+    "ac_atm_dinit_20" : ["20",""],
+    "ac_atm_dinit_21" : ["21",""]
     }
 # biogem
 ocn_init = {
@@ -514,7 +520,9 @@ par_atm_force_scale_val = {
     "bg_par_atm_force_scale_val_16" : ["16",""],
     "bg_par_atm_force_scale_val_17" : ["17",""],
     "bg_par_atm_force_scale_val_18" : ["18",""],
-    "bg_par_atm_force_scale_val_19" : ["19",""]
+    "bg_par_atm_force_scale_val_19" : ["19",""],
+    "bg_par_atm_force_scale_val_20" : ["20",""],
+    "bg_par_atm_force_scale_val_21" : ["21",""]
     }
 par_atm_force_scale_time = {
     "bg_par_atm_force_scale_time_1" : ["1",""],
@@ -535,7 +543,9 @@ par_atm_force_scale_time = {
     "bg_par_atm_force_scale_time_16" : ["16",""],
     "bg_par_atm_force_scale_time_17" : ["17",""],
     "bg_par_atm_force_scale_time_18" : ["18",""],
-    "bg_par_atm_force_scale_time_19" : ["19",""]
+    "bg_par_atm_force_scale_time_19" : ["19",""],
+    "bg_par_atm_force_scale_time_20" : ["20",""],
+    "bg_par_atm_force_scale_time_21" : ["21",""]
     }
 par_ocn_force_scale_val = {
     "bg_par_ocn_force_scale_val_1" : ["1",""],

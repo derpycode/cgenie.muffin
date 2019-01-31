@@ -1259,10 +1259,16 @@ subroutine biogem(        &
                        end IF
                        ! calculate flux of CO2 to atmosphere with specified d13C to approach atmospheric d13C target
                        ! NOTE: units of (mol yr-1)
-                       locij_fatm(ia_pCO2,i,j) = loc_force_sign*force_flux_atm(ia_pCO2,i,j)
+                       locij_fatm(ia_pCO2,i,j)     = loc_force_sign*force_flux_atm(ia_pCO2,i,j)
                        locij_fatm(ia_pCO2_13C,i,j) = loc_frac*locij_fatm(ia_pCO2,i,j)
                        diag_misc_2D(idiag_misc_2D_FpCO2,i,j)     = locij_fatm(ia_pCO2,i,j)
                        diag_misc_2D(idiag_misc_2D_FpCO2_13C,i,j) = locij_fatm(ia_pCO2_13C,i,j)
+                       IF (force_flux_atm_select(ia_pcolr) .AND. force_flux_atm_select(ia_pcolr_13C)) THEN
+                          locij_fatm(ia_pCO2,i,j)      = locij_fatm(ia_pCO2,i,j) + locij_fatm(ia_pcolr,i,j)
+                          locij_fatm(ia_pCO2_13C,i,j)  = locij_fatm(ia_pCO2_13C,i,j) + locij_fatm(ia_pcolr_13C,i,j)
+                          locij_fatm(ia_pcolr,i,j)     = 0.0
+                          locij_fatm(ia_pcolr_13C,i,j) = 0.0
+                       end if
                     end if
                  end if
                  ! ------------------------------------------- !
