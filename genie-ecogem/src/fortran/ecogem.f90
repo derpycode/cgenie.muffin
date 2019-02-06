@@ -7,8 +7,8 @@ subroutine ecogem(          &
      & dum_egbg_fxsw,       & ! input
      & dum_mld,             & ! input
      & dum_egbg_sfcocn,     & ! input  -- tracer concentrations
-     & dum_egbg_sfcpart,    &
-     & dum_egbg_sfcdiss     &
+     & dum_egbg_sfcpart,    & ! output -- change in particulate concentration field
+     & dum_egbg_sfcdiss     & ! output -- change in remin concentration field
      & )
 
   use gem_cmn
@@ -87,6 +87,9 @@ subroutine ecogem(          &
   REAL,DIMENSION(npmax)                    ::BioC,PP
   REAL,DIMENSION(iomax+iChl,npmax)         ::GrazPredEat,GrazPreyEaten
   REAL,DIMENSION(npmax)                    ::BioCiso
+  
+  real		   		     ::loc_total_weights ! JDW total weights
+  real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size 
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
   REAL                                     ::loc_rdts,loc_rdtyr            ! time reciprocals
@@ -97,6 +100,15 @@ subroutine ecogem(          &
   ! ------------------------------------------------------- !
   ! local array for ocean tracers
   loc_ocn(:,:,:,:) = dum_egbg_sfcocn(:,:,:,:)
+
+  ! JDW Overwrite surface temperature with input
+  if(ctrl_force_T)then 
+	loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface layer?
+  end if	
+  
+  ! zero output arrays
+  dum_egbg_sfcpart = 0.0
+  dum_egbg_sfcdiss = 0.0
 
   ! *** CALCULATE LOCAL CONSTANTS & VARIABLES ***
   ! sea surface temp (in degrees C)
@@ -247,10 +259,22 @@ subroutine ecogem(          &
                  if (topD.lt.mld) imld=k                     ! if top of level is above MLD, include level in ML
                  topD = topD + layerthick                    ! get depth for top of next level
                  templocal = loc_ocn(io_T,i,j,k)
+                 ! cap maximum temperature seen by ECOGEM
+                 !temp_max=35
+                 !if (templocal.gt.(temp_max+273.15)) print*,'\/'
+                 !print*,templocal,temp_max,MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
+                 templocal = MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
 
-                 loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
-                 loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
-                 BioC(:) = loc_biomass(iCarb,:)
+		IF(ctrl_limit_neg_biomass)THEN
+                        !IF(ANY(plankton(:,:,i,j,k).lt.0.0)) print*,'\/',i,j
+                 	loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
+                 	loc_biomass(:,:) = merge(plankton(:,:,i,j,k),1.0e-4,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
+                 	BioC(:) = loc_biomass(iCarb,:)
+                 else
+                 	loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
+                 	loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
+                 	BioC(:) = loc_biomass(iCarb,:)
+                 endif
 
                  if (c13trace) then
                     !plankiso(iCarb13C,:,i,j,k) = plankton(iCarb,:,i,j,k) * 0.0109 !force for testing
@@ -262,11 +286,16 @@ subroutine ecogem(          &
 
                  ! LIGHT ATTENUATION     
                  if (n_keco.eq.1) then ! Calculate light as mean across (virtual) ML
+                    ! [AR] restrict MLD to (top) layer thickness
+                    if (ctrl_restrict_mld) then
+                       if (topD > mld) mld = topD
+                    end if
                     totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 
                     totchl    = totchl * layerthick / mld ! recalculate chl concentration as if spread evenly across ML
                     k_tot     = (k_w + k_chl*totchl) ! attenuation due to water and pigment
                     if (fundamental) k_tot = k_w ! no self-shading (i.e. no competition for light) in fundamental niche experiment
                     PAR_layer = PAR_in /mld /k_tot*(1-exp(-k_tot*mld)) ! average PAR in  layer
+                    ! [AR] this ... doesn't 'do' anything? k_tot*(1-exp(-k_tot*mld)) is never 0.0 or less(?)
                     PAR_layer = MERGE(PAR_layer,0.0,k_tot*(1-exp(-k_tot*mld)).gt.0.0)
                  else ! Calculate mean light within each layer
                     totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 
@@ -455,6 +484,31 @@ subroutine ecogem(          &
                  enddo
                  ! no organic matter production in fundamental niche experiment
                  if (fundamental) dorgmatdt(:,:) = 0.0
+                 
+                 ! ******* JDW size-dependent remineralisation *******
+		 ! calculate weighted mean size for size-dependent remineralisation scheme
+		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
+                 if (sed_select(is_POC_size)) then
+		 
+                 	loc_weighted_mean_size=0.0
+                 	loc_total_weights=0.0
+                 
+                 	do jp=1,npmax
+				if(autotrophy(jp).gt.0.0)then
+				
+				! Biomass weighted
+				loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(jp) ! sum of weights * size
+				loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
+				
+				! POC weighted 
+                 		!loc_weighted_mean_size=loc_weighted_mean_size+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp)))*logesd(jp) ! sum of weights * size            	
+                 		!loc_total_weights=loc_total_weights+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp))) ! sum of weights
+				endIF
+			enddo
+                 	
+                 	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
+                 endif
+                 ! ***************************************************
 
                  !**********************ckc ISOTOPES**********************************************************************
 
@@ -623,13 +677,14 @@ subroutine ecogem(          &
      print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
      STOP
   endif
+
   ! CaCO3 production
   gamma = (omega-1.0)**par_bio_red_POC_CaCO3_pP
   gamma = MERGE(gamma,0.0,omega.gt.1.0)
-
   dum_egbg_sfcpart(is_CaCO3,:,:,:) = dum_egbg_sfcpart(is_POC,:,:,:)       * par_bio_red_POC_CaCO3 * gamma
   dum_egbg_sfcdiss(io_DIC  ,:,:,:) = dum_egbg_sfcdiss(io_DIC,:,:,:) - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
   dum_egbg_sfcdiss(io_ALK  ,:,:,:) = dum_egbg_sfcdiss(io_ALK,:,:,:) - 2.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
+  dum_egbg_sfcdiss(io_Ca  ,:,:,:)  = dum_egbg_sfcdiss(io_Ca,:,:,:)  - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
 
   !cxarbon isotope for CaCO3
   if (useDIC_13C) then
@@ -722,7 +777,6 @@ SUBROUTINE diag_ecogem_timeslice( &
      int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr *   uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
      int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) + loc_dtyr *    phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
      int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr *        nutrient(:,:,:,:)        ! mmol m^-3
-
   end if
 
   ! write time-slice data and re-set integration

@@ -195,6 +195,7 @@ c AY (19/12/03) : need to calculate wind stresses first
 c                 code below taken from gseto.F
          do j=1,jmax
             do i=1,imax
+
                dztau(1,i,j) = scf*stressxu_ocn(i,j)
      1              /(rh0sc*dsc*usc*fsc)/dzz
                dztau(2,i,j) = scf*stressyu_ocn(i,j)

@@ -867,7 +867,7 @@ c-----------------------------------------------------------------------
 c AY (18/12/03) : standard c-GOLDSTEIN sea-ice routine
 c                 would be nice to include dummy routine as well
                if(sica(i,j).gt.0.0)then
-c              * Sea-ice present *                 
+c              * Sea-ice present *       
 
 c let albedo over sea ice vary as a function of tair (Holland et al. 1993)
 
@@ -1634,6 +1634,10 @@ ccc            if (flag_ents) then
                eb_uv(2,i,j)  = usc*uatm(2,i,j)
                eb_usurf(i,j) = usurf(i,j)
 c     eb_relh(i,j) = real(relh(i,j))
+cccc SHELF SOLAR RADIATION HACK
+ccc               if(k1(i,j).ne.kmax) then
+ccc                  go_fxsw(i,j) = 0.0
+ccc               endif
 ccc            endif
          enddo
       enddo

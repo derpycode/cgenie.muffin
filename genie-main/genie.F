@@ -551,6 +551,7 @@ ccc THIS MOSTLY FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM,
 ccc BUT NEEDS BIOGEM TEST REPLACING (AND *CARE* TAKEN)
                   if (koverall.eq.(conv_kocn_kbiogem*kocn_loop))
      &                 call biogem_climate_sol_wrapper
+                  if (flag_ecogem) call diag_biogem_ecogem_wrapper ! extract ECOGEM diagnostics
                   call biogem_forcing_wrapper
                   call biogem_wrapper
                   call biogem_tracercoupling_wrapper
@@ -568,9 +569,9 @@ ccc BUT NEEDS BIOGEM TEST REPLACING (AND *CARE* TAKEN)
                      call diag_biogem_timeseries_wrapper
                   end if
                   call cpl_flux_ocnatm_wrapper
-                  call cpl_flux_ocnsed_wrapper
-                  call cpl_comp_ocnsed_wrapper
-                  call reinit_flux_rokocn_wrapper
+                  if (flag_sedgem) call cpl_flux_ocnsed_wrapper
+                  if (flag_sedgem) call cpl_comp_ocnsed_wrapper
+                  if (flag_rokgem) call reinit_flux_rokocn_wrapper
                   if (debug_loop.gt.0) call diag_biogem_wrapper
 c     If GEMlite: test for the end of the 1st (normal) part of cycle
 c     => create annual averages of <ocn> (for later transfer to GEMlite)

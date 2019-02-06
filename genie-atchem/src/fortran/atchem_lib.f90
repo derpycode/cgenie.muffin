@@ -67,6 +67,9 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/ctrl_ncrst
   CHARACTER(len=127)::par_ncrst_name                           ! 
   NAMELIST /ini_atchem_nml/par_ncrst_name
+  ! ------------------- DEBUGGING OPTIONS ---------------------------------------------------------------------------------------- !
+  LOGICAL::ctrl_debug_lvl1                                       ! report 'level #1' debug?
+  NAMELIST /ini_atchem_nml/ctrl_debug_lvl1 
   ! ############################################################################################################################## !
 
 

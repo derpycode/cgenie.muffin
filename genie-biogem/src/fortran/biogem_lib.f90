@@ -183,6 +183,8 @@ MODULE biogem_lib
   real::par_part_red_opal_FeTKSp                                        ! Ridgwell [2001] -- opal:POC KSp for FeT
   real::par_part_red_opal_FeToff                                        ! Ridgwell [2001] -- opal:POC offset for FeT
   NAMELIST /ini_biogem_nml/par_part_red_opal_FeTKSp,par_part_red_opal_FeToff
+  CHARACTER(len=63)::opt_bio_red_SitoC                                  ! opal:POC rain ratio option ID (e.g. 'fixed' == default)
+  NAMELIST /ini_biogem_nml/opt_bio_red_SitoC
   ! ------------------- REMINERALIZATION ----------------------------------------------------------------------------------------- !
   real::par_bio_remin_RDOMfrac                                          ! fraction of POM remin concverted to RDOM
   NAMELIST /ini_biogem_nml/par_bio_remin_RDOMfrac
@@ -287,6 +289,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
+  real::par_bio_remin_POC_eL0		! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
+  real::par_bio_remin_POC_size0		! JDW size-dependent remin: diameter of smallest ecogem size class (um)
+  real::par_bio_remin_POC_eta		! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
+  NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta
   ! kinetics
   real::par_bio_remin_k_O2
   real::par_bio_remin_k_NO3
@@ -337,6 +343,8 @@ MODULE biogem_lib
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
   CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
   NAMELIST /ini_biogem_nml/opt_d13C_DIC_Corg
+  CHARACTER(len=63)::opt_d44Ca_Ca_CaCO3                          ! CaCO3 44Ca fractionation scheme ID string
+  NAMELIST /ini_biogem_nml/opt_d44Ca_Ca_CaCO3
   real::par_d13C_DIC_Corg_b                                      ! b value for Popp et al. fractionation
   NAMELIST /ini_biogem_nml/par_d13C_DIC_Corg_b
   real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix
@@ -1005,6 +1013,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_diag_misc_2D,n_i,n_j)::diag_misc_2D           !
   REAL,DIMENSION(0:n_i,0:n_j)::diag_misc_psi                     !
   real,DIMENSION(:,:,:,:),ALLOCATABLE::diag_redox                ! redox diagnostics
+  REAL,DIMENSION(n_sed,n_i,n_j)::diag_ecogem_part                ! 
+  REAL,DIMENSION(n_ocn,n_i,n_j)::diag_ecogem_remin               ! 
 
   ! *** integrated (time-averaged) time-series storage scalars and vectors ***
   !
@@ -1015,6 +1025,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_ocn)::int_ocn_sig                             !
   REAL,DIMENSION(n_atm)::int_ocnatm_sig                          !
   REAL,DIMENSION(n_sed)::int_fexport_sig                         !
+  REAL,DIMENSION(n_sed)::int_fracdom_sig                         !
   REAL,DIMENSION(n_atm)::int_focnatm_sig                         !
   REAL,DIMENSION(n_sed)::int_focnsed_sig                         !
   REAL,DIMENSION(n_ocn)::int_fsedocn_sig                         !
@@ -1081,6 +1092,9 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm,n_i,n_j)::int_diag_airsea_timeslice       ! air-sea gas exchange diagnostics
   ! redox
   real,DIMENSION(:,:,:,:),ALLOCATABLE::int_diag_redox_timeslice  ! redox diagnostics 3D time-slice
+  ! ecogem
+  REAL,DIMENSION(n_sed,n_i,n_j)::int_diag_ecogem_part                ! 
+  REAL,DIMENSION(n_ocn,n_i,n_j)::int_diag_ecogem_remin               ! 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
   !
   ! ############################################################################################################################## !
@@ -1119,6 +1133,8 @@ MODULE biogem_lib
   CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::orb_pts_var              ! orbital point variable data
   real,DIMENSION(:,:,:),ALLOCATABLE::orb_pts                     ! saved orbital point data
   real,DIMENSION(:),ALLOCATABLE::orb_pts_time                ! orbital point time
+  ! global means
+  REAL,DIMENSION(n_sed)::int_fracdom                         !
 
   ! *** forcing ***
   ! forcing - restoring

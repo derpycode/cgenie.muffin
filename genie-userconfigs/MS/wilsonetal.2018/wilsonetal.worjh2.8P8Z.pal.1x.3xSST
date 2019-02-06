@@ -1,0 +1,113 @@
+#
+#
+# --- CLIMATE ---------------------------------------------------------
+#
+# set no climate feedback
+ea_36=n
+#
+# --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
+#
+# biological scheme ID string
+bg_par_bio_prodopt="NONE"
+#
+# --- ORGANIC MATTER EXPORT RATIOS ------------------------------------
+#
+# production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# --- INORGANIC MATTER EXPORT RATIOS ----------------------------------
+#
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+bg_par_bio_red_POC_CaCO3=0.0485
+# exponent for modifier of CaCO3:POC export ratio
+bg_par_bio_red_POC_CaCO3_pP=0.7440
+#
+# --- REMINERALIZATION ------------------------------------------------
+#
+# DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=0.5
+# initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=0.0557
+# depth of remineralization or particulate organic matter
+bg_par_bio_remin_POC_eL1=589.9451
+# remineralization length #2 for POC
+bg_par_bio_remin_POC_eL2=1000000.0
+# initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.45
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1.8905e+003
+# remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+#
+# --- IRON ----------------------------------------------------------
+#
+#
+# --- ECOGEM ----------------------------------------------------------
+#
+gm_ctrl_debug_init          =0
+eg_ctrl_debug_eco_init      =.false.
+
+eg_par_ecogem_plankton_file ='8P8Z.eco'
+
+#################### Nitrogen ############################
+eg_useNO3                   =.false.
+eg_nquota                   =.false.
+################## Phosphorus ############################
+eg_usePO4                   =.true.
+eg_pquota                   =.true.
+######################## Iron ############################
+eg_useFe                    =.false. # JDW
+eg_fquota                   =.false. # JDW
+################# Chlorophyll ############################
+eg_chlquota                 =.true.
+################# d13C ###################################
+eg_useDIC_13C               =.true.
+
+# Tuned
+eg_qminP_a     =   3.33e-3
+eg_qminFe_a    =   1.00e-6
+eg_qmaxFe_a    =   4.00e-6
+
+eg_ns          =   2
+
+eg_respir_a    = 0
+
+eg_beta_mort_a =   0.8 # Maximum fraction to DOM as ESD --> zero
+eg_beta_mort_b =   0.4 # Minimum fraction to DOM as ESD --> infinity 
+eg_beta_mort_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
+eg_beta_graz_a =   0.8 # Maximum fraction to DOM as ESD --> zero
+eg_beta_graz_b =   0.4 # Minimum fraction to DOM as ESD --> infinity
+eg_beta_graz_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
+
+eg_par_bio_red_POC_CaCO3     = 0.0285 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+eg_par_bio_red_POC_CaCO3_pP  = 0.7440 # exponent for modifier of CaCO3:POC export ratio
+
+eg_nsubtime                 =25
+eg_n_keco                   =1
+
+# disable ECOGEM restarts (as not currently coded up / used)
+eg_ctrl_ncrst               =.false.
+eg_ctrl_continuing          =.false.
+go_imld = 1 # JDW
+#
+# --- DATA SAVING -----------------------------------------------------
+#
+bg_par_data_save_level=8
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=1
+#
+# --- FORCINGS --------------------------------------------------------
+#
+# specify forcings
+bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2"
+bg_par_atm_force_scale_val_3=278.0E-06
+bg_par_atm_force_scale_val_4=-6.5
+#
+bg_par_atm_force_scale_val_3=278.0E-06
+bg_par_data_save_level=8
+ea_36=y
+eg_ctrl_force_T=.true.
+eg_par_ecogem_force_T_file="20170811.worjh2.PO4.8P8Z.pal.3x_SST.dat"
+# --- END -------------------------------------------------------------
+#
+#

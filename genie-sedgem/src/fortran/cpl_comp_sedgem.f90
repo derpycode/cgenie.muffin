@@ -16,6 +16,7 @@ SUBROUTINE cpl_comp_ocnsed(      &
      & dum_sfcocn1,              &
      & dum_sfcsumocn             &
      & )
+  USE sedgem_lib
   IMPLICIT NONE
   ! dummy arguments
   integer,intent(in)::dum_ocnstep                               ! 
@@ -29,6 +30,12 @@ SUBROUTINE cpl_comp_ocnsed(      &
   integer::i,j                                                  ! 
   integer::i1,j1                                                ! 
   integer::loc_scalei,loc_scalej                                ! 
+  ! ---------------------------------------------------------- !
+  ! START
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '*** COUPLE INTERFACE COMPOSITION: OCN->SED ***'
+  IF (ctrl_debug_lvl1) print*, '    >>>'
+  ! ---------------------------------------------------------- !
   ! initialize local variables
   loc_scalei = dum_n_i_sed/dum_n_i_ocn
   loc_scalej = dum_n_j_sed/dum_n_j_ocn
@@ -52,6 +59,11 @@ SUBROUTINE cpl_comp_ocnsed(      &
              & real(int(MOD(dum_ocnstep - dum_mbiogem,dum_msedgem)/dum_mbiogem) + 1)
      end DO
   end DO
+  ! ---------------------------------------------------------- !
+  ! END
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '    <<<'
+  ! ---------------------------------------------------------- !
 end SUBROUTINE cpl_comp_ocnsed
 ! ******************************************************************************************************************************** !
 
@@ -80,6 +92,12 @@ SUBROUTINE cpl_comp_sedocn(     &
   integer::di,dj                                                !
   integer::loc_scalei,loc_scalej                                !
   real::loc_rscale                                               !
+  ! ---------------------------------------------------------- !
+  ! START
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '*** COUPLE INRTERFACE COMPOSITION: SED->OCN ***'
+  IF (ctrl_debug_lvl1) print*, '    >>>'
+  ! ---------------------------------------------------------- !
   ! initialize local variables
   loc_scalei = dum_n_i_sed/dum_n_i_ocn
   loc_scalej = dum_n_j_sed/dum_n_j_ocn
@@ -141,6 +159,11 @@ SUBROUTINE cpl_comp_sedocn(     &
         end DO
      end DO
   end DO
+  ! ---------------------------------------------------------- !
+  ! END
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '    <<<'
+  ! ---------------------------------------------------------- !
 end SUBROUTINE cpl_comp_sedocn
 ! ******************************************************************************************************************************** !
 
