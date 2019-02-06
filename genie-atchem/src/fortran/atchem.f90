@@ -69,10 +69,6 @@ SUBROUTINE atchem(    &
            IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
               CALL sub_calc_oxidize_CH4_schmidt03(i,j,loc_dtyr)
            END IF
-        case ('schmidt03_exp')
-           IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-              CALL sub_calc_oxidize_CH4_schmidt03_exp(i,j,loc_dtyr)
-           END IF
         case default
             !!! NOTHING
         end select
@@ -103,19 +99,19 @@ SUBROUTINE atchem(    &
   select case (par_atm_CH4_photochem)
      case ('claire06')
       IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire(loc_dtyr,loc_conv_atm_mol(:,:))
+         CALL sub_calc_oxidize_CH4_claire06(loc_dtyr,loc_conv_atm_mol(:,:))
       END IF
      case('claire06_fixed')
       IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire_fixed(loc_dtyr,loc_conv_atm_mol(:,:))
+         CALL sub_calc_oxidize_CH4_claire06_fixed(loc_dtyr,loc_conv_atm_mol(:,:))
       END IF
      case ('claire06H')
       IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claireH(loc_dtyr,loc_conv_atm_mol(:,:))
+         CALL sub_calc_oxidize_CH4_claire06H(loc_dtyr,loc_conv_atm_mol(:,:))
       END IF
      case ('goldblatt06')
       IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_goldblatt(loc_dtyr,loc_conv_atm_mol(:,:))
+         CALL sub_calc_oxidize_CH4_goldblatt06(loc_dtyr,loc_conv_atm_mol(:,:))
       END IF
   case default
     !!! NOTHING

@@ -58,10 +58,6 @@ CONTAINS
        print*,'Baseline atmospheric pCH4                           : ',par_pCH4_oxidation_C0
        print*,'Baseline CH4 lifetime                               : ',par_pCH4_oxidation_tau0
        print*,'Exponent for CH4 lifetime                           : ',par_pCH4_oxidation_N
-       print*,'first linear term for 2-term exponential fit        : ',par_pCH4_oxidation_a1
-       print*,'first exponential term for 2-term exponential fit   : ',par_pCH4_oxidation_a2
-       print*,'second linear term for 2-term exponential fit       : ',par_pCH4_oxidation_b1
-       print*,'second exponential term for 2-term exponential fit  : ',par_pCH4_oxidation_b2
        print*,'Atmospheric pO2 for fixed scheme                    : ',par_atm_pO2_fixed
        ! --- EMISSIONS-TO-ATMOSPHERE --------------------------------------------------------------------------------------------- !
        print*,'--- EMISSIONS-TO-ATMOSPHERE ------------------------'
