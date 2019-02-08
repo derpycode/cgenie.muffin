@@ -6295,7 +6295,7 @@
                         <description>reference atmospheric pCH4 [atm]</description>
                    </param>
                    <param name="par_pCH4_oxidation_tau0">
-                        <value datatype="real">7.6</value>
+                        <value datatype="real">7.6161</value>
                         <description>baseline atmospheric CH4 lifetime [yr]</description>
                    </param>
                    <param name="par_pCH4_oxidation_N">
