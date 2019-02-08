@@ -16,7 +16,7 @@ go_saln0=34.9
 # --- ATMOSPHERIC PHOTOCHEMISTRY --------------------------------------
 #
 # atmospheric photochemical scheme ID string
-ac_par_atm_CH4_photochem="claire06"
+ac_par_atm_CH4_photochem="schmidt03"
 #
 # --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
 #
@@ -26,6 +26,8 @@ bg_par_bio_prodopt="bio_P"
 bg_par_bio_k0_PO4=1.9582242E-06
 # [PO4] M-M half-sat value (mol kg-1)
 bg_par_bio_c0_PO4=2.1989611E-07
+# biological uptake time-scale
+bg_par_bio_tau=63.3827
 #
 # --- ORGANIC MATTER EXPORT RATIOS ------------------------------------
 #
@@ -79,7 +81,7 @@ bg_opt_bio_remin_oxidize_H2StoSO4="OLD"
 # aerobic CH4 oxidation scheme
 bg_par_bio_remin_CH4ox="CH4ox_MM"
 # rate constant for aerobic methanotrophy
-bg_par_bio_remin_AER_kAER=0.40
+bg_par_bio_remin_AER_kAER=0.4
 # O2 half-saturation constant for aerobic methanotrophy
 bg_par_bio_remin_AER_Km_O2=20.E-06
 # rate constant for AOM
@@ -146,7 +148,7 @@ bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2_RpO2"
 bg_par_atm_force_scale_val_3=278.0E-06      # restoring forcing for pCO2 [atm]
 bg_par_atm_force_scale_val_4=-6.5           # restoring forcing for d13C CO2 [o/oo]
 bg_par_atm_force_scale_val_6=0.2095         # restoring forcing for pO2 [atm]
-ac_par_atm_wetlands_FCH4=10.0E12            # wetland CH4 flux [mol/yr]
+ac_par_atm_wetlands_FCH4=100.0E12           # wetland CH4 flux [mol/yr]
 ac_par_atm_wetlands_FCH4_d13C=-60.0         # wetland d13C CH4 [o/oo]
 #
 # --- INITIAL CONDITIONS ---------------------------------------------

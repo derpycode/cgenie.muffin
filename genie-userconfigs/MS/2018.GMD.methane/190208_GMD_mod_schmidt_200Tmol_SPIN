@@ -16,7 +16,7 @@ go_saln0=34.9
 # --- ATMOSPHERIC PHOTOCHEMISTRY --------------------------------------
 #
 # atmospheric photochemical scheme ID string
-ac_par_atm_CH4_photochem="claire06"
+ac_par_atm_CH4_photochem="schmidt03"
 #
 # --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
 #
@@ -26,6 +26,8 @@ bg_par_bio_prodopt="bio_P"
 bg_par_bio_k0_PO4=1.9582242E-06
 # [PO4] M-M half-sat value (mol kg-1)
 bg_par_bio_c0_PO4=2.1989611E-07
+# biological uptake time-scale
+bg_par_bio_tau=63.3827
 #
 # --- ORGANIC MATTER EXPORT RATIOS ------------------------------------
 #
@@ -145,8 +147,8 @@ ma_debug_loop=1
 bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2_RpO2"
 bg_par_atm_force_scale_val_3=278.0E-06      # restoring forcing for pCO2 [atm]
 bg_par_atm_force_scale_val_4=-6.5           # restoring forcing for d13C CO2 [o/oo]
-bg_par_atm_force_scale_val_6=0.21E-03       # restoring forcing for pO2 [atm]
-ac_par_atm_wetlands_FCH4=3.0E12             # wetland CH4 flux [mol/yr]
+bg_par_atm_force_scale_val_6=0.2095         # restoring forcing for pO2 [atm]
+ac_par_atm_wetlands_FCH4=200.0E12           # wetland CH4 flux [mol/yr]
 ac_par_atm_wetlands_FCH4_d13C=-60.0         # wetland d13C CH4 [o/oo]
 #
 # --- INITIAL CONDITIONS ---------------------------------------------
@@ -154,8 +156,8 @@ ac_par_atm_wetlands_FCH4_d13C=-60.0         # wetland d13C CH4 [o/oo]
 # ATMOSPHERIC CHEMISTRY
 ac_atm_init_3=278.0E-06             # pCO2 [atm]
 ac_atm_init_4=-6.5                  # d13C CO2 [o/oo]
-ac_atm_init_6=0.21E-03              # pO2 [atm]
-ac_atm_init_10=500.0E-06            # pCH4 [atm]
+ac_atm_init_6=0.2095                # pO2 [atm]
+ac_atm_init_10=0.7E-06              # pCH4 [atm]
 ac_atm_init_11=-60.0                # d13C CH4 [o/oo]
 #
 # OCEAN CHEMISTRY
@@ -166,10 +168,10 @@ bg_ocn_init_10=0.0                  # O2 [mol/kg]
 bg_ocn_init_12=2.363E-03            # ALK [mol/kg]
 bg_ocn_init_15=0.0                  # DOM_C [mol/kg]
 bg_ocn_init_20=0.0                  # DOM_P [mol/kg]
-bg_ocn_init_25=50.0E-06             # CH4 [mol/kg]
+bg_ocn_init_25=1.0E-09              # CH4 [mol/kg]
 bg_ocn_init_26=-60.0                # d13C CH4 [o/oo]
 bg_ocn_init_35=1.025E-02            # Ca [mol/kg]
-bg_ocn_init_38=560.0E-06            # SO4 [mol/kg]
+bg_ocn_init_38=28.0E-03             # SO4 [mol/kg]
 bg_ocn_init_40=0.0                  # H2S [mol/kg]
 bg_ocn_init_50=5.282E-02            # Mg [mol/kg]
 #
