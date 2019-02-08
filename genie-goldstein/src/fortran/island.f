@@ -12,6 +12,7 @@ c     subroutine island(ubloc,pex,erisl,isl,indj)
 
       real ubloc(2,0:maxi+1,0:maxj),erisl1,cor,tv1,tv2
 c     real pex(0:maxi,0:maxj)
+      
       erisl1 = 0.0
       do i=1,npi(isl)
          lpi = lpisl(i,isl)

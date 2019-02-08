@@ -120,6 +120,7 @@ CONTAINS
        write(*,68),'  - cost of biosynthesis               (biosynth) :   ',   biosynth
        write(*,68),'  - light attenuation by water              (k_w) :   ',        k_w
        write(*,68),'  - light attenuation by chlorophyll a    (k_chl) :   ',      k_chl
+       write(*,68),'  - restrict MLD for mean light calculation?      :   ',      ctrl_restrict_mld
        write(*,*), '- Grazing parameters --------------------------------'
        write(*,68),'  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
        write(*,67),'  - prey switching exponent (integer)        (ns) :   ',         ns
@@ -137,6 +138,7 @@ CONTAINS
        write(*,70),'  - fraction mortality to dissolved   (beta_mort) : a=',beta_mort_a,', b=',beta_mort_b,', c=',beta_mort_c
        write(*,*), '- Other stuff -----------------------------'
        write(*,71),'  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
+       write(*,68),'  - maximum temperature                (temp_max) :   ',temp_max
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b
@@ -808,6 +810,27 @@ CONTAINS
   END SUBROUTINE sub_init_phys_ocn
   ! ****************************************************************************************************************************** !
 
+  ! ****************************************************************************************************************************** !
+  ! READ IN TEMPERATURE FORCING FILE - JDW
+  subroutine sub_init_load_forceT()
+  ! local variables
+  integer::i,j,loc_n_elements,loc_n_start,ios
+  character(LEN=127)::loc_filename
+  
+  loc_filename = TRIM(par_indir_name)//TRIM(par_ecogem_force_T_file)
+  !CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
+  
+  ! open file pipe
+  OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  READ(unit=in,fmt=*,IOSTAT=ios) T_input
+
+  ! close file pipe
+  CLOSE(unit=in,iostat=ios)
+  call check_iostat(ios,__LINE__,__FILE__)
+  
+  end subroutine sub_init_load_forceT
+  ! ****************************************************************************************************************************** !
 
 END MODULE ecogem_data
 

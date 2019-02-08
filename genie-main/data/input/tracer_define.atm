@@ -19,9 +19,11 @@
  pN2O      14  14  01  'nitrous oxide (N2O)'                         'atm'         -1.00       1.00
  pN2O_15N  15  14  14  'd15N N2O'                                    'o/oo'        -9.99E+2    9.99E+2
  pH2S      16  16  01  'hydrogen sulphide (H2S)'                     'atm'         -1.00       1.00
- pH2S_34S  17  16  15  'd32S of H2S'                                 'o/oo'        -9.99E+2    9.99E+2
+ pH2S_34S  17  16  15  'd34S of H2S'                                 'o/oo'        -9.99E+2    9.99E+2
  pCFC11    18  18  01  'CFC-11'                                      'atm'         -1.00       1.00
  pCFC12    19  19  01  'CFC-12'                                      'atm'         -1.00       1.00
+ pcolr     20  20  00  'RED numerical (color) tracer'                'atm'         -1.00       1.00
+ pcolr_13C 21  20  11  'd13C of RED(!)'                              'o/oo'        -9.99E+2    9.99E+2
 -END-OF-DATA-
 
  /\        /\  /\  /\  /\                                            /\       /\        /\

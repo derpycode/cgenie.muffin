@@ -39,14 +39,6 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/par_pCH4_oxidation_tau0
   real::par_pCH4_oxidation_N                                   ! Exponent for CH4 lifetime (dimensionless)
   NAMELIST /ini_atchem_nml/par_pCH4_oxidation_N
-  real::par_pCH4_oxidation_a1                                  ! First linear term for 2-term exponential fit
-  NAMELIST /ini_atchem_nml/par_pCH4_oxidation_a1
-  real::par_pCH4_oxidation_a2                                  ! First exponential term for 2-term exponential fit
-  NAMELIST /ini_atchem_nml/par_pCH4_oxidation_a2
-  real::par_pCH4_oxidation_b1                                  ! Second linear term for 2-term exponential fit
-  NAMELIST /ini_atchem_nml/par_pCH4_oxidation_b1          
-  real::par_pCH4_oxidation_b2                                  ! Second exponential term for 2-term exponential fit
-  NAMELIST /ini_atchem_nml/par_pCH4_oxidation_b2
   real::par_atm_pO2_fixed                                      ! Atmospheric pO2 for fixed fixed scheme
   NAMELIST /ini_atchem_nml/par_atm_pO2_fixed
   ! ------------------- EMISSIONS-TO-ATMOSPHERE ---------------------------------------------------------------------------------- !
@@ -75,6 +67,9 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/ctrl_ncrst
   CHARACTER(len=127)::par_ncrst_name                           ! 
   NAMELIST /ini_atchem_nml/par_ncrst_name
+  ! ------------------- DEBUGGING OPTIONS ---------------------------------------------------------------------------------------- !
+  LOGICAL::ctrl_debug_lvl1                                       ! report 'level #1' debug?
+  NAMELIST /ini_atchem_nml/ctrl_debug_lvl1 
   ! ############################################################################################################################## !
 
 
