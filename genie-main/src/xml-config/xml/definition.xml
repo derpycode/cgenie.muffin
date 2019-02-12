@@ -7554,6 +7554,18 @@
 			<value datatype="real">0.16</value>
                         <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
                     </param>
+                    <param name="par_weather_Os">
+			<value datatype="real">0.0</value>
+                        <description>mean Os:Ca2+ ratio of weathering flux</description>
+                    </param>
+                    <param name="par_weather_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 187Os/188Os ratio of weathering flux</description>
+                    </param>
+                    <param name="par_weather_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of weathering flux</description>
+                    </param>
                     <param name="par_weather_CaSiO3_fracCa5PO43">
 			<value datatype="real">0.0</value>
 			      <description>global silicate apatite abundance</description>
