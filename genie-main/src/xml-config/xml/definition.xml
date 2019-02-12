@@ -6987,6 +6987,26 @@
 			<value datatype="real">0.0</value>
                         <description>CO2 low-T alteration (weathering) sink (mol yr-1) (0.5E12 in Payton et al.)</description>
                     </param>
+                    <param name="par_sed_hydroip_fOs">
+			<value datatype="real">0.0</value>
+                        <description>hydrothermal Os flux (mol yr-1)</description>
+                    </param>
+                    <param name="par_sed_hydroip_fOs_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>187Os/188Os ratio of hydrothermal Os flux</description>
+                    </param>
+                    <param name="par_sed_hydroip_fOs_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>188Os/192Os ratio of hydrothermal Os flux</description>
+                    </param>
+                    <param name="par_sed_Os_dep_oxic">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
+                    </param>
+                    <param name="par_sed_Os_dep_suboxic">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under suboxic conditions (mol m-2 yr-1)</description>
+                    </param>
                     <param name="par_sed_hydroip_fDIC">
 			<value datatype="real">0.0</value>
                         <description>hydrothermal CO2 outgassing (mol yr-1)</description>
@@ -7554,7 +7574,7 @@
 			<value datatype="real">0.16</value>
                         <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
                     </param>
-                    <param name="par_weather_Os">
+                    <param name="par_weather_fracOs">
 			<value datatype="real">0.0</value>
                         <description>mean Os:Ca2+ ratio of weathering flux</description>
                     </param>

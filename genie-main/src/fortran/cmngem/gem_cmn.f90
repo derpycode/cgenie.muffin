@@ -636,7 +636,7 @@ MODULE gem_cmn
   integer,parameter::n_itype_min  = 11
   integer,parameter::n_itype_max  = 23
   integer,parameter::n_itype_minR = 24
-  integer,parameter::n_itype_maxR = 25
+  integer,parameter::n_itype_maxR = 27
   ! 18O:(18O+17O+16O) [estimated from % natural abundance data]
   REAL,PARAMETER::const_stnd_18O_O          = 0.002004
   ! isotopic standard array
@@ -672,6 +672,8 @@ MODULE gem_cmn
   !       138Ba: 
   !       87Sr:  87Sr/86Sr = 0.709175 [modern seawater ratio]
   !       88Sr:  88Sr/86Sr = 8.375209 [NBS987]
+  !       187Os:  187Os/188Os = 1.05 [modern seawater ratio]
+  !       188Os:  188Os/192Os = 0.3244 [Dabek and Hallas 2007]
   REAL,PARAMETER,DIMENSION(n_itype_min:n_itype_max)::const_standards = (/ &
        & 0.011202,  & ! TYPE 11; 13C ! OLD: 0.011237 ! NEW: 0.011202
        & 1.176E-12, & ! TYPE 12; 14C ! OLD: 1.117E-12 ! NEW: 1.176E-12
@@ -688,7 +690,9 @@ MODULE gem_cmn
        & 0.0 /)       ! TYPE 23; 138Ba
   REAL,PARAMETER,DIMENSION(n_itype_minR:n_itype_maxR)::const_standardsR = (/ &
        & 0.709175,  & ! TYPE 24; 87Sr
-       & 8.375209 /)  ! TYPE 25; 88Sr 
+       & 8.375209,  & ! TYPE 25; 88Sr 
+       & 1.05,      & ! TYPE 26; 187Os 
+       & 0.3244 /)    ! TYPE 27; 188Os 
 
   ! *** radioactive decay ***
   ! ln(2) is used for the conversion between half-life and e-folding time of decay
