@@ -3182,6 +3182,22 @@ CONTAINS
                    end if
                 end if
 
+                ! *** Scavenge Os from water column ***
+                if ((ocn_select(io_Os) .AND. sed_select(is_POM_Os)) .AND. (par_bio_remin_kOstoPOMOS > const_real_nullsmall)) then
+                   if (dum_vocn%mk(io2l(io_Os),kk) > const_real_nullsmall) then
+                      call sub_box_scav_Os(               &
+                           & dum_dtyr,                     &
+                           & loc_bio_remin_dt_scav,        &
+                           & dum_vocn%mk(io2l(io_Os),kk), &
+                           & dum_vocn%mk(io2l(io_Os_187Os),kk), &
+                           & dum_vocn%mk(io2l(io_Os_188Os),kk), &
+                           & dum_vocn%mk(io2l(io_O2),kk), &
+                           & loc_bio_part_TMP(:,kk),       &
+                           & loc_bio_remin(:,kk)           &
+                           & )
+                   end if
+                end if
+
              end If
           end do
 
@@ -3607,6 +3623,48 @@ CONTAINS
   end SUBROUTINE sub_calc_scav_Fe
   ! ****************************************************************************************************************************** !
 
+  ! ****************************************************************************************************************************** !
+  ! Calculate Os scavenging
+  SUBROUTINE sub_box_scav_Os(dum_dtyr,dum_dt_scav,dum_ocn_Os,dum_ocn_Os_187Os,dum_ocn_Os_188Os,dum_ocn_O2,dum_bio_part,dum_bio_remin)
+    ! dummy arguments
+    REAL,INTENT(in)::dum_dtyr
+    REAL,INTENT(in)::dum_dt_scav
+    REAL,INTENT(in)::dum_ocn_Os,dum_ocn_Os_187Os,dum_ocn_Os_188Os,dum_ocn_O2
+    real,dimension(n_sed),INTENT(inout)::dum_bio_part
+    real,dimension(n_ocn),INTENT(inout)::dum_bio_remin
+    ! local variables
+    real::loc_Os,loc_Os_187Os,loc_Os_188Os,loc_part_den_POCl
+    real::loc_Os_scavenging,loc_Os_187Os_scavenging,loc_Os_188Os_scavenging
+
+    ! *** Calculate Os scavenging ***
+    ! set local variables
+    loc_Os = dum_ocn_Os
+    loc_Os_187Os = dum_ocn_Os_187Os
+    loc_Os_188Os = dum_ocn_Os_188Os
+    ! density of labile POC
+    loc_part_den_POCl = (1.0 - dum_bio_part(is2l(is_POC_frac2)))*dum_bio_part(is2l(is_POC))
+    ! estimate Os scavenging
+    ! NOTE: cap Os removal at the minimum of ([Os], [labile POC])
+    loc_Os_scavenging = 0.0
+    if (dum_ocn_O2 < 10E-6) then
+       loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
+       loc_Os_scavenging = min(loc_Os_scavenging,loc_part_den_POCl,loc_Os)
+    end if
+    if (loc_Os_scavenging < const_real_nullsmall) loc_Os_scavenging = 0.0
+    ! Assume no isotopic fractionation during scavenging
+    loc_Os_187Os_scavenging = loc_Os_187Os*loc_Os_scavenging/loc_Os
+    loc_Os_188Os_scavenging = loc_Os_188Os*loc_Os_scavenging/loc_Os
+    !print*,loc_Os_scavenging
+    dum_bio_remin(io2l(io_Os))      = dum_bio_remin(io2l(io_Os)) - loc_Os_scavenging
+    dum_bio_remin(io2l(io_Os_187Os))      = dum_bio_remin(io2l(io_Os_187Os)) - loc_Os_187Os_scavenging
+    dum_bio_remin(io2l(io_Os_188Os))      = dum_bio_remin(io2l(io_Os_188Os)) - loc_Os_188Os_scavenging
+    dum_bio_part(is2l(is_POM_Os))     = dum_bio_part(is2l(is_POM_Os)) + loc_Os_scavenging
+    dum_bio_part(is2l(is_POM_Os_187Os))     = dum_bio_part(is2l(is_POM_Os_187Os)) + loc_Os_187Os_scavenging
+    dum_bio_part(is2l(is_POM_Os_188Os))     = dum_bio_part(is2l(is_POM_Os_188Os)) + loc_Os_188Os_scavenging
+
+  end SUBROUTINE sub_box_scav_Os
+  ! ****************************************************************************************************************************** !
+
 
   ! ****************************************************************************************************************************** !
   ! Calculate H2S scavenging
@@ -3827,6 +3885,13 @@ CONTAINS
                 CASE (0,1)
                    force_flux_locn(loc_l,i,j,k) = force_flux_ocn_sig_x(dum_io)*force_flux_locn(loc_l,i,j,k)*loc_force_flux_ocn_rtot
                 end SELECT
+                ! Calculate Os isotope flux forcings
+                if (dum_io == io_Os) then
+                   loc_tot  = force_flux_locn(conv_io_lselected(io_Os),i,j,k) &
+                                  & /(1.0+force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)+force_flux_ocn_sig_x(io_Os_188Os))
+                   force_flux_locn(conv_io_lselected(io_Os_187Os),i,j,k) = force_flux_ocn_sig_x(io_Os_187Os)*loc_tot
+                   force_flux_locn(conv_io_lselected(io_Os_188Os),i,j,k) = force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
+                end if
              END DO
           END DO
        END DO

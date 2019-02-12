@@ -4455,6 +4455,10 @@
 			<value datatype="string">NONE</value>
                         <description>H2S -> POCS scavenging option</description>
                     </param>
+                    <param name="par_bio_remin_kOstoPOMOS">
+			<value datatype="real">0.0</value>
+                        <description>Os scavening efficiency</description>
+                    </param>
                     <param name="ctrl_bio_remin_thresh">
 			<value datatype="boolean">.false.</value>
                         <description>Apply a hard tracer oxidant remin threshold?</description>
