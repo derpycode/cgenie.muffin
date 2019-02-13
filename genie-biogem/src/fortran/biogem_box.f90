@@ -3646,7 +3646,7 @@ CONTAINS
     ! estimate Os scavenging
     ! NOTE: cap Os removal at the minimum of ([Os], [labile POC])
     loc_Os_scavenging = 0.0
-    if (dum_ocn_O2 < 10E-6) then
+    if (dum_ocn_O2 < 10E-5) then
        loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
        loc_Os_scavenging = min(loc_Os_scavenging,loc_part_den_POCl,loc_Os)
     end if
@@ -3889,7 +3889,7 @@ CONTAINS
                 if (dum_io == io_Os) then
                    loc_tot  = force_flux_locn(conv_io_lselected(io_Os),i,j,k) &
                                   & /(1.0+force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)+force_flux_ocn_sig_x(io_Os_188Os))
-                   force_flux_locn(conv_io_lselected(io_Os_187Os),i,j,k) = force_flux_ocn_sig_x(io_Os_187Os)*loc_tot
+                   force_flux_locn(conv_io_lselected(io_Os_187Os),i,j,k) = force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
                    force_flux_locn(conv_io_lselected(io_Os_188Os),i,j,k) = force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
                 end if
              END DO

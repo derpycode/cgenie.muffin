@@ -491,8 +491,8 @@ SUBROUTINE sedgem(          &
        ! Os
        ! NOTE: deposition rates are given in mol m-2 yr-1
         IF ((ocn_select(io_Os)) .AND. (dum_sfcsumocn(io_Os,i,j) > const_real_nullsmall)) then
-          ! Apply oxic Os deposition rate if O2 concentration above threshold, else suboxic deposition rate
-          if (dum_sfcsumocn(io_O2,i,j) > 10E-6) then
+          ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018), else suboxic deposition rate
+          if (dum_sfcsumocn(io_O2,i,j) > 10E-5) then
              loc_fsed = par_sed_Os_dep_oxic*dum_sfcsumocn(io_Os,i,j)
           else
              loc_fsed = par_sed_Os_dep_suboxic*dum_sfcsumocn(io_Os,i,j)
