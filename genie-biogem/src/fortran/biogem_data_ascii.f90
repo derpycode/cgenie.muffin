@@ -666,6 +666,63 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)  
           end if
        end if
+       ! Os diagnostics
+       IF (ocn_select(io_Os_187Os) .AND. ocn_select(io_Os_188Os)) THEN
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_Os',string_results_ext)
+          loc_string = '% time (yr) / Os / 188Os / 187Os / 192Os'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_r187Os',string_results_ext)
+          loc_string = '% time (yr) / mean ocean 187Os / mean ocean 187/188 ratio'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          if (flag_rokgem) then
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_Os',string_results_ext)
+             loc_string = '% time (yr) / Os (mol yr-1) / 188Os (mol yr-1) / 187Os (mol yr-1) / 192Os (mol yr-1)'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_r187Os',string_results_ext)
+             loc_string = '% time (yr) / weathering 187Os (mol yr-1) / weathering 187/188 ratio'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)  
+          end if
+          if (force_flux_ocn_select(io_Os_187Os) .AND. force_flux_ocn_select(io_Os_188Os)) then
+             loc_filename=fun_data_timeseries_filename(loc_t,par_outdir_name, &
+                  & trim(par_outfile_name)//'_series_diag_misc','specified_forcing_Os_r187Os',string_results_ext)
+             loc_string = '% time (yr) / 187Os (mol yr-1) / 187/188 ratio'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
+       end if
        ! insolation (wet grid only)
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_insol',string_results_ext)
@@ -2026,6 +2083,78 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)
              CLOSE(unit=out,iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)  
+          end if
+       end if
+       ! Os diagnostics
+       IF (ocn_select(io_Os_187Os) .AND. ocn_select(io_Os_188Os)) THEN
+          ! all Sr species
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_Os',string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
+               & loc_t, &
+               & int_ocn_sig(io_Os)/int_t_sig, &
+               & int_ocn_sig(io_Os_188Os)/int_t_sig, &
+               & int_ocn_sig(io_Os_187Os)/int_t_sig, &
+               & (int_ocn_sig(io_Os)-int_ocn_sig(io_Os_187Os)-int_ocn_sig(io_Os_188Os))/int_t_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          ! 187Os
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_r187Os',string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          loc_frac = int_ocn_sig(io_Os_187Os)/int_t_sig
+          if (int_ocn_sig(io_Os_188Os) > const_real_nullsmall) then
+             loc_sig = int_ocn_sig(io_Os_187Os)/int_ocn_sig(io_Os_187Os)
+          else
+             loc_sig = -999.9
+          end if
+          WRITE(unit=out,fmt='(f12.3,e15.7,f12.7)',iostat=ios) &
+               & loc_t, &
+               & loc_frac, &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          if (flag_rokgem) then
+             ! all Os species
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_Os',string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
+                  & loc_t, &
+                  & int_diag_weather_sig(io_Os)/int_t_sig, &
+                  & int_diag_weather_sig(io_Os_188Os), &
+                  & int_diag_weather_sig(io_Os_187Os)/int_t_sig, &
+                  & (int_diag_weather_sig(io_Os)-int_diag_weather_sig(io_Os_187Os)-int_diag_weather_sig(io_Os_188Os))/int_t_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             ! 187Os
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_r187Os',string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             if (int_diag_weather_sig(io_Os_188Os) > const_real_nullsmall) then
+                loc_sig = int_diag_weather_sig(io_Os_187Os)/loc_tot
+             else
+                loc_sig = -999.9
+             end if
+             WRITE(unit=out,fmt='(f12.3,e15.7,f12.7)',iostat=ios) &
+                  & loc_t, &
+                  & int_diag_weather_sig(io_Os_187Os)/int_t_sig, &
+                  & loc_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__) 
           end if
        end if
        ! insolation (wet grid only)

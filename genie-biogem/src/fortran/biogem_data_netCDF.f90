@@ -714,6 +714,23 @@ CONTAINS
                & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end DO
     end If
+    !----------------------------------------------------------------
+    !       Os isotope ratios
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Os) .AND. ocn_select(io_Os_187Os)) &
+         & ) then
+         loc_unitsname = ''
+         loc_ijk(:,:,:) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)
+         call sub_adddef_netcdf(loc_iou,4,'misc_Os_187Osr188Os', &
+              & 'water-column Os isotope ratio', &
+              & trim(loc_unitsname),const_real_zero,const_real_zero)
+         call sub_putvar3d_g('misc_Os_187Osr188Os',loc_iou, &
+              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !!----------------------
     !!-----------------------------------------------------------------------
     !!       misc 'physics'
     !!-----------------------------------------------------------------------
