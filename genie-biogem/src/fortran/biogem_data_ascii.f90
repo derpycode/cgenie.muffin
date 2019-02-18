@@ -2110,7 +2110,7 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
           loc_frac = int_ocn_sig(io_Os_187Os)/int_t_sig
           if (int_ocn_sig(io_Os_188Os) > const_real_nullsmall) then
-             loc_sig = int_ocn_sig(io_Os_187Os)/int_ocn_sig(io_Os_187Os)
+             loc_sig = int_ocn_sig(io_Os_187Os)/int_ocn_sig(io_Os_188Os)
           else
              loc_sig = -999.9
           end if
