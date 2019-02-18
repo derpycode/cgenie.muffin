@@ -35,6 +35,29 @@ SUBROUTINE atchem(    &
   ! fractional reduction factors for decaying isotopes
   loc_fracdecay_atm(:) = EXP(-loc_dtyr*const_lambda_atm(:))
 
+  ! *** OXIDIZE CH4 [NOTE: for schemes that initially homogenize atmospheric composition]***
+  select case (par_atm_CH4_photochem)
+     case ('claire06')
+      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+         CALL sub_calc_oxidize_CH4_claire06(loc_dtyr,loc_conv_atm_mol(:,:))
+      END IF
+     case('claire06_fixed')
+      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+         CALL sub_calc_oxidize_CH4_claire06_fixed(loc_dtyr,loc_conv_atm_mol(:,:))
+      END IF
+     case ('claire06H')
+      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+         CALL sub_calc_oxidize_CH4_claire06H(loc_dtyr,loc_conv_atm_mol(:,:))
+      END IF
+     case ('goldblatt06')
+      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+         CALL sub_calc_oxidize_CH4_goldblatt06(loc_dtyr,loc_conv_atm_mol(:,:))
+      END IF
+  case default
+  !!! NOTHING
+  end select
+  
+  
   ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
   ! *** (i,j) GRID PT LOOP START *** !
   ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
@@ -65,6 +88,10 @@ SUBROUTINE atchem(    &
                  END if
               END IF
            END IF
+        case ('schmidt03')
+           IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+              CALL sub_calc_oxidize_CH4_schmidt03(i,j,loc_dtyr)
+           END IF
         case default
             !!! NOTHING
         end select
@@ -91,32 +118,7 @@ SUBROUTINE atchem(    &
   ! *** (i,j) GRID PT LOOP END *** !
   ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
 
-  ! *** OXIDIZE CH4 ***
-  select case (par_atm_CH4_photochem)
-     case ('schmidt03')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_schmidt03(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
-     case ('claire06')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire06(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
-     case('claire06_fixed')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire06_fixed(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
-     case ('claire06H')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire06H(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
-     case ('goldblatt06')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_goldblatt06(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
-  case default
-    !!! NOTHING
-  end select
-
+  
   ! *** UPDATE ATMOSPHERIC COMPOSITION ***
   ! set internal atmospheric flux
   fatm(:,:,:) = dum_sfxsumatm(:,:,:)

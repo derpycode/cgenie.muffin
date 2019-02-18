@@ -84,79 +84,34 @@ CONTAINS
 
   ! *****************************************************************************************************************************!
   ! OXIDIZE CH4 -- FIT TO DATA FROM 2-D PHOTOCHEMISTRY MODEL IN SCHMIDT & SCHINDELL [2003] (CTR|12-2017)
-  ! NOTE: atmospheric CH4 burden and lifetime are on a globally integrated basis
-  SUBROUTINE sub_calc_oxidize_CH4_schmidt03(dum_dtyr,dum_conv_atm_mol)
+  SUBROUTINE sub_calc_oxidize_CH4_schmidt03(dum_i,dum_j,dum_dtyr)
     IMPLICIT NONE
     ! dummy arguments
+    INTEGER,INTENT(in)::dum_i,dum_j
     real,intent(in)::dum_dtyr
-    real,dimension(n_i,n_j),intent(in)::dum_conv_atm_mol
     ! local variables
     real::loc_tau
     real::loc_fracdecay
-    real::loc_O2,loc_CH4,loc_CO2
-    real::loc_13CH4,loc_14CH4
-    real::loc_r13CH4,loc_r14CH4
-    real::loc_13CO2,loc_14CO2
-    real::loc_r13CO2,loc_r14CO2
-    real::loc_atmV
-    
-    ! sum tracers
-    loc_O2  = SUM(dum_conv_atm_mol*atm(ia_pO2,:,:))
-    loc_CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4,:,:))
-    loc_CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2,:,:))
+    real::loc_CH4
 
-    loc_13CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4_13C,:,:))
-    loc_14CH4 = SUM(dum_conv_atm_mol*atm(ia_pCH4_14C,:,:))
-    loc_13CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2_13C,:,:))
-    loc_14CO2 = SUM(dum_conv_atm_mol*atm(ia_pCO2_13C,:,:))
-
-    loc_r13CH4 = loc_13CH4/loc_CH4
-    loc_r14CH4 = loc_14CH4/loc_CH4
-    loc_r13CO2 = loc_13CO2/loc_CO2
-    loc_r14CO2 = loc_14CO2/loc_CO2
-
-    loc_atmV = SUM(phys_atm(ipa_V,:,:))
- 
-    IF (loc_O2 > 1.0E8) THEN ! proceed with CH4 oxidation
     ! *** CALCULATE LOCAL CONSTANTS ***
     ! atmospheric lifetime from Schmidt and Shindell [2003]
     ! NOTE1: restrict lifetime calculation to 1.0*CH4(0) at the lower end (limit of calibration curve)
     ! NOTE2: strictly, calibration curve ends at 200.0*CH4(0) in Schmidt and Shindell [2003]
     ! NOTE3: 2-D model includes HOx-NOx-Ox-CO-CH4 chemistry
+    loc_CH4 = atm(ia_pCH4,dum_i,dum_j)
     if (loc_CH4 < par_pCH4_oxidation_C0) loc_CH4 = par_pCH4_oxidation_C0
     loc_tau = par_pCH4_oxidation_tau0*(loc_CH4/par_pCH4_oxidation_C0)**par_pCH4_oxidation_N
     loc_fracdecay = dum_dtyr/loc_tau
 
-    ! *** PERFORM METHANE OXIDATION ***
-    ! NOTE: stoichiometry of CH4 oxidation : CH4 + 2O2 + hv  --> CO2 + 2H2O
-    loc_CH4     = loc_CH4   - loc_fracdecay*loc_CH4
-    loc_13CH4   = loc_13CH4 - loc_fracdecay*loc_13CH4
-    loc_14CH4   = loc_14CH4 - loc_fracdecay*loc_14CH4
-    loc_CO2     = loc_CO2   + loc_fracdecay*loc_CH4
-    loc_13CO2   = loc_13CO2 + loc_fracdecay*loc_13CH4
-    loc_14CO2   = loc_14CO2 + loc_fracdecay*loc_14CH4
-    loc_O2      = loc_O2    - 2.0*loc_fracdecay*loc_CH4
-    END IF
-   
-    ! *** ADJUST INVENTORIES TO AVOID -VE CH4 ***
-    IF (loc_CH4 < const_real_zero) THEN
-     loc_CH4   = const_real_zero
-     loc_13CH4 = loc_13CH4 - loc_r13CH4*(loc_CH4)
-     loc_14CH4 = loc_14CH4 - loc_r14CH4*(loc_CH4)
-     loc_CO2   = loc_CO2   + loc_CH4
-     loc_13CO2 = loc_13CO2 + loc_r13CH4*(loc_CH4)
-     loc_14CO2 = loc_14CO2 + loc_r14CH4*(loc_CH4)
-     loc_O2    = loc_O2    - 2.0*loc_CH4
-    END IF    
-
-    ! *** UPDATE ATM. TRACERS ***
-    atm(ia_pCH4,:,:)     = (loc_CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-    atm(ia_pCH4_13C,:,:) = (loc_13CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-    atm(ia_pCH4_14C,:,:) = (loc_14CH4/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-    atm(ia_pCO2,:,:)     = (loc_CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-    atm(ia_pCO2_13C,:,:) = (loc_13CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-    atm(ia_pCO2_14C,:,:) = (loc_14CO2/loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
-    atm(ia_pO2,:,:)      = (loc_O2 /loc_atmV)*conv_Pa_atm*const_R_SI*(atm(ia_T,:,:)+const_zeroC)
+    ! *** ATMOSPHERIC CH4->CO2 ***
+    atm(ia_pO2,dum_i,dum_j)      = atm(ia_pO2,dum_i,dum_j)      - 2.0*loc_fracdecay*atm(ia_pCH4,dum_i,dum_j)
+    atm(ia_pCO2,dum_i,dum_j)     = atm(ia_pCO2,dum_i,dum_j)     + loc_fracdecay*atm(ia_pCH4,dum_i,dum_j)
+    atm(ia_pCO2_13C,dum_i,dum_j) = atm(ia_pCO2_13C,dum_i,dum_j) + loc_fracdecay*atm(ia_pCH4_13C,dum_i,dum_j)
+    atm(ia_pCO2_14C,dum_i,dum_j) = atm(ia_pCO2_14C,dum_i,dum_j) + loc_fracdecay*atm(ia_pCH4_14C,dum_i,dum_j)
+    atm(ia_pCH4,dum_i,dum_j)     = (1.0 - loc_fracdecay)*atm(ia_pCH4,dum_i,dum_j)
+    atm(ia_pCH4_13C,dum_i,dum_j) = (1.0 - loc_fracdecay)*atm(ia_pCH4_13C,dum_i,dum_j)
+    atm(ia_pCH4_14C,dum_i,dum_j) = (1.0 - loc_fracdecay)*atm(ia_pCH4_14C,dum_i,dum_j)
 
   END SUBROUTINE sub_calc_oxidize_CH4_schmidt03
   ! ****************************************************************************************************************************** !
@@ -292,7 +247,7 @@ CONTAINS
 
   END SUBROUTINE sub_calc_oxidize_CH4_claire06
   ! ****************************************************************************************************************************** !
-  
+ 
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], NO H ESCAPE, FIXED ATMOSPHERIC O2 (CTR|09-2018)
    SUBROUTINE sub_calc_oxidize_CH4_claire06_fixed(dum_dtyr,dum_conv_atm_mol)
@@ -422,7 +377,7 @@ CONTAINS
  
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], H ESCAPE ENABLED (CTR|05-2017)
-  SUBROUTINE sub_calc_oxidize_CH4_claire06H(dum_dtyr, dum_conv_atm_mol)
+  SUBROUTINE sub_calc_oxidize_CH4_claire06H(dum_dtyr,dum_conv_atm_mol)
     IMPLICIT NONE
     ! DUMMY ARGUMENTS
     REAL, INTENT(in)::dum_dtyr
