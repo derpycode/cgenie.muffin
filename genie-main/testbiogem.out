@@ -2031,25 +2031,25 @@ Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
 	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem_box.f90 -o ecogem_box.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
-ecogem_box.f90:458.38:
+ecogem_box.f90:458.15:
 
-                              diameter,    &
-                                      1
+       diameter,    &
+               1
 Warning: Unused dummy argument 'diameter' at (1)
-ecogem_box.f90:457.36:
+ecogem_box.f90:457.13:
 
-                              nutiso,  &
-                                    1
+       nutiso,  &
+             1
 Warning: Unused dummy argument 'nutiso' at (1)
-ecogem_box.f90:456.34:
+ecogem_box.f90:456.11:
 
-                              nuts,    &
-                                  1
+       nuts,    &
+           1
 Warning: Unused dummy argument 'nuts' at (1)
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
 	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem_data.f90 -o ecogem_data.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
-ecogem_data.f90:696.54:
+ecogem_data.f90:700.54:
 
     REAL              :: loc_tser_lat,loc_tser_lon,tmp
                                                       1
@@ -2193,6 +2193,11 @@ Warning: Unused variable 'stat' declared at (1)
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
 	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem.f90 -o ecogem.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ecogem.f90:71.54:
+
+  REAL                                     ::Corg_frac
+                                                      1
+Warning: Unused variable 'corg_frac' declared at (1)
 ecogem.f90:73.55:
 
   REAL,DIMENSION(n_i,n_j,n_k)              ::frac_ratio !for iCarb multiplier
@@ -2223,87 +2228,87 @@ ecogem.f90:72.52:
   REAL                                     ::PDBstnd !ckc VPDB d13C standard
                                                     1
 Warning: Unused variable 'pdbstnd' declared at (1)
-ecogem.f90:733.20:
+ecogem.f90:661.20:
 
      & dum_egbg_fxsw,       & ! input
                     1
 Warning: Unused dummy argument 'dum_egbg_fxsw' at (1)
-ecogem.f90:737.23:
+ecogem.f90:665.23:
 
      & dum_egbg_sfcdiss     &
                        1
 Warning: Dummy argument 'dum_egbg_sfcdiss' at (1) was declared INTENT(OUT) but was not set
-ecogem.f90:735.22:
+ecogem.f90:663.22:
 
      & dum_egbg_sfcocn,     & ! input  -- tracer concentrations
                       1
 Warning: Unused dummy argument 'dum_egbg_sfcocn' at (1)
-ecogem.f90:736.23:
+ecogem.f90:664.23:
 
      & dum_egbg_sfcpart,    &
                        1
 Warning: Dummy argument 'dum_egbg_sfcpart' at (1) was declared INTENT(OUT) but was not set
-ecogem.f90:731.20:
+ecogem.f90:659.20:
 
      & dum_endseries,       & ! input
                     1
 Warning: Unused dummy argument 'dum_endseries' at (1)
-ecogem.f90:729.26:
+ecogem.f90:657.26:
 
      & dum_genie_intseries, & ! input
                           1
 Warning: Unused dummy argument 'dum_genie_intseries' at (1)
-ecogem.f90:727.24:
+ecogem.f90:655.24:
 
      & dum_genie_tseries,   & ! input
                         1
 Warning: Unused dummy argument 'dum_genie_tseries' at (1)
-ecogem.f90:734.14:
+ecogem.f90:662.14:
 
      & dum_mld,             & ! input
               1
 Warning: Unused dummy argument 'dum_mld' at (1)
-ecogem.f90:770.22:
+ecogem.f90:698.22:
 
   integer :: dum_ntrec
                       1
 Warning: Unused variable 'dum_ntrec' declared at (1)
-ecogem.f90:765.14:
+ecogem.f90:693.14:
 
   integer :: i,j,k,l,io,ia,is
               1
 Warning: Unused variable 'i' declared at (1)
-ecogem.f90:765.26:
+ecogem.f90:693.26:
 
   integer :: i,j,k,l,io,ia,is
                           1
 Warning: Unused variable 'ia' declared at (1)
-ecogem.f90:765.23:
+ecogem.f90:693.23:
 
   integer :: i,j,k,l,io,ia,is
                        1
 Warning: Unused variable 'io' declared at (1)
-ecogem.f90:765.29:
+ecogem.f90:693.29:
 
   integer :: i,j,k,l,io,ia,is
                              1
 Warning: Unused variable 'is' declared at (1)
-ecogem.f90:765.16:
+ecogem.f90:693.16:
 
   integer :: i,j,k,l,io,ia,is
                 1
 Warning: Unused variable 'j' declared at (1)
-ecogem.f90:765.20:
+ecogem.f90:693.20:
 
   integer :: i,j,k,l,io,ia,is
                     1
 Warning: Unused variable 'l' declared at (1)
-ecogem.f90:766.19:
+ecogem.f90:694.19:
 
   integer :: loc_k1                                                !
                    1
 Warning: Unused variable 'loc_k1' declared at (1)
-ecogem.f90:862.12:
+ecogem.f90:790.12:
 
   integer::l
             1
@@ -2539,11 +2544,11 @@ gfortran  -fopenmp genie_control.o genie_global.o local_netcdf.o genie_util.o lo
 	-L/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/lib -lnetcdf -lnetcdff   
 make[1]: Leaving directory `/home/portabello/cgenie.muffin/genie-main'
 STARTING EXPERIMENT:
-Fri Jun 15 12:37:29 PDT 2018
+Fri Jan 18 13:12:04 PST 2019
 ./genie.exe: error while loading shared libraries: libnetcdf.so.11: cannot open shared object file: No such file or directory
 
 real	0m0.000s
 user	0m0.000s
-sys	0m0.001s
+sys	0m0.000s
 cp: cannot stat `fort.2': No such file or directory
 ERROR: !!!!!!!!!! ERROR PROCESSING !!!!!!!!!!

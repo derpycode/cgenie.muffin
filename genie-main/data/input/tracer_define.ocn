@@ -56,9 +56,9 @@
  B                36  36  01  'dissolved boron (B)'                     'mol kg-1'   -9.99E+2    9.99E-1
  F                37  37  01  'dissolved florine (F)'                   'mol kg-1'   -9.99E+2    9.99E-1
  SO4              38  38  01  'dissolved sulphate (SO4)'                'mol kg-1'   -9.99E+2    9.99E-1
- SO4_34S          39  38  15  '32S of SO4'                              'o/oo'       -9.99E+2    9.99E+2
- H2S              40  40  01  'dissolved hydrogen sulphide (H2S)'       'mol kg-1'   -9.99E+2    9.99E-1
- H2S_34S          41  40  15  '32S of H2S'                              'o/oo'       -9.99E+2    9.99E+2
+ SO4_34S          39  38  15  '34S of SO4'                              'o/oo'       -9.99E+2    9.99E+2
+ H2S              40  40  01  'dissolved hydrogen sulphide (H4S)'       'mol kg-1'   -9.99E+2    9.99E-1
+ H2S_34S          41  40  15  '34S of H2S'                              'o/oo'       -9.99E+2    9.99E+2
  Mo               77  77  01  'dissolved Molybdenum (Mo)'               'mol kg-1'   -9.99E+2    9.99E-1
  Mo_98Mo          78  77  21  '98Mo of Mo'                              'o/oo'       -9.99E+2    9.99E+2
  231Pa            43  43  01  '231Pa'                                   'mol kg-1'   -9.99E+2    9.99E-1

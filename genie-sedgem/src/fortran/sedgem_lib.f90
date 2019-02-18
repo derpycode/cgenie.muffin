@@ -239,6 +239,8 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_misc_debug_i,par_misc_debug_j
   real::par_sed_age_save_dt                                      ! threshold of accumulated time for sedcorenv save (yr) 
   NAMELIST /ini_sedgem_nml/par_sed_age_save_dt
+  LOGICAL::ctrl_debug_lvl1                                       ! report 'level #1' debug?
+  NAMELIST /ini_atchem_nml/ctrl_debug_lvl1 
   ! ------------------- DATA SAVING: MISC ---------------------------------------------------------------------------------------- !
   LOGICAL::ctrl_ncrst                                          ! restart as netCDF format?
   NAMELIST /ini_sedgem_nml/ctrl_ncrst
