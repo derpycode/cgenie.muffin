@@ -1,0 +1,154 @@
+#
+#
+# --- CLIMATE --------------------------------------------------
+#
+# set climate feedback
+ea_36=y
+#
+# --- BIOLOGICAL NEW PRODUCTION --------------------------------
+#
+# biological scheme ID string
+bg_par_bio_prodopt="bio_PFe"
+# [PO4] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_PO4=0.10E-06
+# [Fe] M-M half-sat value (mol kg-1) -- REDUCE BY FACTOR 1000
+bg_par_bio_c0_Fe=0.10E-12
+# biological uptake time-scale
+bg_par_bio_tau=63.3827
+#
+# --- ORGANIC MATTER EXPORT RATIOS -----------------------------
+#
+#production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# --- INORGANIC MATTER EXPORT RATIOS ---------------------------
+#
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+# set fixed 0.2 CaCO3:POC rain ratio
+bg_par_bio_red_POC_CaCO3=0.200
+#exponent for modifier of CaCO3:POC export ratio
+bg_par_bio_red_POC_CaCO3_pP=0.0
+#
+# --- REMINERALIZATION -----------------------------------------
+#
+#DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=1.0
+#initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=0.055
+# depth of remineralization or particulate organic matter
+bg_par_bio_remin_POC_eL1=589.9451
+#remineralization length #2 for POC
+bg_par_bio_remin_POC_eL2=1000000.0
+#initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.45
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1.8905e+003
+#remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+# OM sulphurization
+bg_opt_bio_remin_scavenge_H2StoPOMS="kinetic"
+# reaction rate constant OM sulph
+bg_par_bio_remin_kH2StoPOMS=100000.0
+# Set N associated with OM to zero
+# bg_par_bio_red_PON_ALK=0.0
+# tie all O2 consumption to POC (rather than also to POP)
+# bg_ctrl_bio_red_O2withPOC=.true.
+# Tie ALK with POC (rather than POP) Email 08.08.2017
+bg_ctrl_bio_red_ALKwithPOC=.true.
+#
+# --- IRON ----------------------------------------------------------
+#
+# aeolian Fe solubility
+bg_par_det_Fe_sol=0.00291468
+#exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
+bg_par_det_Fe_sol_exp=0.500
+# modifier of the scavenging rate of dissolved Fe -- SET TO ZERO
+bg_par_scav_Fe_sf_POC=0.0
+bg_par_scav_Fe_sf_CaCO3=0.0
+bg_par_scav_Fe_sf_opal=0.0
+bg_par_scav_Fe_sf_det=0.0
+# no scavenged regeneration
+bg_par_scav_fremin=0.0
+# return POFe
+bg_ctrl_bio_NO_fsedFe=.false.
+# Variable Fe:C -- FIX Fe:C VEYR HIGH!
+bg_ctrl_bio_red_fixedFetoC=.true.
+#(max) C/Fe organic matter ratio
+bg_par_bio_red_POFe_POC=999999999.0
+# adjust pK'(FeL)
+bg_par_K_FeL_pP=11.0
+#
+# --- SEDIMENTS ------------------------------------------------
+#
+# Sediment grid
+SEDGEMNLONSOPTS='$(DEFINE)SEDGEMNLONS=36'
+SEDGEMNLATSOPTS='$(DEFINE)SEDGEMNLATS=36'
+# sediment grid options
+sg_par_sed_Dmax_neritic=175.0
+sg_par_sed_topo_D_name="p0093k.depth.36x36x16"
+sg_par_sed_reef_mask_name="p0093k.reefmask.36x36x16"
+sg_par_sedcore_save_mask_name="p0093k.sedcoremask.36x36x16"
+# sediment diagenesis options
+sg_par_sed_diagen_CaCO3opt="NONE"
+sg_ctrl_sed_bioturb=.false.
+sg_ctrl_sed_bioturb_Archer=.false.
+sg_par_n_sed_mix=20
+# set invarient surface bioturbation mixing rate
+sg_par_sed_mix_k_sur_max=0.15
+sg_par_sed_mix_k_sur_min=0.15
+# additional detrital flux (g cm-2 kyr-1)
+sg_par_sed_fdet=0.180
+#
+# Use OMEN-SED
+sg_par_sed_diagen_Corgopt = 'huelse2016'
+# global OM degradation rate constants (1/yr)
+sg_par_sed_huelse2017_k1=0.0065
+sg_par_sed_huelse2017_k2=0.001
+sg_par_sed_huelse2017_k2_anoxic=1E-5
+# Remove implicit Alk associated with buried sulf-OM / no permanent alkalinity gain?
+sg_par_sed_huelse2017_remove_impl_sulALK=.true.
+# Simulate ocean Porg loss with buried sulf-OM? 
+sg_par_sed_huelse2017_sim_P_loss=.true.
+#
+# --- WEATHERING -----------------------------------------------
+#
+# set a CLOSED system
+bg_ctrl_force_sed_closedsystem=.false.
+# set prescribed weathering rate: value from seddiag_misc_DATA_GLOBAL.res as total POC pres
+rg_par_weather_CaSiO3=1.0
+rg_par_weather_CaSiO3_fracC=4.455781E+013
+rg_par_weather_CaCO3=0.0E+14
+rg_par_weather_CaCO3_d13C=0.0
+#
+# --- DATA SAVING ----------------------------------------------
+#
+bg_par_data_save_level=8
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=1
+# enable the 'old' geochem saving:
+bg_ctrl_data_save_slice_diag_redox_old=.true.
+bg_ctrl_data_save_sig_diag_redox_old=.true.
+#
+# --- FORCINGS -------------------------------------------------
+#
+
+# specify forcings
+bg_par_forcing_name="pyyyyz.RpO2.DOM"
+# 4x modern pCO2:
+#bg_par_atm_force_scale_val_3=1112.0E-06
+bg_par_atm_force_scale_val_4=-4.5
+bg_par_atm_force_scale_val_6=0.2095
+# set alternative wind speed field
+bg_par_windspeed_file="p0093k_windspeed.dat"
+#re-scale gas transfer coeff to give ~0.058 mol m-2 yr-1 uatm-1 global mean air-sea coefficient (original: 0.310)
+bg_par_gastransfer_a=1.385
+#
+# --- MISC -----------------------------------------------------
+#
+# INIT ALK
+#bg_ocn_init_12=2.000-03
+# Initial oceanic PO4 concentration (modern PO4)
+#bg_ocn_init_8=4.318E-06
+#
+# --- END ------------------------------------------------------
+#

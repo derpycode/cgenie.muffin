@@ -220,7 +220,8 @@ CONTAINS
         real::loc_fPOC_13C                                          ! 13C of POC flux to the sediment [cm3 cm-2]
         !        real::dum_POC1_wtpct_swi, dum_POC2_wtpct_swi       ! POC concentrations at SWI [wt%]
         logical :: loc_print_results
-        logical :: loc_calc_ALK, loc_sim_P_loss, loc_remove_impl_sulALK
+        logical :: loc_calc_ALK
+!	logical :: par_sed_huelse2017_sim_P_loss, par_sed_huelse2017_remove_impl_sulALK
 	real::loc_new_sed_vol                                       ! new sediment volume - settling flux (as SOLID material)
         real::loc_sed_burial                                        ! burial rate (w) - corrected for porosity
         !        integer:: loc_k = 0
@@ -229,8 +230,8 @@ CONTAINS
         loc_sed_pres_insane = .false.
         loc_print_results = .false.
         loc_calc_ALK = .false.
-        loc_sim_P_loss = .false.		! simulate a P-loss to sediments due to OM-sulfurization?
-	loc_remove_impl_sulALK = .true.		! remove implicit Alk associated with buried sulf-OM - needed for steady-state simulations (then just see the sulf -> OM-burial effect)?
+!        par_sed_huelse2017_sim_P_loss = .false.		! simulate a P-loss to sediments due to OM-sulfurization?
+!	par_sed_huelse2017_remove_impl_sulALK = .true.		! remove implicit Alk associated with buried sulf-OM - needed for steady-state simulations (then just see the sulf -> OM-burial effect)?
 	loc_O2_swiflux_pos = .false.
 
         loc_O2_swiflux = 0.0
@@ -668,14 +669,14 @@ CONTAINS
 !                            print*,' '                            
                         else
 !				print*,'Do not use OMEN P-cycle '
-				if(loc_sim_P_loss)then
+				if(par_sed_huelse2017_sim_P_loss)then
 					! PO4 hack: remineralise just the non-sulfurised POC and calculate PO4 return flux
-		                        loc_PO4_swiflux = (loc_POC1_flux_swi+loc_POC2_flux_swi)*1.0/106.0
+		                        loc_PO4_swiflux = (loc_POC1_flux_swi+loc_POC2_flux_swi)*PC1/SD
 !		                        print*,'Sim P-loss PO4 = ', loc_PO4_swiflux
-				else
+				else								
 				        ! PO4 hack: remineralise all POC and calculate PO4 return flux
 				        loc_PO4_swiflux = loc_fPOC*conv_POC_cm3_mol*PC1/SD
-!					print*,'all PO4 = ', loc_PO4_swiflux
+!					print*,'all PO4 returned = ', loc_PO4_swiflux
 				end if
                         end if  ! par_sed_huelse2017_P_cycle                       
                         !                        print*,' '
@@ -722,7 +723,7 @@ CONTAINS
                             loc_ALK_swiflux = loc_ALK_swiflux + dum_POC_total_flux_zinf*ALKROX/SD
 !                            print*,'FINAL loc_ALK_swiflux = ', loc_ALK_swiflux
 !                            print*,' '
-			    if(loc_remove_impl_sulALK)then
+			    if(par_sed_huelse2017_remove_impl_sulALK)then
 				! JUST FOR CLOSED-SYSTEM: Account for burial of negative ALK with OM
 				! will just the the sulf affect on OM-burial
 				! We decided to bury the H2S and 'remove' just the associated ALK (Email POC-S 05.09.2017)
@@ -740,7 +741,7 @@ CONTAINS
                     else    ! use ALK hack
 !                        print*,'ALK HACK '
                         loc_ALK_swiflux = 2.0*loc_H2S_swiflux + loc_new_sed(is_POC)*conv_POC_cm3_mol*ALKROX/SD  !16/106 !NC1
-			    if(loc_remove_impl_sulALK)then
+			    if(par_sed_huelse2017_remove_impl_sulALK)then
 				! JUST FOR CLOSED-SYSTEM: Account for burial of negative ALK with OM
 				! will just the the sulf affect on OM-burial
 				! We decided to bury the H2S and 'remove' just the associated ALK (Email POC-S 05.09.2017)
