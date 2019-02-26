@@ -3646,7 +3646,10 @@ CONTAINS
     ! estimate Os scavenging
     ! NOTE: cap Os removal at the minimum of ([Os], [labile POC])
     loc_Os_scavenging = 0.0
-    if (dum_ocn_O2 < 10E-5) then
+    if ((ctrl_Os_scav_O2_dep) .and. (dum_ocn_O2 < 10E-5)) then
+       loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
+       loc_Os_scavenging = min(loc_Os_scavenging,loc_part_den_POCl,loc_Os)
+    elseif (.not. ctrl_Os_scav_O2_dep) then
        loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
        loc_Os_scavenging = min(loc_Os_scavenging,loc_part_den_POCl,loc_Os)
     end if

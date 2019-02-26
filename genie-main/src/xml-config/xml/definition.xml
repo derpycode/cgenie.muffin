@@ -451,7 +451,7 @@
                         </param>
                   </paramArray>
 <!-- ocn_select -->
-                   <paramArray name="ocn_select" dimension="1" extent="100">
+                   <paramArray name="ocn_select" dimension="1" extent="107">
                         <description>tracer selection</description>    
                         <param name="ocn_select(1)" index="1">
                             <value datatype="boolean">.true.</value>
@@ -883,7 +883,7 @@
                         </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="86">
+                   <paramArray name="sed_select" dimension="1" extent="99">
                         <description>tracer selection</description>    
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -2958,7 +2958,7 @@
             <file name="data_BIOGEM">
                 <namelist name="INI_BIOGEM_NML">
 
-                    <paramArray name="ocn_init" dimension="1" extent="101">
+                    <paramArray name="ocn_init" dimension="1" extent="107">
                         <description>tracer initialisation</description>    
                         <param name="ocn_init(1)" index="1">
                             <value datatype="real">0.0</value>
@@ -3389,7 +3389,7 @@
                             <description></description>
                         </param>
                     </paramArray>
-                    <paramArray name="ocn_dinit" dimension="1" extent="101">
+                    <paramArray name="ocn_dinit" dimension="1" extent="107">
                         <description>tracer restart perturbation (re-initialisation)</description>    
                         <param name="ocn_dinit(1)" index="1">
                             <value datatype="real">0.0</value>
@@ -4459,6 +4459,10 @@
 			<value datatype="real">0.0</value>
                         <description>Os scavening efficiency</description>
                     </param>
+                    <param name="ctrl_Os_scav_O2_dep">
+			<value datatype="boolean">.false.</value>
+                        <description>switch to turn on O2 dependency of Os scavenging</description>
+                    </param>
                     <param name="ctrl_bio_remin_thresh">
 			<value datatype="boolean">.false.</value>
                         <description>Apply a hard tracer oxidant remin threshold?</description>
@@ -5445,7 +5449,7 @@
                             <description></description>
                         </param>
                     </paramArray>
-                    <paramArray name="par_ocn_force_scale_val" dimension="1" extent="101">
+                    <paramArray name="par_ocn_force_scale_val" dimension="1" extent="107">
                         <description>ocean tracer forcing scaling - value</description>    
                         <param name="par_ocn_force_scale_val(1)" index="1">
                             <value datatype="real">1.0</value>
@@ -5876,7 +5880,7 @@
                             <description></description>
                         </param>
                     </paramArray>
-                    <paramArray name="par_ocn_force_scale_time" dimension="1" extent="101">
+                    <paramArray name="par_ocn_force_scale_time" dimension="1" extent="107">
                         <description>ocean tracer forcing scaling - time</description>    
                         <param name="par_ocn_force_scale_time(1)" index="1">
                             <value datatype="real">1.0</value>
