@@ -14,6 +14,7 @@ SUBROUTINE cpl_flux_ocnsed(     &
      & dum_sfxsed1,             &
      & dum_sfxsumsed            &
      & )
+  USE sedgem_lib
   IMPLICIT NONE
   ! dummy arguments
   real,intent(in)::dum_dts
@@ -26,6 +27,12 @@ SUBROUTINE cpl_flux_ocnsed(     &
   integer::i,j
   integer::i1,j1
   integer::loc_scalei,loc_scalej
+  ! ---------------------------------------------------------- !
+  ! START
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '*** COUPLE FLUXES: OCN->SED ***'
+  IF (ctrl_debug_lvl1) print*, '    >>>'
+  ! ---------------------------------------------------------- !
   ! initialize local variables
   loc_scalei = dum_ns_maxi/dum_n_maxi
   loc_scalej = dum_ns_maxj/dum_n_maxj
@@ -45,6 +52,11 @@ SUBROUTINE cpl_flux_ocnsed(     &
         dum_sfxsumsed(:,i,j) = dum_sfxsumsed(:,i,j) + dum_dts*dum_sfxsed1(:,i1,j1)
      end DO
   end DO
+  ! ---------------------------------------------------------- !
+  ! END
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '    <<<'
+  ! ---------------------------------------------------------- !
 end SUBROUTINE cpl_flux_ocnsed
 ! ******************************************************************************************************************************** !
 
@@ -58,6 +70,7 @@ SUBROUTINE cpl_flux_sedsed1(    &
      & dum_sfxsumsed,           &
      & dum_sfxsumsed1           &
      & )
+  USE sedgem_lib
   IMPLICIT NONE
   ! dummy arguments
   integer,intent(in)::dum_n_maxsed
@@ -71,6 +84,12 @@ SUBROUTINE cpl_flux_sedsed1(    &
   integer::di,dj
   integer::loc_scalei,loc_scalej
   real::loc_scale
+  ! ---------------------------------------------------------- !
+  ! START
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '*** COUPLE FLUXES: SED->SED1 ***'
+  IF (ctrl_debug_lvl1) print*, '    >>>'
+  ! ---------------------------------------------------------- !
   ! initialize local variables
   loc_scalei = dum_ns_maxi/dum_n_maxi
   loc_scalej = dum_ns_maxj/dum_n_maxj
@@ -97,6 +116,11 @@ SUBROUTINE cpl_flux_sedsed1(    &
         end do
      end DO
   end DO
+  ! ---------------------------------------------------------- !
+  ! END
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '    <<<'
+  ! ---------------------------------------------------------- !
 end SUBROUTINE cpl_flux_sedsed1
 ! ******************************************************************************************************************************** !
 
@@ -110,6 +134,7 @@ SUBROUTINE cpl_flux_sedocn(     &
      & dum_sfxocn1,             &
      & dum_sfxocn               &
      & )
+  USE sedgem_lib
   IMPLICIT NONE
   ! dummy arguments
   integer,intent(in)::dum_n_maxocn
@@ -123,6 +148,12 @@ SUBROUTINE cpl_flux_sedocn(     &
   integer::di,dj
   integer::loc_scalei,loc_scalej
   real::loc_scale
+  ! ---------------------------------------------------------- !
+  ! START
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '*** COUPLE FLUXES: SED->OCN ***'
+  IF (ctrl_debug_lvl1) print*, '    >>>'
+  ! ---------------------------------------------------------- !
   ! initialize local variables
   loc_scalei = dum_ns_maxi/dum_n_maxi
   loc_scalej = dum_ns_maxj/dum_n_maxj
@@ -149,6 +180,11 @@ SUBROUTINE cpl_flux_sedocn(     &
         end do
      end DO
   end DO
+  ! ---------------------------------------------------------- !
+  ! END
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '    <<<'
+  ! ---------------------------------------------------------- !
 end SUBROUTINE cpl_flux_sedocn
 ! ******************************************************************************************************************************** !
 
