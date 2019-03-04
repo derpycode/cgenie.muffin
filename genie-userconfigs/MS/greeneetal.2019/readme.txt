@@ -7,34 +7,14 @@ For:
 S.E. Greene, A. Ridgwell, S. Kirtland Turner, D.N. Schmidt, H. Pälike, E. Thomas, L.K. Greene, B.A.A. Hoogakker
 
 ################################################################
-18/03/5 -- README.txt file creation (A.R.)
+19/03/01 -- README.txt file creation (A.R.)
 ################################################################
 
-Provided is the code used to create the model experiments presented in the paper.
-Also given are the configuration files necessary to run these experiments.
+Provided are the configuration files necessary to run the model experiments presented in the paper.
 
 The intention is to provide an oppertunity to question the assumptions and
 interpretation through re-analysis and the creation of new and different experiments.
 (Plus, to provide a means to replicate results.)
-
-### code version and installation ###############################
-
-The specific svn version of the code that runs the experiments, is:
-
-r.10211
-
-(but the expectation is that the current (head) version will also always replicate the published results)
-
-Instructions for installing the model code, 
-as well as a series of tutorials for learning how to configure, run, and analyses the model output, can be  found here:
-
-http://www.seao2.info/mycgenie.html
-
-See 'got muffin?' quick start guides for installing the code.
-
-Refer to the cGENIE.muffin combined user-manual and an introduction to Earth system modelling tutorials for a complete set of model documentation:
-
-http://www.seao2.info/cgenie/docs/muffin.pdf
 
 ### model experiments -- spinups ################################
 
