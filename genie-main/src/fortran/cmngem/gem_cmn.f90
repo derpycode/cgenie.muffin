@@ -777,6 +777,7 @@ MODULE gem_cmn
   REAL,PARAMETER::const_real_null       = -0.999999E+19                 ! 
   REAL,PARAMETER::const_real_nullhigh   = +0.999999E+19                 ! 
   REAL,PARAMETER::const_real_nullsmall  = +0.999999E-19                 ! 
+  REAL,PARAMETER::const_rns             = +0.999999E-19                 ! 
   REAL,PARAMETER::const_real_zero       = +0.000000E+00                 ! 
   REAL,PARAMETER::const_real_one        = +1.000000E+00                 ! 
   REAL,PARAMETER::const_nulliso         = -999.999                      ! isotope null

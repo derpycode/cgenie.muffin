@@ -1848,7 +1848,7 @@ CONTAINS
     end do
     DO l=3,n_l_sed
        is = conv_iselected_is(l)
-       loc_bio_uptake(is,:) = 0.0
+       loc_bio_part(is,:) = 0.0
     end DO
     ! restrict abiotic precipitation to the surface if requested
     if (ctrl_bio_CaCO3precip_sur) then
