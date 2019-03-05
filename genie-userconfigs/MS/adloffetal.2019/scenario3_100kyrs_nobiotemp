@@ -5,12 +5,6 @@ ea_36=y
 #
 # --- BIOLOGICAL NEW PRODUCTION --------------------------------
 #
-#temperature dependent productivity
-bg_par_bio_prodopt='1N1T_PO4MM_Tdep'
-#Max growth rate term (multiplier)
-bg_par_bio_mu1=65
-bg_par_bio_kT0=0.59
-bg_par_bio_kT_eT=25.45'
 #maximum rate of conversion of dissolved PO4 into organic matter by phytoplankton (mol kg-1 yr-1)
 bg_par_bio_k0_PO4=8.9876e-006
 #[PO4] M-M half-sat value (mol kg-1)
@@ -48,15 +42,6 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 bg_par_bio_remin_denitrO2thresh=40E-6
 #F remineralisation into NH4
 bg_ctrl_bio_remin_ONtoNH4=.true.
-
-#temperature dependence for remineralization as in John et al 2014
-bg_ctrl_bio_remin_POC_fixed=.false.
-bg_par_bio_remin_sinkingrate=125.0
-bg_par_bio_remin_POC_K1=9.0E11
-bg_par_bio_remin_POC_Ea1=55000.0
-bg_par_bio_remin_POC_K2=1.0E14
-bg_par_bio_remin_POC_Ea2=80000.0
-bg_par_bio_remin_POC_frac2=0.008
 #
 # --- DATA SAVING ----------------------------------------------
 #
@@ -70,7 +55,7 @@ bg_ctrl_data_save_slice_fsedocn=.false.
 bg_ctrl_data_save_slice_diag=.true.
 bg_ctrl_data_save_slice_misc=.true.
 bg_ctrl_data_save_derived=.true.
-bg_par_infile_slice_name='save_timeslice_APTIAN_C3_20kyrs.dat'
+bg_par_infile_slice_name='save_timeslice_APTIAN_C3_100kyrs.dat'
 #
 # --- SEDIMENTS ------------------------------------------------
 #
@@ -111,14 +96,14 @@ rg_opt_weather_P_Ca=.TRUE.
 # set CaSiO3_weathering-productivity feedback
 rg_opt_weather_P_Si=.TRUE.
 # weathering reference mean global land surface temperature (C)
-rg_par_ref_T0=17.698925
+rg_par_ref_T0=21.713
 rg_par_ref_CO20=840.0
-#set total weathering rate #0.431588E+14 2.676
-rg_par_weather_CaCO3=0.28E+14
-rg_par_weather_CaSiO3=0.06E+14
+#set total weathering rate #0.262780E+14 
+rg_par_weather_CaCO3=0.1821753E+14
+rg_par_weather_CaSiO3=0.01574E+14
 #set bulk weathering isotopic composition
-rg_par_weather_CaCO3_d13C=5.41
-rg_par_outgas_CO2=0.06E+14
+rg_par_weather_CaCO3_d13C=4.38
+rg_par_outgas_CO2=0.1252974E+13
 rg_par_outgas_CO2_d13C=-6.0
 #
 # --- GEOCHEM ACCELERATION -------------------------------------
@@ -134,7 +119,7 @@ rg_par_outgas_CO2_d13C=-6.0
 # --- FORCINGS -------------------------------------------------
 #
 bg_ctrl_force_oldformat=.false.
-bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.APTIAN_C3_20kyrs_medpCO2_INC6"
+bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.Adloffetal2019_scenario3_100kyrs"
 bg_par_atm_force_scale_val_3=1
 bg_par_atm_force_scale_val_4=1
 bg_ctrl_force_invert_explicit=.true.
@@ -144,6 +129,7 @@ bg_par_gastransfer_a=1.385
 #
 #
 # --- MISC -----------------------------------------------------
+#
 # turn off tracer 'auditing'
 bg_ctrl_audit=.false.
 #

@@ -134,7 +134,7 @@ rg_par_outgas_CO2_d13C=-6.0
 # --- FORCINGS -------------------------------------------------
 #
 bg_ctrl_force_oldformat=.false.
-bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.APTIAN_C3_100kyrs_datapCO2_INC6"
+bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.Adloffetal2019_scenario2_100kyrs"
 bg_par_atm_force_scale_val_3=1
 bg_par_atm_force_scale_val_4=1
 bg_ctrl_force_invert_explicit=.true.

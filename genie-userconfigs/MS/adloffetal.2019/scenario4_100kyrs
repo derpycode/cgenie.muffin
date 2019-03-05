@@ -114,10 +114,10 @@ rg_opt_weather_P_Si=.TRUE.
 rg_par_ref_T0=17.698925
 rg_par_ref_CO20=840.0
 #set total weathering rate #0.431588E+14 2.676
-rg_par_weather_CaCO3=0.4147E+14
-rg_par_weather_CaSiO3=0.1355E+14
+rg_par_weather_CaCO3=0.28E+14
+rg_par_weather_CaSiO3=0.06E+14
 #set bulk weathering isotopic composition
-rg_par_weather_CaCO3_d13C=6.87
+rg_par_weather_CaCO3_d13C=5.41
 rg_par_outgas_CO2=0.06E+14
 rg_par_outgas_CO2_d13C=-6.0
 #
@@ -134,7 +134,7 @@ rg_par_outgas_CO2_d13C=-6.0
 # --- FORCINGS -------------------------------------------------
 #
 bg_ctrl_force_oldformat=.false.
-bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.APTIAN_C3_100kyrs_medpCO2_INC6"
+bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.Adloffetal2019_scenario4_100kyrs"
 bg_par_atm_force_scale_val_3=1
 bg_par_atm_force_scale_val_4=1
 bg_ctrl_force_invert_explicit=.true.

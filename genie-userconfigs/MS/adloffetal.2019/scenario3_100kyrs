@@ -70,7 +70,7 @@ bg_ctrl_data_save_slice_fsedocn=.false.
 bg_ctrl_data_save_slice_diag=.true.
 bg_ctrl_data_save_slice_misc=.true.
 bg_ctrl_data_save_derived=.true.
-bg_par_infile_slice_name='save_timeslice_EVERY001000.dat'
+bg_par_infile_slice_name='save_timeslice_APTIAN_C3_100kyrs.dat'
 #
 # --- SEDIMENTS ------------------------------------------------
 #
@@ -111,14 +111,14 @@ rg_opt_weather_P_Ca=.TRUE.
 # set CaSiO3_weathering-productivity feedback
 rg_opt_weather_P_Si=.TRUE.
 # weathering reference mean global land surface temperature (C)
-rg_par_ref_T0=21.71
+rg_par_ref_T0=17.698925
 rg_par_ref_CO20=840.0
-#set total weathering rate #0.5008418E+14 2.676
-rg_par_weather_CaCO3=0.575E+14
-rg_par_weather_CaSiO3=0.002E+14
+#set total weathering rate #0.431588E+14 2.676
+rg_par_weather_CaCO3=0.28E+14
+rg_par_weather_CaSiO3=0.06E+14
 #set bulk weathering isotopic composition
-rg_par_weather_CaCO3_d13C=6.158
-rg_par_outgas_CO2=0.1141639E+11
+rg_par_weather_CaCO3_d13C=5.41
+rg_par_outgas_CO2=0.06E+14
 rg_par_outgas_CO2_d13C=-6.0
 #
 # --- GEOCHEM ACCELERATION -------------------------------------
@@ -134,22 +134,16 @@ rg_par_outgas_CO2_d13C=-6.0
 # --- FORCINGS -------------------------------------------------
 #
 bg_ctrl_force_oldformat=.false.
-bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.APTIAN_C3_20kyrs_medpCO2_INC6"
+bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.Adloffetal2019_scenario3_100kyrs"
 bg_par_atm_force_scale_val_3=1
 bg_par_atm_force_scale_val_4=1
 bg_ctrl_force_invert_explicit=.true.
-bg_ctrl_force_invert_noneg=.true.
 bg_par_windspeed_file="p0120c_windspeed.dat"
 #re-scale gas transfer coeff to give ~0.058 mol m-2 yr-1 uatm-1 global mean air-sea coefficient (original: 0.310)
 bg_par_gastransfer_a=1.385
 #
 #
 # --- MISC -----------------------------------------------------
-#
-# enable Corg burial!
-#bg_ctrl_force_invert_Corgburial=.true.
-# scale Corg burial!
-#bg_par_force_invert_fCorgburial=0.01
 # turn off tracer 'auditing'
 bg_ctrl_audit=.false.
 #

@@ -49,6 +49,14 @@ bg_par_bio_remin_denitrO2thresh=40E-6
 #F remineralisation into NH4
 bg_ctrl_bio_remin_ONtoNH4=.true.
 
+#temperature dependence for remineralization as in John et al 2014
+bg_ctrl_bio_remin_POC_fixed=.false.
+bg_par_bio_remin_sinkingrate=125.0
+bg_par_bio_remin_POC_K1=9.0E11
+bg_par_bio_remin_POC_Ea1=55000.0
+bg_par_bio_remin_POC_K2=1.0E14
+bg_par_bio_remin_POC_Ea2=80000.0
+bg_par_bio_remin_POC_frac2=0.008
 #
 # --- DATA SAVING ----------------------------------------------
 #
@@ -62,7 +70,7 @@ bg_ctrl_data_save_slice_fsedocn=.false.
 bg_ctrl_data_save_slice_diag=.true.
 bg_ctrl_data_save_slice_misc=.true.
 bg_ctrl_data_save_derived=.true.
-bg_par_infile_slice_name='save_timeslice_APTIAN_C3_100kyrs.dat'
+bg_par_infile_slice_name='save_timeslice_APTIAN_C3_20kyrs.dat'
 #
 # --- SEDIMENTS ------------------------------------------------
 #
@@ -126,7 +134,7 @@ rg_par_outgas_CO2_d13C=-6.0
 # --- FORCINGS -------------------------------------------------
 #
 bg_ctrl_force_oldformat=.false.
-bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.APTIAN_C3_100kyrs_medpCO2_INC6"
+bg_par_forcing_name="pyyyyz.FRpCO2_FRp13CO2.Adloffetal2019_scenario3_20kyrs"
 bg_par_atm_force_scale_val_3=1
 bg_par_atm_force_scale_val_4=1
 bg_ctrl_force_invert_explicit=.true.
