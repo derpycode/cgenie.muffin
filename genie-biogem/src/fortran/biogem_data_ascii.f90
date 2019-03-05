@@ -713,10 +713,39 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end DO
     end if
-    IF (ctrl_data_save_sig_diag_geochem .AND. ctrl_data_save_sig_diag_redox_old) THEN
-       DO id=1,n_diag_geochem
+    IF (ctrl_data_save_sig_diag_redox_old) THEN
+       DO id=1,n_diag_geochem_old
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem',trim(string_diag_geochem(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem_old', &
+               & trim(string_diag_geochem_old(id)),string_results_ext)
+          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_precip
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_react
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
           loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
@@ -730,7 +759,7 @@ CONTAINS
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_redox
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_redox',trim(string_diag_redox(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_redox(id)),string_results_ext)
           loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
@@ -2084,11 +2113,46 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end DO
     end if
-    IF (ctrl_data_save_sig_diag_geochem .AND. ctrl_data_save_sig_diag_redox_old) THEN
-       DO id=1,n_diag_geochem
-          loc_sig = int_diag_geochem_sig(id)/int_t_sig
+    IF (ctrl_data_save_sig_diag_redox_old) THEN
+       DO id=1,n_diag_geochem_old
+          loc_sig = int_diag_geochem_old_sig(id)/int_t_sig
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem',trim(string_diag_geochem(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem_old', &
+               & trim(string_diag_geochem_old(id)),string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+               & loc_t,                        &
+               & loc_ocn_tot_M*loc_sig,        &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_precip
+          loc_sig = int_diag_precip_sig(id)/int_t_sig
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+               & loc_t,                        &
+               & loc_ocn_tot_M*loc_sig,        &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_react
+          loc_sig = int_diag_react_sig(id)/int_t_sig
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2105,7 +2169,7 @@ CONTAINS
        DO id=1,n_diag_redox
           loc_sig = int_diag_redox_sig(id)/int_t_sig
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_redox',trim(string_diag_redox(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_redox(id)),string_results_ext)
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)

@@ -2791,8 +2791,8 @@ SUBROUTINE diag_biogem_timeslice( &
            if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
               SELECT CASE (trim(opt_geochem_Fe))
               CASE ('hybrid')
-                 diag_Fe(idiag_Fe_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
-                 diag_Fe(idiag_Fe_TL,:,:,:)   = ocn(io_TL,:,:,:)
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
+                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
                  DO i=1,n_i
                     DO j=1,n_j
                        loc_k1 = goldstein_k1(i,j)
@@ -2801,16 +2801,16 @@ SUBROUTINE diag_biogem_timeslice( &
                              loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
                                   & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k),par_K_FeL &
                                   & )
-                             diag_Fe(idiag_Fe_Fe,i,j,k)  = loc_FeFeLL(1)
-                             diag_Fe(idiag_Fe_FeL,i,j,k) = loc_FeFeLL(2)
-                             diag_Fe(idiag_Fe_L,i,j,k)   = loc_FeFeLL(3)
+                             diag_iron(idiag_iron_Fe,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_FeL,i,j,k) = loc_FeFeLL(2)
+                             diag_iron(idiag_iron_L,i,j,k)   = loc_FeFeLL(3)
                           end DO
                        end IF
                     end DO
                  end DO
               CASE ('lookup_4D')
-                 diag_Fe(idiag_Fe_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
-                 diag_Fe(idiag_Fe_TL,:,:,:)   = ocn(io_TL,:,:,:)
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
+                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
                  DO i=1,n_i
                     DO j=1,n_j
                        loc_k1 = goldstein_k1(i,j)
@@ -2820,22 +2820,22 @@ SUBROUTINE diag_biogem_timeslice( &
                                   & (/ ocn(io_T,i,j,k), carb(ic_H,i,j,k),   &
                                   & ocn(io_TDFe,i,j,k), ocn(io_TL,i,j,k) /) &
                                   & )
-                             diag_Fe(idiag_Fe_Fe3,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_Fe3,i,j,k)  = loc_FeFeLL(1)
                              loc_FeFeLL(1) = fun_box_calc_lookup_Fe_4D_geo( &
                                   & (/ ocn(io_T,i,j,k), carb(ic_H,i,j,k),   &
                                   & ocn(io_TDFe,i,j,k), ocn(io_TL,i,j,k) /) &
                                   & )
-                             diag_Fe(idiag_Fe_geo,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_geo,i,j,k)  = loc_FeFeLL(1)
                           end DO
                        end IF
                     end DO
                  end DO
               CASE default
-                 diag_Fe(idiag_Fe_Fe,:,:,:)   = ocn(io_Fe,:,:,:)
-                 diag_Fe(idiag_Fe_FeL,:,:,:)  = ocn(io_FeL,:,:,:)
-                 diag_Fe(idiag_Fe_L,:,:,:)    = ocn(io_L,:,:,:)
-                 diag_Fe(idiag_Fe_TDFe,:,:,:) = ocn(io_Fe,:,:,:) + ocn(io_FeL,:,:,:)
-                 diag_Fe(idiag_Fe_TL,:,:,:)   = ocn(io_L,:,:,:)  + ocn(io_FeL,:,:,:)
+                 diag_iron(idiag_iron_Fe,:,:,:)   = ocn(io_Fe,:,:,:)
+                 diag_iron(idiag_iron_FeL,:,:,:)  = ocn(io_FeL,:,:,:)
+                 diag_iron(idiag_iron_L,:,:,:)    = ocn(io_L,:,:,:)
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_Fe,:,:,:) + ocn(io_FeL,:,:,:)
+                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_L,:,:,:)  + ocn(io_FeL,:,:,:)
               end SELECT
            end IF
 
@@ -2869,10 +2869,12 @@ SUBROUTINE diag_biogem_timeslice( &
            int_psi_timeslice(:,:)   = int_psi_timeslice(:,:)   + loc_dtyr*diag_misc_psi(:,:)
            int_u_timeslice(:,:,:,:) = int_u_timeslice(:,:,:,:) + loc_dtyr*phys_ocn(ipo_gu:ipo_gw,:,:,:)
            ! update time-slice data - diagnostics
-           int_diag_bio_timeslice(:,:,:)       = int_diag_bio_timeslice(:,:,:)       + diag_bio(:,:,:)
-           int_diag_geochem_timeslice(:,:,:,:) = int_diag_geochem_timeslice(:,:,:,:) + diag_geochem(:,:,:,:)
-           int_diag_Fe_timeslice(:,:,:,:)      = int_diag_Fe_timeslice(:,:,:,:)      + loc_dtyr*diag_Fe(:,:,:,:)
-           int_diag_redox_timeslice(:,:,:,:)   = int_diag_redox_timeslice(:,:,:,:)   + diag_redox(:,:,:,:)
+           int_diag_bio_timeslice(:,:,:)           = int_diag_bio_timeslice(:,:,:)       + diag_bio(:,:,:)
+           int_diag_geochem_old_timeslice(:,:,:,:) = int_diag_geochem_old_timeslice(:,:,:,:) + diag_geochem_old(:,:,:,:)
+           int_diag_precip_timeslice(:,:,:,:)      = int_diag_precip_timeslice(:,:,:,:) + diag_precip(:,:,:,:)
+           int_diag_react_timeslice(:,:,:,:)       = int_diag_react_timeslice(:,:,:,:) + diag_react(:,:,:,:)
+           int_diag_redox_timeslice(:,:,:,:)       = int_diag_redox_timeslice(:,:,:,:)   + diag_redox(:,:,:,:)
+           int_diag_iron_timeslice(:,:,:,:)        = int_diag_iron_timeslice(:,:,:,:)      + loc_dtyr*diag_iron(:,:,:,:)
            ! gemlite
            if (dum_gemlite) then
               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + loc_dtyr*dum_sfxsumrok1(:,:,:)
@@ -3369,9 +3371,17 @@ SUBROUTINE diag_biogem_timeseries( &
                  int_diag_bio_sig(ib) = int_diag_bio_sig(ib) + &
                       & SUM(phys_ocn(ipo_A,:,:,n_k)*diag_bio(ib,:,:))/loc_tot_A
               END DO
-              DO id=1,n_diag_geochem
-                 int_diag_geochem_sig(id) = int_diag_geochem_sig(id) + &
-                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_geochem(id,:,:,:))*loc_ocn_rtot_M
+              DO id=1,n_diag_geochem_old
+                 int_diag_geochem_old_sig(id) = int_diag_geochem_old_sig(id) + &
+                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_geochem_old(id,:,:,:))*loc_ocn_rtot_M
+              END DO
+              DO id=1,n_diag_precip
+                 int_diag_precip_sig(id) = int_diag_precip_sig(id) + &
+                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_precip(id,:,:,:))*loc_ocn_rtot_M
+              END DO
+              DO id=1,n_diag_react
+                 int_diag_react_sig(id) = int_diag_react_sig(id) + &
+                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_react(id,:,:,:))*loc_ocn_rtot_M
               END DO
               DO id=1,n_diag_redox
                  int_diag_redox_sig(id) = int_diag_redox_sig(id) + &

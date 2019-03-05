@@ -249,8 +249,10 @@ MODULE biogem_lib
   CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
   CHARACTER(len=63)::opt_bio_remin_oxidize_H2StoSO4              ! H2S -> SO4 oxidation option
   NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_NH4toNO3,opt_bio_remin_oxidize_H2StoSO4
-  CHARACTER(len=63)::opt_bio_remin_scavenge_H2StoPOMS
-  NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS      ! H2S -> POMS
+  CHARACTER(len=63)::opt_bio_remin_scavenge_H2StoPOMS            ! H2S -> POMS
+  NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS
+  LOGICAL::ctrl_scav_H2S_dt_old                                  ! Old local residence time in layer for H2S? 
+  NAMELIST /ini_biogem_nml/ctrl_scav_H2S_dt_old
   CHARACTER(len=63)::par_bio_remin_CH4ox                         ! aerobic methanotrophy scheme ID string
   NAMELIST /ini_biogem_nml/par_bio_remin_CH4ox
   real::par_bio_remin_CH4rate                                    ! specific CH4 oxidation rate (d-1)
@@ -691,8 +693,10 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_data                           = 30 ! data (I/O)
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
   INTEGER,PARAMETER::n_diag_bio                           = 21 !
-  INTEGER,PARAMETER::n_diag_geochem                       = 15 !
-  INTEGER,PARAMETER::n_diag_Fe                            = 07 !
+  INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
+  INTEGER,PARAMETER::n_diag_precip                        = 06 !
+  INTEGER,PARAMETER::n_diag_react                         = 05 !
+  INTEGER,PARAMETER::n_diag_iron                          = 07 !
   INTEGER,PARAMETER::n_diag_misc_2D                       = 07 !
   INTEGER::n_diag_redox                                   =  0 !
 
@@ -791,30 +795,38 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_bio_CaCO3toPOC_nsp            = 19    !
   INTEGER,PARAMETER::idiag_bio_opaltoPOC_sp              = 20    !
   INTEGER,PARAMETER::idiag_bio_fspPOC                    = 21    !
-  ! diagnostics - geochemistry
-  INTEGER,PARAMETER::idiag_geochem_ammox_dNO3            = 01    !
-  INTEGER,PARAMETER::idiag_geochem_ammox_dNH4            = 02    !
-  INTEGER,PARAMETER::idiag_geochem_Nredct_dN2            = 03    !
-  INTEGER,PARAMETER::idiag_geochem_Nredct_dNH4           = 04    !
-  INTEGER,PARAMETER::idiag_geochem_Sredct_dH2S           = 05    !
-  INTEGER,PARAMETER::idiag_geochem_Sredct_dNH4           = 06    !
-  INTEGER,PARAMETER::idiag_geochem_dH2S                  = 07    !
-  INTEGER,PARAMETER::idiag_geochem_dCH4                  = 08    !
-  INTEGER,PARAMETER::idiag_geochem_dCH4_AOM              = 09    !
-  INTEGER,PARAMETER::idiag_geochem_dH2S_POMS             = 10    !
-  INTEGER,PARAMETER::idiag_geochem_dFe_FeS2              = 11    !
-  INTEGER,PARAMETER::idiag_geochem_dH2S_FeS2             = 12    !
-  INTEGER,PARAMETER::idiag_geochem_dSO4_FeS2             = 13    !
-  INTEGER,PARAMETER::idiag_geochem_dFe_FeCO3             = 14    !
-  INTEGER,PARAMETER::idiag_geochem_dDIC_FeCO3            = 15    !
-  ! diagnostics - geochemistry -- Fe
-  INTEGER,PARAMETER::idiag_Fe_Fe                         = 01    !
-  INTEGER,PARAMETER::idiag_Fe_FeL                        = 02    !
-  INTEGER,PARAMETER::idiag_Fe_L                          = 03    !
-  INTEGER,PARAMETER::idiag_Fe_TDFe                       = 04    !
-  INTEGER,PARAMETER::idiag_Fe_TL                         = 05    !
-  INTEGER,PARAMETER::idiag_Fe_Fe3                        = 06    !
-  INTEGER,PARAMETER::idiag_Fe_geo                        = 07    !
+  ! diagnostics - OLD
+  INTEGER,PARAMETER::idiag_geochem_old_ammox_dNO3        = 01    !
+  INTEGER,PARAMETER::idiag_geochem_old_ammox_dNH4        = 02    !
+  INTEGER,PARAMETER::idiag_geochem_old_Nredct_dN2        = 03    !
+  INTEGER,PARAMETER::idiag_geochem_old_Nredct_dNH4       = 04    !
+  INTEGER,PARAMETER::idiag_geochem_old_Sredct_dH2S       = 05    !
+  INTEGER,PARAMETER::idiag_geochem_old_Sredct_dNH4       = 06    !
+  INTEGER,PARAMETER::idiag_geochem_old_dH2S              = 07    !
+  INTEGER,PARAMETER::idiag_geochem_old_dCH4              = 08    !
+  INTEGER,PARAMETER::idiag_geochem_old_dCH4_AOM          = 09    !
+  INTEGER,PARAMETER::idiag_geochem_old_dH2S_POMS         = 10    !
+  ! diagnostics - geochemistry -- precip
+  INTEGER,PARAMETER::idiag_precip_FeS2_dFe               = 01    !
+  INTEGER,PARAMETER::idiag_precip_FeS2_dH2S              = 02    !
+  INTEGER,PARAMETER::idiag_precip_FeS2_dSO4              = 03    !
+  INTEGER,PARAMETER::idiag_precip_FeCO3_dFe              = 04    !
+  INTEGER,PARAMETER::idiag_precip_FeCO3_dDIC             = 05    !
+  INTEGER,PARAMETER::idiag_precip_FeOOH_dFe              = 06    !
+  ! diagnostics - geochemistry -- iron speciation
+  INTEGER,PARAMETER::idiag_iron_Fe                       = 01    !
+  INTEGER,PARAMETER::idiag_iron_FeL                      = 02    !
+  INTEGER,PARAMETER::idiag_iron_L                        = 03    !
+  INTEGER,PARAMETER::idiag_iron_TDFe                     = 04    !
+  INTEGER,PARAMETER::idiag_iron_TL                       = 05    !
+  INTEGER,PARAMETER::idiag_iron_Fe3                      = 06    !
+  INTEGER,PARAMETER::idiag_iron_geo                      = 07    !
+  ! diagnostics - geochemistry -- solid-solute reactions
+  INTEGER,PARAMETER::idiag_react_POMS_dH2S               = 01    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dFe               = 02    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dH2S              = 03    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dSO4              = 04    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dALK              = 05    !
   ! diagnostics - misc - 2D
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2                 = 01    !
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2_13C             = 02    !
@@ -901,32 +913,42 @@ MODULE biogem_lib
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
        & 'fspPOC        ' /)       
-  ! diagnostics - geochemistry
-  CHARACTER(len=14),DIMENSION(n_diag_geochem),PARAMETER::string_diag_geochem = (/ &
-       & 'NH4_oxid_dNO3 ', &
-       & 'NH4_oxid_dNH4 ', &
-       & 'NO3_redct_dN2 ', &
-       & 'NO3_redct_dNH4', &
-       & 'SO4_redct_dH2S', &
-       & 'SO4_redct_dNH4', &
+  ! diagnostics - geochemistry -- OLD
+  CHARACTER(len=14),DIMENSION(n_diag_geochem_old),PARAMETER::string_diag_geochem_old = (/ &
+       & 'dNO3_NH4_oxid ', &
+       & 'dNH4_NH4_oxid ', &
+       & 'dN2_NO3_redct ', &
+       & 'dNH4_NO3_redct', &
+       & 'dH2S_SO4_redct', &
+       & 'dNH4_SO4_redct', &
        & 'dH2S          ', &
        & 'dCH4          ', &
        & 'dCH4_AOM      ', &
-       & 'H2StoPOMS_dH2S', &
-       & 'dFe_FeS2      ', &
-       & 'dH2S_FeS2     ', &
-       & 'dSO4_FeS2     ', &
-       & 'dFe_FeCO3     ', &
-       & 'dDIC_FeCO3    '/)
-  ! diagnostics - geochemistry -- Fe
-  CHARACTER(len=14),DIMENSION(n_diag_Fe),PARAMETER::string_diag_Fe = (/ &
-       & 'Fe            ', &
-       & 'FeL           ', &
-       & 'L             ', &
-       & 'TDFe          ', &
-       & 'TL            ', &
-       & 'Fe3           ', &
-       & 'geo           ' /)
+       & 'H2StoPOMS_dH2S'/)    
+  ! diagnostics - geochemistry -- precip
+  CHARACTER(len=18),DIMENSION(n_diag_precip),PARAMETER::string_diag_precip = (/ &
+       & 'precip_FeS2_dFe   ', &
+       & 'precip_FeS2_dH2S  ', &
+       & 'precip_FeS2_dSO4  ', &
+       & 'precip_FeCO3_dFe  ', &
+       & 'precip_FeCO3_dDIC ', &
+       & 'precip_FeOOH_dFe  '/)
+  ! diagnostics - geochemistry -- Fe speciation
+  CHARACTER(len=18),DIMENSION(n_diag_iron),PARAMETER::string_diag_iron = (/ &
+       & 'iron_Fe           ', &
+       & 'iron_FeL          ', &
+       & 'iron_L            ', &
+       & 'iron_TDFe         ', &
+       & 'iron_TL           ', &
+       & 'iron_Fe3          ', &
+       & 'iron_geo          ' /)
+  ! diagnostics - geochemistry -- solid-solute reactions
+  CHARACTER(len=18),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &
+       & 'react_POMS_dH2S   ', &
+       & 'react_FeOOH_dFe   ', &
+       & 'react_FeOOH_dH2S  ', &
+       & 'react_FeOOH_dSO4  ', &
+       & 'react_FeOOH_dALK  ' /)
   ! diagnostics - misc - 2D
   CHARACTER(len=14),DIMENSION(n_diag_misc_2D),PARAMETER::string_diag_misc_2D = (/ &
        & 'FpCO2         ', &
@@ -1054,8 +1076,10 @@ MODULE biogem_lib
   REAL,DIMENSION(3,n_i,n_j,n_k)::carb_TSn                        !
   ! diagnostics
   REAL,DIMENSION(n_diag_bio,n_i,n_j)::diag_bio                   ! biology diagnostics
-  REAL,DIMENSION(n_diag_geochem,n_i,n_j,n_k)::diag_geochem       ! geochemistry diagnostics
-  REAL,DIMENSION(n_diag_Fe,n_i,n_j,n_k)::diag_Fe                 ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_geochem_old,n_i,n_j,n_k)::diag_geochem_old ! geochemistry diagnostics -- OLD
+  REAL,DIMENSION(n_diag_precip,n_i,n_j,n_k)::diag_precip         ! geochemistry diagnostics --  precipitation
+  REAL,DIMENSION(n_diag_iron,n_i,n_j,n_k)::diag_iron             ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_react,n_i,n_j,n_k)::diag_react           ! geochemistry solid-solute reaction diagnostics
 !!!  REAL,DIMENSION(n_ocn,n_i,n_j)::diag_weather                    ! weathering diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::diag_airsea                     ! air-sea gas exchange diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::diag_forcing                    ! atmospheric forcing diagnostics
@@ -1090,7 +1114,10 @@ MODULE biogem_lib
   real::int_misc_det_Fe_tot_sig,int_misc_det_Fe_dis_sig          !
   REAL,DIMENSION(n_sed)::int_ocnsed_sig                          !
   REAL,DIMENSION(n_diag_bio)::int_diag_bio_sig                   ! biology diagnostics
-  REAL,DIMENSION(n_diag_geochem)::int_diag_geochem_sig           ! geochemistry diagnostics
+  REAL,DIMENSION(n_diag_geochem_old)::int_diag_geochem_old_sig   ! geochemistry diagnostics -- OLD
+  REAL,DIMENSION(n_diag_precip)::int_diag_precip_sig             ! geochemistry diagnostics -- precipitation
+  REAL,DIMENSION(n_diag_iron)::int_diag_iron_sig                 ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_react)::int_diag_react_sig               ! geochemistry solid-solute reaction diagnostics
   REAL,DIMENSION(n_ocn)::int_diag_weather_sig                    ! weathering diagnostics
   REAL,DIMENSION(n_atm)::int_diag_airsea_sig                     ! air-sea gas exchange diagnostics
   REAL,DIMENSION(n_atm)::int_diag_forcing_sig                    ! forcing diagnostics
@@ -1135,8 +1162,10 @@ MODULE biogem_lib
   REAL,DIMENSION(3,n_i,n_j,n_k)::int_u_timeslice                 !
   REAL,DIMENSION(0:n_i,0:n_j)::int_psi_timeslice                 !
   REAL,DIMENSION(n_diag_bio,n_i,n_j)::int_diag_bio_timeslice             ! biology diagnostics
-  REAL,DIMENSION(n_diag_geochem,n_i,n_j,n_k)::int_diag_geochem_timeslice ! geochemistry diagnostics
-  REAL,DIMENSION(n_diag_Fe,n_i,n_j,n_k)::int_diag_Fe_timeslice ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_geochem_old,n_i,n_j,n_k)::int_diag_geochem_old_timeslice ! geochemistry diagnostics -- OLD
+  REAL,DIMENSION(n_diag_precip,n_i,n_j,n_k)::int_diag_precip_timeslice ! geochemistry diagnostics -- precipitation
+  REAL,DIMENSION(n_diag_iron,n_i,n_j,n_k)::int_diag_iron_timeslice   ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_react,n_i,n_j,n_k)::int_diag_react_timeslice ! geochemistry solid-solute reaction diagnostics
   REAL,DIMENSION(n_ocn,n_i,n_j)::int_diag_weather_timeslice      ! weathering diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::int_diag_airsea_timeslice       ! air-sea gas exchange diagnostics
   ! redox

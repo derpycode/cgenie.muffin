@@ -2559,6 +2559,7 @@ CONTAINS
     loc_bio_remin_opal_frac2 = 0.0
     loc_bio_part_opal_ratio = 0.0
     loc_bio_remin_dt = 0.0
+    loc_bio_remin_dt_scav = 0.0
     !
     dum_i = dum_vbio_part%i
     dum_j = dum_vbio_part%j
@@ -2694,21 +2695,11 @@ CONTAINS
                 end SELECT
              end if
              ! ----------------------------------------------- ! ADDITIONAL (OCEAN SURFACE) PARTICLE TRANSFORMATIONS
-             ! ----------------------------------------------- ! surface Fe oxy-hydroxides particle transformations
-             if (sed_select(is_FeOOH)) then
-                ! ### INSERT CODE ################################################################################################ !                    
-                ! ################################################################################################################ !
-             end if
-             ! ----------------------------------------------- ! surface pyrite particle transformations
-             if (sed_select(is_FeS2)) then
-                ! ### INSERT CODE ################################################################################################ !
-                ! ################################################################################################################ !
-             end if
-             ! ----------------------------------------------- ! surface siderite particle transformations
-             if (sed_select(is_FeCO3)) then
-                ! ### INSERT CODE ################################################################################################ !
-                ! ################################################################################################################ !
-             end if
+             ! ----------------------------------------------- ! example
+             ! ### INSERT CODE ################################################################################################### ! 
+             ! if (sed_select(is_xxx)) then                   
+             ! end if
+             ! ################################################################################################################### !
           end If
 
           ! >>>>>>>>>>>>>>>>>>>>>>>>>
@@ -2901,42 +2892,13 @@ CONTAINS
                 !       where l is derived from the is particle index: 
                 !       l = is2l(is)
                 ! NOTE: the time (years) spent by a particle in the layer (kk) is given by the variable: loc_bio_remin_dt
-                ! -------------------------------------------- ! Fe oxy-hydroxides
-                if (sed_select(is_FeOOH)) then
-                   ! default, no dissolution (particle reduction/oxidation)
-                   loc_bio_part_FeOOH_ratio = 1.0
-                   ! ### INSERT CODE ############################################################################################# !
-                   ! loc_part_FeOOH_red = fun_box_calc_dissfrac_FeOOH(loc_bio_remin_dt,ocn(io_H2S,dum_i,dum_j,k),sed(is_FeOOH,dum_i,dum_j,k))
-                   ! loc_bio_part_FeOOH_ratio = 1.0 - loc_part_FeOOH_red
-                   
-                   ! loc_part_FeOOH_red = loc_part_FeOOH_red*sed(is_FeOOH,dum_i,dum_j,k)
-                   ! if (loc_part_FeOOH_red > const_real_nullsmall) then
-                      ! !dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) + loc_part_FeOOH_red 
-                      ! dum_bio_remin(io2l(io_Fe2)) = dum_bio_remin(io2l(io_Fe2)) + loc_part_FeOOH_red 
-                      ! dum_bio_remin(io2l(io_H2S)) = dum_bio_remin(io2l(io_H2S)) - 1.0/8.0*loc_part_FeOOH_red 
-                      ! dum_bio_remin(io2l(io_SO4)) = dum_bio_remin(io2l(io_SO4)) + 1.0/8.0*loc_part_FeOOH_red
-                      ! dum_bio_remin(io2l(io_ALK)) = dum_bio_remin(io2l(io_ALK)) - 1.0/4.0*loc_part_FeOOH_red
-                   ! end if
-                   ! ############################################################################################################# !
-                end if
-
-                ! -------------------------------------------- ! pyrite
-                if (sed_select(is_FeS2)) then
-                   ! default, no dissolution (particle reduction/oxidation)
-                   loc_bio_part_FeS2_ratio = 1.0
-                   ! ### INSERT CODE ############################################################################################# !
-                   !!!loc_bio_part_FeS2_ratio = 1.0 - fun_box_calc_dissfrac_FeS2()
-                   ! ############################################################################################################# !
-                end if
-
-                ! -------------------------------------------- ! siderite
-                if (sed_select(is_FeCO3)) then
-                   ! default, no dissolution (particle reduction/oxidation)
-                   loc_bio_part_FeCO3_ratio = 1.0
-                   ! ### INSERT CODE ############################################################################################# !
-                   !!!loc_bio_part_FeCO3_ratio = 1.0 - fun_box_calc_dissfrac_FeCO3()
-                   ! ############################################################################################################# !
-                end if
+                ! -------------------------------------------- ! example
+                ! ### INSERT CODE ################################################################################################ !
+                ! if (sed_select(is_xxx)) then
+                !    ! default, no dissolution (particle reduction/oxidation)
+                !   loc_bio_part_xxx_ratio = 1.0
+                ! end if
+                ! ################################################################################################################ !
 
                 ! *** Calculate particle concentrations in layer below ***
                 ! calculate local (temporary) particulate tracer concentration;
@@ -2951,13 +2913,13 @@ CONTAINS
                 ! NOTE: par_sed_type_misc => no remin (e.g. S bound refractory organic matter)
                 DO l=1,n_l_sed
                    is = conv_iselected_is(l)
+                   ! -------------------------------------- ! particulate organic matter
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    if ( &
                         & (sed_dep(is) == is_POC) .OR. &
                         & (sed_type(is) == par_sed_type_POM) .OR. &
                         & (sed_type(sed_dep(is)) == is_POC) &
                         & ) then
-                      ! -------------------------------------- ! particulate organic matter
-                                                               ! (plus elemental components, particle-reactive scavenged elements)
                       if (sed_type(is) == par_sed_type_scavenged) then
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*(1.0 - par_scav_fremin*(1.0 - loc_bio_part_POC_ratio))
@@ -2965,9 +2927,9 @@ CONTAINS
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*loc_bio_part_POC_ratio
                       end if
+                   ! -------------------------------------- ! carbonate
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    else if ( &
-                      ! -------------------------------------- ! carbonate
-                                                               ! (plus elemental components, particle-reactive scavenged elements)
                         & (sed_dep(is) == is_CaCO3) .OR. &
                         & (sed_type(is) == par_sed_type_CaCO3) .OR. &
                         & (sed_type(sed_dep(is)) == par_sed_type_CaCO3) &
@@ -2979,13 +2941,13 @@ CONTAINS
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*loc_bio_part_CaCO3_ratio
                       end if
+                   ! -------------------------------------- ! opal
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    else if ( &
                         & (sed_dep(is) == is_opal) .OR. &
                         & (sed_type(is) == par_sed_type_opal) .OR. &
                         & (sed_type(sed_dep(is)) == par_sed_type_opal) &
                         & ) then
-                      ! -------------------------------------- ! opal
-                                                               ! (plus elemental components, particle-reactive scavenged elements)
                       if (sed_type(is) == par_sed_type_scavenged) then
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*(1.0 - par_scav_fremin*(1.0 - loc_bio_part_opal_ratio))
@@ -2993,37 +2955,23 @@ CONTAINS
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*loc_bio_part_opal_ratio
                       endif
-                   else if ( &
-                        & (is == is_FeOOH) .OR. &
-                        & (sed_dep(is) == is_FeOOH) &
-                        & ) then
-                      ! -------------------------------------- ! Fe oxy-hydroxides
-                                                               ! (plus isotopes)
-                      loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
-                           & loc_bio_remin_layerratio*loc_bio_part_FeOOH_ratio
-                   else if ( &
-                        & (is == is_FeS2) .OR. &
-                        & (sed_dep(is) == is_FeS2) &
-                        & ) then
-                      ! -------------------------------------- ! pyrite
-                                                               ! (plus isotopes)
-                      loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
-                           & loc_bio_remin_layerratio*loc_bio_part_FeS2_ratio
-                   else if ( &
-                        & (is == is_FeCO3) .OR. &
-                        & (sed_dep(is) == is_FeCO3) &
-                        & ) then
-                      ! -------------------------------------- ! siderite
-                                                               ! (plus isotopes)
-                      loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
-                           & loc_bio_remin_layerratio*loc_bio_part_FeCO3_ratio
+                   ! -------------------------------------- ! SPECIAL CASES EXAMPLE
+                                                            ! (comes before generic detrital tracer handling)
+                   ! ### INSERT CODE ############################################################################################# !
+                   ! else if ( &
+                   !      & (is == is_xxx) .OR. &
+                   !      & (sed_dep(is) == is_xxx) &
+                   !      & ) then
+                   !    loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
+                   !         & loc_bio_remin_layerratio*loc_bio_part_xxx_ratio
+                   ! ############################################################################################################# !
+                   ! -------------------------------------- ! (remaining) detrital
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    else if ( &
                         & (sed_dep(is) == is_det) .OR. &
                         & (sed_type(is) == par_sed_type_det) .OR. &
                         & (sed_type(sed_dep(is)) == par_sed_type_det) &
                         & ) then
-                      ! -------------------------------------- ! (remaining) detrital
-                                                               ! (plus elemental components, particle-reactive scavenged elements)
                       loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                            & loc_bio_remin_layerratio
                    end if
@@ -3170,10 +3118,23 @@ CONTAINS
 
                 ! *** Scavenge H2S from water column ***
                 if (ocn_select(io_H2S) .AND. sed_select(is_POM_S)) then
-                   if (dum_vocn%mk(io2l(io_H2S),kk) > const_real_nullsmall) then
+                   if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns) then
                       call sub_box_scav_H2S(               &
                            & dum_i,dum_j,kk,               &
                            & dum_dtyr,                     &
+                           & loc_bio_remin_dt_scav,        &
+                           & dum_vocn%mk(io2l(io_H2S),kk), &
+                           & loc_bio_part_TMP(:,kk),       &
+                           & loc_bio_remin(:,kk)           &
+                           & )
+                   end if
+                end if
+
+                ! *** other particle-solute reactions ***
+                if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2) .AND. sed_select(is_FeOOH)) then
+                   if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
+                      call sub_box_react_FeOOH_H2S(               &
+                           & dum_i,dum_j,kk,               &
                            & loc_bio_remin_dt_scav,        &
                            & dum_vocn%mk(io2l(io_H2S),kk), &
                            & loc_bio_part_TMP(:,kk),       &
@@ -3253,33 +3214,72 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! Calculate FeOOH dissolution
-  ! NOTE: 
-  ! function fun_box_calc_dissfrac_FeOOH(dum_dtyr,dum_ocn_H2S,dum_bio_part)
-    ! ! -------------------------------------------------------- !
-    ! ! RESULT VARIABLE
-    ! ! -------------------------------------------------------- !
-    ! REAL::fun_box_calc_dissfrac_FeOOH
-    ! ! -------------------------------------------------------- !
-    ! ! DUMMY ARGUMENTS
-    ! ! -------------------------------------------------------- !
-    ! REAL,INTENT(in)::dum_dtyr
-    ! REAL,INTENT(in)::dum_ocn_H2S
-    ! real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
-    ! ! -------------------------------------------------------- !
-    ! ! DEFINE LOCAL VARIABLES
-    ! ! -------------------------------------------------------- !
-    ! real::loc_H2S
-    ! real::loc_r56Fe, loc_R_56Fe, loc_r34S, loc_R_34S
-    ! real::loc_part_FeOOH_red
-    ! ! -------------------------------------------------------- !
-    ! ! CALCULATE FeOOH dissolution rate
-    ! ! -------------------------------------------------------- !
-    ! loc_part_FeOOH_red  = dum_dtyr*par_bio_remin_kFeOOHtoFe2*dum_bio_part*dum_ocn_H2S 
-    ! ! -------------------------------------------------- ! set output [Fe]
-    ! fun_box_scav_Fe = loc_part_FeOOH_red/dum_bio_part
-       
-  ! end function fun_box_calc_dissfrac_FeOOH
+  ! Calculate FeOOH dissolution (reaction with H2S)
+  ! NOTE: calling of this sub is conditional on both H2S and FeOOH not being zero
+  !       (so divide-by-zero issues should already have be screened for ...)
+  SUBROUTINE sub_box_react_FeOOH_H2S(dum_i,dum_j,dum_k,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k
+    REAL,INTENT(in)::dum_dt_scav
+    REAL,INTENT(in)::dum_ocn_H2S
+    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
+    real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::loc_H2S
+    real::loc_part_den_FeOOH
+    real::loc_dFeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE FeOOH dissolution rate
+    ! -------------------------------------------------------- !
+    ! reaction: 
+    !           FeOOH + 1/8H2S --> 1/8SO4 + Fe2
+    ! and where FeOOH comes from: 
+    !           Fe2 + 1/4O2  --> Fe3 
+    !           Fe3+ + 2*H2O --> FeOOH + 3*H+
+    ! or, overall, ignoring water etc:
+    !           Fe2 + 1/4O2 --> FeOOH
+    ! NOTE: par_bio_remin_kFeOOHtoFe2 == kinetic constant for FeOOH reduction using sulphide in M-1 yr-1
+    ! -------------------------------------------------------- ! set local solutes
+    loc_H2S = dum_ocn_H2S
+    ! -------------------------------------------------------- ! extract density of FeOOH
+    loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
+    ! -------------------------------------------------------- ! calculate reaction rate
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*loc_H2S
+    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
+    ! -------------------------------------------------------- ! implement reaction
+    dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
+    dum_bio_remin(io2l(io_H2S))  = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_Fe))   = dum_bio_remin(io2l(io_Fe))   + loc_dFeOOH
+    dum_bio_remin(io2l(io_SO4))  = dum_bio_remin(io2l(io_SO4))  + (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_ALK))  = dum_bio_remin(io2l(io_ALK))  - 2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- ! implement reaction -- isotopes
+    ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
+    if (ocn_select(io_Fe_56Fe)) then
+       dum_bio_part(is2l(is_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/dum_bio_part(is2l(is_FeOOH)))*dum_bio_part(is2l(is_FeOOH_56Fe))
+       dum_bio_remin(io2l(io_Fe)) = dum_bio_remin(io2l(io_Fe)) + &
+            & (loc_dFeOOH/dum_bio_part(is2l(is_FeOOH)))*dum_bio_part(is2l(is_FeOOH_56Fe))
+    end if
+    if (ocn_select(io_H2S_34S)) then
+       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+    end if
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_FeOOH_dFe,dum_i,dum_j,dum_k)  = loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = -(1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = -2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_react_FeOOH_H2S
   ! ****************************************************************************************************************************** !
 
 
@@ -3547,6 +3547,9 @@ CONTAINS
     !       => normalize by the fraction of time spent in that cell during the time-step
     !          = residence time / time-step
     !            (could also be: cell thickness / (time-step x local velocity))
+    !       -> note that ultimately, dum_dtyr/dum_dtyr cancel out leaving the residence time dum_dtyr
+    !          (this could then be simplified, but it is easier(?) to see how things pan out with the effective
+    !           particle concentration adjusted up-front by dum_dt_scav/dum_dtyr)
     ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
     if (sed_select(is_POM_Fe)) then
        loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is_POC)/conv_kg_l) * dum_dt_scav/dum_dtyr
@@ -3621,8 +3624,17 @@ CONTAINS
     ! local variables
     real::loc_H2S,loc_part_den_POCl
     real::loc_H2S_scavenging
+    real::loc_dt
 
     ! *** Calculate H2S scavenging ***
+    ! set local residence time in layer
+    ! NOTE: the residence time should have been: dum_dtyr*(dum_dt_scav/dum_dtyr) == dum_dt_scav
+    !       as per the Fe scavenging scheme (I know ... confusing ...)
+    if (ctrl_scav_H2S_dt_old) then
+       loc_dt = dum_dt_scav*(dum_dt_scav/dum_dtyr)
+    else
+       loc_dt = dum_dt_scav
+    end if
     ! set local variables
     loc_H2S = dum_ocn_H2S
     ! density of labile POC
@@ -3637,7 +3649,7 @@ CONTAINS
        ! NOTE: the concentration that dum_bio_part represents is actually spread across multiple cells during each time step
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
-       loc_H2S_scavenging = dum_dt_scav*par_bio_remin_kH2StoSO4*loc_H2S*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
+       loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoSO4*loc_H2S*loc_part_den_POCl
        loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
        !       print*, 'oxidationanalogue, par_bio_remin_kH2StoSO4 ', par_bio_remin_kH2StoSO4
        !       print*, 'loc_H2S, loc_H2S_scavenging', loc_H2S, loc_H2S_scavenging
@@ -3648,7 +3660,7 @@ CONTAINS
        ! NOTE: the concentration that dum_bio_part represents is actually spread across multiple cells during each time step
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
-       loc_H2S_scavenging = dum_dt_scav*par_bio_remin_kH2StoPOMS*loc_H2S*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
+       loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoPOMS*loc_H2S*loc_part_den_POCl
        loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
     CASE ('complete')
        loc_H2S_scavenging = min(loc_part_den_POCl,loc_H2S)
@@ -3665,7 +3677,7 @@ CONTAINS
     if (dum_bio_part(is2l(is_POC_frac2)) > 1.1) stop
     if (dum_bio_part(is2l(is_POC_frac2)) > 1.0) dum_bio_part(is2l(is_POC_frac2)) = 1.0
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dH2S_POMS,dum_i,dum_j,dum_k) = loc_H2S_scavenging
+    diag_react(idiag_react_POMS_dH2S,dum_i,dum_j,dum_k) = loc_H2S_scavenging
 
   end SUBROUTINE sub_box_scav_H2S
   ! ****************************************************************************************************************************** !
@@ -4154,9 +4166,6 @@ CONTAINS
        io = conv_iselected_io(l)
        bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
     end do
-!!$    ! record diagnostics
-!!$    diag_geochem(idiag_geochem_ammox_dNH4,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
-!!$    diag_geochem(idiag_geochem_ammox_dNO3,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
 
   end SUBROUTINE sub_calc_misc_brinerejection
   ! ****************************************************************************************************************************** !

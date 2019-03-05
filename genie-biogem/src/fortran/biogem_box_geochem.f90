@@ -119,8 +119,8 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_ammox_dNH4,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
-    diag_geochem(idiag_geochem_ammox_dNO3,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
+    diag_geochem_old(idiag_geochem_old_ammox_dNH4,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
+    diag_geochem_old(idiag_geochem_old_ammox_dNO3,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('NH4toNO3_dNH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
@@ -380,7 +380,6 @@ CONTAINS
   ! ****************************************************************************************************************************** !
 
 
-
   ! ****************************************************************************************************************************** !
   ! OXIDATION OF reduced dissolved Fe2
   SUBROUTINE sub_box_oxidize_Fe2(dum_i,dum_j,dum_k1,dum_dtyr)
@@ -464,14 +463,10 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    !id = fun_find_str_i('H2StoSO4_dH2S',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
-    !id = fun_find_str_i('H2StoSO4_dSO4',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
-    !id = fun_find_str_i('H2StoSO4_dO2',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    !id = fun_find_str_i('H2StoSO4_dALK',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:) 
+    id = fun_find_str_i('Fe2toFe3_dFe2',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_Fe2,:)
+    id = fun_find_str_i('Fe2toFe3_dO2',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -566,7 +561,7 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    !diag_geochem(idiag_geochem_dFe_FeOOH,dum_i,dum_j,:) = loc_bio_uptake(io_Fe,:)
+    diag_precip(idiag_precip_FeOOH_dFe,dum_i,dum_j,:) = -loc_bio_uptake(io_Fe,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -932,9 +927,9 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    diag_geochem(idiag_geochem_dFe_FeS2,dum_i,dum_j,:) = loc_bio_uptake(io_Fe2,:)
-    diag_geochem(idiag_geochem_dH2S_FeS2,dum_i,dum_j,:) = loc_bio_uptake(io_H2S,:)
-    diag_geochem(idiag_geochem_dSO4_FeS2,dum_i,dum_j,:) = loc_bio_uptake(io_SO4,:)
+    diag_precip(idiag_precip_FeS2_dFe,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    diag_precip(idiag_precip_FeS2_dH2S,dum_i,dum_j,:) = loc_bio_uptake(io_H2S,:)
+    diag_precip(idiag_precip_FeS2_dSO4,dum_i,dum_j,:) = loc_bio_uptake(io_SO4,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -1098,8 +1093,8 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    diag_geochem(idiag_geochem_dFe_FeCO3,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
-    diag_geochem(idiag_geochem_dDIC_FeCO3,dum_i,dum_j,:) = loc_bio_uptake(io_DIC,:)
+    diag_precip(idiag_precip_FeCO3_dFe,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    diag_precip(idiag_precip_FeCO3_dDIC,dum_i,dum_j,:) = loc_bio_uptake(io_DIC,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -1200,7 +1195,7 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dH2S,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
+    diag_geochem_old(idiag_geochem_old_dH2S,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('H2StoSO4_dH2S',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
@@ -1295,7 +1290,7 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
+    diag_geochem_old(idiag_geochem_old_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('CH4toDIC_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
@@ -1403,7 +1398,7 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
+    diag_geochem_old(idiag_geochem_old_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('CH4toDIC_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
@@ -1515,7 +1510,7 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dCH4_AOM,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
+    diag_geochem_old(idiag_geochem_old_dCH4_AOM,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('CH4toDICaom_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)

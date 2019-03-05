@@ -4533,6 +4533,10 @@
                         <value datatype="real">1.0</value>
                         <description>Reaction rate constant for H2S -> POMS</description>
                     </param>
+                    <param name="ctrl_scav_H2S_dt_old">
+                       <value datatype="boolean">.true.</value>
+                        <description>Old local residence time in layer for H2S?</description>
+                    </param>
 <!-- N -->
                     <param name="par_bio_remin_kNH4toNO2">
                         <value datatype="real">0.0</value>

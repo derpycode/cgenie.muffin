@@ -217,9 +217,10 @@ CONTAINS
        print*,'Hard threshold for denitrification (mol kg-1)       : ',par_bio_remin_cthresh_NO3
        print*,'Hard threshold for sulphate reduction (mol kg-1)    : ',par_bio_remin_cthresh_SO4
        print*,'Catch rapidly-oxidizing species going < 0.0?        : ',ctrl_bio_remin_reminfix
-       print*,'NH4 -> NO3 odixation option                         : ',trim(opt_bio_remin_oxidize_NH4toNO3)
+       print*,'NH4 -> NO3 oxidation option                         : ',trim(opt_bio_remin_oxidize_NH4toNO3)
        print*,'H2S -> SO4 oxidation option                         : ',trim(opt_bio_remin_oxidize_H2StoSO4)
        print*,'H2S -> POCS scavenging option                       : ',trim(opt_bio_remin_scavenge_H2StoPOMS)
+       print*,'Old local residence time in layer for H2S?          : ',ctrl_scav_H2S_dt_old
        print*,'Remin rate -- oxic (yr-1)                           : ',par_bio_remin_k_O2
        print*,'Remin rate -- denitrification (yr-1)                : ',par_bio_remin_k_NO3
        print*,'Remin rate -- sulphate reduction (yr-1)             : ',par_bio_remin_k_SO4
@@ -868,65 +869,73 @@ CONTAINS
     if (ocn_select(io_H2S)) then
        if (ocn_select(io_O2)) then
           n = n+1
-          loc_string(n) = 'H2StoSO4_dH2S'
+          loc_string(n) = 'redox_H2StoSO4_dH2S'
           n = n+1
-          loc_string(n) = 'H2StoSO4_dSO4'
+          loc_string(n) = 'redox_H2StoSO4_dSO4'
           n = n+1
-          loc_string(n) = 'H2StoSO4_dO2' 
+          loc_string(n) = 'redox_H2StoSO4_dO2' 
           n = n+1
-          loc_string(n) = 'H2StoSO4_dALK'     
+          loc_string(n) = 'redox_H2StoSO4_dALK'     
        end if
     end if
     if (ocn_select(io_NH4)) then
        if (ocn_select(io_O2)) then
           n = n+1
-          loc_string(n) = 'NH4toNO3_dNH4'
+          loc_string(n) = 'redox_NH4toNO3_dNH4'
           n = n+1
-          loc_string(n) = 'NH4toNO3_dNO3'
+          loc_string(n) = 'redox_NH4toNO3_dNO3'
           n = n+1
-          loc_string(n) = 'NH4toNO3_dO2'  
+          loc_string(n) = 'redox_NH4toNO3_dO2'  
           n = n+1
-          loc_string(n) = 'NH4toNO3_dALK'   
+          loc_string(n) = 'redox_NH4toNO3_dALK'   
        end if
     end if
     if (ocn_select(io_CH4)) then
        if (ocn_select(io_O2)) then
           n = n+1
-          loc_string(n) = 'CH4toDIC_dCH4'
+          loc_string(n) = 'redox_CH4toDIC_dCH4'
           n = n+1
-          loc_string(n) = 'CH4toDIC_dCO2'
+          loc_string(n) = 'redox_CH4toDIC_dCO2'
           n = n+1
-          loc_string(n) = 'CH4toDIC_dO2'   
+          loc_string(n) = 'redox_CH4toDIC_dO2'   
           n = n+1
-          loc_string(n) = 'CH4toDIC_dALK'   
+          loc_string(n) = 'redox_CH4toDIC_dALK'   
        end if
        if (ocn_select(io_SO4)) then
           n = n+1
-          loc_string(n) = 'CH4toDICaom_dCH4'
+          loc_string(n) = 'redox_CH4toDICaom_dCH4'
           n = n+1
-          loc_string(n) = 'CH4toDICaom_dDIC'
+          loc_string(n) = 'redox_CH4toDICaom_dDIC'
           n = n+1
-          loc_string(n) = 'CH4toDICaom_dH2S'   
+          loc_string(n) = 'redox_CH4toDICaom_dH2S'   
           n = n+1
-          loc_string(n) = 'CH4toDICaom_dSO4'  
+          loc_string(n) = 'redox_CH4toDICaom_dSO4'  
           n = n+1
-          loc_string(n) = 'CH4toDICaom_dALK'      
+          loc_string(n) = 'redox_CH4toDICaom_dALK'      
        end if
     end if
     if (ocn_select(io_I) .AND. ocn_select(io_I)) then
        if (ocn_select(io_O2)) then
           n = n+1
-          loc_string(n) = 'ItoIO3_dI'
+          loc_string(n) = 'redox_ItoIO3_dI'
           n = n+1
-          loc_string(n) = 'ItoIO3_dIO3'
+          loc_string(n) = 'redox_ItoIO3_dIO3'
           n = n+1
-          loc_string(n) = 'ItoIO3_dO2'  
+          loc_string(n) = 'redox_ItoIO3_dO2'  
           n = n+1
-          loc_string(n) = 'IO3toI_dI'
+          loc_string(n) = 'redox_IO3toI_dI'
           n = n+1
-          loc_string(n) = 'IO3toI_dIO3'
+          loc_string(n) = 'redox_IO3toI_dIO3'
           n = n+1
-          loc_string(n) = 'IO3toI_dO2'  
+          loc_string(n) = 'redox_IO3toI_dO2'  
+       end if
+    end if
+    if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe)) then
+       if (ocn_select(io_O2)) then
+          n = n+1
+          loc_string(n) = 'redox_Fe2toFe3_dFe2'
+          n = n+1
+          loc_string(n) = 'redox_Fe2toFe3_dO2'  
        end if
     end if
     ! -------------------------------------------------------- ! (2) solid -> dissolved
@@ -1353,8 +1362,10 @@ CONTAINS
     int_u_timeslice(:,:,:,:) = 0.0
     ! integrated time slice storage arrays - diagnostics
     int_diag_bio_timeslice(:,:,:)       = 0.0
-    int_diag_geochem_timeslice(:,:,:,:) = 0.0
-    int_diag_Fe_timeslice(:,:,:,:)      = 0.0
+    int_diag_geochem_old_timeslice(:,:,:,:) = 0.0
+    int_diag_precip_timeslice(:,:,:,:)  = 0.0
+    int_diag_iron_timeslice(:,:,:,:)    = 0.0
+    int_diag_react_timeslice(:,:,:,:)   = 0.0
     int_diag_weather_timeslice(:,:,:)   = 0.0
     int_diag_airsea_timeslice(:,:,:)    = 0.0
     int_diag_redox_timeslice(:,:,:,:)   = 0.0
@@ -1401,7 +1412,10 @@ CONTAINS
     int_misc_ocn_fxsw_sig   = 0.0
     int_ocnsed_sig(:)       = 0.0
     int_diag_bio_sig(:)     = 0.0
-    int_diag_geochem_sig(:) = 0.0
+    int_diag_geochem_old_sig(:) = 0.0
+    int_diag_precip_sig(:)  = 0.0
+    int_diag_iron_sig(:)    = 0.0
+    int_diag_react_sig(:)   = 0.0
     int_diag_weather_sig(:) = 0.0
     int_diag_airsea_sig(:)  = 0.0
     int_diag_misc_2D_sig(:) = 0.0
@@ -1504,12 +1518,15 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! INITIALIZE DIAGNOSTICS ARRAYS
   SUBROUTINE sub_init_diag()
-    diag_bio(:,:,:)          = 0.0
-    diag_geochem(:,:,:,:)    = 0.0
+    diag_bio(:,:,:)           = 0.0
+    diag_geochem_old(:,:,:,:) = 0.0
+    diag_precip(:,:,:,:)      = 0.0
+    diag_react(:,:,:,:)       = 0.0
+    diag_iron(:,:,:,:)        = 0.0
 !!!   diag_weather(:,:,:)      = 0.0
-    diag_airsea(:,:,:)       = 0.0
-    diag_ecogem_part(:,:,:)  = 0.0
-    diag_ecogem_remin(:,:,:) = 0.0
+    diag_airsea(:,:,:)        = 0.0
+    diag_ecogem_part(:,:,:)   = 0.0
+    diag_ecogem_remin(:,:,:)  = 0.0
   END SUBROUTINE sub_init_diag
   ! ****************************************************************************************************************************** !
 
