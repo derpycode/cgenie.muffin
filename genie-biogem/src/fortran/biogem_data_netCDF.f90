@@ -723,7 +723,14 @@ CONTAINS
          & (ocn_select(io_Os) .AND. ocn_select(io_Os_187Os)) &
          & ) then
          loc_unitsname = ''
-         loc_ijk(:,:,:) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)
+         loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)                                                       
+                END DO
+             END DO
+          END DO
          call sub_adddef_netcdf(loc_iou,4,'misc_Os_187Osr188Os', &
               & 'water-column Os isotope ratio', &
               & trim(loc_unitsname),const_real_zero,const_real_zero)
