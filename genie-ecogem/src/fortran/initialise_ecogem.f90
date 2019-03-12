@@ -26,8 +26,8 @@ SUBROUTINE initialise_ecogem(    &
   real,intent(inout),dimension(n_ocn ,n_i,n_j,n_k)::dum_egbg_sfcocn   ! ecology-interface ocean tracer composition; ocn grid
   real,intent(in)                                 ::dum_dsc           !
   integer,DIMENSION(n_i,n_j),INTENT(in)::dum_k1                  !
-  REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 ! 
-  REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv    ! 
+  REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 !
+  REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv    !
   integer :: stat
   CHARACTER(len=64)::site_string
   ! ---------------------------------------------------------- !
@@ -39,7 +39,7 @@ SUBROUTINE initialise_ecogem(    &
   print*,' >>> Initialising ECOGEM ocean ecology module ...'
 
   ! *** load goin information ***
-  call sub_load_goin_ecogem()  
+  call sub_load_goin_ecogem()
   ! ---------------------------------------------------------- ! set time
   ! NOTE: modify 'par_misc_t_start' according to the run-time accumulated in any requested restart,
   !       so that the time that EcoGeM starts with is the same as the requested start time
@@ -67,10 +67,10 @@ SUBROUTINE initialise_ecogem(    &
   CALL sub_init_phys_ocn()
 
   ! check required nutrients are carried by BIOGEM!
-  call check_egbg_compatible() 
+  call check_egbg_compatible()
 
   ! get specifications of plankton populations from input file
-  CALL sub_init_populations()    
+  CALL sub_init_populations()
   ! get names and locations of time-series sites for output
   CALL sub_init_timeseries()
 
@@ -84,9 +84,9 @@ SUBROUTINE initialise_ecogem(    &
      enddo
      write(*,*),' ---------------------------------------------------'
   endif
-  ! calculate other indices dependent on goin information 
+  ! calculate other indices dependent on goin information
   !order and indices for nutrient elements (unused elements to zero)
-  iDIC  = 1 ! Mandatory                                                  ! index for dissolved inorganic carbon 
+  iDIC  = 1 ! Mandatory                                                  ! index for dissolved inorganic carbon
   iNO3  = (    iDIC                           +1) * MERGE(1,0,useNO3)    ! index for nitrate
   iNO2  = (MAX(iDIC,iNO3,iNO2)                +1) * MERGE(1,0,useNO2)    ! index for nitrite
   iNH4  = (MAX(iDIC,iNO3,iNO2)                +1) * MERGE(1,0,useNH4)    ! index for ammonium
@@ -183,7 +183,7 @@ SUBROUTINE initialise_ecogem(    &
   eco_carb(ic_H,:,:,:)   = 1.0e-7   !
   eco_carbconst(:,:,:,:) = 0.0   !
   ! *** dimension parameter vectors (for npmax plankton) ***
-  ! Size 
+  ! Size
   ALLOCATE(volume(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(logvol(npmax),STAT=alloc_error)
@@ -302,7 +302,7 @@ SUBROUTINE initialise_ecogem(    &
 
   ! *** initialise plankton biomass array
   call sub_init_plankton()
-  
+
   ! JDW: allocate and load temperature forcing dataset
   if(ctrl_force_T)then
   	allocate(T_input(n_i,n_j),STAT=alloc_error)
@@ -315,7 +315,7 @@ SUBROUTINE initialise_ecogem(    &
   string_ncout2d = TRIM(par_outdir_name)//'fields_ecogem_2d.nc'
   string_ncout3d = TRIM(par_outdir_name)//'fields_ecogem_3d.nc'
   string_nctsint = TRIM(par_outdir_name)//'timeseries_ecogem.nc'
-  string_nctsi   = TRIM(par_outdir_name)//'ts_ecogem_int.nc'  
+  string_nctsi   = TRIM(par_outdir_name)//'ts_ecogem_int.nc'
 
 
   ALLOCATE(ncout1d_iou(n_tser),STAT=alloc_error)
@@ -353,4 +353,3 @@ SUBROUTINE initialise_ecogem(    &
 
 END SUBROUTINE initialise_ecogem
 ! ******************************************************************************************************************************** !
-
