@@ -2520,6 +2520,10 @@
 			<value datatype="boolean">.false.</value>
                         <description></description>
                     </param>
+                    <param name="par_dsc">
+                        <value datatype="real">5000.0</value>
+                        <description>ocean depth scale (m)</description>
+                    </param>
                 </namelist>
             </file>
         </model>
@@ -6534,6 +6538,14 @@
                     <param name="par_sed_huelse2017_P_cycle">
 			<value datatype="boolean">.false.</value>
                         <description>Include explicit P-cycle in OMEN-SED?</description>
+                    </param>
+                    <param name="par_sed_huelse2017_remove_impl_sulALK">
+			<value datatype="boolean">.true.</value>
+                        <description>Remove implicit Alk associated with buried sulf-OM?</description>
+                    </param>
+                    <param name="par_sed_huelse2017_sim_P_loss">
+			<value datatype="boolean">.false.</value>
+                        <description>Simulate ocean Porg loss with buried sulf-OM?</description>
                     </param>
                     <param name="par_sed_huelse2017_k1">
 			<value datatype="real">0.0065</value>
