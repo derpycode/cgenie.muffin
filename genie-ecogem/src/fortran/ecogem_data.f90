@@ -423,6 +423,9 @@ CONTAINS
     ! maximum photosynthetic rate
     !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
     vmax(iDIC,:)    = (vmaxDIC_a  + log10(volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(volume(:)) + log10(volume(:))**2) * autotrophy(:)
+    do jp=1,npmax
+       if(pft(jp).eq.'coccolithophore') vmax(iDIC,jp)=vmax(iDIC,jp)*par_cocco_vmax_mod ! JDW
+    enddo
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
        qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
@@ -454,9 +457,9 @@ CONTAINS
        vmax(iPO4,:)     = vmaxPO4_a  * volume(:) **  vmaxPO4_b * autotrophy(:)
        affinity(iPO4,:) = affinPO4_a * volume(:) ** affinPO4_b * autotrophy(:)
        kexc(iPhos,:)    =   kexcP_a  * volume(:) **    kexcP_b
-       do jp=1,npmax
-          if(pft(jp).eq.'coccolithophore') vmax(iPO4,jp)=vmax(iPO4,jp)*par_cocco_vmax_mod ! JDW
-       enddo
+       ! do jp=1,npmax
+       !    if(pft(jp).eq.'coccolithophore') vmax(iPO4,jp)=vmax(iPO4,jp)*par_cocco_vmax_mod ! JDW
+       ! enddo
     endif
     !-----------------------------------------------------------------------------------------
     if (fquota) then ! iron parameters
