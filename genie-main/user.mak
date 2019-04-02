@@ -74,7 +74,10 @@ MODEXT=mod
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
 ### DEFAULT ###
-NETCDF_DIR=/usr/local
+#NETCDF_DIR=/usr/local
+#NETCDF_DIR=/usr/local
+### domino ###
+NETCDF_DIR=/share/apps
 ### eevee ###
 #NETCDF_DIR=/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4
 ### iwan ###
