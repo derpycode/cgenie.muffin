@@ -189,9 +189,10 @@ MODULE sedgem_lib
   real::par_sed_hydroip_fDIC                                     ! hydrothermal CO2 outgassing (mol yr-1)    
   real::par_sed_hydroip_fDIC_d13C                                ! d13C                
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fDIC,par_sed_hydroip_fDIC_d13C
+  real::par_sed_Os_depTOT					 ! deposition rate of Os in oxic bottom waters (mol yr-1)
   real::par_sed_Os_dep_oxic					 ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
   real::par_sed_Os_dep_suboxic					 ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
-  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic
+  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic,par_sed_Os_depTOT
   real::par_sed_hydroip_fOs					 ! hydrothermal Os flux (mol yr-1)
   real::par_sed_hydroip_fOs_187Os_188Os				 ! 187Os/188Os ratio of hydrothermal Os flux
   real::par_sed_hydroip_fOs_188Os_192Os				 ! 188Os/192Os ratio of hydrothermal Os flux

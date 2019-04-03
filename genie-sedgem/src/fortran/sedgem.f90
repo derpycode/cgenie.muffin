@@ -121,6 +121,9 @@ SUBROUTINE sedgem(          &
   if ((par_sed_SrCO3recrystTOT*loc_tot_A_reef) > const_real_nullsmall) then
      par_sed_SrCO3recryst = conv_cm2_m2*par_sed_SrCO3recrystTOT/loc_tot_A_reef
   end if
+  if ((par_sed_Os_depTOT*loc_tot_A_reef) > const_real_nullsmall) then
+     par_sed_Os_dep_oxic = conv_cm2_m2*par_sed_Os_depTOT/loc_tot_A
+  end if
 
   ! *** UPDATE CARBONATE CHEMSITRY ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE CARBONATE CHEMSITRY ***'
@@ -493,11 +496,12 @@ SUBROUTINE sedgem(          &
           ! NOTE: deposition rates are given in mol m-2 yr-1
            IF ((ocn_select(io_Os)) .AND. (dum_sfcsumocn(io_Os,i,j) > const_real_nullsmall)) then
              ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018), else suboxic deposition rate
-             if (dum_sfcsumocn(io_O2,i,j) > 10E-5) then
-                loc_fsed = par_sed_Os_dep_oxic*dum_sfcsumocn(io_Os,i,j)
-             else
-                loc_fsed = par_sed_Os_dep_suboxic*dum_sfcsumocn(io_Os,i,j)
-             end if
+!             if (dum_sfcsumocn(io_O2,i,j) > 10E-5) then
+!                loc_fsed = par_sed_Os_dep_oxic*dum_sfcsumocn(io_Os,i,j)
+!             else
+!                loc_fsed = par_sed_Os_dep_suboxic*dum_sfcsumocn(io_Os,i,j)
+!             end if
+             loc_fsed = par_sed_Os_dep_oxic*dum_sfcsumocn(io_Os,i,j)
              if (loc_fsed <= const_real_nullsmall) then
                 loc_fsed = 0.0
              end if

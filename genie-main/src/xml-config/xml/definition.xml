@@ -7007,6 +7007,10 @@
 			<value datatype="real">0.0</value>
                         <description>188Os/192Os ratio of hydrothermal Os flux</description>
                     </param>
+                    <param name="par_sed_Os_depTOT">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol yr-1)</description>
+                    </param>
                     <param name="par_sed_Os_dep_oxic">
 			<value datatype="real">0.0</value>
                         <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
