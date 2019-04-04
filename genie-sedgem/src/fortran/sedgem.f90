@@ -122,7 +122,7 @@ SUBROUTINE sedgem(          &
      par_sed_SrCO3recryst = conv_cm2_m2*par_sed_SrCO3recrystTOT/loc_tot_A_reef
   end if
   if ((par_sed_Os_depTOT*loc_tot_A_reef) > const_real_nullsmall) then
-     par_sed_Os_dep_oxic = conv_cm2_m2*par_sed_Os_depTOT/loc_tot_A
+     par_sed_Os_dep_oxic = par_sed_Os_depTOT/loc_tot_A
   end if
 
   ! *** UPDATE CARBONATE CHEMSITRY ***
