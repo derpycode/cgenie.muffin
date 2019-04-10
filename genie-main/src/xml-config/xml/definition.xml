@@ -7011,6 +7011,18 @@
 			<value datatype="real">0.0</value>
                         <description>Os deposition rate under oxic conditions (mol yr-1)</description>
                     </param>
+                    <param name="ctrl_sed_Os_O2">
+			<value datatype="boolean">.false.</value>
+                        <description>switch for turning on oxygen-dependent Os deposition</description>
+                    </param>
+                    <param name="par_sed_Os_O2_threshold">
+			<value datatype="real">0.0</value>
+                        <description>[O2] threshold for switching from oxic to suboxic Os deposition (mol)</description>
+                    </param>
+                    <param name="par_sed_Os_dep">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
+                    </param>
                     <param name="par_sed_Os_dep_oxic">
 			<value datatype="real">0.0</value>
                         <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
