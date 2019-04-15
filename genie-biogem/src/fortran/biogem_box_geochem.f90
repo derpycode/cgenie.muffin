@@ -122,10 +122,14 @@ CONTAINS
     diag_geochem_old(idiag_geochem_old_ammox_dNH4,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
     diag_geochem_old(idiag_geochem_old_ammox_dNO3,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('NH4toNO3_dNH4',string_diag_redox)
+    id = fun_find_str_i('redox_NH4toNO3_dNH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
-    id = fun_find_str_i('NH4toNO3_dNO3',string_diag_redox)
+    id = fun_find_str_i('redox_NH4toNO3_dNO3',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
+    id = fun_find_str_i('redox_NH4toNO3_dO2',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
+    id = fun_find_str_i('redox_NH4toNO3_dALK',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -463,9 +467,11 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('Fe2toFe3_dFe2',string_diag_redox)
+    id = fun_find_str_i('redox_Fe2toFe3_dFe2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_Fe2,:)
-    id = fun_find_str_i('Fe2toFe3_dO2',string_diag_redox)
+    id = fun_find_str_i('redox_Fe2toFe3_dFe',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_Fe,:)
+    id = fun_find_str_i('redox_Fe2toFe3_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
     ! -------------------------------------------------------- !
     ! END
@@ -691,14 +697,16 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    !id = fun_find_str_i('H2StoSO4_dH2S',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
-    !id = fun_find_str_i('H2StoSO4_dSO4',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
-    !id = fun_find_str_i('H2StoSO4_dO2',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    !id = fun_find_str_i('H2StoSO4_dALK',string_diag_redox)
-    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:) 
+    id = fun_find_str_i('redox_Fe3toFe2_dFe',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_Fe,:)
+    id = fun_find_str_i('redox_Fe3toFe2_dFe2',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_Fe2,:)
+    id = fun_find_str_i('redox_Fe3toFe2_dH2S',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
+    id = fun_find_str_i('redox_Fe3toFe2_dSO4',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:) 
+    id = fun_find_str_i('redox_Fe3toFe2_dALK',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:) 
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -823,7 +831,7 @@ CONTAINS
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
     real,dimension(1:3)::loc_Fe2spec
-    real::loc_H2S,loc_SO4,loc_FeS,loc_Fe
+    real::loc_H2S,loc_SO4,loc_FeS,loc_Fe2
     real::loc_r56Fe, loc_r34S, loc_r34S_SO4, loc_r34S_FeS
     real::loc_R_56Fe
     real::loc_alpha_56Fe
@@ -849,44 +857,52 @@ CONTAINS
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        ! set local concentrations
+       ! NOTE: Fe2 (not Fe(3))
+       ! NOTE: cap diagnosed [loc_FeS] at [loc_Fe2]
        if (ctrl_bio_FeS2precip_explicit) then
           loc_FeS  = ocn(io_FeS,dum_i,dum_j,k)
           loc_H2S  = ocn(io_H2S,dum_i,dum_j,k)
+          loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
+          loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
        else 
           loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
           loc_FeS  = loc_Fe2spec(3)
           loc_H2S  = loc_Fe2spec(2)
+          loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
+          loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
+          if (loc_FeS > loc_Fe2) then
+             loc_FeS = loc_Fe2
+          end if
        end if
-       loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
-       loc_Fe  = ocn(io_Fe,dum_i,dum_j,k)
        ! calculate pyrite precipitation
        ! NOTE: const_rns == const_real_nullsmall
        if ( (loc_FeS > const_rns) .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
           ! loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_FeS*loc_H2S
           loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(K_lim_PYR + loc_FeS))*loc_FeS*loc_H2S
           ! calculate isotopic ratio
-          if (loc_Fe > const_rns) then
-             loc_r56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,k)/loc_Fe
+          if (loc_Fe2 > const_rns) then
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
           else
              loc_r56Fe = 0.0
           end if
           loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
-          !
+          ! test for limitation by one of the reactants
           if (loc_FeS2_precipitation > MIN(4.0/3.0*loc_H2S,loc_FeS,4.0/1.0*loc_SO4)) then
-             !
+             ! reactant limited
              loc_bio_part(is_FeS2,k) = MIN(4.0/3.0*loc_H2S,loc_FeS,4.0/1.0*loc_SO4)
              if (loc_FeS2_precipitation == loc_FeS) then
                 loc_bio_part(is_FeS2_56Fe,k) = loc_r56Fe*loc_bio_part(is_FeS2,k)
              else 
                 ! Potential Fe fractionation
-                loc_bio_part(is_FeS2_56Fe,k)  &
-                    & = par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe)*loc_bio_part(is_FeS2,k)
+                loc_bio_part(is_FeS2_56Fe,k) = &
+                    & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
              end if
           else
+             ! no limitation
              loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
              ! isotopes
              loc_bio_part(is_FeS2_56Fe,k) = &
-                 & par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe)*loc_bio_part(is_FeS2,k)	 
+                 & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)	
           end if
           ! no fractionation of S during pyrite formation
           ! calculate isotopic ratio
@@ -895,7 +911,6 @@ CONTAINS
           else
               loc_r34S = 0.0
           end if
-          !!!loc_r34S_SO4  = ocn(io_SO4_34S,dum_i,dum_j,k)/loc_SO4
           loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
        end if
        ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
@@ -1197,14 +1212,14 @@ CONTAINS
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
     diag_geochem_old(idiag_geochem_old_dH2S,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('H2StoSO4_dH2S',string_diag_redox)
+    id = fun_find_str_i('redox_H2StoSO4_dH2S',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
-    id = fun_find_str_i('H2StoSO4_dSO4',string_diag_redox)
+    id = fun_find_str_i('redox_H2StoSO4_dSO4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
-    id = fun_find_str_i('H2StoSO4_dO2',string_diag_redox)
+    id = fun_find_str_i('redox_H2StoSO4_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    id = fun_find_str_i('H2StoSO4_dALK',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:) 
+    id = fun_find_str_i('redox_H2StoSO4_dALK',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -1292,13 +1307,13 @@ CONTAINS
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
     diag_geochem_old(idiag_geochem_old_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('CH4toDIC_dCH4',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('CH4toDIC_dCO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dCO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
-    id = fun_find_str_i('CH4toDIC_dO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    id = fun_find_str_i('CH4toDIC_dALK',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dALK',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
     ! -------------------------------------------------------- !
     ! END
@@ -1400,13 +1415,13 @@ CONTAINS
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
     diag_geochem_old(idiag_geochem_old_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('CH4toDIC_dCH4',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('CH4toDIC_dCO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dCO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
-    id = fun_find_str_i('CH4toDIC_dO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    id = fun_find_str_i('CH4toDIC_dALK',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dALK',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
     ! -------------------------------------------------------- !
     ! END
@@ -1512,15 +1527,15 @@ CONTAINS
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
     diag_geochem_old(idiag_geochem_old_dCH4_AOM,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('CH4toDICaom_dCH4',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDICaom_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('CH4toDICaom_dCO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDICaom_dCO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
-    id = fun_find_str_i('CH4toDICaom_dH2S',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDICaom_dH2S',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
-    id = fun_find_str_i('CH4toDICaom_dSO4',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDICaom_dSO4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
-    id = fun_find_str_i('CH4toDICaom_dALK',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDICaom_dALK',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
     ! -------------------------------------------------------- !
     ! END
@@ -1605,11 +1620,11 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('ItoIO3_dI',string_diag_redox)
+    id = fun_find_str_i('redox_ItoIO3_dI',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_I,:)
-    id = fun_find_str_i('ItoIO3_dIO3',string_diag_redox)
+    id = fun_find_str_i('redox_ItoIO3_dIO3',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_IO3,:)
-    id = fun_find_str_i('ItoIO3_dO2',string_diag_redox)
+    id = fun_find_str_i('redox_ItoIO3_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
     ! -------------------------------------------------------- !
     ! END
@@ -1686,11 +1701,11 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('IO3toI_dI',string_diag_redox)
+    id = fun_find_str_i('redox_IO3toI_dI',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_I,:)
-    id = fun_find_str_i('IO3toI_dIO3',string_diag_redox)
+    id = fun_find_str_i('redox_IO3toI_dIO3',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_IO3,:)
-    id = fun_find_str_i('IO3toI_dO2',string_diag_redox)
+    id = fun_find_str_i('redox_IO3toI_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
     ! -------------------------------------------------------- !
     ! END

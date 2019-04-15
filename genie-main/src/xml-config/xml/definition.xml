@@ -4673,20 +4673,20 @@
                         <description>Fixed Fe scavenging rate (d-1)</description>
                     </param>
                     <param name="par_scav_Fe_sf_POC">
-			<value datatype="real">0.300</value>
-                        <description>Parekh (POC) Fe scavenging rate scale factor</description>
+			<value datatype="real">0.000</value>
+                        <description>(POC) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_Fe_sf_CaCO3">
 			<value datatype="real">0.000</value>
-                        <description>Parekh (CaCO3) Fe scavenging rate scale factor</description>
+                        <description>(CaCO3) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_Fe_sf_opal">
 			<value datatype="real">0.000</value>
-                        <description>Parekh (opal) Fe scavenging rate scale factor</description>
+                        <description>(opal) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_Fe_sf_det">
 			<value datatype="real">0.000</value>
-                        <description>Parekh (detrital) Fe scavenging rate scale factor</description>
+                        <description>(detrital) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_fremin">
 			<value datatype="real">1.0</value>

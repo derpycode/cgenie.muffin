@@ -179,7 +179,7 @@ integer :: debug_init,debug_end,debug_loop
       character(len=BUFSIZ) :: fname_restart_main
       character(len=BUFSIZ) :: fname_fluxrestart
 
-      character(len=6) :: fname_topo
+      character(len=8) :: fname_topo
 
       integer(kind=8) :: dt_write
       

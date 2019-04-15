@@ -935,7 +935,23 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_Fe2toFe3_dFe2'
           n = n+1
+          loc_string(n) = 'redox_Fe2toFe3_dFe'
+          n = n+1
           loc_string(n) = 'redox_Fe2toFe3_dO2'  
+       end if
+    end if
+    if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
+       if (ocn_select(io_O2)) then
+          n = n+1
+          loc_string(n) = 'redox_Fe3toFe2_dFe'
+          n = n+1
+          loc_string(n) = 'redox_Fe3toFe2_dFe2'
+          n = n+1
+          loc_string(n) = 'redox_Fe3toFe2_dH2S'  
+          n = n+1
+          loc_string(n) = 'redox_Fe3toFe2_dSO4'  
+          n = n+1
+          loc_string(n) = 'redox_Fe3toFe2_dALK'  
        end if
     end if
     ! -------------------------------------------------------- ! (2) solid -> dissolved

@@ -2576,18 +2576,19 @@ CONTAINS
     ! set water column particulate tracer loop limit and sinking rate
     ! => test for sinking in any one time-step being less than the max depth of the ocean
     if (dum_dtyr*par_bio_remin_sinkingrate <= goldstein_dsc) then
-       ! assume particules could be present at any/every depth in the local water column
        ! set sinking rate for scavenging to sinking rate
-       loc_klim = loc_k1
        loc_bio_remin_sinkingrate = par_bio_remin_sinkingrate
        loc_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate
     else
-       ! assume particulates present only in surface layer
        ! leave sinking rate alone ... but could e.g. set to exactly match the ocean depth in one time-step
-       loc_klim = n_k
        loc_bio_remin_sinkingrate = par_bio_remin_sinkingrate
        loc_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate_scav
     end if
+    ! test for possibilty of precip in water column
+    ! and assume particules could be present at any/every depth in the local water column
+    ! if not => assume particulates present only in surface layer
+    loc_klim = loc_k1
+    !!!loc_klim = n_k
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
@@ -3258,10 +3259,11 @@ CONTAINS
     dum_bio_remin(io2l(io_ALK))  = dum_bio_remin(io2l(io_ALK))  - 2.0*(1.0/8.0)*loc_dFeOOH
     ! -------------------------------------------------------- ! implement reaction -- isotopes
     ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
+    ! NOTE: no fractionation (currently)
     if (ocn_select(io_Fe_56Fe)) then
-       dum_bio_part(is2l(is_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/dum_bio_part(is2l(is_FeOOH)))*dum_bio_part(is2l(is_FeOOH_56Fe))
-       dum_bio_remin(io2l(io_Fe)) = dum_bio_remin(io2l(io_Fe)) + &
-            & (loc_dFeOOH/dum_bio_part(is2l(is_FeOOH)))*dum_bio_part(is2l(is_FeOOH_56Fe))
+       dum_bio_remin(io2l(io_Fe_56Fe)) = dum_bio_remin(io2l(io_Fe_56Fe)) + &
+            & (loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
+       dum_bio_part(is2l(is_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
     end if
     if (ocn_select(io_H2S_34S)) then
        dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
@@ -4187,12 +4189,10 @@ CONTAINS
     real,dimension(n_sed,n_i,n_j,n_k)::loc_bio_part
     real,dimension(n_ocn,n_i,n_j,n_k)::loc_bio_part_ocn
     real,dimension(n_ocn,n_i,n_j,n_k)::loc_ocn
-    real,dimension(n_ocn,n_i,n_j,n_k)::loc_ocn_tot
     ! set local variables
     loc_bio_part(:,:,:,:)     = 0.0
     loc_bio_part_ocn(:,:,:,:) = 0.0
     loc_ocn(:,:,:,:)          = 0.0
-    loc_ocn_tot(:,:,:,:)      = 0.0
     ! set default result
     fun_calc_ocn_tot(:) = 0.0
     ! convert particulate sediment and dissolved organic matter tracer concentrations to (dissolved) tracers
@@ -4233,11 +4233,10 @@ CONTAINS
     ! determine ocean tracer inventory (mol)
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
-       loc_ocn_tot(io,:,:,:) = loc_ocn(io,:,:,:) + loc_bio_part_ocn(io,:,:,:)
-       fun_calc_ocn_tot(io) = sum(phys_ocn(ipo_M,:,:,:)*loc_ocn_tot(io,:,:,:))
+       fun_calc_ocn_tot(io) = sum(phys_ocn(ipo_M,:,:,:)*(loc_ocn(io,:,:,:) + loc_bio_part_ocn(io,:,:,:)))
     end do
     fun_calc_ocn_tot(:) = fun_audit_combinetracer(fun_calc_ocn_tot(:))
-  END function fun_calc_ocn_tot
+  END FUNCTION fun_calc_ocn_tot
   ! ****************************************************************************************************************************** !
 
 
@@ -4353,6 +4352,10 @@ CONTAINS
        fun_audit_combinetracer(io_SO4) = fun_audit_combinetracer(io_SO4) + dum_ocn(io_H2S)
     end if
     fun_audit_combinetracer(io_H2S) = 0.0
+    if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe)) then
+       fun_audit_combinetracer(io_Fe)  = fun_audit_combinetracer(io_Fe)  + dum_ocn(io_Fe2)
+    end if
+    fun_audit_combinetracer(io_Fe2) = 0.0
     if (ocn_select(io_Fe) .AND. ocn_select(io_FeL)) then
        fun_audit_combinetracer(io_Fe)  = fun_audit_combinetracer(io_Fe)  + dum_ocn(io_FeL)
     end if
@@ -4369,6 +4372,15 @@ CONTAINS
        fun_audit_combinetracer(io_SO4_34S) = fun_audit_combinetracer(io_SO4_34S) + dum_ocn(io_H2S_34S)
        fun_audit_combinetracer(io_H2S_34S) = 0.0
     end if
+    ! ISOTOPES
+    if (ocn_select(io_Fe2_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
+       fun_audit_combinetracer(io_Fe_56Fe)  = fun_audit_combinetracer(io_Fe_56Fe)  + dum_ocn(io_Fe2_56Fe)
+    end if
+    fun_audit_combinetracer(io_Fe2_56Fe) = 0.0
+    if (ocn_select(io_Fe_56Fe) .AND. ocn_select(io_FeL_56Fe)) then
+       fun_audit_combinetracer(io_Fe_56Fe)  = fun_audit_combinetracer(io_Fe_56Fe)  + dum_ocn(io_FeL_56Fe)
+    end if
+    fun_audit_combinetracer(io_FeL_56Fe) = 0.0
     ! #### INSERT CODE FOR FURTHER SPECIAL CASES ################################################################################# !
     !
     ! ############################################################################################################################ !
