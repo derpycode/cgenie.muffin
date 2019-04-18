@@ -364,6 +364,11 @@ Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
 gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 \
 	-c tstipa.f
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+tstipa.f:19.24:
+
+      real tv, ups, ups0, pec, diffpp, cimp, centre, dtloc                      
+                        1
+Warning: Unused variable 'ups0' declared at (1)
 gfortran -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14   -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -x f77-cpp-input -ffixed-line-length-80 -fdefault-real-8  -I/home/portabello/cgenie.muffin/genie-main -fdefault-real-8 -Ddimpa -Debatmos \
 	-c err_embm.F
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
@@ -1765,24 +1770,64 @@ make[3]: Entering directory `/home/portabello/cgenie.muffin/genie-biogem/src/for
 gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
 	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_lib.f90 -o biogem_lib.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+biogem_lib.f90:292.30:
+
+  real::par_bio_remin_POC_eL0  ! JDW size-dependent remin: e-folding depth of s
+                              1
+Warning: Nonconforming tab character at (1)
+biogem_lib.f90:293.32:
+
+  real::par_bio_remin_POC_size0  ! JDW size-dependent remin: diameter of smalle
+                                1
+Warning: Nonconforming tab character at (1)
+biogem_lib.f90:294.30:
+
+  real::par_bio_remin_POC_eta  ! JDW size-dependent remin: exponent linking sin
+                              1
+Warning: Nonconforming tab character at (1)
 gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
 	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_box.f90 -o biogem_box.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
-biogem_box.f90:2950.33:
+biogem_box.f90:3499.22:
+
+    real::loc_eL_size               ! local efolding depth varying with ecosyst
+                      1
+Warning: Nonconforming tab character at (1)
+biogem_box.f90:3500.20:
+
+    real::loc_size0             ! JDW
+                    1
+Warning: Nonconforming tab character at (1)
+biogem_box.f90:3793.23:
+
+                        loc_eL_size=par_bio_remin_POC_eL0*((loc_bio_part_OLD(is
+                       1
+Warning: Nonconforming tab character at (1)
+biogem_box.f90:3794.23:
+
+                        loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/
+                       1
+Warning: Nonconforming tab character at (1)
+biogem_box.f90:3007.33:
 
     real::loc_IO3_reduction_const,loc_IO3_reduction
                                  1
 Warning: Unused variable 'loc_io3_reduction_const' declared at (1)
-biogem_box.f90:2864.31:
+biogem_box.f90:2921.31:
 
     real::loc_I_oxidation_const,loc_I_oxidation
                                1
 Warning: Unused variable 'loc_i_oxidation_const' declared at (1)
-biogem_box.f90:2747.25:
+biogem_box.f90:2804.25:
 
     real::loc_CH4,loc_DIC,loc_HCO3
                          1
 Warning: Unused variable 'loc_dic' declared at (1)
+biogem_box.f90:1698.22:
+
+    integer::loc_k_mld
+                      1
+Warning: Unused variable 'loc_k_mld' declared at (1)
 gfortran -c  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8 -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -x f95-cpp-input -ffree-line-length-none \
 	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  biogem_data_netCDF.f90 -o biogem_data_netCDF.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
@@ -1968,6 +2013,11 @@ Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
 	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  rokgem_box.f90 -o rokgem_box.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+rokgem_box.f90:1044.12:
+
+         & -2.0*(1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+            1
+Warning: Extension: Unary operator following arithmetic operator (use parentheses) at (1)
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic   -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none \
 	-DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_rokgem.f90 -o initialise_rokgem.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
@@ -2049,7 +2099,27 @@ Warning: Unused dummy argument 'nuts' at (1)
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
 	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem_data.f90 -o ecogem_data.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
-ecogem_data.f90:700.54:
+ecogem_data.f90:817.12:
+
+  integer::i,j,loc_n_elements,loc_n_start,ios
+            1
+Warning: Unused variable 'i' declared at (1)
+ecogem_data.f90:817.14:
+
+  integer::i,j,loc_n_elements,loc_n_start,ios
+              1
+Warning: Unused variable 'j' declared at (1)
+ecogem_data.f90:817.29:
+
+  integer::i,j,loc_n_elements,loc_n_start,ios
+                             1
+Warning: Unused variable 'loc_n_elements' declared at (1)
+ecogem_data.f90:817.41:
+
+  integer::i,j,loc_n_elements,loc_n_start,ios
+                                         1
+Warning: Unused variable 'loc_n_start' declared at (1)
+ecogem_data.f90:702.54:
 
     REAL              :: loc_tser_lat,loc_tser_lon,tmp
                                                       1
@@ -2185,6 +2255,21 @@ Warning: Unused variable 'loc_id_misc' declared at (1)
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
 	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  initialise_ecogem.f90 -o initialise_ecogem.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+initialise_ecogem.f90:308.3:
+
+   allocate(T_input(n_i,n_j),STAT=alloc_error)
+   1
+Warning: Nonconforming tab character at (1)
+initialise_ecogem.f90:309.1:
+
+ T_input(:,:)=0.0
+ 1
+Warning: Nonconforming tab character at (1)
+initialise_ecogem.f90:310.1:
+
+ call sub_init_load_forceT()
+ 1
+Warning: Nonconforming tab character at (1)
 initialise_ecogem.f90:31.17:
 
   integer :: stat
@@ -2193,6 +2278,101 @@ Warning: Unused variable 'stat' declared at (1)
 gfortran -c -I../../../genie-main/src/fortran/cmngem/ -I../../../genie-main/  -I/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/include -Wall -fimplicit-none -fopenmp -O2 -O3  -funroll-loops  -msse -fno-automatic  -fdefault-real-8  -x f95-cpp-input -ffree-line-length-none  \
 	 -DGENIENX=36 -DGENIENY=36 -DGOLDSTEINNTRACS=14  ecogem.f90 -o ecogem.o
 Warning: Flag -fno-automatic overwrites -frecursive implied by -fopenmp
+ecogem.f90:91.7:
+
+  real            ::loc_total_weights ! JDW total weights
+       1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:106.1:
+
+ loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface 
+ 1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:107.9:
+
+  end if 
+         1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:268.1:
+
+  IF(ctrl_limit_neg_biomass)THEN
+ 1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:270.18:
+
+                  loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:271.18:
+
+                  loc_biomass(:,:) = merge(plankton(:,:,i,j,k),1.0e-4,plankton(
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:272.18:
+
+                  BioC(:) = loc_biomass(iCarb,:)
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:274.18:
+
+                  loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:275.18:
+
+                  loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:276.18:
+
+                  BioC(:) = loc_biomass(iCarb,:)
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:493.18:
+
+                  loc_weighted_mean_size=0.0
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:494.18:
+
+                  loc_total_weights=0.0
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:496.18:
+
+                  do jp=1,npmax
+                  1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:497.1:
+
+    if(autotrophy(jp).gt.0.0)then
+ 1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:500.1:
+
+    loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(
+ 1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:501.1:
+
+    loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
+ 1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:506.1:
+
+    endIF
+ 1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:507.1:
+
+   enddo
+ 1
+Warning: Nonconforming tab character at (1)
+ecogem.f90:509.18:
+
+                  dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_si
+                  1
+Warning: Nonconforming tab character at (1)
 ecogem.f90:71.54:
 
   REAL                                     ::Corg_frac
@@ -2208,11 +2388,6 @@ ecogem.f90:36.73:
   INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,
                                                                          1
 Warning: Unused variable 'is' declared at (1)
-ecogem.f90:36.61:
-
-  INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,
-                                                             1
-Warning: Unused variable 'jp' declared at (1)
 ecogem.f90:36.64:
 
   INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,
@@ -2228,87 +2403,87 @@ ecogem.f90:72.52:
   REAL                                     ::PDBstnd !ckc VPDB d13C standard
                                                     1
 Warning: Unused variable 'pdbstnd' declared at (1)
-ecogem.f90:661.20:
+ecogem.f90:716.20:
 
      & dum_egbg_fxsw,       & ! input
                     1
 Warning: Unused dummy argument 'dum_egbg_fxsw' at (1)
-ecogem.f90:665.23:
+ecogem.f90:720.23:
 
      & dum_egbg_sfcdiss     &
                        1
 Warning: Dummy argument 'dum_egbg_sfcdiss' at (1) was declared INTENT(OUT) but was not set
-ecogem.f90:663.22:
+ecogem.f90:718.22:
 
      & dum_egbg_sfcocn,     & ! input  -- tracer concentrations
                       1
 Warning: Unused dummy argument 'dum_egbg_sfcocn' at (1)
-ecogem.f90:664.23:
+ecogem.f90:719.23:
 
      & dum_egbg_sfcpart,    &
                        1
 Warning: Dummy argument 'dum_egbg_sfcpart' at (1) was declared INTENT(OUT) but was not set
-ecogem.f90:659.20:
+ecogem.f90:714.20:
 
      & dum_endseries,       & ! input
                     1
 Warning: Unused dummy argument 'dum_endseries' at (1)
-ecogem.f90:657.26:
+ecogem.f90:712.26:
 
      & dum_genie_intseries, & ! input
                           1
 Warning: Unused dummy argument 'dum_genie_intseries' at (1)
-ecogem.f90:655.24:
+ecogem.f90:710.24:
 
      & dum_genie_tseries,   & ! input
                         1
 Warning: Unused dummy argument 'dum_genie_tseries' at (1)
-ecogem.f90:662.14:
+ecogem.f90:717.14:
 
      & dum_mld,             & ! input
               1
 Warning: Unused dummy argument 'dum_mld' at (1)
-ecogem.f90:698.22:
+ecogem.f90:753.22:
 
   integer :: dum_ntrec
                       1
 Warning: Unused variable 'dum_ntrec' declared at (1)
-ecogem.f90:693.14:
+ecogem.f90:748.14:
 
   integer :: i,j,k,l,io,ia,is
               1
 Warning: Unused variable 'i' declared at (1)
-ecogem.f90:693.26:
+ecogem.f90:748.26:
 
   integer :: i,j,k,l,io,ia,is
                           1
 Warning: Unused variable 'ia' declared at (1)
-ecogem.f90:693.23:
+ecogem.f90:748.23:
 
   integer :: i,j,k,l,io,ia,is
                        1
 Warning: Unused variable 'io' declared at (1)
-ecogem.f90:693.29:
+ecogem.f90:748.29:
 
   integer :: i,j,k,l,io,ia,is
                              1
 Warning: Unused variable 'is' declared at (1)
-ecogem.f90:693.16:
+ecogem.f90:748.16:
 
   integer :: i,j,k,l,io,ia,is
                 1
 Warning: Unused variable 'j' declared at (1)
-ecogem.f90:693.20:
+ecogem.f90:748.20:
 
   integer :: i,j,k,l,io,ia,is
                     1
 Warning: Unused variable 'l' declared at (1)
-ecogem.f90:694.19:
+ecogem.f90:749.19:
 
   integer :: loc_k1                                                !
                    1
 Warning: Unused variable 'loc_k1' declared at (1)
-ecogem.f90:790.12:
+ecogem.f90:844.12:
 
   integer::l
             1
@@ -2544,11 +2719,11 @@ gfortran  -fopenmp genie_control.o genie_global.o local_netcdf.o genie_util.o lo
 	-L/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4/lib -lnetcdf -lnetcdff   
 make[1]: Leaving directory `/home/portabello/cgenie.muffin/genie-main'
 STARTING EXPERIMENT:
-Fri Jan 18 13:12:04 PST 2019
+Thu Apr 18 07:39:15 PDT 2019
 ./genie.exe: error while loading shared libraries: libnetcdf.so.11: cannot open shared object file: No such file or directory
 
 real	0m0.000s
 user	0m0.000s
-sys	0m0.000s
+sys	0m0.001s
 cp: cannot stat `fort.2': No such file or directory
 ERROR: !!!!!!!!!! ERROR PROCESSING !!!!!!!!!!
