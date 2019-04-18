@@ -4463,6 +4463,10 @@
 			<value datatype="boolean">.false.</value>
                         <description>switch to turn on O2 dependency of Os scavenging</description>
                     </param>
+                    <param name="par_scav_Os_O2_threshold">
+			<value datatype="real">5e-9</value>
+                        <description>O2 threshold for O2-dependent Os scavenging [mol/kg]</description>
+                    </param>
                     <param name="ctrl_bio_remin_thresh">
 			<value datatype="boolean">.false.</value>
                         <description>Apply a hard tracer oxidant remin threshold?</description>

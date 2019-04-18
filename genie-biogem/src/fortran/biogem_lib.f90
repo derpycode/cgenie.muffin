@@ -452,7 +452,8 @@ MODULE biogem_lib
   real::par_bio_remin_kOstoPOMOS					! Os scavenging efficiency
   NAMELIST /ini_biogem_nml/par_bio_remin_kOstoPOMOS
   logical::ctrl_Os_scav_O2_dep					! Switch to turn on O2 dependency for Os scavenging
-  NAMELIST /ini_biogem_nml/ctrl_Os_scav_O2_dep
+  logical::par_scav_Os_O2_threshold                             !O2 threshold for oxygen-dependent Os scavenging
+  NAMELIST /ini_biogem_nml/ctrl_Os_scav_O2_dep,par_scav_Os_O2_threshold
   ! ------------------- 230Th AND 231Pa CYCLING ---------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_scav_230Th_scavopt                     ! scavenging scheme ID string (e.g., 'equilibrium') for 230Th
   CHARACTER(len=63)::par_scav_231Pa_scavopt                     ! scavenging scheme ID string (e.g., 'equilibrium') for 231Pa
