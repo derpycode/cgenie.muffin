@@ -6309,33 +6309,17 @@
                         <description>reference atmospheric pCH4 [atm]</description>
                    </param>
                    <param name="par_pCH4_oxidation_tau0">
-                        <value datatype="real">7.6</value>
+                        <value datatype="real">7.6161</value>
                         <description>baseline atmospheric CH4 lifetime [yr]</description>
                    </param>
                    <param name="par_pCH4_oxidation_N">
                         <value datatype="real">0.338</value>
                         <description>atmospheric CH4 oxidation exponent</description>
                    </param>
-                   <param name="par_pCH4_oxidation_a1">
-                        <value datatype="real">-7.929E01</value>
-                        <description>first linear term for 2-term exponential fit</description>
-                   </param>
-                   <param name="par_pCH4_oxidation_a2">
-                        <value datatype="real">-1.090E-02</value>
-                        <description>first exponential term for 2-term exponential fit</description>
-                   </param>
-                   <param name="par_pCH4_oxidation_b1">
-                        <value datatype="real">8.823E01</value>
-                        <description>second linear term for 2-term exponential fit</description>
-                   </param>
-                   <param name="par_pCH4_oxidation_b2">
-                        <value datatype="real">-2.690E-03</value>
-                        <description>second exponential term for 2-term exponential fit</description>
-                   </param>
                    <param name="par_atm_pO2_fixed">
                         <value datatype="real">0.2095</value>
                         <description>Atmospheric pO2 for fixed scheme</description>
-                   </param>
+                    </param>
                     <param name="par_atm_wetlands_FCH4">
 			<value datatype="real">0.0</value>
                         <description>Wetlands CH4 flux (mol yr-1)</description>
