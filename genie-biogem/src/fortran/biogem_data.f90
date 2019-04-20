@@ -456,6 +456,10 @@ CONTAINS
        print*,'Scaling C burial flux relative to emissions         : ',par_force_invert_fCorgburial
        print*,'Force explicit inversion?                           : ',ctrl_force_invert_explicit
        print*,'Automatic ocean age tracer?                         : ',ctrl_force_ocn_age
+       ! --- TRANSPORT MATRIX ------------------------------------------------------------------------------------------------------ !
+       print*,'Diagnose transport matrix during run?		: ',ctrl_data_diagnose_TM
+       print*,'Year to start diagnosing transport matrix	: ',par_data_TM_start
+       print*,'Number of intervals within a year to diagnose transport matrix		: ',par_data_TM_avg_n
        ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ########################################################################## !
        !
        ! ######################################################################################################################### !
@@ -958,6 +962,9 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! UPDATE RELATIONSHIPS BETWEEN TRACERS
+  ! NOTE: the reverse transformation array <conv_ocn_sed> was never used and hence is no longer updated here
+  ! NOTE: update the basic oxic transformation (<conv_sed_ocn>) first:
+  !       this is used to create particulate matter (e.g. biological uptake) as well as in the tracer auditing calculations
   SUBROUTINE sub_data_update_tracerrelationships()
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
@@ -971,59 +978,39 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !
-    ! N
-    ! NOTE: leave alone the conv_ocn_sed (organic matter formation) connections
-    !       (e.g. if NH4 selected -- still assume default assimilation (and uptake) of NO3 to form PON)
-    if (ocn_select(io_NH4)) then
-       conv_sed_ocn(io_NO3,is_PON) = 0.0
-       conv_sed_ocn(io_NH4,is_PON) = 1.0
-    elseif (ocn_select(io_NO3)) then
+    ! N (in POM)
+    ! NOTE: the default assumption is that the assimilation (and uptake) of N to form PON, is as NO3 (and not N2 or NH4)
+    if (ocn_select(io_NO3)) then
        conv_sed_ocn(io_NO3,is_PON) = 1.0
        conv_sed_ocn(io_NH4,is_PON) = 0.0
+       conv_sed_ocn(io_N2,is_PON)  = 0.0
     else
        conv_sed_ocn(io_NO3,is_PON) = 0.0
        conv_sed_ocn(io_NH4,is_PON) = 0.0
+       conv_sed_ocn(io_N2,is_PON)  = 0.0
     end if
     ! ALK
     ! if NO3 is employed: calculate alkalnity corrections associated with the formation and destruction of organic matter from NO3
     ! otherwise: convert PO4 units to NO3 via the P:N Redfield ratio and then calculate the ALK correction from NO3
     ! NOTE: ensure that both corrections are mutually exclusive (i.e., make sure that there can be no double ALK correction)
     ! NOTE: catch any incidence of Redfield ratios (par_bio_red_xxx) set to 0.0
-    ! NOTE: some of the zero values here are already the (hard-coded) defaults ... they are repeated here to be completely explicit
-    if (ocn_select(io_NH4)) then
-       conv_sed_ocn(io_ALK,is_PON) = conv_sed_ocn(io_NH4,is_PON)
-       conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
+    if (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_ALK,is_PON) = par_bio_red_PON_ALK
        conv_sed_ocn(io_ALK,is_POP) = 0.0
-       conv_ocn_sed(is_POP,io_ALK) = 0.0
        conv_sed_ocn(io_ALK,is_POC) = 0.0
-       conv_ocn_sed(is_POC,io_ALK) = 0.0
-    elseif (ocn_select(io_NO3)) then
-       conv_sed_ocn(io_ALK,is_PON) = -conv_sed_ocn(io_NO3,is_PON)
-       conv_ocn_sed(is_PON,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_PON)
-       conv_sed_ocn(io_ALK,is_POP) = 0.0
-       conv_ocn_sed(is_POP,io_ALK) = 0.0
-       conv_sed_ocn(io_ALK,is_POC) = 0.0
-       conv_ocn_sed(is_POC,io_ALK) = 0.0
     else
        conv_sed_ocn(io_ALK,is_PON) = 0.0
-       conv_ocn_sed(is_PON,io_ALK) = 0.0
-       if (abs(par_bio_red_POP_POC*par_bio_red_POP_PON*par_bio_red_PON_ALK) > const_real_nullsmall) then
+       if (abs(par_bio_red_POP_POC) > const_real_nullsmall) then
           if (ctrl_bio_red_ALKwithPOC) then
              conv_sed_ocn(io_ALK,is_POC) = (1.0/par_bio_red_POP_POC)*par_bio_red_POP_PON*par_bio_red_PON_ALK
-             conv_ocn_sed(is_POC,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POC)
              conv_sed_ocn(io_ALK,is_POP) = 0.0
-             conv_ocn_sed(is_POP,io_ALK) = 0.0
           else
              conv_sed_ocn(io_ALK,is_POC) = 0.0
-             conv_ocn_sed(is_POC,io_ALK) = 0.0
              conv_sed_ocn(io_ALK,is_POP) = par_bio_red_POP_PON*par_bio_red_PON_ALK
-             conv_ocn_sed(is_POP,io_ALK) = 1.0/conv_sed_ocn(io_ALK,is_POP)
           end if
        else
           conv_sed_ocn(io_ALK,is_POC) = 0.0
-          conv_ocn_sed(is_POC,io_ALK) = 0.0
           conv_sed_ocn(io_ALK,is_POP) = 0.0
-          conv_ocn_sed(is_POP,io_ALK) = 0.0
        end if
     end if
     ! O2 (of P, N, C)
@@ -1031,7 +1018,36 @@ CONTAINS
     ! reduce O2 demand associated with C (and H) oxidation => treat N and P explicitly
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
-    !       (and as implemented, ber N, this ends up as (5/2)/2 = 5.0/4.0
+    !       (and as implemented, per mol N, this ends up as (5/2)/2 = 5.0/4.0
+    if (ocn_select(io_NO3)) then
+       conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
+    else
+       conv_sed_ocn(io_O2,is_PON) = 0.0
+    end if
+    if (ctrl_bio_red_O2withPOC) then
+       conv_sed_ocn(io_O2,is_POP) = 0.0
+       conv_sed_ocn(io_O2,is_PON) = 0.0
+    else
+       conv_sed_ocn(io_O2,is_POP) = -4.0/2.0
+    end if
+    if (abs(par_bio_red_POP_POC*par_bio_red_POP_PO2) > const_real_nullsmall) then
+       conv_sed_ocn(io_O2,is_POC) = par_bio_red_POP_PO2/par_bio_red_POP_POC - &
+            & conv_sed_ocn(io_O2,is_POP)/par_bio_red_POP_POC - &
+            & conv_sed_ocn(io_O2,is_PON)*par_bio_red_POP_PON/par_bio_red_POP_POC
+    else
+       conv_sed_ocn(io_O2,is_POP) = 0.0
+       conv_sed_ocn(io_O2,is_PON) = 0.0
+       conv_sed_ocn(io_O2,is_POC) = 0.0
+    end if
+    ! -------------------------------------------------------- !
+    ! UPDATE ALT REDOX SED->OCN RELATIONSHIPS
+    ! -------------------------------------------------------- !
+    ! NOTE: arrays are only one-way (i.e. there is no equivalent ocn --> sed transformation)
+    ! NOTE: remember that conv_sed_ocn(io_O2,is_POC) is *negative*
+    ! -------------------------------------------------------- ! Modify for oxic conditions(!)
+    ! NOTE: the only modifications needed relate to the remin of N in POM
+    ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
+    !       (and as implemented, per mol N, this ends up as (5/2)/2 = 5.0/4.0
     ! NOTE: to balance the uptake of NO3 into organic matter
     !       [2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O]
     !       with the release of N as ammonium and subsequent oxidation to NO3 ...
@@ -1040,41 +1056,23 @@ CONTAINS
     !       2PON + 3H2O + 2H+ --> 2NH4+ + (3/2)O2
     !       and per N:
     !       PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
-    if (ctrl_bio_red_O2withPOC) then
-       conv_sed_ocn(io_O2,is_POP) = 0.0
-       conv_ocn_sed(is_POP,io_O2) = 0.0
-    else
-       conv_sed_ocn(io_O2,is_POP) = -4.0/2.0
-       conv_ocn_sed(is_POP,io_O2) = 1.0/conv_sed_ocn(io_O2,is_POP)
-    endif
-    if (ocn_select(io_NH4)) then
-       conv_sed_ocn(io_O2,is_PON) = (3.0/4.0)
-       conv_ocn_sed(is_PON,io_O2) = -(4.0/5.0)
-    elseif (ocn_select(io_NO3)) then
-       conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
-       conv_ocn_sed(is_PON,io_O2) = 1.0/conv_sed_ocn(io_O2,is_PON)
-    else
-       conv_sed_ocn(io_O2,is_PON) = 0.0
-       conv_ocn_sed(is_PON,io_O2) = 0.0
-    endif
-    if (abs(par_bio_red_POP_POC*par_bio_red_POP_PO2) > const_real_nullsmall) then
-       conv_sed_ocn(io_O2,is_POC) = par_bio_red_POP_PO2/par_bio_red_POP_POC - &
-            & conv_sed_ocn(io_O2,is_POP)/par_bio_red_POP_POC - &
-            & conv_sed_ocn(io_O2,is_PON)*par_bio_red_POP_PON/par_bio_red_POP_POC
-       conv_ocn_sed(is_POC,io_O2) = 1.0/conv_sed_ocn(io_O2,is_POC)
-    else
-       conv_sed_ocn(io_O2,is_POP) = 0.0
-       conv_sed_ocn(io_O2,is_PON) = 0.0
-       conv_sed_ocn(io_O2,is_POC) = 0.0
-       conv_ocn_sed(is_POP,io_O2) = 0.0
-       conv_ocn_sed(is_PON,io_O2) = 0.0
-       conv_ocn_sed(is_POC,io_O2) = 0.0
+    if (ocn_select(io_O2)) then
+       conv_sed_ocn_O(:,:)  = conv_sed_ocn(:,:)
+       ! N
+       if (ocn_select(io_NH4)) then
+          conv_sed_ocn_O(io_NO3,is_PON) = 0.0
+          conv_sed_ocn_O(io_NH4,is_PON) = 1.0
+          conv_sed_ocn_O(io_N2,is_PON)  = 0.0
+       end if
+       ! ALK
+       if (ocn_select(io_NH4)) then
+          conv_sed_ocn_O(io_ALK,is_PON) = conv_sed_ocn_O(io_NH4,is_PON)
+       end if
+       ! O2 (of P, N, C)
+       if (ocn_select(io_NH4)) then
+          conv_sed_ocn_O(io_O2,is_PON) = (3.0/4.0)
+       end if
     end if
-    ! -------------------------------------------------------- !
-    ! UPDATE ALT REDOX SED->OCN RELATIONSHIPS
-    ! -------------------------------------------------------- !
-    ! NOTE: arrays are only one-way (i.e. there is no equivalent ocn --> sed transformation)
-    ! NOTE: remember that conv_sed_ocn(io_O2,is_POC) is *negative*
     ! -------------------------------------------------------- ! Modify for N-reducing conditions
     ! NOTE: to balance the uptake of NO3 into organic matter
     !       [2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O]
@@ -1206,7 +1204,7 @@ CONTAINS
     ! -------------------------------------------------------- ! Set local remin array reflecting 'mix' of redox possibilities
     ! NOTE: this is the 'redox tree' of all enabled posibilities
     !       (possibilities of not having O2 but having a different oxidant are omitted, as are O2 + Fe without SO4)
-    if (ocn_select(io_O2))  loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn)
+    if (ocn_select(io_O2))  loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_O)
     if (ocn_select(io_NO3)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_N)
     if (ocn_select(io_SO4)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_S)
     if (ocn_select(io_CH4)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_meth)
@@ -1217,6 +1215,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! sed -> ocn
     if (ocn_select(io_O2))  conv_ls_lo(:,:)      =  fun_conv_sedocn2lslo(conv_sed_ocn(:,:))
+    if (ocn_select(io_O2))  conv_ls_lo_O(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_O(:,:))
     if (ocn_select(io_NO3)) conv_ls_lo_N(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_N(:,:))
     if (ocn_select(io_SO4)) conv_ls_lo_S(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_S(:,:))
     if (ocn_select(io_CH4)) conv_ls_lo_meth(:,:) =  fun_conv_sedocn2lslo(conv_sed_ocn_meth(:,:))
@@ -2492,6 +2491,53 @@ CONTAINS
           ctrl_data_save_slice_carbconst = .FALSE.
        end IF
     end IF
+    
+! *** transport matrix paramater consistency checks ***
+    if(ctrl_data_diagnose_TM)THEN
+         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
+			 & '[par_data_TM_start] has been changed to allow matrix diagnosis to finish', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 par_data_TM_start=par_misc_t_runtime-n_k
+         end if
+         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).lt.0.0)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'The run is too short to diagnose a full transport matrix', &
+			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 ctrl_data_diagnose_TM=.false.
+         end if
+         if(ctrl_bio_preformed)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Diagnosing transport matrix will overwrite preformed tracers', &
+			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 ctrl_data_diagnose_TM=.false.
+         end if
+         if(conv_kocn_kbiogem.gt.1.0)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Biogem timestep ratio should not be greater than 1 for a transport matrix', &
+			 & 'STOPPING', &
+			 & (/const_real_null/),.true. &
+			 & )
+         end if
+	if((96.0/par_data_save_slice_n).ne.par_data_TM_avg_n)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'The seasonal saving intervals you have chosen do not correspond to the transport matrix averaging', &
+			 & 'CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+         end if
+    end if
 
   END SUBROUTINE sub_check_par_biogem
   ! ****************************************************************************************************************************** !

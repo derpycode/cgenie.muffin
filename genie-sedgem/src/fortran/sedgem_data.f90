@@ -108,6 +108,8 @@ CONTAINS
        print*,'refractory Corg deg. rate order compared to labile  : ',par_sed_huelse2017_k2_order
        print*,'anoxic refractory Corg deg. rate constant (1/yr)    : ',par_sed_huelse2017_k2_anoxic
        print*,'Include explicit P-cycle in OMEN-SED?               : ',par_sed_huelse2017_P_cycle
+       print*,'Remove implicit Alk associated with buried sulf-OM? : ',par_sed_huelse2017_remove_impl_sulALK
+       print*,'Simulate ocean Porg loss with buried sulf-OM?       : ',par_sed_huelse2017_sim_P_loss
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
@@ -216,6 +218,7 @@ CONTAINS
        print*,'Report errors?                                      : ',ctrl_misc_report_err
        print*,'i sediment coordinate for debug reporting           : ',par_misc_debug_i
        print*,'j sediment coordinate for debug reporting           : ',par_misc_debug_j
+       print*,'Report level #1 debug?                              : ',ctrl_debug_lvl1
        ! --- DATA SAVING: MISC --------------------------------------------------------------------------------------------------- !
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst

@@ -166,6 +166,8 @@ CONTAINS
           !       with the corresponding ocean tracer index given in the i=1 index position of the conv_atm_ocn_i array
           io = conv_atm_ocn_i(1,ia)
           SELECT CASE (atm_type(ia))
+          CASE (0)
+             ! [do nothing]
           CASE (1)
              ! calculate bulk gas exchange
              ! set local ocean and atmosphere tracer variables
@@ -3152,7 +3154,16 @@ CONTAINS
        loc_kmeth = 0.0
     end if
     ! ---------------------------------------------------------- ! remove normalization for kinetic scheme
-    if (ctrl_bio_remin_POC_kinetic .OR. (loc_k < const_real_nullsmall)) loc_k = 1.0
+    if (ctrl_bio_remin_POC_kinetic) loc_k = 1.0
+    ! ---------------------------------------------------------- ! check *some* remin occurs in non-kinetic scheme
+    ! NOTE: if a hard threshold is selected (subsequent test), CH4 production is assumed if no oxidants remain
+    !       (or no remin will occur ...)
+    ! here: parameters adjusted in factor (par_bio_remin_k_O2*loc_kO2/loc_k) to make this unity
+    ! if no remin would otherwise occur
+    if ((.NOT. ctrl_bio_remin_POC_kinetic) .AND. (loc_k < const_real_nullsmall)) then
+       loc_kO2 = 1.0
+       loc_k   = 1.0/par_bio_remin_k_O2
+    end if
     ! ---------------------------------------------------------- ! modify for hard threshold scheme
     if (ctrl_bio_remin_thresh) then
        if (loc_O2 > par_bio_remin_cthresh_O2) then
@@ -3185,40 +3196,40 @@ CONTAINS
           if (ocn_select(io_SO4)) then
              if (ocn_select(io_CH4)) then
                 dum_conv_ls_lo(:,:) = &
-                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                      & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
                      & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
                      & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
              else
                 dum_conv_ls_lo(:,:) = &
-                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                      & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
                      & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
              end if
           else
              dum_conv_ls_lo(:,:) = &
-                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
+                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                   & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:)
           end if
        elseif (ocn_select(io_SO4)) then
           if (ocn_select(io_CH4)) then
              dum_conv_ls_lo(:,:) = &
-                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
+                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                   & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
                   & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
              dum_conv_ls_lo(:,:) = &
-                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
+                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                   & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
           end if
        else
           if (ocn_select(io_CH4)) then
              dum_conv_ls_lo(:,:) = &
-                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:) + &
+                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                   & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
              dum_conv_ls_lo(:,:) = &
-                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo(:,:)
+                  & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:)
           end if
        end if
     else
@@ -4737,7 +4748,7 @@ CONTAINS
                & force_restore_atm_I(dum_ia,i,j) + &
                & force_restore_atm_sig_x(dum_ia)*(force_restore_atm_II(dum_ia,i,j) - force_restore_atm_I(dum_ia,i,j))
           SELECT CASE (atm_type(dum_ia))
-          CASE (1)
+          CASE (0,1)
              force_restore_atm(dum_ia,i,j) = loc_force_restore_atm
           case (n_itype_min:n_itype_max)
              loc_tot  = force_restore_atm(atm_dep(dum_ia),i,j)
@@ -4781,7 +4792,7 @@ CONTAINS
                & force_flux_atm_I(dum_ia,i,j) + &
                & force_flux_atm_sig_x(dum_ia)*(force_flux_atm_II(dum_ia,i,j) - force_flux_atm_I(dum_ia,i,j))
           SELECT CASE (atm_type(dum_ia))
-          CASE (1)
+          CASE (0,1)
              force_flux_atm(dum_ia,i,j) = loc_force_flux_atm
              loc_force_flux_atm_tot = loc_force_flux_atm_tot + loc_force_flux_atm
           case (n_itype_min:n_itype_max)
@@ -4809,7 +4820,7 @@ CONTAINS
        DO i=1,n_i
           DO j=1,n_j
              SELECT CASE (atm_type(dum_ia))
-             CASE (1)
+             CASE (0,1)
                 force_flux_atm(dum_ia,i,j) = force_flux_atm(dum_ia,i,j)*force_flux_atm_sig_x(dum_ia)*loc_force_flux_atm_rtot
              END SELECT
           END DO
@@ -4950,15 +4961,6 @@ CONTAINS
 !!$                   loc_ocn(io,i,j,k) = 0.0
 !!$                end do
 !!$             end do
-             DO l=3,n_l_ocn
-                io = conv_iselected_io(l)
-                loc_tot_i = conv_DOM_POM_i(0,io)
-                do loc_i=1,loc_tot_i
-                   is = conv_DOM_POM_i(loc_i,io)
-                   loc_bio_part(is,i,j,k)  = loc_bio_part(is,i,j,k) + conv_DOM_POM(is,io)*loc_ocn(io,i,j,k)
-                   loc_ocn(io,i,j,k) = 0.0
-                end do
-             end do
              DO l=1,n_l_sed
                 is = conv_iselected_is(l)
                 loc_tot_i = conv_sed_ocn_i(0,is)
@@ -5045,6 +5047,7 @@ CONTAINS
     ! NOTE: adjust ALK for H2S (assumed created via sulphate reduction and thus ocean ALK increase)
     ! NOTE: subtract 2.0 x NH4 from O2 potential inventory to take into account virtual O2 liberation during ammoniam oxidation:
     !       NH4+ + 2O2 -> NO3- + 2H+ + H2O
+    !       BUT ... -(3.0/4.0) balances NH4 production from PON (WHY???)
     ! NOTE: subtract 2.0 x N2 from O2 potential inventory to take into account virtual O2 liberation during denitrification:
     !       2NO3- + 2H+ -> N2 + 5/2O2 + H2O <--> 5O2 + 2N2 + 2H2O -> 4NO3- + 4H+
     ! NOTE: ALK changes associayed with NO3- are taken into account in the NO3- budget
@@ -5067,7 +5070,7 @@ CONTAINS
     end if
     if (ocn_select(io_NO3)) then
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) + dum_ocn(io_NO3)
-       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + (3.0/2.0)*dum_ocn(io_NO3)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + (5.0/4.0)*dum_ocn(io_NO3)
     end if
     if (ocn_select(io_N2O)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + 2.0*dum_ocn(io_N2O)
@@ -5081,7 +5084,7 @@ CONTAINS
     if (ocn_select(io_NH4)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + dum_ocn(io_NH4)
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) - dum_ocn(io_NH4)
-       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - (3.0/2.0)*dum_ocn(io_NH4)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - (3.0/4.0)*dum_ocn(io_NH4)
     end if
     fun_audit_combinetracer(io_NH4) = 0.0
     if (ocn_select(io_SO4)) then

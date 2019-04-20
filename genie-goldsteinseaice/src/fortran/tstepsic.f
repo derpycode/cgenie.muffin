@@ -112,6 +112,7 @@ c
      1                        (fe(l) - fw(l))*rdphi
      2                        + (fn(l) - fs(l,i))*rds(j))
      1                          + tsc*dtsic*dtha(l,i,j)
+
                endif
                fw(l) = fe(l)
                fs(l,i) = fn(l)

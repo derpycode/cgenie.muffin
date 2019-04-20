@@ -87,6 +87,8 @@ CONTAINS
           CASE (0)
              If (ia == ia_T) loc_string = '% time (yr) / surface air temperature (degrees C)'
              If (ia == ia_q) loc_string = '% time (yr) / surface humidity (???)'
+             If (ia == ia_pcolr) &
+                  & loc_string = '% time (yr) / global '//TRIM(string_atm(ia))//' (mol) / global ' //TRIM(string_atm(ia))//' (atm)'
           CASE (1)
              loc_string = '% time (yr) / global '//TRIM(string_atm(ia))//' (mol) / global ' //TRIM(string_atm(ia))//' (atm)'
           CASE (n_itype_min:n_itype_max)
@@ -194,7 +196,7 @@ CONTAINS
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','fseaair_'//TRIM(string_atm(ia)),string_results_ext &
                & )
           SELECT CASE (atm_type(ia))
-          CASE (1)
+          CASE (0,1)
              loc_string = '% time (yr) / global '//TRIM(string_atm(ia))// ' sea->air transfer flux (mol yr-1) / '//&
                   & 'global '//TRIM(string_atm(ia))// ' density (mol m-2 yr-1)'
           CASE (n_itype_min:n_itype_max)
@@ -202,7 +204,7 @@ CONTAINS
                   & 'global '//TRIM(string_atm(ia))//' (o/oo)'
           end SELECT
           SELECT CASE (atm_type(ia))
-          CASE (1,n_itype_min:n_itype_max)
+          CASE (0,1,n_itype_min:n_itype_max)
              call check_unit(out,__LINE__,__FILE__)
              OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
@@ -221,7 +223,7 @@ CONTAINS
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','focnatm_'//TRIM(string_atm(ia)),string_results_ext &
                & )
           SELECT CASE (atm_type(ia))
-          CASE (1)
+          CASE (0,1)
              loc_string = '% time (yr) / global '//TRIM(string_atm(ia))//' flux (mol yr-1) / global '// &
                   & TRIM(string_atm(ia))//' density (mol m-2 yr-1) '//&
                   & ' NOTE: is the atmospheric forcing flux *net* of the sea-air gas exchange flux.'
@@ -231,7 +233,7 @@ CONTAINS
                   & ' NOTE: is the atmospheric forcing flux *net* of the sea-air gas exchange flux.'
           end SELECT
           SELECT CASE (atm_type(ia))
-          CASE (1,n_itype_min:n_itype_max)
+          CASE (0,1,n_itype_min:n_itype_max)
              call check_unit(out,__LINE__,__FILE__)
              OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
@@ -810,7 +812,7 @@ CONTAINS
                   & trim(par_outfile_name)//'_series_diag_misc','specified_forcing_'//TRIM(string_atm(ia)),string_results_ext &
                   & )
              SELECT CASE (atm_type(ia))
-             CASE (1)
+             CASE (0,1)
                 loc_string = '% time (yr) / global '//TRIM(string_atm(ia))//' flux (mol yr-1) '//&
                      & ' NOTE: is the instantaneous (per unit time) atmospheric forcing flux.'
              CASE (n_itype_min:n_itype_max)
@@ -819,7 +821,7 @@ CONTAINS
                      & ' NOTE: is the instantaneous (per unit time) atmospheric forcing flux.'
              end SELECT
              SELECT CASE (atm_type(ia))
-             CASE (1,n_itype_min:n_itype_max)
+             CASE (0,1,n_itype_min:n_itype_max)
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
@@ -1200,9 +1202,16 @@ CONTAINS
              call check_unit(out,__LINE__,__FILE__)
              OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
-             WRITE(unit=out,fmt='(f12.3,f12.6)',iostat=ios) &
-                  & loc_t, &
-                  & loc_sig
+             If (ia == ia_T .OR. ia == ia_q)  then
+                WRITE(unit=out,fmt='(f12.3,f12.6)',iostat=ios) &
+                     & loc_t, &
+                     & loc_sig
+             elseif (ia == ia_pcolr) then
+                WRITE(unit=out,fmt='(f12.3,e20.12,e14.6)',iostat=ios) &
+                     & loc_t, &
+                     & conv_atm_mol*loc_sig, &
+                     & loc_sig
+             end if
              call check_iostat(ios,__LINE__,__FILE__)
              CLOSE(unit=out,iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
@@ -1379,7 +1388,7 @@ CONTAINS
                & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','fseaair_'//TRIM(string_atm(ia)),string_results_ext &
                & )
           SELECT CASE (atm_type(ia))
-          CASE (1)
+          CASE (0,1)
              loc_sig = int_diag_airsea_sig(ia)/int_t_sig
              call check_unit(out,__LINE__,__FILE__)
              OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
@@ -1420,7 +1429,7 @@ CONTAINS
                & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','focnatm_'//TRIM(string_atm(ia)),string_results_ext &
                & )
           SELECT CASE (atm_type(ia))
-          CASE (1)
+          CASE (0,1)
              loc_sig = int_focnatm_sig(ia)/int_t_sig
              call check_unit(out,__LINE__,__FILE__)
              OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
@@ -2236,7 +2245,7 @@ CONTAINS
                   & trim(par_outfile_name)//'_series_diag_misc','specified_forcing_'//TRIM(string_atm(ia)),string_results_ext &
                   & )
              SELECT CASE (atm_type(ia))
-             CASE (1)
+             CASE (0,1)
                 loc_sig = int_diag_forcing_sig(ia)/int_t_sig
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)

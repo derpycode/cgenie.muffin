@@ -87,6 +87,9 @@ CONTAINS
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst
        print*,'netCDF restart file name                            : ',trim(par_ncrst_name)
+       ! --- DEBUGGING OPTIONS --------------------------------------------------------------------------------------------------- !
+       print*,'--- DEBUGGING OPTIONS ----------'
+       print*,'Report level #1 debug?                              : ',ctrl_debug_lvl1
        ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ########################################################################## !
        !
        ! ######################################################################################################################### !
