@@ -124,7 +124,7 @@ c                 files
       character xv_wstress*127, yv_wstress*127
       integer   len_xu, len_yu, len_xv, len_yv
 
-      character u_wspeed*20, v_wspeed*20
+      character u_wspeed*127, v_wspeed*127
       integer   len_uws, len_vws
 
 c AY (09/01/04) : local variables reinstated

@@ -92,6 +92,10 @@ SUBROUTINE atchem(    &
            IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
               CALL sub_calc_oxidize_CH4_schmidt03(i,j,loc_dtyr)
            END IF
+        case ('schmidt03_exp')
+           IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+              CALL sub_calc_oxidize_CH4_schmidt03_exp(i,j,loc_dtyr)
+           END IF
         case default
             !!! NOTHING
         end select
@@ -118,7 +122,6 @@ SUBROUTINE atchem(    &
   ! *** (i,j) GRID PT LOOP END *** !
   ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
 
-  
   ! *** UPDATE ATMOSPHERIC COMPOSITION ***
   ! set internal atmospheric flux
   fatm(:,:,:) = dum_sfxsumatm(:,:,:)

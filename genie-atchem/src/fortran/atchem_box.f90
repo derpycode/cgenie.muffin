@@ -247,7 +247,7 @@ CONTAINS
 
   END SUBROUTINE sub_calc_oxidize_CH4_claire06
   ! ****************************************************************************************************************************** !
- 
+  
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], NO H ESCAPE, FIXED ATMOSPHERIC O2 (CTR|09-2018)
    SUBROUTINE sub_calc_oxidize_CH4_claire06_fixed(dum_dtyr,dum_conv_atm_mol)
