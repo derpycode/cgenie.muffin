@@ -120,6 +120,7 @@ CLEAN_UTIL_TARGETS = $(UTIL_NAMES:%=clean_%)
 # with an appropriate target, e.g. 'make clean_igcm3'
 cleanall : clean cleanutils cleanmodules
 	\rm -f include/*.mod
+	\rm -f testbiogem.out
 
 # clean  - just local files
 clean : $(CLEAN_LOCAL_TARGETS)
