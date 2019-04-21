@@ -78,7 +78,7 @@ NETCDF_DIR=/usr/local
 ### domino ###
 #NETCDF_DIR=/share/apps
 ### eevee ###
-NETCDF_DIR=/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4
+#NETCDF_DIR=/share/apps/netcdf-c-4.4.1.1-fortran-4.4.4
 ### iwan ###
 #NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.4
 ### sprout ###
