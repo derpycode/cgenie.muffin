@@ -2690,7 +2690,7 @@ CONTAINS
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean k = (n_k - 1) (base of surface layer) area : ', &
+         & ' Global ocean k = (n_k - 1) (sub-surface layer) area : ', &
          & SUM(loc_phys_ocn(ipo_A,:,:,n_k - 1)), &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
@@ -2699,8 +2699,15 @@ CONTAINS
          & SUM(loc_phys_ocn(ipo_V,:,:,:)), &
          & ' m3'
     call check_iostat(ios,__LINE__,__FILE__)
-    loc_K = sum(int_phys_ocnatm_timeslice(ipoa_KCO2,:,:)*(1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)))/ &
-         & (sum(int_phys_ocn_timeslice(ipo_mask_ocn,:,:,n_k)*(1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:))))
+    loc_K = sum( &
+         & phys_ocnatm(ipoa_A,:,:)*int_phys_ocnatm_timeslice(ipoa_KCO2,:,:)* &
+         & (1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)) &
+         & ) &
+         & / &
+         & sum( &
+         & phys_ocnatm(ipoa_A,:,:)*int_phys_ocn_timeslice(ipo_mask_ocn,:,:,n_k)* &
+         & (1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)) &
+         & )
     Write(unit=out,fmt='(A49,f8.6,A24)',iostat=ios) &
          & ' Global mean air-sea coefficient, K(CO2) ..... : ', &
          & loc_K, &

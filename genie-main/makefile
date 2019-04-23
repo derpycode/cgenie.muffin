@@ -121,6 +121,7 @@ CLEAN_UTIL_TARGETS = $(UTIL_NAMES:%=clean_%)
 cleanall : clean cleanutils cleanmodules
 	\rm -f include/*.mod
 	\rm -f testbiogem.out
+	\rm -f tmp*
 
 # clean  - just local files
 clean : $(CLEAN_LOCAL_TARGETS)
