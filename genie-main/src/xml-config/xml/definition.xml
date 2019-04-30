@@ -4956,7 +4956,7 @@
 			<value datatype="real">1.0</value>
                         <description>Rate law power for FeS formation</description>
                     </param>
-                    <param name="par_bio_FeS_abioticohm_min">
+                    <param name="par_bio_FeS_abioticohm_cte">
 			<value datatype="real">8.3e-6</value>
                         <description>Ohmega constant for FeS formation</description>
                     </param>
