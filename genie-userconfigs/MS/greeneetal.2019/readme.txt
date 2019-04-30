@@ -8,6 +8,7 @@ S.E. Greene, A. Ridgwell, S. Kirtland Turner, D.N. Schmidt, H. Pälike, E. Thoma
 
 ################################################################
 19/03/01 -- README.txt file creation (A.R.)
+19/04/30 -- experiments checked and instructions revised (A.R.)
 ################################################################
 
 Provided are the configuration files necessary to run the model experiments presented in the paper.
