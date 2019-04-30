@@ -530,7 +530,7 @@ CONTAINS
        end if
        ! calculate isotopic ratio
        if (loc_Fe > const_real_nullsmall) then
-          loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/loc_Fe
+          loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
        else
           loc_r56Fe = 0.0
        end if
@@ -1032,7 +1032,10 @@ CONTAINS
        else 
           if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
              loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
-             loc_Fe2  = loc_Fe2spec(1)      
+             loc_Fe2  = loc_Fe2spec(1) 
+                if (loc_Fe2 > ocn(io_Fe2,dum_i,dum_j,k)) then
+                    loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)   
+                end if                    
           else
              loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
           end if
