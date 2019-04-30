@@ -168,6 +168,9 @@ CONTAINS
        else
           loc_FeS = minval(loc_roots(:))
        end if
+       if (loc_FeS > MIN(dum_Fe2,dum_H2S)) then
+           loc_FeS = MIN(dum_Fe2,dum_H2S)
+       end if
        loc_Fe2  = dum_Fe2 - loc_FeS
        loc_H2S  = dum_H2S - loc_FeS
     end if
