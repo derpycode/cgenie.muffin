@@ -3254,14 +3254,14 @@ CONTAINS
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
     dum_bio_remin(io2l(io_H2S))  = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
-    dum_bio_remin(io2l(io_Fe))   = dum_bio_remin(io2l(io_Fe))   + loc_dFeOOH
+    dum_bio_remin(io2l(io_Fe2))  = dum_bio_remin(io2l(io_Fe2))  + loc_dFeOOH
     dum_bio_remin(io2l(io_SO4))  = dum_bio_remin(io2l(io_SO4))  + (1.0/8.0)*loc_dFeOOH
     dum_bio_remin(io2l(io_ALK))  = dum_bio_remin(io2l(io_ALK))  - 2.0*(1.0/8.0)*loc_dFeOOH
     ! -------------------------------------------------------- ! implement reaction -- isotopes
     ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
     ! NOTE: no fractionation (currently)
-    if (ocn_select(io_Fe_56Fe)) then
-       dum_bio_remin(io2l(io_Fe_56Fe)) = dum_bio_remin(io2l(io_Fe_56Fe)) + &
+    if (ocn_select(io_Fe2_56Fe)) then
+       dum_bio_remin(io2l(io_Fe2_56Fe)) = dum_bio_remin(io2l(io_Fe2_56Fe)) + &
             & (loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
        dum_bio_part(is2l(is_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
     end if
