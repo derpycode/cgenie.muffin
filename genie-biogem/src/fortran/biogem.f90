@@ -3185,6 +3185,7 @@ SUBROUTINE diag_biogem_timeseries( &
 
   ! *** TIME-SERIES DATA UPDATE ***
   IF (ctrl_debug_lvl1) print*, '*** RUN-TIME DATA UPDATE ***'
+
   ! update time slice data
   ! NOTE: carried out only when the local (BioGeM) time falls between a selected time slice time plus integration time,
   !       and the time slice time itself
@@ -3610,9 +3611,11 @@ SUBROUTINE diag_biogem_timeseries( &
      END IF
 
   end IF if_save1
-  ! ******************************************************************************************************************************** !
+  ! ****************************************************************************************************************************** !
 
 end SUBROUTINE diag_biogem_timeseries
+
+
 ! ******************************************************************************************************************************** !
 subroutine matrix_recover_exp(&
 & dum_matrix_k)
@@ -3760,4 +3763,5 @@ character(len=127)::loc_filename
   
   end subroutine matrix_recover_exp
   
-  ! ******************************************************************************************************************************** !
+  ! ****************************************************************************************************************************** !
+
