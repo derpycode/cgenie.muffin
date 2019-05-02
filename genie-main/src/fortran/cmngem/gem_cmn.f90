@@ -692,7 +692,7 @@ MODULE gem_cmn
        & 0.709175,  & ! TYPE 24; 87Sr
        & 8.375209,  & ! TYPE 25; 88Sr 
        & 1.05,      & ! TYPE 26; 187Os 
-       & 0.3244 /)    ! TYPE 27; 188Os 
+       & 0.159 /)    ! TYPE 27; 188Os 
 
   ! *** radioactive decay ***
   ! ln(2) is used for the conversion between half-life and e-folding time of decay

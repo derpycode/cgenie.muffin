@@ -493,7 +493,7 @@ SUBROUTINE sedgem(          &
      DO j=1,n_j
         if (loc_phys_sed_mask_deepsea(i,j) > const_real_nullsmall) then
           ! Os
-          ! NOTE: deposition rates are given in mol m-2 yr-1
+          ! NOTE: deposition rates are given in mol m-2 s-1
            IF ((ocn_select(io_Os)) .AND. (dum_sfcsumocn(io_Os,i,j) > const_real_nullsmall)) then
              ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018), else suboxic deposition rate
              if ((ctrl_sed_Os_O2) .AND. (dum_sfcsumocn(io_O2,i,j) > par_sed_Os_O2_threshold)) then
@@ -506,15 +506,15 @@ SUBROUTINE sedgem(          &
              if (loc_fsed <= const_real_nullsmall) then
                 loc_fsed = 0.0
              end if
-             dum_sfxocn(io_Os,i,j) = dum_sfxocn(io_Os,i,j) - loc_fsed/dum_dts
+             dum_sfxocn(io_Os,i,j) = dum_sfxocn(io_Os,i,j) - loc_fsed
              ! Assume no isotopic fractionation during deposition. Hence, bury the same relative amounts of all isotopes
              if ((ocn_select(io_Os_187Os)) .AND. (dum_sfcsumocn(io_Os_187Os,i,j) > const_real_nullsmall)) then
                 dum_sfxocn(io_Os_187Os,i,j) = dum_sfxocn(io_Os_187Os,i,j) &
-                            & - dum_sfcsumocn(io_Os_187Os,i,j)*(loc_fsed/dum_dts)/(dum_sfcsumocn(io_Os,i,j))
+                            & - dum_sfcsumocn(io_Os_187Os,i,j)*(loc_fsed)/(dum_sfcsumocn(io_Os,i,j))
              end if
              if ((ocn_select(io_Os_188Os)) .AND. (dum_sfcsumocn(io_Os_188Os,i,j) > const_real_nullsmall)) then
                 dum_sfxocn(io_Os_188Os,i,j) = dum_sfxocn(io_Os_188Os,i,j) &
-                            & - dum_sfcsumocn(io_Os_188Os,i,j)*(loc_fsed/dum_dts)/(dum_sfcsumocn(io_Os,i,j))
+                            & - dum_sfcsumocn(io_Os_188Os,i,j)*(loc_fsed)/(dum_sfcsumocn(io_Os,i,j))
              end if
            end IF
            ! NOTE: the value of par_sed_lowTalt_fLi_alpha is calculated on the basis of a sink of x mol yr-1
