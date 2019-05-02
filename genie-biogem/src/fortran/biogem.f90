@@ -1330,7 +1330,7 @@ subroutine biogem(        &
               ! NOTE: only do anything if there is O2 in the atmosphere!!!
               if (ocn_select(io_H2S) .AND. atm_select(ia_pH2S)) then
                  select case (opt_ocnatmH2S_fix)
-                 case ('KMM')
+                 case ('KMM') ! default
                     IF (                                                       &
                          & (locij_focnatm(ia_pH2S,i,j) > const_real_nullsmall) &
                          &  .AND.                                              &
@@ -1339,16 +1339,32 @@ subroutine biogem(        &
                        ! mass balance adjustments
                        locijk_focn(io_ALK,i,j,n_k) = locijk_focn(io_ALK,i,j,n_k) - 2.0*locij_focnatm(ia_pH2S,i,j)
                        locijk_focn(io_SO4,i,j,n_k) = locijk_focn(io_SO4,i,j,n_k) + locij_focnatm(ia_pH2S,i,j)
-                       locij_fatm(ia_pO2,i,j)  = locij_fatm(ia_pO2,i,j) - 2.0*locij_focnatm(ia_pH2S,i,j)
-                       locij_fatm(ia_pH2S,i,j) = 0.0
+                       locij_fatm(ia_pO2,i,j)      = locij_fatm(ia_pO2,i,j)      - 2.0*locij_focnatm(ia_pH2S,i,j)
+                       locij_fatm(ia_pH2S,i,j)     = 0.0
                        ! update flux reporting
-                       locij_focnatm(ia_pO2,i,j)  = locij_focnatm(ia_pO2,i,j) - 2.0*locij_focnatm(ia_pH2S,i,j)
-                       locij_focnatm(ia_pH2S,i,j) = 0.0
+                       locij_focnatm(ia_pO2,i,j)   = locij_focnatm(ia_pO2,i,j)   - 2.0*locij_focnatm(ia_pH2S,i,j)
+                       locij_focnatm(ia_pH2S,i,j)  = 0.0
                        ! ### INSERT CODE FOR ISOTOPES ############################################################################### !
                        !
                        ! ############################################################################################################ !
                     end IF
-                 case default
+                 case ('KMM_lowO2')
+                    IF (                                                       &
+                         & (locij_focnatm(ia_pH2S,i,j) > const_real_nullsmall) &
+                         & ) THEN
+                       ! mass balance adjustments
+                       locijk_focn(io_ALK,i,j,n_k) = locijk_focn(io_ALK,i,j,n_k) - 2.0*locij_focnatm(ia_pH2S,i,j)
+                       locijk_focn(io_SO4,i,j,n_k) = locijk_focn(io_SO4,i,j,n_k) + locij_focnatm(ia_pH2S,i,j)
+                       locij_fatm(ia_pO2,i,j)      = locij_fatm(ia_pO2,i,j)      - 2.0*locij_focnatm(ia_pH2S,i,j)
+                       locij_fatm(ia_pH2S,i,j)     = 0.0
+                       ! update flux reporting
+                       locij_focnatm(ia_pO2,i,j)   = locij_focnatm(ia_pO2,i,j)   - 2.0*locij_focnatm(ia_pH2S,i,j)
+                       locij_focnatm(ia_pH2S,i,j)  = 0.0
+                       ! ### INSERT CODE FOR ISOTOPES ############################################################################### !
+                       !
+                       ! ############################################################################################################ !
+                    end IF
+                 case ('noflux')
                     ! no flux to atmosphere
                     locij_fatm(ia_pH2S,i,j)    = 0.0
                     locij_focnatm(ia_pH2S,i,j) = 0.0
