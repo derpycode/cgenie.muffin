@@ -823,7 +823,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_iron_geo                      = 07    !
   ! diagnostics - geochemistry -- solid-solute reactions
   INTEGER,PARAMETER::idiag_react_POMS_dH2S               = 01    !
-  INTEGER,PARAMETER::idiag_react_FeOOH_dFe               = 02    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dFe2              = 02    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dH2S              = 03    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dSO4              = 04    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dALK              = 05    !
@@ -945,7 +945,7 @@ MODULE biogem_lib
   ! diagnostics - geochemistry -- solid-solute reactions
   CHARACTER(len=18),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &
        & 'react_POMS_dH2S   ', &
-       & 'react_FeOOH_dFe   ', &
+       & 'react_FeOOH_dFe2  ', &
        & 'react_FeOOH_dH2S  ', &
        & 'react_FeOOH_dSO4  ', &
        & 'react_FeOOH_dALK  ' /)

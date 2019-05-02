@@ -3274,10 +3274,14 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    diag_react(idiag_react_FeOOH_dFe,dum_i,dum_j,dum_k)  = loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = -(1.0/8.0)*loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = (1.0/8.0)*loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = -2.0*(1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) = &
+         & diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) + loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = &
+         & diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) - (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = &
+         & diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) + (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = &
+         & diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) - 2.0*(1.0/8.0)*loc_dFeOOH
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
