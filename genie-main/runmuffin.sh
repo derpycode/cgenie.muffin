@@ -366,6 +366,8 @@ else
     echo ">> WARNING: No record of last base-config (file: current_config.dat): CONTINUING ..."
     echo ""
     sleep 4
+    make cleanall
+    echo "$MODELID" > 'current_config.dat'
 fi
 ./genie_example.job -O -f $CONFIGPATH/$CONFIGNAME
 # Clean up and archive
