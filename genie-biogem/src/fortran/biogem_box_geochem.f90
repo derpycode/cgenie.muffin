@@ -416,7 +416,7 @@ CONTAINS
     DO k=n_k,dum_k1,-1
        loc_O2 = ocn(io_O2,dum_i,dum_j,k)
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
-       if ((4.0/1.0*loc_O2 > const_real_nullsmall) .AND. (loc_Fe2 > const_real_nullsmall)) then
+       if ((4.0/1.0*loc_O2 > const_real_nullsmall) .AND. (loc_Fe2 > 1e-11)) then
           ! calculate H2S oxidation, and cap value at H2S concentration if necessary
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
 
@@ -607,7 +607,7 @@ CONTAINS
     DO k=n_k,dum_k1,-1
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        loc_Fe = ocn(io_Fe,dum_i,dum_j,k)
-       if ((8.0/1.0*loc_H2S > const_real_nullsmall) .AND. (loc_Fe > const_real_nullsmall)) then
+       if ((8.0/1.0*loc_H2S > 1e-11) .AND. (loc_Fe > 1e-11)) then
           ! calculate H2S oxidation, and cap value at H2S concentration if necessary
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
 
@@ -751,7 +751,7 @@ CONTAINS
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        loc_FeS = ocn(io_FeS,dum_i,dum_j,k)
        ! either Fe2 and H2S, or FeS have to be present
-       if (((loc_Fe2 > const_rns) .AND. (loc_H2S > const_rns)) .OR. (loc_FeS > const_rns)) then
+       if (((loc_Fe2 > 1e-11) .AND. (loc_H2S > 1e-11)) .OR. (loc_FeS > 1e-11)) then
 
           ! Avoid calculating with negative concentrations
           if (loc_FeS < const_rns) then
@@ -876,7 +876,7 @@ CONTAINS
        end if
        ! calculate pyrite precipitation
        ! NOTE: const_rns == const_real_nullsmall
-       if ( (loc_FeS > const_rns) .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
+       if ( (loc_FeS > 1e-11) .AND. (4.0/3.0*loc_H2S > 1e-11) .AND. (4.0/1.0*loc_SO4 > 1e-11) ) then
           ! loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_FeS*loc_H2S
           loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(K_lim_PYR + loc_FeS))*loc_FeS*loc_H2S
           ! calculate isotopic ratio
@@ -1041,7 +1041,7 @@ CONTAINS
           end if
        end if
 
-       if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_CO3 > const_real_nullsmall)) then
+       if ((loc_Fe2 > 1e-11) .AND. (loc_CO3 > 1e-11)) then
 
           loc_ohm  = (loc_CO3*loc_Fe2)/par_bio_FeCO3precip_abioticohm_cte
 
@@ -1157,7 +1157,7 @@ CONTAINS
     DO k=n_k,dum_k1,-1
        loc_O2 = ocn(io_O2,dum_i,dum_j,k)
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
+       if ((loc_O2 > const_real_nullsmall) .AND. (loc_H2S > 1e-11)) then
           ! calculate H2S oxidation, and cap value at H2S concentration if necessary
           SELECT CASE (opt_bio_remin_oxidize_H2StoSO4)
           CASE ('linear')
