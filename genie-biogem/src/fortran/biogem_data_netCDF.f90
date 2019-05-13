@@ -837,51 +837,6 @@ CONTAINS
        ! Preformed nutrients and things
        !-----------------------------------------------------------------------
        if (ctrl_bio_preformed) then
-          if (.not. ocn_select(io_col0)) then
-             if (ocn_select(io_PO4) .AND. ocn_select(io_colr)) then
-                loc_unitsname = 'mol kg-1'
-                loc_ijk(:,:,:) = const_real_null
-                DO i=1,n_i
-                   DO j=1,n_j
-                      DO k=goldstein_k1(i,j),n_k
-                         loc_ijk(i,j,k) = int_ocn_timeslice(io_colr,i,j,k)/int_t_timeslice
-                      END DO
-                   END DO
-                END DO
-                call sub_adddef_netcdf(loc_iou,4,'misc_PO4pre','Preformed PO4', &
-                     & trim(loc_unitsname),const_real_zero,const_real_zero)
-                call sub_putvar3d_g('misc_PO4pre',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
-             endif
-             if (ocn_select(io_NO3) .AND. ocn_select(io_colb)) then
-                loc_unitsname = 'mol kg-1'
-                loc_ijk(:,:,:) = const_real_null
-                DO i=1,n_i
-                   DO j=1,n_j
-                      DO k=goldstein_k1(i,j),n_k
-                         loc_ijk(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_t_timeslice
-                      END DO
-                   END DO
-                END DO
-                call sub_adddef_netcdf(loc_iou,4,'misc_NO3pre','Preformed NO3', &
-                     & trim(loc_unitsname),const_real_zero,const_real_zero)
-                call sub_putvar3d_g('misc_NO3pre',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
-             elseif (ocn_select(io_PO4) .AND. ocn_select(io_colb)) then
-                loc_unitsname = 'yr'
-                loc_ijk(:,:,:) = const_real_null
-                DO i=1,n_i
-                   DO j=1,n_j
-                      DO k=goldstein_k1(i,j),n_k
-                         if (int_ocn_timeslice(io_PO4,i,j,k) > const_real_nullsmall) then
-                            loc_ijk(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_PO4,i,j,k)
-                         end if
-                      END DO
-                   END DO
-                END DO
-                call sub_adddef_netcdf(loc_iou,4,'misc_PO4age','PO4 age', &
-                     & trim(loc_unitsname),const_real_zero,const_real_zero)
-                call sub_putvar3d_g('misc_PO4age',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
-             endif
-          else
              do io=io_col0,io_col9
                 if (ocn_select(io)) then
                    loc_ijk(:,:,:) = const_real_null
@@ -936,7 +891,6 @@ CONTAINS
                    call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
                 end if
              end do
-          end if
        end if
        !
     end If
@@ -2902,25 +2856,26 @@ CONTAINS
     !-----------------------------------------------------------------------
     ! WRITE DATA
     !-----------------------------------------------------------------------
-    call sub_adddef_netcdf(loc_iou,4,'misc_bMINUSr','color tracers; [b] minus [r]','mol kg-1',loc_c0,loc_c0)
-    call sub_putvar3d_g ('misc_bMINUSr',loc_iou,n_i,n_j,n_k,loc_ntrec, &
-         & loc_colbminusr(:,:,:)/int_t_timeslice,loc_mask)
-    call sub_adddef_netcdf(loc_iou,4,'misc_bOVERr','color tracers; [b] / [r]','n/a (ratio)',loc_c0,loc_c0)
-    call sub_putvar3d_g('misc_bOVERr',loc_iou,n_i,n_j,n_k,loc_ntrec, &
-         & loc_colboverr(:,:,:),loc_mask)
-    call sub_adddef_netcdf(loc_iou,4,'misc_rOVERrPLUSb','color tracers; [r] / ([r] + [b])','n/a (ratio)',loc_c0,loc_c0)
-    call sub_putvar3d_g('misc_rOVERrPLUSb',loc_iou,n_i,n_j,n_k,loc_ntrec, &
-         & loc_colroverrplusb(:,:,:),loc_mask)
-    call sub_adddef_netcdf(loc_iou,4,'misc_bOVERrPLUSb','color tracers; [b] / ([r] + [b])','n/a (ratio)',loc_c0,loc_c0)
-    call sub_putvar3d_g('misc_bOVERrPLUSb',loc_iou,n_i,n_j,n_k,loc_ntrec, &
-         & loc_colboverrplusb(:,:,:),loc_mask)
     if (ctrl_force_ocn_age) then
        call sub_adddef_netcdf(loc_iou,4,'misc_col_age','color tracers; total age','(yrs)',loc_c0,loc_c0)
        call sub_putvar3d_g('misc_col_age',loc_iou,n_i,n_j,n_k,loc_ntrec, &
             & loc_colage(:,:,:),loc_mask)         
        call sub_adddef_netcdf(loc_iou,4,'misc_col_Dage','color tracers; ventilation age','(yrs)',loc_c0,loc_c0)
        call sub_putvar3d_g('misc_col_Dage',loc_iou,n_i,n_j,n_k,loc_ntrec, &
-            & loc_colage(:,:,:)-dum_t,loc_mask)    
+            & loc_colage(:,:,:)-dum_t,loc_mask)
+    else
+       call sub_adddef_netcdf(loc_iou,4,'misc_bMINUSr','color tracers; [b] minus [r]','mol kg-1',loc_c0,loc_c0)
+       call sub_putvar3d_g ('misc_bMINUSr',loc_iou,n_i,n_j,n_k,loc_ntrec, &
+            & loc_colbminusr(:,:,:)/int_t_timeslice,loc_mask)
+       call sub_adddef_netcdf(loc_iou,4,'misc_bOVERr','color tracers; [b] / [r]','n/a (ratio)',loc_c0,loc_c0)
+       call sub_putvar3d_g('misc_bOVERr',loc_iou,n_i,n_j,n_k,loc_ntrec, &
+            & loc_colboverr(:,:,:),loc_mask)
+       call sub_adddef_netcdf(loc_iou,4,'misc_rOVERrPLUSb','color tracers; [r] / ([r] + [b])','n/a (ratio)',loc_c0,loc_c0)
+       call sub_putvar3d_g('misc_rOVERrPLUSb',loc_iou,n_i,n_j,n_k,loc_ntrec, &
+            & loc_colroverrplusb(:,:,:),loc_mask)
+       call sub_adddef_netcdf(loc_iou,4,'misc_bOVERrPLUSb','color tracers; [b] / ([r] + [b])','n/a (ratio)',loc_c0,loc_c0)
+       call sub_putvar3d_g('misc_bOVERrPLUSb',loc_iou,n_i,n_j,n_k,loc_ntrec, &
+            & loc_colboverrplusb(:,:,:),loc_mask)
     endif
     !-----------------------------------------------------------------------
   END SUBROUTINE sub_save_netcdf_ocn_col_extra
