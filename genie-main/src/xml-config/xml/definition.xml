@@ -2520,6 +2520,10 @@
 			<value datatype="boolean">.false.</value>
                         <description></description>
                     </param>
+                    <param name="par_dsc">
+                        <value datatype="real">5000.0</value>
+                        <description>ocean depth scale (m)</description>
+                    </param>
                 </namelist>
             </file>
         </model>
@@ -4108,7 +4112,7 @@
                         <description>Specific CH4 oxidation rate (d-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_kAER">
-            <value datatype="real">1.57</value>
+            <value datatype="real">0.40</value>
                         <description>Aerobic methanotrophy rate constant (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_Km_O2">
@@ -4128,7 +4132,7 @@
                         <description>AER biological energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_kAOM">
-            <value datatype="real">0.022</value>
+            <value datatype="real">0.035</value>
                         <description>AOM rate constant (yr-1) (see Olson et al., 2016)</description>
                     </param>
                     <param name="par_bio_remin_AOM_Km_SO4">
@@ -6091,6 +6095,16 @@
 			<value datatype="boolean">.false.</value>
                         <description>Automatic ocean age tracer?</description>
                     </param>
+<!-- TRANSPORT MATRIX  -->
+		<param name="ctrl_data_diagnose_TM">
+			<value datatype="boolean">.false.</value>
+		</param>
+		<param name="par_data_TM_start">
+                     	<value datatype="real">0.0</value>
+		</param>
+		<param name="par_data_TM_avg_n">
+                     	<value datatype="real">1.0</value>
+		</param>    
                 </namelist>
             </file>
         </model>
@@ -6289,6 +6303,22 @@
                    <param name="par_atm_CH4_photochem">
                         <value datatype="string">default</value>
                         <description>Atmospheric photochemistry scheme</description>
+                    </param>
+                   <param name="par_pCH4_oxidation_C0">
+                        <value datatype="real">700.0E-09</value>
+                        <description>reference atmospheric pCH4 [atm]</description>
+                   </param>
+                   <param name="par_pCH4_oxidation_tau0">
+                        <value datatype="real">7.6161</value>
+                        <description>baseline atmospheric CH4 lifetime [yr]</description>
+                   </param>
+                   <param name="par_pCH4_oxidation_N">
+                        <value datatype="real">0.338</value>
+                        <description>atmospheric CH4 oxidation exponent</description>
+                   </param>
+                   <param name="par_atm_pO2_fixed">
+                        <value datatype="real">0.2095</value>
+                        <description>Atmospheric pO2 for fixed scheme</description>
                     </param>
                     <param name="par_atm_wetlands_FCH4">
 			<value datatype="real">0.0</value>
@@ -6524,6 +6554,14 @@
                     <param name="par_sed_huelse2017_P_cycle">
 			<value datatype="boolean">.false.</value>
                         <description>Include explicit P-cycle in OMEN-SED?</description>
+                    </param>
+                    <param name="par_sed_huelse2017_remove_impl_sulALK">
+			<value datatype="boolean">.true.</value>
+                        <description>Remove implicit Alk associated with buried sulf-OM?</description>
+                    </param>
+                    <param name="par_sed_huelse2017_sim_P_loss">
+			<value datatype="boolean">.false.</value>
+                        <description>Simulate ocean Porg loss with buried sulf-OM?</description>
                     </param>
                     <param name="par_sed_huelse2017_k1">
 			<value datatype="real">0.0065</value>

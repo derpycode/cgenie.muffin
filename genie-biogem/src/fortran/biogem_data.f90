@@ -456,6 +456,10 @@ CONTAINS
        print*,'Scaling C burial flux relative to emissions         : ',par_force_invert_fCorgburial
        print*,'Force explicit inversion?                           : ',ctrl_force_invert_explicit
        print*,'Automatic ocean age tracer?                         : ',ctrl_force_ocn_age
+       ! --- TRANSPORT MATRIX ------------------------------------------------------------------------------------------------------ !
+       print*,'Diagnose transport matrix during run?		: ',ctrl_data_diagnose_TM
+       print*,'Year to start diagnosing transport matrix	: ',par_data_TM_start
+       print*,'Number of intervals within a year to diagnose transport matrix		: ',par_data_TM_avg_n
        ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ########################################################################## !
        !
        ! ######################################################################################################################### !
@@ -2487,6 +2491,53 @@ CONTAINS
           ctrl_data_save_slice_carbconst = .FALSE.
        end IF
     end IF
+    
+! *** transport matrix paramater consistency checks ***
+    if(ctrl_data_diagnose_TM)THEN
+         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
+			 & '[par_data_TM_start] has been changed to allow matrix diagnosis to finish', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 par_data_TM_start=par_misc_t_runtime-n_k
+         end if
+         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).lt.0.0)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'The run is too short to diagnose a full transport matrix', &
+			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 ctrl_data_diagnose_TM=.false.
+         end if
+         if(ctrl_bio_preformed)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Diagnosing transport matrix will overwrite preformed tracers', &
+			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 ctrl_data_diagnose_TM=.false.
+         end if
+         if(conv_kocn_kbiogem.gt.1.0)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Biogem timestep ratio should not be greater than 1 for a transport matrix', &
+			 & 'STOPPING', &
+			 & (/const_real_null/),.true. &
+			 & )
+         end if
+	if((96.0/par_data_save_slice_n).ne.par_data_TM_avg_n)then 
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'The seasonal saving intervals you have chosen do not correspond to the transport matrix averaging', &
+			 & 'CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+         end if
+    end if
 
   END SUBROUTINE sub_check_par_biogem
   ! ****************************************************************************************************************************** !
