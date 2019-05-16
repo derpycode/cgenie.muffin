@@ -815,6 +815,15 @@ subroutine biogem(        &
                     END DO
                  END IF
               END DO
+              ! test for, and apply, additional salinity flux forcing
+              if (.NOT. ctrl_force_ocn_age) then
+                 IF (force_flux_ocn_select(io_S) .AND. force_flux_ocn_select(io_colb)) THEN
+                    DO k=loc_k1,n_k
+                       locijk_focn(io_S,i,j,k)    = locijk_focn(io_S,i,j,k) + locijk_focn(io_colb,i,j,k)
+                       locijk_focn(io_colb,i,j,k) = 0.0
+                    END DO
+                 end if
+              end if
               ! SEDIMENT TRACERS #1
               ! NOTE: currently, fluxes are valid at the ocean surface only
               ! NOTE: addition is made directly to particulate sedimentary tracer array (scaled by time-step and cell mass)
