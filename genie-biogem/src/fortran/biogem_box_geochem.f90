@@ -416,7 +416,7 @@ CONTAINS
     DO k=n_k,dum_k1,-1
        loc_O2 = ocn(io_O2,dum_i,dum_j,k)
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
-       if ((4.0/1.0*loc_O2 > const_real_nullsmall) .AND. (loc_Fe2 > 1e-11)) then
+       if ((4.0/1.0*loc_O2 > const_rns) .AND. (loc_Fe2 > const_rns)) then
           ! calculate H2S oxidation, and cap value at H2S concentration if necessary
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
 
@@ -442,13 +442,15 @@ CONTAINS
              loc_bio_remin(io_O2,k)  = -1.0/4.0*loc_Fe2_oxidation
              !loc_bio_remin(io_ALK,k) = -2.0*loc_Fe2_oxidation
              ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
+             loc_bio_remin(io_Fe2_56Fe,k) = -loc_r56Fe*loc_Fe2_oxidation
+             loc_bio_remin(io_Fe_56Fe,k) = loc_r56Fe*loc_Fe2_oxidation
+             
+             !loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
 
-             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
-
-             loc_bio_remin(io_Fe2_56Fe,k)  &
-                  & = -par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
-             loc_bio_remin(io_Fe_56Fe,k)  &
-                  & = par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
+             !loc_bio_remin(io_Fe2_56Fe,k)  &
+             !     & = -par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
+             !loc_bio_remin(io_Fe_56Fe,k)  &
+             !     & = par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
 
              ! ################################################################################################################### !
           end if
@@ -524,16 +526,21 @@ CONTAINS
        if (ctrl_bio_FeOOHprecip_explicit) then
           if (loc_Fe > 1.0E-09) then
              loc_bio_part(is_FeOOH,k) = loc_Fe - 1.0E-09
+             loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
+          else   
+             loc_bio_part(is_FeOOH,k) = 0.0  
+             loc_r56Fe = 0.0
           end if
        else   
           loc_bio_part(is_FeOOH,k) = 0.0  
-       end if
-       ! calculate isotopic ratio
-       if (loc_Fe > const_real_nullsmall) then
-          loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
-       else
           loc_r56Fe = 0.0
        end if
+       ! calculate isotopic ratio
+       !if (loc_Fe > 5.0e-11) then
+          
+       !else
+       !   
+       !end if
        loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
        ! Potential Fe fractionation
        loc_bio_part(is_FeOOH_56Fe,k) = &
@@ -607,7 +614,7 @@ CONTAINS
     DO k=n_k,dum_k1,-1
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        loc_Fe = ocn(io_Fe,dum_i,dum_j,k)
-       if ((8.0/1.0*loc_H2S > 1e-11) .AND. (loc_Fe > 1e-11)) then
+       if ((8.0/1.0*loc_H2S > const_rns) .AND. (loc_Fe > 1.0e-10)) then
           ! calculate H2S oxidation, and cap value at H2S concentration if necessary
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
 
@@ -647,11 +654,14 @@ CONTAINS
              loc_bio_remin(io_H2S,k)  = -1.0/8.0*loc_H2S
              loc_bio_remin(io_SO4,k)  = 1.0/8.0*loc_H2S
              loc_bio_remin(io_ALK,k) = -1.0/4.0*loc_H2S
+             
+             loc_bio_remin(io_Fe_56Fe,k) = -loc_r56Fe*loc_H2S
+             loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_H2S
+             
+             !loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
 
-             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
-
-             loc_bio_remin(io_Fe_56Fe,k) = -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
-             loc_bio_remin(io_Fe2_56Fe,k) = par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
+             !loc_bio_remin(io_Fe_56Fe,k) = -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
+             !loc_bio_remin(io_Fe2_56Fe,k) = par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
 
              ! complete H2S oxidation (no S fractionation)
              loc_bio_remin(io_H2S_34S,k) = -loc_r34S*1.0/8.0*loc_H2S
@@ -666,12 +676,15 @@ CONTAINS
              loc_bio_remin(io_SO4,k)  = 1.0/8.0*loc_Fe_reduction
              loc_bio_remin(io_ALK,k) = -1.0/4.0*loc_Fe_reduction
 
-             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_bio_remin(io_Fe_56Fe,k) = -loc_r56Fe*loc_Fe_reduction
+             loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_Fe_reduction
+             
+             !loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
 
-             loc_bio_remin(io_Fe_56Fe,k)  = &
-                  & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
-             loc_bio_remin(io_Fe2_56Fe,k) = &
-                  & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
+             !loc_bio_remin(io_Fe_56Fe,k)  = &
+             !     & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
+             !loc_bio_remin(io_Fe2_56Fe,k) = &
+             !     & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
 
              loc_R_34S = loc_r34S/(1.0 - loc_r34S) 
 
@@ -751,7 +764,7 @@ CONTAINS
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        loc_FeS = ocn(io_FeS,dum_i,dum_j,k)
        ! either Fe2 and H2S, or FeS have to be present
-       if (((loc_Fe2 > 1e-11) .AND. (loc_H2S > 1e-11)) .OR. (loc_FeS > 1e-11)) then
+       if (((loc_Fe2 > 1.0e-11) .AND. (loc_H2S > 1.0e-11)) .OR. (loc_FeS > 1.0e-11)) then
 
           ! Avoid calculating with negative concentrations
           if (loc_FeS < const_rns) then
@@ -876,7 +889,7 @@ CONTAINS
        end if
        ! calculate pyrite precipitation
        ! NOTE: const_rns == const_real_nullsmall
-       if ( (loc_FeS > 1e-11) .AND. (4.0/3.0*loc_H2S > 1e-11) .AND. (4.0/1.0*loc_SO4 > 1e-11) ) then
+       if ( (loc_FeS > const_rns) .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
           ! loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_FeS*loc_H2S
           loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(K_lim_PYR + loc_FeS))*loc_FeS*loc_H2S
           ! calculate isotopic ratio
@@ -1041,7 +1054,7 @@ CONTAINS
           end if
        end if
 
-       if ((loc_Fe2 > 1e-11) .AND. (loc_CO3 > 1e-11)) then
+       if ((loc_Fe2 > const_rns) .AND. (loc_CO3 > const_rns)) then
 
           loc_ohm  = (loc_CO3*loc_Fe2)/par_bio_FeCO3precip_abioticohm_cte
 
