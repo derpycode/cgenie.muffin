@@ -442,15 +442,15 @@ CONTAINS
              loc_bio_remin(io_O2,k)  = -1.0/4.0*loc_Fe2_oxidation
              !loc_bio_remin(io_ALK,k) = -2.0*loc_Fe2_oxidation
              ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
-             loc_bio_remin(io_Fe2_56Fe,k) = -loc_r56Fe*loc_Fe2_oxidation
-             loc_bio_remin(io_Fe_56Fe,k) = loc_r56Fe*loc_Fe2_oxidation
+             !loc_bio_remin(io_Fe2_56Fe,k) = -loc_r56Fe*loc_Fe2_oxidation
+             !loc_bio_remin(io_Fe_56Fe,k) = loc_r56Fe*loc_Fe2_oxidation
              
-             !loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
 
-             !loc_bio_remin(io_Fe2_56Fe,k)  &
-             !     & = -par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
-             !loc_bio_remin(io_Fe_56Fe,k)  &
-             !     & = par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
+             loc_bio_remin(io_Fe2_56Fe,k)  &
+                  & = -par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
+             loc_bio_remin(io_Fe_56Fe,k)  &
+                  & = par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
 
              ! ################################################################################################################### !
           end if
@@ -655,13 +655,13 @@ CONTAINS
              loc_bio_remin(io_SO4,k)  = 1.0/8.0*loc_H2S
              loc_bio_remin(io_ALK,k) = -1.0/4.0*loc_H2S
              
-             loc_bio_remin(io_Fe_56Fe,k) = -loc_r56Fe*loc_H2S
-             loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_H2S
+             !loc_bio_remin(io_Fe_56Fe,k) = -loc_r56Fe*loc_H2S
+             !loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_H2S
              
-             !loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
 
-             !loc_bio_remin(io_Fe_56Fe,k) = -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
-             !loc_bio_remin(io_Fe2_56Fe,k) = par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
+             loc_bio_remin(io_Fe_56Fe,k) = -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
+             loc_bio_remin(io_Fe2_56Fe,k) = par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_H2S
 
              ! complete H2S oxidation (no S fractionation)
              loc_bio_remin(io_H2S_34S,k) = -loc_r34S*1.0/8.0*loc_H2S
@@ -676,15 +676,15 @@ CONTAINS
              loc_bio_remin(io_SO4,k)  = 1.0/8.0*loc_Fe_reduction
              loc_bio_remin(io_ALK,k) = -1.0/4.0*loc_Fe_reduction
 
-             loc_bio_remin(io_Fe_56Fe,k) = -loc_r56Fe*loc_Fe_reduction
-             loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_Fe_reduction
+             !loc_bio_remin(io_Fe_56Fe,k) = -loc_r56Fe*loc_Fe_reduction
+             !loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_Fe_reduction
              
-             !loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
 
-             !loc_bio_remin(io_Fe_56Fe,k)  = &
-             !     & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
-             !loc_bio_remin(io_Fe2_56Fe,k) = &
-             !     & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
+             loc_bio_remin(io_Fe_56Fe,k)  = &
+                  & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
+             loc_bio_remin(io_Fe2_56Fe,k) = &
+                  & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
 
              loc_R_34S = loc_r34S/(1.0 - loc_r34S) 
 
