@@ -1306,6 +1306,9 @@ CONTAINS
     int_ocn_ben_sig(:)      = 0.0
     int_carb_sur_sig(:)     = 0.0
     int_carb_ben_sig(:)     = 0.0
+    int_misc_age_sig        = 0.0
+    int_misc_age_sur_sig    = 0.0
+    int_misc_age_ben_sig    = 0.0
     int_misc_seaice_sig     = 0.0
     int_misc_seaice_sig_th  = 0.0
     int_misc_seaice_sig_vol = 0.0
@@ -2140,11 +2143,14 @@ CONTAINS
        end if
     end if
     ! check color tracers
-    if (ocn_select(io_colr) .AND. ocn_select(io_colb)) then
-       if (ctrl_bio_preformed .AND. (.NOT. ocn_select(io_col0))) then                 
-          ctrl_force_ocn_age = .false.
-       end if
-    else
+    if (ctrl_force_ocn_age .AND. (.NOT.(ocn_select(io_colr) .AND. ocn_select(io_colb)))) then
+          CALL sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'Parameter: ctrl_force_ocn_age is selected (true), but the necessary red and blue ocean tracers are not.'// &
+               & 'The automatic age tracer option is hence deselected.', &
+               & 'CONTINUING', &
+               & (/const_real_null/),.FALSE. &
+               & )
        ctrl_force_ocn_age = .false.
     end if
 

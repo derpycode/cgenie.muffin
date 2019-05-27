@@ -349,8 +349,6 @@ CONTAINS
     case default
        ! NOTHING
     end select
-    ! preformed tracers
-    call sub_calc_bio_preformed(dum_i,dum_j)
   end SUBROUTINE sub_calc_bio
   ! ****************************************************************************************************************************** !
 
@@ -1707,16 +1705,6 @@ CONTAINS
     ! *** create pre-formed tracers ***
     ! 
     if (ctrl_bio_preformed) then
-       if (.not. ocn_select(io_col0)) then
-          if (ocn_select(io_PO4) .AND. ocn_select(io_colr)) then
-             bio_remin(io_colr,dum_i,dum_j,n_k) = loc_ocn(io_PO4) - ocn(io_colr,dum_i,dum_j,n_k)
-          end if
-          if (ocn_select(io_NO3) .AND. ocn_select(io_colb)) then
-             bio_remin(io_colb,dum_i,dum_j,n_k) = loc_ocn(io_NO3) - ocn(io_colb,dum_i,dum_j,n_k)
-          elseif (ocn_select(io_PO4) .AND. ocn_select(io_colb)) then
-             bio_remin(io_colb,dum_i,dum_j,n_k) = -ocn(io_colb,dum_i,dum_j,n_k)
-          end if
-       else
           do io=io_col0,io_col9
              if (ocn_select(io)) then
                 select case (io)
@@ -1739,7 +1727,6 @@ CONTAINS
                 end select
              end if
           end do
-       end if
     end if
 
   end SUBROUTINE sub_calc_bio_preformed

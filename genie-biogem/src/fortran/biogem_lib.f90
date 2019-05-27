@@ -1047,6 +1047,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_ocn)::int_ocn_ben_sig                         !
   REAL,DIMENSION(n_carb)::int_carb_sur_sig                       !
   REAL,DIMENSION(n_carb)::int_carb_ben_sig                       !
+  REAL::int_misc_age_sig                                         !
+  real::int_misc_age_sur_sig,int_misc_age_ben_sig                !
   REAL::int_misc_seaice_sig                                      !
   real::int_misc_seaice_sig_th,int_misc_seaice_sig_vol           !
   real::int_misc_opsi_min_sig,int_misc_opsi_max_sig              !
