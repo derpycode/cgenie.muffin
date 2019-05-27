@@ -50,6 +50,10 @@ if (ctrl_debug_init > 0) then
     print*,'maximum T used in empirical geochem calculations    : ',par_geochem_Tmax
     print*,'minimum S used in empirical geochem calculations    : ',par_geochem_Smin 
     print*,'maximum S used in empirical geochem calculations    : ',par_geochem_Smax 
+    print*,'minimum T used in empirical carbchem calculations   : ',par_carbchem_Tmin 
+    print*,'maximum T used in empirical carbchem calculations   : ',par_carbchem_Tmax
+    print*,'minimum S used in empirical carbchem calculations   : ',par_carbchem_Smin 
+    print*,'maximum S used in empirical carbchem calculations   : ',par_carbchem_Smax 
     print*,'--- MISC CONTROLS ---'
     print*,'assumed longitudinal offset of the grid             : ',par_grid_lon_offset
     print*,'Debug (initialization) level                        : ',ctrl_debug_init
