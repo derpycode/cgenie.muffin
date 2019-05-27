@@ -9,6 +9,7 @@ MODULE biogem_box
 
 
   use gem_carbchem
+  use gem_geochem
   USE biogem_lib
   IMPLICIT NONE
   SAVE
@@ -91,10 +92,14 @@ CONTAINS
     ! set local variables
     ! temperature powers
     ! NOTE: temeprature must be converted to the correct units (degrees C)
-    ! NOTE: valid temperature range is 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]
-    loc_TC  = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
-    if (loc_TC <  0.0) loc_TC =  0.0
-    if (loc_TC > 30.0) loc_TC = 30.0
+    ! NOTE: original valid temperature range was 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]
+    if (ocn(io_T,dum_i,dum_j,n_k) <  (const_zeroC +  par_geochem_Tmin))  then
+       loc_TC = par_geochem_Tmin
+    elseif (ocn(io_T,dum_i,dum_j,n_k) > (const_zeroC + par_geochem_Tmax)) then
+       loc_TC = par_geochem_Tmax
+    else
+       loc_TC = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
+    endif
     loc_TC2 = loc_TC*loc_TC
     loc_TC3 = loc_TC2*loc_TC
     ! wind speed^2
