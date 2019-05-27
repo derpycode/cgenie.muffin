@@ -24,7 +24,7 @@ subroutine ecogem(          &
   ! ------------------------------------------------------------ !
   REAL   ,INTENT(IN)                                     :: dum_dts             ! biogem time-step length (seconds)
   integer(kind=8),intent(in)                             :: dum_genie_clock     ! genie clock (ms since start) NOTE: 8-byte integer
-  real   ,intent(in) ,dimension(n_i,n_j)                 :: dum_egbg_fxsw       ! 
+  real   ,intent(in) ,dimension(n_i,n_j)                 :: dum_egbg_fxsw       !
   real   ,intent(in) ,dimension(n_i,n_j)                 :: dum_mld             ! mixed layer depth
   real   ,intent(in) ,dimension(n_ocn ,n_i,n_j,n_k)      :: dum_egbg_sfcocn     ! ecology-interface ocean tracer composition; ocn grid
   real   ,intent(out),dimension(n_sed ,n_i,n_j,n_k)      :: dum_egbg_sfcpart    ! ocean -> ecology flux; ocn grid
@@ -65,9 +65,9 @@ subroutine ecogem(          &
   REAL,DIMENSION(iimax)                    ::loc_nuts
   REAL,DIMENSION(iomaxiso,npmax)           ::loc_bioiso !ckc isotopes
   REAL,DIMENSION(iimaxiso)                 ::loc_nutiso !ckc isotopes
-  REAL,DIMENSION(iomax,npmax)              ::ratiobGraz, biobGraz !ckc for isotopes
-  REAL,DIMENSION(iomax,komax)              ::ratioGraz, orgbGraz  !ckc for isotope grazing calculations
-  REAL,DIMENSION(n_i,n_j,n_k)              ::POC_Rfrac, CaCO3_Rfrac  !ckc local Corg d13C dependent on local water iso 
+  REAL,DIMENSION(iomax+iChl,npmax)              ::ratiobGraz, biobGraz !ckc for isotopes (jdw: added iChl)
+  REAL,DIMENSION(iomax+iChl,komax)              ::ratioGraz, orgbGraz  !ckc for isotope grazing calculations  (jdw: added iChl)
+  REAL,DIMENSION(n_i,n_j,n_k)              ::POC_Rfrac, CaCO3_Rfrac  !ckc local Corg d13C dependent on local water iso
   REAL                                     ::Corg_frac
   REAL                                     ::PDBstnd !ckc VPDB d13C standard
   REAL,DIMENSION(n_i,n_j,n_k)              ::frac_ratio !for iCarb multiplier
@@ -87,9 +87,9 @@ subroutine ecogem(          &
   REAL,DIMENSION(npmax)                    ::BioC,PP
   REAL,DIMENSION(iomax+iChl,npmax)         ::GrazPredEat,GrazPreyEaten
   REAL,DIMENSION(npmax)                    ::BioCiso
-  
+
   real		   		     ::loc_total_weights ! JDW total weights
-  real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size 
+  real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
   REAL                                     ::loc_rdts,loc_rdtyr            ! time reciprocals
@@ -102,10 +102,10 @@ subroutine ecogem(          &
   loc_ocn(:,:,:,:) = dum_egbg_sfcocn(:,:,:,:)
 
   ! JDW Overwrite surface temperature with input
-  if(ctrl_force_T)then 
+  if(ctrl_force_T)then
 	loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface layer?
-  end if	
-  
+  end if
+
   ! zero output arrays
   dum_egbg_sfcpart = 0.0
   dum_egbg_sfcdiss = 0.0
@@ -227,7 +227,7 @@ subroutine ecogem(          &
               IF (ocn_select(io_DIC_13C)) then
                  call sub_calc_carb_r13C(              &
                       & loc_ocn(io_T       ,i,j,k),      &
-                      & loc_ocn(io_DIC     ,i,j,k),      & 
+                      & loc_ocn(io_DIC     ,i,j,k),      &
                       & loc_ocn(io_DIC_13C ,i,j,k),   &
                       & eco_carb(         :,i,j,k),     &
                       & eco_carbisor(     :,i,j,k)  &
@@ -252,7 +252,7 @@ subroutine ecogem(          &
               imld   = n_k
               do k=n_k,kbase,-1 ! counting backwards, from surface to base of productive layer
                  ! (only doing ecosystem calculations in upper n_keco grid layers)
-                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
+                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
                  layerthick = loc_grid_dz(k) * goldstein_dsc ! layer thickness
                  layermid   = topD + layerthick / 2.0
@@ -284,13 +284,13 @@ subroutine ecogem(          &
                     !BioCiso(:) = loc_biomass(iCarb,:) * 0.0109 !force for testing
                  end if
 
-                 ! LIGHT ATTENUATION     
+                 ! LIGHT ATTENUATION
                  if (n_keco.eq.1) then ! Calculate light as mean across (virtual) ML
                     ! [AR] restrict MLD to (top) layer thickness
                     if (ctrl_restrict_mld) then
                        if (topD > mld) mld = topD
                     end if
-                    totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 
+                    totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation
                     totchl    = totchl * layerthick / mld ! recalculate chl concentration as if spread evenly across ML
                     k_tot     = (k_w + k_chl*totchl) ! attenuation due to water and pigment
                     if (fundamental) k_tot = k_w ! no self-shading (i.e. no competition for light) in fundamental niche experiment
@@ -298,7 +298,7 @@ subroutine ecogem(          &
                     ! [AR] this ... doesn't 'do' anything? k_tot*(1-exp(-k_tot*mld)) is never 0.0 or less(?)
                     PAR_layer = MERGE(PAR_layer,0.0,k_tot*(1-exp(-k_tot*mld)).gt.0.0)
                  else ! Calculate mean light within each layer
-                    totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation 
+                    totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation
                     k_tot     = (k_w + k_chl*totchl) ! attenuation due to water and pigment
                     PAR_layer = PAR_in /layerthick /k_tot*(1-exp(-k_tot*layerthick)) ! average PAR in  layer
                     PAR_layer = MERGE(PAR_layer,0.0,k_tot*(1-exp(-k_tot*layerthick)).gt.0.0)
@@ -312,10 +312,10 @@ subroutine ecogem(          &
                  qreg_h(:,:) = 0.0 ! (iomax,npmax)
                  quota(:,:) = 0.0 ! (iomax,npmax)
                  VLlimit(:) = 0.0 ! (npmax)
-                 gamma_T = 0.0 ! 
+                 gamma_T = 0.0 !
                  PP(:) = 0.0 ! (npmax)
                  chlsynth(:) = 0.0 ! (npmax)
-                 totPP = 0.0 ! 
+                 totPP = 0.0 !
 
                  !ckc isotopes
                  up_inorgiso(:,:) = 0.0 ! (iomaxiso,npmax)
@@ -336,7 +336,7 @@ subroutine ecogem(          &
                  call grazing(loc_biomass,gamma_T,GrazMat(:,:,:))
 
                  !ckc isotopes uptake, from nutrient uptake, nutrient concentration and fractionation
-                 if (c13trace) then 
+                 if (c13trace) then
                     call nut_fractionation(up_inorg(:,:),loc_nuts,loc_nutiso,diameter,up_inorgiso(:,:)) !need isotope ratio fractionation
                  endif
                  !call exudation
@@ -357,8 +357,8 @@ subroutine ecogem(          &
 
                  ! calculate assimilation efficiency based on quota status
                  do io=1,iomax+iChl
-                    ! Integrate grazing interactions 
-                    GrazPredEat(io,:)   = 0.0 ! Total prey biomass killed (pre-assimilation), summed by predator and by prey 
+                    ! Integrate grazing interactions
+                    GrazPredEat(io,:)   = 0.0 ! Total prey biomass killed (pre-assimilation), summed by predator and by prey
                     GrazPreyEaten(io,:) = 0.0
                     do jpred=1,npmax
                        do jprey=1,npmax
@@ -390,7 +390,7 @@ subroutine ecogem(          &
                  ! uptake by phytoplankton
                  do ii=1,iimax
                     dnutrientdt(ii) = dnutrientdt(ii) - sum(BioC(:) * up_inorg(ii,:)) ! - uptake of inorganic nutrient
-                 enddo ! ii            
+                 enddo ! ii
                  !ckc if tracing c13 through food web
                  if (c13trace) then
                     do ii=1,iimaxiso
@@ -415,7 +415,7 @@ subroutine ecogem(          &
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  ratiobGraz(:,:) = 0.0       !ckc initialise grazing ratio
                  !ratioEaten(:,:) = 0.0     !ckc initialise grazing ratio
-                 biobGraz(:,:) = 0.0       
+                 biobGraz(:,:) = 0.0
                  !biobEaten(:,:) = 0.0
 
                  ! INORGANIC RESOURCE UPTAKE
@@ -465,7 +465,7 @@ subroutine ecogem(          &
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  ! ORGANIC MATTER
                  dorgmatdt(:,:) = 0.0 ! initialise
-                 dorgmatisodt(:,:) = 0.0 
+                 dorgmatisodt(:,:) = 0.0
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  orgbGraz(:,:) = 0.0
 
@@ -484,28 +484,28 @@ subroutine ecogem(          &
                  enddo
                  ! no organic matter production in fundamental niche experiment
                  if (fundamental) dorgmatdt(:,:) = 0.0
-                 
+
                  ! ******* JDW size-dependent remineralisation *******
 		 ! calculate weighted mean size for size-dependent remineralisation scheme
 		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
                  if (sed_select(is_POC_size)) then
-		 
+
                  	loc_weighted_mean_size=0.0
                  	loc_total_weights=0.0
-                 
+
                  	do jp=1,npmax
 				if(autotrophy(jp).gt.0.0)then
-				
+
 				! Biomass weighted
 				loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(jp) ! sum of weights * size
 				loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
-				
-				! POC weighted 
-                 		!loc_weighted_mean_size=loc_weighted_mean_size+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp)))*logesd(jp) ! sum of weights * size            	
+
+				! POC weighted
+                 		!loc_weighted_mean_size=loc_weighted_mean_size+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp)))*logesd(jp) ! sum of weights * size
                  		!loc_total_weights=loc_total_weights+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp))) ! sum of weights
 				endIF
 			enddo
-                 	
+
                  	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
                  endif
                  ! ***************************************************
@@ -569,14 +569,14 @@ subroutine ecogem(          &
                  !ckc ISOTOPES POC as Biogem
                  if (.NOT.c13trace) then
                     !ckc c13 only for DOC and POC, not during uptake (as Biogem)
-                    dorgmatisodt(iCarb13C,:)  = 0.0 
+                    dorgmatisodt(iCarb13C,:)  = 0.0
                     dnutisodt(iCarb13C) = 0.0
                     ! POC_Rfrac is big R
                     POC_Rfrac(i,j,k) = fun_Corg_Rfrac(loc_ocn(io_T,i,j,k),eco_carb(ic_conc_CO2,i,j,k),&
-                         & eco_carbisor(ici_CO2_r13C,i,j,k),par_d13C_DIC_Corg_ef,.false.) 
-                    ! apply to carbon fluxes    
-                    dorgmatisodt(iCarb13C,:)  = dorgmatdt(iCarb,:) * POC_Rfrac(i,j,k) 
-                    dnutisodt(iCarb13C)       = - sum(dorgmatisodt(iCarb13C,:)) 
+                         & eco_carbisor(ici_CO2_r13C,i,j,k),par_d13C_DIC_Corg_ef,.false.)
+                    ! apply to carbon fluxes
+                    dorgmatisodt(iCarb13C,:)  = dorgmatdt(iCarb,:) * POC_Rfrac(i,j,k)
+                    dnutisodt(iCarb13C)       = - sum(dorgmatisodt(iCarb13C,:))
                     !dnutisodt(iCarb13C)       = - sum(dorgmatisodt(iCarb13C,:) - dorgmatisodt(iCarb13C,1))
                     nutiso_flux(:,i,j,k)      = nutiso_flux(:,i,j,k)      + dnutisodt(:)      * dum_dts/real(nsubtime) !ckc
                     orgmatiso_flux(:,:,i,j,k) = orgmatiso_flux(:,:,i,j,k) + dorgmatisodt(:,:) * dum_dts/real(nsubtime)
@@ -651,7 +651,7 @@ subroutine ecogem(          &
   if (fquota)  dum_egbg_sfcdiss(io_DOM_Fe,:,:,:) = orgmat_flux(iIron,1,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   !ckc Isotopes dissolved
   dum_egbg_sfcdiss(io_DOM_C_13C,:,:,:) = orgmatiso_flux(iCarb13C,1,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
-  !  if (squota) 
+  !  if (squota)
   ! Particulate
   dum_egbg_sfcpart(is_POC   ,:,:,:) = orgmat_flux(iCarb,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   if (nquota)  dum_egbg_sfcpart(is_PON   ,:,:,:) = orgmat_flux(iNitr,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
@@ -692,7 +692,7 @@ subroutine ecogem(          &
      dum_egbg_sfcdiss(io_DIC_13C  ,:,:,:) = dum_egbg_sfcdiss(io_DIC_13C,:,:,:) - 1.0 * dum_egbg_sfcpart(is_CaCO3_13C,:,:,:)
   endif
 
-  ! set initial values for protected fraction of POM and CaCO3 
+  ! set initial values for protected fraction of POM and CaCO3
   dum_egbg_sfcpart(is_POC_frac2  ,:,:,n_k) = par_bio_remin_POC_frac2
   dum_egbg_sfcpart(is_CaCO3_frac2,:,:,n_k) = par_bio_remin_CaCO3_frac2
 
@@ -738,7 +738,7 @@ SUBROUTINE diag_ecogem_timeslice( &
   logical,intent(in)                               ::dum_genie_intslice  ! BIOGEM currently saving time slice data
   logical,intent(in)                               ::dum_endseries       ! BIOGEM currently writing time series data
   logical,intent(in)                               ::dum_endslice        ! BIOGEM currently writing time slice data
-  real   ,intent(in) ,dimension(n_i,n_j)           ::dum_egbg_fxsw       ! 
+  real   ,intent(in) ,dimension(n_i,n_j)           ::dum_egbg_fxsw       !
   real   ,intent(in) ,dimension(n_i,n_j)           ::dum_mld             ! mixed layer depth
   real   ,intent(in) ,dimension(n_ocn ,n_i,n_j,n_k)::dum_egbg_sfcocn     ! ecology-interface ocean tracer composition; ocn grid
   real   ,intent(out),dimension(n_sed ,n_i,n_j,n_k)::dum_egbg_sfcpart    ! ocean -> ecology flux; ocn grid
@@ -802,7 +802,7 @@ SUBROUTINE diag_ecogem_timeslice( &
 
      ! Write timeseries data for each specified site for timeslice years
      if (n_tser.gt.0) then
-        do k=1,n_tser    
+        do k=1,n_tser
            call sub_update_netcdf_tser(k)
            call sub_save_netcdf_tseries(k)
            ncout1d_ntrec(k) = ncout1d_ntrec(k) + 1
@@ -810,7 +810,7 @@ SUBROUTINE diag_ecogem_timeslice( &
         enddo
      endif
 
-     ! Write 2d array output for timeslice years 
+     ! Write 2d array output for timeslice years
      call sub_update_netcdf(loc_yr_save,2)
      call sub_save_netcdf_2d()
      ncout2d_ntrec = ncout2d_ntrec + 1
@@ -842,8 +842,8 @@ SUBROUTINE ecogem_save_rst(dum_genie_clock)
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
   integer::l
-  integer::loc_iou 
-  real::loc_yr                                                 ! 
+  integer::loc_iou
+  real::loc_yr                                                 !
   CHARACTER(len=255)::loc_filename
   ! ---------------------------------------------------------- ! calculate local time (years)
   loc_yr = real(dum_genie_clock)/(48.0*1000.0*conv_yr_s)
