@@ -1214,11 +1214,7 @@
                             <description></description>
                         </param>
                   </paramArray>
-<!-- MISC CONTROLS  -->
-                    <param name="par_grid_lon_offset">
-                        <value datatype="real">-260.0</value>
-                        <description>assumed longitudinal offset of the grid</description>
-                    </param>
+<!-- GEOCHEM CONTROLS  -->
                     <param name="par_carbconstset_name">
                         <value datatype="string">Mehrbach</value>
                         <description>carbonate dissociation constants set</description>
@@ -1234,6 +1230,43 @@
                     <param name="ctrl_carbchem_fail">
                         <value datatype="boolean">.true.</value>
                         <description>exit upon pH solution failure?</description>
+                    </param>
+                    <param name="par_geochem_Tmin">
+                        <value datatype="real">0.0</value>
+                        <description>minimum T used in empirical geochem calculations [default: 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]]</description>
+                    </param>
+                    <param name="par_geochem_Tmax">
+                        <value datatype="real">30.0</value>
+                        <description>maximum T used in empirical geochem calculations [default: 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]]</description>
+                    </param>
+                    <param name="par_geochem_Smin">
+                        <value datatype="real">26.0</value>
+                        <description>minimum S used in empirical geochem calculations [not (yet) used -- set as per par_carbchem_Smin]</description>
+                    </param>
+                    <param name="par_geochem_Smax">
+                        <value datatype="real">43.0</value>
+                        <description>maximum S used in empirical geochem calculations [not (yet) used -- set as per par_carbchem_Smax]</description>
+                    </param>
+                    <param name="par_carbchem_Tmin">
+                        <value datatype="real">2.0</value>
+                        <description>minimum T used in empirical carbchem calculations [default from Mehrbach: 2.0 lte T lte 35 C]</description>
+                    </param>
+                    <param name="par_carbchem_Tmax">
+                        <value datatype="real">35.0</value>
+                        <description>maximum T used in empirical carbchem calculations [default from Mehrbach: 2.0 lte T lte 35 C]</description>
+                    </param>
+                    <param name="par_carbchem_Smin">
+                        <value datatype="real">26.0</value>
+                        <description>minimum S used in empirical carbchem calculations [default from Mehrbach: 26.0 lte S lte 43 PSU]</description>
+                    </param>
+                    <param name="par_carbchem_Smax">
+                        <value datatype="real">43.0</value>
+                        <description>maximum S used in empirical carbchem calculations [default from Mehrbach: 26.0 lte S lte 43 PSU]</description>
+                    </param>
+<!-- MISC CONTROLS  -->
+                    <param name="par_grid_lon_offset">
+                        <value datatype="real">-260.0</value>
+                        <description>assumed longitudinal offset of the grid</description>
                     </param>
                     <param name="ctrl_debug_init">
                         <value datatype="integer">0</value>
