@@ -1447,6 +1447,12 @@ subroutine biogem(        &
               ! *** SURFACE OCEAN BIOLOGICAL PRODUCTIVITY ***
               call sub_calc_bio(i,j,loc_k1,loc_dtyr)
 
+
+              IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
+                   & '*** SET PREFORMED TRACERS ***'
+              ! *** SET PREFORMED TRACERS ***
+              call sub_calc_bio_preformed(i,j)
+
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN ABIOTIC PRECIPITATION ***'
               ! *** OCEAN ABIOTIC PRECIPITATION ***
@@ -1823,7 +1829,7 @@ end if ! end of store/write call
   ! shut down the simulation
   print*, '*** <<< MATRIX DIAGNOSED.....'
   print*, '*** <<< MATRIX INDEX WRITTEN TO FILE'
-  ctrl_data_diagnose_TM=.false. 	! stop matrix being diagnosed
+  ctrl_data_diagnose_TM=.false. ! stop matrix being diagnosed
   !stop
   end if
   
@@ -1996,7 +2002,7 @@ end do
 
 
 if(matrix_go.eq.0)then
-matrix_go=1		! flag for starting out of sync matrix loops
+matrix_go=1 ! flag for starting out of sync matrix loops
 end if
 
 end if ! par_data_TM_start
@@ -3162,7 +3168,7 @@ SUBROUTINE diag_biogem_timeseries( &
   logical,INTENT(IN)::dum_forcesave                              ! force data saving?
   logical,intent(in)::dum_gemlite                                ! in GEMlite phase of cycle?
   ! local variables
-  INTEGER::i,j,l,io,ia,is,ic
+  INTEGER::i,j,k,l,io,ia,is,ic
   integer::ib,id,i2D                                             ! counting variables
   integer::loc_k1                                                !
   real::loc_t,loc_dts,loc_dtyr                                   !
@@ -3226,8 +3232,8 @@ SUBROUTINE diag_biogem_timeseries( &
            else
               loc_ocnatm_rtot_A = 0.0
            end if
-           ! total ocean surface area (ice-free)
-           loc_ocn_tot_A = sum((1.0 - phys_ocnatm(ipoa_seaice,:,:))*phys_ocn(ipo_A,:,:,n_k))
+           ! total ocean surface area
+           loc_ocn_tot_A = sum(phys_ocn(ipo_A,:,:,n_k))
            if (loc_ocn_tot_A > const_real_nullsmall) then
               loc_ocn_rtot_A = 1.0/loc_ocn_tot_A
            else
@@ -3301,6 +3307,21 @@ SUBROUTINE diag_biogem_timeseries( &
                  int_ocn_sig(io) = int_ocn_sig(io) + &
                       & loc_dtyr*SUM(phys_ocn(ipo_M,:,:,:)*ocn(io,:,:,:))*loc_ocn_rtot_M
               END DO
+              IF (ctrl_force_ocn_age) THEN
+                 DO i=1,n_i
+                    DO j=1,n_j
+                       loc_k1 = goldstein_k1(i,j)
+                       IF (n_k >= loc_k1) THEN
+                          DO k=loc_k1,n_k
+                             if (ocn(io_colr,i,j,k) > const_real_nullsmall) then
+                                int_misc_age_sig = int_misc_age_sig + &
+                                     & loc_dtyr*phys_ocn(ipo_M,i,j,k)*ocn(io_colb,i,j,k)/ocn(io_colr,i,j,k)*loc_ocn_rtot_M
+                             end if
+                          end DO
+                       end IF
+                    end DO
+                 end DO
+              END if
            end if
            IF (ctrl_data_save_sig_ocnatm) THEN
               DO l=1,n_l_atm
@@ -3342,21 +3363,47 @@ SUBROUTINE diag_biogem_timeseries( &
               DO l=1,n_l_ocn
                  io = conv_iselected_io(l)
                  int_ocn_sur_sig(io) = int_ocn_sur_sig(io) + loc_dtyr*&
-                      & SUM((1.0 - phys_ocnatm(ipoa_seaice,:,:))*phys_ocn(ipo_A,:,:,n_k)*ocn(io,:,:,n_k))*loc_ocn_rtot_A
+                      & SUM(phys_ocn(ipo_A,:,:,n_k)*ocn(io,:,:,n_k))*loc_ocn_rtot_A
               END DO
+              IF (ctrl_force_ocn_age) THEN
+                 DO i=1,n_i
+                    DO j=1,n_j
+                       loc_k1 = goldstein_k1(i,j)
+                       IF (n_k >= loc_k1) THEN
+                          if (ocn(io_colr,i,j,n_k) > const_real_nullsmall) then
+                             int_misc_age_sur_sig = int_misc_age_sur_sig + loc_dtyr*loc_ocn_rtot_A*&
+                                  & phys_ocn(ipo_A,i,j,n_k)*ocn(io_colb,i,j,n_k)/ocn(io_colr,i,j,n_k)
+                          end if
+                       end IF
+                    end DO
+                 end DO
+              END if
            end if
            IF (ctrl_data_save_sig_carb_sur) THEN
               DO ic=1,n_carb
                  int_carb_sur_sig(ic) = int_carb_sur_sig(ic) + loc_dtyr*&
-                      & SUM((1.0 - phys_ocnatm(ipoa_seaice,:,:))*phys_ocn(ipo_A,:,:,n_k)*carb(ic,:,:,n_k))*loc_ocn_rtot_A
+                      & SUM(phys_ocn(ipo_A,:,:,n_k)*carb(ic,:,:,n_k))*loc_ocn_rtot_A
               END DO
            end if
            IF (ctrl_data_save_sig_ocn_sur) THEN
               DO l=1,n_l_ocn
                  io = conv_iselected_io(l)
-                 int_ocn_ben_sig(io) = int_ocn_ben_sig(io) + loc_dtyr*&
-                      & SUM(locij_mask_ben(:,:)*phys_ocn(ipo_A,:,:,n_k)*locij_ocn_ben(io,:,:))*loc_ocnsed_rtot_A_ben
+                 int_ocn_ben_sig(io) = int_ocn_ben_sig(io) + loc_dtyr*loc_ocnsed_rtot_A_ben*&
+                      & SUM(locij_mask_ben(:,:)*phys_ocn(ipo_A,:,:,n_k)*locij_ocn_ben(io,:,:))
               END DO
+              IF (ctrl_force_ocn_age) THEN
+                 DO i=1,n_i
+                    DO j=1,n_j
+                       loc_k1 = goldstein_k1(i,j)
+                       IF (n_k >= loc_k1) THEN
+                          if (locij_ocn_ben(io_colr,i,j) > const_real_nullsmall) then
+                             int_misc_age_ben_sig = int_misc_age_ben_sig + loc_dtyr*loc_ocnsed_rtot_A_ben*locij_mask_ben(i,j)*&
+                                  & phys_ocn(ipo_A,i,j,n_k)*locij_ocn_ben(io_colb,i,j)/locij_ocn_ben(io_colr,i,j)
+                          end if
+                       end IF
+                    end DO
+                 end DO
+              END if
            end if
            IF (ctrl_data_save_sig_misc) THEN
               ! record GEMlite phase
@@ -3569,12 +3616,17 @@ SUBROUTINE diag_biogem_timeseries( &
                 & loc_yr_save
            ! check that there is no chance of dividing-by-zero ...
            IF (int_t_sig > const_real_nullsmall) then
+              IF (ctrl_misc_t_BP) THEN
+                 loc_yr = loc_t + par_misc_t_end
+              ELSE
+                 loc_yr = par_misc_t_end - loc_t
+              END IF
               ! ### OPTIONAL CODE ################################################################################################ !
               ! NOTE: netCDF time-series saving is disabled by default, partly because updating has lagged behind the ASCII version
               !       (and partly because personally, I never used the data files ...)
               ! ################################################################################################################## !
               IF (ctrl_data_save_sig_ascii) then
-                 CALL sub_data_save_runtime(loc_yr_save)
+                 CALL sub_data_save_runtime(loc_yr_save,loc_t)
               else
                  CALL sub_save_netcdf_runtime(loc_yr_save)
               end IF
@@ -3586,16 +3638,11 @@ SUBROUTINE diag_biogem_timeseries( &
                  call sub_closefile(ncout3dsig_iou)
               end if
               if (.NOT. ctrl_debug_lvl0) then
-                 IF (ctrl_misc_t_BP) THEN
-                    loc_yr = loc_t + par_misc_t_end
-                 ELSE
-                    loc_yr = par_misc_t_end - loc_t
-                 END IF
                  loc_opsi_scale = goldstein_dsc*goldstein_usc*const_rEarth*1.0E-6
                  CALL sub_calc_psi( &
                       & phys_ocn(ipo_gu:ipo_gw,:,:,:),loc_opsi,loc_opsia,loc_opsip,loc_zpsi,loc_opsia_minmax,loc_opsip_minmax &
                       & )
-                 call sub_echo_runtime(loc_yr ,loc_opsi_scale,loc_opsia_minmax,dum_sfcatm1(:,:,:),dum_gemlite)
+                 call sub_echo_runtime(loc_yr,loc_opsi_scale,loc_opsia_minmax,dum_sfcatm1(:,:,:),dum_gemlite)
               endif
            end if
 
