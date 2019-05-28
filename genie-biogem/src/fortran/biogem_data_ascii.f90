@@ -2301,7 +2301,7 @@ CONTAINS
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
-          WRITE(unit=out,fmt='(f12.3,3f12.6)',iostat=ios) &
+          WRITE(unit=out,fmt='(f12.3,3f12.3)',iostat=ios) &
                & loc_t,                                  &
                & loc_sig,                                &
                & loc_sig_sur,                            &
@@ -2313,7 +2313,7 @@ CONTAINS
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
-          WRITE(unit=out,fmt='(f12.3,f12.6)',iostat=ios) &
+          WRITE(unit=out,fmt='(f12.3,f12.3)',iostat=ios) &
                & loc_t,                                 &
                & loc_sig
           call check_iostat(ios,__LINE__,__FILE__)
