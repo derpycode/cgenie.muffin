@@ -6476,6 +6476,15 @@
 			<value datatype="integer">1</value>
                         <description># sedimentary stack sub-layers to drop off bottom</description>
                     </param>
+<!-- DETRITAL CONFIGURATION  -->
+                    <param name="par_sed_fdet">
+			<value datatype="real">0.150</value>
+                        <description>prescribed (additional) flux of detrital material to the seds (g cm-2 kyr-1)</description>
+                    </param>
+                    <param name="ctrl_sed_det_NOdust">
+			<value datatype="boolean">.false.</value>
+                        <description>No pelagic (dust) detrital contribution?</description>
+                    </param>
 <!-- DIAGENESIS SCHEME: SELECTION  -->
                     <param name="par_sed_diagen_CaCO3opt">
 			<value datatype="string">archer1991explicit</value>
@@ -6509,10 +6518,6 @@
                     <param name="par_sed_mix_k_sur_min">
 			<value datatype="real">0.0001</value>
                         <description>maximum surface bioturbation mixing rate (cm2 yr-1)</description>
-                    </param>
-                    <param name="par_sed_fdet">
-			<value datatype="real">0.150</value>
-                        <description>prescribed (additional) flux of detrital material to the seds (g cm-2 kyr-1)</description>
                     </param>
                     <param name="ctrl_sed_noerosion">
 			<value datatype="boolean">.false.</value>

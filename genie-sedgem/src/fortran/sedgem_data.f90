@@ -70,6 +70,9 @@ CONTAINS
        print*,'# sedimentary stack sub-layers                      : ',n_sed_tot
        print*,'# initial sedimentary stack sub-layers filled       : ',n_sed_tot_init
        print*,'# sedimentary stack sub-layers to drop off bottom   : ',n_sed_tot_drop
+       ! --- DETRITAL CONFIGURATION ---------------------------------------------------------------------------------------------- !
+       print*,'Flux of refractory material (g cm-2 kyr-1)          : ',par_sed_fdet
+       print*,'No pelagic (dust) detrital contribution?            : ',ctrl_sed_det_NOdust
        ! --- DIAGENESIS SCHEME: SELECTION ---------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: SELECTION -------------------'
        print*,'CaCO3 diagenesis scheme                             : ',par_sed_diagen_CaCO3opt
@@ -82,7 +85,6 @@ CONTAINS
        print*,'maximum layer depth for bioturbation                : ',par_n_sed_mix
        print*,'Max surface bioturbation mixing rate (cm2 yr-1)     : ',par_sed_mix_k_sur_max
        print*,'Min surface bioturbation mixing rate (cm2 yr-1)     : ',par_sed_mix_k_sur_min
-       print*,'Flux of refractory material (g cm-2 kyr-1)          : ',par_sed_fdet
        print*,'Prevent CaCO3 erosion (Fdis > Fsed)?                : ',ctrl_sed_noerosion
        print*,'CaCO3 interface dissolution?                        : ',ctrl_sed_interface
        print*,'CaCO3 red tracer tag fraction                       : ',par_sed_CaCO3_fred
