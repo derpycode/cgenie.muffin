@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2
+END
+biogem_force_restore_atm_pCO2_sig.dat
+K 25
+svn:wc:ra_dav:version-url
+V 143
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2/biogem_force_restore_atm_pCO2_sig.dat
+END
+configure_forcings_ocn.dat
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2/configure_forcings_ocn.dat
+END
+configure_forcings_atm.dat
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2/configure_forcings_atm.dat
+END
+biogem_force_flux_sed_det_SUR.dat
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2/biogem_force_flux_sed_det_SUR.dat
+END
+biogem_force_restore_atm_pCO2_13C_sig.dat
+K 25
+svn:wc:ra_dav:version-url
+V 147
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2/biogem_force_restore_atm_pCO2_13C_sig.dat
+END
+configure_forcings_sed.dat
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2/configure_forcings_sed.dat
+END
+biogem_force_flux_sed_det_sig.dat
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/subversion/genie/!svn/ver/8274/branches/cgenie.muffin/genie-forcings/worjh2.FeMahowald2006_RpCO2_Rp13CO2/biogem_force_flux_sed_det_sig.dat
+END

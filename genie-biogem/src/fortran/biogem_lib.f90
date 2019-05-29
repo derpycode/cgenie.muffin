@@ -154,6 +154,10 @@ MODULE biogem_lib
   real::par_bio_red_POP_PO2                                             ! O2/P organic matter pseudo-Redfield ratio
   real::par_bio_red_PON_ALK                                             ! ALK/N alkalinty correction factor
   NAMELIST /ini_biogem_nml/par_bio_red_POP_PON,par_bio_red_POP_POC,par_bio_red_POP_PO2,par_bio_red_PON_ALK
+  integer::par_bio_red_PC_flex                                          ! C/P organic matter flexible stoichiometry activation
+  real::par_bio_red_PC_alpha1                                           ! scaling of C/P flexible stoichiometry
+  real::par_bio_red_PC_alpha2                                           ! offset of C/P flexible stoichiometry
+  NAMELIST /ini_biogem_nml/par_bio_red_PC_flex,par_bio_red_PC_alpha1,par_bio_red_PC_alpha2
   real::par_bio_red_DOMfrac                                             ! production fraction of dissolved organic matter
   NAMELIST /ini_biogem_nml/par_bio_red_DOMfrac
   real::par_bio_red_RDOMfrac                                            ! production fraction of R-dissolved organic matter
