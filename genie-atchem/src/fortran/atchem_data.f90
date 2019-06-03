@@ -58,6 +58,7 @@ CONTAINS
        print*,'Baseline atmospheric pCH4                           : ',par_pCH4_oxidation_C0
        print*,'Baseline CH4 lifetime                               : ',par_pCH4_oxidation_tau0
        print*,'Exponent for CH4 lifetime                           : ',par_pCH4_oxidation_N
+       print*,'Atmospheric pO2 for fixed scheme                    : ',par_atm_pO2_fixed
        ! --- EMISSIONS-TO-ATMOSPHERE --------------------------------------------------------------------------------------------- !
        print*,'--- EMISSIONS-TO-ATMOSPHERE ------------------------'
        print*,'Wetlands CH4 flux (mol yr-1)                        : ',par_atm_wetlands_FCH4

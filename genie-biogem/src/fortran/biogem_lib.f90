@@ -154,6 +154,10 @@ MODULE biogem_lib
   real::par_bio_red_POP_PO2                                             ! O2/P organic matter pseudo-Redfield ratio
   real::par_bio_red_PON_ALK                                             ! ALK/N alkalinty correction factor
   NAMELIST /ini_biogem_nml/par_bio_red_POP_PON,par_bio_red_POP_POC,par_bio_red_POP_PO2,par_bio_red_PON_ALK
+  integer::par_bio_red_PC_flex                                          ! C/P organic matter flexible stoichiometry activation
+  real::par_bio_red_PC_alpha1                                           ! scaling of C/P flexible stoichiometry
+  real::par_bio_red_PC_alpha2                                           ! offset of C/P flexible stoichiometry
+  NAMELIST /ini_biogem_nml/par_bio_red_PC_flex,par_bio_red_PC_alpha1,par_bio_red_PC_alpha2
   real::par_bio_red_DOMfrac                                             ! production fraction of dissolved organic matter
   NAMELIST /ini_biogem_nml/par_bio_red_DOMfrac
   real::par_bio_red_RDOMfrac                                            ! production fraction of R-dissolved organic matter
@@ -617,6 +621,12 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_invert_explicit
   logical::ctrl_force_ocn_age                                   ! automatic ocean age tracer
   NAMELIST /ini_biogem_nml/ctrl_force_ocn_age
+  ! ---------------- TRANSPORT MATRIX---------------------------!
+  LOGICAL::ctrl_data_diagnose_TM !                              ! diagnose matrix in run?
+  NAMELIST /ini_biogem_nml/ctrl_data_diagnose_TM
+  REAL::par_data_TM_avg_n                                       ! number of intervals to diagnose average matrix in 1 year
+  REAL::par_data_TM_start                                       ! year to start diagnosing matrix
+  NAMELIST /ini_biogem_nml/par_data_TM_avg_n,par_data_TM_start
   ! ############################################################################################################################## !
   ! ****************************************************************************************************************************** !
 
@@ -945,6 +955,13 @@ MODULE biogem_lib
   logical::par_misc_t_endseries = .FALSE.
   logical::par_misc_t_endslice  = .FALSE.
 
+  !*** transport matrix ***
+  INTEGER::matrix_vocn_n = 0
+  INTEGER::matrix_K = n_k
+  INTEGER::matrix_go = 0
+  INTEGER::matrix_season = 1
+  INTEGER::matrix_avg_count = 0
+
   ! ocean tracer array
   !
   integer::n_vocn
@@ -962,6 +979,7 @@ MODULE biogem_lib
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vphys_ocn             !
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vbio_part             !
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vdbio_part            !
+  type(fieldocn),DIMENSION(:),ALLOCATABLE::matrix_exp            ! matrix dye output
   !
   ! atmosphere tracer array
   !
@@ -1033,6 +1051,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_ocn)::int_ocn_ben_sig                         !
   REAL,DIMENSION(n_carb)::int_carb_sur_sig                       !
   REAL,DIMENSION(n_carb)::int_carb_ben_sig                       !
+  REAL::int_misc_age_sig                                         !
+  real::int_misc_age_sur_sig,int_misc_age_ben_sig                !
   REAL::int_misc_seaice_sig                                      !
   real::int_misc_seaice_sig_th,int_misc_seaice_sig_vol           !
   real::int_misc_opsi_min_sig,int_misc_opsi_max_sig              !

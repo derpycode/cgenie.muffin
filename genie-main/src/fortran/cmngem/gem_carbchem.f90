@@ -1,6 +1,6 @@
 ! ******************************************************************************************************************************** !
 ! gem_carbchem.f90
-! Geochemistry Model
+! Carbonate chemistry Module
 ! AQUEOUS CARBONATE CHEMISTRY ROUTINES
 ! SEE: Ridgwell, A., J. Hargreaves, N. Edwards, J. Annan, T. Lenton, R. Marsh, A. Yool, and A. Watson,
 !      Marine geochemical data assimilation in an efficient Earth System Model of global biogeochemical cycling,
@@ -71,32 +71,31 @@ CONTAINS
     real::loc_T,loc_rT,loc_Tr100,loc_T_ln,loc_T_log,loc_TC
     real::loc_rRtimesT
     real::loc_Ftot,loc_SO4tot
-    ! calculate local constants
+    ! calculate local constants -- T and S
     ! NOTE: restrict valid T,S range for empirical fit (see Millero [1995])
-    loc_T          = dum_T
-    loc_S          = dum_S
-    select case (trim(par_carbconstset_name))
-    case ('DicksonMillero')
-       if (loc_T < (const_zeroC +  0.0)) loc_T = const_zeroC +  0.0
-       if (loc_T > (const_zeroC + 35.0)) loc_T = const_zeroC + 35.0
-       if (loc_S < 20.0) loc_S = 20.0
-       if (loc_S > 43.0) loc_S = 43.0
-    case ('Hansson')
-       if (loc_T < (const_zeroC +  0.0)) loc_T = const_zeroC +  0.0
-       if (loc_T > (const_zeroC + 30.0)) loc_T = const_zeroC + 30.0
-       if (loc_S < 20.0) loc_S = 20.0
-       if (loc_S > 40.0) loc_S = 40.0
-    case ('Roy')
-       if (loc_T < (const_zeroC +  0.0)) loc_T = const_zeroC +  0.0
-       if (loc_T > (const_zeroC + 45.0)) loc_T = const_zeroC + 45.0
-       if (loc_S < 20.0) loc_S = 20.0
-       if (loc_S > 43.0) loc_S = 43.0
-    case default
-       if (loc_T < (const_zeroC +  2.0)) loc_T = const_zeroC +  2.0
-       if (loc_T > (const_zeroC + 35.0)) loc_T = const_zeroC + 35.0
-       if (loc_S < 26.0) loc_S = 26.0
-       if (loc_S > 43.0) loc_S = 43.0
-    end select
+    !	    'DicksonMillero' :  0.0  <= T <= 35.0 C
+    !                          20.0  <= S <= 43.0 PSU
+    !	    'Hansson'        :  0.0  <= T <= 30.0 C
+    !                          20.0  <= S <= 40.0 PSU
+    !	    'Roy'            :  0.0  <= T <= 45.0 C
+    !                          20.0  <= S <= 43.0 PSU
+    !	    original default :  2.0  <= T <= 35.0 C
+    !                          26.0  <= S <= 43.0 PSU
+    if (dum_T <  (const_zeroC +  par_carbchem_Tmin))  then
+       loc_T = const_zeroC +  par_carbchem_Tmin
+    elseif (dum_T > (const_zeroC + par_carbchem_Tmax)) then
+       loc_T = const_zeroC + par_carbchem_Tmax
+    else
+       loc_T = dum_T
+    endif
+    if (dum_S < par_carbchem_Smin) then
+       loc_S = par_carbchem_Smin
+    elseif (dum_S > par_carbchem_Smax) then
+       loc_S = par_carbchem_Smax
+    else
+       loc_S = dum_S
+    endif
+    ! calculate local constants
     loc_P        = dum_D/10.0
     loc_S_p05    = loc_S**0.5
     loc_S_p15    = loc_S**1.5
@@ -1358,71 +1357,6 @@ CONTAINS
     ! return function value
     fun_find_ALK_from_dCO3 = loc_ALK
   END function fun_find_ALK_from_dCO3
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE SOLUBILITY COEFFICIENT
-  function fun_calc_solconst(dum_ia,dum_T,dum_S,dum_rho)
-    ! result variable
-    REAL::fun_calc_solconst
-    ! dummy arguments
-    integer,INTENT(in)::dum_ia
-    real,INTENT(in)::dum_T,dum_S,dum_rho
-    ! local variables
-    REAL::loc_T,loc_rT,loc_Tr100,loc_S
-    ! calculate local constants
-    ! NOTE: pressure in units of (bar) (1 m depth approx = 1 dbar pressure)
-    ! NOTE: temperature in K
-    ! NOTE: restrict valid T,S range for empirical fit
-    ! ### THESE VALUES IDEALLY NEED TO BE REPLACED WITH THE ACTUAL LITERATURE VALUES ############################################# !
-    ! ### CURRENTLY, THEY TAKE THE SAME CONSERVATIVE LIMITS AS THE Mehrbach K1, K2 CONSTANTS] #################################### !
-    if (dum_T <  const_zeroC +  2.0)  then
-       loc_T = const_zeroC +  2.0
-    elseif (dum_T > (const_zeroC + 35.0)) then
-       loc_T = const_zeroC + 35.0
-    else
-       loc_T = dum_T
-    endif
-    if (dum_S < 26.0) then
-       loc_S = 26.0
-    elseif (dum_S > 43.0) then
-       loc_S = 43.0
-    else
-       loc_S = dum_S
-    endif
-    ! ############################################################################################################################ !
-    loc_rT    = 1.0/loc_T
-    loc_Tr100 = loc_T/100.0
-    ! calculate Solubility Coefficients (mol/(kg atm)) and return function value
-    ! NOTE: for CO2 and N2O, the soluability coefficient is in units of mol/(kg atm)
-    !       rather than as a Bunsen Solubility Coefficient (see Wanninkohf [1992])
-    !       => convert units for others
-    ! NOTE: for CFC-11 and CFC-12, the soluability coefficient is in units of mol/(kg atm)
-    !       rather than as a Bunsen Solubility Coefficient (see Wanninkohf [1992])
-    !       (actaully, it is not really this simple and K should be corrected for water vapour pressure and lame things like that)
-    SELECT CASE (dum_ia)
-    CASE (ia_pCO2,ia_pN2O)
-       fun_calc_solconst = EXP( &
-            & par_bunsen_coef(1,dum_ia) + par_bunsen_coef(2,dum_ia)*(100*loc_rT) + par_bunsen_coef(3,dum_ia)*LOG(loc_Tr100) + &
-            & loc_S* &
-            & (par_bunsen_coef(4,dum_ia) + par_bunsen_coef(5,dum_ia)*(loc_Tr100) + par_bunsen_coef(6,dum_ia)*(loc_Tr100)**2) &
-            &  )
-    CASE (ia_pCFC11,ia_pCFC12)
-       fun_calc_solconst = EXP( &
-            & par_bunsen_coef(1,dum_ia) + par_bunsen_coef(2,dum_ia)*(100*loc_rT) + par_bunsen_coef(3,dum_ia)*LOG(loc_Tr100) + &
-            & loc_S* &
-            & (par_bunsen_coef(4,dum_ia) + par_bunsen_coef(5,dum_ia)*(loc_Tr100) + par_bunsen_coef(6,dum_ia)*(loc_Tr100)**2) &
-            &  )
-    CASE default
-       fun_calc_solconst = EXP( &
-            & par_bunsen_coef(1,dum_ia) + par_bunsen_coef(2,dum_ia)*(100*loc_rT) + par_bunsen_coef(3,dum_ia)*LOG(loc_Tr100) + &
-            & loc_S* &
-            & (par_bunsen_coef(4,dum_ia) + par_bunsen_coef(5,dum_ia)*(loc_Tr100) + par_bunsen_coef(6,dum_ia)*(loc_Tr100)**2) &
-            &  )/ &
-            & (dum_rho*const_V)
-    END SELECT
-  end function fun_calc_solconst
   ! ****************************************************************************************************************************** !
   
   

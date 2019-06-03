@@ -833,9 +833,25 @@ CONTAINS
           end if
        END DO
     END IF
+    ! age tracers
+    IF (ctrl_data_save_sig_ocn .AND. ctrl_force_ocn_age) THEN
+       loc_filename=fun_data_timeseries_filename(loc_t, &
+            & par_outdir_name,trim(par_outfile_name)//'_series','misc_col_age',string_results_ext)
+       IF (ctrl_data_save_sig_ocn_sur) THEN
+          loc_string = '% time (yr) / mean global ventilation age (yr) / surface ventilation age (yr) / benthic ventilation age (yr)'
+       else
+          loc_string = '% time (yr) / mean global ventilation age (yr)'
+       end if
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+    end if
     ! preformed tracers
     IF (ctrl_data_save_sig_diag .AND. ctrl_bio_preformed) THEN
-       if (ocn_select(io_col0) .AND. (.not. flag_ocnlite)) then
           do io=io_col0,io_col9
              if (ocn_select(io)) then
                 select case (io)
@@ -915,7 +931,6 @@ CONTAINS
                 end if
              end if
           END DO
-       END IF
     end if
     ! Save 3D water column DIC d13C data for specific ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN
@@ -953,10 +968,10 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! SAVE RUN-TIME DATA
-  SUBROUTINE sub_data_save_runtime(dum_t)
+  SUBROUTINE sub_data_save_runtime(dum_yr_save,dum_t)
     USE genie_util, ONLY:check_unit,check_iostat
     ! dummy arguments
-    REAL,INTENT(in)::dum_t
+    REAL,INTENT(in)::dum_yr_save,dum_t
     ! local variables
     INTEGER::l,io,ia,is,ic,ios,idm2D,k
     integer::ib,id
@@ -982,7 +997,7 @@ CONTAINS
     ! ocean surface area
     loc_ocn_tot_A = sum(phys_ocn(ipo_A,:,:,n_k))
     ! local time
-    loc_t = dum_t
+    loc_t = dum_yr_save
 
     ! *** initialize local arrays
     loc_carbisor(:) = 0.0
@@ -2275,9 +2290,39 @@ CONTAINS
           end if
        END DO
     end IF
+    ! age tracers
+    IF (ctrl_data_save_sig_ocn .AND. ctrl_force_ocn_age) THEN
+       loc_filename=fun_data_timeseries_filename( &
+            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_col_age',string_results_ext)
+       loc_sig = int_misc_age_sig - dum_t
+       IF (ctrl_data_save_sig_ocn_sur .OR. (par_data_save_level > 3)) THEN
+          loc_sig_sur = int_misc_age_sur_sig - dum_t
+          loc_sig_ben = int_misc_age_ben_sig - dum_t
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,3f12.3)',iostat=ios) &
+               & loc_t,                                  &
+               & loc_sig,                                &
+               & loc_sig_sur,                            &
+               & loc_sig_ben
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       else
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,f12.3)',iostat=ios) &
+               & loc_t,                                 &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end IF
+    end if
     ! preformed tracers
     IF (ctrl_data_save_sig_diag .AND. ctrl_bio_preformed) THEN
-       if (ocn_select(io_col0) .AND. (.not. flag_ocnlite)) then
           do io=io_col0,io_col9
              if (ocn_select(io)) then
                 loc_save = .false.
@@ -2373,7 +2418,6 @@ CONTAINS
                 end if
              end if
           END DO
-       END IF
     end if
     ! Save 3D data from a particular ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN
@@ -2690,7 +2734,7 @@ CONTAINS
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean k = (n_k - 1) (base of surface layer) area : ', &
+         & ' Global ocean k = (n_k - 1) (sub-surface layer) area : ', &
          & SUM(loc_phys_ocn(ipo_A,:,:,n_k - 1)), &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
@@ -2699,8 +2743,15 @@ CONTAINS
          & SUM(loc_phys_ocn(ipo_V,:,:,:)), &
          & ' m3'
     call check_iostat(ios,__LINE__,__FILE__)
-    loc_K = sum(int_phys_ocnatm_timeslice(ipoa_KCO2,:,:)*(1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)))/ &
-         & (sum(int_phys_ocn_timeslice(ipo_mask_ocn,:,:,n_k)*(1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:))))
+    loc_K = sum( &
+         & phys_ocnatm(ipoa_A,:,:)*int_phys_ocnatm_timeslice(ipoa_KCO2,:,:)* &
+         & (1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)) &
+         & ) &
+         & / &
+         & sum( &
+         & phys_ocnatm(ipoa_A,:,:)*int_phys_ocn_timeslice(ipo_mask_ocn,:,:,n_k)* &
+         & (1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)) &
+         & )
     Write(unit=out,fmt='(A49,f8.6,A24)',iostat=ios) &
          & ' Global mean air-sea coefficient, K(CO2) ..... : ', &
          & loc_K, &
