@@ -65,8 +65,8 @@ subroutine ecogem(          &
   REAL,DIMENSION(iimax)                    ::loc_nuts
   REAL,DIMENSION(iomaxiso,npmax)           ::loc_bioiso !ckc isotopes
   REAL,DIMENSION(iimaxiso)                 ::loc_nutiso !ckc isotopes
-  REAL,DIMENSION(iomax,npmax)              ::ratiobGraz, biobGraz !ckc for isotopes
-  REAL,DIMENSION(iomax,komax)              ::ratioGraz, orgbGraz  !ckc for isotope grazing calculations
+  REAL,DIMENSION(iomax+iChl,npmax)              ::ratiobGraz, biobGraz !ckc for isotopes (jdw: added iChl)
+  REAL,DIMENSION(iomax+iChl,komax)              ::ratioGraz, orgbGraz  !ckc for isotope grazing calculations  (jdw: added iChl)
   REAL,DIMENSION(n_i,n_j,n_k)              ::POC_Rfrac, CaCO3_Rfrac  !ckc local Corg d13C dependent on local water iso
   REAL                                     ::Corg_frac
   REAL                                     ::PDBstnd !ckc VPDB d13C standard
@@ -88,7 +88,7 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax+iChl,npmax)         ::GrazPredEat,GrazPreyEaten
   REAL,DIMENSION(npmax)                    ::BioCiso
 
-  real		   		                           ::loc_total_weights ! JDW total weights
+  real		   		     ::loc_total_weights ! JDW total weights
   real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
