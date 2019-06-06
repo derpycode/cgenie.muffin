@@ -2571,6 +2571,13 @@ CONTAINS
     loc_bio_part(:,:) = 0.0
     ! initialize remineralization tracer array
     loc_bio_remin(:,:) = 0.0
+    ! initialize diagnostics tracers (reset array)
+    if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2) .AND. sed_select(is_FeOOH)) then
+       diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,:) = 0.0
+    end if
     !
     loc_bio_settle(:,:) = 0.0
     ! set water column particulate tracer loop limit and sinking rate
