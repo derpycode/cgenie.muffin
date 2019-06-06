@@ -2584,11 +2584,13 @@ CONTAINS
        loc_bio_remin_sinkingrate = par_bio_remin_sinkingrate
        loc_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate_scav
     end if
-    ! test for possibilty of precip in water column
-    ! and assume particules could be present at any/every depth in the local water column
-    ! if not => assume particulates present only in surface layer
-    loc_klim = loc_k1
+    ! -------------------------------------------------------- ! test for possibilty of precip in water column
+    ! if so: assume particules could be present at any/every depth in the local water column
+    ! if not: assume particulates present only in surface layer
+    ! ### INSERT CODE ############################################################################################################ ! 
+    loc_klim = loc_k1 ! for now: search throughout the water column
     !!!loc_klim = n_k
+    ! ############################################################################################################################ !
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
@@ -3274,14 +3276,14 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) = &
-         & diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) + loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = &
-         & diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) - (1.0/8.0)*loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = &
-         & diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) + (1.0/8.0)*loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = &
-         & diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) - 2.0*(1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) + &
+         & loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) - &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) + &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) - &
+         & 2.0*(1.0/8.0)*loc_dFeOOH
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
@@ -3682,7 +3684,7 @@ CONTAINS
     dum_bio_part(is2l(is_POC_frac2)) = dum_bio_part(is2l(is_POC_frac2)) + loc_H2S_scavenging/dum_bio_part(is2l(is_POC))
     if (dum_bio_part(is2l(is_POC_frac2)) > 1.1) stop
     if (dum_bio_part(is2l(is_POC_frac2)) > 1.0) dum_bio_part(is2l(is_POC_frac2)) = 1.0
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
+    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     diag_react(idiag_react_POMS_dH2S,dum_i,dum_j,dum_k) = loc_H2S_scavenging
 
   end SUBROUTINE sub_box_scav_H2S

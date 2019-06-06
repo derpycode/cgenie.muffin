@@ -3403,6 +3403,8 @@ SUBROUTINE diag_biogem_timeseries( &
                  ia = conv_iselected_ia(l)
                  int_diag_forcing_sig(ia) = int_diag_forcing_sig(ia) + loc_dtyr*SUM(diag_forcing(ia,:,:))
               END DO
+              ! special case for diagnostics tracers (reset array)
+              diag_react(:,:,:,:) = 0.0
            end if
            ! high resolution 3D tracer data
            if (ctrl_data_save_3d_sig) then
