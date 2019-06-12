@@ -4038,6 +4038,26 @@
 			<value datatype="real">106.0</value>
                         <description>C/P organic matter Redfield ratio</description>
                     </param>
+<!-- malod: activation variable for flexible stoichiometry
+par_bio_red_PC_flex: default setting = 0 (fixed stoichiometry)
+set to 1 for flexible stoichiometry (Galbraith & Martiny, 2015)
+set to 2 for flexible stoichiometry with fixed stoichiometry from
+upper boundary of [PO4] = 1.7 µM
+par_bio_red_PC_alpha1 scales the flexible C:P relationship by a constant value
+par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C:P regression -->
+                    <param name="par_bio_red_PC_flex">
+                        <value datatype="integer">0</value>
+                        <description>C/P organic matter fixed or flexible stoichiometry </description>
+                    </param>
+                    <param name="par_bio_red_PC_alpha1">
+                        <value datatype="real">1.0</value>
+                        <description>scaling of C/P organic matter flexible stoichiometry </description>
+                    </param>
+                    <param name="par_bio_red_PC_alpha2">
+                        <value datatype="real">1.0</value>
+                        <description>offset of C/P organic matter flexible stoichiometry </description>
+                    </param>
+<!-- malod: flexible stoichiometry  end -->
                     <param name="par_bio_red_POP_PO2">
 			<value datatype="real">-138.0</value>
                         <description>O2/P organic matter pseudo-Redfield ratio</description>
@@ -6476,6 +6496,15 @@
 			<value datatype="integer">1</value>
                         <description># sedimentary stack sub-layers to drop off bottom</description>
                     </param>
+<!-- DETRITAL CONFIGURATION  -->
+                    <param name="par_sed_fdet">
+			<value datatype="real">0.150</value>
+                        <description>prescribed (additional) flux of detrital material to the seds (g cm-2 kyr-1)</description>
+                    </param>
+                    <param name="ctrl_sed_det_NOdust">
+			<value datatype="boolean">.false.</value>
+                        <description>No pelagic (dust) detrital contribution?</description>
+                    </param>
 <!-- DIAGENESIS SCHEME: SELECTION  -->
                     <param name="par_sed_diagen_CaCO3opt">
 			<value datatype="string">archer1991explicit</value>
@@ -6509,10 +6538,6 @@
                     <param name="par_sed_mix_k_sur_min">
 			<value datatype="real">0.0001</value>
                         <description>maximum surface bioturbation mixing rate (cm2 yr-1)</description>
-                    </param>
-                    <param name="par_sed_fdet">
-			<value datatype="real">0.150</value>
-                        <description>prescribed (additional) flux of detrital material to the seds (g cm-2 kyr-1)</description>
                     </param>
                     <param name="ctrl_sed_noerosion">
 			<value datatype="boolean">.false.</value>

@@ -154,6 +154,9 @@ CONTAINS
        print*,'--- ORGANIC MATTER EXPORT RATIOS -------------------'
        print*,'N/P organic matter Redfield ratio                   : ',par_bio_red_POP_PON
        print*,'C/P organic matter Redfield ratio                   : ',par_bio_red_POP_POC
+       print*,'C/P organic matter set to flexible? ( > 0 = yes)    : ',par_bio_red_PC_flex
+       print*,'PC_alpha1, scaling of flexible C/P ratio            : ',par_bio_red_PC_alpha1
+       print*,'PC_alpha2, offset of flexible C/P ratio             : ',par_bio_red_PC_alpha2
        print*,'O2/P organic matter pseudo-Redfield ratio           : ',par_bio_red_POP_PO2
        print*,'ALK/N alkalinty correction factor                   : ',par_bio_red_PON_ALK
        print*,'Production fraction of dissolved organic matter     : ',par_bio_red_DOMfrac
@@ -654,6 +657,7 @@ CONTAINS
   ! INITIALIZE 'BIOLOGICAL' PARAMETERS AND VARIABLES
   SUBROUTINE sub_init_bio()
     ! local variables
+    integer::i,j              !malod: for flexible stoichiometry
     CHARACTER(len=255)::loc_filename
 
     ! *** initialize global arrays ***
@@ -673,9 +677,31 @@ CONTAINS
     bio_part_red(is_POFe,is_POFe,:,:)   = 1.0
     ! set values and derived values
     ! NOTE: relate everything to carbon units where it is not already
-    IF (abs(par_bio_red_POP_POC) > const_real_nullsmall) then
-       bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
-       bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,:,:)
+    ! NOTE2: Variable P:C ratio coded by malod
+    IF (abs(par_bio_red_POP_POC) > const_real_nullsmall) then      
+       ! par_bio_red_PC_flex = 1 --> activate variable stoichiometry
+       ! par_bio_red_PC_flex = 2 --> activate variable stoichiometry with limit at high PO4
+       ! par_bio_red_PC_flex = 0 --> default fixed Redfield stoichiometry
+       if (par_bio_red_PC_flex > 0) then
+          ! default par_bio_red_PC_alpha1 = 1.0
+          ! default par_bio_red_PC_alpha2 = 1.0
+          ! to achieve average P:C more similar to fixed Redfield modern run, use  PC_alpha1 = 1.1643
+          ! an alternative is to scale only PC_alpha2 = 1.16
+          DO i = 1,n_i
+             do j = 1,n_j
+                bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,i,j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+                if (par_bio_red_PC_flex > 1) then  ! limit C:P for high PO4 (no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
+                   if (bio_part_red(is_POC,is_POP,i,j) > 1.0/55.0) then
+                      bio_part_red(is_POC,is_POP,i,j) = 1.0/55.0
+                   end if
+                end if
+                bio_part_red(is_POP,is_POC,i,j) = 1.0/bio_part_red(is_POC,is_POP,i,j)
+             end do
+          end DO
+       else
+          bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
+          bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,:,:)
+       end if
     end if
     IF (abs(par_bio_red_POP_PON) > const_real_nullsmall) then
        bio_part_red(is_POP,is_PON,:,:) = par_bio_red_POP_PON

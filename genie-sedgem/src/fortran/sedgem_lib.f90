@@ -44,6 +44,11 @@ MODULE sedgem_lib
   integer::n_sed_tot_init                                        ! # initial sedimentary stack sub-layers filled
   integer::n_sed_tot_drop                                        ! # sedimentary stack sub-layers to drop off bottom     
   NAMELIST /ini_sedgem_nml/n_sed_tot,n_sed_tot_init,n_sed_tot_drop
+  ! ------------------- DETRITAL CONFIGURATION ----------------------------------------------------------------------------------- !
+  REAL::par_sed_fdet                                             ! prescribed (additional) flux of detrital material to the seds
+  NAMELIST /ini_sedgem_nml/par_sed_fdet
+  LOGICAL::ctrl_sed_det_NOdust                                   ! no pelagic (dust) detrital contribution?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_det_NOdust
   ! ------------------- DIAGENESIS SCHEME: SELECTION ----------------------------------------------------------------------------- !
   character(len=63)::par_sed_diagen_CaCO3opt                     ! CaCO3 diagenesis scheme
   character(len=63)::par_sed_diagen_opalopt                      ! opal diagenesis scheme
@@ -58,8 +63,6 @@ MODULE sedgem_lib
   REAL::par_sed_mix_k_sur_max                                    ! maximum surface bioturbation mixing rate (cm2 yr-1)
   REAL::par_sed_mix_k_sur_min                                    ! minimum surface bioturbation mixing rate (cm2 yr-1)
   NAMELIST /ini_sedgem_nml/par_sed_mix_k_sur_max,par_sed_mix_k_sur_min
-  REAL::par_sed_fdet                                             ! prescribed (additional) flux of detrital material to the seds
-  NAMELIST /ini_sedgem_nml/par_sed_fdet
   logical::ctrl_sed_noerosion
   NAMELIST /ini_sedgem_nml/ctrl_sed_noerosion
   logical::ctrl_sed_interface                                    ! CaCO3 interface dissolution?
@@ -86,14 +89,15 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_ox,par_sed_diagen_fracC2Ppres_anox,par_sed_diagen_fracC2Ppres_eux
   LOGICAL::ctrl_sed_huelse2017_remin_POP                         ! Force return of PO4 to ocean in HUELSE 2017 scheme
   NAMELIST /ini_sedgem_nml/ctrl_sed_huelse2017_remin_POP  
-  ! ------------------- DIAGENESIS SCHEME: ORGANIC MATTER HUELSE 2017 ------------------------------------------------------------------------ !
+  ! ------------------- DIAGENESIS SCHEME: ORGANIC MATTER HUELSE 2017 ------------------------------------------------------------ !
   character(len=63)::par_sed_huelse2017_kscheme                  ! Corg k parametrisation scheme ID string
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_kscheme
   logical::par_sed_huelse2017_redox                              ! Corg degradation rates redox dependent?
   logical::par_sed_huelse2017_P_cycle                            ! Include explicit P-cycle in OMEN-SED?
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_redox,par_sed_huelse2017_P_cycle
   logical::par_sed_huelse2017_remove_impl_sulALK                 ! Remove implicit Alk associated with buried sulf-OM? / no permanent ALk gain?
   logical::par_sed_huelse2017_sim_P_loss                         ! Simulate ocean Porg loss with buried sulf-OM?
-  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_redox,par_sed_huelse2017_P_cycle,par_sed_huelse2017_remove_impl_sulALK,par_sed_huelse2017_sim_P_loss
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_remove_impl_sulALK,par_sed_huelse2017_sim_P_loss
   REAL::par_sed_huelse2017_k1                                    ! labile degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2                                    ! refractory degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2_order                              ! k2 = k1/par_sed_huelse2017_k2_order
@@ -108,7 +112,7 @@ MODULE sedgem_lib
   integer::par_sed_archer1991_iterationmax                       ! loop limit in 'o2org' subroutine
   NAMELIST /ini_sedgem_nml/par_sed_archer1991_iterationmax
   NAMELIST /ini_sedgem_nml/par_sed_archer1991_iterationmax
-       ! --- DIAGENESIS SCHEME: opal --------------------------------------------------------------------------------------------- !
+  ! ------------------- DIAGENESIS SCHEME: opal ---------------------------------------------------------------------------------- !
   REAL::par_sed_opal_KSi0                                        ! base opal KSi value (yr-1)
   NAMELIST /ini_sedgem_nml/par_sed_opal_KSi0
   ! ------------------- CaCO3 PRODUCTION ----------------------------------------------------------------------------------------- !
