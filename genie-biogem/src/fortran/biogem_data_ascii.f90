@@ -40,16 +40,24 @@ CONTAINS
           IF (ctrl_data_save_sig_ocn_sur) THEN
              SELECT CASE (ocn_type(io))
              CASE (0)
-                If (io == io_T) loc_string = '% time (yr) / temperature (C) / _surT (C) / _benT (degrees C)'
-                If (io == io_S) loc_string = '% time (yr) / salinity (o/oo) / _surS (o/oo) / _benS (o/oo)'
+                If (io == io_T) loc_string = &
+                     & '% time (yr) / temperature (C) / _surT (ice-free) (C) / _benT (C) / _surT (C)'
+                If (io == io_S) loc_string = &
+                     & '% time (yr) / salinity (o/oo) / _surS (ice-free) (o/oo) / _benS (o/oo) / _surS (o/oo)'
              CASE (1)
-                loc_string = '% time (yr) / global ' //TRIM(string_ocn(io))//' (mol) / global ' // &
-                     & TRIM(string_ocn(io))//' (mol kg-1)'// &
-                     & ' / surface ' //TRIM(string_ocn(io))//' (mol kg-1) / benthic ' //TRIM(string_ocn(io))//' (mol kg-1)'
+                loc_string = '% time (yr) / ' //&
+                     & 'global total ' //TRIM(string_ocn(io))//' (mol) / ' //&
+                     & 'global mean ' //TRIM(string_ocn(io))//' (mol kg-1) / ' //&
+                     & 'surface (ice-free)' //TRIM(string_ocn(io))//' (mol kg-1) / ' //&
+                     & 'benthic ' //TRIM(string_ocn(io))//' (mol kg-1) / ' //&
+                     & 'surface' //TRIM(string_ocn(io))//' (mol kg-1)'
              CASE (n_itype_min:n_itype_max)
-                loc_string = '% time (yr) / global '//TRIM(string_ocn(io))//' (mol) / global ' // &
-                     & TRIM(string_ocn(io))//' (o/oo)'// &
-                     & ' / surface ' //TRIM(string_ocn(io))//' (o/oo) / benthic ' //TRIM(string_ocn(io))//' (o/oo)'
+                loc_string = '% time (yr) / ' //&
+                     & 'global total '//TRIM(string_ocn(io))//' (mol) / ' //&
+                     & 'global ' // TRIM(string_ocn(io))//' (o/oo) / ' //&
+                     & 'surface (ice-free) ' //TRIM(string_ocn(io))//' (o/oo) / ' //&
+                     & 'benthic ' //TRIM(string_ocn(io))//' (o/oo) / ' //&
+                     & 'surface ' //TRIM(string_ocn(io))//' (o/oo)'
              end SELECT
           else
              SELECT CASE (ocn_type(io))
@@ -57,10 +65,10 @@ CONTAINS
                 If (io == io_T) loc_string = '% time (yr) / temperature (degrees C)'
                 If (io == io_S) loc_string = '% time (yr) / salinity (o/oo)'
              CASE (1)
-                loc_string = '% time (yr) / global '//TRIM(string_ocn(io))//' (mol) / global ' // &
+                loc_string = '% time (yr) / global total '//TRIM(string_ocn(io))//' (mol) / global mean ' // &
                      & TRIM(string_ocn(io))//' (mol kg-1)'
              CASE (n_itype_min:n_itype_max)
-                loc_string = '% time (yr) / global '//TRIM(string_ocn(io))//' (mol) / global ' // &
+                loc_string = '% time (yr) / global total '//TRIM(string_ocn(io))//' (mol) / global ' // &
                      & TRIM(string_ocn(io))//' (o/oo)'
              end SELECT
           end IF
@@ -315,11 +323,16 @@ CONTAINS
              loc_string = '% time (yr) / mean saturation state'
           CASE (ic_conc_CO2,ic_conc_HCO3,ic_conc_CO3)
              if (ocn_select(io_DIC_14C)) then
-                loc_string = '% time (yr) / surface '//TRIM(string_carb(ic))//' (mol kg-1) / surface '//TRIM(string_carb(ic))// &
-                     & ' d13C (o/oo) / surface '//TRIM(string_carb(ic))//' d14C (o/oo)'
+                loc_string = '% time (yr) / ' //&
+                     & 'surface mean (ice-free) '//TRIM(string_carb(ic))//' (mol kg-1) / ' //&
+                     & 'surface '//TRIM(string_carb(ic))// ' d13C (o/oo) / ' //&
+                     & 'surface '//TRIM(string_carb(ic))//' d14C (o/oo) / ' //&
+                     & 'surface mean '//TRIM(string_carb(ic))//' (mol kg-1)' 
              elseif (ocn_select(io_DIC_13C)) then
-                loc_string = '% time (yr) / surface '//TRIM(string_carb(ic))//' (mol kg-1) / surface '//TRIM(string_carb(ic))// &
-                     & ' d13C (o/oo)'
+                loc_string = '% time (yr) / ' //&
+                     & 'surface mean (ice-free) '//TRIM(string_carb(ic))//' (mol kg-1) / ' //&
+                     & 'surface '//TRIM(string_carb(ic))// ' d13C (o/oo) / ' //&
+                     & 'surface mean '//TRIM(string_carb(ic))//' (mol kg-1)'
              else
                 loc_string = '% time (yr) / surface '//TRIM(string_carb(ic))//' (mol kg-1)'
              end if
@@ -978,9 +991,9 @@ CONTAINS
     REAL::loc_t
     real::loc_opsi_scale
     real::loc_ocn_tot_M,loc_ocn_tot_M_sur,loc_ocn_tot_A
-    real::loc_sig,loc_sig_sur,loc_sig_ben,loc_rsig
-    real::loc_tot,loc_tot_sur,loc_tot_ben
-    real::loc_frac,loc_frac_sur,loc_frac_ben,loc_standard
+    real::loc_sig,loc_sig_sur,loc_sig_opn,loc_sig_ben,loc_rsig
+    real::loc_tot,loc_tot_sur,loc_tot_opn,loc_tot_ben
+    real::loc_frac,loc_frac_sur,loc_frac_opn,loc_frac_ben,loc_standard
     real::loc_d13C,loc_d14C
     REAL,DIMENSION(n_k)::loc_sig_3D,loc_tot_3D,loc_frac_3D,loc_standard_3D 
     CHARACTER(len=255)::loc_filename
@@ -1021,19 +1034,22 @@ CONTAINS
              IF (ctrl_data_save_sig_ocn_sur .OR. (par_data_save_level > 3)) THEN
                 If (io == io_T) then
                    loc_sig_sur = int_ocn_sur_sig(io)/int_t_sig - const_zeroC
+                   loc_sig_opn = int_ocn_opn_sig(io)/int_t_sig - const_zeroC
                    loc_sig_ben = int_ocn_ben_sig(io)/int_t_sig - const_zeroC
                 else
                    loc_sig_sur = int_ocn_sur_sig(io)/int_t_sig
+                   loc_sig_opn = int_ocn_opn_sig(io)/int_t_sig
                    loc_sig_ben = int_ocn_ben_sig(io)/int_t_sig
                 end If
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
-                WRITE(unit=out,fmt='(f12.3,3f12.6)',iostat=ios) &
-                     & loc_t,                                  &
-                     & loc_sig,                                &
-                     & loc_sig_sur,                            &
-                     & loc_sig_ben
+                WRITE(unit=out,fmt='(f12.3,4f12.6)',iostat=ios) &
+                     & loc_t,                                   &
+                     & loc_sig,                                 &
+                     & loc_sig_sur,                             &
+                     & loc_sig_ben,                             &
+                     & loc_sig_opn
                 call check_iostat(ios,__LINE__,__FILE__)
                 CLOSE(unit=out,iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
@@ -1042,7 +1058,7 @@ CONTAINS
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
                 WRITE(unit=out,fmt='(f12.3,f12.6)',iostat=ios) &
-                     & loc_t,                                 &
+                     & loc_t,                                  &
                      & loc_sig
                 call check_iostat(ios,__LINE__,__FILE__)
                 CLOSE(unit=out,iostat=ios)
@@ -1052,16 +1068,18 @@ CONTAINS
              loc_sig = int_ocn_sig(io)/int_t_sig
              IF (ctrl_data_save_sig_ocn_sur) THEN
                 loc_sig_sur = int_ocn_sur_sig(io)/int_t_sig
+                loc_sig_opn = int_ocn_opn_sig(io)/int_t_sig
                 loc_sig_ben = int_ocn_ben_sig(io)/int_t_sig
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
-                WRITE(unit=out,fmt='(f12.3,e20.12,3e14.6)',iostat=ios) &
-                     & loc_t,                                   &
-                     & loc_ocn_tot_M*loc_sig,                   &
-                     & loc_sig,                                 &
-                     & loc_sig_sur,                             &
-                     & loc_sig_ben
+                WRITE(unit=out,fmt='(f12.3,e20.12,4e14.6)',iostat=ios) &
+                     & loc_t,                                          &
+                     & loc_ocn_tot_M*loc_sig,                          &
+                     & loc_sig,                                        &
+                     & loc_sig_sur,                                    &
+                     & loc_sig_ben,                                    &
+                     & loc_sig_opn
                 call check_iostat(ios,__LINE__,__FILE__)
                 CLOSE(unit=out,iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)                
@@ -1087,18 +1105,22 @@ CONTAINS
                 loc_tot_sur    = int_ocn_sur_sig(ocn_dep(io))/int_t_sig
                 loc_frac_sur   = int_ocn_sur_sig(io)/int_t_sig
                 loc_sig_sur    = fun_calc_isotope_delta(loc_tot_sur,loc_frac_sur,loc_standard,.FALSE.,const_nulliso)
+                loc_tot_opn    = int_ocn_opn_sig(ocn_dep(io))/int_t_sig
+                loc_frac_opn   = int_ocn_opn_sig(io)/int_t_sig
+                loc_sig_opn    = fun_calc_isotope_delta(loc_tot_opn,loc_frac_opn,loc_standard,.FALSE.,const_nulliso)
                 loc_tot_ben    = int_ocn_ben_sig(ocn_dep(io))/int_t_sig
                 loc_frac_ben   = int_ocn_ben_sig(io)/int_t_sig
                 loc_sig_ben    = fun_calc_isotope_delta(loc_tot_ben,loc_frac_ben,loc_standard,.FALSE.,const_nulliso)
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
-                WRITE(unit=out,fmt='(f12.3,e20.12,3f12.3)',iostat=ios) &
-                     & loc_t,                                         &
-                     & loc_ocn_tot_M*loc_frac,                        &
-                     & loc_sig,                                       &
-                     & loc_sig_sur,                                   &
-                     & loc_sig_ben
+                WRITE(unit=out,fmt='(f12.3,e20.12,4f12.3)',iostat=ios) &
+                     & loc_t,                                          &
+                     & loc_ocn_tot_M*loc_frac,                         &
+                     & loc_sig,                                        &
+                     & loc_sig_sur,                                    &
+                     & loc_sig_ben,                                    &
+                     & loc_sig_opn
                 call check_iostat(ios,__LINE__,__FILE__)
                 CLOSE(unit=out,iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
@@ -1151,49 +1173,56 @@ CONTAINS
           SELECT CASE (ic)
           CASE (ic_conc_CO2,ic_conc_HCO3,ic_conc_CO3)
              if (ocn_select(io_DIC_14C)) then
-                loc_sig = int_carb_sur_sig(ic)/int_t_sig
+                loc_sig_sur = int_carb_sur_sig(ic)/int_t_sig
+                loc_sig_opn = int_carb_opn_sig(ic)/int_t_sig
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
-                WRITE(unit=out,fmt='(f12.3,e15.7,2f12.3)',iostat=ios) &
+                WRITE(unit=out,fmt='(f12.3,e15.7,2f12.3,e15.7)',iostat=ios) &
                      & loc_t, &
-                     & loc_sig, &
-                     & fun_calc_isotope_delta(loc_sig,loc_carbisor(ic - 1)*loc_sig,const_standards(11),.FALSE.,const_nulliso), &
-                     & fun_calc_isotope_delta(loc_sig,loc_carbisor(ic + 3)*loc_sig,const_standards(12),.FALSE.,const_nulliso)
+                     & loc_sig_sur, &
+                     & fun_calc_isotope_delta&
+                     & (loc_sig_sur,loc_carbisor(ic - 1)*loc_sig_sur,const_standards(11),.FALSE.,const_nulliso), &
+                     & fun_calc_isotope_delta &
+                     & (loc_sig_sur,loc_carbisor(ic + 3)*loc_sig_sur,const_standards(12),.FALSE.,const_nulliso), &
+                     & loc_sig_opn
                 call check_iostat(ios,__LINE__,__FILE__)
                 CLOSE(unit=out,iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
              elseif (ocn_select(io_DIC_13C)) then
-                loc_sig = int_carb_sur_sig(ic)/int_t_sig
+                loc_sig_sur = int_carb_sur_sig(ic)/int_t_sig
+                loc_sig_opn = int_carb_opn_sig(ic)/int_t_sig
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                 WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
                      & loc_t, &
-                     & loc_sig, &
-                     & fun_calc_isotope_delta(loc_sig,loc_carbisor(ic - 1)*loc_sig,const_standards(11),.FALSE.,const_nulliso)
+                     & loc_sig_sur, &
+                     & fun_calc_isotope_delta &
+                     & (loc_sig_sur,loc_carbisor(ic - 1)*loc_sig_sur,const_standards(11),.FALSE.,const_nulliso), &
+                     & loc_sig_opn
                 call check_iostat(ios,__LINE__,__FILE__)
                 CLOSE(unit=out,iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
              else
-                loc_sig = int_carb_sur_sig(ic)/int_t_sig
+                loc_sig_sur = int_carb_sur_sig(ic)/int_t_sig
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
                 WRITE(unit=out,fmt='(f12.3,e15.7)',iostat=ios) &
                      & loc_t, &
-                     & loc_sig
+                     & loc_sig_sur
                 call check_iostat(ios,__LINE__,__FILE__)
                 CLOSE(unit=out,iostat=ios)
                 call check_iostat(ios,__LINE__,__FILE__)
              end if
           case default
-             loc_sig = int_carb_sur_sig(ic)/int_t_sig
+                loc_sig_sur = int_carb_sur_sig(ic)/int_t_sig
              call check_unit(out,__LINE__,__FILE__)
              OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
              WRITE(unit=out,fmt='(f12.3,e15.7)',iostat=ios) &
                   & loc_t, &
-                  & loc_sig
+                  & loc_sig_sur
              call check_iostat(ios,__LINE__,__FILE__)
              CLOSE(unit=out,iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
