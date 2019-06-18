@@ -492,6 +492,7 @@ CONTAINS
     REAL                            :: loc_standard
     real::loc_d13C
     real::loc_87Sr,loc_88Sr
+    real::loc_187Os,loc_188Os
     REAL::loc_weather_o(n_ocn)
 
     CHARACTER(LEN=7),DIMENSION(n_ocn)       :: globtracer_names
@@ -996,6 +997,28 @@ CONTAINS
     loc_weather_o(io_Sr_88Sr) = loc_88Sr
     loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
     end select
+    ! ######################################################################################################################### !
+
+    ! ######################################################################################################################### !
+    ! OSMIUM CODE
+    ! initialization
+    ! NOTE: populate array with bulk flux and isotopic delta values
+    loc_weather_o(:) = 0.0
+    loc_weather_o(io_Os) = par_weather_fracOs*(weather_fCaCO3 + weather_fCaSiO3)
+    loc_weather_o(io_Os_187Os) = 1000.0*(par_weather_187Os_188Os*par_weather_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+    loc_weather_o(io_Os_188Os) = 1000.0*(par_weather_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+    ! calculate Os ISOTOPES -- 187Os
+    ! NOTE: do not update <loc_weather_o> yet as it is needed for the d188Os calculation ...
+    loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),1)
+    ! calculate Os ISOTOPES -- 188Os
+    loc_188Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),2)
+    ! update flux array
+    loc_weather_o(io_Os_187Os) = loc_187Os
+    loc_weather_o(io_Os_188Os) = loc_188Os
+    loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
+
+!    print*,loc_force_flux_weather_o(io_Os)-loc_force_flux_weather_o(io_Os_187Os)-loc_force_flux_weather_o(io_Os_192Os)
+
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !

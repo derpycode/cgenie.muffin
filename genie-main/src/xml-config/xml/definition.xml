@@ -451,7 +451,7 @@
                         </param>
                   </paramArray>
 <!-- ocn_select -->
-                   <paramArray name="ocn_select" dimension="1" extent="100">
+                   <paramArray name="ocn_select" dimension="1" extent="107">
                         <description>tracer selection</description>    
                         <param name="ocn_select(1)" index="1">
                             <value datatype="boolean">.true.</value>
@@ -883,7 +883,7 @@
                         </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="86">
+                   <paramArray name="sed_select" dimension="1" extent="99">
                         <description>tracer selection</description>    
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -2958,7 +2958,7 @@
             <file name="data_BIOGEM">
                 <namelist name="INI_BIOGEM_NML">
 
-                    <paramArray name="ocn_init" dimension="1" extent="101">
+                    <paramArray name="ocn_init" dimension="1" extent="107">
                         <description>tracer initialisation</description>    
                         <param name="ocn_init(1)" index="1">
                             <value datatype="real">0.0</value>
@@ -3389,7 +3389,7 @@
                             <description></description>
                         </param>
                     </paramArray>
-                    <paramArray name="ocn_dinit" dimension="1" extent="101">
+                    <paramArray name="ocn_dinit" dimension="1" extent="107">
                         <description>tracer restart perturbation (re-initialisation)</description>    
                         <param name="ocn_dinit(1)" index="1">
                             <value datatype="real">0.0</value>
@@ -4455,6 +4455,18 @@
 			<value datatype="string">NONE</value>
                         <description>H2S -> POCS scavenging option</description>
                     </param>
+                    <param name="par_bio_remin_kOstoPOMOS">
+			<value datatype="real">0.0</value>
+                        <description>Os scavening efficiency</description>
+                    </param>
+                    <param name="ctrl_Os_scav_O2_dep">
+			<value datatype="boolean">.false.</value>
+                        <description>switch to turn on O2 dependency of Os scavenging</description>
+                    </param>
+                    <param name="par_scav_Os_O2_threshold">
+			<value datatype="real">5e-9</value>
+                        <description>O2 threshold for O2-dependent Os scavenging [mol/kg]</description>
+                    </param>
                     <param name="ctrl_bio_remin_thresh">
 			<value datatype="boolean">.false.</value>
                         <description>Apply a hard tracer oxidant remin threshold?</description>
@@ -5445,7 +5457,7 @@
                             <description></description>
                         </param>
                     </paramArray>
-                    <paramArray name="par_ocn_force_scale_val" dimension="1" extent="101">
+                    <paramArray name="par_ocn_force_scale_val" dimension="1" extent="107">
                         <description>ocean tracer forcing scaling - value</description>    
                         <param name="par_ocn_force_scale_val(1)" index="1">
                             <value datatype="real">1.0</value>
@@ -5876,7 +5888,7 @@
                             <description></description>
                         </param>
                     </paramArray>
-                    <paramArray name="par_ocn_force_scale_time" dimension="1" extent="101">
+                    <paramArray name="par_ocn_force_scale_time" dimension="1" extent="107">
                         <description>ocean tracer forcing scaling - time</description>    
                         <param name="par_ocn_force_scale_time(1)" index="1">
                             <value datatype="real">1.0</value>
@@ -6991,6 +7003,42 @@
 			<value datatype="real">0.0</value>
                         <description>CO2 low-T alteration (weathering) sink (mol yr-1) (0.5E12 in Payton et al.)</description>
                     </param>
+                    <param name="par_sed_hydroip_fOs">
+			<value datatype="real">0.0</value>
+                        <description>hydrothermal Os flux (mol yr-1)</description>
+                    </param>
+                    <param name="par_sed_hydroip_fOs_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>187Os/188Os ratio of hydrothermal Os flux</description>
+                    </param>
+                    <param name="par_sed_hydroip_fOs_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>188Os/192Os ratio of hydrothermal Os flux</description>
+                    </param>
+                    <param name="par_sed_Os_depTOT">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol yr-1)</description>
+                    </param>
+                    <param name="ctrl_sed_Os_O2">
+			<value datatype="boolean">.false.</value>
+                        <description>switch for turning on oxygen-dependent Os deposition</description>
+                    </param>
+                    <param name="par_sed_Os_O2_threshold">
+			<value datatype="real">0.0</value>
+                        <description>[O2] threshold for switching from oxic to suboxic Os deposition (mol)</description>
+                    </param>
+                    <param name="par_sed_Os_dep">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
+                    </param>
+                    <param name="par_sed_Os_dep_oxic">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
+                    </param>
+                    <param name="par_sed_Os_dep_suboxic">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under suboxic conditions (mol m-2 yr-1)</description>
+                    </param>
                     <param name="par_sed_hydroip_fDIC">
 			<value datatype="real">0.0</value>
                         <description>hydrothermal CO2 outgassing (mol yr-1)</description>
@@ -7557,6 +7605,18 @@
                     <param name="par_weather_CaCO3_d88Sr">
 			<value datatype="real">0.16</value>
                         <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_fracOs">
+			<value datatype="real">0.0</value>
+                        <description>mean Os:Ca2+ ratio of weathering flux</description>
+                    </param>
+                    <param name="par_weather_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 187Os/188Os ratio of weathering flux</description>
+                    </param>
+                    <param name="par_weather_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of weathering flux</description>
                     </param>
                     <param name="par_weather_CaSiO3_fracCa5PO43">
 			<value datatype="real">0.0</value>

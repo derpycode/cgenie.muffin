@@ -714,6 +714,79 @@ CONTAINS
                & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end DO
     end If
+    !----------------------------------------------------------------
+    !       Os isotope ratios
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Os) .AND. ocn_select(io_Os_187Os)) &
+         & ) then
+         loc_unitsname = ''
+         loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)                                                       
+                END DO
+             END DO
+          END DO
+         call sub_adddef_netcdf(loc_iou,4,'misc_Os_187Osr188Os', &
+              & 'water-column Os isotope ratio', &
+              & trim(loc_unitsname),const_real_zero,const_real_zero)
+         call sub_putvar3d_g('misc_Os_187Osr188Os',loc_iou, &
+              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !!----------------------
+    !----------------------------------------------------------------
+    !       Sr 87/86 isotope ratios
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Sr) .AND. ocn_select(io_Sr_87Sr)) &
+         & ) then
+         loc_unitsname = ''
+         loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Sr_87Sr,i,j,k)/(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k))
+                END DO
+             END DO
+          END DO
+         call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_87Srr86Sr', &
+              & 'water-column Sr isotope ratio', &
+              & trim(loc_unitsname),const_real_zero,const_real_zero)
+         call sub_putvar3d_g('ocn_Sr_87Srr86Sr',loc_iou, &
+              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !!----------------------
+    !----------------------------------------------------------------
+    !       Sr d88Sr isotope ratios
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Sr) .AND. ocn_select(io_Sr_88Sr)) &
+         & ) then
+         loc_unitsname = ''
+         loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)                                            
+
+                END DO
+             END DO
+          END DO
+         call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_d88Sr', &
+              & 'water-column Sr isotope ratio', &
+              & trim(loc_unitsname),const_real_zero,const_real_zero)
+         call sub_putvar3d_g('ocn_Sr_d88Sr',loc_iou, &
+              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !!----------------------
     !!-----------------------------------------------------------------------
     !!       misc 'physics'
     !!-----------------------------------------------------------------------
