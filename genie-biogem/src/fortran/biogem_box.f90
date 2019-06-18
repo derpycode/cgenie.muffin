@@ -388,6 +388,7 @@ CONTAINS
     real::loc_alpha,loc_delta,loc_standard
     real::loc_r15N,loc_r30Si,loc_r114Cd,loc_r7Li,loc_r44Ca
     real::loc_86Sr,loc_87Sr,loc_88Sr
+    real::loc_192Os,loc_188Os,loc_187Os
     real::loc_R,loc_r18O
     real::loc_PO4,loc_Cd,loc_FeT,loc_SiO2,loc_N,loc_IO3
     real::loc_kPO4,loc_kPO4_sp,loc_kPO4_nsp,loc_kN
@@ -1163,6 +1164,12 @@ CONTAINS
        bio_part_red(is_CaCO3,is_SrCO3,dum_i,dum_j) = par_bio_red_CaCO3_SrCO3 + par_bio_red_CaCO3_SrCO3_alpha* &
             & ocn(io_Sr,dum_i,dum_j,n_k)/ocn(io_Ca,dum_i,dum_j,n_k)
     end if
+    !
+    ! TRACE METALS: Os
+    if (ocn_select(io_Os) .AND. ocn_select(io_Os)) then
+       bio_part_red(is_CaCO3,is_OsCO3,dum_i,dum_j) = par_bio_red_CaCO3_OsCO3 + par_bio_red_CaCO3_OsCO3_alpha* &
+            & ocn(io_Os,dum_i,dum_j,n_k)/ocn(io_Ca,dum_i,dum_j,n_k)
+    end if
 
     ! *** CALCULATE ISOTOPIC FRACTIONATION ************************************************************************************** !
     ! NOTE: implement isotopic fraction as a 'Redfield' ratio (populate array <bio_part_red>)
@@ -1341,6 +1348,37 @@ CONTAINS
           bio_part_red(is_SrCO3,is_SrCO3_88Sr,dum_i,dum_j) = 0.0
        end if
     end if
+    !
+    ! 187 + 188Os [CaCO3]
+    ! NOTE: be lazy and add deltas ...
+    if (sed_select(is_OsCO3_187Os) .AND. sed_select(is_OsCO3_187Os)) then
+       if (ocn(io_Os,dum_i,dum_j,n_k) > const_real_nullsmall) then
+          ! initialization
+          loc_192Os = ocn(io_Os,dum_i,dum_j,n_k)-ocn(io_Os_187Os,dum_i,dum_j,n_k)-ocn(io_Os_188Os,dum_i,dum_j,n_k)
+          loc_ocn(io_Os) = ocn(io_Os,dum_i,dum_j,n_k)
+          ! calculate 187Os/192Os of export
+          loc_187Os = ocn(io_Os_187Os,dum_i,dum_j,n_k)
+          loc_standard = const_standardsR(ocn_type(io_Os_187Os))
+          loc_delta = fun_calc_isotope_deltaR(loc_192Os,loc_187Os,loc_standard,const_real_null) + par_d187Os_OsCO3_epsilon
+          loc_ocn(io_Os_187Os) = loc_delta
+          ! calculate 188Os/192Os of export
+          loc_188Os = ocn(io_Os_188Os,dum_i,dum_j,n_k)
+          loc_standard = const_standardsR(ocn_type(io_Os_188Os))
+          loc_delta = fun_calc_isotope_deltaR(loc_192Os,loc_188Os,loc_standard,const_real_null) + par_d188Os_OsCO3_epsilon
+          loc_ocn(io_Os_188Os) = loc_delta
+          ! calculate new Os ISOTOPE abundance -- 187Os
+          loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_ocn(:),1)
+          ! calculate new Os ISOTOPE abundance -- 188Os
+          loc_188Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_ocn(:),2)
+          ! calculate equivalent Redfield ratios (comapred to bulk Os)
+          bio_part_red(is_OsCO3,is_OsCO3_187Os,dum_i,dum_j) = loc_187Os/ocn(io_Os,dum_i,dum_j,n_k)
+          bio_part_red(is_OsCO3,is_OsCO3_188Os,dum_i,dum_j) = loc_188Os/ocn(io_Os,dum_i,dum_j,n_k)
+       else
+          bio_part_red(is_OsCO3,is_OsCO3_187Os,dum_i,dum_j) = 0.0
+          bio_part_red(is_OsCO3,is_OsCO3_188Os,dum_i,dum_j) = 0.0
+       end if
+    end if
+
 
     ! ### INSERT CODE TO DEAL WITH ADDITIONAL ISOTOPES ########################################################################### !
     !

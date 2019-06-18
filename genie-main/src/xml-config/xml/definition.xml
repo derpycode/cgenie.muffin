@@ -4651,6 +4651,14 @@
 			<value datatype="real">-0.236</value>
                         <description>88/86Sr fractionation between Sr and SrCO3 -- modified from Vollstaedt et al. [2014] (87/86Sr fractionation is simply half as large)</description>
                     </param>
+                    <param name="par_d187Os_OsCO3_epsilon">
+			<value datatype="real">1.0</value>
+                        <description>187/192Os fractionation between Os and OsCO3</description>
+                    </param>
+                    <param name="par_d188Os_OsCO3_epsilon">
+			<value datatype="real">1.0</value>
+                        <description>188/192Os fractionation between Os and OsCO3</description>
+                    </param>
                     <param name="par_d13C_Corg_CH4_epsilon">
 			<value datatype="real">-35.0</value>
                         <description>methanogenesis fractionation</description>
@@ -4854,6 +4862,14 @@
                     <param name="par_bio_red_CaCO3_SrCO3_alpha">
 			<value datatype="real">0.176</value>
                         <description>partition coefficient (alpha) [Stoll and Schrag [1998]</description>
+                    </param>
+                    <param name="par_bio_red_CaCO3_OsCO3">
+			<value datatype="real">0.0E-6</value>
+                        <description>Default CaCO3 Ca:Os ratio</description>
+                    </param>
+                    <param name="par_bio_red_CaCO3_OsCO3_alpha">
+			<value datatype="real">0.0</value>
+                        <description>partition coefficient (alpha)</description>
                     </param>
                     <param name="par_bio_red_POC_POI">
 			<value datatype="real">1.0E-4</value>

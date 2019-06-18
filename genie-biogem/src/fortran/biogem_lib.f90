@@ -367,6 +367,9 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d44Ca_CaCO3_epsilon
   real::par_d88Sr_SrCO3_epsilon                                  ! 88/86Sr fractionation between Sr and SrCO3 
   namelist /ini_biogem_nml/par_d88Sr_SrCO3_epsilon
+  real::par_d187Os_OsCO3_epsilon                                  ! 187/192Os fractionation between Os and OsCO3 
+  real::par_d188Os_OsCO3_epsilon                                  ! 188/192Os fractionation between Os and OsCO3 
+  namelist /ini_biogem_nml/par_d187Os_OsCO3_epsilon,par_d188Os_OsCO3_epsilon
   real::par_d13C_Corg_CH4_epsilon                                ! methanogenesis fractionation
   namelist /ini_biogem_nml/par_d13C_Corg_CH4_epsilon
   real::par_d34S_Corg_SO4_epsilon                                ! sulphate reduction fractionation (in S isotopes)
@@ -448,6 +451,9 @@ MODULE biogem_lib
   real::par_bio_red_CaCO3_SrCO3                                     ! Default CaCO3 Sr/Ca ratio
   real::par_bio_red_CaCO3_SrCO3_alpha                               ! partition coefficient (alpha)
   NAMELIST /ini_biogem_nml/par_bio_red_CaCO3_SrCO3,par_bio_red_CaCO3_SrCO3_alpha
+  real::par_bio_red_CaCO3_OsCO3                                     ! Default CaCO3 Os/Ca ratio
+  real::par_bio_red_CaCO3_OsCO3_alpha                               ! partition coefficient (alpha)
+  NAMELIST /ini_biogem_nml/par_bio_red_CaCO3_OsCO3,par_bio_red_CaCO3_OsCO3_alpha
   real::par_bio_red_POC_POI                                     ! Default cellular C:I (I/C) ratio
   real::par_bio_red_POC_POI_C0                                  ! Reference [IO3-] value @ default C:I ratio
   NAMELIST /ini_biogem_nml/par_bio_red_POC_POI,par_bio_red_POC_POI_C0

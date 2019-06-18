@@ -675,7 +675,7 @@ MODULE gem_cmn
   !       138Ba: 
   !       87Sr:  87Sr/86Sr = 0.709175 [modern seawater ratio]
   !       88Sr:  88Sr/86Sr = 8.375209 [NBS987]
-  !       187Os:  187Os/188Os = 1.05 [modern seawater ratio]
+  !       187Os:  187Os/192Os = 0.34062 [Dabek and Hallas 2007]
   !       188Os:  188Os/192Os = 0.3244 [Dabek and Hallas 2007]
   REAL,PARAMETER,DIMENSION(n_itype_min:n_itype_max)::const_standards = (/ &
        & 0.011202,  & ! TYPE 11; 13C ! OLD: 0.011237 ! NEW: 0.011202
@@ -694,8 +694,8 @@ MODULE gem_cmn
   REAL,PARAMETER,DIMENSION(n_itype_minR:n_itype_maxR)::const_standardsR = (/ &
        & 0.709175,  & ! TYPE 24; 87Sr
        & 8.375209,  & ! TYPE 25; 88Sr 
-       & 1.05,      & ! TYPE 26; 187Os 
-       & 0.159 /)    ! TYPE 27; 188Os 
+       & 0.34062,      & ! TYPE 26; 187Os 
+       & 0.3244 /)    ! TYPE 27; 188Os 
 
   ! *** radioactive decay ***
   ! ln(2) is used for the conversion between half-life and e-folding time of decay
