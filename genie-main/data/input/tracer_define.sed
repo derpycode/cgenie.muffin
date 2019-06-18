@@ -55,6 +55,9 @@
  SrCO3            84  84  04  'CaCO3 incorporated strontium'         'wt%'     0.00     100.00
  SrCO3_87Sr       85  84  24  'd87Sr of SrCO3'                       'o/oo'   -9.99E+2    9.99E+2
  SrCO3_88Sr       86  84  25  'd88Sr of SrCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ OsCO3           100 100  04  'CaCO3 incorporated osmium'            'wt%'     0.00     100.00
+ OsCO3_187Os     101 100  26  '187Os of OsCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ OsCO3_188Os     102 100  27  '188Os of OsCO3'                       'o/oo'   -9.99E+2    9.99E+2
  FeCO3            88  88  06  'Fe carbonate'                         'wt%'     0.00     100.00
  FeCO3_13C        89  88  11  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
  FeCO3_56Fe       90  88  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2

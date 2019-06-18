@@ -143,6 +143,9 @@ CONTAINS
     conv_sed_ocn(io_Sr,is_SrCO3)                = 1.0
     conv_sed_ocn(io_Sr_87Sr,is_SrCO3_87Sr)      = 1.0
     conv_sed_ocn(io_Sr_88Sr,is_SrCO3_88Sr)      = 1.0
+    conv_sed_ocn(io_Os,is_OsCO3)                = 1.0
+    conv_sed_ocn(io_Os_187Os,is_OsCO3_187Os)      = 1.0
+    conv_sed_ocn(io_Os_188Os,is_OsCO3_188Os)      = 1.0
     conv_sed_ocn(io_DIC,is_FeCO3)               = 1.0
     conv_sed_ocn(io_Fe2,is_FeCO3)               = 1.0
     conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)       = 1.0
