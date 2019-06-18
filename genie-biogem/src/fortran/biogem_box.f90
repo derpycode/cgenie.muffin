@@ -3665,7 +3665,7 @@ CONTAINS
     ! NOTE: cap Os removal at the minimum of ([Os], [POC])
     loc_Os_scavenging = 0.0
     if ((ctrl_Os_scav_O2_dep) .and. (dum_ocn_O2 < par_scav_Os_O2_threshold)) then
-       loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*(dum_dt_scav/dum_dtyr)*dum_bio_part(is2l(is_POC))
+       loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*dum_dtyr*dum_bio_part(is2l(is_POC))
        loc_Os_scavenging = min(loc_Os_scavenging,dum_bio_part(is2l(is_POC)),loc_Os)
     elseif (.not. ctrl_Os_scav_O2_dep) then
        loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*(dum_dt_scav/dum_dtyr)*dum_bio_part(is2l(is_POC))
