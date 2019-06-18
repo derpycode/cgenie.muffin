@@ -1048,8 +1048,10 @@ MODULE biogem_lib
   REAL,DIMENSION(n_sed)::int_focnsed_sig                         !
   REAL,DIMENSION(n_ocn)::int_fsedocn_sig                         !
   REAL,DIMENSION(n_ocn)::int_ocn_sur_sig                         !
+  REAL,DIMENSION(n_ocn)::int_ocn_opn_sig                         !
   REAL,DIMENSION(n_ocn)::int_ocn_ben_sig                         !
   REAL,DIMENSION(n_carb)::int_carb_sur_sig                       !
+  REAL,DIMENSION(n_carb)::int_carb_opn_sig                       !
   REAL,DIMENSION(n_carb)::int_carb_ben_sig                       !
   REAL::int_misc_age_sig                                         !
   real::int_misc_age_sur_sig,int_misc_age_ben_sig                !
@@ -1067,8 +1069,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm)::int_diag_forcing_sig                    ! forcing diagnostics
   REAL,DIMENSION(n_diag_misc_2D)::int_diag_misc_2D_sig           !
   ! misc
-  real::int_misc_ocn_solfor_sig                                  !
-  real::int_misc_ocn_fxsw_sig                                    !
+  real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
+  real::int_misc_ocn_fxsw_sig,int_misc_opn_fxsw_sig              !
   ! 'snap-shot' time-series arrays
   real::snap_misc_ocn_solfor_N_sig                               !
   real::snap_misc_ocn_solfor_S_sig                               !
