@@ -374,6 +374,11 @@ subroutine ecogem(          &
                     elseif (io.eq.iChlo) then
                        assimilated(io,:) = 0.0                  ! don't assimilate chlorophyll
                     endif
+                    do jpred=1,npmax ! JDW - check do loop is needed
+                       if (io.eq.iSili .and. pft(jpred).eq.'zooplankton') then ! .and. silicify(:).eq.0.0) then
+                         assimilated(io,jpred) = 0.0                  ! don't assimilate Si if not selected - Scott April 2019
+                       endif
+                    enddo
                     unassimilated(:,:) = 1.0 - assimilated(:,:)
                  enddo
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -468,8 +473,7 @@ subroutine ecogem(          &
                  dorgmatisodt(:,:) = 0.0
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  orgbGraz(:,:) = 0.0
-
-                 do io=1,iomax
+                 do io=1,iomax !! Be aware this calculates also for Si "OM" - Fanny/Jamie - Jun19
                     ! mortality
                     dorgmatdt(io,1) = dorgmatdt(io,1) + sum(loc_biomass(io,:) * mortality(:)        * beta_mort(:)  ) ! fraction to DOM
                     dorgmatdt(io,2) = dorgmatdt(io,2) + sum(loc_biomass(io,:) * mortality(:)        * beta_mort_1(:)) ! fraction to POM
@@ -657,6 +661,7 @@ subroutine ecogem(          &
   if (nquota)  dum_egbg_sfcpart(is_PON   ,:,:,:) = orgmat_flux(iNitr,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   if (pquota)  dum_egbg_sfcpart(is_POP   ,:,:,:) = orgmat_flux(iPhos,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   if (fquota)  dum_egbg_sfcpart(is_POFe  ,:,:,:) = orgmat_flux(iIron,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
+  if (squota)  dum_egbg_sfcpart(is_opal  ,:,:,:) = (orgmat_flux(iSili,1,:,:,:) + orgmat_flux(iSili,2,:,:,:)) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} ! FMM/JDW June 2019, "DOSi + POSi"
   !ckc Isotopes particulate
   dum_egbg_sfcpart(is_POC_13C,:,:,:) = orgmatiso_flux(iCarb13C,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
 

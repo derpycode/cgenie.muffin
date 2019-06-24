@@ -1,6 +1,6 @@
 ! ******************************************************************************************************************************** !
 ! ecogem_data.f90
-! 
+!
 ! DATA LOADING/SAVING/INITIALIZATION ROUTINES
 ! ******************************************************************************************************************************** !
 
@@ -20,7 +20,7 @@ CONTAINS
   SUBROUTINE sub_load_goin_ecogem()
     USE genie_util, ONLY: check_unit,check_iostat
     ! local variables
-    integer::ios 
+    integer::ios
     ! read data_ECOGEM file
     call check_unit(in,__LINE__,__FILE__)
     open(unit=in,file='data_ECOGEM',status='old',action='read',iostat=ios)
@@ -183,7 +183,7 @@ CONTAINS
     integer::loc_ncid                                          !
     CHARACTER(len=255)::loc_filename                           ! filename string
     CHARACTER(len=255)::shrtstrng                              ! variable string
-    real,dimension(n_i,n_j,n_k)::loc_ijk                       ! 
+    real,dimension(n_i,n_j,n_k)::loc_ijk                       !
     integer::loc_ndims,loc_nvars
     integer::loc_n_l_plankton                                  ! number of plankton in binary re-start file
     integer,ALLOCATABLE,dimension(:)::loc_dimlen
@@ -229,7 +229,7 @@ CONTAINS
           call check_iostat(alloc_error,__LINE__,__FILE__)
           ! -------------------------------------------------- ! get variable names
           call sub_inqvars(loc_ncid,loc_ndims,loc_nvars,loc_dimlen,loc_varname,loc_vdims,loc_varlen)
-          ! -------------------------------------------------- ! load plankton restart fields   
+          ! -------------------------------------------------- ! load plankton restart fields
           IF (ctrl_debug_eco_init) print*,' * Loading plankton restart fields: '
           DO iv=1,loc_nvars
              DO io=1,iomax+iChl
@@ -242,8 +242,8 @@ CONTAINS
                       !                  if ('eco2D'//trim(shrtstrng) == trim(loc_varname(iv))) then
                       !                    IF (ctrl_debug_eco_init) print*,"Loading "//trim(loc_varname(iv))
                       !                    loc_ij(:,:) = 0.0 ! NEED OCEAN MASK
-                      !                    call sub_getvarij(loc_ncid,'eco2D'//shrtstrng,n_i,n_j,loc_ij(:,:)) ! load 2D fields     
-                      !                    ! ???(io,jp,:,:) = loc_ij(:,:)  
+                      !                    call sub_getvarij(loc_ncid,'eco2D'//shrtstrng,n_i,n_j,loc_ij(:,:)) ! load 2D fields
+                      !                    ! ???(io,jp,:,:) = loc_ij(:,:)
                       !                  endif
                       ! ------------------------------------------------------------------------------------
                       ! read 3D variables
@@ -254,7 +254,7 @@ CONTAINS
                          ! possible 'malloc' error associated with this call ...
                          call sub_getvarijk(loc_ncid,'eco3D'//shrtstrng,n_i,n_j,n_k,loc_ijk(:,:,:)) ! load 3D fields
                          ! *************************************************************************************************************
-                         plankton(io,jp,:,:,:) = loc_ijk(:,:,:)  
+                         plankton(io,jp,:,:,:) = loc_ijk(:,:,:)
                       endif
                       ! ------------------------------------------------------------------------------------
                    endif ! end if not zooplankton chlorophyll
@@ -343,7 +343,7 @@ CONTAINS
           silicify(jp)    = 1.0
           autotrophy(jp)  = 1.0
           heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          palatability(jp)= 0.5 ! JDW
        elseif (pft(jp).eq.'coccolithophore') then
           NO3up(jp)       = 1.0
           Nfix(jp)        = 0.0
@@ -392,14 +392,14 @@ CONTAINS
           autotrophy(jp)  = trophic_tradeoff*0.5
           heterotrophy(jp)= trophic_tradeoff*0.5
           palatability(jp)= 0.5
-       else 
-          print*," " 
-          print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" 
+       else
+          print*," "
+          print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           print*,"! Unknown plankton functional type '"//trim(pft(jp))//"'"
           print*,"! Specified in input file "//TRIM(par_indir_name)//TRIM(par_ecogem_plankton_file)
           print*,"Choose from Prochlorococcus, Synechococcus, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Phytoplankton, Zooplankton or Mixotroph"
-          print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" 
-          stop         
+          print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+          stop
        endif
     enddo
 
@@ -468,12 +468,12 @@ CONTAINS
     if (squota) then ! silicon parameters
        qmin(iSili,:)     =   qminSi_a * volume(:) **    qminSi_b                 * silicify(:)
        qmax(iSili,:)     =   qmaxSi_a * volume(:) **    qmaxSi_b                 * silicify(:)
-       if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
+       !if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
        vmax(iSiO2,:)     = vmaxSiO2_a * volume(:) **  vmaxSiO2_b * autotrophy(:) * silicify(:)
        affinity(iSiO2,:) =affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
        kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
     endif
-    !-----------------------------------------------------------------------------------------  
+    !-----------------------------------------------------------------------------------------
 
     ! other parameters
     qcarbon(:)  =     qcarbon_a * volume(:) ** qcarbon_b
@@ -591,7 +591,7 @@ CONTAINS
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ! initialise plankton state variables with maximum quotas
     plankton(:,:,:,:,:) = 0.0
-    plankton(iCarb, :,:,:,n_k-n_keco+1:n_k) = 1.0e-1                  
+    plankton(iCarb, :,:,:,n_k-n_keco+1:n_k) = 1.0e-1
     do jp=1,npmax
        if (chlquota) plankton(iChlo,jp,:,:,n_k-n_keco+1:n_k) = chl2nmax / 6.625 * plankton(iCarb,jp,:,:,n_k-n_keco+1:n_k)
        if (nquota)   plankton(iNitr,jp,:,:,n_k-n_keco+1:n_k) = qmin(iNitr,jp)   * plankton(iCarb,jp,:,:,n_k-n_keco+1:n_k)
@@ -610,7 +610,7 @@ CONTAINS
     enddo
 
 
-    if (c13trace) then !ckc initialise carbon 13 for full food web tracing 
+    if (c13trace) then !ckc initialise carbon 13 for full food web tracing
        plankiso(:,:,:,:,:) = 0.0
        plankiso(iCarb13C, :,:,:,n_k-n_keco+1:n_k) = plankton(iCarb, :,:,:,n_k-n_keco+1:n_k) * 0.0109 !about -24permil
        !plankiso initialisation works here, but when it gets to ecogem.f90 its got weird...
@@ -649,10 +649,10 @@ CONTAINS
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
 
     if (loc_n_elements.eq.0) then
-       print*," " 
-       print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" 
+       print*," "
+       print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
        print*,"! No plankton types specified in input file ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_plankton_file)
-       print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" 
+       print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
        stop
     endif
 
@@ -803,7 +803,7 @@ CONTAINS
        DO j=1,n_j
           loc_grid_area = 2.0*const_pi*(const_rEarth**2)*(1.0/n_i)*(goldstein_sv(j) - goldstein_sv(j-1))
           ocn_grid_vol(i,j,:) = loc_grid_area * goldstein_dz(:) * goldstein_dsc
-          !print*,ocn_grid_vol(i,j,n_k) 
+          !print*,ocn_grid_vol(i,j,n_k)
        END DO
     END DO
 
@@ -816,10 +816,10 @@ CONTAINS
   ! local variables
   integer::i,j,loc_n_elements,loc_n_start,ios
   character(LEN=127)::loc_filename
-  
+
   loc_filename = TRIM(par_indir_name)//TRIM(par_ecogem_force_T_file)
   !CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
-  
+
   ! open file pipe
   OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -828,9 +828,8 @@ CONTAINS
   ! close file pipe
   CLOSE(unit=in,iostat=ios)
   call check_iostat(ios,__LINE__,__FILE__)
-  
+
   end subroutine sub_init_load_forceT
   ! ****************************************************************************************************************************** !
 
 END MODULE ecogem_data
-
