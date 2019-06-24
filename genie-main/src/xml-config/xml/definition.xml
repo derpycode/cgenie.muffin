@@ -6157,7 +6157,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 		</param>
 		<param name="par_data_TM_avg_n">
                      	<value datatype="real">1.0</value>
-		</param>    
+		</param>
                 </namelist>
             </file>
         </model>
@@ -7856,7 +7856,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
 <!-- Silicon parameters -->
                     <param name="qminSi_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.002</value>
 	                  <description>Silicon minimum quota - intercept</description>
                     </param>
                     <param name="qminSi_b">
@@ -7864,7 +7864,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 	                  <description>Silicon minimum quota - exponent</description>
                     </param>
                     <param name="qmaxSi_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.004</value>
 	                  <description>Silicon maximum quota - intercept</description>
                     </param>
                     <param name="qmaxSi_b">
@@ -7872,19 +7872,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 	                  <description>Silicon maximum quota - exponent</description>
                     </param>
                     <param name="vmaxSiO2_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.077</value>
 	                  <description>Maximum silica uptake rate - intercept</description>
                     </param>
                     <param name="vmaxSiO2_b">
-			<value datatype="real">0.0</value>
+			<value datatype="real">-0.27</value>
 	                  <description>Maximum silica uptake rate - exponent</description>
                     </param>
                     <param name="affinSiO2_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.024</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - intercept</description>
                     </param>
                     <param name="affinSiO2_b">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.27</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - exponent</description>
                     </param>
                     <param name="kexcSi_a">

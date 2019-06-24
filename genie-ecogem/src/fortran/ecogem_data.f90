@@ -343,7 +343,7 @@ CONTAINS
           silicify(jp)    = 1.0
           autotrophy(jp)  = 1.0
           heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          palatability(jp)= 0.5 ! JDW
        elseif (pft(jp).eq.'coccolithophore') then
           NO3up(jp)       = 1.0
           Nfix(jp)        = 0.0
@@ -474,7 +474,7 @@ CONTAINS
     if (squota) then ! silicon parameters
        qmin(iSili,:)     =   qminSi_a * volume(:) **    qminSi_b                 * silicify(:)
        qmax(iSili,:)     =   qmaxSi_a * volume(:) **    qmaxSi_b                 * silicify(:)
-       if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
+       !if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
        vmax(iSiO2,:)     = vmaxSiO2_a * volume(:) **  vmaxSiO2_b * autotrophy(:) * silicify(:)
        affinity(iSiO2,:) =affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
        kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)

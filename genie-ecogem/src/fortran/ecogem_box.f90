@@ -80,6 +80,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     integer :: io
+    real,dimension(iomax,npmax) :: denom ! JDW
     !
     ! *****************************************************************
     ! ******************** Evaluate Limitation ***********************
@@ -101,10 +102,13 @@ CONTAINS
     qreg(:,:)        = 0.0 ! (iomax,npmax)
     qreg_h(:,:)      = 0.0 ! (iomax,npmax)
 
+    ! JDW: precalculate qmin-qmax to avoid divide by zero errorss
+    denom = merge(1.0/(qmax - qmin),0.0,qmax.gt.0.0) ! JDW: calculate 1.0/denominator and take care of instances of 1.0/0.0
     ! Calculate quota limitation terms
     ! N and Si take linear form
     if (nquota) limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) / ( qmax(iNitr,:) - qmin(iNitr,:))
-    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:))
+    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) * denom(iSili,:) ! JDW
+    !if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:)) ! original
     ! P and Fe take normalised Droop form
     if (pquota) limit(iPhos,:) = (1.0 - qmin(iPhos,:)/quota(iPhos,:)) / (1.0 - qmin(iPhos,:)/qmax(iPhos,:) )
     if (fquota) limit(iIron,:) = (1.0 - qmin(iIron,:)/quota(iIron,:)) / (1.0 - qmin(iIron,:)/qmax(iIron,:) )
@@ -114,7 +118,8 @@ CONTAINS
 
     do io = 2,iomax ! skip carbon index; quota = X:C biomass ratio
        ! Calculate linear regulation term
-       qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) )
+       qreg(io,:) = (qmax(io,:) - quota(io,:)) * denom(io,:) ! JDW
+       !qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) ) ! original
        ! Transform regulation term using hill number
        qreg_h(io,:) = qreg(io,:) ** hill
     enddo
@@ -148,7 +153,6 @@ CONTAINS
     ! *****************************************************************
     ! ******************** Resource Acquisition ***********************
     ! *****************************************************************
-
     ! initialise
     up_inorg(2:iimax,:) = 0.0
     ! C-specific nutrient uptake
@@ -431,7 +435,7 @@ CONTAINS
                 ! other organic elements (+ chlorophyll) are grazed in stoichiometric relation to carbon
                 do io=2,iomax+iChl
                    if (biomass(iCarb,jprey).gt.0.0) then
-                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) & 
+                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) &
                            &                                      * biomass(io,jprey)/biomass(iCarb,jprey)
                    endif
                 enddo ! io
@@ -449,7 +453,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
-  ! ****************************************************************************************************************************** !  
+  ! ****************************************************************************************************************************** !
   !ckc fractiontion to calculate nutrient isotopes uptake rates based on up_inorg
   SUBROUTINE nut_fractionation (           &
        up_inorg,    &
@@ -554,4 +558,3 @@ CONTAINS
   ! ****************************************************************************************************************************** !
 
 END MODULE ecogem_box
-
