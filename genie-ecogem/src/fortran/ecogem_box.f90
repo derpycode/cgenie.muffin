@@ -114,7 +114,9 @@ CONTAINS
     if (fquota) limit(iIron,:) = (1.0 - qmin(iIron,:)/quota(iIron,:)) / (1.0 - qmin(iIron,:)/qmax(iIron,:) )
 
     ! Set Von Leibig limitation according to most limiting nutrient (excluding iCarb=1)
-    VLlimit(:) = minval(limit(2:iomax,:),1)
+    ! VLlimit(:) = minval(limit(2:iomax,:),1) ! original
+    VLlimit(:) = minval(limit(2:max(iNitr,iPhos,iIron),:),1) ! JDW: calculate limitation for N,P,Fe ony
+    VLlimit = merge(minval(limit(2:iomax,:),1),minval(limit(2:max(iNitr,iPhos,iIron),:),1),silicify.eq.1.0) ! JDW: in case of diatom reset taking into account SiO2
 
     do io = 2,iomax ! skip carbon index; quota = X:C biomass ratio
        ! Calculate linear regulation term
