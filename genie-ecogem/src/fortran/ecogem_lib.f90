@@ -201,8 +201,12 @@ MODULE ecogem_lib
   ! ------------------- MISC ----------------------------------------------------------------------------------------------------- !
   logical::ctrl_limit_neg_biomass
   NAMELIST /ini_ecogem_nml/ ctrl_limit_neg_biomass
+  ! functional type parameters
   real::par_cocco_palatability_mod , par_cocco_vmax_mod
   namelist /ini_ecogem_nml/ par_cocco_palatability_mod,par_cocco_vmax_mod
+  real::par_diatom_palatability_mod , par_diatom_vmax_mod
+  namelist /ini_ecogem_nml/ par_diatom_palatability_mod,par_diatom_vmax_mod
+
   ! ------------------- TEST" !--------------------------------------------------------------------------------------------------- !
   logical::ctrl_hello_world                                             ! hello world!
   NAMELIST /ini_ecogem_nml/ctrl_hello_world
