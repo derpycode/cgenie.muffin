@@ -7880,11 +7880,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 	                  <description>Maximum silica uptake rate - exponent</description>
                     </param>
                     <param name="affinSiO2_a">
-			<value datatype="real">0.024</value>
+			<value datatype="real">3.208</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - intercept</description>
                     </param>
                     <param name="affinSiO2_b">
-			<value datatype="real">0.27</value>
+			<value datatype="real">-0.54</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - exponent</description>
                     </param>
                     <param name="kexcSi_a">
