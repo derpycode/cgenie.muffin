@@ -343,7 +343,7 @@ CONTAINS
           silicify(jp)    = 1.0
           autotrophy(jp)  = 1.0
           heterotrophy(jp)= 0.0
-          palatability(jp)= 0.5 ! JDW
+          palatability(jp)= par_diatom_palatability_mod ! JDW
        elseif (pft(jp).eq.'coccolithophore') then
           NO3up(jp)       = 1.0
           Nfix(jp)        = 0.0
@@ -423,6 +423,7 @@ CONTAINS
     ! maximum photosynthetic rate
     !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
     vmax(iDIC,:)    = (vmaxDIC_a  + log10(volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(volume(:)) + log10(volume(:))**2) * autotrophy(:)
+    vmax(iDIC,:)    = merge(vmax(iDIC,:)*par_diatom_vmax_mod,vmax(iDIC,:),silicify.eq.1.0)
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
        qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
@@ -454,6 +455,8 @@ CONTAINS
        vmax(iPO4,:)     = vmaxPO4_a  * volume(:) **  vmaxPO4_b * autotrophy(:)
        affinity(iPO4,:) = affinPO4_a * volume(:) ** affinPO4_b * autotrophy(:)
        kexc(iPhos,:)    =   kexcP_a  * volume(:) **    kexcP_b
+
+       vmax(iPO4,:)    = merge(vmax(iPO4,:)*par_diatom_vmax_mod,vmax(iPO4,:),silicify.eq.1.0)
     endif
     !-----------------------------------------------------------------------------------------
     if (fquota) then ! iron parameters

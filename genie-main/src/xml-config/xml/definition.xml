@@ -8154,6 +8154,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">temperature.dat</value>
 		     			<description>Input file for forcing temperature in ecogem</description>
                     </param>
+                    <param name="par_diatom_palatability_mod">
+      <value datatype="real">1.0</value>
+              <description>Modifier for diatom palatability</description>
+                    </param>
+                    <param name="par_diatom_vmax_mod">
+      <value datatype="real">1.0</value>
+              <description>Modifier for diatom uptake and growth</description>
+                    </param>
                 </namelist>
             </file>
         </model>

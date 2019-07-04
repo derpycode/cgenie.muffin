@@ -1,6 +1,6 @@
 ! ******************************************************************************************************************************** !
 ! ecogem_lib.f90
-! 
+!
 ! LIBRARY MODULE
 ! ******************************************************************************************************************************** !
 
@@ -37,7 +37,7 @@ MODULE ecogem_lib
   logical :: useFe   ! using Iron
   logical :: useSiO2 ! using Silicate
   namelist/ini_ecogem_nml/useDIC,useNO3,useNO2,useNH4,usePO4,useFe,useSiO2
-  logical :: useDIC_13C !ckc added by kc, using carbon-13 DIC  
+  logical :: useDIC_13C !ckc added by kc, using carbon-13 DIC
   namelist/ini_ecogem_nml/useDIC_13C
   logical :: nquota   ! dynamic N quota
   logical :: pquota   ! dynamic P quota
@@ -50,11 +50,11 @@ MODULE ecogem_lib
   logical :: c13trace !ckc tracing for carbon 13
   namelist/ini_ecogem_nml/c13trace
 
-  !ckc need to add either a logical or other to choose which c13 scheme to use  
+  !ckc need to add either a logical or other to choose which c13 scheme to use
 
   ! ****************************************************************************************************************************** !
   ! *** ECOSYSTEM MODEL RATE and RELATIONSHIP PARAMETERS ************************************************************************* !
-  ! ****************************************************************************************************************************** ! 
+  ! ****************************************************************************************************************************** !
   ! Nitrogen parameters
   real :: qminN_a,   qminN_b        ! a/b: minimum quota
   real :: qmaxN_a,   qmaxN_b        ! a/b: maximum quota
@@ -135,11 +135,11 @@ MODULE ecogem_lib
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff
   ! Temperature dependence
-  real ::  temp_A,temp_T0   ! 
+  real ::  temp_A,temp_T0   !
   namelist/ini_ecogem_nml/temp_A,temp_T0
   ! maximum temperature
   real ::  temp_max
-  namelist/ini_ecogem_nml/temp_max 
+  namelist/ini_ecogem_nml/temp_max
   ! CaCO3 production
   real ::  par_bio_red_POC_CaCO3,par_bio_red_POC_CaCO3_pP
   namelist/ini_ecogem_nml/par_bio_red_POC_CaCO3,par_bio_red_POC_CaCO3_pP
@@ -152,11 +152,11 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/ctrl_tdep_form,ctrl_photosynth_form
   ! other stuff
   integer :: nsubtime ! Number of ecogem timesteps per biogem timestep
-  NAMELIST /ini_ecogem_nml/nsubtime! 
-  CHARACTER(len=127)::par_ecogem_plankton_file 
-  NAMELIST /ini_ecogem_nml/par_ecogem_plankton_file 
-  ! JDW force T fields 
-  logical::ctrl_force_T 
+  NAMELIST /ini_ecogem_nml/nsubtime!
+  CHARACTER(len=127)::par_ecogem_plankton_file
+  NAMELIST /ini_ecogem_nml/par_ecogem_plankton_file
+  ! JDW force T fields
+  logical::ctrl_force_T
   namelist /ini_ecogem_nml/ctrl_force_T
   character(LEN=127)::par_ecogem_force_T_file
   namelist /ini_ecogem_nml/par_ecogem_force_T_file
@@ -176,16 +176,16 @@ MODULE ecogem_lib
   LOGICAL::ctrl_misc_t_BP                                      ! years before present?
   NAMELIST /ini_ecogem_nml/ctrl_misc_t_BP
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
-  CHARACTER(len=255)::par_indir_name                           ! 
-  CHARACTER(len=255)::par_outdir_name                          ! 
-  CHARACTER(len=255)::par_rstdir_name                          ! 
+  CHARACTER(len=255)::par_indir_name                           !
+  CHARACTER(len=255)::par_outdir_name                          !
+  CHARACTER(len=255)::par_rstdir_name                          !
   NAMELIST /ini_ecogem_nml/par_indir_name,par_outdir_name,par_rstdir_name
-  CHARACTER(len=127)::par_infile_name,par_outfile_name         ! 
+  CHARACTER(len=127)::par_infile_name,par_outfile_name         !
   NAMELIST /ini_ecogem_nml/par_infile_name,par_outfile_name
   ! ------------------- DATA SAVING: MISC ---------------------------------------------------------------------------------------- !
   LOGICAL::ctrl_ncrst                                          ! restart as netCDF format?
   NAMELIST /ini_ecogem_nml/ctrl_ncrst
-  CHARACTER(len=127)::par_ncrst_name                           ! 
+  CHARACTER(len=127)::par_ncrst_name                           !
   NAMELIST /ini_ecogem_nml/par_ncrst_name
   REAL :: par_data_save_sig_dt,par_data_save_slice_dt          ! Integration interval (years)
   NAMELIST /ini_ecogem_nml/par_data_save_sig_dt,par_data_save_slice_dt
@@ -196,11 +196,14 @@ MODULE ecogem_lib
   LOGICAL::ctrl_data_save_sig_autoend,ctrl_data_save_3d_sig
   NAMELIST /ini_ecogem_nml/ctrl_data_save_sig_autoend,ctrl_data_save_3d_sig
   ! ------------------- DATA SAVING: TIME-SERIES --------------------------------------------------------------------------------- !
-  LOGICAL::ctrl_data_save_timeseries                           ! time-series data save: e.g. JGOFS  
+  LOGICAL::ctrl_data_save_timeseries                           ! time-series data save: e.g. JGOFS
   NAMELIST /ini_ecogem_nml/ ctrl_data_save_timeseries
   ! ------------------- MISC ----------------------------------------------------------------------------------------------------- !
   logical::ctrl_limit_neg_biomass
   NAMELIST /ini_ecogem_nml/ ctrl_limit_neg_biomass
+  ! diatom type adjustments
+  real::par_diatom_palatability_mod , par_diatom_vmax_mod
+  namelist /ini_ecogem_nml/ par_diatom_palatability_mod,par_diatom_vmax_mod
   ! ------------------- TEST" !--------------------------------------------------------------------------------------------------- !
   logical::ctrl_hello_world                                             ! hello world!
   NAMELIST /ini_ecogem_nml/ctrl_hello_world
@@ -213,8 +216,8 @@ MODULE ecogem_lib
 
   ! *** array dimensions ***
   ! grid dimensions
-  INTEGER,PARAMETER::n_i = ilon1_ocn                                    ! 
-  INTEGER,PARAMETER::n_j = ilat1_ocn                                    ! 
+  INTEGER,PARAMETER::n_i = ilon1_ocn                                    !
+  INTEGER,PARAMETER::n_j = ilat1_ocn                                    !
   INTEGER,PARAMETER::n_k = inl1_ocn                                     !
 
   ! indices for ecological arrays
@@ -230,24 +233,24 @@ MODULE ecogem_lib
 
   ! ****************************************************************************************************************************** !
   ! *** GLOBAL VARIABLES AND RUN-TIME SET PARAMETERS ***************************************************************************** !
-  ! *****************************************************  
+  ! *****************************************************
   ! thickness of ocean layers
-  REAL                           ::goldstein_dsc ! 
-  REAL   ,DIMENSION(n_k)         ::goldstein_dz  ! 
-  REAL   ,DIMENSION(n_k)         ::goldstein_dza ! 
-  INTEGER,DIMENSION(n_i,n_j)     ::goldstein_k1  ! 
+  REAL                           ::goldstein_dsc !
+  REAL   ,DIMENSION(n_k)         ::goldstein_dz  !
+  REAL   ,DIMENSION(n_k)         ::goldstein_dza !
+  INTEGER,DIMENSION(n_i,n_j)     ::goldstein_k1  !
   REAL   ,DIMENSION(0:n_j)       ::goldstein_sv  !
-  REAL   ,DIMENSION(n_k)         ::loc_grid_dz   ! 
+  REAL   ,DIMENSION(n_k)         ::loc_grid_dz   !
   REAL   ,DIMENSION(n_i,n_j,n_k) ::ocn_grid_vol  !
-  INTEGER,DIMENSION(n_i,n_j)     ::wet_mask_ij   ! 
-  INTEGER,DIMENSION(n_i,n_j,n_k) ::wet_mask_ijk  ! 
+  INTEGER,DIMENSION(n_i,n_j)     ::wet_mask_ij   !
+  INTEGER,DIMENSION(n_i,n_j,n_k) ::wet_mask_ijk  !
 
   ! Ecosystem arrays
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::nutrient      ! nutrient array (iimax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::plankton      ! plankton biomass array (npmax,iomax,i,j,k)
   !ckc isotope arrays for water (like nutrient) and plankton groups (like plankton)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::nutiso        !ckc isotopes of nutrient (iimaxiso, i,j,k)
-  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::plankiso      !ckc isotopes in plankton (npmax,iomaxiso,i,j,k) 
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::plankiso      !ckc isotopes in plankton (npmax,iomaxiso,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::uptake_flux   ! inorganic nutrient uptake flux for each plankton (iomax,npmax,i,j,k)
   !ckc isotope uptake flux array, to trace full food web interaction
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::up_flux_iso   !ckc rate of upstake isotopes (iimaxiso,npmax,i,j,k)
@@ -274,11 +277,11 @@ MODULE ecogem_lib
   ! Grazing kernel
   REAL,ALLOCATABLE,DIMENSION(:,:)::gkernel,gkernelT
   ! netCDF and netCDF restart parameters
-  CHARACTER(len=31)::string_rstid                              ! 
-  CHARACTER(len=7)::string_ncrunid                             ! 
-  CHARACTER(len=254)::string_ncout2d                           ! 
-  CHARACTER(len=254)::string_ncout3d                           ! 
-  CHARACTER(len=254)::string_ncrst                             ! 
+  CHARACTER(len=31)::string_rstid                              !
+  CHARACTER(len=7)::string_ncrunid                             !
+  CHARACTER(len=254)::string_ncout2d                           !
+  CHARACTER(len=254)::string_ncout3d                           !
+  CHARACTER(len=254)::string_ncrst                             !
   CHARACTER(len=254) ::string_nctsi                            !
   CHARACTER(len=254) ::string_nctsint                          !
   integer,ALLOCATABLE,DIMENSION(:)::ncout1d_ntrec              ! count for netcdf datasets
@@ -306,11 +309,11 @@ MODULE ecogem_lib
   real::par_misc_t_tslice  = 0.0
   logical::par_misc_t_intseries = .FALSE.
   logical::par_misc_t_intslice  = .FALSE.
-  
+
  ! JDW: force temperature array
   real,allocatable,dimension(:,:)::T_input! (i,j,k) array for forced temperature JDW
-  
-  ! ############################################################################################################################## !  
+
+  ! ############################################################################################################################## !
   ! ### ADD ADDITIONAL TIME-SERIES ARRAY DEFINITIONS HERE ######################################################################## !
   INTEGER :: n_tser
   character(len=16),ALLOCATABLE,DIMENSION(:)    ::tser_name       ! Time series name
@@ -334,33 +337,3 @@ MODULE ecogem_lib
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
 
 END MODULE ecogem_lib
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
