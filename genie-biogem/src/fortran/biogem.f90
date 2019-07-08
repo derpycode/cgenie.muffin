@@ -1819,7 +1819,7 @@ subroutine biogem_tracercoupling( &
     matrix_avg_count=matrix_avg_count+1 ! keep track of number of steps integrated
     matrix_vocn_n=matrix_vocn_n+1  ! one full initialise/recover cycle complete so advance counter
 
-    if(mod(real(matrix_vocn_n),(96/par_data_TM_avg_n)).eq.0)then! if at set point, average results, write to file, advance some control counters
+    if(mod(real(matrix_vocn_n),(conv_kocn_ksedgem/par_data_TM_avg_n)).eq.0)then! if at set point, average results, write to file, advance some control counters, n.b. conv_kocn_ksedgem = n_timsteps!!
 
       call matrix_recover_exp(matrix_k)
 
@@ -1978,7 +1978,7 @@ subroutine biogem_tracercoupling( &
         print*,'>>> Initialising transport matrix at depth level:',matrix_k
       end if
 
-      if(mod(matrix_vocn_n,96).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed
+      if(mod(matrix_vocn_n,conv_kocn_ksedgem).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed, n.b. conv_kocn_ksedgem = n_timesteps!!
         matrix_k=matrix_k-1 ! decrement matrix_k for next time
         if(matrix_k.gt.0) print*,'>>> Initialising transport matrix at depth level:',matrix_k
       end if

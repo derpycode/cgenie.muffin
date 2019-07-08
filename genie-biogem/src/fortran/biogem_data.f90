@@ -2530,7 +2530,7 @@ CONTAINS
                  call sub_report_error( &
 		         & 'biogem_data','sub_check_par', &
 			 & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
-			 & '[par_data_TM_start] has been changed to allow matrix diagnosis to finish', &
+			 & '[par_data_TM_start] HAS BEEN CHANGED TO ALLOW MATRIX DIAGNOSIS TO FINISH', &
 			 & (/const_real_null/),.false. &
 			 & )
                  par_data_TM_start=par_misc_t_runtime-n_k
@@ -2561,13 +2561,14 @@ CONTAINS
 			 & (/const_real_null/),.true. &
 			 & )
          end if
-        if((96.0/par_data_save_slice_n).ne.par_data_TM_avg_n)then ! JDW: need to set 96.0 to number of timesteps 
+        if((conv_kocn_ksedgem/par_data_save_slice_n).ne.par_data_TM_avg_n)then ! n.b. conv_ksedgem = n_timesteps!!
                  call sub_report_error( &
 		         & 'biogem_data','sub_check_par', &
-			 & 'The seasonal saving intervals you have chosen do not correspond to the transport matrix averaging', &
-			 & 'CONTINUING', &
+			 & 'The interannual saving intervals you have chosen do not correspond to the transport matrix averaging', &
+			 & '[par_data_save_slice_n] HAS BEEN SET TO MATCH MATRIX AVERAGING INTERVAL', &
 			 & (/const_real_null/),.false. &
 			 & )
+                par_data_save_slice_n=conv_kocn_ksedgem/par_data_TM_avg_n
          end if
     end if
 
