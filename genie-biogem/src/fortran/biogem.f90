@@ -1716,7 +1716,7 @@ subroutine biogem_tracercoupling( &
   type(fieldocn),DIMENSION(:),ALLOCATABLE::loc_vocn            !
   type(fieldocn),DIMENSION(:),ALLOCATABLE::loc_vts             !
   real,DIMENSION(:),ALLOCATABLE::loc_partialtot                !
-  integer::matrix_tracer,tmp_count ! matrix
+  integer::matrix_tracer,nc_record_count ! matrix
   real::loc_t,loc_yr
   ! ---------------------------------------------------------- !
   ! INITIALIZE LOCAL VARIABLES
@@ -1774,84 +1774,71 @@ subroutine biogem_tracercoupling( &
   if(ctrl_data_diagnose_TM) then
 
   if(matrix_go.eq.1)then
-  !print*,"<<<<Recovering Matrix Information"
 
-!print*,'<<<< Integrating matrix'
-! integrate dye experiment results array
-do l=1,6,1
-do n=1,n_vocn,1
-loc_k1=loc_vts(n)%k1
-do k=n_k,loc_k1,-1
-select case(l)
-case(1)
-matrix_exp(n)%mk(io2l(io_col0),k)=matrix_exp(n)%mk(io2l(io_col0),k)+loc_vts(n)%mk(io2l(io_col0),k)
-case(2)
-matrix_exp(n)%mk(io2l(io_col1),k)=matrix_exp(n)%mk(io2l(io_col1),k)+loc_vts(n)%mk(io2l(io_col1),k)
-case(3)
-matrix_exp(n)%mk(io2l(io_col2),k)=matrix_exp(n)%mk(io2l(io_col2),k)+loc_vts(n)%mk(io2l(io_col2),k)
-case(4)
-matrix_exp(n)%mk(io2l(io_col3),k)=matrix_exp(n)%mk(io2l(io_col3),k)+loc_vts(n)%mk(io2l(io_col3),k)
-case(5)
-matrix_exp(n)%mk(io2l(io_col4),k)=matrix_exp(n)%mk(io2l(io_col4),k)+loc_vts(n)%mk(io2l(io_col4),k)
-case(6)
-matrix_exp(n)%mk(io2l(io_col5),k)=matrix_exp(n)%mk(io2l(io_col5),k)+loc_vts(n)%mk(io2l(io_col5),k)
-end select
-end do
-end do
-end do
-matrix_avg_count=matrix_avg_count+1 ! keep track of number of steps integrated
-matrix_vocn_n=matrix_vocn_n+1  ! one full initialise/recover cycle complete so advance counter
-
-if(mod(real(matrix_vocn_n),(96/par_data_TM_avg_n)).eq.0)then! if at set point, average results, write to file, advance some control counters
-
-!if(matrix_season.eq.4)matrix_k=matrix_k+1 ! very last initialisation of season 4 will have advanced matrix_k so temporally undo
-call matrix_recover_exp(matrix_k)
-!if(matrix_season.eq.4)matrix_k=matrix_k-1 ! set matrix_k back for loop control
-
-if(matrix_season.eq.par_data_TM_avg_n)then !
-matrix_season=1 ! need to reset season
-else
-matrix_season=matrix_season+1 ! otherwise advance season
-end if
-
-matrix_avg_count=0 ! since we have zeroed the matrix array, set the averaging count to 0
-end if ! end of experiment recovering call
-
-end if ! end of store/write call
-
-  ! if we have been through 96 steps then move to next depth level
-  ! get out clause when all boxes are initialised....
-  ! n_vocn is not the number of all wet
-  ! grid boxes though-> is the number of wet 2d grid points!
-  IF(matrix_k.lt.1)THEN
-  ! write out an indexing file
-  tmp_count=1
-  do n=1,n_vocn,1
-    loc_k1 = loc_vts(n)%k1
-      do k=n_k,loc_k1,-1
-        call sub_save_netcdf_TM(0,tmp_count,0.0,0,0,0,loc_vts(n)%i,loc_vts(n)%j,k)
-        tmp_count=tmp_count+1
+    ! if matrix_k == 0 then we have finished diagnosing the matrix
+    ! instead of recording results, write index and let run finish
+    IF(matrix_k.lt.1)THEN
+      ! write out an indexing file
+      nc_record_count=1
+      do n=1,n_vocn,1
+        loc_k1 = loc_vts(n)%k1
+        do k=n_k,loc_k1,-1
+          call sub_save_netcdf_TM(0,nc_record_count,0.0,0,0,0,loc_vts(n)%i,loc_vts(n)%j,k)
+          nc_record_count=nc_record_count+1
+        end do
       end do
-  end do
-  ! open(21,file='muffin_matrix_v_index')
-  ! do n=1,n_vocn,1
-  ! loc_k1 = loc_vts(n)%k1
-  ! do k=n_k,loc_k1,-1
-  ! write(21,FMT='(A2,1X,A2,1X,A2)')&
-  ! &fun_conv_num_char_n(2,loc_vts(n)%i), &
-  ! &fun_conv_num_char_n(2,loc_vts(n)%j), &
-  ! &fun_conv_num_char_n(2,k)
-  ! end do
-  ! end do
-  ! close(21)
-  ! ! shut down the simulation
-  ! print*, '*** <<< MATRIX DIAGNOSED.....'
-  ! print*, '*** <<< MATRIX INDEX WRITTEN TO FILE'
-  ! ctrl_data_diagnose_TM=.false. ! stop matrix being diagnosed
-  !stop
-  end if
+      print*, '>>> Transport matrix diagnosed'
+      print*, '>>> Transport matrix index written to file'
+      ctrl_data_diagnose_TM=.false. ! stop matrix being diagnosed
 
-  end if
+    else
+
+    ! integrate dye experiment results array
+    do l=1,6,1
+      do n=1,n_vocn,1
+        loc_k1=loc_vts(n)%k1
+        do k=n_k,loc_k1,-1
+          select case(l)
+          case(1)
+            matrix_exp(n)%mk(io2l(io_col0),k)=matrix_exp(n)%mk(io2l(io_col0),k)+loc_vts(n)%mk(io2l(io_col0),k)
+          case(2)
+            matrix_exp(n)%mk(io2l(io_col1),k)=matrix_exp(n)%mk(io2l(io_col1),k)+loc_vts(n)%mk(io2l(io_col1),k)
+          case(3)
+            matrix_exp(n)%mk(io2l(io_col2),k)=matrix_exp(n)%mk(io2l(io_col2),k)+loc_vts(n)%mk(io2l(io_col2),k)
+          case(4)
+            matrix_exp(n)%mk(io2l(io_col3),k)=matrix_exp(n)%mk(io2l(io_col3),k)+loc_vts(n)%mk(io2l(io_col3),k)
+          case(5)
+            matrix_exp(n)%mk(io2l(io_col4),k)=matrix_exp(n)%mk(io2l(io_col4),k)+loc_vts(n)%mk(io2l(io_col4),k)
+          case(6)
+            matrix_exp(n)%mk(io2l(io_col5),k)=matrix_exp(n)%mk(io2l(io_col5),k)+loc_vts(n)%mk(io2l(io_col5),k)
+          end select
+        end do
+      end do
+    end do
+
+    matrix_avg_count=matrix_avg_count+1 ! keep track of number of steps integrated
+    matrix_vocn_n=matrix_vocn_n+1  ! one full initialise/recover cycle complete so advance counter
+
+    if(mod(real(matrix_vocn_n),(96/par_data_TM_avg_n)).eq.0)then! if at set point, average results, write to file, advance some control counters
+
+      call matrix_recover_exp(matrix_k)
+
+      if(matrix_season.eq.par_data_TM_avg_n)then !
+        matrix_season=1 ! need to reset season
+      else
+        matrix_season=matrix_season+1 ! otherwise advance season
+      end if
+
+      matrix_avg_count=0 ! since we have zeroed the matrix array, set the averaging count to 0
+    end if ! end of experiment recovering call (mod(real...))
+
+  end if ! end of store/write call (matrix_go)
+
+  end if ! write index, matrix_k.lt.1
+
+  end if ! ctrl_data_diagnose_TM
+
+
   ! ---------------------------------------------------------- !
   ! OCEAN TRACER UPDATE
   ! ---------------------------------------------------------- !
@@ -1979,52 +1966,53 @@ end if ! end of store/write call
         vphys_ocn(n)%mk(ipo_rM,loc_k1:n_k) = loc_Sratio*vphys_ocn(n)%mk(ipo_rM,loc_k1:n_k)
      end do
   ! ---------------------------------------------------------- !
-  ! MUFFIN MATRIX I
+  ! MUFFIN MATRIX II
   ! ---------------------------------------------------------- !
   ! initialise colour tracer in ts (going to goldstein)
   ! n.b. matrix_count & matrix_k are set in biogem_lib
-  !IF(par_misc_matrix)THEN
-  ! initialising grid_boxes with 1 mol kg-1 of colour tracer
 
-if(ctrl_data_diagnose_TM)THEN
-if(loc_yr.ge.par_data_TM_start)then
-!print*,'<<<< Initialising Matrix'
+  if(ctrl_data_diagnose_TM)THEN
+    if(loc_yr.ge.par_data_TM_start)then
 
-if(mod(matrix_vocn_n,96).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed, catch issue when matrix_vocn_n=0 initally?
-matrix_k=matrix_k-1 ! decrement matrix_k for next time
-print*,'>>> initialising matrix_k level:',matrix_k
-end if
+      if(matrix_vocn_n.eq.0)then ! catch issue when matrix_vocn_n=0 initally
+        print*,'>>> Initialising transport matrix at depth level:',matrix_k
+      end if
+
+      if(mod(matrix_vocn_n,96).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed
+        matrix_k=matrix_k-1 ! decrement matrix_k for next time
+        if(matrix_k.gt.0) print*,'>>> Initialising transport matrix at depth level:',matrix_k
+      end if
+
+      ! initialising grid_boxes with 1 mol kg-1 of colour tracer
+      do n=1,n_vocn
+        loc_k1=loc_vocn(n)%k1
+        ! check k level for matrix is not in sediment
+        if (matrix_k.ge.loc_k1) then
+          matrix_tracer=mod(2*loc_vts(n)%j-1+mod(loc_vts(n)%i-1,6),6)+1 ! get tracer number for i j
+          select case (matrix_tracer)
+          CASE(1)
+            loc_vts(n)%mk(io2l(io_col0),matrix_k)=1.0
+          CASE(2)
+            loc_vts(n)%mk(io2l(io_col1),matrix_k)=1.0
+          CASE(3)
+            loc_vts(n)%mk(io2l(io_col2),matrix_k)=1.0
+          CASE(4)
+            loc_vts(n)%mk(io2l(io_col3),matrix_k)=1.0
+          CASE(5)
+            loc_vts(n)%mk(io2l(io_col4),matrix_k)=1.0
+          CASE(6)
+            loc_vts(n)%mk(io2l(io_col5),matrix_k)=1.0
+          end select
+        end if
+      end do
 
 
-do n=1,n_vocn
-loc_k1=loc_vocn(n)%k1
-! check k level for matrix is not in sediment
-if (matrix_k.ge.loc_k1) then
-matrix_tracer=mod(2*loc_vts(n)%j-1+mod(loc_vts(n)%i-1,6),6)+1 ! get tracer number for i j
-select case (matrix_tracer)
-Case(1)
-loc_vts(n)%mk(io2l(io_col0),matrix_k)=1.0
-CASE(2)
-loc_vts(n)%mk(io2l(io_col1),matrix_k)=1.0
-CASE(3)
-loc_vts(n)%mk(io2l(io_col2),matrix_k)=1.0
-CASE(4)
-loc_vts(n)%mk(io2l(io_col3),matrix_k)=1.0
-CASE(5)
-loc_vts(n)%mk(io2l(io_col4),matrix_k)=1.0
-CASE(6)
-loc_vts(n)%mk(io2l(io_col5),matrix_k)=1.0
-end select
-end if
-end do
+      if(matrix_go.eq.0)then
+        matrix_go=1 ! flag for starting out of sync matrix loops
+      end if
 
-
-if(matrix_go.eq.0)then
-matrix_go=1 ! flag for starting out of sync matrix loops
-end if
-
-end if ! par_data_TM_start
-end if ! ctrl_data_diagnose_TM
+    end if ! par_data_TM_start
+  end if ! ctrl_data_diagnose_TM
 
      ! ---------------------------------------------------- !
      ! (4) SET DUMMARY VARIABLE VALUES FOR RETURN
@@ -3694,139 +3682,97 @@ implicit none
 
 Integer,Intent(in)::dum_matrix_k ! depth level of dye experiment
 
-integer::loop_count,loop_count2,n,n2,k,k2 ! loop counters
+integer::col_count,row_count,n,n2,k,k2 ! loop counters
 integer:: m_j,m_i,m_i_plus_one,m_i_minus_one,m_j_plus_one,m_j_minus_one ! grid_indices
 integer::matrix_tracer ! index for selecting colour tracer
 integer::loc_k1,col_name!,gridboxes,tracer_n
-real::loc_col
-character(len=127)::loc_filename
-integer::tmp_count
+real::loc_val
+integer::nc_record_count
 
-  print*,">>> Recovering Matrix Information at k level:",dum_matrix_k,'@ averaging interval n:',matrix_season
+print*,">>> Recovering Matrix Information at k level:",dum_matrix_k,'@ averaging interval n:',matrix_season
 
-  loc_filename="muffin_matrix"
-  open(22,file=loc_filename,position='append')
-
-  ! temporary hack to read out total grid-box connections
-  !gridboxes=0
-  !do tracer_n=1,6,1
-  !do n=1,n_vocn,1
-  !loc_k1=matrix_exp(n)%k1
-  !do k=n_k,loc_k1,-1
-  !
-  !
-   !select CASE (tracer_n)
-   !Case(1)
-   !col_name=io_col0
-   !Case(2)
-   !col_name=io_col1
-   !Case(3)
-   !col_name=io_col2
-   !Case(4)
-   !col_name=io_col3
-   !Case(5)
-   !col_name=io_col4
-   !Case(6)
-   !col_name=io_col5
-   !end select
-  !loc_col=matrix_exp(n)%mk(io2l(col_name),k)
-  !if(abs(loc_col).gt.const_real_nullsmall)THEN
-  !gridboxes=gridboxes+1
- ! matrix_exp(n)%mk(io2l(col_name),k)=0.0
-  !end if
-  !
-  !end do
-  !end do
-  !end do
-
-  !write(22,FMT='(I8)')&
-  ! & gridboxes
-
-  ! loop over boxes in vts
-   loop_count=1	 ! outer loop for matrix column	index
-   loop_count2=1	! inner loop for matrix row index
-   tmp_count=1
-   do n=1,n_vocn,1
-   loc_k1 = matrix_exp(n)%k1
+! loop over boxes in vts
+col_count=1  ! outer loop for matrix column	index
+row_count=1  ! inner loop for matrix row index
+nc_record_count=1
+do n=1,n_vocn,1
+  loc_k1 = matrix_exp(n)%k1
    do k=n_k,loc_k1,-1
-   if(k.eq.dum_matrix_k)then ! start looping over whole array for row indices and record results...
+     if(k.eq.dum_matrix_k)then ! start looping over whole array for row indices and record results...
 
-!   find out which tracer was initialised
-   matrix_tracer=mod(2*matrix_exp(n)%j-1+mod(matrix_exp(n)%i-1,6),6)+1 ! get tracer number for i j
-   select CASE (matrix_tracer)
-   Case(1)
-   col_name=io_col0
-   Case(2)
-   col_name=io_col1
-   Case(3)
-   col_name=io_col2
-   Case(4)
-   col_name=io_col3
-   Case(5)
-   col_name=io_col4
-   Case(6)
-   col_name=io_col5
-   end select
+       ! find out which tracer was initialised
+       matrix_tracer=mod(2*matrix_exp(n)%j-1+mod(matrix_exp(n)%i-1,6),6)+1 ! get tracer number for i j
+       select CASE (matrix_tracer)
+        case(1)
+            col_name=io_col0
+        case(2)
+            col_name=io_col1
+        case(3)
+            col_name=io_col2
+        case(4)
+            col_name=io_col3
+        case(5)
+            col_name=io_col4
+        case(6)
+            col_name=io_col5
+       end select
 
-!   calculate i+1, i-1, j+1, j-1
-   m_i=matrix_exp(n)%i
-   m_j=matrix_exp(n)%j
-   m_i_plus_one=matrix_exp(n)%i+1
-   m_i_minus_one=matrix_exp(n)%i-1
-   m_j_plus_one=matrix_exp(n)%j+1
-   m_j_minus_one=matrix_exp(n)%j-1
+       ! calculate i+1, i-1, j+1, j-1
+       m_i=matrix_exp(n)%i
+       m_j=matrix_exp(n)%j
+       m_i_plus_one=matrix_exp(n)%i+1
+       m_i_minus_one=matrix_exp(n)%i-1
+       m_j_plus_one=matrix_exp(n)%j+1
+       m_j_minus_one=matrix_exp(n)%j-1
 
-!   account for longitude wraparound and off-grid
-   if (m_i_plus_one.gt.36)then
-   m_i_plus_one=1
-   elseif(m_i_minus_one.lt.1)then
-   m_i_minus_one=36
-   end if
+       ! account for longitude wraparound and off-grid
+       if (m_i_plus_one.gt.36)then
+         m_i_plus_one=1
+       elseif(m_i_minus_one.lt.1)then
+         m_i_minus_one=36
+       end if
 
+       ! loop over whole grid recording tracer where equals above i j's
+       do n2=1,n_vocn,1
+         loc_k1 = matrix_exp(n2)%k1
+         do k2=n_k,loc_k1,-1
 
-!   loop over whole grid recording tracer where equals above i j's
-   do n2=1,n_vocn,1
-   loc_k1 = matrix_exp(n2)%k1
-   do k2=n_k,loc_k1,-1
+           ! catch grid-box in potential neighbouring boxes
+           if(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j)then
+             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+           elseif(matrix_exp(n2)%i.eq.m_i_plus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
+             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+           elseif(matrix_exp(n2)%i.eq.m_i_minus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
+             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+           elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j_plus_one)THEN
+             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+           elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j .eq.m_j_minus_one)THEN
+             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+           else
+             loc_val=0.0
+           end if
 
-!   catch grid-box in potential neighbouring boxes
-   if(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j)then
-   loc_col=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-   matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-   elseif(matrix_exp(n2)%i.eq.m_i_plus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
-   loc_col=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-   matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-   elseif(matrix_exp(n2)%i.eq.m_i_minus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
-   loc_col=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-   matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-   elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j_plus_one)THEN
-   loc_col=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-   matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-   elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j .eq.m_j_minus_one)THEN
-   loc_col=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-   matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-   else
-   loc_col=0.0
-   end if
+           ! record tracer if not zero
+           if(abs(loc_val).gt.const_real_nullsmall)THEN
+             call sub_save_netcdf_TM(1,nc_record_count,loc_val,col_count,row_count,matrix_season,0,0,0)
+             nc_record_count=nc_record_count+1
+           end if
 
-   ! record tracer if not zero
-   if(abs(loc_col).gt.const_real_nullsmall)THEN
-     call sub_save_netcdf_TM(1,tmp_count,loc_col,loop_count,loop_count2,matrix_season,0,0,0)
-     tmp_count=tmp_count+1
-   end if
+           row_count=row_count+1
 
-   loop_count2=loop_count2+1
+         end do
+       end do
+       row_count=1
 
-   end do
-   end do
-   loop_count2=1
-
-   end if
-   loop_count=loop_count+1
-   end do
-   end do
-
-  close(22)
+     end if
+     col_count=col_count+1
+    end do
+  end do
 
   end subroutine matrix_recover_exp
   ! ****************************************************************************************************************************** !
