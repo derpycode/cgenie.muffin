@@ -25,8 +25,8 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
-    character(LEN=*),INTENT(IN)::dum_name                      ! 
-    REAL,INTENT(in)::dum_yr                                    ! 
+    character(LEN=*),INTENT(IN)::dum_name                      !
+    REAL,INTENT(in)::dum_yr                                    !
     INTEGER,INTENT(OUT)::dum_iou                               !
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
@@ -53,7 +53,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! WRITE TO FILE
     ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! open file 
+    ! -------------------------------------------------------- ! open file
     call sub_opennew(dum_name,loc_iou)
     ! -------------------------------------------------------- ! start definitions
     call sub_redef(loc_iou)
@@ -101,7 +101,7 @@ CONTAINS
     ! -------------------------------------------------------- ! end definitions
     call sub_enddef (loc_iou)
     call sub_sync(loc_iou)
-    ! -------------------------------------------------------- ! 
+    ! -------------------------------------------------------- !
     loc_ntrec = 1
     ! -------------------------------------------------------- ! write 1D variables
     call sub_putvar1d ('lon',loc_iou,n_i,loc_ntrec,n_i,phys_ocn(ipo_lon,:,1,n_k),loc_c1,loc_c0)
@@ -163,12 +163,12 @@ CONTAINS
     integer::loc_id_latp_e,loc_id_ztp_e
     integer::loc_id_lonps_e,loc_id_latps_e
     !-----------------------------------------------------------------------
-    !       initialize local variables 
+    !       initialize local variables
     !-----------------------------------------------------------------------
     loc_c0 = 0.
     loc_c1 = 1.
     !-----------------------------------------------------------------------
-    !       open file 
+    !       open file
     !-----------------------------------------------------------------------
     call sub_opennew (dum_name, dum_iou)
     !-----------------------------------------------------------------------
@@ -303,6 +303,100 @@ CONTAINS
   END SUBROUTINE sub_init_netcdf
   ! ****************************************************************************************************************************** !
 
+  ! ****************************************************************************************************************************** !
+  SUBROUTINE sub_init_netcdf_TM(dum_wet_grid)
+    !-----------------------------------------------------------------------
+    !       dummy arguments
+    !-----------------------------------------------------------------------
+    integer::dum_wet_grid
+    !-----------------------------------------------------------------------
+    !       define local variables
+    !-----------------------------------------------------------------------
+    integer::ncid,status
+    integer::coo_dimid,index_dimid,var_id
+
+    ! open file
+    status=nf90_create(TRIM(par_outdir_name)//'transport_matrix_COO.nc',nf90_clobber,ncid)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    ! dimensions
+    status=nf90_def_dim(ncid,'coo',nf90_unlimited,coo_dimid)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    status=nf90_def_dim(ncid,'index',dum_wet_grid,index_dimid)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    ! define variables
+    status=nf90_def_var(ncid,'coo_val',nf90_double,(/coo_dimid/),var_id)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    status=nf90_def_var(ncid,'coo_row',nf90_int,(/coo_dimid/),var_id)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    status=nf90_def_var(ncid,'coo_col',nf90_int,(/coo_dimid/),var_id)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    status=nf90_def_var(ncid,'coo_avg_n',nf90_byte,(/coo_dimid/),var_id)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    status=nf90_def_var(ncid,'index_i',nf90_int,(/index_dimid/),var_id)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    status=nf90_def_var(ncid,'index_j',nf90_int,(/index_dimid/),var_id)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    status=nf90_def_var(ncid,'index_k',nf90_int,(/index_dimid/),var_id)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    !end definition
+    status=nf90_enddef(ncid)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    ! close file
+    status=nf90_close(ncid)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+  END SUBROUTINE sub_init_netcdf_TM
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  SUBROUTINE sub_save_netcdf_TM(dum_TM_flag,dum_start,dum_val,dum_col,dum_row,dum_avg_n,dum_i,dum_j,dum_k)
+
+    integer::dum_start
+    real::dum_val
+    integer::dum_TM_flag
+    integer::dum_col,dum_row,dum_avg_n,dum_i,dum_j,dum_k
+
+    integer::ncid,var_id,status
+
+    ! open file
+    status=nf90_open(TRIM(par_outdir_name)//'transport_matrix_COO.nc',nf90_write,ncid)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+    select case (dum_TM_flag)
+    case(1) ! write TM data
+      call sub_putvars ('coo_val', ncid, dum_start, dum_val,1.0,0.0)
+
+      call sub_putvarIs ('coo_col', ncid, dum_start, dum_col,1.0,0.0)
+
+      call sub_putvarIs ('coo_row', ncid, dum_start, dum_row,1.0,0.0)
+
+      call sub_putvarIs ('coo_avg_n', ncid, dum_start, dum_avg_n,1.0,0.0)
+      
+    case(0) ! write index data
+      call sub_putvarIs ('index_i', ncid, dum_start, dum_i,1.0,0.0)
+
+      call sub_putvarIs ('index_j', ncid, dum_start, dum_j,1.0,0.0)
+
+      call sub_putvarIs ('index_k', ncid, dum_start, dum_k,1.0,0.0)
+    end select
+
+    ! close file
+    status=nf90_close(ncid)
+    if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+
+  END SUBROUTINE sub_save_netcdf_TM
+  ! ****************************************************************************************************************************** !
 
   ! ****************************************************************************************************************************** !
   SUBROUTINE sub_save_netcdf(dum_yr,dum_dd)
@@ -326,7 +420,7 @@ CONTAINS
     REAL,DIMENSION(0:n_k+1)::loc_zt_moc_e
     logical :: loc_defined
     !-----------------------------------------------------------------------
-    !       initialize local variables 
+    !       initialize local variables
     !-----------------------------------------------------------------------
     loc_c0 = 0.
     loc_c1 = 1.
@@ -367,12 +461,12 @@ CONTAINS
             & 'illegal netCDF dimension', &
             & 'STOPPING', &
             & (/const_real_null/),.true. &
-            & )       
+            & )
     end select
     ! open file and get latest record number
     loc_defined = .true.
     loc_i = 0
-    if (loc_ntrec .eq. 0) then 
+    if (loc_ntrec .eq. 0) then
        loc_defined = .false.
        loc_i = 1
     end if
@@ -416,7 +510,7 @@ CONTAINS
        loc_zt_e(0)=0.0
        call sub_putvar1d ('zt_edges', loc_iou, n_k+1, loc_ntrec, n_k+1, &
             & loc_zt_e, loc_c1, loc_c0)
-       ! 
+       !
        SELECT CASE (dum_dd)
        CASE (2)
           ! MOC
@@ -484,7 +578,7 @@ CONTAINS
     CASE (4)
        ncout3dsig_ntrec = loc_ntrec
     end select
-    ! 
+    !
     call sub_sync(loc_iou)
     !-----------------------------------------------------------------------
   END SUBROUTINE sub_save_netcdf
@@ -519,7 +613,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     loc_iou   = ncout3d_iou
     loc_ntrec = ncout3d_ntrec
-    loc_mask(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:) 
+    loc_mask(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:)
     !-----------------------------------------------------------------------
     !       pH FIELD
     !-----------------------------------------------------------------------
@@ -917,7 +1011,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     loc_iou         = ncout3d_iou
     loc_ntrec       = ncout3d_ntrec
-    loc_mask(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:) 
+    loc_mask(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:)
     !-----------------------------------------------------------------------
     ! pH
     !-----------------------------------------------------------------------
@@ -1141,7 +1235,7 @@ CONTAINS
              END DO
              call sub_adddef_netcdf(loc_iou,3,'misc_sur_rCdtoCa_carbonate','Cd:Ca trace metal ratio (carbonate)', &
                   & trim(loc_unitsname),const_real_zero,const_real_zero)
-             call sub_putvar2d('misc_sur_rCdtoCa_carbonate',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)          
+             call sub_putvar2d('misc_sur_rCdtoCa_carbonate',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
           end IF
        end IF
     end if
@@ -1396,14 +1490,14 @@ CONTAINS
     real::loc_tot,loc_frac,loc_standard
     real::loc_d13C,loc_d14C
     !-----------------------------------------------------------------------
-    !       initialize local variables 
+    !       initialize local variables
     !-----------------------------------------------------------------------
     loc_iou   = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
     loc_mask_surf(:,:)     = phys_ocnatm(ipoa_mask_ocn,:,:)
     loc_mask_surf_ALL(:,:) = 1.0
     !-----------------------------------------------------------------------
-    !              <ocnatm_*>                           
+    !              <ocnatm_*>
     !       save ocean-atmosphere interface tracer data field
     !-----------------------------------------------------------------------
     If (ctrl_data_save_slice_ocnatm) then
@@ -1462,9 +1556,9 @@ CONTAINS
        end if
     end if
     !----------------------------------------------------------------
-    !              <misc_*>                           
+    !              <misc_*>
     !       save miscellaneous data
-    !----------------------------------------------------------------  
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_misc .AND. ctrl_data_save_slice_carb) then
        IF (opt_select(iopt_select_carbchem)) THEN
           ! air-sea delta pCO2
@@ -1477,9 +1571,9 @@ CONTAINS
        end if
     END IF
     !----------------------------------------------------------------
-    !              <phys_*>                           
+    !              <phys_*>
     !       save physical ocean data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_misc) then
        ! (1) overturning stream-function
        CALL sub_save_netcdf_goldstein_opsi()
@@ -1537,7 +1631,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       FULL ATMOSPEHRE 'PHYSICS'
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_phys_atm) then
        loc_ij(:,:) = const_real_zero
        DO ip=1,n_phys_ocnatm
@@ -1549,9 +1643,9 @@ CONTAINS
        END DO
     end if
     !----------------------------------------------------------------
-    !              <diag_*>                           
+    !              <diag_*>
     !       save diagnostics data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem .AND. flag_rokgem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO ib=1,n_diag_bio
@@ -1663,7 +1757,7 @@ CONTAINS
     end If
     !----------------------------------------------------------------
     !       OCEAN SURFACE DATA
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     ! NOTE: exclude dissolved organic matter tracers
     If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
        DO l=1,n_l_ocn
@@ -1677,10 +1771,10 @@ CONTAINS
                    IF (n_k >= loc_k1) THEN
                       SELECT CASE (ocn_type(io))
                       CASE (0)
-                         if (io == io_T) then 
+                         if (io == io_T) then
                             loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice - const_zeroC
                          else
-                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice                            
+                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice
                          end if
                       CASE (1)
                          loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice
@@ -1716,7 +1810,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       OCEAN FLOOR DATA
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     ! NOTE: exclude dissolved organic matter tracers
     If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
        DO l=1,n_l_ocn
@@ -1730,10 +1824,10 @@ CONTAINS
                    IF (n_k >= loc_k1) THEN
                       SELECT CASE (ocn_type(io))
                       CASE (0)
-                         if (io == io_T) then 
+                         if (io == io_T) then
                             loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice - const_zeroC
                          else
-                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice                            
+                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice
                          end if
                       CASE (1)
                          loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice
@@ -1769,7 +1863,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       ocean surface carbonate chemistry data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_sur) then
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ij(:,:) = const_real_zero
@@ -1801,7 +1895,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       PARTICULATE FLUXES
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_bio) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
@@ -1847,13 +1941,13 @@ CONTAINS
     CALL sub_save_netcdf_2d_sed()
     !----------------------------------------------------------------
     !       USED-DEFINED (MISC) FIELDS
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     CALL sub_save_netcdf_2d_USER()
-    !--------------------------------------------------------- ! 
+    !--------------------------------------------------------- !
     ! CDR-MIP
-    !--------------------------------------------------------- ! 
+    !--------------------------------------------------------- !
     if (ctrl_data_save_slice_cdrmip) CALL sub_save_netcdf_2d_cdrmip()
-    !--------------------------------------------------------- ! 
+    !--------------------------------------------------------- !
   END SUBROUTINE sub_save_netcdf_2d
   ! ****************************************************************************************************************************** !
 
@@ -1871,14 +1965,14 @@ CONTAINS
     real,DIMENSION(n_i,n_j)::loc_ij,loc_ij_1,loc_ij_2,loc_sed_mask
     real::loc_tot,loc_frac,loc_standard
     !-----------------------------------------------------------------------
-    !       initialize local variables 
+    !       initialize local variables
     !-----------------------------------------------------------------------
     loc_iou   = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
     loc_sed_mask(:,:) = phys_ocn(ipo_mask_ocn,:,:,n_k)
     !----------------------------------------------------------------
     !       save ocn->sed interface flux data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_focnsed) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
@@ -1953,7 +2047,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       save core-top sediment composition data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_ocnsed) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
@@ -1980,7 +2074,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       save overlying ocean dissolved tracer data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     ! NOTE: exclude dissolved organic matter tracers
     If (ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
@@ -1994,10 +2088,10 @@ CONTAINS
                    IF (n_k >= loc_k1) THEN
                       SELECT CASE (ocn_type(io))
                       CASE (0)
-                         if (io == io_T) then 
+                         if (io == io_T) then
                             loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice - const_zeroC
                          else
-                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice                          
+                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice
                          end if
                       CASE (1)
                          loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice
@@ -2033,7 +2127,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       save planktic-benthic difference
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     ! NOTE: exclude dissolved organic matter tracers
     If (ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
@@ -2105,12 +2199,12 @@ CONTAINS
           END DO
           call sub_adddef_netcdf(loc_iou,3,'misc_rCdtoCa','Cd:Ca trace metal ratio (ocean)', &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_rCdtoCa',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_sed_mask) 
+          call sub_putvar2d('misc_rCdtoCa',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_sed_mask)
        end IF
     end if
     !----------------------------------------------------------------
     !       save overlying ocean carbonate chemistry data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_carb .AND. (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_ocnsed)) then
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ij(:,:) = const_real_zero
@@ -2142,7 +2236,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       particulate flux fractions
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_focnsed) then
        loc_unitsname = 'n/a'
        IF (sed_select(is_POC_frac2)) THEN
@@ -2203,15 +2297,15 @@ CONTAINS
     CHARACTER(len=255)::loc_unitsname
     real,DIMENSION(n_i,n_j)::loc_ij,loc_mask
     !-----------------------------------------------------------------------
-    !       initialize local variables 
+    !       initialize local variables
     !-----------------------------------------------------------------------
     loc_iou = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
     !----------------------------------------------------------------
     !                  <fseaair_*>
     !       save flux density data
-    !---------------------------------------------------------------- 
-    ! NOTE: use atmospheric grid point physics array to avoid the zero 
+    !----------------------------------------------------------------
+    ! NOTE: use atmospheric grid point physics array to avoid the zero
     !       area values of dry grid points in the (ocean) physics array
     ! NOTE: a positive value of the array represents net ocean to atmosphere transfer
     loc_mask = phys_ocnatm(ipoa_mask_ocn,:,:)
@@ -2227,14 +2321,14 @@ CONTAINS
                & ': net sea->air gas exchange flux density',                                                          &
                & trim(loc_unitsname),const_real_zero,const_real_zero                                                  &
                & )
-          call sub_putvar2d ('fseaair_'//trim(string_atm(ia)),loc_iou,n_i,n_j, &  
+          call sub_putvar2d ('fseaair_'//trim(string_atm(ia)),loc_iou,n_i,n_j, &
                & loc_ntrec,loc_ij,loc_mask)
        end SELECT
     END DO
     !----------------------------------------------------------------
     !                  <misc_Fseaair_*>
     !       save derived flux data
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_carb .AND. ctrl_data_save_slice_diag_geochem) then
        loc_ij(:,:) = int_diag_airsea_timeslice(ia_pCO2,:,:)/int_t_timeslice
        loc_unitsname = 'mol yr-1'
@@ -2252,7 +2346,7 @@ CONTAINS
             & )
        call sub_putvar2d('Fseaair_pCO2_grid',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask)
     end if
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
   END SUBROUTINE sub_save_netcdf_flux_seaair
   ! ****************************************************************************************************************************** !
 
@@ -2277,7 +2371,7 @@ CONTAINS
     !----------------------------------------------------------------
     loc_iou = ncout3d_iou
     loc_ntrec = ncout3d_ntrec
-    loc_mask = phys_ocn(ipo_mask_ocn,:,:,:) 
+    loc_mask = phys_ocn(ipo_mask_ocn,:,:,:)
     !----------------------------------------------------------------
     !       SAVE OCEAN TRACER FIELD
     !----------------------------------------------------------------
@@ -2290,7 +2384,7 @@ CONTAINS
                 DO k=goldstein_k1(i,j),n_k
                    SELECT CASE (ocn_type(io))
                    CASE (0)
-                      if (io == io_T) then 
+                      if (io == io_T) then
                          loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice - const_zeroC
                       else
                          loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
@@ -2436,7 +2530,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       OCEAN 'PHYSICS'
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_phys_ocn) then
        loc_ijk(:,:,:) = const_real_zero
        DO ip=1,n_phys_ocn
@@ -2449,7 +2543,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       CARBONATE CHEMISTRY FIELD
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_carb) then
        loc_ijk(:,:,:) = const_real_zero
        DO ic=1,n_carb
@@ -2462,7 +2556,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       CARBONATE CHEMISTRY CONSTANTS (YAWN)
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_carbconst) then
        DO icc=1,n_carbconst
           loc_ijk(:,:,:) = const_real_zero
@@ -2475,7 +2569,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       PARTICULATE CONCENTRATION FIELD
-    !----------------------------------------------------------------  
+    !----------------------------------------------------------------
     loc_sed_mask = loc_mask
     If (ctrl_data_save_slice_bio .AND. ctrl_data_save_derived) then
        DO l=1,n_l_sed
@@ -2517,7 +2611,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     !       PARTICULATE FLUXES
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_bio) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
@@ -2604,7 +2698,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- OLD
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem .AND. ctrl_data_save_slice_diag_redox_old) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_geochem
@@ -2617,7 +2711,7 @@ CONTAINS
     end If
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_redox
@@ -2630,18 +2724,18 @@ CONTAINS
     end If
     !----------------------------------------------------------------
     !       OCEAN VELOCITY FIELD
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_misc) CALL sub_save_netcdf_goldstein_u()
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     !----------------------------------------------------------------
     !       USED-DEFINED (MISC) FIELDS
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     CALL sub_save_netcdf_3d_USER()
-    !--------------------------------------------------------- ! 
+    !--------------------------------------------------------- !
     ! CDR-MIP
-    !--------------------------------------------------------- ! 
+    !--------------------------------------------------------- !
     if (ctrl_data_save_slice_cdrmip) CALL sub_save_netcdf_3d_cdrmip()
-    !--------------------------------------------------------- ! 
+    !--------------------------------------------------------- !
   END SUBROUTINE sub_save_netcdf_3d
   ! ****************************************************************************************************************************** !
 
@@ -2660,7 +2754,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     loc_iou   = ncout3dsig_iou
     loc_ntrec = ncout3dsig_ntrec
-    loc_mask  = phys_ocn(ipo_mask_ocn,:,:,:) 
+    loc_mask  = phys_ocn(ipo_mask_ocn,:,:,:)
     !----------------------------------------------------------------
     !       SAVE OCEAN TRACER FIELD
     !----------------------------------------------------------------
@@ -2672,7 +2766,7 @@ CONTAINS
                 DO k=goldstein_k1(i,j),n_k
                    SELECT CASE (ocn_type(l2io(l)))
                    CASE (0)
-                      if (l == io2l(io_T)) then 
+                      if (l == io2l(io_T)) then
                          loc_ijk(i,j,k) = int_misc_3D_sig(l,i,j,k)/int_t_sig - const_zeroC
                       else
                          loc_ijk(i,j,k) = int_misc_3D_sig(l,i,j,k)/int_t_sig
@@ -2697,7 +2791,7 @@ CONTAINS
           END SELECT
        END DO
     end if
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
   END SUBROUTINE sub_save_netcdf_3d_sig
   ! ****************************************************************************************************************************** !
 
@@ -2785,18 +2879,18 @@ CONTAINS
     !-----------------------------------------------------------------------
     ! NOTE: scale to give velocity components in units of (m s-1);
     !       for the horizontal velocity components, the scale factor is usc (= 0.05) [Edwards and Shepherd, 2002]
-    !       for the vertical velocity component, the overall scale factor is usc*dsc/rsc 
+    !       for the vertical velocity component, the overall scale factor is usc*dsc/rsc
     !       (= 0.05*5000.0/6.36e6) [Edwards and Shepherd, 2002]
     loc_mask = phys_ocn(ipo_mask_ocn,:,:,:)
-    ! 
+    !
     loc_ijk(:,:,:) = goldstein_usc*int_u_timeslice(1,:,:,:)/int_t_timeslice
     call sub_adddef_netcdf(loc_iou,4,'phys_u','ocean velocity - u','m/s',-loc_c100,loc_c100)
     call sub_putvar3d_g('phys_u',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
-    ! 
+    !
     loc_ijk(:,:,:) = goldstein_usc*int_u_timeslice(2,:,:,:)/int_t_timeslice
     call sub_adddef_netcdf(loc_iou,4,'phys_v','ocean velocity - v', 'm/s',-loc_c100,loc_c100)
     call sub_putvar3d_g('phys_v',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
-    ! 
+    !
     loc_ijk(:,:,:) = (goldstein_usc*goldstein_dsc/const_rEarth)*int_u_timeslice(3,:,:,:)/int_t_timeslice
     call sub_adddef_netcdf(loc_iou,4,'phys_w','ocean velocity - w', 'm/s',-loc_c100,loc_c100)
     call sub_putvar3d_g('phys_w',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
@@ -2818,7 +2912,7 @@ CONTAINS
     REAL,DIMENSION(n_i,n_j,n_k)::loc_colroverrplusb,loc_colboverrplusb
     real::loc_c0
     !-----------------------------------------------------------------------
-    !       SET LOCAL 
+    !       SET LOCAL
     !-----------------------------------------------------------------------
     !----------------------------------------------------------------------- ! local constants
     loc_iou = ncout3d_iou
@@ -2859,7 +2953,7 @@ CONTAINS
     if (ctrl_force_ocn_age) then
        call sub_adddef_netcdf(loc_iou,4,'misc_col_age','color tracers; total age','(yrs)',loc_c0,loc_c0)
        call sub_putvar3d_g('misc_col_age',loc_iou,n_i,n_j,n_k,loc_ntrec, &
-            & loc_colage(:,:,:),loc_mask)         
+            & loc_colage(:,:,:),loc_mask)
        call sub_adddef_netcdf(loc_iou,4,'misc_col_Dage','color tracers; ventilation age','(yrs)',loc_c0,loc_c0)
        call sub_putvar3d_g('misc_col_Dage',loc_iou,n_i,n_j,n_k,loc_ntrec, &
             & loc_colage(:,:,:)-dum_t,loc_mask)
@@ -2968,11 +3062,11 @@ CONTAINS
     call sub_putvars ('time', loc_iou, loc_ntrec, dum_t, loc_c1, loc_c0)
 
     ! ------------------------------------------------------------------
-    !                  <sig_ocn_*>                          
+    !                  <sig_ocn_*>
     ! save ocean tracer data
     ! ------------------------------------------------------------------
     !
-    ! NOTE: write data both as the total inventory, and as the 
+    ! NOTE: write data both as the total inventory, and as the
     !       equivalent mean concentration
     IF (ctrl_data_save_sig_ocn) THEN
        DO l=1,n_l_ocn
@@ -3008,7 +3102,7 @@ CONTAINS
     END IF
 
     ! ------------------------------------------------------------------
-    !                  <sig_ocn_sur_*>                          
+    !                  <sig_ocn_sur_*>
     ! save ocean  surface tracer data
     ! ------------------------------------------------------------------
 
@@ -3046,7 +3140,7 @@ CONTAINS
     end if
 
     ! ------------------------------------------------------------------
-    !                  <sig_carb_sur_*>                          
+    !                  <sig_carb_sur_*>
     ! save ocean surface carbonate chemistry data
     ! ------------------------------------------------------------------
 
@@ -3074,11 +3168,11 @@ CONTAINS
     end if
 
     ! ------------------------------------------------------------------
-    !                  <sig_ocnatm_*>                          
+    !                  <sig_ocnatm_*>
     ! save atmosphere tracer data
     ! ------------------------------------------------------------------
 
-    ! NOTE: write data both as the total inventory, and as the equivalent 
+    ! NOTE: write data both as the total inventory, and as the equivalent
     !       mean partial pressure simple conversion factor from atm to mol is used
     IF (ctrl_data_save_sig_ocnatm) THEN
        DO l=3,n_l_atm
@@ -3113,7 +3207,7 @@ CONTAINS
     END IF
 
     ! ------------------------------------------------------------------
-    !                  <sig_fexport_*>                          
+    !                  <sig_fexport_*>
     ! save export flux data
     ! ------------------------------------------------------------------
 
@@ -3163,11 +3257,11 @@ CONTAINS
     END IF
 
     ! ------------------------------------------------------------------
-    !                  <sig_focnatm_*>                          
+    !                  <sig_focnatm_*>
     ! save ocean-atmopshere flux data
     ! ------------------------------------------------------------------
 
-    ! NOTE: write data both as the total flux, and as the equivalent mean 
+    ! NOTE: write data both as the total flux, and as the equivalent mean
     !       flux density
     IF (ctrl_data_save_sig_focnatm) THEN
        DO l=3,n_l_atm
@@ -3188,12 +3282,12 @@ CONTAINS
     END IF
 
     ! ------------------------------------------------------------------
-    !                  <sig_focnsed_*>                          
+    !                  <sig_focnsed_*>
     ! save ocean-sediment flux data
-    ! ------------------------------------------------------------------   
+    ! ------------------------------------------------------------------
 
-    ! NOTE: write data both as the total flux, and as the equivalent mean 
-    !       flux density the surface ocean area is used as a proxy for the 
+    ! NOTE: write data both as the total flux, and as the equivalent mean
+    !       flux density the surface ocean area is used as a proxy for the
     !       ocean bottom area
     IF (ctrl_data_save_sig_focnsed) THEN
        DO l=1,n_l_sed
@@ -3240,12 +3334,12 @@ CONTAINS
     end IF
 
     ! ------------------------------------------------------------------
-    !                  <sig_fsedocn_*>                          
+    !                  <sig_fsedocn_*>
     ! save sediment->ocean flux data
     ! ------------------------------------------------------------------
 
-    ! NOTE: write data both as the total flux, and as the equivalent mean 
-    !       flux density the surface ocean area is used as a proxy for the 
+    ! NOTE: write data both as the total flux, and as the equivalent mean
+    !       flux density the surface ocean area is used as a proxy for the
     !       ocean bottom area
     IF (ctrl_data_save_sig_fsedocn) THEN
        DO l=1,n_l_ocn
@@ -3280,12 +3374,12 @@ CONTAINS
     END IF
 
     ! ------------------------------------------------------------------
-    !                  <sig_ocnsed_*>                          
+    !                  <sig_ocnsed_*>
     ! save sediment (core-top) composition data
     ! ------------------------------------------------------------------
 
-    ! NOTE: the data placed on the sediment composition interface array 
-    !       has already had the necessary type conversions made  
+    ! NOTE: the data placed on the sediment composition interface array
+    !       has already had the necessary type conversions made
     !       (i.e., isotopes in per mill, solid tracers as mass (or volume) fraction, etc)
     IF (ctrl_data_save_sig_ocnsed) THEN
        DO l=1,n_l_sed
@@ -3310,7 +3404,7 @@ CONTAINS
     END IF
 
     ! ------------------------------------------------------------------
-    !                  <sig_misc_*>                          
+    !                  <sig_misc_*>
     ! save miscellaneous data (if requested)
     ! ------------------------------------------------------------------
 
