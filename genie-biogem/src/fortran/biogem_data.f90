@@ -2564,7 +2564,7 @@ CONTAINS
         if((conv_kocn_ksedgem/par_data_save_slice_n).ne.par_data_TM_avg_n)then ! n.b. conv_ksedgem = n_timesteps!!
                  call sub_report_error( &
 		         & 'biogem_data','sub_check_par', &
-			 & 'The interannual saving intervals you have chosen do not correspond to the transport matrix averaging', &
+			 & 'The intra-annual saving intervals you have chosen do not correspond to the transport matrix averaging', &
 			 & '[par_data_save_slice_n] HAS BEEN SET TO MATCH MATRIX AVERAGING INTERVAL', &
 			 & (/const_real_null/),.false. &
 			 & )

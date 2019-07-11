@@ -3687,14 +3687,13 @@ integer:: m_j,m_i,m_i_plus_one,m_i_minus_one,m_j_plus_one,m_j_minus_one ! grid_i
 integer::matrix_tracer ! index for selecting colour tracer
 integer::loc_k1,col_name!,gridboxes,tracer_n
 real::loc_val
-integer::nc_record_count
 
 print*,">>> Recovering Matrix Information at k level:",dum_matrix_k,'@ averaging interval n:',matrix_season
+
 
 ! loop over boxes in vts
 col_count=1  ! outer loop for matrix column	index
 row_count=1  ! inner loop for matrix row index
-nc_record_count=1
 do n=1,n_vocn,1
   loc_k1 = matrix_exp(n)%k1
    do k=n_k,loc_k1,-1
@@ -3759,8 +3758,7 @@ do n=1,n_vocn,1
 
            ! record tracer if not zero
            if(abs(loc_val).gt.const_real_nullsmall)THEN
-             call sub_save_netcdf_TM(1,nc_record_count,loc_val,col_count,row_count,matrix_season,0,0,0)
-             nc_record_count=nc_record_count+1
+             call sub_save_netcdf_TM(1,1,loc_val,col_count,row_count,matrix_season,0,0,0)
            end if
 
            row_count=row_count+1

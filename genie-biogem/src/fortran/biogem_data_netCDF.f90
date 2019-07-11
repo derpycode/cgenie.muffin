@@ -367,7 +367,8 @@ CONTAINS
     integer::dum_TM_flag
     integer::dum_col,dum_row,dum_avg_n,dum_i,dum_j,dum_k
 
-    integer::ncid,var_id,status
+    integer::ncid,status,nc_record_count,dimid
+    character(len=100)::name
 
     ! open file
     status=nf90_open(TRIM(par_outdir_name)//'transport_matrix_COO.nc',nf90_write,ncid)
@@ -375,15 +376,27 @@ CONTAINS
 
     select case (dum_TM_flag)
     case(1) ! write TM data
-      call sub_putvars ('coo_val', ncid, dum_start, dum_val,1.0,0.0)
 
-      call sub_putvarIs ('coo_col', ncid, dum_start, dum_col,1.0,0.0)
+      ! coo is unlimited dimension that we have to append to
+      ! find the current length of coo:
+      status=nf90_inq_dimid(ncid, 'coo', dimid)
+      if(status /= nf90_NoErr) print*,trim(nf90_strerror(status)//',coo')
 
-      call sub_putvarIs ('coo_row', ncid, dum_start, dum_row,1.0,0.0)
+      status=nf90_inquire_dimension(ncid, dimid, name, nc_record_count)
+      if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
 
-      call sub_putvarIs ('coo_avg_n', ncid, dum_start, dum_avg_n,1.0,0.0)
-      
+      nc_record_count=nc_record_count+1 ! start count for appending data
+
+      call sub_putvars ('coo_val', ncid, nc_record_count, dum_val,1.0,0.0)
+
+      call sub_putvarIs ('coo_col', ncid, nc_record_count, dum_col,1.0,0.0)
+
+      call sub_putvarIs ('coo_row', ncid, nc_record_count, dum_row,1.0,0.0)
+
+      call sub_putvarIs ('coo_avg_n', ncid, nc_record_count, dum_avg_n,1.0,0.0)
+
     case(0) ! write index data
+
       call sub_putvarIs ('index_i', ncid, dum_start, dum_i,1.0,0.0)
 
       call sub_putvarIs ('index_j', ncid, dum_start, dum_j,1.0,0.0)
