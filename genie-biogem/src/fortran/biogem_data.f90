@@ -1329,8 +1329,10 @@ CONTAINS
     int_focnsed_sig(:)      = 0.0
     int_fsedocn_sig(:)      = 0.0
     int_ocn_sur_sig(:)      = 0.0
+    int_ocn_opn_sig(:)      = 0.0
     int_ocn_ben_sig(:)      = 0.0
     int_carb_sur_sig(:)     = 0.0
+    int_carb_opn_sig(:)     = 0.0
     int_carb_ben_sig(:)     = 0.0
     int_misc_age_sig        = 0.0
     int_misc_age_sur_sig    = 0.0
@@ -1346,7 +1348,9 @@ CONTAINS
     int_misc_det_Fe_tot_sig = 0.0
     int_misc_det_Fe_dis_sig = 0.0
     int_misc_ocn_solfor_sig = 0.0
+    int_misc_opn_solfor_sig = 0.0
     int_misc_ocn_fxsw_sig   = 0.0
+    int_misc_opn_fxsw_sig   = 0.0
     int_ocnsed_sig(:)       = 0.0
     int_diag_bio_sig(:)     = 0.0
     int_diag_geochem_sig(:) = 0.0

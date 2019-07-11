@@ -3186,8 +3186,10 @@ SUBROUTINE diag_biogem_timeseries( &
   REAL,DIMENSION(n_ocn,n_i,n_j)::locij_fsedocn                   ! local sed->ocean change (ocn tracer currency) (mol)
   REAL,DIMENSION(n_ocn,n_i,n_j)::locij_ocn_ben                   ! local benthic ocean composition
   REAL,DIMENSION(n_i,n_j)::locij_mask_ben                        ! benthic save mask
-  real::loc_ocn_tot_M,loc_ocn_tot_A,loc_ocnatm_tot_A             !
-  real::loc_ocn_rtot_M,loc_ocn_rtot_A,loc_ocnatm_rtot_A          !
+  real::loc_ocn_tot_M                                            !
+  real::loc_ocn_rtot_M                                           !
+  real::loc_ocn_tot_A,loc_opn_tot_A,loc_ocnatm_tot_A             !
+  real::loc_ocn_rtot_A,loc_opn_rtot_A,loc_ocnatm_rtot_A          !
   real::loc_ocnsed_tot_A,loc_ocnsed_tot_A_ben                    !
   real::loc_ocnsed_rtot_A,loc_ocnsed_rtot_A_ben                  !
   real::loc_tot_A                                                !
@@ -3244,6 +3246,13 @@ SUBROUTINE diag_biogem_timeseries( &
               loc_ocn_rtot_A = 1.0/loc_ocn_tot_A
            else
               loc_ocn_rtot_A = 0.0
+           end if
+           ! total open ocean surface area (ice-free)
+           loc_opn_tot_A = sum((1.0 - phys_ocnatm(ipoa_seaice,:,:))*phys_ocn(ipo_A,:,:,n_k))
+           if (loc_opn_tot_A > const_real_nullsmall) then
+              loc_opn_rtot_A = 1.0/loc_opn_tot_A
+           else
+              loc_opn_rtot_A = 0.0
            end if
            ! total ocean-sediment interface area
            loc_ocnsed_tot_A = sum(phys_ocn(ipo_A,:,:,n_k))
@@ -3370,6 +3379,8 @@ SUBROUTINE diag_biogem_timeseries( &
                  io = conv_iselected_io(l)
                  int_ocn_sur_sig(io) = int_ocn_sur_sig(io) + loc_dtyr*&
                       & SUM(phys_ocn(ipo_A,:,:,n_k)*ocn(io,:,:,n_k))*loc_ocn_rtot_A
+                 int_ocn_opn_sig(io) = int_ocn_opn_sig(io) + loc_dtyr*&
+                      & SUM((1.0 - phys_ocnatm(ipoa_seaice,:,:))*phys_ocn(ipo_A,:,:,n_k)*ocn(io,:,:,n_k))*loc_opn_rtot_A
               END DO
               IF (ctrl_force_ocn_age) THEN
                  DO i=1,n_i
@@ -3389,6 +3400,8 @@ SUBROUTINE diag_biogem_timeseries( &
               DO ic=1,n_carb
                  int_carb_sur_sig(ic) = int_carb_sur_sig(ic) + loc_dtyr*&
                       & SUM(phys_ocn(ipo_A,:,:,n_k)*carb(ic,:,:,n_k))*loc_ocn_rtot_A
+                 int_carb_opn_sig(ic) = int_carb_opn_sig(ic) + loc_dtyr*&
+                      & SUM((1.0 - phys_ocnatm(ipoa_seaice,:,:))*phys_ocn(ipo_A,:,:,n_k)*carb(ic,:,:,n_k))*loc_opn_rtot_A
               END DO
            end if
            IF (ctrl_data_save_sig_ocn_sur) THEN
@@ -3455,8 +3468,12 @@ SUBROUTINE diag_biogem_timeseries( &
               ! (1) mean global properties
               int_misc_ocn_solfor_sig = int_misc_ocn_solfor_sig + &
                    & loc_dtyr*loc_ocn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_solfor,:,:))
+              int_misc_opn_solfor_sig = int_misc_opn_solfor_sig + &
+                   & loc_dtyr*loc_opn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_solfor,:,:))
               int_misc_ocn_fxsw_sig = int_misc_ocn_fxsw_sig + &
                    & loc_dtyr*loc_ocn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_fxsw,:,:))
+              int_misc_opn_fxsw_sig = int_misc_opn_fxsw_sig + &
+                   & loc_dtyr*loc_opn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_fxsw,:,:))
               ! (2) latitudinal/seasonal properties
               !     NOTE: done very crudely and taking values from a single specified time-step of the averaging only
               if (int_t_sig_count == par_t_sig_count_N) then
