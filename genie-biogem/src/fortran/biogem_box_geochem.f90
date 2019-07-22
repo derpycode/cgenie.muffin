@@ -524,7 +524,7 @@ CONTAINS
        loc_Fe = ocn(io_Fe,dum_i,dum_j,k)
        ! calculate FeOOH precipitation
        if (ctrl_bio_FeOOHprecip_explicit) then
-          if (loc_Fe > 1.0E-09) then
+          if (loc_Fe > const_rns) then
              loc_bio_part(is_FeOOH,k) = loc_Fe - 1.0E-09
              loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
           else   

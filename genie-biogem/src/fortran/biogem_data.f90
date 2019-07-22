@@ -296,6 +296,7 @@ CONTAINS
        print*,'Fixed cellular Fe:C ratio?                          : ',ctrl_bio_red_fixedFetoC
        print*,'C/Fe organic matter ratio                           : ',par_bio_red_POFe_POC
        print*,'Fixed scavening rate (if not: Parekh scheme)?       : ',ctrl_bio_Fe_fixedKscav
+       print*,'Fe scavening scheme ID string                       : ',trim(opt_bio_Fe_scav)
        print*,'Fixed Fe scavenging rate (d-1)                      : ',par_scav_Fe_Ks
        print*,'Parekh Fe scavenging rate scale factor: POC         : ',par_scav_Fe_sf_POC
        print*,'Parekh Fe scavenging rate scale factor: CaCO3       : ',par_scav_Fe_sf_CaCO3
@@ -374,7 +375,7 @@ CONTAINS
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
        print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha       
-	   ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
+       ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
        print*,'Input dir. name                                     : ',trim(par_indir_name)
@@ -529,6 +530,16 @@ CONTAINS
     par_bio_remin_ballast_ko = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_opal_cm3_mol*conv_opal_g_cm3))*par_bio_remin_ballast_ko
     par_bio_remin_ballast_kl = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_det_cm3_mol*conv_det_g_cm3))*par_bio_remin_ballast_kl
     ! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ! 
+    ! -------------------------------------------------------- !
+    ! BAKCWARDS COMPATABILITY
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! translate default Fe scavening scheme
+    if (.NOT. ctrl_bio_Fe_fixedKscav) then
+       opt_bio_Fe_scav = 'Parekh'
+    end if
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- !
 
   END SUBROUTINE sub_load_goin_biogem
   ! ****************************************************************************************************************************** !

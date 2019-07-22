@@ -388,6 +388,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_red_POFe_POC
   LOGICAL::ctrl_bio_Fe_fixedKscav                                ! Fixed scavening rate (if not: Parekh scheme)?
   NAMELIST /ini_biogem_nml/ctrl_bio_Fe_fixedKscav
+  CHARACTER(len=63)::opt_bio_Fe_scav                             ! Fe scavening scheme ID string
+  NAMELIST /ini_biogem_nml/opt_bio_Fe_scav
   real::par_scav_Fe_Ks                                           ! Fixed Fe scavenging rate (d-1)
   NAMELIST /ini_biogem_nml/par_scav_Fe_Ks
   real::par_scav_Fe_sf_POC                                       ! Parekh Fe scavenging rate scale factor - POC

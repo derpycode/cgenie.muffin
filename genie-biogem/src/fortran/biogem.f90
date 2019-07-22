@@ -416,7 +416,8 @@ subroutine biogem(        &
                        do loc_i=1,loc_tot_i
                           lo = conv_ls_lo_i(loc_i,ls)
                           if (lo > 0) then
-                             if (sed_type(l2is(ls)) == par_sed_type_scavenged) then
+                             if ( (sed_type(l2is(ls)) == par_sed_type_scavenged) .OR. &
+                                  & ( sed_type(sed_dep(l2is(ls))) == par_sed_type_scavenged) ) then
                                 if ((l2is(ls) == is_POM_S) .OR. (sed_dep(l2is(ls)) == is_POM_S)) then
                                    loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                                 else
@@ -1451,7 +1452,7 @@ subroutine biogem(        &
               end if
               ! *** simple oxic iron cycle ***
               if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
-                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+                 !!!call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
               end if
               if (sed_select(is_FeOOH) .AND. ocn_select(io_Fe)) then
                  call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
@@ -1463,7 +1464,7 @@ subroutine biogem(        &
                 end if   
               end if
               if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
-                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
+                 !!!call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
               end if
                ! if (ocn_select(io_Fe2) .AND. sed_select(is_FeOOH) .AND. ocn_select(io_H2S)) then
                  ! call sub_box_reduce_FeOOH(i,j,loc_k1,loc_dtyr)
@@ -1490,7 +1491,7 @@ subroutine biogem(        &
               ! NOTE: although <locijk_focn> Fe is added to the remin array within the sub_calc_geochem_Fe subroutine,
               !       the same flux is subtracted again after equilibrium has been calculated,
               !       hence <locijk_focn> Fe later can be added 'as normal' in updating the <ocn> array
-              ! NOTE: the above of course makes no sense at all and newer schemes are called earier without this shit
+              ! NOTE: the above, of course, makes no sense at all, and all newer schemes are called earier without all this shit
               if (sed_select(is_det) .AND. ocn_select(io_Fe)) then
                  SELECT CASE (trim(opt_geochem_Fe))
                  CASE ('OLD')

@@ -4700,6 +4700,10 @@
 			<value datatype="boolean">.false.</value>
                         <description>Fixed scavening rate (if not: Parekh scheme)?</description>
                     </param>
+                    <param name="opt_bio_Fe_scav">
+			<value datatype="string">Parekh</value>
+                        <description>Fe scavening scheme ID string</description>
+                    </param>
                     <param name="par_scav_Fe_Ks">
 			<value datatype="real">0.1E-3</value>
                         <description>Fixed Fe scavenging rate (d-1)</description>
