@@ -145,7 +145,7 @@ MODULE genie_control
       ! WARNING: parameter information duplicated in gem_cmn.f90
       integer, parameter :: intrac_atm_max =  19
       integer, parameter :: intrac_ocn_max = 107
-      integer, parameter :: intrac_sed_max = 102
+      integer, parameter :: intrac_sed_max = 104
       parameter(intrac_sed=intrac_sed_max)
 
       ! others

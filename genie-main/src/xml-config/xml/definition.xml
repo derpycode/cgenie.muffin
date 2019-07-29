@@ -1293,6 +1293,14 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="sed_select(103)" index="103">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(104)" index="104">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- MISC CONTROLS  -->
                     <param name="par_grid_lon_offset">

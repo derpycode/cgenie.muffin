@@ -21,7 +21,9 @@
  POM_231Pa        11  03  07  'POM scavenged 231Pa'                  'wt%'     0.00     100.00
  POM_230Th        12  03  07  'POM scavenged 230Th'                  'wt%'     0.00     100.00
  POM_Fe           13  03  07  'POM scavenged Fe'                     'wt%'     0.00     100.00
- POM_Fe_56Fe      75  13  22  '54Fe of POM scavenged Fe'             'o/oo'   -9.99E+2    9.99E+2
+ POM_Fe_56Fe      75  13  22  '56Fe of POM scavenged Fe'             'o/oo'   -9.99E+2    9.99E+2
+ POM_FeOOH       103  03  07  'POM scavenged FeOOH'                  'wt%'     0.00     100.00
+ POM_FeOOH_56Fe  104 103  22  '56Fe of POM scavenged FeOOH'          'o/oo'   -9.99E+2    9.99E+2
  POM_Nd           47  03  07  'POM scavenged Nd'                     'wt%'     0.00     100.00
  POM_Nd_144Nd     48  47  19  'POM scavenged 144Nd'                  'o/oo'   -9.99E+2    9.99E+2
  POM_MoS2         58  03  07  'POM scavenged MoS2'                   'wt%'     0.00     100.00

@@ -2743,6 +2743,9 @@ CONTAINS
                 case default
                    loc_FeFeLL(:) = 0.0
                 end SELECT
+
+                   !!!loc_FeFeLL(:) = 0.0
+
                    ! calculate mean Fe isotopic composition
                    ! NOTE: isotopes not enabled for all of the Fe schemes
                    If ( ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe) ) then
@@ -2799,12 +2802,15 @@ CONTAINS
                               & loc_FeFeLL(1),          &
                               & loc_bio_part_TMP(is2l(is_POC),k)  &
                               & )
-                         if (sed_select(is_FeOOH)) then
+                         if (sed_select(is_POM_FeOOH)) then
                             loc_bio_remin(io2l(io_Fe),k)        = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
-                            loc_bio_part_TMP(is2l(is_FeOOH),k)  = loc_bio_part_TMP(is2l(is_FeOOH),k) + loc_scav_Fe
+                            loc_bio_part_TMP(is2l(is_POM_FeOOH),k) = loc_bio_part_TMP(is2l(is_POM_FeOOH),k) + loc_scav_Fe
+
+             !!!loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - loc_r56Fe*loc_scav_Fe
-                               loc_bio_part_TMP(is2l(is_FeOOH_56Fe),k)  = loc_bio_part_TMP(is2l(is_FeOOH_56Fe),k) + &
+                               loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k)  = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k) + &
                                     & loc_r56Fe*loc_scav_Fe
                             end if
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
@@ -3226,6 +3232,9 @@ CONTAINS
                    case default
                       loc_FeFeLL(:) = 0.0
                    end SELECT
+
+                      !!!loc_FeFeLL(:) = 0.0
+
                    ! calculate mean Fe isotopic composition
                    ! NOTE: isotopes not enabled for all of the Fe schemes
                    If ( ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe) ) then
@@ -3284,19 +3293,24 @@ CONTAINS
                               & loc_FeFeLL(1),          &
                               & loc_bio_part_TMP(is2l(is_POC),kk)  &
                               & )
-                         if (sed_select(is_FeOOH)) then
+                         if (sed_select(is_POM_FeOOH)) then
                             loc_bio_remin(io2l(io_Fe),kk)        = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
-                            loc_bio_part_TMP(is2l(is_FeOOH),kk)  = loc_bio_part_TMP(is2l(is_FeOOH),kk) + loc_scav_Fe
+                            loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_scav_Fe
+
+
+             !!!loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
-                               loc_bio_part_TMP(is2l(is_FeOOH_56Fe),kk)  = loc_bio_part_TMP(is2l(is_FeOOH_56Fe),kk) + &
+                               loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)  = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + &
                                     & loc_r56Fe*loc_scav_Fe
                             end if
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
                             loc_bio_part_TMP(is2l(is_det),kk) = loc_bio_part_TMP(is2l(is_det),kk) + &
                                  & loc_bio_part_TMP(is2l(is_FeOOH),kk)
                          else
-                            loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
+                            loc_bio_remin(io2l(io_Fe),kk)        = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
+                            loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - &
                                     & loc_r56Fe*loc_scav_Fe

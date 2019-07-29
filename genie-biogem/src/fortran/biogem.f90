@@ -1452,7 +1452,7 @@ subroutine biogem(        &
               end if
               ! *** simple oxic iron cycle ***
               if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
-                 !!!call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
               end if
               if (sed_select(is_FeOOH) .AND. ocn_select(io_Fe)) then
                  call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
@@ -1464,9 +1464,9 @@ subroutine biogem(        &
                 end if   
               end if
               if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
-                 !!!call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
+                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
               end if
-               ! if (ocn_select(io_Fe2) .AND. sed_select(is_FeOOH) .AND. ocn_select(io_H2S)) then
+              ! if (ocn_select(io_Fe2) .AND. sed_select(is_FeOOH) .AND. ocn_select(io_H2S)) then
                  ! call sub_box_reduce_FeOOH(i,j,loc_k1,loc_dtyr)
               ! end if
               if (sed_select(is_FeS2)) then
