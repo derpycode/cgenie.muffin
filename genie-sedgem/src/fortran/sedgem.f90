@@ -593,6 +593,7 @@ SUBROUTINE sedgem(          &
      print*,''
   end if
   ! catch any carbonate chemistry errors arising in sub_update_sed
+  if (error_stop) error_stop = .false.  ! forcing to proceed YK added
   if (error_stop) then
      call end_sedgem(     &
           & dum_dts,      &
@@ -628,6 +629,16 @@ SUBROUTINE sedgem(          &
   IF (ctrl_misc_debug4) print*,'*** UPDATE SEDGEM TIME ***'
   ! update sediment age (== current time in years)
   sed_age = sed_age - loc_dtyr
+  
+  ! YK added 
+  if (dum_reinit_sfxsumsed) then 
+     irec_sed = irec_sed + 1
+     if (mod(irec_sed,20)==0) then 
+        print*,'===== going to save sediment data ====='
+        call sub_save_data_kanzaki(irec_sed)
+        print*,'=====         success !!!         ====='
+     endif 
+  endif 
 
 end SUBROUTINE sedgem
 ! ******************************************************************************************************************************** !

@@ -119,9 +119,9 @@ CLEAN_UTIL_TARGETS = $(UTIL_NAMES:%=clean_%)
 # Note that an individual module or util can be cleaned
 # with an appropriate target, e.g. 'make clean_igcm3'
 cleanall : clean cleanutils cleanmodules
-	\rm -f include/*.mod
-	\rm -f testbiogem.out
-	\rm -f tmp*
+	rm -f include/*.mod
+	rm -f testbiogem.out
+	rm -f tmp*
 
 # clean  - just local files
 clean : $(CLEAN_LOCAL_TARGETS)
@@ -149,12 +149,12 @@ $(CLEAN_MODULE_TARGETS) : clean_% :
 $(EXE_MAIN) : $(CONTROL_OBJS) $(UTIL_LIBS) $(LOCAL_LIBS) $(MODULE_LIBS) $(OBJECTS_MAIN) $(OTHER_FILES)
 	$(F77_LD) $(LDFLAGS) $(OBJECTS_MAIN) $(OUT_FLAG)$(EXE_MAIN) \
         $(LINK_MODULE_LIBRARIES) $(LINK_UTIL_LIBRARIES) \
-	$(NETCDF) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS)
+	$(NETCDF) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS) -lopenblas
 
 $(EXE_COSTFN) : $(EXE) $(CONTROL_OBJS) $(UTIL_LIBS) $(LOCAL_LIBS) $(MODULE_LIBS) $(OBJECTS_COSTFN) $(OTHER_FILES)
 	$(F77_LD) $(LDFLAGS) $(OBJECTS_COSTFN) $(OUT_FLAG)$(EXE_COSTFN) \
         $(LINK_MODULE_LIBRARIES) $(LINK_UTIL_LIBRARIES) \
-	$(NETCDF) $(GLIMMER) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS)
+	$(NETCDF) $(GLIMMER) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS) -lopenblas
 
 # Rule to make custom netcdf comparison program
 nccompare :

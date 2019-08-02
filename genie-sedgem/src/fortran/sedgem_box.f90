@@ -14,6 +14,7 @@ MODULE sedgem_box
   use sedgem_box_archer1991_sedflx
   use sedgem_box_ridgwelletal2003_sedflx
   use sedgem_box_benthic
+  use sedgem_box_kanzaki
   IMPLICIT NONE
   SAVE
 
@@ -343,14 +344,17 @@ CONTAINS
          & 'ridgwell2001lookup',    &
          & 'ridgwell2001lookupvec', &
          & 'ridgwell2001nn',        &
-         & 'archer2002nn'           &
+         & 'archer2002nn',          &
+         & 'kanzaki2019ss',         &
+         & 'kanzaki2019trs'         &
          & )
        CALL sub_calc_sed_dis_CaCO3(                                                  &
             & dum_dtyr,                                                              &
             & dum_D,sed_carb(ic_dCO3_cal,dum_i,dum_j),loc_sed_diagen_fCorg,          &
             & dum_sfcsumocn(:),sed_carbconst(:,dum_i,dum_j),sed_carb(:,dum_i,dum_j), &
             & loc_dis_sed(:),loc_new_sed(:),sed_top(:,dum_i,dum_j),                  &
-            & phys_sed(ips_mix_k0,dum_i,dum_j)                                       &
+            & phys_sed(ips_mix_k0,dum_i,dum_j),                                      &
+            & dum_i,dum_j                                                            &
             & )
        if (error_Archer .AND. ctrl_misc_report_err) then
           CALL sub_report_error(                                                                                           &
@@ -688,6 +692,63 @@ CONTAINS
        sed_top_h(dum_i,dum_j) = sed_top_h(dum_i,dum_j) - REAL(n_sed_tot_drop)
        loc_n_sed_stack_top = INT(sed_top_h(dum_i,dum_j)) + 1
     ENDIF
+    
+    ! ###################### an attempt for signal tracking #################################################
+    
+        ! if (                                                &
+            ! (dum_i == 14 .and. dum_j == 30)                 &
+            ! .or.(dum_i == 10 .and. dum_j == 19)             & 
+            ! .or.(dum_i == 22 .and. dum_j == 27)             &
+            ! .or.(dum_i == 26 .and. dum_j ==  6)             &
+            ! series recorded by genie 
+            ! (dum_i == 23 .and. dum_j == 17)             &
+            ! .or.(dum_i == 24 .and. dum_j == 17)             &
+            ! .or.(dum_i == 25 .and. dum_j == 17)             &
+            ! .or.(dum_i == 26 .and. dum_j == 17)             &
+            ! .or.(dum_i == 27 .and. dum_j == 17)             &
+            ! .or.(dum_i == 31 .and. dum_j == 17)             &
+            ! .or.(dum_i == 32 .and. dum_j == 17)             &
+            ! .or.(dum_i == 33 .and. dum_j == 17)             &
+            ! .or.(dum_i == 34 .and. dum_j == 17)             &
+            ! .or.(dum_i == 35 .and. dum_j == 17)             &
+            ! .or.(dum_i == 36 .and. dum_j == 17)             &
+            ! adding more 
+            ! .or.(dum_i ==  1 .and. dum_j == 17)             &
+            ! .or.(dum_i ==  3 .and. dum_j == 17)             &
+            ! .or.(dum_i ==  4 .and. dum_j == 17)             &
+            ! .or.(dum_i ==  5 .and. dum_j == 17)             &
+            ! .or.(dum_i ==  6 .and. dum_j == 17)             &
+            ! .or.(dum_i ==  7 .and. dum_j == 17)             &
+            ! .or.(dum_i ==  8 .and. dum_j == 17)             &
+            ! .or.(dum_i ==  9 .and. dum_j == 17)             &
+            ! .or.(dum_i == 10 .and. dum_j == 17)             &
+            ! .or.(dum_i == 11 .and. dum_j == 17)             &
+            ! .or.(dum_i == 12 .and. dum_j == 17)             &
+            ! .or.(dum_i == 13 .and. dum_j == 17)             &
+            ! .or.(dum_i == 14 .and. dum_j == 17)             &
+            ! .or.(dum_i == 15 .and. dum_j == 17)             &
+            ! .or.(dum_i == 16 .and. dum_j == 17)             &
+            ! .or.(dum_i == 17 .and. dum_j == 17)             &
+            ! .or.(dum_i == 18 .and. dum_j == 17)             &
+            ! ) then 
+            ! print*,'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+            ! print*,'signal tracking'
+            ! call sub_kanzaki2019_sigtrck(                                   &
+                ! dum_sfcsumocn,dum_D*1e-3,dum_dtyr                           &
+                ! ,sed_fsed(is_CaCO3,dum_i,dum_j)/dum_dtyr                    &
+                ! ,loc_sed_diagen_fCorg/conv_sed_mol_cm3(is_POC)/dum_dtyr     &
+                ! ,sed_fsed(is_det,dum_i,dum_j)*conv_sed_mol_cm3(is_det)/conv_sed_g_cm3(is_det)/dum_dtyr                               &
+                ! ,dum_i                                                      &  
+                ! ,dum_j                                                      &  
+                ! )
+            ! print*,'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+            ! print*,''
+            ! print*,''
+            
+            ! <<<<< testing also caco3 dissolution flux and fraction >>>>>>> 
+            
+            ! loc_dis_sed(is_CaCO3) = ccdis_sed(dum_i,dum_j)*conv_cal_mol_cm3*dum_dtyr
+        ! endif 
 
     IF (ctrl_misc_debug3) print*,'(g) calculate sediment dissolution flux to ocean'
     ! *** (g) calculate sediment dissolution flux to ocean
@@ -1840,7 +1901,9 @@ CONTAINS
        & dum_sed_dis,                &
        & dum_sed_new,                &
        & dum_sed_top,                &
-       & dum_sed_mix_k               &
+       & dum_sed_mix_k,              &
+       & dum_i,                      &
+       & dum_j                       &
        & )
     IMPLICIT NONE
     ! dummy arguments
@@ -1863,6 +1926,14 @@ CONTAINS
     REAL::loc_dis              ! raw dissolution flux from lookup table
     real::loc_O2               ! local bottom-water oxygen concentration
     real::loc_sed_new_frac
+    
+    real::loc_fcarb           ! caco3 rain rate (mol cm-2 a-1) (2019-may-7 YK)
+    real::loc_fdet            ! om/cc rain ratio 
+    real::loc_dis_chk  
+    real::loc_fPOC_2
+    real::loc_dt_kanzaki  
+    integer,intent(in)::dum_i,dum_j           
+    
     !REAL,DIMENSION(par_nn_input)::loc_nn_inp,loc_nn_inpnorm     ! neural network variables
 
     ! *** USER-DEFINABLE OPTIONS ***
@@ -1875,7 +1946,12 @@ CONTAINS
     loc_dis = 0.0
     loc_sed_dis_new = 0.0
     loc_sed_dis_top = 0.0
-
+    
+    loc_dis_chk = 0.0
+    loc_fcarb = 0.0
+    loc_fdet = 0.0
+    loc_fPOC_2 = 0.0
+    
     ! *** calculate sediment diagenesis defining variables ***
     ! NOTE: the units of the Corg flux must be changed from (cm3 cm-2) to (mol cm-2 yr-1),
     !       in order to calculate CaCO3 diagenesis
@@ -1910,6 +1986,46 @@ CONTAINS
             & )
        loc_dis = conv_cal_mol_cm3*loc_dis*dum_dtyr
        if (error_Archer) loc_dis = dum_sed_new(is_CaCO3)
+       ! print*,loc_dis,loc_fPOC
+    case ('kanzaki2019ss','kanzaki2019trs')    
+       ! print*,'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+       ! print*,'pre_calc',loc_dis,loc_fPOC,dum_D*1e-3
+       ! loc_TC = dum_ocn(io_T) - const_zeroC
+       ! loc_dis = fun_archer1991_sedflx(                                                           &
+            ! & loc_O2,loc_frac_CaCO3_top,loc_fPOC,                                                 &
+            ! & dum_carb(ic_conc_CO2),dum_carb(ic_conc_HCO3),dum_carb(ic_conc_CO3),                 &
+            ! & dum_carbconst(icc_k1),dum_carbconst(icc_k2),dum_carbconst(icc_kcal)/dum_ocn(io_Ca), &
+            ! & dum_sed_mix_k                                                                       &
+            ! & )
+       ! loc_dis = conv_cal_mol_cm3*loc_dis*dum_dtyr
+       loc_fcarb = dum_sed_new(is_CaCO3)/conv_sed_mol_cm3(is_CaCO3)/dum_dtyr  !  Hopefully changed into mol cm-2 yr-1
+       loc_fdet = dum_sed_new(is_det)/conv_sed_g_cm3(is_det)/dum_dtyr ! g cm-2 yr-1
+       loc_fPOC_2 = dum_sed_new(is_POC)/conv_sed_mol_cm3(is_POC)/dum_dtyr   ! mol cm-2 yr-1
+       ! loc_om2cc = dum_sed_new(is_POC)/conv_sed_mol_cm3(is_POC)  &
+            ! & /loc_fcarb
+       ! loc_dic = dum_ocn(io_DIC)*1e6  ! mol kg-1 to umol kg-1
+       ! loc_alk = dum_ocn(io_ALK)*1e6  !  mol kg-1 to umol kg-1
+       ! if (trim(par_sed_diagen_CaCO3opt)=='kanzaki2019ss') loc_dt_kanzaki = 1d8  ! steady state dissolution 
+       ! if (trim(par_sed_diagen_CaCO3opt)=='kanzaki2019trs') loc_dt_kanzaki = dum_dtyr  ! time transient 
+        call sub_kanzaki2019_sigtrck(                                   &
+            dum_ocn,dum_D*1e-3,dum_dtyr                                 &
+            ,loc_fcarb                                                  &
+            ,loc_fPOC                                                   &
+            ,loc_fdet                                                   &
+            ,dum_i                                                      &  
+            ,dum_j                                                      &  
+            )
+       ! loc_dis = fun_kanzaki2019_sedflx(                                   &
+            ! & dum_ocn,dum_D*1e-3,loc_dt_kanzaki                            &
+            ! & ,loc_fcarb,loc_fPOC_2,loc_fdet,loc_frac_CaCO3_top            &                                                             
+            ! & )
+       loc_dis = conv_cal_mol_cm3*ccdis_sed(dum_i,dum_j)*dum_dtyr
+       ! loc_dis = dum_sed_new(is_CaCO3)
+       ! print*,'fin_calc',loc_dis,loc_fPOC,dum_D*1e-3
+       ! print*,'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+       ! print*,''
+       ! print*,''
+       ! print*, loc_dis
     case ('ridgwell2001lookup')
        ! CALCULATE SEDIMENT CACO3 DIAGENESIS VIA A LOOK-UP TABLE [Ridgwell, 2001]
        loc_dis = fun_interp_4D(                                                  &
