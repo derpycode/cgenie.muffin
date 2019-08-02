@@ -17,6 +17,8 @@ OBJECTS = sedgem_lib.$(OBJ_EXT) \
         sedgem_box_archer1991_sedflx.$(OBJ_EXT) \
         sedgem_box_ridgwelletal2003_sedflx.$(OBJ_EXT) \
         sedgem_box_benthic.$(OBJ_EXT) \
+        caco3_therm.$(OBJ_EXT) \
+        sedgem_box_kanzaki.$(OBJ_EXT) \
         sedgem_nnutils.$(OBJ_EXT) \
         sedgem_box.$(OBJ_EXT) sedgem_data_netCDF.$(OBJ_EXT) \
 	sedgem_data.$(OBJ_EXT) initialise_sedgem.$(OBJ_EXT) \
