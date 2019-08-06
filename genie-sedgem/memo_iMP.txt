@@ -1,0 +1,16 @@
+Memo for iMP
+
+A. OpenBLAS library is needed
+    How to install:
+        1. download: http://www.openblas.net/ -> TAR
+        2. tar zxvf OpenBLAS-0.2.20.tar.gz
+        3. cd OpenBLAS-0.2.20
+        4. make BINARY=64 CC="gcc -m64" FC="gfortran -m64"
+        5. su
+        6. make PREFIX=/usr/local install
+
+    If you get the error 'libopenblas.so.0: cannot open shared object file: No such file or directory' then try the following:
+        1. sudo apt-get install libopenblas-base
+        2. export LD_LIBRARY_PATH=/usr/lib/openblas-base/
+    
+B. Choose option 'kanzaki2019trs' for sg_par_sed_diagen_CaCO3opt in userconfig files
