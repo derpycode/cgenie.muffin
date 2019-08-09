@@ -597,7 +597,12 @@ SUBROUTINE sedgem(          &
      print*,''
   end if
   ! catch any carbonate chemistry errors arising in sub_update_sed
-  if (error_stop) error_stop = .false.  ! forcing to proceed YK added
+  if (error_stop .and. trim(par_sed_diagen_CaCO3opt) == 'kanzaki2019trs') then 
+     print *, '*** Warning: detected error in carbonate chemistry'
+     print *, '             but forced to proceed                '
+     error_stop = .false.  ! forcing to proceed YK added
+  endif 
+  
   if (error_stop) then
      call end_sedgem(     &
           & dum_dts,      &
@@ -635,12 +640,10 @@ SUBROUTINE sedgem(          &
   sed_age = sed_age - loc_dtyr
   
   ! YK added 
-  if (dum_reinit_sfxsumsed) then 
+  if (dum_reinit_sfxsumsed .and. trim(par_sed_diagen_CaCO3opt) == 'kanzaki2019trs') then 
      irec_sed = irec_sed + 1
      if (mod(irec_sed,20)==0) then 
-        print*,'===== going to save sediment data ====='
         call sub_save_data_kanzaki(irec_sed)
-        print*,'=====         success !!!         ====='
      endif 
   endif 
 
