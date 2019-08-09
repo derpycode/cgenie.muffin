@@ -315,7 +315,7 @@ real f13c_ocn,r13c_ocn
 
 real::kom_ox(nz),kom_an(nz),kom_dum(nz,3),dt_om_o2,error_o2min
 integer::itr_w_max = 10
-integer iizox, iizox_errmin
+integer iizox, iizox_errmin, izox_errmin
 real::loc_start,loc_finish
 
 real::ztot = ztot_sed                                                     ! g/cm3 sediment particle density assuming opal (SiO2•n(H2O) )
@@ -326,10 +326,16 @@ real::mom = mom_sed                                                   ! g/mol ar
 real::msed = msed_sed                                                ! g/mol arbitrary sediment g/mol assuming kaolinite ( 	Al2Si2O5(OH)4 )
 real::mcc = mcc_sed                                                    ! g/mol CaCO3
 
-! logical::loc_display = .false.
-logical::loc_display = .true.
+logical::loc_display = .false.
+! logical::loc_display = .true.
 real::dt_save,zx_sample
 integer::loc_i_time_proc,loc_nt,iz_xcm
+logical:: all_oxic, loc_reading
+logical:: ox_degall = .true.
+! logical:: ox_degall = .false.
+
+logical:: dis_off = .true.  
+real:: dis_off_val = 10d0  ! dissolution rate const. offset % 
 
 call cpu_time(loc_start)
 
@@ -339,6 +345,10 @@ if (loc_display) then
 endif 
 ! print*,'now in main sb'
 signal_tracking=.true.
+
+loc_reading = ctrl_continuing ! if continuing, read from previous run
+loc_reading = .false. ! always start from steady state
+
 if (dum_i==0 .or. dum_j==0) signal_tracking=.false.
 
 ! when signal tracking, 4 caco3 species are considered with higher sediment resolution
@@ -361,6 +371,15 @@ if (allnobio) nobio = .true.
 if (allturbo2) turbo2 = .true.
 if (alllabs) labs = .true.
 if (oxonly) anoxic = .false. 
+
+!  if denine oxonly alone, there can be some residual om below oxygen penetration depth as in Archer (1991)
+!  when ox_degall is also defined, then om is all degradated and all om consumption is attributed to aerobic degradation (e.g., Archer et al., 1997)
+!  the latter situation is realized by first assume ox-anox om model to degradate all om 
+!  then the calculated anoxic om degradation rate (anco2) is converted to aerobic deg. rate (oxco2)
+!  mass balance of om degradation and oxygen (i.e., between o2dec, alkdec, dicdec) is not satisfied in tis case 
+if (.not. oxonly) ox_degall = .false.  !! ox_degall is an option only effective for ox-only OM degradation 
+if (ox_degall) anoxic = .true.          
+
 
 o2i = dum_sfcsumocn(io_O2)*1d6
 dici = dum_sfcsumocn(io_DIC)*1d6
@@ -404,7 +423,7 @@ co2chem = 'genie'
 ! #ifndef nonrec
 ! prepare directory to store result files 
 if (signal_tracking) then  
-    if (loc_display) print*,o2i,dici,alki,dep,sal,temp,dt,ccflxi,omflx,detflx,dum_i,dum_j,ctrl_continuing
+    if (loc_display) print*,o2i,dici,alki,dep,sal,temp,dt,ccflxi,omflx,detflx,dum_i,dum_j,loc_reading
     if (loc_display) print*,'making dir'
     write(filechr,"(i0.3,'-',i0.3)") dum_i,dum_j
     call makeprofdir(  &  ! make profile files and a directory to store them 
@@ -449,8 +468,8 @@ if (.not. signal_tracking) then
     ! nt = 10 
     loc_nt = 10 
 else
-    ! if (first_call .and. (.not.ctrl_continuing)) then ! iterations to steady state only when  starting a new seriese of experiment 
-    if (first_call) then  !  iterations to steady states at individual run 
+    if (first_call .and. (.not.loc_reading)) then ! iterations to steady state only when  starting a new seriese of experiment 
+    ! if (first_call) then  !  iterations to steady states at individual run 
         ! nt = 1000
         loc_nt = 1000
         itr_w_max = 100
@@ -523,6 +542,7 @@ call make_transmx(  &
 call coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
+    ,dis_off,dis_off_val
     )
 
 !!   INITIAL CONDITIONS !!!!!!!!!!!!!!!!!!! 
@@ -537,7 +557,7 @@ o2 = o2i*1d-6/1d3 ! mol/cm3  ; factor is added to change uM to mol/cm3
 
 ! if not called first time, reading depth profiles from previous data
 if (signal_tracking) then 
-    ! if (.not. ctrl_continuing) then  ! not restarting 
+    ! if (.not. loc_reading) then  ! not restarting 
     if (.not.first_call) then 
         if (loc_display) print*,'reading from previous run from global data'
         cc(:,:) = cc_sed(1:nz,1:nspcc,dum_i,dum_j)
@@ -561,13 +581,13 @@ if (signal_tracking) then
             )
     elseif (first_call) then 
         ! if not initializing every simulation, the following reading must be done  
-        ! if (ctrl_continuing) then  ! restarting 
-            ! print*,'reading from previous run using files',ctrl_continuing
-            ! call readprofile(                                                                   &
-                ! 1,file_tmp,rstdir,nz,nspcc,msed,co3sat,mom,mcc          & ! input 
-                ! ,z,age,pt,rho,cc,dic,alk,co3,pro,om,up,dwn,cnr,adf,w,frt,d13c_blk,d18o_blk,o2   & ! output
-                ! )
-        ! endif 
+        if (loc_reading) then  ! restarting 
+            if (loc_display) print*,'reading from previous run using files',loc_reading
+            call readprofile(                                                                   &
+                1,file_tmp,rstdir,nz,nspcc,msed,co3sat,mom,mcc          & ! input 
+                ,z,age,pt,rho,cc,dic,alk,co3,pro,om,up,dwn,cnr,adf,w,frt,d13c_blk,d18o_blk,o2   & ! output
+                )
+        endif 
     endif 
     
     if (loc_display) then 
@@ -618,7 +638,7 @@ select case (trim(co2chem))
             )
             
         dum_carb(ic_H) = pro(1)
-        ! if (first_call .and. (.not.ctrl_continuing)) then  ! calling only when starting a series of experiments
+        ! if (first_call .and. (.not.loc_reading)) then  ! calling only when starting a series of experiments
         if (first_call) then   ! calling whenever a new experiment is started (whether or not continued from previous/other experiments)  
             do iz=1,nz
                 call sub_calc_carb(             &
@@ -715,7 +735,7 @@ anco2 = 0d0  ! anoxic counterpart
 if (.not. flg_500) then 
     loc_time = 0d0
     if (signal_tracking) then 
-        if (first_call .and. (.not.ctrl_continuing)) then 
+        if (first_call .and. (.not.loc_reading)) then 
             loc_time = dt !- 0.5d0
             dt = 1d9  ! an attempt to reach steady state initially and immediately
             ! open(unit=file_tmp,file=trim(adjustl(workdir))//'time.txt',action='write',status='replace') 
@@ -724,15 +744,15 @@ if (.not. flg_500) then
             time_sed(dum_i,dum_j) = loc_time
             ! loc_time_fin = dt
             loc_time_fin = ztot/wi*10d0
-        elseif (first_call .and. ctrl_continuing) then 
+        elseif (first_call .and. loc_reading) then 
             loc_time = dt !- 0.5d0
-            dt = 1d9   ! an attempt to reach steady state initially and immediately 
+            ! dt = 1d9   ! an attempt to reach steady state initially and immediately 
             ! open(unit=file_tmp,file=trim(adjustl(workdir))//'time.txt',action='write',status='replace') 
             ! write(file_tmp,*) time 
             ! close(file_tmp)
             time_sed(dum_i,dum_j) = loc_time 
-            ! loc_time_fin = dt
-            loc_time_fin = ztot/wi*10d0
+            loc_time_fin = dt
+            ! loc_time_fin = ztot/wi*10d0
         else 
             loc_time = time_sed(dum_i,dum_j) 
             ! open(unit=file_tmp,file=trim(adjustl(workdir))//'time.txt',action='read',status='old') 
@@ -798,13 +818,19 @@ do
         endif 
     endif 
 ! #endif
-
+    
+    if (dis_off) then 
+        ccflx(1:nspcc/2) = ccflxi/2d0
+        ccflx(1+nspcc/2:nspcc) = ccflxi/2d0
+    endif 
+    
     !! === temperature & pressure and associated boundary changes ====
     ! if temperature is changed during signal change event this affect diffusion coeff etc. 
     ! call coefs(temp,sal,dep)
     call coefs(  &
         dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
         ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
+        ,dis_off,dis_off_val
         )
     !! /////////////////////
 ! #ifdef sense
@@ -925,16 +951,25 @@ do
         if (all(o2x>=0d0).and.izox==nz) then 
             iizox_errmin = nz
             ! print *,'all oxic',iizox_errmin 
+            all_oxic = .true.
         elseif (any(o2x<0d0)) then 
+            all_oxic = .true.
             error_o2min = 1d4
             iizox_errmin = izox
             do iizox = 1,nz   
             ! do iizox = izox,nz   
             ! do iizox = max(1,izox-20),min(nz,izox+20)   
-                call o2calc_sbox(  &
-                    o2x  & ! output
-                    ,iizox,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
-                    )
+                if (iizox < nz) then 
+                    call o2calc_sbox(  &
+                        o2x  & ! output
+                        ,iizox,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                        )
+                elseif (iizox ==nz) then 
+                    call o2calc_ox(  &
+                        o2x  & ! output
+                        ,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                        )
+                endif 
                 ! fluxes relevant to oxygen 
                 ! call calcflxo2_sbox( &
                     ! o2dec,o2dif,o2tflx,o2res  & ! output 
@@ -948,17 +983,27 @@ do
                     endif 
                 endif 
             enddo 
-            
-            call o2calc_sbox(  &
-                o2x  & ! output
-                ,iizox_errmin,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
-                )
-            ! fluxes relevant to oxygen 
-            call calcflxo2_sbox( &
-                o2dec,o2dif,o2tflx,o2res  & ! output 
-                ,nz,sporo,kom_ox,omx,dz,poro,dif_o2,dt_om_o2,o2,o2x,iizox_errmin,ox2om,o2i  & ! input
-                )
-                
+            if (iizox_errmin < nz) then 
+                call o2calc_sbox(  &
+                    o2x  & ! output
+                    ,iizox_errmin,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                    )
+                ! fluxes relevant to oxygen 
+                call calcflxo2_sbox( &
+                    o2dec,o2dif,o2tflx,o2res  & ! output 
+                    ,nz,sporo,kom_ox,omx,dz,poro,dif_o2,dt_om_o2,o2,o2x,iizox_errmin,ox2om,o2i  & ! input
+                    )
+            elseif (iizox_errmin ==nz) then 
+                call o2calc_ox(  &
+                    o2x  & ! output
+                    ,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                    )
+                !  fluxes relevant to o2 (at the same time checking the satisfaction of difference equations) 
+                call calcflxo2_ox( &
+                    o2dec,o2dif,o2tflx,o2res  & ! output 
+                    ,nz,sporo,kom_ox,omx,dz,poro,dif_o2,dt_om_o2,o2,o2x,ox2om,o2i  & ! input
+                    )
+            endif 
             ! izox_calc_done = .false.
             ! if (oxic) then 
                 ! do iz=1,nz
@@ -1022,10 +1067,38 @@ do
         ! if (itr >nz+101) then 
             ! stop
         ! endif
-        if (izox==iizox_errmin) exit 
+        if (izox==iizox_errmin) then 
+            if (all_oxic) then            
+                exit 
+            else 
+                if (izox < nz) then 
+                    call o2calc_sbox(  &
+                        o2x  & ! output
+                        ,izox,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                        )
+                    ! fluxes relevant to oxygen 
+                    call calcflxo2_sbox( &
+                        o2dec,o2dif,o2tflx,o2res  & ! output 
+                        ,nz,sporo,kom_ox,omx,dz,poro,dif_o2,dt_om_o2,o2,o2x,izox,ox2om,o2i  & ! input
+                        )
+                elseif (izox == nz) then 
+                    call o2calc_ox(  &
+                        o2x  & ! output
+                        ,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                        )
+                    !  fluxes relevant to o2 (at the same time checking the satisfaction of difference equations) 
+                    call calcflxo2_ox( &
+                        o2dec,o2dif,o2tflx,o2res  & ! output 
+                        ,nz,sporo,kom_ox,omx,dz,poro,dif_o2,dt_om_o2,o2,o2x,ox2om,o2i  & ! input
+                        )
+                endif
+                exit
+            endif 
+        endif 
         
         if (loc_error < minerr ) then 
             minerr = loc_error 
+            izox_errmin = iizox_errmin
         else 
             if (izox < nz .and. iizox_errmin == nz) then 
             
@@ -1048,13 +1121,38 @@ do
         if (itr > 100) then 
             print*
             print*
-            print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-            print*,'too much iterations for ox & om: exit '
-            print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+            print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+            print*,'*** Warning : too much iterations for ox & om: exit'
+            print*,'    minimum error in zox = ',minerr
+            print*,'    zox = ', izox_errmin
+            print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
             print*
             print*
             print*
             write(file_err,*) 'too much iterations for om & ox',loc_time,itr,izox,iizox_errmin
+            
+            if (izox_errmin < nz) then 
+                call o2calc_sbox(  &
+                    o2x  & ! output
+                    ,izox_errmin,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                    )
+                ! fluxes relevant to oxygen 
+                call calcflxo2_sbox( &
+                    o2dec,o2dif,o2tflx,o2res  & ! output 
+                    ,nz,sporo,kom_ox,omx,dz,poro,dif_o2,dt_om_o2,o2,o2x,izox_errmin,ox2om,o2i  & ! input
+                    )
+            elseif (izox_errmin == nz) then 
+                call o2calc_ox(  &
+                    o2x  & ! output
+                    ,nz,poro,o2,kom_ox,omx,sporo,dif_o2,dz,dt_om_o2,ox2om,o2i & ! input
+                    )
+                !  fluxes relevant to o2 (at the same time checking the satisfaction of difference equations) 
+                call calcflxo2_ox( &
+                    o2dec,o2dif,o2tflx,o2res  & ! output 
+                    ,nz,sporo,kom_ox,omx,dz,poro,dif_o2,dt_om_o2,o2,o2x,ox2om,o2i  & ! input
+                    )
+            endif 
+            
             exit 
         endif 
 
@@ -1072,9 +1170,13 @@ do
             ! endif
         ! endif
     ! enddo
-    
-    oxco2(:) = (1d0-poro(:))*kom_ox(:)*omx(:)
-    anco2(:) = (1d0-poro(:))*kom_an(:)*omx(:)
+    if (.not. ox_degall) then 
+        oxco2(:) = (1d0-poro(:))*kom_ox(:)*omx(:)
+        anco2(:) = (1d0-poro(:))*kom_an(:)*omx(:)
+    else 
+        oxco2(:) = (1d0-poro(:))*(kom_ox(:)+kom_an(:))*omx(:)
+        ! anco2(:) = (1d0-poro(:))*kom_an(:)*omx(:)
+    endif 
 
     do iz=1,nz
         dw(iz) = dw(iz) -(1d0-poro(iz))*mvom*kom(iz)*omx(iz)  !! burial rate change need reflect volume change caused by chemical reactions 
@@ -1378,18 +1480,19 @@ do
             ! ) 
     ! endif 
 ! #endif
-
-    !! in theory, o2dec/ox2om + alkdec = dicdec = omdec (in absolute value)
-    if (om2cc /= 0d0) then 
-        if ( abs((o2dec/ox2om - alkdec + dicdec)/dicdec) > tol) then
-            print*,' ____ om calc weird ____'
-            print*, abs((o2dec/ox2om + alkdec - dicdec)/dicdec) ,o2dec/ox2om,alkdec,dicdec
-            write(file_err,*) trim(adjustl(dumchr(1))), loc_time, dt &
-                , abs((o2dec/ox2om + alkdec - dicdec)/dicdec),o2dec/ox2om,alkdec,dicdec
-            ! pause
-        endif
+    
+    if (.not. ox_degall) then 
+        !! in theory, o2dec/ox2om + alkdec = dicdec = omdec (in absolute value)
+        if (om2cc /= 0d0) then 
+            if ( abs((o2dec/ox2om - alkdec + dicdec)/dicdec) > tol) then
+                print*,' ____ om calc weird ____'
+                print*, abs((o2dec/ox2om + alkdec - dicdec)/dicdec) ,o2dec/ox2om,alkdec,dicdec
+                write(file_err,*) trim(adjustl(dumchr(1))), loc_time, dt &
+                    , abs((o2dec/ox2om + alkdec - dicdec)/dicdec),o2dec/ox2om,alkdec,dicdec
+                ! pause
+            endif
+        endif 
     endif 
-
 ! #ifndef nonrec 
     ! if (site_id/=0) then 
     ! recording signals at 3 different depths (btm of mixed layer, 2xdepths of btm of mixed layer and btm depth of calculation domain)
@@ -1422,8 +1525,9 @@ do
         ! if (it > 10) exit 
         if (loc_time_proc>=loc_time_fin) exit 
     else
-        if (first_call) then 
-            ! if (.not.ctrl_continuing) then 
+        ! if (first_call) then 
+        if (first_call .and. (.not.loc_reading)) then 
+            ! if (.not.loc_reading) then 
                 if (err_f<tol) then 
                     if (loc_display) print*,'enough iterations',err_f,tol,err_f<tol
                     exit
@@ -1661,29 +1765,29 @@ enddo
 ! workdir = trim(adjustl(workdir))//'genie/'
 ! workdir = trim(adjustl(workdir))//'test/'
 workdir = trim(par_outdir_name)
-workdir = trim(adjustl(workdir))//'/'
-if (.not. anoxic) then 
-    workdir = trim(adjustl(workdir))//'ox'
-else 
-    workdir = trim(adjustl(workdir))//'oxanox'
-endif
-if (any(labs)) workdir = trim(adjustl(workdir))//'_labs'
-if (any(turbo2)) workdir = trim(adjustl(workdir))//'_turbo2'
-if (any(nobio)) workdir = trim(adjustl(workdir))//'_nobio'
-workdir = trim(adjustl(workdir))//'/'
+workdir = trim(adjustl(workdir))//'/imp/profiles/'
+! if (.not. anoxic) then 
+    ! workdir = trim(adjustl(workdir))//'ox'
+! else 
+    ! workdir = trim(adjustl(workdir))//'oxanox'
+! endif
+! if (any(labs)) workdir = trim(adjustl(workdir))//'_labs'
+! if (any(turbo2)) workdir = trim(adjustl(workdir))//'_turbo2'
+! if (any(nobio)) workdir = trim(adjustl(workdir))//'_nobio'
+! workdir = trim(adjustl(workdir))//'/'
 workdir = trim(adjustl(workdir))//'site-'//trim(adjustl(filechr))
 ! restart directory 
 rstdir = trim(par_rstdir_name)
-rstdir = trim(adjustl(rstdir))//'/'
-if (.not. anoxic) then 
-    rstdir = trim(adjustl(rstdir))//'ox'
-else 
-    rstdir = trim(adjustl(rstdir))//'oxanox'
-endif
-if (any(labs)) rstdir = trim(adjustl(rstdir))//'_labs'
-if (any(turbo2)) rstdir = trim(adjustl(rstdir))//'_turbo2'
-if (any(nobio)) rstdir = trim(adjustl(rstdir))//'_nobio'
-rstdir = trim(adjustl(rstdir))//'/'
+rstdir = trim(adjustl(rstdir))//'/imp/profiles/'
+! if (.not. anoxic) then 
+    ! rstdir = trim(adjustl(rstdir))//'ox'
+! else 
+    ! rstdir = trim(adjustl(rstdir))//'oxanox'
+! endif
+! if (any(labs)) rstdir = trim(adjustl(rstdir))//'_labs'
+! if (any(turbo2)) rstdir = trim(adjustl(rstdir))//'_turbo2'
+! if (any(nobio)) rstdir = trim(adjustl(rstdir))//'_nobio'
+! rstdir = trim(adjustl(rstdir))//'/'
 rstdir = trim(adjustl(rstdir))//'site-'//trim(adjustl(filechr))
 rstdir = trim(adjustl(rstdir))//'/'
 
@@ -2144,12 +2248,15 @@ endsubroutine make_transmx
 subroutine coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
+    ,dis_off,dis_off_val
     )
 integer,intent(in)::nz,nspcc
 real,intent(in)::temp,sal,dep,poro(nz),cai,komi,kcci
 real,intent(out)::dif_dic(nz),dif_alk(nz),dif_o2(nz),kom(nz),kcc(nz,nspcc),co3sat
 real dif_dic0,dif_alk0,dif_o20,ff(nz),keq1,keq2,keqcc
 real calceq1,calceq2,calceqcc
+real,intent(in)::dis_off_val
+logical,intent(in)::dis_off
 
 ff = poro*poro       ! representing tortuosity factor 
 
@@ -2179,6 +2286,11 @@ keqcc = calceqcc(temp,sal,dep) ! calcite solubility function called from caco3_t
 co3sat = keqcc/cai ! co3 conc. at calcite saturation 
 
 ! print*,cai,keqcc,co3sat
+
+if (dis_off) then 
+    kcc(:,1:nspcc/2) = kcci*(1d0-dis_off/100d0)
+    kcc(:,1+nspcc/2:nspcc) = kcci*(1d0+dis_off/100d0)
+endif 
 
 endsubroutine coefs
 !**************************************************************************************************************************************
@@ -2333,7 +2445,7 @@ frt(:) = dum_real(:,5)
 w(:) = dum_real(:,6)
 pt(:) = dum_real(:,3)/(msed/rho(:)*100d0)
 
-print*,pt
+! print*,pt
 
 open(unit=file_tmp,file=trim(adjustl(workdir))//'ccx-'//trim(adjustl(dumchr(1)))//'.res' &
     ,action='read',status='old') 
@@ -4539,11 +4651,11 @@ integer,intent(in)::time_int
 integer::i,j
 character*256 workdir,intchr
 
-print*, ' printing data by signal tracking model '
+! print*, ' printing data by signal tracking model '
 
 write(intchr,*)time_int
 workdir = trim(par_outdir_name)
-workdir = trim(adjustl(workdir))//'/'
+workdir = trim(adjustl(workdir))//'/imp/'
 
 do j=1,n_j
     do i=1,n_i
@@ -4557,7 +4669,7 @@ do j=1,n_j
     enddo
 enddo 
 
-print*, ' data prepared ... now going to record '
+! print*, ' data prepared ... now going to record '
 
 open(unit=100,file=trim(adjustl(workdir))//'ccbml-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
@@ -4602,7 +4714,7 @@ enddo
 close(100)
 
 
-print*, ' ... recording finished ... !!! '
+! print*, ' ... recording finished ... !!! '
 
 ! irec_sed = irec_sed + 1
 
