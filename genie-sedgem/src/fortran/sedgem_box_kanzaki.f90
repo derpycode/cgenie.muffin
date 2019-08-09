@@ -542,7 +542,7 @@ call make_transmx(  &
 call coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-    ,dis_off,dis_off_val
+    ,dis_off,dis_off_val  &
     )
 
 !!   INITIAL CONDITIONS !!!!!!!!!!!!!!!!!!! 
@@ -830,7 +830,7 @@ do
     call coefs(  &
         dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
         ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-        ,dis_off,dis_off_val
+        ,dis_off,dis_off_val  &
         )
     !! /////////////////////
 ! #ifdef sense
@@ -2248,7 +2248,7 @@ endsubroutine make_transmx
 subroutine coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-    ,dis_off,dis_off_val
+    ,dis_off,dis_off_val  &
     )
 integer,intent(in)::nz,nspcc
 real,intent(in)::temp,sal,dep,poro(nz),cai,komi,kcci
@@ -2288,8 +2288,8 @@ co3sat = keqcc/cai ! co3 conc. at calcite saturation
 ! print*,cai,keqcc,co3sat
 
 if (dis_off) then 
-    kcc(:,1:nspcc/2) = kcci*(1d0-dis_off/100d0)
-    kcc(:,1+nspcc/2:nspcc) = kcci*(1d0+dis_off/100d0)
+    kcc(:,1:nspcc/2) = kcci*(1d0-dis_off_val/100d0)
+    kcc(:,1+nspcc/2:nspcc) = kcci*(1d0+dis_off_val/100d0)
 endif 
 
 endsubroutine coefs
