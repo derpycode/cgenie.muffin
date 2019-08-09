@@ -1027,7 +1027,7 @@ CONTAINS
     ! NOTE: use (i.e. set non-zero) ONLY ONE of par_bio_red_CaCO3_LiCO3 and par_bio_red_CaCO3_LiCO3_alpha
     !       (they represent 2 and mutuially exclusive ways of doing it)
     if (ocn_select(io_Li) .AND. ocn_select(io_Ca) .AND. sed_select(is_LiCO3)) then
-       sed_fsed(is_LiCO3,dum_i,dum_j) = sed_fsed(is_LiCO3,dum_i,dum_j)* &
+       sed_fsed(is_LiCO3,dum_i,dum_j) = sed_fsed(is_CaCO3,dum_i,dum_j)* &
             & (par_bio_red_CaCO3_LiCO3 + par_bio_red_CaCO3_LiCO3_alpha*dum_sfcsumocn(io_Li)/dum_sfcsumocn(io_Ca))
     end if
     ! calculate 7/6Li fractionation between Li and LiCO3

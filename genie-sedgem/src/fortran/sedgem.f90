@@ -190,6 +190,10 @@ SUBROUTINE sedgem(          &
            !       ... but allow prescribed (uniform) sed det flux PLUS spatial burial flux
            ! NOTE: if an opal flux is provided but opal is not selected as a tracer, add to the detrital field
            if (sed_select(is_det)) then
+              if (ctrl_sed_det_NOdust) then
+                 ! zero det flux, which at this point is assumed to be all pelagic (dust)
+                 dum_sfxsumsed(is_det,i,j) = 0.0
+              endif
               if (ctrl_sed_Fdet) then
                  dum_sfxsumsed(is_det,i,j) =  &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*par_sed_fdet + &
