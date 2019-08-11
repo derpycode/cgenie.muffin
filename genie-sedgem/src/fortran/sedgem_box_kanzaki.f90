@@ -335,7 +335,8 @@ logical:: ox_degall = .true.
 ! logical:: ox_degall = .false.
 
 logical:: dis_off = .true.  
-real:: dis_off_val = 10d0  ! dissolution rate const. offset % 
+real:: dis_off_val = 1000d0  ! dissolution rate const. offset % 
+integer:: itr_stst  ! iteration for steady state
 
 call cpu_time(loc_start)
 
@@ -545,6 +546,8 @@ call coefs(  &
     ,dis_off,dis_off_val  &
     )
 
+! print *, kcc(1,1),kcc(nz,1), kcc(1,2),kcc(nz,2)
+! pause
 !!   INITIAL CONDITIONS !!!!!!!!!!!!!!!!!!! 
 ! cc = 1d-8   ! assume an arbitrary low conc. 
 cc = 0.9d0/(mcc/rhocc)   ! assume 90 wt%  
@@ -857,6 +860,7 @@ do
 ! #endif 
 ! #endif 
     dt = dt_save 
+    itr_stst = 0
     700 continue
 
     itr_w = 0  ! # of iteration made to converge w 
@@ -1224,11 +1228,23 @@ do
         print*
         ! go to 500
         if (first_call) then 
-            dt = dt /10d0
-            ccx(:,:) = cc(:,:)
-            alkx(:) = alk(:)
-            dicx(:) = dic(:)
-            go to 700 
+            ! dt = dt /10d0
+            ! ccx(:,:) = cc(:,:)
+            ! alkx(:) = alk(:)
+            ! dicx(:) = dic(:)
+            ! itr_stst = itr_stst + 1
+            ! if (itr_stst > 100) then 
+                ! print *
+                ! print *
+                ! print *,' ******* WARNING ******* '
+                ! print *,' steady state cannot be reached within 100 iterations @ site: ',trim(adjustl(filechr))
+                ! print *,' simulation continues nonetheless ... ' 
+                ! print *,' *********************** '
+                ! print *
+                ! print *
+            ! else 
+                ! go to 700 
+            ! endif 
         endif 
     endif 
     ! ~~~~  End of calculation iteration for CO2 species ~~~~~~~~~~~~~~~~~~~~
@@ -1253,11 +1269,23 @@ do
         ! #ifdef sense
                 ! go to 500
                 if (first_call) then 
-                    dt=dt/10d0
-                    ccx(:,:) = cc(:,:)
-                    alkx(:) = alk(:)
-                    dicx(:) = dic(:)
-                    go to 700 
+                    ! dt=dt/10d0
+                    ! ccx(:,:) = cc(:,:)
+                    ! alkx(:) = alk(:)
+                    ! dicx(:) = dic(:)
+                    ! itr_stst = itr_stst + 1 
+                    ! if (itr_stst > 100) then 
+                        ! print *
+                        ! print *
+                        ! print *,' ******* WARNING ******* '
+                        ! print *,' steady state cannot be reached within 100 iterations @ site: ',trim(adjustl(filechr))
+                        ! print *,' simulation continues nonetheless ... ' 
+                        ! print *,' *********************** '
+                        ! print *
+                        ! print *
+                    ! else 
+                        ! go to 700 
+                    ! endif 
                 endif 
         ! #else
                 ! stop
@@ -1288,11 +1316,23 @@ do
         ! #ifdef sense
                 ! go to 500
                 if (first_call) then 
-                    dt=dt/10d0
-                    ccx(:,:) = cc(:,:)
-                    alkx(:) = alk(:)
-                    dicx(:) = dic(:)
-                    go to 700 
+                    ! dt=dt/10d0
+                    ! ccx(:,:) = cc(:,:)
+                    ! alkx(:) = alk(:)
+                    ! dicx(:) = dic(:)
+                    ! itr_stst = itr_stst + 1
+                    ! if (itr_stst > 100) then 
+                        ! print *
+                        ! print *
+                        ! print *,' ******* WARNING ******* '
+                        ! print *,' steady state cannot be reached within 100 iterations @ site: ',trim(adjustl(filechr))
+                        ! print *,' simulation continues nonetheless ... ' 
+                        ! print *,' *********************** '
+                        ! print *
+                        ! print *
+                    ! else 
+                        ! go to 700 
+                    ! endif 
                 endif 
         ! #else
                 ! stop
@@ -2288,8 +2328,13 @@ co3sat = keqcc/cai ! co3 conc. at calcite saturation
 ! print*,cai,keqcc,co3sat
 
 if (dis_off) then 
-    kcc(:,1:nspcc/2) = kcci*(1d0-dis_off_val/100d0)
-    kcc(:,1+nspcc/2:nspcc) = kcci*(1d0+dis_off_val/100d0)
+    if (dis_off_val < 100d0) then 
+        kcc(:,1:nspcc/2) = kcci*(1d0-dis_off_val/100d0)
+        kcc(:,1+nspcc/2:nspcc) = kcci*(1d0+dis_off_val/100d0)
+    elseif (dis_off_val >= 100d0) then
+        kcc(:,1:nspcc/2) = kcci/(dis_off_val/100d0)
+        kcc(:,1+nspcc/2:nspcc) = kcci*(dis_off_val/100d0)
+    endif 
 endif 
 
 endsubroutine coefs
@@ -4648,8 +4693,8 @@ end subroutine checkfile
 subroutine sub_save_data_kanzaki(time_int)
 implicit none 
 integer,intent(in)::time_int
-integer::i,j
-character*256 workdir,intchr
+integer::i,j,isp
+character*256 workdir,intchr,spchr
 
 ! print*, ' printing data by signal tracking model '
 
@@ -4670,6 +4715,23 @@ do j=1,n_j
 enddo 
 
 ! print*, ' data prepared ... now going to record '
+
+do isp=1,n_sedcc
+    write(spchr,'(i0.3)') isp
+    open(unit=100,file=trim(adjustl(workdir))//'ccbml_sp'//trim(adjustl(spchr))  &
+        //'-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+    do j=1,n_j
+        write(100,*) ((cc_sed(izml_sed(i,j)+1,isp,i,j))*mcc_sed/rho_sed(izml_sed(i,j)+1,i,j)*100d0,i=1,n_i)
+    enddo 
+    close(100)
+
+    open(unit=100,file=trim(adjustl(workdir))//'ccsfc_sp'//trim(adjustl(spchr))  &
+        //'-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+    do j=1,n_j
+        write(100,*) ((cc_sed(1,isp,i,j))*mcc_sed/rho_sed(1,i,j)*100d0,i=1,n_i)
+    enddo 
+    close(100)
+enddo 
 
 open(unit=100,file=trim(adjustl(workdir))//'ccbml-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
