@@ -881,6 +881,14 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="ocn_select(108)" index="108">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(109)" index="109">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- sed_select -->
                    <paramArray name="sed_select" dimension="1" extent="99">
@@ -3408,6 +3416,14 @@
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
+                        <param name="ocn_init(108)" index="108">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(109)" index="100">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="ocn_dinit" dimension="1" extent="107">
                         <description>tracer restart perturbation (re-initialisation)</description>    
@@ -3836,6 +3852,14 @@
                             <description></description>
                         </param>
                         <param name="ocn_dinit(107)" index="107">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(108)" index="108">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(109)" index="109">
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
@@ -5927,6 +5951,14 @@
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
+                        <param name="par_ocn_force_scale_val(108)" index="108">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(109)" index="109">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="par_ocn_force_scale_time" dimension="1" extent="107">
                         <description>ocean tracer forcing scaling - time</description>    
@@ -6355,6 +6387,14 @@
                             <description></description>
                         </param>
                         <param name="par_ocn_force_scale_time(107)" index="107">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(108)" index="108">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(109)" index="109">
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>

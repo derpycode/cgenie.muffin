@@ -160,7 +160,9 @@ ocn_select = {
     "gm_ocn_select_104" : ["104",""],
     "gm_ocn_select_105" : ["105",""],
     "gm_ocn_select_106" : ["106",""],
-    "gm_ocn_select_107" : ["107",""]
+    "gm_ocn_select_107" : ["107",""],
+    "gm_ocn_select_108" : ["108",""],
+    "gm_ocn_select_109" : ["109",""]
     }
 sed_select = {
     "gm_sed_select_1" : ["1",""],
@@ -419,7 +421,9 @@ ocn_init = {
     "bg_ocn_init_104" : ["104",""],
     "bg_ocn_init_105" : ["105",""],
     "bg_ocn_init_106" : ["106",""],
-    "bg_ocn_init_107" : ["107",""]
+    "bg_ocn_init_107" : ["107",""],
+    "bg_ocn_init_108" : ["108",""],
+    "bg_ocn_init_109" : ["109",""]
     }
 ocn_dinit = {
     "bg_ocn_dinit_1" : ["1",""],
@@ -528,7 +532,9 @@ ocn_dinit = {
     "bg_ocn_dinit_104" : ["104",""],
     "bg_ocn_dinit_105" : ["105",""],
     "bg_ocn_dinit_106" : ["106",""],
-    "bg_ocn_dinit_107" : ["107",""]
+    "bg_ocn_dinit_107" : ["107",""],
+    "bg_ocn_dinit_106" : ["108",""],
+    "bg_ocn_dinit_107" : ["109",""]
     }
 par_atm_force_scale_val = {
     "bg_par_atm_force_scale_val_1" : ["1",""],
@@ -679,7 +685,9 @@ par_ocn_force_scale_val = {
     "bg_par_ocn_force_scale_val_104" : ["104",""],
     "bg_par_ocn_force_scale_val_105" : ["105",""],
     "bg_par_ocn_force_scale_val_106" : ["106",""],
-    "bg_par_ocn_force_scale_val_107" : ["107",""]
+    "bg_par_ocn_force_scale_val_107" : ["107",""],
+    "bg_par_ocn_force_scale_val_108" : ["108",""],
+    "bg_par_ocn_force_scale_val_109" : ["109",""]
     }
 par_ocn_force_scale_time = {
     "bg_par_ocn_force_scale_time_1" : ["1",""],
@@ -788,7 +796,9 @@ par_ocn_force_scale_time = {
     "bg_par_ocn_force_scale_time_104" : ["104",""],
     "bg_par_ocn_force_scale_time_105" : ["105",""],
     "bg_par_ocn_force_scale_time_106" : ["106",""],
-    "bg_par_ocn_force_scale_time_107" : ["107",""]
+    "bg_par_ocn_force_scale_time_107" : ["107",""],
+    "bg_par_ocn_force_scale_time_108" : ["108",""],
+    "bg_par_ocn_force_scale_time_109" : ["109",""]
     }
 # embm
 diffamp = {

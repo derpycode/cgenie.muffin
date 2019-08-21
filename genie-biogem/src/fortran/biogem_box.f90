@@ -2214,15 +2214,16 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     real::loc_k
-    real::loc_O2,loc_NO3,loc_SO4
-    real::loc_kO2,loc_kNO3,loc_kSO4,loc_kmeth
-    real::loc_kiO2,loc_kiNO3,loc_kiSO4
-    real::loc_r15N,loc_r34S
+    real::loc_O2,loc_NO3,loc_FeOOH,loc_SO4
+    real::loc_kO2,loc_kNO3,loc_kFeOOH,loc_kSO4,loc_kmeth
+    real::loc_kiO2,loc_kiNO3,loc_kiFeOOH,loc_kiSO4
+    real::loc_r15N,loc_r56Fe,loc_r34S
     real::loc_alpha,loc_R
     ! ---------------------------------------------------------- ! initialize
-    loc_k    = 0.0
-    loc_r15N = 0.0
-    loc_r34S = 0.0
+    loc_k     = 0.0
+    loc_r15N  = 0.0
+    loc_r56Fe = 0.0
+    loc_r34S  = 0.0
     ! ---------------------------------------------------------- !
     ! CREATE REMIN ARRAY
     ! ---------------------------------------------------------- !
@@ -2266,6 +2267,22 @@ CONTAINS
        loc_kNO3  = 0.0
        loc_kiNO3 = 1.0
     end if
+!    if (ocn_select(io_FeOOH)) then
+!       loc_FeOOH = dum_ocn(io2l(io_FeOOH))
+!       if (loc_FeOOH <= const_real_nullsmall) then
+!          loc_FeOOH   = 0.0
+!          loc_kFeOOH  = 0.0
+!          loc_kiFeOOH = 1.0
+!       else
+!          loc_kFeOOH = loc_FeOOH/(loc_FeOOH + par_bio_remin_c0_FeOOH)
+!          loc_kiFeOOH = par_bio_remin_ci_FeOOH/(par_bio_remin_ci_FeOOH + loc_FeOOH)
+!       end if
+!       loc_k     = loc_k + par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2
+!    else
+!       loc_FeOOH   = 0.0
+!       loc_kFeOOH  = 0.0
+!       loc_kiFeOOH = 1.0
+!    end if
     if (ocn_select(io_SO4)) then
        loc_SO4 = dum_ocn(io2l(io_SO4))
        if (loc_SO4 <= const_real_nullsmall) then
@@ -2302,25 +2319,36 @@ CONTAINS
     ! ---------------------------------------------------------- ! modify for hard threshold scheme
     if (ctrl_bio_remin_thresh) then
        if (loc_O2 > par_bio_remin_cthresh_O2) then
-          loc_k     = par_bio_remin_k_O2*loc_kO2
-          loc_kNO3  = 0.0
-          loc_kSO4  = 0.0
-          loc_kmeth = 0.0
+          loc_k      = par_bio_remin_k_O2*loc_kO2
+          loc_kNO3   = 0.0
+          loc_kFeOOH = 0.0
+          loc_kSO4   = 0.0
+          loc_kmeth  = 0.0
        elseif (loc_NO3 > par_bio_remin_cthresh_NO3) then
-          loc_kO2   = 0.0
-          loc_k     = par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
-          loc_kSO4  = 0.0
-          loc_kmeth = 0.0
+          loc_kO2    = 0.0
+          loc_k      = par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
+          loc_kFeOOH = 0.0
+          loc_kSO4   = 0.0
+          loc_kmeth  = 0.0
+       elseif (loc_FeOOH > par_bio_remin_cthresh_NO3) then
+       !!!elseif (loc_FeOOH > par_bio_remin_cthresh_FeOOH) then
+          loc_kO2    = 0.0
+          loc_kNO3   = 0.0
+          loc_k      = 0 !!!par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2
+          loc_kSO4   = 0.0
+          loc_kmeth  = 0.0
        elseif (loc_SO4 > par_bio_remin_cthresh_SO4) then
-          loc_kO2   = 0.0
-          loc_kNO3  = 0.0
-          loc_k     = par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
-          loc_kmeth = 0.0
+          loc_kO2    = 0.0
+          loc_kNO3   = 0.0
+          loc_kFeOOH = 0.0
+          loc_k      = par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
+          loc_kmeth  = 0.0
        else
-          loc_kO2   = 0.0
-          loc_kNO3  = 0.0
-          loc_kSO4  = 0.0
-          loc_k     = par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2
+          loc_kO2    = 0.0
+          loc_kNO3   = 0.0
+          loc_kFeOOH = 0.0
+          loc_kSO4   = 0.0
+          loc_k      = par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
        end if
     end if
     ! ---------------------------------------------------------- ! calculate weighted remin array
@@ -2743,9 +2771,6 @@ CONTAINS
                 case default
                    loc_FeFeLL(:) = 0.0
                 end SELECT
-
-                   !!!loc_FeFeLL(:) = 0.0
-
                    ! calculate mean Fe isotopic composition
                    ! NOTE: isotopes not enabled for all of the Fe schemes
                    If ( ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe) ) then
@@ -2805,9 +2830,6 @@ CONTAINS
                          if (sed_select(is_POM_FeOOH)) then
                             loc_bio_remin(io2l(io_Fe),k)        = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_FeOOH),k) = loc_bio_part_TMP(is2l(is_POM_FeOOH),k) + loc_scav_Fe
-
-             !!!loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
-
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - loc_r56Fe*loc_scav_Fe
                                loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k)  = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k) + &
@@ -3232,9 +3254,6 @@ CONTAINS
                    case default
                       loc_FeFeLL(:) = 0.0
                    end SELECT
-
-                      !!!loc_FeFeLL(:) = 0.0
-
                    ! calculate mean Fe isotopic composition
                    ! NOTE: isotopes not enabled for all of the Fe schemes
                    If ( ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe) ) then
@@ -3296,10 +3315,6 @@ CONTAINS
                          if (sed_select(is_POM_FeOOH)) then
                             loc_bio_remin(io2l(io_Fe),kk)        = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_scav_Fe
-
-
-             !!!loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
-
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
                                loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)  = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + &
@@ -3372,16 +3387,29 @@ CONTAINS
                    end if
                 end if
 
-                ! *** other particle-solute reactions ***
-                if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2) .AND. sed_select(is_FeOOH)) then
-                   if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
-                      call sub_box_react_FeOOH_H2S(               &
-                           & dum_i,dum_j,kk,               &
-                           & loc_bio_remin_dt_scav,        &
-                           & dum_vocn%mk(io2l(io_H2S),kk), &
-                           & loc_bio_part_TMP(:,kk),       &
-                           & loc_bio_remin(:,kk)           &
-                           & )
+                ! *** Reduce FeOOH ***
+                ! NOTE: test for both forms (scavenged and 'free')
+                if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2)) then
+                   if (sed_select(is_FeOOH)) then
+                      if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
+                         call sub_box_react_FeOOH_H2S(        &
+                              & dum_i,dum_j,kk,               &
+                              & loc_bio_remin_dt_scav,        &
+                              & dum_vocn%mk(io2l(io_H2S),kk), &
+                              & loc_bio_part_TMP(:,kk),       &
+                              & loc_bio_remin(:,kk)           &
+                              & )
+                      end if
+                   elseif (sed_select(is_POM_FeOOH)) then
+                      if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)>const_rns) then
+                         call sub_box_react_POMFeOOH_H2S(     &
+                              & dum_i,dum_j,kk,               &
+                              & loc_bio_remin_dt_scav,        &
+                              & dum_vocn%mk(io2l(io_H2S),kk), &
+                              & loc_bio_part_TMP(:,kk),       &
+                              & loc_bio_remin(:,kk)           &
+                              & )
+                      end if
                    end if
                 end if
 
@@ -3527,6 +3555,83 @@ CONTAINS
     ! END
     ! -------------------------------------------------------- !
   end SUBROUTINE sub_box_react_FeOOH_H2S
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! Calculate FeOOH dissolution (reaction with H2S) for 'scavenged' FeOOH (POM_FeOOH)
+  ! NOTE: calling of this sub is conditional on both H2S and FeOOH not being zero
+  !       (so divide-by-zero issues should already have be screened for ...)
+  ! NOTE: for now, this is simply an edited copy of sub_box_react_FeOOH_H2S
+  !       -> a cleaner solution (not involving duplicating code) should be possible and implemented ... sometime ...
+  SUBROUTINE sub_box_react_POMFeOOH_H2S(dum_i,dum_j,dum_k,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k
+    REAL,INTENT(in)::dum_dt_scav
+    REAL,INTENT(in)::dum_ocn_H2S
+    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
+    real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::loc_H2S
+    real::loc_part_den_FeOOH
+    real::loc_dFeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE FeOOH dissolution rate
+    ! -------------------------------------------------------- !
+    ! reaction: 
+    !           FeOOH + 1/8H2S --> 1/8SO4 + Fe2
+    ! and where FeOOH comes from: 
+    !           Fe2 + 1/4O2  --> Fe3 
+    !           Fe3+ + 2*H2O --> FeOOH + 3*H+
+    ! or, overall, ignoring water etc:
+    !           Fe2 + 1/4O2 --> FeOOH
+    ! NOTE: par_bio_remin_kFeOOHtoFe2 == kinetic constant for FeOOH reduction using sulphide in M-1 yr-1
+    ! -------------------------------------------------------- ! set local solutes
+    loc_H2S = dum_ocn_H2S
+    ! -------------------------------------------------------- ! extract density of FeOOH
+    loc_part_den_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
+    ! -------------------------------------------------------- ! calculate reaction rate
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*loc_H2S
+    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
+    ! -------------------------------------------------------- ! implement reaction
+    dum_bio_part(is2l(is_POM_FeOOH)) = dum_bio_part(is2l(is_POM_FeOOH)) - loc_dFeOOH
+    dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_Fe2))      = dum_bio_remin(io2l(io_Fe2))  + loc_dFeOOH
+    dum_bio_remin(io2l(io_SO4))      = dum_bio_remin(io2l(io_SO4))  + (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_ALK))      = dum_bio_remin(io2l(io_ALK))  - 2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- ! implement reaction -- isotopes
+    ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
+    ! NOTE: no fractionation (currently)
+    if (ocn_select(io_Fe2_56Fe)) then
+       dum_bio_remin(io2l(io_Fe2_56Fe)) = dum_bio_remin(io2l(io_Fe2_56Fe)) + &
+            & (loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_POM_FeOOH_56Fe))
+       dum_bio_part(is2l(is_POM_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_POM_FeOOH_56Fe))
+    end if
+    if (ocn_select(io_H2S_34S)) then
+       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+    end if
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) + &
+         & loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) - &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) + &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) - &
+         & 2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_react_POMFeOOH_H2S
   ! ****************************************************************************************************************************** !
 
 

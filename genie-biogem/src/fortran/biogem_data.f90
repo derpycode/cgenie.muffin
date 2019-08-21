@@ -1236,6 +1236,10 @@ CONTAINS
     else
        conv_sed_ocn_N(:,:) = 0.0
     end if
+    ! -------------------------------------------------------- ! Modify for FeOOH-reducing(!) conditions
+    if (ocn_select(io_FeOOH)) then
+
+    end if
     ! -------------------------------------------------------- ! Modify for S-reducing conditions
     if (ocn_select(io_SO4)) then
        conv_sed_ocn_S(:,:) = conv_sed_ocn(:,:)
@@ -1321,21 +1325,23 @@ CONTAINS
     ! -------------------------------------------------------- ! Set local remin array reflecting 'mix' of redox possibilities
     ! NOTE: this is the 'redox tree' of all enabled posibilities
     !       (possibilities of not having O2 but having a different oxidant are omitted, as are O2 + Fe without SO4)
-    if (ocn_select(io_O2))  loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_O)
-    if (ocn_select(io_NO3)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_N)
-    if (ocn_select(io_SO4)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_S)
-    if (ocn_select(io_CH4)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_meth)
+    if (ocn_select(io_O2))    loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_O)
+    if (ocn_select(io_NO3))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_N)
+    !!!if (ocn_select(io_FeOOH)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_Fe)
+    if (ocn_select(io_SO4))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_S)
+    if (ocn_select(io_CH4))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_meth)
     ! -------------------------------------------------------- !  indexing array (basic oxic-only)
     conv_sed_ocn_i(:,:) = fun_recalc_tracerrelationships_i(conv_sed_ocn(:,:))
     ! -------------------------------------------------------- !
     ! CREATE COMPACT TRACER INDEX FORMAT ARRAY EQUIVALENTS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! sed -> ocn
-    if (ocn_select(io_O2))  conv_ls_lo(:,:)      =  fun_conv_sedocn2lslo(conv_sed_ocn(:,:))
-    if (ocn_select(io_O2))  conv_ls_lo_O(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_O(:,:))
-    if (ocn_select(io_NO3)) conv_ls_lo_N(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_N(:,:))
-    if (ocn_select(io_SO4)) conv_ls_lo_S(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_S(:,:))
-    if (ocn_select(io_CH4)) conv_ls_lo_meth(:,:) =  fun_conv_sedocn2lslo(conv_sed_ocn_meth(:,:))
+    if (ocn_select(io_O2))    conv_ls_lo(:,:)      =  fun_conv_sedocn2lslo(conv_sed_ocn(:,:))
+    if (ocn_select(io_O2))    conv_ls_lo_O(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_O(:,:))
+    if (ocn_select(io_NO3))   conv_ls_lo_N(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_N(:,:))
+    !!!if (ocn_select(io_FeOOH)) conv_ls_lo_Fe(:,:)   =  fun_conv_sedocn2lslo(conv_sed_ocn_Fe(:,:))
+    if (ocn_select(io_SO4))   conv_ls_lo_S(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_S(:,:))
+    if (ocn_select(io_CH4))   conv_ls_lo_meth(:,:) =  fun_conv_sedocn2lslo(conv_sed_ocn_meth(:,:))
     ! -------------------------------------------------------- !  indexing array (all possible)
     conv_ls_lo_i(:,:) =  fun_conv_sedocn2lslo_i(fun_recalc_tracerrelationships_i(loc_conv_sed_ocn(:,:)))
     ! -------------------------------------------------------- ! POM -> DOM

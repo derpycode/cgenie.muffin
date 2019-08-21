@@ -22,7 +22,7 @@ MODULE gem_cmn
   ! WARNING: these values must be duplicated in genie_control.f90
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
   INTEGER,PARAMETER::n_atm =  19
-  INTEGER,PARAMETER::n_ocn = 107
+  INTEGER,PARAMETER::n_ocn = 109
   INTEGER,PARAMETER::n_sed = 104
 
 
@@ -174,10 +174,12 @@ MODULE gem_cmn
   INTEGER,PARAMETER::io_FeS                               = 101   ! 
   INTEGER,PARAMETER::io_FeS_56Fe                          = 102   ! 
   INTEGER,PARAMETER::io_FeS_34S                           = 103   ! 
+  INTEGER,PARAMETER::io_FeOOH                             = 107   ! 
+  INTEGER,PARAMETER::io_FeOOH_56Fe                        = 108   ! 
   INTEGER,PARAMETER::io_Os                                = 104   ! 
   INTEGER,PARAMETER::io_Os_187Os                          = 105   ! 
   INTEGER,PARAMETER::io_Os_188Os                          = 106   ! 
-  INTEGER,PARAMETER::io_H20                               = 107   ! 
+  INTEGER,PARAMETER::io_H20                               = 109   ! 
   ! atmospheric tracer indices
   INTEGER,PARAMETER::ia_T                                 = 01    ! temperature
   INTEGER,PARAMETER::ia_q                                 = 02    ! specific humidity
@@ -424,6 +426,7 @@ MODULE gem_cmn
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_O                           ! tracer conversion array for oxic conditions
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N                           ! tracer conversion array for N-reduction redox conditions
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_Fe                          ! tracer conversion array for FeOOH-reduction
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_S                           ! tracer conversion array for S-reduction redox conditions
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_meth                        ! tracer conversion array for methanogenesis
   real,DIMENSION(n_sed,n_ocn)::conv_DOM_POM
@@ -438,6 +441,7 @@ MODULE gem_cmn
   real,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_O                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_N                           ! 
+  real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_Fe                          ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_S                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_meth                        ! 
   ! tracer conversion - indices for non-zero transformation ratio values
@@ -446,6 +450,7 @@ MODULE gem_cmn
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! 
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_O                  ! tracer conversion array for oxic conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_Fe                 ! tracer conversion array for FeOOH-reduction
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_S                  ! tracer conversion array for S-reduction redox conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_meth               ! tracer conversion array for methanogenesis
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_DOM_POM_i
@@ -460,6 +465,7 @@ MODULE gem_cmn
   integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD_i               ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_O              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_N              ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_Fe             ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_S              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_meth           ! 
   ! carbonate chemistry
