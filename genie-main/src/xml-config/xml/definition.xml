@@ -4523,6 +4523,10 @@
                         <value datatype="real">0.0</value>
                         <description>Hard threshold for denitrification (mol kg-1)</description>
                     </param>
+                    <param name="par_bio_remin_cthresh_FeOOH">
+                        <value datatype="real">0.0</value>
+                        <description>Hard threshold for FeOOH reduction  (mol kg-1)</description>
+                    </param>
                     <param name="par_bio_remin_cthresh_SO4">
                         <value datatype="real">0.0</value>
                         <description>Hard threshold for sulphate reduction (mol kg-1)</description>
@@ -4548,6 +4552,10 @@
                         <value datatype="real">1.0</value>
                         <description>Remin rate -- denitrification (yr-1) [IDEALIZED DEFAULT]</description>
                     </param>
+                    <param name="par_bio_remin_k_FeOOH">
+                        <value datatype="real">1.0</value>
+                        <description>Remin rate -- FeOOH reduction (yr-1) [IDEALIZED DEFAULT]</description>
+                    </param>
                     <param name="par_bio_remin_k_SO4">
                         <value datatype="real">1.0</value>
                         <description>Remin rate -- sulphate reduction (yr-1) [IDEALIZED DEFAULT]</description>
@@ -4564,6 +4572,10 @@
                         <value datatype="real">30.0e-6</value>
                         <description>Half-saturation for denitrification (mol kg-1) [Boudreau, 1996]</description>
                     </param>
+                    <param name="par_bio_remin_c0_FeOOH">
+                        <value datatype="real">0.0e-6</value>
+                        <description>Half-saturation for FeOOH reduction (mol kg-1) [IDEALIZED DEFAULT]</description>
+                    </param>
                     <param name="par_bio_remin_c0_SO4">
                         <value datatype="real">500.0E-6</value>
                         <description>Half-saturation for sulphate reduction (mol kg-1) [Olson et al, 2016]</description>
@@ -4575,6 +4587,10 @@
                     <param name="par_bio_remin_ci_NO3">
                         <value datatype="real">30.0e-6</value>
                         <description>Nitrate inhibition constant (mol kg-1) [Boudreau, 1996]</description>
+                    </param>
+                    <param name="par_bio_remin_ci_FeOOH">
+                        <value datatype="real">0.0e-6</value>
+                        <description>FeOOH reduction inhibition constant (mol kg-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_ci_SO4">
                         <value datatype="real">1.0E-3</value>

@@ -242,8 +242,9 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_thresh
   real::par_bio_remin_cthresh_O2                                 ! Hard threshold for oxic remin (mol kg-1) 
   real::par_bio_remin_cthresh_NO3                                ! Hard threshold for denitrification (mol kg-1)
+  real::par_bio_remin_cthresh_FeOOH                              ! Hard threshold for FeOOH reduction (mol kg-1)
   real::par_bio_remin_cthresh_SO4                                ! Hard threshold for sulphate reduction (mol kg-1)
-  NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_SO4
+  NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_FeOOH,par_bio_remin_cthresh_SO4
   LOGICAL::ctrl_bio_remin_reminfix                               ! Catch mis-behaving rapidly-oxidizing species going < 0.0?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_reminfix
   CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
@@ -298,17 +299,20 @@ MODULE biogem_lib
   ! kinetics
   real::par_bio_remin_k_O2
   real::par_bio_remin_k_NO3
+  real::par_bio_remin_k_FeOOH
   real::par_bio_remin_k_SO4
   real::par_bio_remin_k_meth
-  NAMELIST /ini_biogem_nml/par_bio_remin_k_O2,par_bio_remin_k_NO3,par_bio_remin_k_SO4,par_bio_remin_k_meth
+  NAMELIST /ini_biogem_nml/par_bio_remin_k_O2,par_bio_remin_k_NO3,par_bio_remin_k_FeOOH,par_bio_remin_k_SO4,par_bio_remin_k_meth
   real::par_bio_remin_c0_O2
   real::par_bio_remin_c0_NO3
+  real::par_bio_remin_c0_FeOOH
   real::par_bio_remin_c0_SO4
-  NAMELIST /ini_biogem_nml/par_bio_remin_c0_O2,par_bio_remin_c0_NO3,par_bio_remin_c0_SO4
+  NAMELIST /ini_biogem_nml/par_bio_remin_c0_O2,par_bio_remin_c0_NO3,par_bio_remin_c0_FeOOH,par_bio_remin_c0_SO4
   real::par_bio_remin_ci_O2
   real::par_bio_remin_ci_NO3
+  real::par_bio_remin_ci_FeOOH
   real::par_bio_remin_ci_SO4
-  NAMELIST /ini_biogem_nml/par_bio_remin_ci_O2,par_bio_remin_ci_NO3,par_bio_remin_ci_SO4
+  NAMELIST /ini_biogem_nml/par_bio_remin_ci_O2,par_bio_remin_ci_NO3,par_bio_remin_ci_FeOOH,par_bio_remin_ci_SO4
   ! S
   real::par_bio_remin_kH2StoSO4
   real::par_bio_remin_kH2StoPOMS

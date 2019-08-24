@@ -2267,22 +2267,22 @@ CONTAINS
        loc_kNO3  = 0.0
        loc_kiNO3 = 1.0
     end if
-!    if (ocn_select(io_FeOOH)) then
-!       loc_FeOOH = dum_ocn(io2l(io_FeOOH))
-!       if (loc_FeOOH <= const_real_nullsmall) then
-!          loc_FeOOH   = 0.0
-!          loc_kFeOOH  = 0.0
-!          loc_kiFeOOH = 1.0
-!       else
-!          loc_kFeOOH = loc_FeOOH/(loc_FeOOH + par_bio_remin_c0_FeOOH)
-!          loc_kiFeOOH = par_bio_remin_ci_FeOOH/(par_bio_remin_ci_FeOOH + loc_FeOOH)
-!       end if
-!       loc_k     = loc_k + par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2
-!    else
-!       loc_FeOOH   = 0.0
-!       loc_kFeOOH  = 0.0
-!       loc_kiFeOOH = 1.0
-!    end if
+    if (ocn_select(io_FeOOH)) then
+       loc_FeOOH = dum_ocn(io2l(io_FeOOH))
+       if (loc_FeOOH <= const_real_nullsmall) then
+          loc_FeOOH   = 0.0
+          loc_kFeOOH  = 0.0
+          loc_kiFeOOH = 1.0
+       else
+          loc_kFeOOH = loc_FeOOH/(loc_FeOOH + par_bio_remin_c0_FeOOH)
+          loc_kiFeOOH = par_bio_remin_ci_FeOOH/(par_bio_remin_ci_FeOOH + loc_FeOOH)
+       end if
+       loc_k     = loc_k + par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2
+    else
+       loc_FeOOH   = 0.0
+       loc_kFeOOH  = 0.0
+       loc_kiFeOOH = 1.0
+    end if
     if (ocn_select(io_SO4)) then
        loc_SO4 = dum_ocn(io2l(io_SO4))
        if (loc_SO4 <= const_real_nullsmall) then
@@ -2330,11 +2330,10 @@ CONTAINS
           loc_kFeOOH = 0.0
           loc_kSO4   = 0.0
           loc_kmeth  = 0.0
-       elseif (loc_FeOOH > par_bio_remin_cthresh_NO3) then
-       !!!elseif (loc_FeOOH > par_bio_remin_cthresh_FeOOH) then
+       elseif (loc_FeOOH > par_bio_remin_cthresh_FeOOH) then
           loc_kO2    = 0.0
           loc_kNO3   = 0.0
-          loc_k      = 0 !!!par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2
+          loc_k      = par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2
           loc_kSO4   = 0.0
           loc_kmeth  = 0.0
        elseif (loc_SO4 > par_bio_remin_cthresh_SO4) then
@@ -2356,41 +2355,97 @@ CONTAINS
     !       (an exception is the basic temperature-only scheme which also needs to be normalized)
     if (ocn_select(io_O2)) then
        if (ocn_select(io_NO3)) then
-          if (ocn_select(io_SO4)) then
-             if (ocn_select(io_CH4)) then
-                dum_conv_ls_lo(:,:) = &
-                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                     & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
-                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
-                     & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+          if (ocn_select(io_FeOOH)) then
+             if (ocn_select(io_SO4)) then
+                if (ocn_select(io_CH4)) then
+                   ! O2 + NO3 + FeOOH + SO4 + CH4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                        & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                else
+                   ! O2 + NO3 + FeOOH + SO4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                end if
              else
+                ! O2 + NO3 + FeOOH
                 dum_conv_ls_lo(:,:) = &
                      & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                      & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
-                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                     & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:)
              end if
           else
+             if (ocn_select(io_SO4)) then
+                if (ocn_select(io_CH4)) then
+                   ! O2 + NO3 + SO4 + CH4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                        & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                else
+                   ! O2 + NO3 + SO4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                end if
+             else
+                ! O2 + NO3
+                dum_conv_ls_lo(:,:) = &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                     & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:)
+             end if
+          endif
+       elseif (ocn_select(io_FeOOH)) then
+          if (ocn_select(io_SO4)) then
+             if (ocn_select(io_CH4)) then
+                ! O2 + FeOOH + SO4 + CH4
+                dum_conv_ls_lo(:,:) = &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                     & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                     & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+             else
+                ! O2 + FeOOH + SO4
+                dum_conv_ls_lo(:,:) = &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                     & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+             end if
+          else
+            ! O2 + FeOOH
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:)
+                  & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:)
           end if
        elseif (ocn_select(io_SO4)) then
           if (ocn_select(io_CH4)) then
+             ! O2 + SO4 + CH4
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
-                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
+             ! O2 + SO4
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
           end if
        else
           if (ocn_select(io_CH4)) then
+             ! O2 + CH4
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
+             ! O2
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:)
           end if
@@ -2419,6 +2474,19 @@ CONTAINS
        dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_SO4_34S),:)
        dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_H2S_34S),:)
     end if
+    !! test for Fe isotopes selected
+    !! NOTE: value of loc_FeOOH already determined
+    !if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
+    !   if (loc_FeOOH > const_real_nullsmall) then
+    !      loc_r56Fe  = dum_ocn(io2l(io_FeOOH_56Fe)) / loc_FeOOH
+    !   else
+    !      loc_r56Fe  = 0.0
+    !   end if
+    !   loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
+    !   loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
+    !   dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:)
+    !   dum_conv_ls_lo(io2l(io_Fe_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe_56Fe),:)
+    !end if
     ! ---------------------------------------------------------- !
     ! END
     ! ---------------------------------------------------------- !

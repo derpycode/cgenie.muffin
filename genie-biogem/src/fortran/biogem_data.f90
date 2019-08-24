@@ -215,6 +215,7 @@ CONTAINS
        print*,'Apply a hard tracer oxidant remin threshold?        : ',ctrl_bio_remin_thresh
        print*,'Hard threshold for oxic remin (mol kg-1)            : ',par_bio_remin_cthresh_O2
        print*,'Hard threshold for denitrification (mol kg-1)       : ',par_bio_remin_cthresh_NO3
+       print*,'Hard threshold for FeOOH reduction (mol kg-1)       : ',par_bio_remin_cthresh_FeOOH
        print*,'Hard threshold for sulphate reduction (mol kg-1)    : ',par_bio_remin_cthresh_SO4
        print*,'Catch rapidly-oxidizing species going < 0.0?        : ',ctrl_bio_remin_reminfix
        print*,'NH4 -> NO3 oxidation option                         : ',trim(opt_bio_remin_oxidize_NH4toNO3)
@@ -223,13 +224,16 @@ CONTAINS
        print*,'Old local residence time in layer for H2S?          : ',ctrl_scav_H2S_dt_old
        print*,'Remin rate -- oxic (yr-1)                           : ',par_bio_remin_k_O2
        print*,'Remin rate -- denitrification (yr-1)                : ',par_bio_remin_k_NO3
+       print*,'Remin rate -- FeOOH reduction (yr-1)                : ',par_bio_remin_k_FeOOH
        print*,'Remin rate -- sulphate reduction (yr-1)             : ',par_bio_remin_k_SO4
        print*,'Remin rate -- methanogenesis (yr-1)                 : ',par_bio_remin_k_meth
        print*,'Half-saturation for oxic remin (mol kg-1)           : ',par_bio_remin_c0_O2
        print*,'Half-saturation for denitrification (mol kg-1)      : ',par_bio_remin_c0_NO3
+       print*,'Half-saturation for FeOOH reduction (mol kg-1)      : ',par_bio_remin_c0_FeOOH
        print*,'Half-saturation for sulphate reduction (mol kg-1)   : ',par_bio_remin_c0_SO4
        print*,'Inhibition constant by oxygen (mol kg-1)            : ',par_bio_remin_ci_O2
        print*,'Inhibition constant by nitrate (mol kg-1)           : ',par_bio_remin_ci_NO3
+       print*,'Inhibition constant by FeOOH (mol kg-1)             : ',par_bio_remin_ci_FeOOH
        print*,'Inhibition constant by sulphate (mol kg-1)          : ',par_bio_remin_ci_SO4
        print*,'Oxidation rate constant for H2S -> SO4              : ',par_bio_remin_kH2StoSO4
        print*,'Oxidation rate constant for NH4 -> NO2              : ',par_bio_remin_kNH4toNO2
