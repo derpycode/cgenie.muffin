@@ -1908,6 +1908,7 @@ CONTAINS
     conv_sed_ocn_i(:,:)      = 0
     conv_sed_ocn_i_O(:,:)    = 0
     conv_sed_ocn_i_N(:,:)    = 0
+    conv_sed_ocn_i_Fe(:,:)   = 0
     conv_sed_ocn_i_S(:,:)    = 0
     conv_sed_ocn_i_meth(:,:) = 0
     conv_DOM_POM_i(:,:)      = 0
@@ -1959,6 +1960,18 @@ CONTAINS
           end if
        end do
        conv_sed_ocn_i_N(0,is) = loc_tot_i
+    end do
+    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
+    ! NOTE: FeOOH-reduction redox conditions
+    do is=1,n_sed
+       loc_tot_i = 0
+       do io=1,n_ocn
+          if (abs(conv_sed_ocn_Fe(io,is)) > const_real_nullsmall) then
+             loc_tot_i = loc_tot_i + 1
+             conv_sed_ocn_Fe(loc_tot_i,is) = io
+          end if
+       end do
+       conv_sed_ocn_i_Fe(0,is) = loc_tot_i
     end do
     ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
     ! NOTE: S-reduction redox conditions

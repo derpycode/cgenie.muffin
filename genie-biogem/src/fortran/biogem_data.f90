@@ -1066,7 +1066,6 @@ CONTAINS
        conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 0.0
        conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 1.0
     end if
-
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !
@@ -1242,7 +1241,35 @@ CONTAINS
     end if
     ! -------------------------------------------------------- ! Modify for FeOOH-reducing(!) conditions
     if (ocn_select(io_FeOOH)) then
-
+       conv_sed_ocn_Fe(:,:) = conv_sed_ocn(:,:)
+       ! N
+       if (ocn_select(io_NH4)) then
+          ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
+          conv_sed_ocn_Fe(io_NO3,is_PON) = 0.0
+          conv_sed_ocn_Fe(io_NH4,is_PON) = 1.0
+          conv_sed_ocn_Fe(io_ALK,is_PON) = conv_sed_ocn_Fe(io_NH4,is_PON)
+          conv_sed_ocn_Fe(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_Fe(io_NH4,is_PON)
+       else
+          ! [DEFAULT, oxic remin relationship]
+       endif
+       ! N isotopes
+       conv_sed_ocn_Fe(io_NO3_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NO3,is_PON)
+       conv_sed_ocn_Fe(io_NH4_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NH4,is_PON)
+       conv_sed_ocn_Fe(io_N2_15N,is_PON_15N)  = conv_sed_ocn_Fe(io_N2,is_PON)
+       ! P,C
+       conv_sed_ocn_Fe(io_FeOOH,is_POP) = (1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POP)
+       conv_sed_ocn_Fe(io_Fe,is_POP)    = -(1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POP)
+       conv_sed_ocn_Fe(io_O2,is_POP)    = 0.0
+       conv_sed_ocn_Fe(io_FeOOH,is_POC) = (1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POC)
+       conv_sed_ocn_Fe(io_Fe,is_POC)    = -(1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POC)
+       conv_sed_ocn_Fe(io_O2,is_POC)    = 0.0
+       ! Fe isotopes
+       conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POP) = conv_sed_ocn_Fe(io_FeOOH,is_POP)
+       conv_sed_ocn_Fe(io_Fe_56Fe,is_POP)    = conv_sed_ocn_Fe(io_Fe,is_POP)
+       conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POC) = conv_sed_ocn_Fe(io_FeOOH,is_POC)
+       conv_sed_ocn_Fe(io_Fe_56Fe,is_POC)    = conv_sed_ocn_Fe(io_Fe,is_POC)
+    else
+       conv_sed_ocn_Fe(:,:) = 0.0
     end if
     ! -------------------------------------------------------- ! Modify for S-reducing conditions
     if (ocn_select(io_SO4)) then
@@ -1328,10 +1355,9 @@ CONTAINS
     end if
     ! -------------------------------------------------------- ! Set local remin array reflecting 'mix' of redox possibilities
     ! NOTE: this is the 'redox tree' of all enabled posibilities
-    !       (possibilities of not having O2 but having a different oxidant are omitted, as are O2 + Fe without SO4)
     if (ocn_select(io_O2))    loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_O)
     if (ocn_select(io_NO3))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_N)
-    !!!if (ocn_select(io_FeOOH)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_Fe)
+    if (ocn_select(io_FeOOH)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_Fe)
     if (ocn_select(io_SO4))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_S)
     if (ocn_select(io_CH4))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_meth)
     ! -------------------------------------------------------- !  indexing array (basic oxic-only)
@@ -1343,7 +1369,7 @@ CONTAINS
     if (ocn_select(io_O2))    conv_ls_lo(:,:)      =  fun_conv_sedocn2lslo(conv_sed_ocn(:,:))
     if (ocn_select(io_O2))    conv_ls_lo_O(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_O(:,:))
     if (ocn_select(io_NO3))   conv_ls_lo_N(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_N(:,:))
-    !!!if (ocn_select(io_FeOOH)) conv_ls_lo_Fe(:,:)   =  fun_conv_sedocn2lslo(conv_sed_ocn_Fe(:,:))
+    if (ocn_select(io_FeOOH)) conv_ls_lo_Fe(:,:)   =  fun_conv_sedocn2lslo(conv_sed_ocn_Fe(:,:))
     if (ocn_select(io_SO4))   conv_ls_lo_S(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_S(:,:))
     if (ocn_select(io_CH4))   conv_ls_lo_meth(:,:) =  fun_conv_sedocn2lslo(conv_sed_ocn_meth(:,:))
     ! -------------------------------------------------------- !  indexing array (all possible)

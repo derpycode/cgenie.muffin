@@ -2417,7 +2417,7 @@ CONTAINS
                 dum_conv_ls_lo(:,:) = &
                      & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                      & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
-                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
              end if
           else
             ! O2 + FeOOH
@@ -2653,6 +2653,7 @@ CONTAINS
     INTEGER::k,kk,loc_bio_remin_min_k,loc_klim
     integer::loc_k1
     integer::loc_m,loc_tot_m
+    real,dimension(1:n_l_ocn)::loc_vocn                                 !
     real,dimension(1:3)::loc_FeFELL
     real::loc_T,loc_SiO2                                                !
     real::loc_Si_eq,loc_u   
@@ -2732,6 +2733,8 @@ CONTAINS
     end if
     !
     loc_bio_settle(:,:) = 0.0
+    !
+    loc_vocn(:) = 0.0
     ! set water column particulate tracer loop limit and sinking rate
     ! => test for sinking in any one time-step being less than the max depth of the ocean
     if (dum_dtyr*par_bio_remin_sinkingrate <= goldstein_dsc) then
@@ -2905,7 +2908,7 @@ CONTAINS
                             end if
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
                             loc_bio_part_TMP(is2l(is_det),k) = loc_bio_part_TMP(is2l(is_det),k) + &
-                                 & loc_bio_part_TMP(is2l(is_FeOOH),k)
+                                 & loc_bio_part_TMP(is2l(is_POM_FeOOH),k)
                          else
                             loc_bio_part_TMP(is2l(is_POM_Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe),k) + loc_scav_Fe
                             loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
@@ -3253,8 +3256,15 @@ CONTAINS
 !!$                   end do
                 end DO
                 ! carry out the remineralization (POM -> inorganic constitutents) itself
+                ! (0) make tempoary conversion of is_POM_FeOOH -> io_FeOOH
+                if (sed_select(is_POM_FeOOH) .AND. ocn_select(io_FeOOH)) then
+                   loc_vocn(io2l(io_FeOOH)) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
+                   if (ocn_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
+                      loc_vocn(io2l(io_FeOOH_56Fe)) = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)
+                   end if
+                end if
                 ! (1) create temporary remin conversion array depending on prevailing redox conditions
-                call sub_box_remin_redfield(dum_vocn%mk(:,kk),loc_conv_ls_lo(:,:))
+                call sub_box_remin_redfield(dum_vocn%mk(:,kk)+loc_vocn(:),loc_conv_ls_lo(:,:))
                 ! (2) carry out actual remin
                 !     NOTE: catch non-selected tracers (index 0 in the conversion io -> l)
                 DO ls=1,n_l_sed
@@ -3272,6 +3282,17 @@ CONTAINS
                       end if
                    end do
                 end DO
+                ! (3) make conversion of io_FeOOH -> is_POM_FeOOH
+                if (sed_select(is_POM_FeOOH) .AND. ocn_select(io_FeOOH)) then
+                   loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = &
+                        & loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_bio_remin(io2l(io_FeOOH),kk)
+                   loc_bio_remin(io2l(io_FeOOH),kk) = 0.0
+                   if (ocn_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
+                     loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) = &
+                           & loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + loc_bio_remin(io2l(io_FeOOH_56Fe),kk)
+                      loc_bio_remin(io2l(io_FeOOH_56Fe),kk) = 0.0
+                   end if
+                end if
 
                 ! *** Scavenge Fe from water column ***
                 ! NOTE: Fe scavenging must be called AFTER particulates have been 'moved' to the next layer down
@@ -3390,7 +3411,7 @@ CONTAINS
                             end if
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
                             loc_bio_part_TMP(is2l(is_det),kk) = loc_bio_part_TMP(is2l(is_det),kk) + &
-                                 & loc_bio_part_TMP(is2l(is_FeOOH),kk)
+                                 & loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
                          else
                             loc_bio_remin(io2l(io_Fe),kk)        = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe

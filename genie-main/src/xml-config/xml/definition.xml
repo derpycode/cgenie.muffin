@@ -4553,7 +4553,7 @@
                         <description>Remin rate -- denitrification (yr-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_k_FeOOH">
-                        <value datatype="real">1.0</value>
+                        <value datatype="real">0.1</value>
                         <description>Remin rate -- FeOOH reduction (yr-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_k_SO4">
@@ -4573,7 +4573,7 @@
                         <description>Half-saturation for denitrification (mol kg-1) [Boudreau, 1996]</description>
                     </param>
                     <param name="par_bio_remin_c0_FeOOH">
-                        <value datatype="real">0.0e-6</value>
+                        <value datatype="real">1.0e-6</value>
                         <description>Half-saturation for FeOOH reduction (mol kg-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_c0_SO4">
@@ -4589,7 +4589,7 @@
                         <description>Nitrate inhibition constant (mol kg-1) [Boudreau, 1996]</description>
                     </param>
                     <param name="par_bio_remin_ci_FeOOH">
-                        <value datatype="real">0.0e-6</value>
+                        <value datatype="real">1.0e-6</value>
                         <description>FeOOH reduction inhibition constant (mol kg-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_ci_SO4">
