@@ -13,8 +13,8 @@ varlist = ["EXPID","RESTARTREAD","CHECKFLUXES"]
 # initialise with default science module choices
 configflags = {
     # flag name in control,shortname,defual config, prefix 
-    # atmos
     "ma_flag_ebatmos" : ["embm",".FALSE.","ea"],
+    "ma_flag_plasimatmos" : ["plasim",".FALSE.","pl"],
     "ma_flag_goldsteinocean" : ["goldstein",".FALSE.","go"],
     "ma_flag_goldsteinseaice" : ["goldsteinseaice",".FALSE.","gs"],
     "ma_flag_ents" : ["ents",".FALSE.","el"],

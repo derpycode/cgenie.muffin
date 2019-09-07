@@ -161,6 +161,7 @@ LONS=$(grep -o '$(DEFINE)GOLDSTEINNLONS=..\>' $CONFIGPATH/$MODELID".config" | se
 LATS=$(grep -o '$(DEFINE)GOLDSTEINNLATS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
 LEVS=$(grep -o '$(DEFINE)GOLDSTEINNLEVS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
 IGRID=$(grep -o 'go_grid=.' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
+PLASIM=$(grep -o 'ma_flag_plasimatmos=.' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
 # filter single digit format level ('8' vs. '08')
 ###if [ "$LEVS" == "8\'" ] || [ "$LEVS" == "8\"" ]; then
 if [ "$LEVS" != "32" ] && [ "$LEVS" != "24" ] && [ "$LEVS" != "16" ] && [ "$LEVS" != "08" ]; then
@@ -192,19 +193,27 @@ else
     let N_TIMESTEPS=96
     let dbiostp=1
 fi
+#
 if [ $IGRID -eq 1 ]; then
     echo "   Making non-equal area grid modifications to time-stepping, igrid: " $IGRID
     N_TIMESTEPS="$(echo "4*$N_TIMESTEPS" | bc -l)"
     dbiostp="$(echo "4*$dbiostp" | bc -l)"
-    let datmstp=5
-else
-    let datmstp=5
 fi
+#
 echo "   Setting time-stepping [GOLDSTEIN, BIOGEM:GOLDSTEIN]: " $N_TIMESTEPS $dbiostp
 # define primary model time step
 # c-goldstein; e.g. ma_genie_timestep = 365.25*24.0/(5*96) * 3600.0 (GOLDSTEIN year length)
 #                => ma_genie_timestep=65745.0
-dstp="$(echo "3600.0*24.0*365.25/$datmstp/$N_TIMESTEPS" | bc -l)"
+if [ "$PLASIM" != ".TRUE."  ]; then
+# plasim has a timestep of 45 minutes = 32 timesteps per day, with 360 model days per year => 32*360*1000=11,520,000 -->
+    let N_TIMESTEPS=720
+    let dbiostp=2
+    let datmstp=16
+     dstp="$(echo "3600.0*24.0*360.0/$datmstp/$N_TIMESTEPS" | bc -l)"
+else
+    let datmstp=5
+     dstp="$(echo "3600.0*24.0*365.25/$datmstp/$N_TIMESTEPS" | bc -l)"
+fi
 echo "   Setting primary model time step: " $dstp
 # write primary model time step
 echo ma_genie_timestep=$dstp >> $CONFIGPATH/$CONFIGNAME
