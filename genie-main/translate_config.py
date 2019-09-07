@@ -366,7 +366,6 @@ def translate_config(config_filename,script_name='translate_config.py'):
                      'filenetin': 'gs_16',
                      'dirnetout': 'gs_17',
                      'lin': 'gs_18'}
-    exceptions_pl = {''}
     exceptions_el = {'indir_name': 'el_1',
                        'outdir_name': 'el_2',
                        'condir_name': 'el_config',
