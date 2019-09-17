@@ -88,7 +88,7 @@ NETCDF_DIR=/usr/local
 ### VM ###
 #NETCDF_DIR=/home/mushroom/netcdf/ifort
 ### Ben Mac Pro ###
-###NETCDF_DIR=/opt/local
+#NETCDF_DIR=/opt/local
 
 NETCDF_NAME=netcdf
 
