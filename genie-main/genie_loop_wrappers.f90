@@ -317,6 +317,7 @@ contains
     !           stressy_ocn              surface wind stress (y) on ocean
     !           frac_sic                 sea-ice fractional cover
     !           temp_sic                 sea-ice surface temperature
+    !           eco_swr_ocn              frac of vis. solar rad into deep ocean (from ecogem) (FL 13/09/18)
     ! Outputs : tstar_ocn                ocean surface temperature
     !           sstar_ocn                ocean surface salinity
     !           ustar_ocn                surface ocean velocity (u)
@@ -349,7 +350,9 @@ contains
          go_mldta, &                               ! output (to BIOGEM)
          go_rho, &                                 ! output (to ENTS)
          go_diffv, &                               ! output (to biogem)
-         go_dzrho)                                 ! output (to biogem) 
+         go_dzrho, &                               ! output (to biogem) 
+	 eco_swr_ocn &                             ! input (from ecogem) (FL 13/09/18)
+	 )
   end subroutine goldstein_wrapper
   !!
   subroutine ents_wrapper
@@ -907,7 +910,8 @@ contains
          & go_mldta,        & ! input
          & egbg_sfcocn,     & ! input  -- tracer concentrations
          & egbg_sfcpart,    & ! output -- change in particulate concentration field
-         & egbg_sfcremin    & ! output -- change in remin concentration field
+         & egbg_sfcremin,   & ! output -- change in remin concentration field
+	 & eco_swr_ocn      & ! output -- frac of vis sol rad into deep ocean (FL 13/09/18)
          )
   end subroutine ecogem_wrapper
 
