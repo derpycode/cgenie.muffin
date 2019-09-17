@@ -318,3 +318,9 @@ c AR (19/01/29) : added ocean depth (max)
      : rst_reset_T,ctrl_diagmld
       real par_dsc
       common /goldstein_ctrl/par_dsc
+c
+c FL (13/09/18) for solar rad absorbtion by chlorophyll
+c
+      logical lsolflx
+      real sol_flx_vis(maxi,maxj,maxk)
+      common/fl_sol_flx/sol_flx_vis,lsolflx      
