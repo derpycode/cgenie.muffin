@@ -8,7 +8,8 @@ subroutine ecogem(          &
      & dum_mld,             & ! input
      & dum_egbg_sfcocn,     & ! input  -- tracer concentrations
      & dum_egbg_sfcpart,    & ! output -- change in particulate concentration field
-     & dum_egbg_sfcdiss     & ! output -- change in remin concentration field
+     & dum_egbg_sfcdiss,    & ! output -- change in remin concentration field
+     & dum_eggo_sol         & ! output -- sol rad into deep ocean
      & )
 
   use gem_cmn
@@ -42,6 +43,9 @@ subroutine ecogem(          &
   REAL,DIMENSION(n_i,n_j,n_k)              ::omega,gamma
   REAL                                     ::templocal,PAR_layer,layerthick,layermid
   REAL                                     ::topD,PAR_in,PAR_out
+
+! FL (21/02/18) factro for vis sol attenuation for the ocean
+  REAL,DIMENSION(n_i,n_j,n_k)              ::dum_eggo_sol
 
   ! to convert per day rates into per second
   real,parameter :: pday = 86400.0
@@ -94,6 +98,8 @@ subroutine ecogem(          &
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
   REAL                                     ::loc_rdts,loc_rdtyr            ! time reciprocals
 
+! FL (21/02/18) initialize viz sol attenuation factor for ocean
+  dum_eggo_sol(:,:,:)=0.
 
   ! ------------------------------------------------------- !
   ! INITIALIZE LOCAL VARIABLES
@@ -297,6 +303,8 @@ subroutine ecogem(          &
                     PAR_layer = PAR_in /mld /k_tot*(1-exp(-k_tot*mld)) ! average PAR in  layer
                     ! [AR] this ... doesn't 'do' anything? k_tot*(1-exp(-k_tot*mld)) is never 0.0 or less(?)
                     PAR_layer = MERGE(PAR_layer,0.0,k_tot*(1-exp(-k_tot*mld)).gt.0.0)
+! FL (21/02/18)
+                    dum_eggo_sol(i,j,k)=dum_eggo_sol(i,j,k)+PARfrac*exp(-k_w*layerthick-k_chl*totchl*mld)		    
                  else ! Calculate mean light within each layer
                     totchl    = sum(loc_biomass(iomax+iChl,:)) ! find sum of all chlorophyll for light attenuation
                     k_tot     = (k_w + k_chl*totchl) ! attenuation due to water and pigment
@@ -304,6 +312,8 @@ subroutine ecogem(          &
                     PAR_layer = MERGE(PAR_layer,0.0,k_tot*(1-exp(-k_tot*layerthick)).gt.0.0)
                     PAR_out   = PAR_in * exp(-k_tot*layerthick) ! light leaving bottom of layer
                     PAR_in    = PAR_out
+! FL (21/02/18)
+                    dum_eggo_sol(i,j,k)=dum_eggo_sol(i,j,k)+PARfrac*exp(-k_tot*layerthick)
                  endif
 
                  ! ?
@@ -615,6 +625,9 @@ subroutine ecogem(          &
      enddo ! end i
      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
   enddo ! END SUB TIME STEP HERE
+
+! FL (21/02/18) average about the sub-cycles
+  dum_eggo_sol(:,:,:)=dum_eggo_sol(:,:,:)/REAL(nsubtime)
 
   ! record time-series site data
   if (n_tser.gt.0) then
