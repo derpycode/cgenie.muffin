@@ -138,6 +138,10 @@ c flux above
      1                       (1.+ups(3))*ts1(l,i,j,k))*0.5
                      fa(l) = fa(l) - (ts1(l,i,j,k+1) - ts1(l,i,j,k))
      1                       *rdza(k)*diffv
+c FL (13/09/18) add vis sol rad
+                    if(l .eq. 1) then
+                     fa(l) = fa(l) + sol_flx_vis(i,j,k+1)
+                    endif     
                   endif
                enddo
                if(diso)then
