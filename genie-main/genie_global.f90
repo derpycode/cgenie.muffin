@@ -874,7 +874,10 @@ MODULE genie_global
 #endif
 
   parameter(genie_version=REV)
-
+  
+! FL 21/02/18  frac of sol rad into deep ocean (ocean grid)
+  real,dimension(ilon1_ocn,ilat1_ocn,inl1_ocn) :: eco_swr_ocn = 0.0
+  
 contains
   
   ! subroutine: increment_genie_clock
