@@ -136,6 +136,11 @@ c     FOR THE ENERGY CALCULATIONS.....
       data ifirst/1/
       save ifirst
       real test_energy_ocean,test_water_ocean
+c
+c     FL (13/09/18) frac of vis sol flux and vis flux (local array)
+c
+      real eco_swr_ocn(maxi,maxj,maxk)
+      real zflx_vis(maxi,maxj)
 
 c ======================================================================
 c DJL
@@ -342,6 +347,24 @@ c           (no boundaries) and does not update tracers at boundaries
                ts1(l,imax+1,j,k) = ts(l,1,j,k)
             enddo
          enddo
+      enddo
+c
+c     FL (13/09/18) include vis solar flux into deep(er) ocean
+c     using ecogem input (attenuation)
+c
+
+      do j=1,jmax
+       do i=1,imax
+        zflx_vis(i,j)=-netsolar_ocn(i,j)*rfluxsc
+       enddo
+      enddo
+      do k=kmax,1,-1
+       do j=1,jmax
+        do i=1,imax
+         zflx_vis(i,j)=zflx_vis(i,j)*eco_swr_ocn(i,j,k)
+         sol_flx_vis(i,j,k)=zflx_vis(i,j)
+        enddo
+       enddo
       enddo
 
 c ======================================================================
