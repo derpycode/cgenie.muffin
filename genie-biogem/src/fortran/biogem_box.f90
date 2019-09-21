@@ -5299,7 +5299,7 @@ CONTAINS
     ENDDO
     dum_opsia_minmax(1) = loc_omina
     dum_opsia_minmax(2) = loc_omaxa
-    !
+    ! zonal overturning streamfunction [see: end_goldstein.F]
     loc_zpsi(:,:) = 0.0
     DO i=1,n_i-1
        DO k=1,n_k-1
