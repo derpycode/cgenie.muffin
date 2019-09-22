@@ -22,17 +22,18 @@ real,dimension(n_i,n_j),save::zox_sed
 real,dimension(n_i,n_j),save::time_sed
 real,dimension(n_i,n_j),save::ccdis_sed
 real,dimension(n_i,n_j),save::ccsfave_sed
+real,dimension(n_i,n_j),save::errf_sed
 integer,dimension(n_i,n_j),save::izml_sed
 integer,save::irec_sed 
 
 real,parameter::ztot_sed = 200d0                                                  ! total sediment thickness (cm)
-! real,parameter::rhosed_sed = 2.09d0                                               ! g/cm3 sediment particle density assuming opal (SiO2•n(H2O) )
+! real,parameter::rhosed_sed = 2.09d0                                               ! g/cm3 sediment particle density assuming opal (SiO2•n(H2O))
 real,parameter::rhosed_sed = 2.6d0                                                ! g/cm3 sediment particle density assming kaolinite 
 real,parameter::rhoom_sed = 1.2d0                                                 ! g/cm3 organic particle density 
 real,parameter::rhocc_sed = 2.71d0                                                ! g/cm3 organic particle density 
 real,parameter::mom_sed = 30d0                                                    ! g/mol OM assuming CH2O
-! real,parameter::msed = 87.11d0                                                ! g/mol arbitrary sediment g/mol assuming opal (SiO2•n(H2O) )
-real,parameter::msed_sed = 258.16d0                                               ! g/mol arbitrary sediment g/mol assuming kaolinite ( 	Al2Si2O5(OH)4 )
+! real,parameter::msed = 87.11d0                                                ! g/mol arbitrary sediment g/mol assuming opal (SiO2•n(H2O))
+real,parameter::msed_sed = 258.16d0                                               ! g/mol arbitrary sediment g/mol assuming kaolinite (Al2Si2O5(OH)4)
 real,parameter::mcc_sed = 100d0                                                   ! g/mol CaCO3 
 
 contains 
@@ -334,9 +335,11 @@ logical:: all_oxic, loc_reading
 logical:: ox_degall = .true.
 ! logical:: ox_degall = .false.
 
-logical:: dis_off = .true.  
-real:: dis_off_val = 1000d0  ! dissolution rate const. offset % 
+logical:: dis_off_flg = .true.  
+!logical:: dis_off = .false.  
+real:: dis_off(nspcc) ! factor with which dissolution rate const. is multiplied (plus) or divided (minus)
 integer:: itr_stst  ! iteration for steady state
+logical::arg_flg(nspcc)
 
 call cpu_time(loc_start)
 
@@ -363,6 +366,11 @@ if (dum_i==0 .or. dum_j==0) signal_tracking=.false.
 nobio=.false.
 turbo2 =.false.
 labs=.false.
+
+arg_flg(:) = .false.
+dis_off(:) = 0d0
+
+arg_flg(2) = .true.
 
 flg_500 = .false. 
 tol = 1d-6
@@ -543,7 +551,7 @@ call make_transmx(  &
 call coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-    ,dis_off,dis_off_val  &
+    ,dis_off  &
     )
 
 ! print *, kcc(1,1),kcc(nz,1), kcc(1,2),kcc(nz,2)
@@ -822,9 +830,11 @@ do
     endif 
 ! #endif
     
-    if (dis_off) then 
-        ccflx(1:nspcc/2) = ccflxi/2d0
-        ccflx(1+nspcc/2:nspcc) = ccflxi/2d0
+    if (dis_off_flg) then 
+        ! ccflx(1:nspcc/2) = ccflxi/2d0
+        ! ccflx(1+nspcc/2:nspcc) = ccflxi/2d0
+        ccflx(1) = ccflxi*1.0d0
+        ccflx(2) = ccflxi-ccflx(1)
     endif 
     
     !! === temperature & pressure and associated boundary changes ====
@@ -833,7 +843,7 @@ do
     call coefs(  &
         dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
         ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-        ,dis_off,dis_off_val  &
+        ,dis_off  &
         )
     !! /////////////////////
 ! #ifdef sense
@@ -1218,6 +1228,7 @@ do
         ,w,up,dwn,cnr,adf,dz,trans,cc,oxco2,anco2,co3sat,kcc,ccflx,ncc,ohmega,nz  & ! input
         ,dum_sfcsumocn  & ! input for genie
         ,tol,poroi,flg_500,fact,file_tmp,alki,dici,ccx_th,workdir,co2chem  &
+        ,arg_flg  &
         )
     if (flg_500) then 
         ! nt = nt*10
@@ -1228,23 +1239,23 @@ do
         print*
         ! go to 500
         if (first_call) then 
-            ! dt = dt /10d0
-            ! ccx(:,:) = cc(:,:)
-            ! alkx(:) = alk(:)
-            ! dicx(:) = dic(:)
-            ! itr_stst = itr_stst + 1
-            ! if (itr_stst > 100) then 
-                ! print *
-                ! print *
-                ! print *,' ******* WARNING ******* '
-                ! print *,' steady state cannot be reached within 100 iterations @ site: ',trim(adjustl(filechr))
-                ! print *,' simulation continues nonetheless ... ' 
-                ! print *,' *********************** '
-                ! print *
-                ! print *
-            ! else 
-                ! go to 700 
-            ! endif 
+            dt = dt /10d0
+            ccx(:,:) = cc(:,:)
+            alkx(:) = alk(:)
+            dicx(:) = dic(:)
+            itr_stst = itr_stst + 1
+            if (itr_stst > 100) then 
+                print *
+                print *
+                print *,' ******* WARNING ******* '
+                print *,' steady state cannot be reached within 100 iterations @ site: ',trim(adjustl(filechr))
+                print *,' simulation continues nonetheless ... ' 
+                print *,' *********************** '
+                print *
+                print *
+            else 
+                go to 700 
+            endif 
         endif 
     endif 
     ! ~~~~  End of calculation iteration for CO2 species ~~~~~~~~~~~~~~~~~~~~
@@ -1597,6 +1608,7 @@ rho_sed(1:nz,dum_i,dum_j) = rho(:)
 zox_sed(dum_i,dum_j) = zox
 ccdis_sed(dum_i,dum_j) = sum(ccdis)
 izml_sed(dum_i,dum_j)= izml
+errf_sed(dum_i,dum_j)= err_f
 
 ! assume 5cm for which average conc. of cc is calculated after Ridgwell and Hargreaves 2007
 zx_sample = 5d0  
@@ -2288,15 +2300,16 @@ endsubroutine make_transmx
 subroutine coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-    ,dis_off,dis_off_val  &
+    ,dis_off  &
     )
 integer,intent(in)::nz,nspcc
 real,intent(in)::temp,sal,dep,poro(nz),cai,komi,kcci
 real,intent(out)::dif_dic(nz),dif_alk(nz),dif_o2(nz),kom(nz),kcc(nz,nspcc),co3sat
 real dif_dic0,dif_alk0,dif_o20,ff(nz),keq1,keq2,keqcc
 real calceq1,calceq2,calceqcc
-real,intent(in)::dis_off_val
-logical,intent(in)::dis_off
+! real,intent(in)::dis_off_val
+real,intent(in)::dis_off(nspcc)
+integer::isp
 
 ff = poro*poro       ! representing tortuosity factor 
 
@@ -2326,16 +2339,14 @@ keqcc = calceqcc(temp,sal,dep) ! calcite solubility function called from caco3_t
 co3sat = keqcc/cai ! co3 conc. at calcite saturation 
 
 ! print*,cai,keqcc,co3sat
-
-if (dis_off) then 
-    if (dis_off_val < 100d0) then 
-        kcc(:,1:nspcc/2) = kcci*(1d0-dis_off_val/100d0)
-        kcc(:,1+nspcc/2:nspcc) = kcci*(1d0+dis_off_val/100d0)
-    elseif (dis_off_val >= 100d0) then
-        kcc(:,1:nspcc/2) = kcci/(dis_off_val/100d0)
-        kcc(:,1+nspcc/2:nspcc) = kcci*(dis_off_val/100d0)
+do isp = 1,nspcc
+    if (dis_off(isp)==0d0) cycle
+    if (dis_off(isp)>0d0) then 
+        kcc(:,isp) = kcci*abs(dis_off(isp))
+    elseif (dis_off(isp)<0d0) then
+        kcc(:,isp) = kcci/abs(dis_off(isp))
     endif 
-endif 
+enddo 
 
 endsubroutine coefs
 !**************************************************************************************************************************************
@@ -3283,6 +3294,7 @@ subroutine calccaco3sys(  &
     ,w,up,dwn,cnr,adf,dz,trans,cc,oxco2,anco2,co3sat,kcc,ccflx,ncc,ohmega,nz  & ! input
     ,dum_sfcsumocn  & ! input for genie geochemistry
     ,tol,poroi,flg_500,fact,file_tmp,alki,dici,ccx_th,workdir,co2chem  &
+    ,arg_flg  &
     )
 implicit none 
 integer,intent(in)::nspcc,nz,file_tmp
@@ -3291,6 +3303,7 @@ real,dimension(n_ocn),intent(in)::dum_sfcsumocn
 real,intent(in)::dep,sal,temp,sporoi,sporof,trans(nz,nz,nspcc+2),cc(nz,nspcc),kcc(nz,nspcc),ccflx(nspcc)
 real,intent(in)::ncc,tol,poroi,fact,alki,dici,ccx_th
 logical,dimension(nspcc+2),intent(in)::labs,turbo2,nonlocal
+logical,dimension(nspcc),intent(in)::arg_flg
 logical,intent(inout)::flg_500
 character*255,intent(in)::workdir
 character*25,intent(in)::co2chem
@@ -3301,6 +3314,7 @@ integer symbolic,numeric
 real::loc_error,prox(nz),co2x(nz),hco3x(nz),co3x(nz),dco3_ddic(nz),dco3_dalk(nz),drcc_dcc(nz,nspcc)  
 real::drcc_dco3(nz,nspcc),drcc_ddic(nz,nspcc),drcc_dalk(nz,nspcc),info(90),control(20)
 real::drcc_dohmega(nz,nspcc),dohmega_dalk(nz),dohmega_ddic(nz),ohmega(nz)
+real::dohmega_arg_dalk(nz),dohmega_arg_ddic(nz),ohmega_arg(nz)
 real,allocatable :: amx(:,:),ymx(:),emx(:),dumx(:,:),ax(:),kai(:),bx(:)
 ! for genie geochemistry
 REAL,DIMENSION(n_carbconst)::dum_carbconst
@@ -3513,6 +3527,7 @@ case('genie')
         hco3x(iz)=dum_carb(ic_conc_HCO3)*1d-3
         co3x(iz)=dum_carb(ic_conc_CO3)*1d-3
         ohmega(iz)=dum_carb(ic_ohm_cal)
+        ohmega_arg(iz)=dum_carb(ic_ohm_arg)
         
         call sub_calc_carb( &
             real((dicx(iz)+dev)*1e3) &
@@ -3530,6 +3545,7 @@ case('genie')
             ,dum_carbalk &
             )
         dohmega_ddic(iz) = (dum_carb(ic_ohm_cal)-ohmega(iz))/dev
+        dohmega_arg_ddic(iz) = (dum_carb(ic_ohm_arg)-ohmega_arg(iz))/dev
         dco3_ddic(iz) = (dum_carb(ic_conc_CO3)*1d-3-co3x(iz))/dev
         
         call sub_calc_carb( &
@@ -3548,22 +3564,40 @@ case('genie')
             ,dum_carbalk &
             )
         dohmega_dalk(iz) = (dum_carb(ic_ohm_cal)-ohmega(iz))/dev
+        dohmega_arg_dalk(iz) = (dum_carb(ic_ohm_arg)-ohmega_arg(iz))/dev
         dco3_dalk(iz) = (dum_carb(ic_conc_CO3)*1d-3-co3x(iz))/dev
     enddo
 
     do isp=1,nspcc
-        ! calculation of dissolution rate for individual species 
-        rcc(:,isp) = kcc(:,isp)*ccx(:,isp)*abs(1d0-ohmega(:))**ncc*merge(1d0,0d0,(1d0-ohmega(:))>0d0)
-        ! calculation of derivatives of dissolution rate wrt conc. of caco3 species, dic and alk 
-        drcc_dcc(:,isp) = kcc(:,isp)*abs(1d0-ohmega(:))**ncc*merge(1d0,0d0,(1d0-ohmega(:))>0d0)
-        drcc_dohmega(:,isp) = kcc(:,isp)*ccx(:,isp)*ncc*abs(1d0-ohmega(:))**(ncc-1d0)  &
-            *merge(1d0,0d0,(1d0-ohmega(:))>0d0)*(-1d0)
-        drcc_ddic(:,isp) = drcc_dohmega(:,isp)*dohmega_ddic(:)
-        drcc_dalk(:,isp) = drcc_dohmega(:,isp)*dohmega_dalk(:)
-        ! drcc_dco3(:,isp) = kcc(:,isp)*ccx(:,isp)*ncc*abs(1d0-co3x(:)*1d3/co3sat)**(ncc-1d0)  &
-            ! *merge(1d0,0d0,(1d0-co3x(:)*1d3/co3sat)>0d0)*(-1d3/co3sat)
-        ! drcc_ddic(:,isp) = drcc_dco3(:,isp)*dco3_ddic(:)
-        ! drcc_dalk(:,isp) = drcc_dco3(:,isp)*dco3_dalk(:)
+        if (.not.arg_flg(isp)) then 
+            ! calculation of dissolution rate for individual species 
+            rcc(:,isp) = kcc(:,isp)*ccx(:,isp)*abs(1d0-ohmega(:))**ncc*merge(1d0,0d0,(1d0-ohmega(:))>0d0)
+            ! calculation of derivatives of dissolution rate wrt conc. of caco3 species, dic and alk 
+            drcc_dcc(:,isp) = kcc(:,isp)*abs(1d0-ohmega(:))**ncc*merge(1d0,0d0,(1d0-ohmega(:))>0d0)
+            drcc_dohmega(:,isp) = kcc(:,isp)*ccx(:,isp)*ncc*abs(1d0-ohmega(:))**(ncc-1d0)  &
+                *merge(1d0,0d0,(1d0-ohmega(:))>0d0)*(-1d0)
+            drcc_ddic(:,isp) = drcc_dohmega(:,isp)*dohmega_ddic(:)
+            drcc_dalk(:,isp) = drcc_dohmega(:,isp)*dohmega_dalk(:)
+            ! drcc_dco3(:,isp) = kcc(:,isp)*ccx(:,isp)*ncc*abs(1d0-co3x(:)*1d3/co3sat)**(ncc-1d0)  &
+                ! *merge(1d0,0d0,(1d0-co3x(:)*1d3/co3sat)>0d0)*(-1d3/co3sat)
+            ! drcc_ddic(:,isp) = drcc_dco3(:,isp)*dco3_ddic(:)
+            ! drcc_dalk(:,isp) = drcc_dco3(:,isp)*dco3_dalk(:)
+        else if (arg_flg(isp)) then 
+            ! calculation of dissolution rate for individual species 
+            rcc(:,isp) = kcc(:,isp)*ccx(:,isp)*abs(1d0-ohmega_arg(:))**ncc  &
+                *merge(1d0,0d0,(1d0-ohmega_arg(:))>0d0)
+            ! calculation of derivatives of dissolution rate wrt conc. of caco3 species, dic and alk 
+            drcc_dcc(:,isp) = kcc(:,isp)*abs(1d0-ohmega_arg(:))**ncc  &
+                *merge(1d0,0d0,(1d0-ohmega_arg(:))>0d0)
+            drcc_dohmega(:,isp) = kcc(:,isp)*ccx(:,isp)*ncc*abs(1d0-ohmega_arg(:))**(ncc-1d0)  &
+                *merge(1d0,0d0,(1d0-ohmega_arg(:))>0d0)*(-1d0)
+            drcc_ddic(:,isp) = drcc_dohmega(:,isp)*dohmega_arg_ddic(:)
+            drcc_dalk(:,isp) = drcc_dohmega(:,isp)*dohmega_arg_dalk(:)
+            ! drcc_dco3(:,isp) = kcc(:,isp)*ccx(:,isp)*ncc*abs(1d0-co3x(:)*1d3/co3sat)**(ncc-1d0)  &
+                ! *merge(1d0,0d0,(1d0-co3x(:)*1d3/co3sat)>0d0)*(-1d3/co3sat)
+            ! drcc_ddic(:,isp) = drcc_dco3(:,isp)*dco3_ddic(:)
+            ! drcc_dalk(:,isp) = drcc_dco3(:,isp)*dco3_dalk(:)
+        endif 
     enddo
 endselect 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -4710,6 +4744,7 @@ do j=1,n_j
             pt_sed(:,i,j)=-1d0
             rho_sed(:,i,j)=1d0
             ccsfave_sed(i,j)=-1d0
+            errf_sed(i,j)=-1d0
         endif 
     enddo
 enddo 
@@ -4772,6 +4807,12 @@ close(100)
 open(unit=100,file=trim(adjustl(workdir))//'ccdis-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (ccdis_sed(i,j)*1d6,i=1,n_i)
+enddo 
+close(100)
+
+open(unit=100,file=trim(adjustl(workdir))//'errf-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+do j=1,n_j
+    write(100,*) (errf_sed(i,j),i=1,n_i)
 enddo 
 close(100)
 
