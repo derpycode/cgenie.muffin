@@ -278,21 +278,31 @@ CONTAINS
     !       define basic 2d/3d data (x,y)
     !-----------------------------------------------------------------------
     SELECT CASE (dum_dd)
-    CASE (2,3,4)
+    CASE (2)
        loc_it(1) = loc_id_lonm
        loc_it(2) = loc_id_latm
-       call sub_defvar ('grid_level', dum_iou, 2, loc_it, loc_c0, 100.0, ' ', 'I', &
-            &'grid definition', 'model_level_number' ,'n/a')
+       call sub_defvar('grid_level',dum_iou,2,loc_it,loc_c0,100.0,' ','I', &
+            & 'grid definition','model_level_number','n/a')
        call sub_defvar ('grid_mask', dum_iou, 2, loc_it, loc_c0, 100.0, ' ', 'F', &
             &'land-sea mask', ' ' ,'n/a')
-       call sub_defvar ('grid_topo', dum_iou, 2, loc_it, loc_c0, 5000., ' ', 'F', &
+       call sub_defvar ('grid_topo', dum_iou, 2, loc_it, loc_c0, 100000., ' ', 'F', &
             &'ocean depth ', ' ' ,'m')
+       call sub_defvar ('grid_area', dum_iou, 2, loc_it, loc_c0, 0.5099044E+15, ' ', 'F', &
+            &'grid area ', ' ' ,'m2')
     end select
     SELECT CASE (dum_dd)
     CASE (3,4)
        loc_it(1) = loc_id_lonm
        loc_it(2) = loc_id_latm
        loc_it(3) = loc_id_zt
+       call sub_defvar('grid_level',dum_iou,2,loc_it,loc_c0,100.0,' ','I', &
+            & 'grid definition','model_level_number','n/a')
+       call sub_defvar ('grid_mask', dum_iou, 2, loc_it, loc_c0, 100.0, ' ', 'F', &
+            &'land-sea mask', ' ' ,'n/a')
+       call sub_defvar ('grid_topo', dum_iou, 2, loc_it, loc_c0, 100000., ' ', 'F', &
+            &'ocean depth ', ' ' ,'m')
+       call sub_defvar ('grid_area', dum_iou, 2, loc_it, loc_c0, 0.5099044E+15, ' ', 'F', &
+            &'grid area ', ' ' ,'m2')
        call sub_defvar('grid_mask_3d',dum_iou,3,loc_it,loc_c0, 1.,' ','F', &
             & 'ocean mask',' ','n/a')
     end select
@@ -424,7 +434,7 @@ CONTAINS
     character(255) :: loc_name
     real           :: loc_c0, loc_c1
     integer        :: i, j, k, loc_i, loc_iou, loc_ntrec
-    real,dimension(n_i,n_j) :: loc_mask_surf, loc_help2d
+    real,dimension(n_i,n_j) :: loc_mask_ALL,loc_data
     real,dimension(n_i+1) :: loc_lon_e, loc_xu_e
     real,dimension(n_j+1) :: loc_lat_e, loc_yu_e
     real,dimension(0:n_k) :: loc_zt_e, loc_help
@@ -438,8 +448,8 @@ CONTAINS
     loc_c0 = 0.
     loc_c1 = 1.
     !
-    loc_mask_surf(:,:) = 0.0
-    loc_help2d(:,:)    = 0.0
+    loc_mask_ALL(:,:)  = 1.0
+    loc_data(:,:)      = 0.0
     loc_lon_e(:)       = 0.0
     loc_xu_e(:)        = 0.0
     loc_lat_e(:)       = 0.0
@@ -551,30 +561,39 @@ CONTAINS
           call sub_putvar1d('lon_psi_edges',loc_iou,n_i+1,loc_ntrec,n_i+1,loc_xu_e(:),loc_c1,loc_c0)
           call sub_putvar1d('lat_psi_edges',loc_iou,n_j+2,loc_ntrec,n_j+2,loc_lat_moc_e(:),loc_c1,loc_c0)
        end select
+       ! set maximum ocean depth
+       do i=1,n_i
+          do j=1,n_j
+             if(phys_ocn(ipo_mask_ocn,i,j,n_k) == 1.0) then
+                loc_data(i,j) = phys_ocn(ipo_Dbot,i,j,goldstein_k1(i,j))
+             else
+                loc_data(i,j) = 0.0
+             end if
+          end do
+       end do
        ! write 2D grid data
        SELECT CASE (dum_dd)
-       CASE (2,3,4)
-          call sub_putvar2dI ('grid_level', loc_iou, n_i, n_j, loc_ntrec, goldstein_k1)
-          loc_mask_surf = 1.0
-          loc_help2d = 1.0
-          where ( phys_ocn(ipo_mask_ocn,:,:,n_k) .eq. 0.0 )
-             loc_mask_surf = 0.0
-             loc_help2d = 1.0
-          endwhere
-          do i=1,n_i
-             do j=1,n_j
-                if(loc_help2d(i,j).ne.0.0.and.goldstein_k1(i,j).le.90) &
-                     &  loc_help2d(i,j) = phys_ocn(ipo_Dbot,i,j,goldstein_k1(i,j))
-             end do
-          end do
+       CASE (2)
+          call sub_putvar2dI ('grid_level', loc_iou, n_i, n_j, loc_ntrec, &
+               & goldstein_k1(:,:))
           call sub_putvar2d ('grid_mask', loc_iou, n_i, n_j, loc_ntrec, &
-               & phys_ocn(ipo_mask_ocn,:,:,n_k), loc_mask_surf)
+               & phys_ocn(ipo_mask_ocn,:,:,n_k), phys_ocn(ipo_mask_ocn,:,:,n_k))
           call sub_putvar2d ('grid_topo', loc_iou, n_i, n_j, loc_ntrec, &
-               & loc_help2d, loc_mask_surf)
+               & loc_data(:,:), phys_ocn(ipo_mask_ocn,:,:,n_k))
+          call sub_putvar2d ('grid_area', loc_iou, n_i, n_j, loc_ntrec, &
+               & phys_ocnatm(ipoa_A,:,:), loc_mask_ALL)
        end select
        ! write 3D grid data
        SELECT CASE (dum_dd)
        CASE (3,4)
+          call sub_putvar2dI ('grid_level', loc_iou, n_i, n_j, loc_ntrec, &
+               & goldstein_k1(:,:))
+          call sub_putvar2d ('grid_mask', loc_iou, n_i, n_j, loc_ntrec, &
+               & phys_ocn(ipo_mask_ocn,:,:,n_k), phys_ocn(ipo_mask_ocn,:,:,n_k))
+          call sub_putvar2d ('grid_topo', loc_iou, n_i, n_j, loc_ntrec, &
+               & loc_data(:,:), phys_ocn(ipo_mask_ocn,:,:,n_k))
+          call sub_putvar2d ('grid_area', loc_iou, n_i, n_j, loc_ntrec, &
+               & phys_ocn(ipo_A,:,:,n_k), phys_ocn(ipo_mask_ocn,:,:,n_k))
           call sub_putvar3d('grid_mask_3d',loc_iou,n_i,n_j,n_k,loc_ntrec, &
                & phys_ocn(ipo_mask_ocn,:,:,n_k:1:-1),phys_ocn(ipo_mask_ocn,:,:,n_k:1:-1))
        end select
