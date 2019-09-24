@@ -332,7 +332,8 @@ logical::loc_display = .false.
 real::dt_save,zx_sample
 integer::loc_i_time_proc,loc_nt,iz_xcm
 logical:: all_oxic, loc_reading
-logical:: ox_degall = .true.
+logical:: ox_degall 
+! logical:: ox_degall = .true.
 ! logical:: ox_degall = .false.
 
 logical:: dis_off_flg = .true.  
@@ -349,7 +350,7 @@ if (loc_display) then
 endif 
 ! print*,'now in main sb'
 signal_tracking=.true.
-
+ox_degall = par_sed_kanzaki2019_oxonly                    !  default true 
 loc_reading = ctrl_continuing ! if continuing, read from previous run
 loc_reading = .false. ! always start from steady state
 
@@ -369,8 +370,9 @@ labs=.false.
 
 arg_flg(:) = .false.
 dis_off(:) = 0d0
-
-arg_flg(2) = .true.
+if (par_sed_kanzaki2019_arg/=0d0) arg_flg(2) = .true.
+dis_off(1) = par_sed_kanzaki2019_dissc1
+dis_off(2) = par_sed_kanzaki2019_dissc2
 
 flg_500 = .false. 
 tol = 1d-6
@@ -833,7 +835,8 @@ do
     if (dis_off_flg) then 
         ! ccflx(1:nspcc/2) = ccflxi/2d0
         ! ccflx(1+nspcc/2:nspcc) = ccflxi/2d0
-        ccflx(1) = ccflxi*1.0d0
+        ! ccflx(1) = ccflxi*1.0d0
+        ccflx(1) = ccflxi*max(0d0,1d0-par_sed_kanzaki2019_arg)
         ccflx(2) = ccflxi-ccflx(1)
     endif 
     
@@ -2340,12 +2343,13 @@ co3sat = keqcc/cai ! co3 conc. at calcite saturation
 
 ! print*,cai,keqcc,co3sat
 do isp = 1,nspcc
-    if (dis_off(isp)==0d0) cycle
-    if (dis_off(isp)>0d0) then 
-        kcc(:,isp) = kcci*abs(dis_off(isp))
-    elseif (dis_off(isp)<0d0) then
-        kcc(:,isp) = kcci/abs(dis_off(isp))
-    endif 
+    ! if (dis_off(isp)==0d0) cycle
+    ! if (dis_off(isp)>0d0) then 
+        ! kcc(:,isp) = kcci*abs(dis_off(isp))
+    ! elseif (dis_off(isp)<0d0) then
+        ! kcc(:,isp) = kcci/abs(dis_off(isp))
+    ! endif 
+    kcc(:,isp) = kcci*dis_off(isp)
 enddo 
 
 endsubroutine coefs

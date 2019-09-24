@@ -112,6 +112,13 @@ MODULE sedgem_lib
   integer::par_sed_archer1991_iterationmax                       ! loop limit in 'o2org' subroutine
   NAMELIST /ini_sedgem_nml/par_sed_archer1991_iterationmax
   NAMELIST /ini_sedgem_nml/par_sed_archer1991_iterationmax
+  ! ------------------- DIAGENESIS SCHEME: KANZAKI 2019 --------------------------------------------------------------------------- !
+  REAL::par_sed_kanzaki2019_arg                                  ! aragonite rain fraction
+  REAL::par_sed_kanzaki2019_dissc1                               ! dissolution rate factor for CaCO3 fracrion 1 
+  REAL::par_sed_kanzaki2019_dissc2                               ! dissolution rate factor for CaCO3 fracrion 2 
+  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_arg,par_sed_kanzaki2019_dissc1,par_sed_kanzaki2019_dissc2
+  logical::par_sed_kanzaki2019_oxonly                            ! om degradation scheme, oxonly (or not)?
+  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_oxonly
   ! ------------------- DIAGENESIS SCHEME: opal ---------------------------------------------------------------------------------- !
   REAL::par_sed_opal_KSi0                                        ! base opal KSi value (yr-1)
   NAMELIST /ini_sedgem_nml/par_sed_opal_KSi0
