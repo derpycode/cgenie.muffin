@@ -4057,6 +4057,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">1.0</value>
                         <description>offset of C/P organic matter flexible stoichiometry </description>
                     </param>
+                    <param name="par_bio_red_PC_max">
+                        <value datatype="real">1.8182e-02</value>
+                        <description>maximum C/P (1.8182e-02 == 1.0/55.0 -- see Galbraith and Martiny, 2015)</description>
+                    </param>
 <!-- malod: flexible stoichiometry  end -->
                     <param name="par_bio_red_POP_PO2">
 			<value datatype="real">-138.0</value>

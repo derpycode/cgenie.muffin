@@ -157,6 +157,7 @@ CONTAINS
        print*,'C/P organic matter set to flexible? ( > 0 = yes)    : ',par_bio_red_PC_flex
        print*,'PC_alpha1, scaling of flexible C/P ratio            : ',par_bio_red_PC_alpha1
        print*,'PC_alpha2, offset of flexible C/P ratio             : ',par_bio_red_PC_alpha2
+       print*,'maximum C/P                                         : ',par_bio_red_PC_max
        print*,'O2/P organic matter pseudo-Redfield ratio           : ',par_bio_red_POP_PO2
        print*,'ALK/N alkalinty correction factor                   : ',par_bio_red_PON_ALK
        print*,'Production fraction of dissolved organic matter     : ',par_bio_red_DOMfrac

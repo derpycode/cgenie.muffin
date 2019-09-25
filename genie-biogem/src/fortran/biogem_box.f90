@@ -434,8 +434,6 @@ CONTAINS
     !
     loc_ocn = 0.0
     
-
-
     ! *** APPLY VARIABLE P:C RATIO ? ***
     ! par_bio_red_PC_flex = 1 --> activate variable stoichiometry
     ! par_bio_red_PC_flex = 2 --> activate variable stoichiometry with limit at high PO4
@@ -445,20 +443,20 @@ CONTAINS
        ! default par_bio_red_PC_alpha2 = 1.0
        ! to achieve average P:C more similar to fixed Redfield modern run, use  PC_alpha1 = 1.1643
        ! an alternative is to scale only PC_alpha2 = 1.16
-       bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,dum_i,dum_j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
-       if (par_bio_red_PC_flex > 1) then   ! limit C:P at high PO4 (because no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
-          if (bio_part_red(is_POC,is_POP,dum_i,dum_j) > 1.0/55.0) then
-             bio_part_red(is_POC,is_POP,dum_i,dum_j) = 1.0/55.0
+       bio_part_red(is_POC,is_POP,dum_i,dum_j) = &
+          & par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,dum_i,dum_j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+       if (par_bio_red_PC_flex == 2) then   ! limit C:P at high PO4 (because no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
+          if (bio_part_red(is_POC,is_POP,dum_i,dum_j) > par_bio_red_PC_max) then
+             bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
           end if
        end if
-       bio_part_red(is_POP,is_POC,dum_i,dum_j) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
+    elseif (par_bio_red_PC_flex == -1) then
+       bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
     else
        bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
-       bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
     end if
-
-
-    !
+    bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
+    ! set local N:P
     loc_bio_NP = bio_part_red(is_POC,is_PON,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)
 
     ! *** CALCULATE MIXED LAYER PROPERTIES ***
