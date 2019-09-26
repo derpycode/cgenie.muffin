@@ -365,7 +365,7 @@ CONTAINS
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
        print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
-       print*,'MM type limiting factor for FeS2 precipitation      : ',K_lim_PYR
+       print*,'MM type limiting factor for FeS2 precipitation      : ',par_k_lim_pyr
        print*,'Minimum ohmega threshold for precip                 : ',par_bio_FeS_abioticohm_min
        print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
@@ -375,6 +375,7 @@ CONTAINS
        print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha 
        print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha 
        print*,'let FeOOH precipitate explictely?                   : ',ctrl_bio_FeOOHprecip_explicit 
+       print*,'threshold of dissolved Fe for FeOOH repcip          : ',par_FeOOH_Fethresh
        print*,'kinetic constant for Fe reduction                   : ',par_bio_remin_kFetoFe2
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
@@ -1115,6 +1116,13 @@ CONTAINS
     else
        conv_sed_ocn(io_O2,is_PON) = 0.0
     end if
+    ! N isotopes (from PON remin)
+    if (sed_select(is_PON_15N)) then
+       conv_sed_ocn(io_NO3_15N,is_PON_15N) = 1.0
+       conv_sed_ocn(io_NH4_15N,is_PON_15N) = 0.0
+       conv_sed_ocn(io_N2_15N,is_PON_15N)  = 0.0
+    end if
+    !
     if (ctrl_bio_red_O2withPOC) then
        conv_sed_ocn(io_O2,is_POP) = 0.0
        conv_sed_ocn(io_O2,is_PON) = 0.0
@@ -1154,6 +1162,12 @@ CONTAINS
           conv_sed_ocn_O(io_NO3,is_PON) = 0.0
           conv_sed_ocn_O(io_NH4,is_PON) = 1.0
           conv_sed_ocn_O(io_N2,is_PON)  = 0.0
+       end if
+       ! N isotopes (from PON remin)
+       if (sed_select(is_PON_15N)) then
+          conv_sed_ocn_O(io_NO3_15N,is_PON_15N) = conv_sed_ocn_O(io_NO3,is_PON)
+          conv_sed_ocn_O(io_NH4_15N,is_PON_15N) = conv_sed_ocn_O(io_NH4,is_PON)
+          conv_sed_ocn_O(io_N2_15N,is_PON_15N)  = conv_sed_ocn_O(io_N2,is_PON)
        end if
        ! ALK
        if (ocn_select(io_NH4)) then
@@ -1205,9 +1219,11 @@ CONTAINS
           ! [DEFAULT, oxic remin relationship]
        endif
        ! N isotopes (from PON remin)
-       conv_sed_ocn_N(io_NO3_15N,is_PON_15N) = conv_sed_ocn_N(io_NO3,is_PON)
-       conv_sed_ocn_N(io_NH4_15N,is_PON_15N) = conv_sed_ocn_N(io_NH4,is_PON)
-       conv_sed_ocn_N(io_N2_15N,is_PON_15N)  = conv_sed_ocn_N(io_N2,is_PON)
+       if (sed_select(is_PON_15N)) then
+          conv_sed_ocn_N(io_NO3_15N,is_PON_15N) = conv_sed_ocn_N(io_NO3,is_PON)
+          conv_sed_ocn_N(io_NH4_15N,is_PON_15N) = conv_sed_ocn_N(io_NH4,is_PON)
+          conv_sed_ocn_N(io_N2_15N,is_PON_15N)  = conv_sed_ocn_N(io_N2,is_PON)
+       end if
        ! P,C
        if (ocn_select(io_NO2)) then
           ! O2 == 2NO3- - 2NO2-
@@ -1240,28 +1256,33 @@ CONTAINS
        conv_sed_ocn_N(:,:) = 0.0
     end if
     ! -------------------------------------------------------- ! Modify for FeOOH-reducing(!) conditions
+    ! NOTE: Fe3 (io_Fe) is associated with 1/4 O2 (comapred to Fe2 (io_Fe2))
+    ! NOTE: io_FeOOH assumes both io_Fe2 and io_Fe (Fe3)
     if (ocn_select(io_FeOOH)) then
        conv_sed_ocn_Fe(:,:) = conv_sed_ocn(:,:)
        ! N
        if (ocn_select(io_NH4)) then
           ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
-          conv_sed_ocn_Fe(io_NO3,is_PON) = 0.0
-          conv_sed_ocn_Fe(io_NH4,is_PON) = 1.0
-          conv_sed_ocn_Fe(io_ALK,is_PON) = conv_sed_ocn_Fe(io_NH4,is_PON)
-          conv_sed_ocn_Fe(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_Fe(io_NH4,is_PON)
+          conv_sed_ocn_Fe(io_NO3,is_PON)   = 0.0
+          conv_sed_ocn_Fe(io_NH4,is_PON)   = 1.0
+          conv_sed_ocn_Fe(io_ALK,is_PON)   = conv_sed_ocn_Fe(io_NH4,is_PON)
+          conv_sed_ocn_Fe(io_FeOOH,is_PON) = (4.0/1.0)*(3.0/4.0)*conv_sed_ocn_Fe(io_NH4,is_PON)
+          conv_sed_ocn_Fe(io_O2,is_PON)    = 0.0
        else
           ! [DEFAULT, oxic remin relationship]
        endif
        ! N isotopes
-       conv_sed_ocn_Fe(io_NO3_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NO3,is_PON)
-       conv_sed_ocn_Fe(io_NH4_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NH4,is_PON)
-       conv_sed_ocn_Fe(io_N2_15N,is_PON_15N)  = conv_sed_ocn_Fe(io_N2,is_PON)
+       if (sed_select(is_PON_15N)) then
+          conv_sed_ocn_Fe(io_NO3_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NO3,is_PON)
+          conv_sed_ocn_Fe(io_NH4_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NH4,is_PON)
+          conv_sed_ocn_Fe(io_N2_15N,is_PON_15N)  = conv_sed_ocn_Fe(io_N2,is_PON)
+       end if
        ! P,C
-       conv_sed_ocn_Fe(io_FeOOH,is_POP) = (1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POP)
-       conv_sed_ocn_Fe(io_Fe,is_POP)    = -(1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POP)
+       conv_sed_ocn_Fe(io_FeOOH,is_POP) = (4.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POP)
+       conv_sed_ocn_Fe(io_Fe2,is_POP)   = -conv_sed_ocn_Fe(io_FeOOH,is_POP)
        conv_sed_ocn_Fe(io_O2,is_POP)    = 0.0
-       conv_sed_ocn_Fe(io_FeOOH,is_POC) = (1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POC)
-       conv_sed_ocn_Fe(io_Fe,is_POC)    = -(1.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POC)
+       conv_sed_ocn_Fe(io_FeOOH,is_POC) = (4.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POC)
+       conv_sed_ocn_Fe(io_Fe2,is_POC)   = -conv_sed_ocn_Fe(io_FeOOH,is_POC)
        conv_sed_ocn_Fe(io_O2,is_POC)    = 0.0
        ! Fe isotopes
        conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POP) = conv_sed_ocn_Fe(io_FeOOH,is_POP)
@@ -1285,15 +1306,17 @@ CONTAINS
           ! [DEFAULT, oxic remin relationship]
        endif
        ! N isotopes
-       conv_sed_ocn_S(io_NO3_15N,is_PON_15N) = conv_sed_ocn_S(io_NO3,is_PON)
-       conv_sed_ocn_S(io_NH4_15N,is_PON_15N) = conv_sed_ocn_S(io_NH4,is_PON)
-       conv_sed_ocn_S(io_N2_15N,is_PON_15N)  = conv_sed_ocn_S(io_N2,is_PON)
+       if (sed_select(is_PON_15N)) then
+          conv_sed_ocn_S(io_NO3_15N,is_PON_15N) = conv_sed_ocn_S(io_NO3,is_PON)
+          conv_sed_ocn_S(io_NH4_15N,is_PON_15N) = conv_sed_ocn_S(io_NH4,is_PON)
+          conv_sed_ocn_S(io_N2_15N,is_PON_15N)  = conv_sed_ocn_S(io_N2,is_PON)
+       end if
        ! P,C
        conv_sed_ocn_S(io_SO4,is_POP) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POP)
-       conv_sed_ocn_S(io_H2S,is_POP) = -(1.0/2.0)*conv_sed_ocn_S(io_O2,is_POP)
+       conv_sed_ocn_S(io_H2S,is_POP) = -conv_sed_ocn_S(io_SO4,is_POP)
        conv_sed_ocn_S(io_O2,is_POP)  = 0.0
        conv_sed_ocn_S(io_SO4,is_POC) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
-       conv_sed_ocn_S(io_H2S,is_POC) = -(1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
+       conv_sed_ocn_S(io_H2S,is_POC) = -conv_sed_ocn_S(io_SO4,is_POC)
        conv_sed_ocn_S(io_O2,is_POC)  = 0.0
        ! S isotopes
        conv_sed_ocn_S(io_SO4_34S,is_POP) = conv_sed_ocn_S(io_SO4,is_POP)
@@ -1339,9 +1362,11 @@ CONTAINS
           ! [DEFAULT, oxic remin relationship]
        endif
        ! N isotopes
-       conv_sed_ocn_meth(io_NO3_15N,is_PON_15N) = conv_sed_ocn_meth(io_NO3,is_PON)
-       conv_sed_ocn_meth(io_NH4_15N,is_PON_15N) = conv_sed_ocn_meth(io_NH4,is_PON)
-       conv_sed_ocn_meth(io_N2_15N,is_PON_15N)  = conv_sed_ocn_meth(io_N2,is_PON)
+       if (sed_select(is_PON_15N)) then
+          conv_sed_ocn_meth(io_NO3_15N,is_PON_15N) = conv_sed_ocn_meth(io_NO3,is_PON)
+          conv_sed_ocn_meth(io_NH4_15N,is_PON_15N) = conv_sed_ocn_meth(io_NH4,is_PON)
+          conv_sed_ocn_meth(io_N2_15N,is_PON_15N)  = conv_sed_ocn_meth(io_N2,is_PON)
+       end if
        ! P,C
        conv_sed_ocn_meth(io_O2,is_POP)  = 0.0
        conv_sed_ocn_meth(io_CH4,is_POC) = -(1.0/2.0)*par_bio_red_POP_PO2/par_bio_red_POP_POC
@@ -1483,7 +1508,7 @@ CONTAINS
     int_diag_airsea_sig(:)  = 0.0
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
-    int_diag_redox_sig(:)   = 0
+    int_diag_redox_sig(:)   = 0.0
     int_diag_ecogem_part    = 0.0 
     int_diag_ecogem_remin   = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)

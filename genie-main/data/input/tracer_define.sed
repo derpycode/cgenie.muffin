@@ -69,8 +69,8 @@
  FeOOH            95  95  06  'Fe (hydr)oxides'                      'wt%'     0.00     100.00
  FeOOH_56Fe       96  95  22  'd56Fe of FeOOH'                       'o/oo'   -9.99E+2    9.99E+2
  det              22  22  02  'detrital (refractory) material'       'wt%'     0.00     100.00
- detLi            55  55  06  'detrital Li'                          'wt%'     0.00     100.00
- detLi_7Li        56  55  18  'detrital 7Li'                         'o/oo'   -9.99E+2    9.99E+2
+ detLi            55  55  06  'CAN BE REASSIGNED'                    'wt%'     0.00     100.00
+ detLi_7Li        56  55  18  'CAN BE REASSIGNED'                    'o/oo'   -9.99E+2    9.99E+2
  det_231Pa        23  22  07  'detrital scavenged 231Pa'             'wt%'     0.00     100.00
  det_230Th        24  22  07  'detrital scavenged 230Th'             'wt%'     0.00     100.00
  det_Fe           25  22  07  'detrital scavenged Fe'                'wt%'     0.00     100.00
@@ -137,7 +137,7 @@ INFO: TRACER ASSIGNMENT RULES
     '3' -> assigned to elemental components associated with POC; P, N, Cd, Fe
     '4' -> assigned to elemental components associated with CaCO3; Cd
     '5' -> assigned to elemental components associated with opal; Ge
-    '5' -> assigned to elemental components associated with det; Li
+    '6' -> assigned to elemental components associated with det; Li
     '7' -> assigned to particle-reactive scavenged elements; 231Pa, 230Th, Fe
     '8' -> assigned to carbonate 'age'
     '9' -> assigned to the fractional partitioning of biogenic material (for remineralization purposes)

@@ -474,7 +474,7 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! CALCULATE ABIOTIC PYRITE PRECIPITATION
+  ! CALCULATE ABIOTIC FeOOH PRECIPITATION
   SUBROUTINE sub_calc_precip_FeOOH(dum_i,dum_j,dum_k1,dum_dt)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
@@ -515,8 +515,8 @@ CONTAINS
        loc_Fe = ocn(io_Fe,dum_i,dum_j,k)
        ! calculate FeOOH precipitation
        if (ctrl_bio_FeOOHprecip_explicit) then
-          if (loc_Fe > const_rns) then
-             loc_bio_part(is_FeOOH,k) = loc_Fe - 1.0E-09
+          if (loc_Fe > par_FeOOH_Fethresh) then
+             loc_bio_part(is_FeOOH,k) = loc_Fe - par_FeOOH_Fethresh
              loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
           else   
              loc_bio_part(is_FeOOH,k) = 0.0  
@@ -527,11 +527,6 @@ CONTAINS
           loc_r56Fe = 0.0
        end if
        ! calculate isotopic ratio
-       !if (loc_Fe > 5.0e-11) then
-          
-       !else
-       !   
-       !end if
        loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
        ! Potential Fe fractionation
        loc_bio_part(is_FeOOH_56Fe,k) = &
@@ -612,8 +607,8 @@ CONTAINS
           ! cap at maximum of available Fe, H2S
           loc_Fe_reduction  = min(loc_Fe_reduction,loc_Fe,(8.0/1.0)*loc_H2S)
           loc_H2S_oxidation = (1.0/8.0)*loc_Fe_reduction
-          ! calculate isotopic ratios
-          ! NOTE: check for the isotope fraction being zero or less (to try and avoid spurious isotopic values appearing)
+          ! calculate isotopic ratios 
+          ! and check for the isotope fraction being zero or less (to try and avoid spurious isotopic values appearing)
           if (ocn_select(io_Fe2_56Fe)) then
              loc_r56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,k)/loc_Fe
              if (loc_r56Fe<const_rns) then
@@ -628,54 +623,34 @@ CONTAINS
                 loc_H2S_oxidation = 0.0
              end if
           end if
-          !
-          if (abs(loc_Fe_reduction-loc_Fe)<const_rns) then
+          ! bulk tracer conversion
+          loc_bio_remin(io_Fe,k)  = -loc_Fe_reduction
+          loc_bio_remin(io_Fe2,k) = loc_Fe_reduction
+          loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
+          loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
+          loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation
+          ! isotopic fractionation (depending on the existence of partial conversion of either species)
+          ! NOTE: assume that the (4th) case of exactly complete Fe3 and H2S reaction is impossible
+          ! Fe
+          if (abs(loc_Fe_reduction-loc_Fe) < const_rns) then
              ! complete Fe reduction (no Fe fractionation) & assuming excess H2S
-             ! => partial H2S oxidation (& S fractionation)
-             loc_Fe_reduction = loc_Fe
-             loc_bio_remin(io_Fe,k)  = -loc_Fe_reduction
-             loc_bio_remin(io_Fe2,k) = loc_Fe_reduction
-             loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
-             loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
-             loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation
-             ! (isotopes)
              loc_bio_remin(io_Fe_56Fe,k)  = -loc_r56Fe*loc_Fe_reduction
              loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_Fe_reduction
-             loc_R_34S = loc_r34S/(1.0 - loc_r34S)
-             loc_bio_remin(io_H2S_34S,k)  = &
-                  & -par_d34S_Fered_alpha*loc_R_34S/(1.0 + par_d34S_Fered_alpha*loc_R_34S)*loc_H2S_oxidation
-             loc_bio_remin(io_SO4_34S,k)  = &
-                  & par_d34S_Fered_alpha*loc_R_34S/(1.0 + par_d34S_Fered_alpha*loc_R_34S)*loc_H2S_oxidation
-          elseif (abs(loc_Fe_reduction-(8.0/1.0)*loc_H2S)<const_rns) then
-             ! complete H2S oxidation (no S fractionation) & assuming excess Fe3
-             ! => partial Fe3 reductuion (& Fe fractionation)
-             loc_Fe_reduction = loc_H2S
-             loc_bio_remin(io_Fe,k)  = -loc_H2S_oxidation
-             loc_bio_remin(io_Fe2,k) = loc_H2S_oxidation
-             loc_bio_remin(io_H2S,k) = -loc_Fe_reduction
-             loc_bio_remin(io_SO4,k) = loc_Fe_reduction
-             loc_bio_remin(io_ALK,k) = -2.0*loc_Fe_reduction
-             ! (isotopes)
+          else
+             ! partial Fe3 reductuion (& Fe fractionation)
              loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
              loc_bio_remin(io_Fe_56Fe,k)  = &
                   & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
              loc_bio_remin(io_Fe2_56Fe,k) = &
                   & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
+          end if
+          ! S
+          if (abs(loc_H2S_oxidation-loc_H2S) < const_rns) then
+             ! complete H2S oxidation (no S fractionation) & assuming excess Fe3
              loc_bio_remin(io_H2S_34S,k)  = -loc_r34S*loc_H2S_oxidation
              loc_bio_remin(io_SO4_34S,k)  = loc_r34S*loc_H2S_oxidation
           else
-             ! partial Fe reduction AND partial S oxidation (=> both Fe and S isotope Rayleigh fractionation)
-             loc_bio_remin(io_Fe,k)  = -loc_Fe_reduction
-             loc_bio_remin(io_Fe2,k) = loc_Fe_reduction
-             loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
-             loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
-             loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation
-             ! (isotopes)
-             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
-             loc_bio_remin(io_Fe_56Fe,k)  = &
-                  & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
-             loc_bio_remin(io_Fe2_56Fe,k) = &
-                  & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
+             ! partial H2S oxidation (& S fractionation)
              loc_R_34S = loc_r34S/(1.0 - loc_r34S) 
              loc_bio_remin(io_H2S_34S,k) = &
                   & -par_d34S_Fered_alpha*loc_R_34S/(1.0 + par_d34S_Fered_alpha*loc_R_34S)*loc_H2S_oxidation
@@ -752,7 +727,6 @@ CONTAINS
        loc_FeS = ocn(io_FeS,dum_i,dum_j,k)
        ! either Fe2 and H2S, or FeS have to be present
        if (((loc_Fe2 > 1.0e-11) .AND. (loc_H2S > 1.0e-11)) .OR. (loc_FeS > 1.0e-11)) then
-
           ! Avoid calculating with negative concentrations
           if (loc_FeS < const_rns) then
              loc_FeS = 0.0
@@ -763,7 +737,6 @@ CONTAINS
           if (loc_H2S < const_rns) then 
              loc_H2S = 0.0
           end if
-
           ! calculate solution for equilibrium:
           ! Fe2_eq*H2S_eq/FeS_eq = K
           ! Fe2_eq = Fe2_in - x; H2S_eq = H2S_in - x; FeS_eq = FeS_in + x
@@ -783,21 +756,17 @@ CONTAINS
           else
              loc_FeS_formation = 0.0
           end if
-
           loc_bio_remin(io_FeS,k) = loc_FeS_formation
           loc_bio_remin(io_Fe2,k) = -loc_FeS_formation
           loc_bio_remin(io_H2S,k) = -loc_FeS_formation
           ! deal with Fe and S isotopes? -> no fractionation of S during pyrite formation
           ! calculate isotopic ratio
-
           loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
           loc_bio_remin(io_FeS_56Fe,k) = loc_r56Fe*loc_bio_remin(io_FeS,k)
           loc_bio_remin(io_Fe2_56Fe,k) = -loc_r56Fe*loc_bio_remin(io_FeS,k)
-
           loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
           loc_bio_remin(io_FeS_34S,k) = loc_r34S*loc_bio_remin(io_FeS,k)
           loc_bio_remin(io_H2S_34S,k) = -loc_r34S*loc_bio_remin(io_FeS,k)   
-
        end if
        ! -------------------------------------------------------- !
        ! WRITE GLOBAL ARRAY DATA
@@ -878,7 +847,7 @@ CONTAINS
        ! NOTE: const_rns == const_real_nullsmall
        if ( (loc_FeS > const_rns) .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
           ! loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_FeS*loc_H2S
-          loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(K_lim_PYR + loc_FeS))*loc_FeS*loc_H2S
+          loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(par_k_lim_pyr + loc_FeS))*loc_FeS*loc_H2S
           ! calculate isotopic ratio
           if (loc_Fe2 > const_rns) then
              loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
@@ -1090,7 +1059,6 @@ CONTAINS
           end do
        end DO
     end DO
-
     ! -------------------------------------------------------- !
     ! SET GLOBAL ARRAYS
     ! -------------------------------------------------------- !
@@ -1099,7 +1067,6 @@ CONTAINS
        io = conv_iselected_io(l)
        bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
     end do
-
     ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
     DO l=3,n_l_sed
        is = conv_iselected_is(l)

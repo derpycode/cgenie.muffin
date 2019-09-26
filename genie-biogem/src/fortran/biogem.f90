@@ -89,7 +89,10 @@ subroutine biogem(        &
      bio_remin(io,:,:,:) = 0.0
   end do
   ! redox remin diag
-  if (ctrl_bio_remin_redox_save) diag_redox(:,:,:,:) = 0.0
+  if (ctrl_bio_remin_redox_save) then
+     diag_redox(:,:,:,:)  = 0.0
+     diag_precip(:,:,:,:) = 0.0
+  end if
 
   ! *** INITIALIZE LOCAL ARRAYS ***
   ! NOTE: only bother initializing for selected tracers
@@ -407,6 +410,8 @@ subroutine biogem(        &
                  else
                     ! set dissolution flux equal to rain flux
                     ! NOTE: force return of S from POM-S in a closed system, despite it being a 'scavenged' type
+                    ! NOTE: par_sed_type_det should not be treated like det re. remin(?)
+                    !       (for now, allow is to be reflected back from the sediment-water interface)
                     DO l=1,n_l_ocn
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
@@ -424,9 +429,10 @@ subroutine biogem(        &
                                    loc_remin = par_scav_fremin*loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                                 end if
                              else if ( &
-                                  & (sed_dep(l2is(ls)) == is_det) .OR. &
-                                  & (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
-                                  & (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
+                                  & (sed_dep(l2is(ls)) == is_det) &
+                                  !& (sed_dep(l2is(ls)) == is_det) .OR. &
+                                  !& (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
+                                  !& (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
                                   & ) then
                                 loc_remin = 0.0
                              else
@@ -2867,12 +2873,12 @@ SUBROUTINE diag_biogem_timeslice( &
            int_psi_timeslice(:,:)   = int_psi_timeslice(:,:)   + loc_dtyr*diag_misc_psi(:,:)
            int_u_timeslice(:,:,:,:) = int_u_timeslice(:,:,:,:) + loc_dtyr*phys_ocn(ipo_gu:ipo_gw,:,:,:)
            ! update time-slice data - diagnostics
-           int_diag_bio_timeslice(:,:,:)           = int_diag_bio_timeslice(:,:,:)       + diag_bio(:,:,:)
+           int_diag_bio_timeslice(:,:,:)           = int_diag_bio_timeslice(:,:,:)           + diag_bio(:,:,:)
            int_diag_geochem_old_timeslice(:,:,:,:) = int_diag_geochem_old_timeslice(:,:,:,:) + diag_geochem_old(:,:,:,:)
-           int_diag_precip_timeslice(:,:,:,:)      = int_diag_precip_timeslice(:,:,:,:) + diag_precip(:,:,:,:)
-           int_diag_react_timeslice(:,:,:,:)       = int_diag_react_timeslice(:,:,:,:) + diag_react(:,:,:,:)
-           int_diag_redox_timeslice(:,:,:,:)       = int_diag_redox_timeslice(:,:,:,:)   + diag_redox(:,:,:,:)
-           int_diag_iron_timeslice(:,:,:,:)        = int_diag_iron_timeslice(:,:,:,:)      + loc_dtyr*diag_iron(:,:,:,:)
+           int_diag_precip_timeslice(:,:,:,:)      = int_diag_precip_timeslice(:,:,:,:)      + diag_precip(:,:,:,:)
+           int_diag_react_timeslice(:,:,:,:)       = int_diag_react_timeslice(:,:,:,:)       + diag_react(:,:,:,:)
+           int_diag_redox_timeslice(:,:,:,:)       = int_diag_redox_timeslice(:,:,:,:)       + diag_redox(:,:,:,:)
+           int_diag_iron_timeslice(:,:,:,:)        = int_diag_iron_timeslice(:,:,:,:)        + loc_dtyr*diag_iron(:,:,:,:)
            ! gemlite
            if (dum_gemlite) then
               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + loc_dtyr*dum_sfxsumrok1(:,:,:)

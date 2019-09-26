@@ -4553,7 +4553,7 @@
                         <description>Remin rate -- denitrification (yr-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_k_FeOOH">
-                        <value datatype="real">0.1</value>
+                        <value datatype="real">1.0</value>
                         <description>Remin rate -- FeOOH reduction (yr-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_k_SO4">
@@ -4573,8 +4573,8 @@
                         <description>Half-saturation for denitrification (mol kg-1) [Boudreau, 1996]</description>
                     </param>
                     <param name="par_bio_remin_c0_FeOOH">
-                        <value datatype="real">1.0e-6</value>
-                        <description>Half-saturation for FeOOH reduction (mol kg-1) [IDEALIZED DEFAULT]</description>
+                        <value datatype="real">10.0e-6</value>
+                        <description>Half-saturation for FeOOH reduction (mol kg-1) [RANDOM DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_c0_SO4">
                         <value datatype="real">500.0E-6</value>
@@ -4589,8 +4589,8 @@
                         <description>Nitrate inhibition constant (mol kg-1) [Boudreau, 1996]</description>
                     </param>
                     <param name="par_bio_remin_ci_FeOOH">
-                        <value datatype="real">1.0e-6</value>
-                        <description>FeOOH reduction inhibition constant (mol kg-1) [IDEALIZED DEFAULT]</description>
+                        <value datatype="real">10.0e-6</value>
+                        <description>FeOOH reduction inhibition constant (mol kg-1) [RANDOM DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_ci_SO4">
                         <value datatype="real">1.0E-3</value>
@@ -5012,6 +5012,10 @@
 			<value datatype="boolean">.true.</value>
                         <description>precipitate FeOOH explicit?</description>
                     </param>
+                    <param name="par_FeOOH_Fethresh">
+			<value datatype="real">1.0E-9</value>
+                        <description>dissovled Fe threshold for FeOOH precipitation</description>
+                    </param>
                     <param name="par_bio_remin_kFetoFe2">
 			<value datatype="real">7.0e+07</value>
                         <description>kinetic constant for Fe reduction using sulphide in M-1 yr-1</description>
@@ -5060,9 +5064,9 @@
 			<value datatype="real">3250.43</value>
                         <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
                     </param>
-                    <param name="K_lim_PYR">
+                    <param name="par_k_lim_pyr">
 			<value datatype="real">0.0</value>
-                        <description>MM type limiting factor for FeS2 precipitation</description>
+                        <description>MM type limiting factor for FeS2 precipitation [was: K_lim_PYR]</description>
                     </param>
                     <param name="par_d56Fe_FeS2_alpha">
 			<value datatype="real">1.0022</value>

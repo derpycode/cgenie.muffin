@@ -2277,7 +2277,7 @@ CONTAINS
           loc_kFeOOH = loc_FeOOH/(loc_FeOOH + par_bio_remin_c0_FeOOH)
           loc_kiFeOOH = par_bio_remin_ci_FeOOH/(par_bio_remin_ci_FeOOH + loc_FeOOH)
        end if
-       loc_k     = loc_k + par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2
     else
        loc_FeOOH   = 0.0
        loc_kFeOOH  = 0.0
@@ -2293,7 +2293,7 @@ CONTAINS
           loc_kSO4  = loc_SO4/(loc_SO4 + par_bio_remin_c0_SO4)
           loc_kiSO4 = par_bio_remin_ci_SO4/(par_bio_remin_ci_SO4 + loc_SO4)
        end if
-       loc_k     = loc_k + par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
     else
        loc_SO4   = 0.0
        loc_kSO4  = 0.0
@@ -2301,7 +2301,7 @@ CONTAINS
     end if
     if (ocn_select(io_CH4)) then
        loc_kmeth = 1.0
-       loc_k     = loc_k + par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
     else
        loc_kmeth = 0.0
     end if
@@ -2694,6 +2694,7 @@ CONTAINS
     real,dimension(1:n_l_ocn,1:n_k)::loc_bio_remin
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_settle
     real,dimension(1:n_l_sed)::loc_bio_part_remin
+    real,DIMENSION(n_diag_precip,n_k)::loc_diag_precip
 
     CHARACTER(len=31)::loc_string     ! 
 
@@ -2756,7 +2757,10 @@ CONTAINS
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
-    if (ctrl_bio_remin_redox_save) loc_diag_redox(:,:) = 0.0
+    if (ctrl_bio_remin_redox_save) then
+       loc_diag_redox(:,:)  = 0.0
+       loc_diag_precip(:,:) = 0.0
+    end if
     
     loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
 
@@ -2899,7 +2903,7 @@ CONTAINS
                               & loc_bio_part_TMP(is2l(is_POC),k)  &
                               & )
                          if (sed_select(is_POM_FeOOH)) then
-                            loc_bio_remin(io2l(io_Fe),k)        = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
+                            loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_FeOOH),k) = loc_bio_part_TMP(is2l(is_POM_FeOOH),k) + loc_scav_Fe
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - loc_r56Fe*loc_scav_Fe
@@ -2909,6 +2913,9 @@ CONTAINS
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
                             loc_bio_part_TMP(is2l(is_det),k) = loc_bio_part_TMP(is2l(is_det),k) + &
                                  & loc_bio_part_TMP(is2l(is_POM_FeOOH),k)
+                            ! ----------------------------------- ! record geochem diagnostics (mol kg-1)
+                            loc_diag_precip(idiag_precip_FeOOH_dFe,k) = &
+                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,k) - loc_scav_Fe
                          else
                             loc_bio_part_TMP(is2l(is_POM_Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe),k) + loc_scav_Fe
                             loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
@@ -3199,7 +3206,7 @@ CONTAINS
                       else
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*loc_bio_part_opal_ratio
-                      endif
+                      end if
                    ! -------------------------------------- ! SPECIAL CASES EXAMPLE
                                                             ! (comes before generic detrital tracer handling)
                    ! ### INSERT CODE ############################################################################################# !
@@ -3223,6 +3230,7 @@ CONTAINS
                    end if
                    ! ----------------------------------------- ! exceptions
                    ! (1) do not remineralize S in S-linked POM (assumed a refractory fraction)
+                   !     i.e. just re-apply a layer ratio concentration change
                    if (is == is_POM_S) loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)*loc_bio_remin_layerratio
 
                 end do
@@ -3389,7 +3397,7 @@ CONTAINS
                               & loc_FeFeLL(1),          &
                               & loc_bio_part_TMP(is2l(is_POC),kk)  &
                               & )
-                         loc_bio_remin(io2l(io_Fe),kk)        = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe 
+                         loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe 
                          loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
                       end if
                    CASE ('FeFe2TL')
@@ -3402,7 +3410,7 @@ CONTAINS
                               & loc_bio_part_TMP(is2l(is_POC),kk)  &
                               & )
                          if (sed_select(is_POM_FeOOH)) then
-                            loc_bio_remin(io2l(io_Fe),kk)        = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
+                            loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_scav_Fe
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
@@ -3412,8 +3420,11 @@ CONTAINS
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
                             loc_bio_part_TMP(is2l(is_det),kk) = loc_bio_part_TMP(is2l(is_det),kk) + &
                                  & loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
+                            ! ----------------------------------- ! record geochem diagnostics (mol kg-1)
+                            loc_diag_precip(idiag_precip_FeOOH_dFe,kk) = &
+                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,kk) - loc_scav_Fe
                          else
-                            loc_bio_remin(io2l(io_Fe),kk)        = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
+                            loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
                             If (ocn_select(io_Fe_56Fe)) then
                                loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - &
@@ -3432,7 +3443,7 @@ CONTAINS
                               & loc_FeFeLL(1),          &
                               & loc_bio_part_TMP(is2l(is_POC),kk)  &
                               & )
-                         loc_bio_remin(io2l(io_TDFe),kk)      = loc_bio_remin(io2l(io_TDFe),kk) - loc_scav_Fe
+                         loc_bio_remin(io2l(io_TDFe),kk) = loc_bio_remin(io2l(io_TDFe),kk) - loc_scav_Fe
                          loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
                          If (ocn_select(io_TDFe_56Fe)) then
                             loc_bio_remin(io2l(io_TDFe_56Fe),kk) = loc_bio_remin(io2l(io_TDFe_56Fe),kk) - &
@@ -3558,7 +3569,10 @@ CONTAINS
     ! write ocean tracer remineralization field (global array)
     dum_vbio_remin%mk(:,:) = dum_vbio_remin%mk(:,:) + loc_bio_remin(:,:)
     ! remin diagnostics
-    if (ctrl_bio_remin_redox_save) diag_redox(:,dum_i,dum_j,:) = diag_redox(:,dum_i,dum_j,:) + loc_diag_redox(:,:)
+    if (ctrl_bio_remin_redox_save) then 
+       diag_redox(:,dum_i,dum_j,:)  = diag_redox(:,dum_i,dum_j,:)  + loc_diag_redox(:,:)
+       diag_precip(:,dum_i,dum_j,:) = diag_precip(:,dum_i,dum_j,:) + loc_diag_precip(:,:)
+    end if
 
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
@@ -4753,6 +4767,7 @@ CONTAINS
     !       => do not attempt to implicitly oxidize reduced forms and calculate the resulting O2 deficit
     ! NOTE: for ALK -- count the charges (+vs and -ve)
     !       (excluding PO4)
+    ! NOTE: Fe3 has 1/4 O2 vs. Fe2
     if (ocn_select(io_CH4)) then
        fun_audit_combinetracer(io_DIC) = fun_audit_combinetracer(io_DIC) + dum_ocn(io_CH4)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - 2.0*dum_ocn(io_CH4)
@@ -4762,40 +4777,45 @@ CONTAINS
        fun_audit_combinetracer(io_DIC_13C) = fun_audit_combinetracer(io_DIC_13C) + dum_ocn(io_CH4_13C)
     end if
     fun_audit_combinetracer(io_CH4_13C) = 0.0
-    if (ocn_select(io_PO4)) then
-       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 2.0*dum_ocn(io_PO4)
-    end if
+    !if (ocn_select(io_PO4)) then
+    !   fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 2.0*dum_ocn(io_PO4)
+    !end if
     if (ocn_select(io_NO3)) then
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) + dum_ocn(io_NO3)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + (5.0/4.0)*dum_ocn(io_NO3)
     end if
+    ! io_N2O
     if (ocn_select(io_N2O)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + 2.0*dum_ocn(io_N2O)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 0.5*dum_ocn(io_N2O)
     end if
     fun_audit_combinetracer(io_N2O) = 0.0
+    ! io_N2
     if (ocn_select(io_N2)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + 2.0*dum_ocn(io_N2)
     end if
     fun_audit_combinetracer(io_N2)  = 0.0
+    ! io_NH4
     if (ocn_select(io_NH4)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + dum_ocn(io_NH4)
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) - dum_ocn(io_NH4)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - (3.0/4.0)*dum_ocn(io_NH4)
     end if
     fun_audit_combinetracer(io_NH4) = 0.0
-    if (ocn_select(io_SO4)) then
-       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 2.0*dum_ocn(io_SO4)
-    end if
+    ! io_H2S
     if (ocn_select(io_H2S)) then
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) - 2.0*dum_ocn(io_H2S)
        fun_audit_combinetracer(io_SO4) = fun_audit_combinetracer(io_SO4) + dum_ocn(io_H2S)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - 2.0*dum_ocn(io_H2S)
     end if
     fun_audit_combinetracer(io_H2S) = 0.0
+    ! io_Fe2
     if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe)) then
        fun_audit_combinetracer(io_Fe)  = fun_audit_combinetracer(io_Fe)  + dum_ocn(io_Fe2)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - (1.0/4.0)*dum_ocn(io_Fe2)
     end if
     fun_audit_combinetracer(io_Fe2) = 0.0
+    ! io_FeL
     if (ocn_select(io_Fe) .AND. ocn_select(io_FeL)) then
        fun_audit_combinetracer(io_Fe)  = fun_audit_combinetracer(io_Fe)  + dum_ocn(io_FeL)
     end if
@@ -4803,20 +4823,23 @@ CONTAINS
        fun_audit_combinetracer(io_L)   = fun_audit_combinetracer(io_L)   + dum_ocn(io_FeL)
     end if
     fun_audit_combinetracer(io_FeL) = 0.0
+    ! io_I
     if (ocn_select(io_I)) then
        fun_audit_combinetracer(io_IO3) = fun_audit_combinetracer(io_IO3) + dum_ocn(io_I)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2) - (3.0/2.0)*dum_ocn(io_I)
     end if
     fun_audit_combinetracer(io_I) = 0.0
+    ! io_H2S_34S
     if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
        fun_audit_combinetracer(io_SO4_34S) = fun_audit_combinetracer(io_SO4_34S) + dum_ocn(io_H2S_34S)
        fun_audit_combinetracer(io_H2S_34S) = 0.0
     end if
-    ! ISOTOPES
+    ! io_Fe2_56Fe
     if (ocn_select(io_Fe2_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
        fun_audit_combinetracer(io_Fe_56Fe)  = fun_audit_combinetracer(io_Fe_56Fe)  + dum_ocn(io_Fe2_56Fe)
     end if
     fun_audit_combinetracer(io_Fe2_56Fe) = 0.0
+    ! io_FeL_56Fe
     if (ocn_select(io_Fe_56Fe) .AND. ocn_select(io_FeL_56Fe)) then
        fun_audit_combinetracer(io_Fe_56Fe)  = fun_audit_combinetracer(io_Fe_56Fe)  + dum_ocn(io_FeL_56Fe)
     end if
