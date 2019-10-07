@@ -3621,7 +3621,7 @@ CONTAINS
     ! -------------------------------------------------------- ! extract density of FeOOH
     loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
     ! -------------------------------------------------------- ! calculate reaction rate
-    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*loc_H2S
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1/2))
     loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
@@ -3698,7 +3698,7 @@ CONTAINS
     ! -------------------------------------------------------- ! extract density of FeOOH
     loc_part_den_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
     ! -------------------------------------------------------- ! calculate reaction rate
-    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*loc_H2S
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1/2))
     loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_POM_FeOOH)) = dum_bio_part(is2l(is_POM_FeOOH)) - loc_dFeOOH
