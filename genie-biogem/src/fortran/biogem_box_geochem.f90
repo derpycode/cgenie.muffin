@@ -603,7 +603,7 @@ CONTAINS
        if ( (loc_H2S>const_rns) .AND. (loc_Fe>const_rns) ) then
           ! calculate H2S oxidation, and cap value at H2S or Fe3 concentration if necessary
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
-          loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S
+          loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S**(1/2)
           ! cap at maximum of available Fe, H2S
           loc_Fe_reduction  = min(loc_Fe_reduction,loc_Fe,(8.0/1.0)*loc_H2S)
           loc_H2S_oxidation = (1.0/8.0)*loc_Fe_reduction
@@ -933,8 +933,8 @@ CONTAINS
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
     real,dimension(1:3)::loc_Fe2spec
-    real::loc_ohm
-    real::loc_delta_FeCO3,loc_CO3,loc_Fe2,loc_Fe,loc_H2S,loc_O2,loc_FeCO3_precipitation
+    real::loc_IAP
+    real::loc_delta_FeCO3,loc_CO3,loc_Fe2,loc_OH,loc_H2S,loc_FeCO3_precipitation
     real::loc_alpha
     real::loc_R, loc_r56Fe,loc_R_56Fe
     integer::loc_kmax
@@ -989,9 +989,11 @@ CONTAINS
             & carbalk(:,dum_i,dum_j,k)    &
             & )
 
-       loc_CO3    = carb(ic_conc_CO3,dum_i,dum_j,n_k)
+       loc_CO3 = carb(ic_conc_CO3,dum_i,dum_j,n_k)
+       loc_OH  = 10**(-(14-carb(ic_pHsws,dum_i,dum_j,n_k)))
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
+       
 
        loc_r56Fe  = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
        loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)       
@@ -1012,11 +1014,11 @@ CONTAINS
 
        if ((loc_Fe2 > const_rns) .AND. (loc_CO3 > const_rns)) then
 
-          loc_ohm  = (loc_CO3*loc_Fe2)/par_bio_FeCO3precip_abioticohm_cte
+          loc_IAP  = (loc_CO3*loc_Fe2*(loc_OH**(1/2)))
 
-          if (loc_ohm > par_bio_FeCO3precip_abioticohm_min) then
+          if (loc_IAP > const_rns) then
              loc_FeCO3_precipitation = &
-                  & dum_dt*par_bio_FeCO3precip_sf*(loc_ohm - 1.0)**par_bio_FeCO3precip_exp
+                  & dum_dt*par_bio_FeCO3precip_sf*exp(par_bio_FeCO3precip_exp*LOG10(loc_IAP))
 
           else
              loc_FeCO3_precipitation      = 0.0 
