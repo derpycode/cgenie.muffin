@@ -4989,11 +4989,11 @@
                         <description>Minimum ohmega threshold for precip</description>
                     </param>
                     <param name="par_bio_FeCO3precip_sf">
-			<value datatype="real">1.0</value>
-                        <description>Scale factor for FeCO3 precipitation</description>
+			<value datatype="real">1.72e-10</value>
+                        <description>kinetic factor for FeCO3 precipitation in M yr-1</description>
                     </param>
                     <param name="par_bio_FeCO3precip_exp">
-			<value datatype="real">1.0</value>
+			<value datatype="real">9.042</value>
                         <description>Rate law power for FeCO3 precipitation</description>
                     </param>
                     <param name="par_bio_FeCO3precip_abioticohm_cte">
@@ -5017,12 +5017,12 @@
                         <description>dissovled Fe threshold for FeOOH precipitation</description>
                     </param>
                     <param name="par_bio_remin_kFetoFe2">
-			<value datatype="real">7.0e+07</value>
-                        <description>kinetic constant for Fe reduction using sulphide in M-1 yr-1</description>
+			<value datatype="real">2.3e+06</value>
+                        <description>kinetic constant for Fe reduction using sulphide in M^(-1/2) yr-1</description>
                     </param>
                     <param name="par_bio_remin_kFeOOHtoFe2">
-			<value datatype="real">4032.3</value>
-                        <description>kinetic constant for FeOOH reduction using sulphide in M-1 yr-1</description>
+			<value datatype="real">1.6e+04</value>
+                        <description>kinetic constant for FeOOH reduction using sulphide in M^(-1/2) yr-1</description>
                     </param>
                     <param name="par_d34S_Fered_alpha">
 			<value datatype="real">0.9982</value>
