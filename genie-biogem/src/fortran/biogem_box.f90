@@ -3560,7 +3560,7 @@ CONTAINS
        ! set sinking rate for geochemical reactions to the physical sinking rate
        loc_klim = loc_k1
        loc_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical
-       loc_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_reaction
+       loc_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_physical
     else
        ! assume particulates present only in surface layer
        ! leave sinking rate alone ... but could e.g. set to exactly match the ocean depth in one time-step

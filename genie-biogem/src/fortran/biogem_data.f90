@@ -507,8 +507,8 @@ CONTAINS
     ! adjust units of scavening rate constant (d-1 -> yr-1)
     par_scav_Fe_ks = par_scav_Fe_ks/conv_d_yr
     ! adjust units of prescribed particulates sinking rate (m d-1 -> m yr-1)
-    par_bio_remin_sinkingrate = par_bio_remin_sinkingrate/conv_d_yr
-    par_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate_scav/conv_d_yr
+    par_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical/conv_d_yr
+    par_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_reaction/conv_d_yr
     ! adjust units of CH4 oxidation (d-1 -> yr-1)
     par_bio_remin_CH4rate = par_bio_remin_CH4rate/conv_d_yr
     ! opal dissolution
