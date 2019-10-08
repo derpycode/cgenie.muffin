@@ -692,13 +692,16 @@ CONTAINS
              do j = 1,n_j
                 bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,i,j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
                 if (par_bio_red_PC_flex > 1) then  ! limit C:P for high PO4 (no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
-                   if (bio_part_red(is_POC,is_POP,i,j) > 1.0/55.0) then
-                      bio_part_red(is_POC,is_POP,i,j) = 1.0/55.0
+                   if (bio_part_red(is_POC,is_POP,i,j) > par_bio_red_PC_max) then
+                      bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_max
                    end if
                 end if
                 bio_part_red(is_POP,is_POC,i,j) = 1.0/bio_part_red(is_POC,is_POP,i,j)
              end do
           end DO
+       elseif (par_bio_red_PC_flex == -1) then
+          bio_part_red(is_POC,is_POP,:,:) = par_bio_red_PC_max
+          bio_part_red(is_POP,is_POC,:,:) = 1.0/bio_part_red(is_POC,is_POP,:,:)
        else
           bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
           bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,:,:)

@@ -450,12 +450,14 @@ CONTAINS
              bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
           end if
        end if
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
     elseif (par_bio_red_PC_flex == -1) then
-       bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
+       bio_part_red(is_POC,is_POP,:,:) = par_bio_red_PC_max
+       bio_part_red(is_POP,is_POC,:,:) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
     else
        bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
+       bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
     end if
-    bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
     ! set local N:P
     loc_bio_NP = bio_part_red(is_POC,is_PON,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)
 
