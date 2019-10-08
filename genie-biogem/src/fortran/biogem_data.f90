@@ -211,6 +211,8 @@ CONTAINS
        print*,'Remineralization length #2 for opal                 : ',par_bio_remin_opal_eL2
        print*,'Prescribed particle sinking rate (m d-1)            : ',par_bio_remin_sinkingrate
        print*,'Prescribed scavenging sinking rate (m d-1)          : ',par_bio_remin_sinkingrate_scav
+       print*,'Explicit physical particle sinking rate (m d-1)     : ',par_bio_remin_sinkingrate_physical
+       print*,'Implicit sinking rate for geochem reactions (m d-1) : ',par_bio_remin_sinkingrate_reaction
        print*,'Organic matter carrying capacity of CaCO3           : ',par_bio_remin_ballast_kc
        print*,'Organic matter carrying capacity of opal            : ',par_bio_remin_ballast_ko
        print*,'Organic matter carrying capacity of lithogenics     : ',par_bio_remin_ballast_kl
@@ -468,8 +470,6 @@ CONTAINS
        !
        ! ######################################################################################################################### !
     end if
-    ! filter CaCO3:POC rain ratio options for backwards compatability
-    if (ctrl_force_CaCO3toPOCrainratio) opt_bio_CaCO3toPOCrainratio = 'prescribed'
     ! ### TO BE CONVERTED TO NAMELIST ITEMS ###################################################################################### !
     par_misc_t_err = 3600.0*1.0/conv_yr_s ! time-stepping error == 1hr
     opt_data(iopt_data_save_timeslice_fnint) = .FALSE.
@@ -487,11 +487,19 @@ CONTAINS
     par_part_red_FeTmin = 0.125E-9 ! (see: Ridgwell [2001])
     par_part_red_FetoCmax = 250000.0 !
     ! ############################################################################################################################ !
-
-    ! *** COMPLETE PATHS ***
-    par_fordir_name = trim(par_fordir_name)//trim(par_forcing_name)//'/'
-
-    ! *** adjust units ***
+    ! -------------------------------------------------------- !
+    ! backwards compatability
+    ! -------------------------------------------------------- !
+    ! filter CaCO3:POC rain ratio options for backwards compatability
+    if (ctrl_force_CaCO3toPOCrainratio) opt_bio_CaCO3toPOCrainratio = 'prescribed'
+    ! sinking -- if par_bio_remin_sinkingrate_physical not set, then re-use values specific by original parameter names
+    if (par_bio_remin_sinkingrate_physical < const_real_nullsmall) then
+       par_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate
+       par_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_scav
+    end if
+    ! -------------------------------------------------------- !
+    ! adjust units
+    ! -------------------------------------------------------- !
     ! adjust units of nutrient update time-scale from days to years
     par_bio_tau     = conv_d_yr*par_bio_tau
     par_bio_tau_sp  = conv_d_yr*par_bio_tau_sp
@@ -503,15 +511,20 @@ CONTAINS
     par_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate_scav/conv_d_yr
     ! adjust units of CH4 oxidation (d-1 -> yr-1)
     par_bio_remin_CH4rate = par_bio_remin_CH4rate/conv_d_yr
-    !
+    ! opal dissolution
     par_bio_remin_opal_K = par_bio_remin_opal_K/conv_d_yr ! opal particulate base dissolution rate (d-1 -> yr-1) [Ridgwell, 2001]
-    ! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ! ballast coefficients (g POC m-2 yr-1 (g ballast m-2 yr-1)-1 -> mol POC m-2 yr-1 (mol ballast m-2 yr-1)-1)
     par_bio_remin_ballast_kc = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_cal_cm3_mol*conv_cal_g_cm3))*par_bio_remin_ballast_kc
     par_bio_remin_ballast_ko = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_opal_cm3_mol*conv_opal_g_cm3))*par_bio_remin_ballast_ko
     par_bio_remin_ballast_kl = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_det_cm3_mol*conv_det_g_cm3))*par_bio_remin_ballast_kl
-    ! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+    ! -------------------------------------------------------- !
+    ! MISC
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! complete path
+    par_fordir_name = trim(par_fordir_name)//trim(par_forcing_name)//'/'
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
   END SUBROUTINE sub_load_goin_biogem
   ! ****************************************************************************************************************************** !
 
