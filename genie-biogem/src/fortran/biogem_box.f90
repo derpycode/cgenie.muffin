@@ -3785,6 +3785,9 @@ CONTAINS
                            & loc_bio_remin_dt_reaction*par_bio_remin_POC_K1*exp(-par_bio_remin_POC_Ea1/(const_R_SI*loc_T))
                       loc_bio_remin_POC_frac2 = &
                            & loc_bio_remin_dt_reaction*par_bio_remin_POC_K2*exp(-par_bio_remin_POC_Ea2/(const_R_SI*loc_T))
+                      ! check for an impossible >1.0 degradation fraction
+                      if (loc_bio_remin_POC_frac1 >= 1.0) loc_bio_remin_POC_frac1 = 1.0
+                      if (loc_bio_remin_POC_frac2 >= 1.0) loc_bio_remin_POC_frac2 = 1.0
                    else
                       ! FRACTION #1
                       select case (par_bio_remin_fun)
