@@ -17,44 +17,46 @@ B. Choose option 'kanzaki2019trs' for sg_par_sed_diagen_CaCO3opt in userconfig f
     Currently you can also play around with fraction of aragonite 
         by changing the parameter 'sg_par_sed_kanzaki2019_arg' from 0 (calcite only) to 1 (aragonite only). 
         
-More specifically:
-to run the coupled model (i.e., cGENIE + iMP) for closed-system spin-up,
+    More specifically:
+    to run the coupled model (i.e., cGENIE + iMP) for spin-up,
+        1) Do usual closed system spin-up first (EXAMPLE.worbe2.RidgwellHargreaves1997_S36x36.SPIN1 for 20000 yr)
+        2) Run the coupled model for closed system spin-up (EXAMPLE.worbe2.RH1997_S36x36_iMP_arg.SPIN1 for 1000 yr)
+        3) Run the coupled model for open system spin-up (EXAMPLE.worbe2.RH1997_S36x36_iMP_arg.SPIN2 for 20000 yr)
 
-    1) Do usual closed system spin-up first (EXAMPLE.worbe2.RidgwellHargreaves1997_S36x36.SPIN1 for 20000 yr)
-    2) Run the coupled closed system spin-up (EXAMPLE.worbe2.RH1997_S36x36_iMP_arg.SPIN1 for 1000 y)
+    E.g.,
+        1) ./runmuffin_sed10yr.sh cgenie.eb_go_gs_ac_bg_sg_rg.worbe2.BASE / EXAMPLE.worbe2.RidgwellHargreaves1997_S36x36.SPIN1 20000
+        2) ./runmuffin_sed10yr.sh cgenie.eb_go_gs_ac_bg_sg_rg.worbe2.BASE / EXAMPLE.worbe2.RH1997_S36x36_iMP_arg.SPIN1 1000 EXAMPLE.worbe2.RidgwellHargreaves1997_S36x36.SPIN1
+        3) ./runmuffin_sed10yr.sh cgenie.eb_go_gs_ac_bg_sg_rg.worbe2.BASE / EXAMPLE.worbe2.RH1997_S36x36_iMP_arg.SPIN2 20000 EXAMPLE.worbe2.RH1997_S36x36_iMP_arg.SPIN1
 
-E.g.,
+    *** Note that iMP tries to reach steady state when called for the first time 
+    (takes a huge time step, 10^8 yr, only when called for the first time; 
+    after that takes the time step for sediment module, i.e., 10 yr in the above example)
+    so 1000 yr is not necessary for closed system spin-up with iMP 
+    (e.g., you can see no difference between 10 yr result and 1000 yr results in iMP). ***
 
-    1) ./runmuffin_sed10yr.sh cgenie.eb_go_gs_ac_bg_sg_rg.worbe2.BASE / EXAMPLE.worbe2.RidgwellHargreaves1997_S36x36.SPIN1 20000
-    2) ./runmuffin_sed10yr.sh cgenie.eb_go_gs_ac_bg_sg_rg.worbe2.BASE / EXAMPLE.worbe2.RH1997_S36x36_iMP_arg.SPIN1 1000 EXAMPLE.worbe2.RidgwellHargreaves1997_S36x36.SPIN1
+    *** Also note that iMP is much slower than sedgem so run only once 10 year 
+    which is realized by using 'runmuffin_sed10yr.sh' instead of 'runmuffin.sh' ***
 
-*** Note that iMP tries to reach steady state when called for the first time 
-(takes a huge time step, 10^8 yr only called for the first time; 
-after that takes the time step for sediment model, i.e., 10 yr in the above example)
-so 1000 yr is not necessary for spin-up for closed system with iMP 
-(you can see no difference between 10 yr result and 1000 yr results in iMP). ***
+    *** Final note: display should show a lot of warnings while running but just ignore these for now ***
 
-*** Also note that iMP is much slower than sedgem so run only once 10 year 
-which is realized using 'runmuffin_sed10yr.sh' instead of 'runmuffin.sh' ***
 
-*** Final note: display should show a lot of warnings while running but just ignore these for now ***
+C. Analyze the results. 
+    iMP provides CaCO3 dissolution flux and change in this flux is reflected in all output as in usual cGENIE simulations.
 
-iMP provides CaCO3 dissolution flux and change in this flux is reflected in all output as in usual cGENIE simulations.
+    Sediment profiles calculated by iMP is stored in sedgem/imp/profiles directory.
+    Global maps of sediment composition are stored in sedgem/imp directory.
+    I have not stored these output in netCDF but currently as text data.
 
-Sediment profiles calculated by iMP is stored in sedgem/imp/profiles directory.
-Global maps of sediment composition are stored in sedgem/imp directory.
-I have not stored these output in netCDF but currently in text data.
+    Those files are:
+        ccbml-xxx (CaCO3 comp. in wt% at the bottom of mixed layer)
+        ccdis-xxx (CaCO3 dissolution flux in umol cm-2 yr-1)
+        ccsfc-xxx (CaCO3 comp. in wt% at the seawater-sediment interface)
+        ccsfcave-xxx (CaCO3 average comp. in wt% within mixed layer)
+        errf-xxx (relative error in total volume of solid sediment, used as an indicator of overall covergence)
+        om-xxx (OM comp. in wt% at the bottom of mixed layer)
+        pt-xxx (Detrital material comp. in wt% at the bottom of mixed layer)
 
-Those files are:
-ccbml-xxx (CaCO3 composition in wt% at the bottom of mixed layer)
-ccdis-xxx (CaCO3 dissolution flux)
-ccsfc-xxx (CaCO3 comp. at the seawater-sediment interface)
-ccsfcave-xxx (CaCO3 average comp. within mixed layer)
-errf-xxx (relative error in total volume of solid sediment, used as an indicator of overall covergence)
-om-xxx (OM comp. in wt% at the bottom of mixed layer)
-pt-xxx (Detrital material comp. in wt% at the bottom of mixed layer)
-
-xxx includes information regarding CaCO3 species and time of recording:
-currently sp001 means calcite species while sp002 means aragonite.
-Other number (e.g., 100) means time in yr but divided by 10 (e.g., 100 means 1000 yr) (I do not remember why I did this...).
+    xxx includes information regarding CaCO3 species and time of recording:
+    currently sp001 means calcite species while sp002 means aragonite.
+    Other number (e.g., 100) means time in yr but divided by 10 (e.g., 100 means 1000 yr) (I do not remember why I did this...).
 
