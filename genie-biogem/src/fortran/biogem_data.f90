@@ -3163,21 +3163,33 @@ CONTAINS
     call check_iostat(alloc_error,__LINE__,__FILE__)
     orb_pts_time(:) = 0.0
     ! -------------------------------------------------------- ! determine loc array size
-    loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_loc_name)
-    n_orb_pts_nloc = fun_calc_data_n(loc_filename)
+    if (n_orb_pts_nmax > 0) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_loc_name)
+       n_orb_pts_nloc = fun_calc_data_n(loc_filename)
+    else
+       n_orb_pts_nloc = 0
+    end if
     ! -------------------------------------------------------- ! allocate loc array
     ALLOCATE(orb_pts_loc(1:n_orb_pts_nloc,2),STAT=alloc_error)
     call check_iostat(alloc_error,__LINE__,__FILE__)
     ! -------------------------------------------------------- ! load loc data
-    call sub_load_data_npt(loc_filename,n_orb_pts_nloc,orb_pts_loc)
+    if (n_orb_pts_nloc > 0) then
+       call sub_load_data_npt(loc_filename,n_orb_pts_nloc,orb_pts_loc)
+    end if
     ! -------------------------------------------------------- ! determine var array size
-    loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_var_name)
-    n_orb_pts_nvar = fun_calc_data_n(loc_filename)
+    if (n_orb_pts_nmax > 0) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_var_name)
+       n_orb_pts_nvar = fun_calc_data_n(loc_filename)
+    else
+       n_orb_pts_nvar = 0
+    end if
     ! -------------------------------------------------------- ! allocate var array
     ALLOCATE(orb_pts_var(1:n_orb_pts_nvar),STAT=alloc_error)
     call check_iostat(alloc_error,__LINE__,__FILE__)
     ! -------------------------------------------------------- ! load var data
-    call sub_load_data_nstr(loc_filename,n_orb_pts_nvar,orb_pts_var)
+    if (n_orb_pts_nvar > 0) then
+       call sub_load_data_nstr(loc_filename,n_orb_pts_nvar,orb_pts_var)
+    end if
     ! -------------------------------------------------------- ! allocate results array
     ! n_orb_ptse_nmax == number of orbital data points
     ! n_orb_ptse_nloc == number of orbital data point locations
