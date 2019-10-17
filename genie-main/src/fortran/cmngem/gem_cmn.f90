@@ -21,7 +21,7 @@ MODULE gem_cmn
   ! NOTE: these definitions must come FIRST, because the namelist arrays are dimensioned by these parameters ...
   ! WARNING: these values must be duplicated in genie_control.f90
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
-  INTEGER,PARAMETER::n_atm =  19
+  INTEGER,PARAMETER::n_atm =  21
   INTEGER,PARAMETER::n_ocn = 109
   INTEGER,PARAMETER::n_sed = 104
 
@@ -37,9 +37,7 @@ MODULE gem_cmn
   LOGICAL,DIMENSION(n_ocn)::ocn_select                                  !
   LOGICAL,DIMENSION(n_sed)::sed_select                                  !
   NAMELIST /ini_gem_nml/atm_select,ocn_select,sed_select
-  ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
-  real::par_grid_lon_offset                                             ! assumed lon grid offset (w.r.t. Prime Meridian)
-  NAMELIST /ini_gem_nml/par_grid_lon_offset
+  ! ------------------- GEOCHEM CONTROLS ----------------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_carbconstset_name                              ! carbonate dissociation constants set
   NAMELIST /ini_gem_nml/par_carbconstset_name
   real::par_carbchem_pH_tolerance                                       ! pH solution tolerance
@@ -47,6 +45,21 @@ MODULE gem_cmn
   NAMELIST /ini_gem_nml/par_carbchem_pH_tolerance,par_carbchem_pH_iterationmax
   logical::ctrl_carbchem_fail                                           ! Exit upon pH solution failure?
   NAMELIST /ini_gem_nml/ctrl_carbchem_fail
+  real::par_geochem_Tmin                                                ! minimum T used in empirical geochem calculations
+  real::par_geochem_Tmax                                                ! maximum T used in empirical geochem calculations
+  NAMELIST /ini_gem_nml/par_geochem_Tmin,par_geochem_Tmax
+  real::par_geochem_Smin                                                ! minimum S used in empirical geochem calculations
+  real::par_geochem_Smax                                                ! maximum S used in empirical geochem calculations
+  NAMELIST /ini_gem_nml/par_geochem_Smin,par_geochem_Smax
+  real::par_carbchem_Tmin                                                ! minimum T used in empirical carbchem calculations
+  real::par_carbchem_Tmax                                                ! maximum T used in empirical carbchem calculations
+  NAMELIST /ini_gem_nml/par_carbchem_Tmin,par_carbchem_Tmax
+  real::par_carbchem_Smin                                                ! minimum S used in empirical carbchem calculations
+  real::par_carbchem_Smax                                                ! maximum S used in empirical carbchem calculations
+  NAMELIST /ini_gem_nml/par_carbchem_Smin,par_carbchem_Smax
+  ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
+  real::par_grid_lon_offset                                             ! assumed lon grid offset (w.r.t. Prime Meridian)
+  NAMELIST /ini_gem_nml/par_grid_lon_offset
   integer::ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end               ! 
   NAMELIST /ini_gem_nml/ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end
   logical::ctrl_debug_reportwarnings                                    ! Report all run-time warnings?
@@ -200,6 +213,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::ia_pH2S_34S                          = 17    ! pH2S
   INTEGER,PARAMETER::ia_pCFC11                            = 18    ! halo-carbon
   INTEGER,PARAMETER::ia_pCFC12                            = 19    ! halo-carbon
+  INTEGER,PARAMETER::ia_pcolr                             = 20    ! RED numerical (color) tracer
+  INTEGER,PARAMETER::ia_pcolr_13C                         = 21    ! 13C (RED)
   ! sediment tracer indicesqsub -j y -o cgenie_output -V -S /bin/bash
   INTEGER,PARAMETER::is_NULL1                             = 01    ! 
   INTEGER,PARAMETER::is_NULL2                             = 02    ! 

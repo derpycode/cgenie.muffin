@@ -449,6 +449,14 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="atm_select(20)" index="20">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="atm_select(21)" index="21">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- ocn_select -->
                    <paramArray name="ocn_select" dimension="1" extent="107">
@@ -1310,11 +1318,7 @@
                             <description></description>
                         </param>
                   </paramArray>
-<!-- MISC CONTROLS  -->
-                    <param name="par_grid_lon_offset">
-                        <value datatype="real">-260.0</value>
-                        <description>assumed longitudinal offset of the grid</description>
-                    </param>
+<!-- GEOCHEM CONTROLS  -->
                     <param name="par_carbconstset_name">
                         <value datatype="string">Mehrbach</value>
                         <description>carbonate dissociation constants set</description>
@@ -1330,6 +1334,43 @@
                     <param name="ctrl_carbchem_fail">
                         <value datatype="boolean">.true.</value>
                         <description>exit upon pH solution failure?</description>
+                    </param>
+                    <param name="par_geochem_Tmin">
+                        <value datatype="real">0.0</value>
+                        <description>minimum T used in empirical geochem calculations [default: 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]]</description>
+                    </param>
+                    <param name="par_geochem_Tmax">
+                        <value datatype="real">30.0</value>
+                        <description>maximum T used in empirical geochem calculations [default: 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]]</description>
+                    </param>
+                    <param name="par_geochem_Smin">
+                        <value datatype="real">26.0</value>
+                        <description>minimum S used in empirical geochem calculations [not (yet) used -- set as per par_carbchem_Smin]</description>
+                    </param>
+                    <param name="par_geochem_Smax">
+                        <value datatype="real">43.0</value>
+                        <description>maximum S used in empirical geochem calculations [not (yet) used -- set as per par_carbchem_Smax]</description>
+                    </param>
+                    <param name="par_carbchem_Tmin">
+                        <value datatype="real">2.0</value>
+                        <description>minimum T used in empirical carbchem calculations [default from Mehrbach: 2.0 lte T lte 35 C]</description>
+                    </param>
+                    <param name="par_carbchem_Tmax">
+                        <value datatype="real">35.0</value>
+                        <description>maximum T used in empirical carbchem calculations [default from Mehrbach: 2.0 lte T lte 35 C]</description>
+                    </param>
+                    <param name="par_carbchem_Smin">
+                        <value datatype="real">26.0</value>
+                        <description>minimum S used in empirical carbchem calculations [default from Mehrbach: 26.0 lte S lte 43 PSU]</description>
+                    </param>
+                    <param name="par_carbchem_Smax">
+                        <value datatype="real">43.0</value>
+                        <description>maximum S used in empirical carbchem calculations [default from Mehrbach: 26.0 lte S lte 43 PSU]</description>
+                    </param>
+<!-- MISC CONTROLS  -->
+                    <param name="par_grid_lon_offset">
+                        <value datatype="real">-260.0</value>
+                        <description>assumed longitudinal offset of the grid</description>
                     </param>
                     <param name="ctrl_debug_init">
                         <value datatype="integer">0</value>
@@ -2619,6 +2660,10 @@
                     <param name="debug_loop">
 			<value datatype="boolean">.false.</value>
                         <description></description>
+                    </param>
+                    <param name="par_dsc">
+                        <value datatype="real">5000.0</value>
+                        <description>ocean depth scale (m)</description>
                     </param>
                 </namelist>
             </file>
@@ -4165,6 +4210,30 @@
 			<value datatype="real">106.0</value>
                         <description>C/P organic matter Redfield ratio</description>
                     </param>
+<!-- malod: activation variable for flexible stoichiometry
+par_bio_red_PC_flex: default setting = 0 (fixed stoichiometry)
+set to 1 for flexible stoichiometry (Galbraith & Martiny, 2015)
+set to 2 for flexible stoichiometry with fixed stoichiometry from
+upper boundary of [PO4] = 1.7 µM
+par_bio_red_PC_alpha1 scales the flexible C:P relationship by a constant value
+par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C:P regression -->
+                    <param name="par_bio_red_PC_flex">
+                        <value datatype="integer">0</value>
+                        <description>C/P organic matter fixed or flexible stoichiometry </description>
+                    </param>
+                    <param name="par_bio_red_PC_alpha1">
+                        <value datatype="real">1.0</value>
+                        <description>scaling of C/P organic matter flexible stoichiometry </description>
+                    </param>
+                    <param name="par_bio_red_PC_alpha2">
+                        <value datatype="real">1.0</value>
+                        <description>offset of C/P organic matter flexible stoichiometry </description>
+                    </param>
+                    <param name="par_bio_red_PC_max">
+                        <value datatype="real">1.8182e-02</value>
+                        <description>maximum C/P (1.8182e-02 == 1.0/55.0 -- see Galbraith and Martiny, 2015)</description>
+                    </param>
+<!-- malod: flexible stoichiometry  end -->
                     <param name="par_bio_red_POP_PO2">
 			<value datatype="real">-138.0</value>
                         <description>O2/P organic matter pseudo-Redfield ratio</description>
@@ -4272,7 +4341,7 @@
                         <description>Specific CH4 oxidation rate (d-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_kAER">
-            <value datatype="real">1.57</value>
+            <value datatype="real">0.40</value>
                         <description>Aerobic methanotrophy rate constant (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_Km_O2">
@@ -4292,7 +4361,7 @@
                         <description>AER biological energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_kAOM">
-            <value datatype="real">0.022</value>
+            <value datatype="real">0.035</value>
                         <description>AOM rate constant (yr-1) (see Olson et al., 2016)</description>
                     </param>
                     <param name="par_bio_remin_AOM_Km_SO4">
@@ -5347,7 +5416,7 @@
                         <description>j location for water column timeseries saving</description>
                     </param>
                     <param name="n_orb_pts_nmax">
-			<value datatype="integer">10000</value>
+			<value datatype="integer">0</value>
                         <description></description>
                     </param>
                     <param name="par_infile_orb_pts_loc_name">
@@ -5461,6 +5530,14 @@
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
+                        <param name="par_atm_force_scale_val(20)" index="20">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_atm_force_scale_val(21)" index="21">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="par_atm_force_scale_time" dimension="1" extent="19">
                         <description>atmospheric tracer forcing scaling - time</description>    
@@ -5537,6 +5614,14 @@
                             <description></description>
                         </param>
                         <param name="par_atm_force_scale_time(19)" index="19">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_atm_force_scale_time(20)" index="20">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_atm_force_scale_time(21)" index="21">
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
@@ -6459,6 +6544,16 @@
 			<value datatype="boolean">.false.</value>
                         <description>Automatic ocean age tracer?</description>
                     </param>
+<!-- TRANSPORT MATRIX  -->
+		<param name="ctrl_data_diagnose_TM">
+			<value datatype="boolean">.false.</value>
+		</param>
+		<param name="par_data_TM_start">
+                     	<value datatype="real">0.0</value>
+		</param>
+		<param name="par_data_TM_avg_n">
+                     	<value datatype="real">1.0</value>
+		</param>    
                 </namelist>
             </file>
         </model>
@@ -6550,6 +6645,14 @@
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
+                        <param name="atm_init(20)" index="20">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="atm_init(21)" index="21">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <paramArray name="atm_dinit" dimension="1" extent="19">
                         <description>tracer perturbation</description>    
@@ -6629,6 +6732,14 @@
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
+                        <param name="atm_dinit(20)" index="20">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="atm_dinit(21)" index="21">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <param name="ctrl_atm_dinit">
 			<value datatype="boolean">.true.</value>
@@ -6641,6 +6752,22 @@
                    <param name="par_atm_CH4_photochem">
                         <value datatype="string">default</value>
                         <description>Atmospheric photochemistry scheme</description>
+                    </param>
+                   <param name="par_pCH4_oxidation_C0">
+                        <value datatype="real">700.0E-09</value>
+                        <description>reference atmospheric pCH4 [atm]</description>
+                   </param>
+                   <param name="par_pCH4_oxidation_tau0">
+                        <value datatype="real">7.6161</value>
+                        <description>baseline atmospheric CH4 lifetime [yr]</description>
+                   </param>
+                   <param name="par_pCH4_oxidation_N">
+                        <value datatype="real">0.338</value>
+                        <description>atmospheric CH4 oxidation exponent</description>
+                   </param>
+                   <param name="par_atm_pO2_fixed">
+                        <value datatype="real">0.2095</value>
+                        <description>Atmospheric pO2 for fixed scheme</description>
                     </param>
                     <param name="par_atm_wetlands_FCH4">
 			<value datatype="real">0.0</value>
@@ -6765,6 +6892,15 @@
 			<value datatype="integer">1</value>
                         <description># sedimentary stack sub-layers to drop off bottom</description>
                     </param>
+<!-- DETRITAL CONFIGURATION  -->
+                    <param name="par_sed_fdet">
+			<value datatype="real">0.150</value>
+                        <description>prescribed (additional) flux of detrital material to the seds (g cm-2 kyr-1)</description>
+                    </param>
+                    <param name="ctrl_sed_det_NOdust">
+			<value datatype="boolean">.false.</value>
+                        <description>No pelagic (dust) detrital contribution?</description>
+                    </param>
 <!-- DIAGENESIS SCHEME: SELECTION  -->
                     <param name="par_sed_diagen_CaCO3opt">
 			<value datatype="string">archer1991explicit</value>
@@ -6798,10 +6934,6 @@
                     <param name="par_sed_mix_k_sur_min">
 			<value datatype="real">0.0001</value>
                         <description>maximum surface bioturbation mixing rate (cm2 yr-1)</description>
-                    </param>
-                    <param name="par_sed_fdet">
-			<value datatype="real">0.150</value>
-                        <description>prescribed (additional) flux of detrital material to the seds (g cm-2 kyr-1)</description>
                     </param>
                     <param name="ctrl_sed_noerosion">
 			<value datatype="boolean">.false.</value>
@@ -6876,6 +7008,14 @@
                     <param name="par_sed_huelse2017_P_cycle">
 			<value datatype="boolean">.false.</value>
                         <description>Include explicit P-cycle in OMEN-SED?</description>
+                    </param>
+                    <param name="par_sed_huelse2017_remove_impl_sulALK">
+			<value datatype="boolean">.true.</value>
+                        <description>Remove implicit Alk associated with buried sulf-OM?</description>
+                    </param>
+                    <param name="par_sed_huelse2017_sim_P_loss">
+			<value datatype="boolean">.false.</value>
+                        <description>Simulate ocean Porg loss with buried sulf-OM?</description>
                     </param>
                     <param name="par_sed_huelse2017_k1">
 			<value datatype="real">0.0065</value>

@@ -26,17 +26,28 @@ c iterations to solve timestep
 
       integer iits, nii
 
-c implicit
-      parameter (nii=4, ups0=999, cimp=0.5)
-c     parameter (nii=4, ups0=0.8, cimp=1.0)
-c recover old explicit 
-c     parameter (nii=8, ups0=0.0, cimp=0.0)
-
       integer i, j, l
 
       logical correct
 
       parameter(correct=.true. )
+
+c implicit
+c NOTE: ups0 not currently used
+      if(igrid.eq.1)then
+c        const dlat grid ... increased nii for stability
+c         parameter (nii=16, ups0=999, cimp=0.5)
+         nii=16
+         cimp=0.5
+      else
+c        default, const dsinlat grid
+c         parameter (nii=4, ups0=999, cimp=0.5)
+         nii=4
+         cimp=0.5
+      endif
+c      parameter (nii=4, ups0=0.8, cimp=1.0)
+c recover old explicit 
+c      parameter (nii=8, ups0=0.0, cimp=0.0)
 
       dtloc = dtatm
 
@@ -54,6 +65,7 @@ c set b.c's on local variables
       do l=1,2    
          do j=1,jmax
             do i=1,imax
+
 c flux to east
                cie(i,j) = betaz(l)*uatm(1,i,j)*rc(j)*0.5*rdphi
                diffpp = diffa(l,1,j) +

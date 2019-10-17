@@ -92,10 +92,14 @@ CONTAINS
     ! set local variables
     ! temperature powers
     ! NOTE: temeprature must be converted to the correct units (degrees C)
-    ! NOTE: valid temperature range is 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]
-    loc_TC  = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
-    if (loc_TC <  0.0) loc_TC =  0.0
-    if (loc_TC > 30.0) loc_TC = 30.0
+    ! NOTE: original valid temperature range was 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]
+    if (ocn(io_T,dum_i,dum_j,n_k) <  (const_zeroC +  par_geochem_Tmin))  then
+       loc_TC = par_geochem_Tmin
+    elseif (ocn(io_T,dum_i,dum_j,n_k) > (const_zeroC + par_geochem_Tmax)) then
+       loc_TC = par_geochem_Tmax
+    else
+       loc_TC = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
+    endif
     loc_TC2 = loc_TC*loc_TC
     loc_TC3 = loc_TC2*loc_TC
     ! wind speed^2
@@ -167,6 +171,8 @@ CONTAINS
           !       with the corresponding ocean tracer index given in the i=1 index position of the conv_atm_ocn_i array
           io = conv_atm_ocn_i(1,ia)
           SELECT CASE (atm_type(ia))
+          CASE (0)
+             ! [do nothing]
           CASE (1)
              ! calculate bulk gas exchange
              ! set local ocean and atmosphere tracer variables
@@ -357,8 +363,6 @@ CONTAINS
     case default
        ! NOTHING
     end select
-    ! preformed tracers
-    call sub_calc_bio_preformed(dum_i,dum_j)
   end SUBROUTINE sub_calc_bio
   ! ****************************************************************************************************************************** !
 
@@ -441,8 +445,32 @@ CONTAINS
     loc_bio_red_DOMtotal = 0.0
     !
     loc_ocn = 0.0
-
-    !
+    
+    ! *** APPLY VARIABLE P:C RATIO ? ***
+    ! par_bio_red_PC_flex = 1 --> activate variable stoichiometry
+    ! par_bio_red_PC_flex = 2 --> activate variable stoichiometry with limit at high PO4
+    ! par_bio_red_PC_flex = 0 --> default fixed Redfield stoichiometry
+    if (par_bio_red_PC_flex > 0) then
+       ! default par_bio_red_PC_alpha1 = 1.0
+       ! default par_bio_red_PC_alpha2 = 1.0
+       ! to achieve average P:C more similar to fixed Redfield modern run, use  PC_alpha1 = 1.1643
+       ! an alternative is to scale only PC_alpha2 = 1.16
+       bio_part_red(is_POC,is_POP,dum_i,dum_j) = &
+          & par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,dum_i,dum_j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+       if (par_bio_red_PC_flex == 2) then   ! limit C:P at high PO4 (because no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
+          if (bio_part_red(is_POC,is_POP,dum_i,dum_j) > par_bio_red_PC_max) then
+             bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
+          end if
+       end if
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
+    elseif (par_bio_red_PC_flex == -1) then
+       bio_part_red(is_POC,is_POP,:,:) = par_bio_red_PC_max
+       bio_part_red(is_POP,is_POC,:,:) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
+    else
+       bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
+       bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
+    end if
+    ! set local N:P
     loc_bio_NP = bio_part_red(is_POC,is_PON,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)
 
     ! *** CALCULATE MIXED LAYER PROPERTIES ***
@@ -1840,16 +1868,6 @@ CONTAINS
     ! *** create pre-formed tracers ***
     ! 
     if (ctrl_bio_preformed) then
-       if (.not. ocn_select(io_col0)) then
-          if (ocn_select(io_PO4) .AND. ocn_select(io_colr)) then
-             bio_remin(io_colr,dum_i,dum_j,n_k) = loc_ocn(io_PO4) - ocn(io_colr,dum_i,dum_j,n_k)
-          end if
-          if (ocn_select(io_NO3) .AND. ocn_select(io_colb)) then
-             bio_remin(io_colb,dum_i,dum_j,n_k) = loc_ocn(io_NO3) - ocn(io_colb,dum_i,dum_j,n_k)
-          elseif (ocn_select(io_PO4) .AND. ocn_select(io_colb)) then
-             bio_remin(io_colb,dum_i,dum_j,n_k) = -ocn(io_colb,dum_i,dum_j,n_k)
-          end if
-       else
           do io=io_col0,io_col9
              if (ocn_select(io)) then
                 select case (io)
@@ -1872,7 +1890,6 @@ CONTAINS
                 end select
              end if
           end do
-       end if
     end if
 
   end SUBROUTINE sub_calc_bio_preformed
@@ -4332,7 +4349,7 @@ CONTAINS
                & force_restore_atm_I(dum_ia,i,j) + &
                & force_restore_atm_sig_x(dum_ia)*(force_restore_atm_II(dum_ia,i,j) - force_restore_atm_I(dum_ia,i,j))
           SELECT CASE (atm_type(dum_ia))
-          CASE (1)
+          CASE (0,1)
              force_restore_atm(dum_ia,i,j) = loc_force_restore_atm
           case (n_itype_min:n_itype_max)
              loc_tot  = force_restore_atm(atm_dep(dum_ia),i,j)
@@ -4376,7 +4393,7 @@ CONTAINS
                & force_flux_atm_I(dum_ia,i,j) + &
                & force_flux_atm_sig_x(dum_ia)*(force_flux_atm_II(dum_ia,i,j) - force_flux_atm_I(dum_ia,i,j))
           SELECT CASE (atm_type(dum_ia))
-          CASE (1)
+          CASE (0,1)
              force_flux_atm(dum_ia,i,j) = loc_force_flux_atm
              loc_force_flux_atm_tot = loc_force_flux_atm_tot + loc_force_flux_atm
           case (n_itype_min:n_itype_max)
@@ -4404,7 +4421,7 @@ CONTAINS
        DO i=1,n_i
           DO j=1,n_j
              SELECT CASE (atm_type(dum_ia))
-             CASE (1)
+             CASE (0,1)
                 force_flux_atm(dum_ia,i,j) = force_flux_atm(dum_ia,i,j)*force_flux_atm_sig_x(dum_ia)*loc_force_flux_atm_rtot
              END SELECT
           END DO
@@ -4965,6 +4982,5 @@ CONTAINS
     END DO
   END SUBROUTINE sub_biogem_copy_ocntotsTS
   ! ****************************************************************************************************************************** !
-
 
 END MODULE biogem_box

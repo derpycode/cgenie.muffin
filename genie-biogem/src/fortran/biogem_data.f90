@@ -71,7 +71,7 @@ CONTAINS
        print*,'Simulation start year                               : ',par_misc_t_start
        print*,'Simulation run length (yr)                          : ',par_misc_t_runtime
        print*,'Time as Years Before Present?                       : ',ctrl_misc_t_BP
-       print*,'Simulation stop year                                : ',par_misc_t_stop       
+       print*,'Simulation stop year                                : ',par_misc_t_stop
        ! --- MISC CONTROL -------------------------------------------------------------------------------------------------------- !
        print*,'--- MISC CONTROL -----------------------------------'
        print*,'Salanity normalization?                             : ',ctrl_misc_Snorm
@@ -154,6 +154,10 @@ CONTAINS
        print*,'--- ORGANIC MATTER EXPORT RATIOS -------------------'
        print*,'N/P organic matter Redfield ratio                   : ',par_bio_red_POP_PON
        print*,'C/P organic matter Redfield ratio                   : ',par_bio_red_POP_POC
+       print*,'C/P organic matter set to flexible? ( > 0 = yes)    : ',par_bio_red_PC_flex
+       print*,'PC_alpha1, scaling of flexible C/P ratio            : ',par_bio_red_PC_alpha1
+       print*,'PC_alpha2, offset of flexible C/P ratio             : ',par_bio_red_PC_alpha2
+       print*,'maximum C/P                                         : ',par_bio_red_PC_max
        print*,'O2/P organic matter pseudo-Redfield ratio           : ',par_bio_red_POP_PO2
        print*,'ALK/N alkalinty correction factor                   : ',par_bio_red_PON_ALK
        print*,'Production fraction of dissolved organic matter     : ',par_bio_red_DOMfrac
@@ -431,7 +435,7 @@ CONTAINS
        print*,'Filename for time-series definition input           : ',trim(par_infile_sig_name)
        print*,'Auto save at run end?                               : ',ctrl_data_save_sig_autoend
        print*,'Save high res 3D data (@ time-series frequency)?    : ',ctrl_data_save_3d_sig
-       print*,'Save 3D data at a particular ij location?           : ',ctrl_data_save_ocn_3D_ij       
+       print*,'Save 3D data at a particular ij location?           : ',ctrl_data_save_ocn_3D_ij
        ! --- DATA SAVING: DIAGNOSTICS -------------------------------------------------------------------------------------------- !
        print*,'--- BIOGEM DATA SAVING: DIAGNOSTICS ----------------'
        print*,'Create pre-formed tracers?                          : ',ctrl_bio_preformed
@@ -488,6 +492,10 @@ CONTAINS
        print*,'Scaling C burial flux relative to emissions         : ',par_force_invert_fCorgburial
        print*,'Force explicit inversion?                           : ',ctrl_force_invert_explicit
        print*,'Automatic ocean age tracer?                         : ',ctrl_force_ocn_age
+       ! --- TRANSPORT MATRIX ------------------------------------------------------------------------------------------------------ !
+       print*,'Diagnose transport matrix during run?		: ',ctrl_data_diagnose_TM
+       print*,'Year to start diagnosing transport matrix	: ',par_data_TM_start
+       print*,'Number of intervals within a year to diagnose transport matrix		: ',par_data_TM_avg_n
        ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ########################################################################## !
        !
        ! ######################################################################################################################### !
@@ -527,7 +535,7 @@ CONTAINS
     par_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate_scav/conv_d_yr
     ! adjust units of CH4 oxidation (d-1 -> yr-1)
     par_bio_remin_CH4rate = par_bio_remin_CH4rate/conv_d_yr
-    ! 
+    !
     par_bio_remin_opal_K = par_bio_remin_opal_K/conv_d_yr ! opal particulate base dissolution rate (d-1 -> yr-1) [Ridgwell, 2001]
     ! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ! ballast coefficients (g POC m-2 yr-1 (g ballast m-2 yr-1)-1 -> mol POC m-2 yr-1 (mol ballast m-2 yr-1)-1)
@@ -692,6 +700,7 @@ CONTAINS
   ! INITIALIZE 'BIOLOGICAL' PARAMETERS AND VARIABLES
   SUBROUTINE sub_init_bio()
     ! local variables
+    integer::i,j              !malod: for flexible stoichiometry
     CHARACTER(len=255)::loc_filename
 
     ! *** initialize global arrays ***
@@ -711,9 +720,34 @@ CONTAINS
     bio_part_red(is_POFe,is_POFe,:,:)   = 1.0
     ! set values and derived values
     ! NOTE: relate everything to carbon units where it is not already
+    ! NOTE2: Variable P:C ratio coded by malod
     IF (abs(par_bio_red_POP_POC) > const_real_nullsmall) then
-       bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
-       bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,:,:)
+       ! par_bio_red_PC_flex = 1 --> activate variable stoichiometry
+       ! par_bio_red_PC_flex = 2 --> activate variable stoichiometry with limit at high PO4
+       ! par_bio_red_PC_flex = 0 --> default fixed Redfield stoichiometry
+       if (par_bio_red_PC_flex > 0) then
+          ! default par_bio_red_PC_alpha1 = 1.0
+          ! default par_bio_red_PC_alpha2 = 1.0
+          ! to achieve average P:C more similar to fixed Redfield modern run, use  PC_alpha1 = 1.1643
+          ! an alternative is to scale only PC_alpha2 = 1.16
+          DO i = 1,n_i
+             do j = 1,n_j
+                bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,i,j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+                if (par_bio_red_PC_flex > 1) then  ! limit C:P for high PO4 (no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
+                   if (bio_part_red(is_POC,is_POP,i,j) > par_bio_red_PC_max) then
+                      bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_max
+                   end if
+                end if
+                bio_part_red(is_POP,is_POC,i,j) = 1.0/bio_part_red(is_POC,is_POP,i,j)
+             end do
+          end DO
+       elseif (par_bio_red_PC_flex == -1) then
+          bio_part_red(is_POC,is_POP,:,:) = par_bio_red_PC_max
+          bio_part_red(is_POP,is_POC,:,:) = 1.0/bio_part_red(is_POC,is_POP,:,:)
+       else
+          bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
+          bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,:,:)
+       end if
     end if
     IF (abs(par_bio_red_POP_PON) > const_real_nullsmall) then
        bio_part_red(is_POP,is_PON,:,:) = par_bio_red_POP_PON
@@ -870,8 +904,8 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     integer::n
-    CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::loc_string     !  
-    integer::lo,ls 
+    CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::loc_string     !
+    integer::lo,ls
     integer::loc_m,loc_tot_m
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
@@ -891,7 +925,7 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_H2StoSO4_dO2' 
           n = n+1
-          loc_string(n) = 'redox_H2StoSO4_dALK'     
+          loc_string(n) = 'redox_H2StoSO4_dALK'  
        end if
     end if
     if (ocn_select(io_NH4)) then
@@ -903,7 +937,7 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_NH4toNO3_dO2'  
           n = n+1
-          loc_string(n) = 'redox_NH4toNO3_dALK'   
+          loc_string(n) = 'redox_NH4toNO3_dALK'  
        end if
     end if
     if (ocn_select(io_CH4)) then
@@ -927,7 +961,7 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_CH4toDICaom_dSO4'  
           n = n+1
-          loc_string(n) = 'redox_CH4toDICaom_dALK'      
+          loc_string(n) = 'redox_CH4toDICaom_dALK'  
        end if
     end if
     if (ocn_select(io_I) .AND. ocn_select(io_I)) then
@@ -1483,9 +1517,14 @@ CONTAINS
     int_focnsed_sig(:)      = 0.0
     int_fsedocn_sig(:)      = 0.0
     int_ocn_sur_sig(:)      = 0.0
+    int_ocn_opn_sig(:)      = 0.0
     int_ocn_ben_sig(:)      = 0.0
     int_carb_sur_sig(:)     = 0.0
+    int_carb_opn_sig(:)     = 0.0
     int_carb_ben_sig(:)     = 0.0
+    int_misc_age_sig        = 0.0
+    int_misc_age_sur_sig    = 0.0
+    int_misc_age_ben_sig    = 0.0
     int_misc_seaice_sig     = 0.0
     int_misc_seaice_sig_th  = 0.0
     int_misc_seaice_sig_vol = 0.0
@@ -1497,7 +1536,9 @@ CONTAINS
     int_misc_det_Fe_tot_sig = 0.0
     int_misc_det_Fe_dis_sig = 0.0
     int_misc_ocn_solfor_sig = 0.0
+    int_misc_opn_solfor_sig = 0.0
     int_misc_ocn_fxsw_sig   = 0.0
+    int_misc_opn_fxsw_sig   = 0.0
     int_ocnsed_sig(:)       = 0.0
     int_diag_bio_sig(:)     = 0.0
     int_diag_geochem_old_sig(:) = 0.0
@@ -2334,11 +2375,14 @@ CONTAINS
        end if
     end if
     ! check color tracers
-    if (ocn_select(io_colr) .AND. ocn_select(io_colb)) then
-       if (ctrl_bio_preformed .AND. (.NOT. ocn_select(io_col0))) then                 
-          ctrl_force_ocn_age = .false.
-       end if
-    else
+    if (ctrl_force_ocn_age .AND. (.NOT.(ocn_select(io_colr) .AND. ocn_select(io_colb)))) then
+          CALL sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'Parameter: ctrl_force_ocn_age is selected (true), but the necessary red and blue ocean tracers are not.'// &
+               & 'The automatic age tracer option is hence deselected.', &
+               & 'CONTINUING', &
+               & (/const_real_null/),.FALSE. &
+               & )
        ctrl_force_ocn_age = .false.
     end if
 
@@ -2701,6 +2745,54 @@ CONTAINS
           ctrl_data_save_slice_carbconst = .FALSE.
        end IF
     end IF
+
+! *** transport matrix paramater consistency checks ***
+    if(ctrl_data_diagnose_TM)THEN
+         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
+			 & '[par_data_TM_start] HAS BEEN CHANGED TO ALLOW MATRIX DIAGNOSIS TO FINISH', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 par_data_TM_start=par_misc_t_runtime-n_k
+         end if
+         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).lt.0.0)then
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'The run is too short to diagnose a full transport matrix', &
+			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 ctrl_data_diagnose_TM=.false.
+         end if
+         if(ctrl_bio_preformed)then
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Diagnosing transport matrix will overwrite preformed tracers', &
+			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+			 & (/const_real_null/),.false. &
+			 & )
+                 ctrl_data_diagnose_TM=.false.
+         end if
+         if(conv_kocn_kbiogem.gt.1.0)then
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'Biogem timestep ratio should not be greater than 1 for a transport matrix', &
+			 & 'STOPPING', &
+			 & (/const_real_null/),.true. &
+			 & )
+         end if
+        if((conv_kocn_ksedgem/par_data_save_slice_n).ne.par_data_TM_avg_n)then ! n.b. conv_ksedgem = n_timesteps!!
+                 call sub_report_error( &
+		         & 'biogem_data','sub_check_par', &
+			 & 'The intra-annual saving intervals you have chosen do not correspond to the transport matrix averaging', &
+			 & '[par_data_save_slice_n] HAS BEEN SET TO MATCH MATRIX AVERAGING INTERVAL', &
+			 & (/const_real_null/),.false. &
+			 & )
+                par_data_save_slice_n=conv_kocn_ksedgem/par_data_TM_avg_n
+         end if
+    end if
 
   END SUBROUTINE sub_check_par_biogem
   ! ****************************************************************************************************************************** !
@@ -3272,40 +3364,52 @@ CONTAINS
     ! -------------------------------------------------------- !
     INTEGER::ios
     CHARACTER(len=255)::loc_filename                           ! filename string
-    CHARACTER(len=255)::loc_str                                ! 
-    CHARACTER(len=6)::loc_locstr                               ! 
+    CHARACTER(len=255)::loc_str                                !
+    CHARACTER(len=6)::loc_locstr                               !
     integer::nloc,nvar
     integer::loc_len,loc_pos
     real::loc_t = 0.0
     ! -------------------------------------------------------- !
     ! INITIALIZE ARRAYS
-    ! -------------------------------------------------------- ! 
+    ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! allocate time array
     ALLOCATE(orb_pts_time(1:n_orb_pts_nmax),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__)    
+    call check_iostat(alloc_error,__LINE__,__FILE__)
     orb_pts_time(:) = 0.0
     ! -------------------------------------------------------- ! determine loc array size
-    loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_loc_name)
-    n_orb_pts_nloc = fun_calc_data_n(loc_filename)
+    if (n_orb_pts_nmax > 0) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_loc_name)
+       n_orb_pts_nloc = fun_calc_data_n(loc_filename)
+    else
+       n_orb_pts_nloc = 0
+    end if
     ! -------------------------------------------------------- ! allocate loc array
     ALLOCATE(orb_pts_loc(1:n_orb_pts_nloc,2),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__)    
+    call check_iostat(alloc_error,__LINE__,__FILE__)
     ! -------------------------------------------------------- ! load loc data
-    call sub_load_data_npt(loc_filename,n_orb_pts_nloc,orb_pts_loc)        
+    if (n_orb_pts_nloc > 0) then
+       call sub_load_data_npt(loc_filename,n_orb_pts_nloc,orb_pts_loc)
+    end if
     ! -------------------------------------------------------- ! determine var array size
-    loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_var_name)
-    n_orb_pts_nvar = fun_calc_data_n(loc_filename)
+    if (n_orb_pts_nmax > 0) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_infile_orb_pts_var_name)
+       n_orb_pts_nvar = fun_calc_data_n(loc_filename)
+    else
+       n_orb_pts_nvar = 0
+    end if
     ! -------------------------------------------------------- ! allocate var array
     ALLOCATE(orb_pts_var(1:n_orb_pts_nvar),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__)    
+    call check_iostat(alloc_error,__LINE__,__FILE__)
     ! -------------------------------------------------------- ! load var data
-    call sub_load_data_nstr(loc_filename,n_orb_pts_nvar,orb_pts_var)    
+    if (n_orb_pts_nvar > 0) then
+       call sub_load_data_nstr(loc_filename,n_orb_pts_nvar,orb_pts_var)
+    end if
     ! -------------------------------------------------------- ! allocate results array
     ! n_orb_ptse_nmax == number of orbital data points
     ! n_orb_ptse_nloc == number of orbital data point locations
     ! n_orb_ptse_nvar == number of orbital data point variables
     ALLOCATE(orb_pts(1:n_orb_pts_nmax,1:n_orb_pts_nloc,1:n_orb_pts_nvar),STAT=alloc_error)
-    call check_iostat(alloc_error,__LINE__,__FILE__) 
+    call check_iostat(alloc_error,__LINE__,__FILE__)
     ! zero array
     orb_pts(:,:,:) = 0.0
     ! -------------------------------------------------------- !
@@ -3313,8 +3417,8 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! create header
     loc_pos = 1
-    loc_str(loc_pos:loc_pos+5) = '% year'  
-    loc_pos = loc_pos+6  
+    loc_str(loc_pos:loc_pos+5) = '% year'
+    loc_pos = loc_pos+6
     DO nvar=1,n_orb_pts_nvar
        loc_str(loc_pos:loc_pos+2) = ' / '
        loc_pos = loc_pos+3
@@ -3324,10 +3428,10 @@ CONTAINS
     end do
     ! pad string array to make it happy
     loc_str(loc_pos:255) = ''
-    ! -------------------------------------------------------- ! create files    
+    ! -------------------------------------------------------- ! create files
     DO nloc=1,n_orb_pts_nloc
        loc_locstr = 'i'//fun_conv_num_char_n(2,orb_pts_loc(nloc,1))//'j'//fun_conv_num_char_n(2,orb_pts_loc(nloc,2))
-       loc_filename=fun_data_timeseries_filename( & 
+       loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_orb',loc_locstr,string_results_ext)
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)

@@ -226,6 +226,7 @@ c     namelist for reading initialisation data
       NAMELIST /ini_gold_nml/ctrl_diagend,ctrl_diagmld
       NAMELIST /ini_gold_nml/saln0
       NAMELIST /ini_gold_nml/rst_reset_T
+      NAMELIST /ini_gold_nml/par_dsc
 
 c ------------------------------------------------------------ c
 c INITIALIZE VARIABLES
@@ -363,7 +364,8 @@ c dimensional scale values
 
       usc = 0.05
       rsc = 6.37e6
-      dsc = 5e3
+c      dsc = 5e3
+      dsc = par_dsc
       fsc = 2*7.2921e-5
       gsc = 9.81
       rh0sc = 1e3

@@ -1,0 +1,40 @@
+
+ 01                 02    03
+ \/                 \/    \/
+
+-START-OF-DATA-
+ Mixotroph         0.20   1
+ Mixotroph         0.60   1
+ Mixotroph         1.90   1
+ Mixotroph         6.00   1
+ Mixotroph        19.00   1
+ Mixotroph        60.00   1
+ Mixotroph       190.00   1
+ Mixotroph       600.00   1
+ Mixotroph      1900.00   1
+-END-OF-DATA-
+
+ /\                 /\    /\
+ 01                 02    03
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: plankton functional type name
+COLUMN #02: plankton diameter (micrometers)
+COLUMN #03: number of randomised replicates
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+                                 Zooplankton
+                                 Mixotroph
+
+
+
+

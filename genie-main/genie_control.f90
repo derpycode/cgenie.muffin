@@ -143,7 +143,7 @@ MODULE genie_control
 
       ! total defined tracer numbers
       ! WARNING: parameter information duplicated in gem_cmn.f90
-      integer, parameter :: intrac_atm_max =  19
+      integer, parameter :: intrac_atm_max =  21
       integer, parameter :: intrac_ocn_max = 109
       integer, parameter :: intrac_sed_max = 104
       parameter(intrac_sed=intrac_sed_max)
