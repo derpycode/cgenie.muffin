@@ -1641,12 +1641,12 @@ CONTAINS
        case default
           DO k=n_k,loc_k_mld,-1
              if (ocn(io_Fe,dum_i,dum_j,k) > const_real_nullsmall) then
-                call sub_calc_scav_Fe(                                                  &
-                     & dum_dt,                                                          &
-                     & phys_ocn(ipo_Dbot,dum_i,dum_j,k)/par_bio_remin_sinkingrate_scav, &
-                     & ocn(io_Fe,dum_i,dum_j,k),                                        &
-                     & bio_part(:,dum_i,dum_j,k),                                       &
-                     & bio_remin(:,dum_i,dum_j,k)                                       &
+                call sub_calc_scav_Fe(                                                      &
+                     & dum_dt,                                                              &
+                     & phys_ocn(ipo_Dbot,dum_i,dum_j,k)/par_bio_remin_sinkingrate_reaction, &
+                     & ocn(io_Fe,dum_i,dum_j,k),                                            &
+                     & bio_part(:,dum_i,dum_j,k),                                           &
+                     & bio_remin(:,dum_i,dum_j,k)                                           &
                      & )
              end if
           end DO
@@ -3489,6 +3489,7 @@ CONTAINS
     type(fieldocn),INTENT(inout)::dum_vbio_part                         !
     type(fieldocn),INTENT(inout)::dum_vbio_remin                        !
     ! local variables
+    integer::dum_i, dum_j                                      ! 'virtual' dummy indices (derived from dum_vocn)
     integer::l,is
     integer::lo,ls                                                      !
     integer::id
@@ -3502,39 +3503,29 @@ CONTAINS
     real::loc_bio_remin_dD
     real::loc_bio_remin_max_D                                         !
     real::loc_bio_remin_layerratio
-    real::loc_bio_remin_sinkingrate                                     ! prescribed particle sinking rate
-    real::loc_bio_remin_sinkingrate_scav                                ! sinking rate (for calculating scavenging)
-    real::loc_bio_remin_dt                                              ! layer residence time (in years)
-    real::loc_bio_remin_dt_scav                                         ! layer residence time (for calculating scavenging)
+    real::loc_bio_remin_sinkingrate_physical                            ! particle sinking rate -- physical
+    real::loc_bio_remin_sinkingrate_reaction                            ! particle sinking rate -- for geochemical reactions
+    real::loc_bio_remin_dt_physical                                     ! layer residence time (in years)
+    real::loc_bio_remin_dt_reaction                                     ! layer residence time (for calculating scavenging)
     real::loc_bio_remin_POC_frac1,loc_bio_remin_POC_frac2
     real::loc_bio_part_POC_ratio
     real::loc_bio_remin_CaCO3_frac1,loc_bio_remin_CaCO3_frac2
     real::loc_bio_part_CaCO3_ratio
     real::loc_bio_remin_opal_frac1,loc_bio_remin_opal_frac2
     real::loc_bio_part_opal_ratio
-    real::loc_eL_size												   ! local efolding depth varying with ecosystem size structure JDW
-    real::loc_size0													! JDW
-!!!real::loc_r_POM_RDOM                                                ! factor to modify nutrient:C ratio in POM->RDOM
+    real::loc_eL_size                                          ! local efolding depth varying with ecosystem size structure JDW
+    real::loc_size0                                            ! JDW
     real::loc_part_tot
-!!$    real,dimension(n_sed,n_k)::loc_bio_part_TMP
-!!$    real,dimension(n_sed,n_k)::loc_bio_part_OLD
-!!$    real,dimension(n_sed,n_k)::loc_bio_part
-!!$    real,dimension(n_ocn,n_k)::loc_bio_remin
-!!$    real,dimension(n_sed,n_k)::loc_bio_settle
-!!$    real,dimension(n_sed)::loc_bio_part_remin                           !
-    real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                       !
-
-    integer::dum_i,dum_j
-
+    real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo            !
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part_TMP
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part_OLD
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part
     real,dimension(1:n_l_ocn,1:n_k)::loc_bio_remin
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_settle
     real,dimension(1:n_l_sed)::loc_bio_part_remin
-
-    CHARACTER(len=31)::loc_string     ! 
-
+    !
+    CHARACTER(len=31)::loc_string 
+    ! define and allocate local arrays
     real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
     allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
 
@@ -3549,8 +3540,7 @@ CONTAINS
     loc_bio_remin_opal_frac1 = 0.0
     loc_bio_remin_opal_frac2 = 0.0
     loc_bio_part_opal_ratio = 0.0
-    loc_bio_remin_dt = 0.0
-    !
+    ! set 'virtua' dummy grid location indices
     dum_i = dum_vbio_part%i
     dum_j = dum_vbio_part%j
     loc_k1 = dum_vbio_part%k1
@@ -3565,24 +3555,24 @@ CONTAINS
     loc_bio_settle(:,:) = 0.0
     ! set water column particulate tracer loop limit and sinking rate
     ! => test for sinking in any one time-step being less than the max depth of the ocean
-    if (dum_dtyr*par_bio_remin_sinkingrate <= goldstein_dsc) then
+    if (dum_dtyr*par_bio_remin_sinkingrate_physical <= goldstein_dsc) then
        ! assume particules could be present at any/every depth in the local water column
-       ! set sinking rate for scavenging to sinking rate
+       ! set sinking rate for geochemical reactions to the physical sinking rate
        loc_klim = loc_k1
-       loc_bio_remin_sinkingrate = par_bio_remin_sinkingrate
-       loc_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate
+       loc_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical
+       loc_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_physical
     else
        ! assume particulates present only in surface layer
        ! leave sinking rate alone ... but could e.g. set to exactly match the ocean depth in one time-step
        loc_klim = n_k
-       loc_bio_remin_sinkingrate = par_bio_remin_sinkingrate
-       loc_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate_scav
+       loc_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical
+       loc_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_reaction
     end if
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
     if (ctrl_bio_remin_redox_save) loc_diag_redox(:,:) = 0.0
-    
+    ! pre-calculate reciprocal
     loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
 
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -3592,10 +3582,10 @@ CONTAINS
     DO k=n_k,loc_klim,-1
        ! find some particulates (POC) in the water column
        loc_part_tot = 0.0
-       if (sed_select(is_POC)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
+       if (sed_select(is_POC)) loc_part_tot   = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
        if (sed_select(is_CaCO3)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_CaCO3),k)
-       if (sed_select(is_opal)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
-       if (sed_select(is_det)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
+       if (sed_select(is_opal)) loc_part_tot  = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
+       if (sed_select(is_det)) loc_part_tot   = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
        If (loc_part_tot  > const_real_nullsmall) then
           ! if the identified particulate material is already residing in the bottom-most ocean layer, flag as sediment flux
           If (k == loc_k1) then
@@ -3608,7 +3598,7 @@ CONTAINS
              ! NOTE: trap the situation where the depth of the sediment surface is surpassed
              ! NOTE: start loop from the layer lying below the one in which the identified particulate material resides
              loc_bio_remin_min_k = loc_k1 - 1
-             loc_bio_remin_max_D = dum_vphys_ocn%mk(ipo_Dbot,k) + dum_dtyr*loc_bio_remin_sinkingrate
+             loc_bio_remin_max_D = dum_vphys_ocn%mk(ipo_Dbot,k) + dum_dtyr*loc_bio_remin_sinkingrate_physical
              do kk=k-1,loc_k1,-1
                 If (dum_vphys_ocn%mk(ipo_Dbot,kk) > loc_bio_remin_max_D) then
                    loc_bio_remin_min_k = kk
@@ -3627,8 +3617,8 @@ CONTAINS
              if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                 ! calculate surface residence time (yr) of particulates in ocean layer (from layer thickness and sinking speed)
                 loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,kk)
-                if (loc_bio_remin_sinkingrate_scav > const_real_nullsmall) &
-                     & loc_bio_remin_dt_scav = loc_bio_remin_dD/loc_bio_remin_sinkingrate_scav
+                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) &
+                     & loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
                 ! calculate Fe scavenging
                 SELECT CASE (trim(opt_geochem_Fe))
                 CASE ('ALT')
@@ -3656,20 +3646,20 @@ CONTAINS
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
                       loc_bio_remin(io2l(io_TDFe),k) = loc_bio_remin(io2l(io_TDFe),k) - &
                            fun_box_scav_Fe(                                                  &
-                           & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
-                           & loc_FeFeLL(1),  &
-                           & loc_bio_part_TMP(:,k)       &
+                           & dum_dtyr,                  &
+                           & loc_bio_remin_dt_reaction, &
+                           & loc_FeFeLL(1),             &
+                           & loc_bio_part_TMP(:,k)      &
                            & )
                    end if
                 CASE default
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
                       loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - &
-                           fun_box_scav_Fe(                                                  &
-                           & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
-                           & loc_FeFeLL(1),  &
-                           & loc_bio_part_TMP(:,k)       &
+                           fun_box_scav_Fe(             &
+                           & dum_dtyr,                  &
+                           & loc_bio_remin_dt_reaction, &
+                           & loc_FeFeLL(1),             &
+                           & loc_bio_part_TMP(:,k)      &
                            & )
                    end if
                 end SELECT
@@ -3698,10 +3688,10 @@ CONTAINS
                 loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,kk)
                 ! calculate residence time (yr) of particulates in ocean layer (from layer thickness and sinking speed)
                 ! NOTE: sinking rate has units of (m yr-1) (converted from parameter file input units)
-                if (loc_bio_remin_sinkingrate > const_real_nullsmall) &
-                     & loc_bio_remin_dt = loc_bio_remin_dD/loc_bio_remin_sinkingrate
-                if (loc_bio_remin_sinkingrate_scav > const_real_nullsmall) &
-                     & loc_bio_remin_dt_scav = loc_bio_remin_dD/loc_bio_remin_sinkingrate_scav
+                if (loc_bio_remin_sinkingrate_physical > const_real_nullsmall) &
+                     & loc_bio_remin_dt_physical = loc_bio_remin_dD/loc_bio_remin_sinkingrate_physical
+                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) &
+                     & loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
 
                 ! *** Calculate fractional change in particulate fluxes ***
                 ! carbonate
@@ -3757,7 +3747,7 @@ CONTAINS
                       ! calculate opal fractional dissolution
                       ! NOTE: for now, assume that both opal 'fractions' behave identically
                       loc_bio_remin_opal_frac1 = 1.0 - EXP(                                  &
-                           & -loc_bio_remin_dt*par_bio_remin_opal_K*                         &
+                           & -loc_bio_remin_dt_reaction*par_bio_remin_opal_K*                &
                            & (1.0/0.71)*                                                     &
                            & (                                                               &
                            &   (0.16*(1.0 + (loc_T - const_zeroC)/15.0)*loc_u) +             &
@@ -3792,9 +3782,12 @@ CONTAINS
                       loc_T = dum_vocn%mk(conv_io_lselected(io_T),kk)
                       ! calculate POC fractional remin
                       loc_bio_remin_POC_frac1 = &
-                           & loc_bio_remin_dt*par_bio_remin_POC_K1*exp(-par_bio_remin_POC_Ea1/(const_R_SI*loc_T))
+                           & loc_bio_remin_dt_reaction*par_bio_remin_POC_K1*exp(-par_bio_remin_POC_Ea1/(const_R_SI*loc_T))
                       loc_bio_remin_POC_frac2 = &
-                           & loc_bio_remin_dt*par_bio_remin_POC_K2*exp(-par_bio_remin_POC_Ea2/(const_R_SI*loc_T))
+                           & loc_bio_remin_dt_reaction*par_bio_remin_POC_K2*exp(-par_bio_remin_POC_Ea2/(const_R_SI*loc_T))
+                      ! check for an impossible >1.0 degradation fraction
+                      if (loc_bio_remin_POC_frac1 >= 1.0) loc_bio_remin_POC_frac1 = 1.0
+                      if (loc_bio_remin_POC_frac2 >= 1.0) loc_bio_remin_POC_frac2 = 1.0
                    else
                       ! FRACTION #1
                       select case (par_bio_remin_fun)
@@ -3806,8 +3799,10 @@ CONTAINS
                               & (phys_ocn(ipo_Dbot,dum_i,dum_j,kk+1)/par_bio_remin_z0)**(par_bio_remin_b(dum_i,dum_j)) &
                               & )
                       case ('KriestOschlies2008') ! efolding depth dependent on mean plankton diameter JDW
-                      	 loc_eL_size=par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta ! n.b. size is in esd
-                      	 loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/loc_eL_size)) 	
+                         ! NOTE: size is in esd
+                         loc_eL_size = &
+                              & par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta
+                         loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/loc_eL_size))
                       case default
                          loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL1))
                       end select
@@ -3816,8 +3811,8 @@ CONTAINS
                          if (loc_bio_part_TMP(is2l(is_POC_frac2),kk+1)*loc_bio_part_TMP(is2l(is_POC),kk+1) &
                               & > &
                               & const_real_nullsmall) then
-                            loc_bio_remin_POC_frac2 = 1.0 -                                                              &
-                                 & (                                                                                     &
+                            loc_bio_remin_POC_frac2 = 1.0 -                                                                   &
+                                 & (                                                                                          &
                                  &   loc_bio_part_CaCO3_ratio*par_bio_remin_kc(dum_i,dum_j)*loc_bio_part_TMP(is_CaCO3,kk+1) + &
                                  &   loc_bio_part_opal_ratio*par_bio_remin_ko(dum_i,dum_j)*loc_bio_part_TMP(is_opal,kk+1) +   &
                                  &   1.0*par_bio_remin_kl(dum_i,dum_j)*loc_bio_part_TMP(is_det,kk+1)                          &
@@ -3997,7 +3992,7 @@ CONTAINS
                          loc_bio_remin(io2l(io_TDFe),kk) = loc_bio_remin(io2l(io_TDFe),kk) - &
                               fun_box_scav_Fe(                                                  &
                               & dum_dtyr,                     &
-                              & loc_bio_remin_dt_scav,        &
+                              & loc_bio_remin_dt_reaction,        &
                               & loc_FeFeLL(1),  &
                               & loc_bio_part_TMP(:,kk)       &
                               & )
@@ -4007,7 +4002,7 @@ CONTAINS
                          loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - &
                               fun_box_scav_Fe(                                                  &
                               & dum_dtyr,                     &
-                              & loc_bio_remin_dt_scav,        &
+                              & loc_bio_remin_dt_reaction,        &
                               & loc_FeFeLL(1),  &
                               & loc_bio_part_TMP(:,kk)       &
                               & )
@@ -4021,7 +4016,7 @@ CONTAINS
                       call sub_box_scav_H2S(               &
                            & dum_i,dum_j,kk,               &
                            & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
+                           & loc_bio_remin_dt_reaction,    &
                            & dum_vocn%mk(io2l(io_H2S),kk), &
                            & loc_bio_part_TMP(:,kk),       &
                            & loc_bio_remin(:,kk)           &
@@ -4086,13 +4081,12 @@ CONTAINS
     dum_vbio_remin%mk(:,:) = dum_vbio_remin%mk(:,:) + loc_bio_remin(:,:)
     ! remin diagnostics
     if (ctrl_bio_remin_redox_save) diag_redox(:,dum_i,dum_j,:) = diag_redox(:,dum_i,dum_j,:) + loc_diag_redox(:,:)
-
+    ! record settling fluxes
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        bio_settle(is,dum_i,dum_j,:) = loc_bio_settle(l,:)
     end do
-
-    ! 
+    ! deallocate local arrays
     DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
   END SUBROUTINE sub_box_remin_part
