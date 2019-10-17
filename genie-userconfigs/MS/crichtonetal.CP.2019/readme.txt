@@ -28,11 +28,11 @@ All experiments are run for 10,000 years.
 
 The mid-point of the time-slice is given in Q10_yypy notation in the filenames:
 
-Q10_00p0 == 0 Ma == Holocene
-Q10_02p5 == 2.5 Ma == Piacenzian (Pliocene/Pleistocene)
-Q10_04p5 == 4.5 Ma == Zanclean (Pliocene)
-Q10_07p5 == 7.5 Ma == Tortonian/Messinian (Miocene)
-Q10_10p0 == 10 Ma == Tortonian (Miocene)
+Q10_00p0 == 0 Ma    == Holocene
+Q10_02p5 == 2.5 Ma  == Piacenzian (Pliocene/Pleistocene)
+Q10_04p5 == 4.5 Ma  == Zanclean (Pliocene)
+Q10_07p5 == 7.5 Ma  == Tortonian/Messinian (Miocene)
+Q10_10p0 == 10 Ma   == Tortonian (Miocene)
 Q10_12p5 == 12.5 Ma == Serravalian (Miocene)
 Q10_15p0 == 15.0 Ma == Langhian (Miocene)
 
@@ -72,10 +72,6 @@ bg_par_data_save_level=15
 bg_ctrl_debug_lvl0=.true.
 ma_debug_loop=1
 
-Also note that no attempt has been made to align the model and observed d13C in absolute value,
-and in the chosen ensemble members, atmospheric d13C is the preindustrial default:
-bg_par_atm_force_scale_val_4=-6.5
-
 The salinity forcing, to contorl the AMOC strength, 
 is applied by means of a 2D forcing that is generic across all the reconstructions:
 
@@ -90,6 +86,23 @@ in units of Sv.
 Atmospheric CO2 is restored in units of atmosphere, e.g.
 
 bg_par_atm_force_scale_val_3=0.000280
+
+Atmospheric CO2 d13C is restored in units of o/oo, e.g.
+
+bg_par_atm_force_scale_val_4=-6.5
+
+Note that atmospheric d13C is set to minimize the bias between model d13C and benthic data (Figure 13)
+
+The complete set of tuned d13C, FwF, and CO2 values are:
+
+time (Ma)   atm d13CO2  FwF (Sv)    CO2 (ppm)
+0.006	    -6.232	    0.200	    280
+2.5	        -6.261	    0.300	    400
+4.5	        -5.954	    0.500	    400
+7.5	        -5.624	    0.400	    800
+10	        -5.497	    0.400	    800
+12.5	    -5.554	    0.200	    1120
+15	        -5.318	    0.100	    1120
 
 ################################################################
 ################################################################
