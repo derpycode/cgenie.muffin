@@ -830,16 +830,89 @@ CONTAINS
          & .AND. &
          & (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) &
          & ) then
-       DO id=1,n_diag_Fe
+       DO id=1,n_diag_iron
           loc_unitsname = 'mol kg-1'
-          loc_ijk(:,:,:) = int_diag_Fe_timeslice(id,:,:,:)/int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,4,'diag_Fe_'//trim(string_diag_Fe(id)), &
-               & 'water-column Fe speciation - '//trim(string_diag_Fe(id)), &
+          loc_ijk(:,:,:) = int_diag_iron_timeslice(id,:,:,:)/int_t_timeslice
+          call sub_adddef_netcdf(loc_iou,4,'diag_'//trim(string_diag_iron(id)), &
+               & 'water-column Fe speciation - '//trim(string_diag_iron(id)), &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar3d_g('diag_Fe_'//trim(string_diag_Fe(id)),loc_iou, &
+          call sub_putvar3d_g('diag_'//trim(string_diag_iron(id)),loc_iou, &
                & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end DO
     end If
+    !----------------------------------------------------------------
+    !       Os isotope ratios
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Os) .AND. ocn_select(io_Os_187Os)) &
+         & ) then
+         loc_unitsname = ''
+         loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)                                                       
+                END DO
+             END DO
+          END DO
+         call sub_adddef_netcdf(loc_iou,4,'misc_Os_187Osr188Os', &
+              & 'water-column Os isotope ratio', &
+              & trim(loc_unitsname),const_real_zero,const_real_zero)
+         call sub_putvar3d_g('misc_Os_187Osr188Os',loc_iou, &
+              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !!----------------------
+    !----------------------------------------------------------------
+    !       Sr 87/86 isotope ratios
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Sr) .AND. ocn_select(io_Sr_87Sr)) &
+         & ) then
+         loc_unitsname = ''
+         loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Sr_87Sr,i,j,k)/(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k))
+                END DO
+             END DO
+          END DO
+         call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_87Srr86Sr', &
+              & 'water-column Sr isotope ratio', &
+              & trim(loc_unitsname),const_real_zero,const_real_zero)
+         call sub_putvar3d_g('ocn_Sr_87Srr86Sr',loc_iou, &
+              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !!----------------------
+    !----------------------------------------------------------------
+    !       Sr d88Sr isotope ratios
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Sr) .AND. ocn_select(io_Sr_88Sr)) &
+         & ) then
+         loc_unitsname = ''
+         loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)                                            
+
+                END DO
+             END DO
+          END DO
+         call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_d88Sr', &
+              & 'water-column Sr isotope ratio', &
+              & trim(loc_unitsname),const_real_zero,const_real_zero)
+         call sub_putvar3d_g('ocn_Sr_d88Sr',loc_iou, &
+              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !!----------------------
     !!-----------------------------------------------------------------------
     !!       misc 'physics'
     !!-----------------------------------------------------------------------
@@ -907,7 +980,7 @@ CONTAINS
           call sub_putvar3d_g('carb_d13C_CO32',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end if
     end If
-    If (ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_tracer) then
+    If (ctrl_data_save_slice_ocn .AND. (ctrl_data_save_slice_diag_bio .OR. ctrl_data_save_slice_diag_geochem)) then
        !-----------------------------------------------------------------------
        !       N-star
        !-----------------------------------------------------------------------
@@ -956,6 +1029,29 @@ CONTAINS
           call sub_adddef_netcdf(loc_iou,4,'misc_Pstar','P-star', &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar3d_g('misc_Pstar',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       end IF
+       !-----------------------------------------------------------------------
+       !       DINex
+       !-----------------------------------------------------------------------
+       IF (ocn_select(io_PO4) .AND. ocn_select(io_NO3) .AND. ocn_select(io_NH4)) THEN
+          loc_unitsname = 'umol kg-1'
+          loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) =                                                           &
+                        & 1.0E6*                                                              &
+                        & (                                                                   &
+                        &   int_ocn_timeslice(io_NO3,i,j,k)+int_ocn_timeslice(io_NH4,i,j,k) - &
+                        &   par_bio_red_POP_PON*int_ocn_timeslice(io_PO4,i,j,k)               &
+                        & )                                                                   &
+                        & /int_t_timeslice
+                END DO
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,4,'misc_DINex','DIN excess', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar3d_g('misc_DINex',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end IF
     end If
     If (ctrl_data_save_slice_ocn) then
@@ -1744,23 +1840,69 @@ CONTAINS
     !----------------------------------------------------------------
     ! WATER-COLUMN INTEGRATED PRODUCTION/OXIDATION RATE -- OLD
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_diag_geochem .AND. ctrl_data_save_slice_diag_redox_old) then
+    If (ctrl_data_save_slice_diag_redox_old) then
        loc_unitsname = 'mol m-2 yr-1'
-       DO id=1,n_diag_geochem
+       DO id=1,n_diag_geochem_old
           loc_ij(:,:) = const_real_null
           DO i=1,n_i
              DO j=1,n_j
                 If (goldstein_k1(i,j) <= n_k) then
                    loc_ij(i,j) = &
-                        & sum(phys_ocn(ipo_M,i,j,:)*int_diag_geochem_timeslice(id,i,j,:))* &
+                        & sum(phys_ocn(ipo_M,i,j,:)*int_diag_geochem_old_timeslice(id,i,j,:))* &
                         & phys_ocn(ipo_rA,i,j,n_k)/int_t_timeslice
                 end If
              end DO
           end DO
-          call sub_adddef_netcdf(loc_iou,3,'diag_int_'//trim(string_diag_geochem(id)), &
-               & 'water-column integrated production/oxidation rate - '//trim(string_diag_geochem(id)), &
+          call sub_adddef_netcdf(loc_iou,3,'diag_int_'//trim(string_diag_geochem_old(id)), &
+               & 'water-column integrated production/oxidation rate - '//trim(string_diag_geochem_old(id)), &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('diag_int_'//trim(string_diag_geochem(id)),loc_iou, &
+          call sub_putvar2d('diag_int_'//trim(string_diag_geochem_old(id)),loc_iou, &
+               & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       end DO
+    end If
+    !----------------------------------------------------------------
+    ! WATER-COLUMN INTEGRATED PRODUCTION RATE
+    !----------------------------------------------------------------
+    If (ctrl_data_save_slice_diag_geochem) then
+       loc_unitsname = 'mol m-2 yr-1'
+       DO id=1,n_diag_precip
+          loc_ij(:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                If (goldstein_k1(i,j) <= n_k) then
+                   loc_ij(i,j) = &
+                        & sum(phys_ocn(ipo_M,i,j,:)*int_diag_precip_timeslice(id,i,j,:))* &
+                        & phys_ocn(ipo_rA,i,j,n_k)/int_t_timeslice
+                end If
+             end DO
+          end DO
+          call sub_adddef_netcdf(loc_iou,3,'diag_int_'//trim(string_diag_precip(id)), &
+               & 'water-column integrated production rate - '//trim(string_diag_precip(id)), &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('diag_int_'//trim(string_diag_precip(id)),loc_iou, &
+               & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       end DO
+    end If
+    !----------------------------------------------------------------
+    ! WATER-COLUMN INTEGRATED REACTION RATE
+    !----------------------------------------------------------------
+    If (ctrl_data_save_slice_diag_geochem) then
+       loc_unitsname = 'mol m-2 yr-1'
+       DO id=1,n_diag_react
+          loc_ij(:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                If (goldstein_k1(i,j) <= n_k) then
+                   loc_ij(i,j) = &
+                        & sum(phys_ocn(ipo_M,i,j,:)*int_diag_react_timeslice(id,i,j,:))* &
+                        & phys_ocn(ipo_rA,i,j,n_k)/int_t_timeslice
+                end If
+             end DO
+          end DO
+          call sub_adddef_netcdf(loc_iou,3,'diag_int_'//trim(string_diag_react(id)), &
+               & 'water-column integrated reaction rate - '//trim(string_diag_react(id)), &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('diag_int_'//trim(string_diag_react(id)),loc_iou, &
                & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end DO
     end If
@@ -1780,10 +1922,10 @@ CONTAINS
                 end If
              end DO
           end DO
-          call sub_adddef_netcdf(loc_iou,3,'redox_int_'//trim(string_diag_redox(id)), &
+          call sub_adddef_netcdf(loc_iou,3,'diag_int_'//trim(string_diag_redox(id)), &
                & 'water-column integrated redox transformation rate - '//trim(string_diag_redox(id)), &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('redox_int_'//trim(string_diag_redox(id)),loc_iou, &
+          call sub_putvar2d('diag_int_'//trim(string_diag_redox(id)),loc_iou, &
                & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end DO
     end If
@@ -2730,27 +2872,54 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- OLD
-    !----------------------------------------------------------------
-    If (ctrl_data_save_slice_diag_geochem .AND. ctrl_data_save_slice_diag_redox_old) then
+    !---------------------------------------------------------------- 
+    If (ctrl_data_save_slice_diag_redox_old) then
        loc_unitsname = 'mol kg-1 yr-1'
-       DO id=1,n_diag_geochem
-          loc_ijk(:,:,:) = int_diag_geochem_timeslice(id,:,:,:)/int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,4,'diag_'//trim(string_diag_geochem(id)), &
-               & 'production/oxidation rate - '//trim(string_diag_geochem(id)),trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar3d_g('diag_'//trim(string_diag_geochem(id)),loc_iou, &
+       DO id=1,n_diag_geochem_old
+          loc_ijk(:,:,:) = int_diag_geochem_old_timeslice(id,:,:,:)/int_t_timeslice
+          call sub_adddef_netcdf(loc_iou,4,'diag_'//trim(string_diag_geochem_old(id)), &
+               & 'production/oxidation rate - '//trim(string_diag_geochem_old(id)), &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar3d_g('diag_'//trim(string_diag_geochem_old(id)),loc_iou, &
                & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end DO
     end If
     !----------------------------------------------------------------
-    ! GEOCHEMICAL DIAGNOSTICS
+    ! GEOCHEMICAL DIAGNOSTICS -- PRECIP
+    !---------------------------------------------------------------- 
+    If (ctrl_data_save_slice_diag_geochem) then
+       loc_unitsname = 'mol kg-1 yr-1'
+       DO id=1,n_diag_precip
+          loc_ijk(:,:,:) = int_diag_precip_timeslice(id,:,:,:)/int_t_timeslice
+          call sub_adddef_netcdf(loc_iou,4,'diag_'//trim(string_diag_precip(id)), &
+               & 'production rate - '//trim(string_diag_precip(id)),trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar3d_g('diag_'//trim(string_diag_precip(id)),loc_iou, &
+               & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       end DO
+    end If
+    !----------------------------------------------------------------
+    ! GEOCHEMICAL DIAGNOSTICS -- REACTION
+    !---------------------------------------------------------------- 
+    If (ctrl_data_save_slice_diag_geochem) then
+       loc_unitsname = 'mol kg-1 yr-1'
+       DO id=1,n_diag_react
+          loc_ijk(:,:,:) = int_diag_react_timeslice(id,:,:,:)/int_t_timeslice
+          call sub_adddef_netcdf(loc_iou,4,'diag_'//trim(string_diag_react(id)), &
+               & 'reaction rate - '//trim(string_diag_react(id)),trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar3d_g('diag_'//trim(string_diag_react(id)),loc_iou, &
+               & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       end DO
+    end If
+    !----------------------------------------------------------------
+    ! GEOCHEMICAL DIAGNOSTICS -- REDOX
     !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_redox
           loc_ijk(:,:,:) = int_diag_redox_timeslice(id,:,:,:)/int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,4,'redox_'//trim(string_diag_redox(id)), &
+          call sub_adddef_netcdf(loc_iou,4,'diag_'//trim(string_diag_redox(id)), &
                & 'redox transformation rate - '//trim(string_diag_redox(id)),trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar3d_g('redox_'//trim(string_diag_redox(id)),loc_iou, &
+          call sub_putvar3d_g('diag_'//trim(string_diag_redox(id)),loc_iou, &
                & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end DO
     end If

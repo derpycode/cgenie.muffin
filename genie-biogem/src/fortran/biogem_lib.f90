@@ -248,15 +248,18 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_thresh
   real::par_bio_remin_cthresh_O2                                 ! Hard threshold for oxic remin (mol kg-1)
   real::par_bio_remin_cthresh_NO3                                ! Hard threshold for denitrification (mol kg-1)
+  real::par_bio_remin_cthresh_FeOOH                              ! Hard threshold for FeOOH reduction (mol kg-1)
   real::par_bio_remin_cthresh_SO4                                ! Hard threshold for sulphate reduction (mol kg-1)
-  NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_SO4
+  NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_FeOOH,par_bio_remin_cthresh_SO4
   LOGICAL::ctrl_bio_remin_reminfix                               ! Catch mis-behaving rapidly-oxidizing species going < 0.0?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_reminfix
   CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
   CHARACTER(len=63)::opt_bio_remin_oxidize_H2StoSO4              ! H2S -> SO4 oxidation option
   NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_NH4toNO3,opt_bio_remin_oxidize_H2StoSO4
-  CHARACTER(len=63)::opt_bio_remin_scavenge_H2StoPOMS
-  NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS      ! H2S -> POMS
+  CHARACTER(len=63)::opt_bio_remin_scavenge_H2StoPOMS            ! H2S -> POMS
+  NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS
+  LOGICAL::ctrl_scav_H2S_dt_old                                  ! Old local residence time in layer for H2S? 
+  NAMELIST /ini_biogem_nml/ctrl_scav_H2S_dt_old
   CHARACTER(len=63)::par_bio_remin_CH4ox                         ! aerobic methanotrophy scheme ID string
   NAMELIST /ini_biogem_nml/par_bio_remin_CH4ox
   real::par_bio_remin_CH4rate                                    ! specific CH4 oxidation rate (d-1)
@@ -295,24 +298,27 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
-  real::par_bio_remin_POC_eL0		! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
-  real::par_bio_remin_POC_size0		! JDW size-dependent remin: diameter of smallest ecogem size class (um)
-  real::par_bio_remin_POC_eta		! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
+  real::par_bio_remin_POC_eL0                                    ! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
+  real::par_bio_remin_POC_size0                                  ! JDW size-dependent remin: diameter of smallest ecogem size class (um)
+  real::par_bio_remin_POC_eta                                    ! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
   NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta
   ! kinetics
   real::par_bio_remin_k_O2
   real::par_bio_remin_k_NO3
+  real::par_bio_remin_k_FeOOH
   real::par_bio_remin_k_SO4
   real::par_bio_remin_k_meth
-  NAMELIST /ini_biogem_nml/par_bio_remin_k_O2,par_bio_remin_k_NO3,par_bio_remin_k_SO4,par_bio_remin_k_meth
+  NAMELIST /ini_biogem_nml/par_bio_remin_k_O2,par_bio_remin_k_NO3,par_bio_remin_k_FeOOH,par_bio_remin_k_SO4,par_bio_remin_k_meth
   real::par_bio_remin_c0_O2
   real::par_bio_remin_c0_NO3
+  real::par_bio_remin_c0_FeOOH
   real::par_bio_remin_c0_SO4
-  NAMELIST /ini_biogem_nml/par_bio_remin_c0_O2,par_bio_remin_c0_NO3,par_bio_remin_c0_SO4
+  NAMELIST /ini_biogem_nml/par_bio_remin_c0_O2,par_bio_remin_c0_NO3,par_bio_remin_c0_FeOOH,par_bio_remin_c0_SO4
   real::par_bio_remin_ci_O2
   real::par_bio_remin_ci_NO3
+  real::par_bio_remin_ci_FeOOH
   real::par_bio_remin_ci_SO4
-  NAMELIST /ini_biogem_nml/par_bio_remin_ci_O2,par_bio_remin_ci_NO3,par_bio_remin_ci_SO4
+  NAMELIST /ini_biogem_nml/par_bio_remin_ci_O2,par_bio_remin_ci_NO3,par_bio_remin_ci_FeOOH,par_bio_remin_ci_SO4
   ! S
   real::par_bio_remin_kH2StoSO4
   real::par_bio_remin_kH2StoPOMS
@@ -371,8 +377,17 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d44Ca_CaCO3_epsilon
   real::par_d88Sr_SrCO3_epsilon                                  ! 88/86Sr fractionation between Sr and SrCO3
   namelist /ini_biogem_nml/par_d88Sr_SrCO3_epsilon
-  real::par_d13C_Corg_CH4_epsilon                                ! 'methanogenesis fractionation
+  real::par_d187Os_OsCO3_epsilon                                  ! 187/192Os fractionation between Os and OsCO3 
+  real::par_d188Os_OsCO3_epsilon                                  ! 188/192Os fractionation between Os and OsCO3 
+  namelist /ini_biogem_nml/par_d187Os_OsCO3_epsilon,par_d188Os_OsCO3_epsilon
+  real::par_d13C_Corg_CH4_epsilon                                ! methanogenesis fractionation
   namelist /ini_biogem_nml/par_d13C_Corg_CH4_epsilon
+  real::par_d34S_Corg_SO4_epsilon                                ! sulphate reduction fractionation (in S isotopes)
+  namelist /ini_biogem_nml/par_d34S_Corg_SO4_epsilon
+  real::par_bio_uptake_dN2_epsilon                               ! N2 fixation 15N fractionation 
+  real::par_bio_uptake_dNH4_epsilon                              ! NH4 assimilation 15N fractionation
+  real::par_bio_uptake_dNO3_epsilon                              ! NO3 uptake 15N fractionation  
+  namelist /ini_biogem_nml/par_bio_uptake_dN2_epsilon,par_bio_uptake_dNH4_epsilon,par_bio_uptake_dNO3_epsilon
   ! ------------------- IRON CYCLING --------------------------------------------------------------------------------------------- !
   real::par_det_Fe_sol                                           ! fractional solubility of Fe in dust
   real::par_det_Fe_sol_exp                                       ! exponent for aeolian Fe solubility
@@ -383,6 +398,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_red_POFe_POC
   LOGICAL::ctrl_bio_Fe_fixedKscav                                ! Fixed scavening rate (if not: Parekh scheme)?
   NAMELIST /ini_biogem_nml/ctrl_bio_Fe_fixedKscav
+  CHARACTER(len=63)::opt_bio_Fe_scav                             ! Fe scavening scheme ID string
+  NAMELIST /ini_biogem_nml/opt_bio_Fe_scav
   real::par_scav_Fe_Ks                                           ! Fixed Fe scavenging rate (d-1)
   NAMELIST /ini_biogem_nml/par_scav_Fe_Ks
   real::par_scav_Fe_sf_POC                                       ! Parekh Fe scavenging rate scale factor - POC
@@ -446,9 +463,18 @@ MODULE biogem_lib
   real::par_bio_red_CaCO3_SrCO3                                     ! Default CaCO3 Sr/Ca ratio
   real::par_bio_red_CaCO3_SrCO3_alpha                               ! partition coefficient (alpha)
   NAMELIST /ini_biogem_nml/par_bio_red_CaCO3_SrCO3,par_bio_red_CaCO3_SrCO3_alpha
+  real::par_bio_red_CaCO3_OsCO3                                     ! Default CaCO3 Os/Ca ratio
+  real::par_bio_red_CaCO3_OsCO3_alpha                               ! partition coefficient (alpha)
+  NAMELIST /ini_biogem_nml/par_bio_red_CaCO3_OsCO3,par_bio_red_CaCO3_OsCO3_alpha
   real::par_bio_red_POC_POI                                     ! Default cellular C:I (I/C) ratio
   real::par_bio_red_POC_POI_C0                                  ! Reference [IO3-] value @ default C:I ratio
   NAMELIST /ini_biogem_nml/par_bio_red_POC_POI,par_bio_red_POC_POI_C0
+  real::par_bio_remin_kOstoPOMOS					! Os scavenging efficiency
+  NAMELIST /ini_biogem_nml/par_bio_remin_kOstoPOMOS
+  logical::ctrl_Os_scav_O2_dep					! Switch to turn on O2 dependency for Os scavenging
+  NAMELIST /ini_biogem_nml/ctrl_Os_scav_O2_dep
+  real::par_scav_Os_O2_threshold                             !O2 threshold for oxygen-dependent Os scavenging
+  NAMELIST /ini_biogem_nml/par_scav_Os_O2_threshold
   ! ------------------- 230Th AND 231Pa CYCLING ---------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_scav_230Th_scavopt                     ! scavenging scheme ID string (e.g., 'equilibrium') for 230Th
   CHARACTER(len=63)::par_scav_231Pa_scavopt                     ! scavenging scheme ID string (e.g., 'equilibrium') for 231Pa
@@ -476,6 +502,42 @@ MODULE biogem_lib
   logical::par_bio_CaCO3precip_calcite                           ! Precipitate as calcite (otherwise aragonite)
   real::par_bio_CaCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
   NAMELIST /ini_biogem_nml/par_bio_CaCO3precip_calcite,par_bio_CaCO3precip_abioticohm_min
+  real::par_bio_FeCO3precip_sf                                   ! Scale factor for FeCO3 precipitation
+  real::par_bio_FeCO3precip_exp                                  ! Rate law power for FeCO3 precipitation
+  NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_sf,par_bio_FeCO3precip_exp
+  real::par_bio_FeCO3precip_abioticohm_cte                       ! ohmega constant for siderite formation
+  real::par_bio_FeCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
+  NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
+  real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
+  namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
+  real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
+  NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k
+  real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
+  namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
+  real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2 
+  namelist /ini_biogem_nml/par_d34S_FeS2_alpha
+  real::par_k_lim_pyr                                            ! MM type limiting factor for FeS2 precipitation 
+  namelist /ini_biogem_nml/par_k_lim_pyr
+  real::par_bio_remin_kFe2toFe                                   ! k-value Fe oxidation
+  real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
+  NAMELIST /ini_biogem_nml/par_bio_remin_kFe2toFe,par_d56Fe_Fe2ox_alpha
+  real::par_bio_remin_kFetoFe2                                   ! k-value Fe reduction
+  real::par_bio_remin_kFeOOHtoFe2                                   ! k-value FeOOH reduction
+  real::par_d56Fe_Fered_alpha                                    ! 56/54Fe fractionation for iron reduction with S
+  real::par_d34S_Fered_alpha                                     ! 34/32S fractionation for sulphide oxidation with Fe
+  NAMELIST /ini_biogem_nml/par_bio_remin_kFetoFe2,par_bio_remin_kFeOOHtoFe2,par_d56Fe_Fered_alpha,par_d34S_Fered_alpha
+  real::par_d56Fe_FeOOH_alpha                                    ! 56/54Fe fractionation for FeOOH precipitation
+  LOGICAL::ctrl_bio_FeOOHprecip_explicit                         ! let FeOOH precipitate explictely?
+  real::par_FeOOH_Fethresh                                       ! dissovled Fe threshold for FeOOH precipitation
+  NAMELIST /ini_biogem_nml/par_d56Fe_FeOOH_alpha,ctrl_bio_FeOOHprecip_explicit, par_FeOOH_Fethresh
+  real::par_bio_FeS_sf                                           ! Scale factor for FeS formation
+  real::par_bio_FeS_exp                                          ! Rate law power for FeS formation
+  NAMELIST /ini_biogem_nml/par_bio_FeS_sf,par_bio_FeS_exp
+  real::par_bio_FeS_abioticohm_cte                               ! ohmega constant for FeS formation
+  real::par_bio_FeS_abioticohm_min                               ! Minimum ohmega threshold for precip
+  NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte 
+  LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
+  NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                             !
   CHARACTER(len=255)::par_indir_name                             !
@@ -592,8 +654,6 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_audit,ctrl_audit_fatal
   real::par_misc_audit_relerr                                    ! threshold of relative inventory change to trigger audit error
   NAMELIST /ini_biogem_nml/par_misc_audit_relerr
-  LOGICAL::ctrl_debug_reportwarnings                             ! report all run-time warnings?
-  NAMELIST /ini_biogem_nml/ctrl_debug_reportwarnings
   LOGICAL::ctrl_debug_lvl0                                       ! report 'level #0' debug?
   LOGICAL::ctrl_debug_lvl1                                       ! report 'level #1' debug?
   LOGICAL::ctrl_debug_lvl2                                       ! report 'level #2' debug?
@@ -664,8 +724,10 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_data                           = 30 ! data (I/O)
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
   INTEGER,PARAMETER::n_diag_bio                           = 21 !
-  INTEGER,PARAMETER::n_diag_geochem                       = 10 !
-  INTEGER,PARAMETER::n_diag_Fe                            = 07 !
+  INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
+  INTEGER,PARAMETER::n_diag_precip                        = 06 !
+  INTEGER,PARAMETER::n_diag_react                         = 05 !
+  INTEGER,PARAMETER::n_diag_iron                          = 07 !
   INTEGER,PARAMETER::n_diag_misc_2D                       = 07 !
   INTEGER::n_diag_redox                                   =  0 !
 
@@ -764,25 +826,38 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_bio_CaCO3toPOC_nsp            = 19    !
   INTEGER,PARAMETER::idiag_bio_opaltoPOC_sp              = 20    !
   INTEGER,PARAMETER::idiag_bio_fspPOC                    = 21    !
-  ! diagnostics - geochemistry
-  INTEGER,PARAMETER::idiag_geochem_ammox_dNO3            = 01    !
-  INTEGER,PARAMETER::idiag_geochem_ammox_dNH4            = 02    !
-  INTEGER,PARAMETER::idiag_geochem_Nredct_dN2            = 03    !
-  INTEGER,PARAMETER::idiag_geochem_Nredct_dNH4           = 04    !
-  INTEGER,PARAMETER::idiag_geochem_Sredct_dH2S           = 05    !
-  INTEGER,PARAMETER::idiag_geochem_Sredct_dNH4           = 06    !
-  INTEGER,PARAMETER::idiag_geochem_dH2S                  = 07    !
-  INTEGER,PARAMETER::idiag_geochem_dCH4                  = 08    !
-  INTEGER,PARAMETER::idiag_geochem_dCH4_AOM              = 09    !
-  INTEGER,PARAMETER::idiag_geochem_dH2S_POMS             = 10    !
-  ! diagnostics - geochemistry -- Fe
-  INTEGER,PARAMETER::idiag_Fe_Fe                         = 01    !
-  INTEGER,PARAMETER::idiag_Fe_FeL                        = 02    !
-  INTEGER,PARAMETER::idiag_Fe_L                          = 03    !
-  INTEGER,PARAMETER::idiag_Fe_TDFe                       = 04    !
-  INTEGER,PARAMETER::idiag_Fe_TL                         = 05    !
-  INTEGER,PARAMETER::idiag_Fe_Fe3                        = 06    !
-  INTEGER,PARAMETER::idiag_Fe_geo                        = 07    !
+  ! diagnostics - OLD
+  INTEGER,PARAMETER::idiag_geochem_old_ammox_dNO3        = 01    !
+  INTEGER,PARAMETER::idiag_geochem_old_ammox_dNH4        = 02    !
+  INTEGER,PARAMETER::idiag_geochem_old_Nredct_dN2        = 03    !
+  INTEGER,PARAMETER::idiag_geochem_old_Nredct_dNH4       = 04    !
+  INTEGER,PARAMETER::idiag_geochem_old_Sredct_dH2S       = 05    !
+  INTEGER,PARAMETER::idiag_geochem_old_Sredct_dNH4       = 06    !
+  INTEGER,PARAMETER::idiag_geochem_old_dH2S              = 07    !
+  INTEGER,PARAMETER::idiag_geochem_old_dCH4              = 08    !
+  INTEGER,PARAMETER::idiag_geochem_old_dCH4_AOM          = 09    !
+  INTEGER,PARAMETER::idiag_geochem_old_dH2S_POMS         = 10    !
+  ! diagnostics - geochemistry -- precip
+  INTEGER,PARAMETER::idiag_precip_FeS2_dFe               = 01    !
+  INTEGER,PARAMETER::idiag_precip_FeS2_dH2S              = 02    !
+  INTEGER,PARAMETER::idiag_precip_FeS2_dSO4              = 03    !
+  INTEGER,PARAMETER::idiag_precip_FeCO3_dFe              = 04    !
+  INTEGER,PARAMETER::idiag_precip_FeCO3_dDIC             = 05    !
+  INTEGER,PARAMETER::idiag_precip_FeOOH_dFe              = 06    !
+  ! diagnostics - geochemistry -- iron speciation
+  INTEGER,PARAMETER::idiag_iron_Fe                       = 01    !
+  INTEGER,PARAMETER::idiag_iron_FeL                      = 02    !
+  INTEGER,PARAMETER::idiag_iron_L                        = 03    !
+  INTEGER,PARAMETER::idiag_iron_TDFe                     = 04    !
+  INTEGER,PARAMETER::idiag_iron_TL                       = 05    !
+  INTEGER,PARAMETER::idiag_iron_Fe3                      = 06    !
+  INTEGER,PARAMETER::idiag_iron_geo                      = 07    !
+  ! diagnostics - geochemistry -- solid-solute reactions
+  INTEGER,PARAMETER::idiag_react_POMS_dH2S               = 01    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dFe2              = 02    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dH2S              = 03    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dSO4              = 04    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dALK              = 05    !
   ! diagnostics - misc - 2D
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2                 = 01    !
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2_13C             = 02    !
@@ -868,28 +943,43 @@ MODULE biogem_lib
        & 'k_SiO2_sp     ', &
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
-       & 'fspPOC        ' /)
-  ! diagnostics - geochemistry
-  CHARACTER(len=14),DIMENSION(n_diag_geochem),PARAMETER::string_diag_geochem = (/ &
-       & 'NH4_oxid_dNO3 ', &
-       & 'NH4_oxid_dNH4 ', &
-       & 'NO3_redct_dN2 ', &
-       & 'NO3_redct_dNH4', &
-       & 'SO4_redct_dH2S', &
-       & 'SO4_redct_dNH4', &
+       & 'fspPOC        ' /)       
+  ! diagnostics - geochemistry -- OLD
+  CHARACTER(len=14),DIMENSION(n_diag_geochem_old),PARAMETER::string_diag_geochem_old = (/ &
+       & 'dNO3_NH4_oxid ', &
+       & 'dNH4_NH4_oxid ', &
+       & 'dN2_NO3_redct ', &
+       & 'dNH4_NO3_redct', &
+       & 'dH2S_SO4_redct', &
+       & 'dNH4_SO4_redct', &
        & 'dH2S          ', &
        & 'dCH4          ', &
        & 'dCH4_AOM      ', &
-       & 'H2StoPOMS_dH2S' /)
-  ! diagnostics - geochemistry -- Fe
-  CHARACTER(len=14),DIMENSION(n_diag_Fe),PARAMETER::string_diag_Fe = (/ &
-       & 'Fe            ', &
-       & 'FeL           ', &
-       & 'L             ', &
-       & 'TDFe          ', &
-       & 'TL            ', &
-       & 'Fe3           ', &
-       & 'geo           ' /)
+       & 'H2StoPOMS_dH2S'/)    
+  ! diagnostics - geochemistry -- precip
+  CHARACTER(len=18),DIMENSION(n_diag_precip),PARAMETER::string_diag_precip = (/ &
+       & 'precip_FeS2_dFe   ', &
+       & 'precip_FeS2_dH2S  ', &
+       & 'precip_FeS2_dSO4  ', &
+       & 'precip_FeCO3_dFe  ', &
+       & 'precip_FeCO3_dDIC ', &
+       & 'precip_FeOOH_dFe  '/)
+  ! diagnostics - geochemistry -- Fe speciation
+  CHARACTER(len=18),DIMENSION(n_diag_iron),PARAMETER::string_diag_iron = (/ &
+       & 'iron_Fe           ', &
+       & 'iron_FeL          ', &
+       & 'iron_L            ', &
+       & 'iron_TDFe         ', &
+       & 'iron_TL           ', &
+       & 'iron_Fe3          ', &
+       & 'iron_geo          ' /)
+  ! diagnostics - geochemistry -- solid-solute reactions
+  CHARACTER(len=18),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &
+       & 'react_POMS_dH2S   ', &
+       & 'react_FeOOH_dFe2  ', &
+       & 'react_FeOOH_dH2S  ', &
+       & 'react_FeOOH_dSO4  ', &
+       & 'react_FeOOH_dALK  ' /)
   ! diagnostics - misc - 2D
   CHARACTER(len=14),DIMENSION(n_diag_misc_2D),PARAMETER::string_diag_misc_2D = (/ &
        & 'FpCO2         ', &
@@ -1025,8 +1115,10 @@ MODULE biogem_lib
   REAL,DIMENSION(3,n_i,n_j,n_k)::carb_TSn                        !
   ! diagnostics
   REAL,DIMENSION(n_diag_bio,n_i,n_j)::diag_bio                   ! biology diagnostics
-  REAL,DIMENSION(n_diag_geochem,n_i,n_j,n_k)::diag_geochem       ! geochemistry diagnostics
-  REAL,DIMENSION(n_diag_Fe,n_i,n_j,n_k)::diag_Fe                 ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_geochem_old,n_i,n_j,n_k)::diag_geochem_old ! geochemistry diagnostics -- OLD
+  REAL,DIMENSION(n_diag_precip,n_i,n_j,n_k)::diag_precip         ! geochemistry diagnostics --  precipitation
+  REAL,DIMENSION(n_diag_iron,n_i,n_j,n_k)::diag_iron             ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_react,n_i,n_j,n_k)::diag_react           ! geochemistry solid-solute reaction diagnostics
 !!!  REAL,DIMENSION(n_ocn,n_i,n_j)::diag_weather                    ! weathering diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::diag_airsea                     ! air-sea gas exchange diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::diag_forcing                    ! atmospheric forcing diagnostics
@@ -1065,7 +1157,10 @@ MODULE biogem_lib
   real::int_misc_det_Fe_tot_sig,int_misc_det_Fe_dis_sig          !
   REAL,DIMENSION(n_sed)::int_ocnsed_sig                          !
   REAL,DIMENSION(n_diag_bio)::int_diag_bio_sig                   ! biology diagnostics
-  REAL,DIMENSION(n_diag_geochem)::int_diag_geochem_sig           ! geochemistry diagnostics
+  REAL,DIMENSION(n_diag_geochem_old)::int_diag_geochem_old_sig   ! geochemistry diagnostics -- OLD
+  REAL,DIMENSION(n_diag_precip)::int_diag_precip_sig             ! geochemistry diagnostics -- precipitation
+  REAL,DIMENSION(n_diag_iron)::int_diag_iron_sig                 ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_react)::int_diag_react_sig               ! geochemistry solid-solute reaction diagnostics
   REAL,DIMENSION(n_ocn)::int_diag_weather_sig                    ! weathering diagnostics
   REAL,DIMENSION(n_atm)::int_diag_airsea_sig                     ! air-sea gas exchange diagnostics
   REAL,DIMENSION(n_atm)::int_diag_forcing_sig                    ! forcing diagnostics
@@ -1110,8 +1205,10 @@ MODULE biogem_lib
   REAL,DIMENSION(3,n_i,n_j,n_k)::int_u_timeslice                 !
   REAL,DIMENSION(0:n_i,0:n_j)::int_psi_timeslice                 !
   REAL,DIMENSION(n_diag_bio,n_i,n_j)::int_diag_bio_timeslice             ! biology diagnostics
-  REAL,DIMENSION(n_diag_geochem,n_i,n_j,n_k)::int_diag_geochem_timeslice ! geochemistry diagnostics
-  REAL,DIMENSION(n_diag_Fe,n_i,n_j,n_k)::int_diag_Fe_timeslice ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_geochem_old,n_i,n_j,n_k)::int_diag_geochem_old_timeslice ! geochemistry diagnostics -- OLD
+  REAL,DIMENSION(n_diag_precip,n_i,n_j,n_k)::int_diag_precip_timeslice ! geochemistry diagnostics -- precipitation
+  REAL,DIMENSION(n_diag_iron,n_i,n_j,n_k)::int_diag_iron_timeslice   ! geochemistry (Fe) diagnostics
+  REAL,DIMENSION(n_diag_react,n_i,n_j,n_k)::int_diag_react_timeslice ! geochemistry solid-solute reaction diagnostics
   REAL,DIMENSION(n_ocn,n_i,n_j)::int_diag_weather_timeslice      ! weathering diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::int_diag_airsea_timeslice       ! air-sea gas exchange diagnostics
   ! redox

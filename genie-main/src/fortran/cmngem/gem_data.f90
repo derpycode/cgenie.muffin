@@ -40,12 +40,14 @@ CONTAINS
 if (ctrl_debug_init > 0) then
     ! --- TRACER SELECTION  ------------------------------------------------------------------------------------------------------ !
     ! NOTE: reported at end of initialise_gem when tracer name information is available
-    ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
+    ! --- GEOCHEM CONTROLS ------------------------------------------------------------------------------------------------------- !
     print*,'--- GEOCHEM CONTROLS ---'
     print*,'carbonate dissociation constants set                : ',trim(par_carbconstset_name)
     print*,'pH solution tolerance                               : ',par_carbchem_pH_tolerance
     print*,'pH solution maximum number of iterations            : ',par_carbchem_pH_iterationmax
     print*,'Exit upon pH solution failure?                      : ',ctrl_carbchem_fail
+    ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
+    print*,'--- MISC CONTROLS ---'
     print*,'minimum T used in empirical geochem calculations    : ',par_geochem_Tmin 
     print*,'maximum T used in empirical geochem calculations    : ',par_geochem_Tmax
     print*,'minimum S used in empirical geochem calculations    : ',par_geochem_Smin 
@@ -54,11 +56,11 @@ if (ctrl_debug_init > 0) then
     print*,'maximum T used in empirical carbchem calculations   : ',par_carbchem_Tmax
     print*,'minimum S used in empirical carbchem calculations   : ',par_carbchem_Smin 
     print*,'maximum S used in empirical carbchem calculations   : ',par_carbchem_Smax 
-    print*,'--- MISC CONTROLS ---'
     print*,'assumed longitudinal offset of the grid             : ',par_grid_lon_offset
     print*,'Debug (initialization) level                        : ',ctrl_debug_init
     print*,'Debug (loop) level                                  : ',ctrl_debug_loop
     print*,'Debug (end) level                                   : ',ctrl_debug_end
+    print*,'Report all run-time warnings?                       : ',ctrl_debug_reportwarnings
     ! --- I/O: DIRECTORY DEFINITIONS --------------------------------------------------------------------------------------------- !
     print*,'--- I/O: DIRECTORY DEFINITIONS ---'
     print*,'Input dir. name                                     : ',trim(par_gem_indir_name)

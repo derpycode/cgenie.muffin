@@ -170,6 +170,10 @@ MODULE rokgem_lib
   REAL::par_weather_CaSiO3b_d88Sr                                                         ! basaltic d88Sr (o/oo)
   REAL::par_weather_CaSiO3g_d88Sr                                                        ! granitic d88r (o/oo) 
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3b_d88Sr,par_weather_CaSiO3g_d88Sr
+  REAL::par_weather_fracOs								 ! Os:Ca2+ ratio in weathering flux
+  REAL::par_weather_187Os_188Os								 ! 187Os/188Os ratio of weathering flux
+  REAL::par_weather_188Os_192Os								 ! 188Os/192Os ratio of weathering flux
+  NAMELIST /ini_rokgem_nml/par_weather_fracOs,par_weather_187Os_188Os,par_weather_188Os_192Os
   real:: par_weather_CaSiO3_fracCa5PO43                                                  ! global silicate apatite relative abundance
   REAL:: par_weather_CaSiO3_fracCa5PO43_d44Ca                                            ! global apatite d44Ca
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracCa5PO43,par_weather_CaSiO3_fracCa5PO43_d44Ca
