@@ -5084,7 +5084,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>j location for water column timeseries saving</description>
                     </param>
                     <param name="n_orb_pts_nmax">
-			<value datatype="integer">10000</value>
+			<value datatype="integer">0</value>
                         <description></description>
                     </param>
                     <param name="par_infile_orb_pts_loc_name">
