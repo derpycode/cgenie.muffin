@@ -5129,6 +5129,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0</value>
                         <description>Minimum ohmega threshold for precip</description>
                     </param>
+                     <param name="par_bio_FeS_part_abioticohm_cte">
+			<value datatype="real">2e-6</value>
+                        <description>Ohmega constant for nanoparticulate FeS formation</description>
+                    </param>
                     <param name="par_bio_FeS2precip_k">
 			<value datatype="real">3250.43</value>
                         <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
