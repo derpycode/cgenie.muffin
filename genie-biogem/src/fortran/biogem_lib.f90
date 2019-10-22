@@ -510,8 +510,9 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
   real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
+  real::par_bio_FeS_part_abioticohm_cte                          ! Ohmega constant for nanoparticulate FeS formation
   real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
-  NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k
+  NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k,par_bio_FeS_part_abioticohm_cte
   real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
   real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2 
