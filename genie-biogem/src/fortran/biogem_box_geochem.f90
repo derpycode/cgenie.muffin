@@ -800,7 +800,7 @@ CONTAINS
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
     real,dimension(1:3)::loc_Fe2spec
-    real::loc_H2S,loc_SO4,loc_FeS,loc_Fe2
+    real::loc_H2S,loc_SO4,loc_FeS,loc_FeSp,loc_Fe2
     real::loc_r56Fe, loc_r34S, loc_r34S_SO4, loc_r34S_FeS
     real::loc_R_56Fe
     real::loc_alpha_56Fe
@@ -845,42 +845,46 @@ CONTAINS
        end if
        ! calculate pyrite precipitation
        ! NOTE: const_rns == const_real_nullsmall
-       if ( (loc_FeS > const_rns) .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
-          ! loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_FeS*loc_H2S
-          loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(par_k_lim_pyr + loc_FeS))*loc_FeS*loc_H2S
-          ! calculate isotopic ratio
-          if (loc_Fe2 > const_rns) then
-             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
-          else
-             loc_r56Fe = 0.0
-          end if
-          loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
-          ! test for limitation by one of the reactants
-          if (loc_FeS2_precipitation > MIN(4.0/3.0*loc_H2S,loc_FeS,4.0/1.0*loc_SO4)) then
-             ! reactant limited
-             loc_bio_part(is_FeS2,k) = MIN(4.0/3.0*loc_H2S,loc_FeS,4.0/1.0*loc_SO4)
-             if (loc_FeS2_precipitation == loc_FeS) then
-                loc_bio_part(is_FeS2_56Fe,k) = loc_r56Fe*loc_bio_part(is_FeS2,k)
-             else 
-                ! Potential Fe fractionation
-                loc_bio_part(is_FeS2_56Fe,k) = &
-                    & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
-             end if
-          else
-             ! no limitation
-             loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
-             ! isotopes
-             loc_bio_part(is_FeS2_56Fe,k) = &
-                 & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)	
-          end if
-          ! no fractionation of S during pyrite formation
-          ! calculate isotopic ratio
-          if (loc_H2S > const_rns) then
-              loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
-          else
-              loc_r34S = 0.0
-          end if
-          loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
+      if (loc_FeS > par_bio_FeS_part_abioticohm_cte) then
+          ! Calculate amount of FeS that precipitates (as nanoparticulate precursor for pyrite)
+          loc_FeSp = loc_FeS - par_bio_FeS_part_abioticohm_cte
+              if ( (loc_FeSp > const_rns) .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
+              loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_FeSp*loc_H2S
+              ! loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(par_k_lim_pyr + loc_FeS))*loc_FeSp*loc_H2S
+              ! calculate isotopic ratio
+                  if (loc_Fe2 > const_rns) then
+                      loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
+                  else
+                    loc_r56Fe = 0.0
+                  end if
+                  loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+                  ! test for limitation by one of the reactants
+                  if (loc_FeS2_precipitation > MIN(4.0/3.0*loc_H2S,loc_FeSp,4.0/1.0*loc_SO4)) then
+                  ! reactant limited
+                      loc_bio_part(is_FeS2,k) = MIN(4.0/3.0*loc_H2S,loc_FeSp,4.0/1.0*loc_SO4)
+                      if (loc_FeS2_precipitation == loc_FeSp) then
+                         loc_bio_part(is_FeS2_56Fe,k) = loc_r56Fe*loc_bio_part(is_FeS2,k)
+                      else 
+                        ! Potential Fe fractionation
+                         loc_bio_part(is_FeS2_56Fe,k) = &
+                             & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
+                      end if
+                  else
+                      ! no limitation
+                      loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
+                      ! isotopes
+                      loc_bio_part(is_FeS2_56Fe,k) = &
+                           & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)	
+                  end if
+                  ! no fractionation of S during pyrite formation
+                  ! calculate isotopic ratio
+                 if (loc_H2S > const_rns) then
+                      loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
+                 else
+                      loc_r34S = 0.0
+                 end if
+               loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
+              end if
        end if
        ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
        DO l=1,n_l_sed
