@@ -367,6 +367,7 @@ CONTAINS
        print*,'Ohnega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
        print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
+       print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte
        print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
        print*,'S fractionation factor for FeS2 precipitation       : ',par_d34S_FeS2_alpha
        print*,'MM type limiting factor for FeS2 precipitation      : ',par_k_lim_pyr
