@@ -59,7 +59,7 @@ bg_par_infile_sig_name='save_timeseries_EVERY000100.dat'
 bg_par_forcing_name="Q_xxxxxx.RpCO2_Rp13CO2.Fsal_SUR"
 bg_par_atm_force_scale_val_4=-5.624
 # parameter: bg_par_atm_force_scale_val_3 -- default value modified by factor: 800
-bg_par_atm_force_scale_val_3=0.00800
+bg_par_atm_force_scale_val_3=0.000800
 # parameter: bg_par_ocn_force_scale_val_2 -- default value modified by factor: 0.4
 bg_par_ocn_force_scale_val_2=0.4
 #
