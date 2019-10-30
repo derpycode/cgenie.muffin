@@ -124,7 +124,7 @@ c                 files
       character xv_wstress*127, yv_wstress*127
       integer   len_xu, len_yu, len_xv, len_yv
 
-      character u_wspeed*20, v_wspeed*20
+      character u_wspeed*127, v_wspeed*127
       integer   len_uws, len_vws
 
 c AY (09/01/04) : local variables reinstated
@@ -1047,7 +1047,7 @@ c disastrous).
 c           uatm(2,i,j) = uatm(2,i,j)*0.0
          enddo
          if (par_wind_polar_avg.ne.1.and.par_wind_polar_avg.ne.2) then 
-         uatm(2,i,jmax) = 0.
+            uatm(2,i,jmax) = 0.
          endif
       enddo
       else
@@ -1059,6 +1059,7 @@ c           uatm(2,i,j) = uatm(2,i,j)*0.0
             enddo
          enddo
       endif
+c [endif of: if (.not.flag_wind) then]
 
 c parameters for extra heat diffusion where pptn high
 
@@ -1124,7 +1125,7 @@ c T diffusion by input params and make sure q diff is no bigger
 c only if constant lat grid (i.e. allowing compatibility with 36x36 version)
 
 crma      if(ldeg)then
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
          diffa(2,1,j) = min(diffa(2,1,j),diffa(1,1,j))
       endif
          if (debug_init.and.(j.gt.1))write(6,'(i4,4e15.5)')j,
@@ -1335,7 +1336,7 @@ c in north Atlantic (north of 24 deg N) NB INCLUDES DRY POINTS
 
       endif
 
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
 
       area_pac1a = 0.
       area_atl1a = 0.
@@ -1459,7 +1460,7 @@ crma If 36x36s ...
 
 ccc If 64x32 or 64x32l ...
 
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
 
       do j=j1as,(j1bs-1)
          do i=ips(j),ipf(j)

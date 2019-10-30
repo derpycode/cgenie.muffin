@@ -17,6 +17,7 @@ c noting that tau not currently defined outside domain
 
       do 50 i=1,imax
          do 50 j=0,jmax
+
             ip1=mod(i,imax) + 1
             k = i + j*n
             if(max(k1(i,j),k1(i+1,j),k1(i,j+1),k1(i+1,j+1)).le.kmax)then
@@ -29,6 +30,7 @@ c noting that tau not currently defined outside domain
             else
                gb(k) = 0
             endif
+
             gbold(k) = gb(k)
    50 continue
 

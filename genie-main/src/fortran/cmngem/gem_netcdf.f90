@@ -294,7 +294,6 @@ CONTAINS
        i = nf90_put_att (dum_ncid, loc_iv, 'missing_value', nf90_fill_double)
        call sub_checkerror (i,'defvar fill_value double '//trim(dum_name))
     elseif (dum_type .eq. 'F') then
-       !     print*,'defvar ',dum_ncid, dum_name, dum_id, dum_nd
        i = nf90_def_var (dum_ncid, dum_name, nf90_float, dum_id(1:dum_nd), loc_iv)
        call sub_checkerror (i,'defvar real '//dum_name)
 

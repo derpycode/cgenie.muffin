@@ -42,7 +42,7 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 # --- DATA SAVING -----------------------------------------------------
 #
 # data saving & reporting options
-bg_par_data_save_level=4
+bg_par_data_save_level=5
 bg_ctrl_debug_lvl0=.true.
 ma_debug_loop=1
 #

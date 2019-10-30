@@ -70,6 +70,9 @@ CONTAINS
        print*,'# sedimentary stack sub-layers                      : ',n_sed_tot
        print*,'# initial sedimentary stack sub-layers filled       : ',n_sed_tot_init
        print*,'# sedimentary stack sub-layers to drop off bottom   : ',n_sed_tot_drop
+       ! --- DETRITAL CONFIGURATION ---------------------------------------------------------------------------------------------- !
+       print*,'Flux of refractory material (g cm-2 kyr-1)          : ',par_sed_fdet
+       print*,'No pelagic (dust) detrital contribution?            : ',ctrl_sed_det_NOdust
        ! --- DIAGENESIS SCHEME: SELECTION ---------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: SELECTION -------------------'
        print*,'CaCO3 diagenesis scheme                             : ',par_sed_diagen_CaCO3opt
@@ -82,7 +85,6 @@ CONTAINS
        print*,'maximum layer depth for bioturbation                : ',par_n_sed_mix
        print*,'Max surface bioturbation mixing rate (cm2 yr-1)     : ',par_sed_mix_k_sur_max
        print*,'Min surface bioturbation mixing rate (cm2 yr-1)     : ',par_sed_mix_k_sur_min
-       print*,'Flux of refractory material (g cm-2 kyr-1)          : ',par_sed_fdet
        print*,'Prevent CaCO3 erosion (Fdis > Fsed)?                : ',ctrl_sed_noerosion
        print*,'CaCO3 interface dissolution?                        : ',ctrl_sed_interface
        print*,'CaCO3 red tracer tag fraction                       : ',par_sed_CaCO3_fred
@@ -108,6 +110,8 @@ CONTAINS
        print*,'refractory Corg deg. rate order compared to labile  : ',par_sed_huelse2017_k2_order
        print*,'anoxic refractory Corg deg. rate constant (1/yr)    : ',par_sed_huelse2017_k2_anoxic
        print*,'Include explicit P-cycle in OMEN-SED?               : ',par_sed_huelse2017_P_cycle
+       print*,'Remove implicit Alk associated with buried sulf-OM? : ',par_sed_huelse2017_remove_impl_sulALK
+       print*,'Simulate ocean Porg loss with buried sulf-OM?       : ',par_sed_huelse2017_sim_P_loss
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
@@ -216,6 +220,7 @@ CONTAINS
        print*,'Report errors?                                      : ',ctrl_misc_report_err
        print*,'i sediment coordinate for debug reporting           : ',par_misc_debug_i
        print*,'j sediment coordinate for debug reporting           : ',par_misc_debug_j
+       print*,'Report level #1 debug?                              : ',ctrl_debug_lvl1
        ! --- DATA SAVING: MISC --------------------------------------------------------------------------------------------------- !
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst

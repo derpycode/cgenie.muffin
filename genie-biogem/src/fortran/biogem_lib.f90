@@ -35,7 +35,7 @@ MODULE biogem_lib
   LOGICAL::ctrl_misc_t_BP                                               ! years before present?
   NAMELIST /ini_biogem_nml/ctrl_misc_t_BP
   REAL::par_misc_t_stop                                                ! stop time (years)
-  NAMELIST /ini_biogem_nml/par_misc_t_stop  
+  NAMELIST /ini_biogem_nml/par_misc_t_stop
   ! ------------------- MISC CONTROL --------------------------------------------------------------------------------------------- !
   logical::ctrl_misc_Snorm                                              !
   logical::ctrl_misc_noSnorm                                            !
@@ -57,11 +57,11 @@ MODULE biogem_lib
   logical::ctrl_ocn_rst_reset_T                                         ! Overwrite restart temperatures?
   NAMELIST /ini_biogem_nml/ctrl_ocn_rst_reset_T
   logical::ctrl_carbchemupdate_full                                     ! Full (entire grid) carbonate chem update?
-  NAMELIST /ini_biogem_nml/ctrl_carbchemupdate_full 
+  NAMELIST /ini_biogem_nml/ctrl_carbchemupdate_full
   ! ------------------- BOUNDARY CONDITIONS -------------------------------------------------------------------------------------- !
   logical::ctrl_force_sed_closedsystem                                  ! Set dissolution flux = rain flux to close system?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closedsystem
-  logical::ctrl_force_sed_closed_P                                      ! Balance the P cycle (with weathering)? 
+  logical::ctrl_force_sed_closed_P                                      ! Balance the P cycle (with weathering)?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closed_P
   logical::ctrl_force_GOLDSTEInTS                                       ! Allow temperature / salinity forcing of climate?
   logical::ctrl_force_GOLDSTEInTSonly                                   ! Allow ONLY temperature / salinity forcing of climate?
@@ -154,6 +154,12 @@ MODULE biogem_lib
   real::par_bio_red_POP_PO2                                             ! O2/P organic matter pseudo-Redfield ratio
   real::par_bio_red_PON_ALK                                             ! ALK/N alkalinty correction factor
   NAMELIST /ini_biogem_nml/par_bio_red_POP_PON,par_bio_red_POP_POC,par_bio_red_POP_PO2,par_bio_red_PON_ALK
+  integer::par_bio_red_PC_flex                                          ! C/P organic matter flexible stoichiometry activation
+  real::par_bio_red_PC_alpha1                                           ! scaling of C/P flexible stoichiometry
+  real::par_bio_red_PC_alpha2                                           ! offset of C/P flexible stoichiometry
+  NAMELIST /ini_biogem_nml/par_bio_red_PC_flex,par_bio_red_PC_alpha1,par_bio_red_PC_alpha2
+  real::par_bio_red_PC_max                                              ! maximum C/P
+  NAMELIST /ini_biogem_nml/par_bio_red_PC_max
   real::par_bio_red_DOMfrac                                             ! production fraction of dissolved organic matter
   NAMELIST /ini_biogem_nml/par_bio_red_DOMfrac
   real::par_bio_red_RDOMfrac                                            ! production fraction of R-dissolved organic matter
@@ -183,6 +189,8 @@ MODULE biogem_lib
   real::par_part_red_opal_FeTKSp                                        ! Ridgwell [2001] -- opal:POC KSp for FeT
   real::par_part_red_opal_FeToff                                        ! Ridgwell [2001] -- opal:POC offset for FeT
   NAMELIST /ini_biogem_nml/par_part_red_opal_FeTKSp,par_part_red_opal_FeToff
+  CHARACTER(len=63)::opt_bio_red_SitoC                                  ! opal:POC rain ratio option ID (e.g. 'fixed' == default)
+  NAMELIST /ini_biogem_nml/opt_bio_red_SitoC
   ! ------------------- REMINERALIZATION ----------------------------------------------------------------------------------------- !
   real::par_bio_remin_RDOMfrac                                          ! fraction of POM remin concverted to RDOM
   NAMELIST /ini_biogem_nml/par_bio_remin_RDOMfrac
@@ -228,6 +236,9 @@ MODULE biogem_lib
   real::par_bio_remin_sinkingrate                                ! prescribed particle sinking rate (m d-1)
   real::par_bio_remin_sinkingrate_scav                           ! sinking rate (for calculating scavenging) (m d-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate,par_bio_remin_sinkingrate_scav
+  real::par_bio_remin_sinkingrate_physical                       ! Explicit physical particle sinking rate (m d-1)
+  real::par_bio_remin_sinkingrate_reaction                       ! Implicit sinking rate for geochem reactions (m d-1)
+  NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate_physical,par_bio_remin_sinkingrate_reaction
   real::par_bio_remin_ballast_kc                                 ! organic matter carrying capacity of CaCO3
   real::par_bio_remin_ballast_ko                                 ! organic matter carrying capacity of opal
   real::par_bio_remin_ballast_kl                                 ! organic matter carrying capacity of detital (lithogenic)
@@ -236,9 +247,9 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_ONtoNH4
   REAL::par_bio_remin_denitrO2thresh                             ! Denitrification [O2] threshold (mol kg-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_denitrO2thresh
-  LOGICAL::ctrl_bio_remin_thresh                                 ! Apply a hard tracer oxidant remin threshold? 
+  LOGICAL::ctrl_bio_remin_thresh                                 ! Apply a hard tracer oxidant remin threshold?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_thresh
-  real::par_bio_remin_cthresh_O2                                 ! Hard threshold for oxic remin (mol kg-1) 
+  real::par_bio_remin_cthresh_O2                                 ! Hard threshold for oxic remin (mol kg-1)
   real::par_bio_remin_cthresh_NO3                                ! Hard threshold for denitrification (mol kg-1)
   real::par_bio_remin_cthresh_SO4                                ! Hard threshold for sulphate reduction (mol kg-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_SO4
@@ -287,9 +298,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
-  real::par_bio_remin_POC_eL0		! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
-  real::par_bio_remin_POC_size0		! JDW size-dependent remin: diameter of smallest ecogem size class (um)
-  real::par_bio_remin_POC_eta		! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
+  ! JDW size-dependent remin
+  real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m)
+  real::par_bio_remin_POC_size0                                  ! diameter of smallest ecogem size class (um)
+  real::par_bio_remin_POC_eta                                    ! exponent linking sinking speed and size (Stemmann et al., 2004)
   NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta
   ! kinetics
   real::par_bio_remin_k_O2
@@ -361,7 +373,7 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/opt_bio_foram_p_13C_delta
   real::par_d44Ca_CaCO3_epsilon                                  ! 44/40Ca fractionation between Ca and CaCO3
   namelist /ini_biogem_nml/par_d44Ca_CaCO3_epsilon
-  real::par_d88Sr_SrCO3_epsilon                                  ! 88/86Sr fractionation between Sr and SrCO3 
+  real::par_d88Sr_SrCO3_epsilon                                  ! 88/86Sr fractionation between Sr and SrCO3
   namelist /ini_biogem_nml/par_d88Sr_SrCO3_epsilon
   real::par_d13C_Corg_CH4_epsilon                                ! 'methanogenesis fractionation
   namelist /ini_biogem_nml/par_d13C_Corg_CH4_epsilon
@@ -405,7 +417,7 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_lookup_Fe_file_1,par_lookup_Fe_file_2,par_lookup_Fe_file_3,par_lookup_Fe_file_4
   ! ------------------- SILICIC ACID CYCLING ------------------------------------------------------------------------------------- !
   real::par_bio_remin_opal_K                                     ! opal particulate base dissolution rate (d-1)
-  NAMELIST /ini_biogem_nml/par_bio_remin_opal_K  
+  NAMELIST /ini_biogem_nml/par_bio_remin_opal_K
   ! ------------------- NITROGEN CYCLING ----------------------------------------------------------------------------------------- !
   real::par_bio_mu1                                              ! mu-1 maximum rate of export production (yr-1)
   real::par_bio_mu2                                              ! mu-2 maximum rate of export production from N2-fixation (yr-1)
@@ -572,7 +584,7 @@ MODULE biogem_lib
   LOGICAL::ctrl_data_save_3d                                     ! save 3D netCDF data?
   NAMELIST /ini_biogem_nml/ctrl_data_save_2d,ctrl_data_save_3d
   integer::par_misc_save_i
-  integer::par_misc_save_j 
+  integer::par_misc_save_j
   NAMELIST /ini_biogem_nml/par_misc_save_i,par_misc_save_j
   integer::n_orb_pts_nmax                                            !
   CHARACTER(len=127)::par_infile_orb_pts_loc_name                        !
@@ -589,7 +601,7 @@ MODULE biogem_lib
   LOGICAL::ctrl_debug_lvl0                                       ! report 'level #0' debug?
   LOGICAL::ctrl_debug_lvl1                                       ! report 'level #1' debug?
   LOGICAL::ctrl_debug_lvl2                                       ! report 'level #2' debug?
-  NAMELIST /ini_biogem_nml/ctrl_debug_lvl0,ctrl_debug_lvl1,ctrl_debug_lvl2 
+  NAMELIST /ini_biogem_nml/ctrl_debug_lvl0,ctrl_debug_lvl1,ctrl_debug_lvl2
   ! ------------------- TRACER FORCING ------------------------------------------------------------------------------------------- !
   REAL,DIMENSION(n_atm)::par_atm_force_scale_time                ! scale tracer forcing time points
   REAL,DIMENSION(n_atm)::par_atm_force_scale_val                 ! scale tracer forcing value
@@ -615,6 +627,12 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_invert_explicit
   logical::ctrl_force_ocn_age                                   ! automatic ocean age tracer
   NAMELIST /ini_biogem_nml/ctrl_force_ocn_age
+  ! ---------------- TRANSPORT MATRIX---------------------------!
+  LOGICAL::ctrl_data_diagnose_TM !                              ! diagnose matrix in run?
+  NAMELIST /ini_biogem_nml/ctrl_data_diagnose_TM
+  REAL::par_data_TM_avg_n                                       ! number of intervals to diagnose average matrix in 1 year
+  REAL::par_data_TM_start                                       ! year to start diagnosing matrix
+  NAMELIST /ini_biogem_nml/par_data_TM_avg_n,par_data_TM_start
   ! ############################################################################################################################## !
   ! ****************************************************************************************************************************** !
 
@@ -803,7 +821,7 @@ MODULE biogem_lib
        & 'v               ', &
        & 'w               ', &
        & 'dzrho           ', &
-       & 'diffv           ', & 
+       & 'diffv           ', &
        & 'rho_go          ' /)
   ! ocean-atmosphere interface 'physics'
   CHARACTER(len=16),DIMENSION(n_phys_ocnatm),PARAMETER::string_phys_ocnatm = (/ &
@@ -854,7 +872,7 @@ MODULE biogem_lib
        & 'k_SiO2_sp     ', &
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
-       & 'fspPOC        ' /)       
+       & 'fspPOC        ' /)
   ! diagnostics - geochemistry
   CHARACTER(len=14),DIMENSION(n_diag_geochem),PARAMETER::string_diag_geochem = (/ &
        & 'NH4_oxid_dNO3 ', &
@@ -886,7 +904,7 @@ MODULE biogem_lib
        & 'FCa           ', &
        & 'FCa_44Ca      ' /)
   ! diagnostics - redox
-  CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::string_diag_redox        ! 
+  CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::string_diag_redox        !
 
   ! *** miscellaneous ***
   ! changes in T or S required to trigger re-calculation of carbonate dissociation constants and Schmidt number
@@ -943,6 +961,13 @@ MODULE biogem_lib
   logical::par_misc_t_endseries = .FALSE.
   logical::par_misc_t_endslice  = .FALSE.
 
+  !*** transport matrix ***
+  INTEGER::matrix_vocn_n = 0
+  INTEGER::matrix_k = n_k
+  INTEGER::matrix_go = 0
+  INTEGER::matrix_season = 1
+  INTEGER::matrix_avg_count = 0
+
   ! ocean tracer array
   !
   integer::n_vocn
@@ -960,6 +985,7 @@ MODULE biogem_lib
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vphys_ocn             !
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vbio_part             !
   type(fieldocn),DIMENSION(:),ALLOCATABLE::vdbio_part            !
+  type(fieldocn),DIMENSION(:),ALLOCATABLE::matrix_exp            ! matrix dye output
   !
   ! atmosphere tracer array
   !
@@ -1011,6 +1037,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_diag_misc_2D,n_i,n_j)::diag_misc_2D           !
   REAL,DIMENSION(0:n_i,0:n_j)::diag_misc_psi                     !
   real,DIMENSION(:,:,:,:),ALLOCATABLE::diag_redox                ! redox diagnostics
+  REAL,DIMENSION(n_sed,n_i,n_j)::diag_ecogem_part                !
+  REAL,DIMENSION(n_ocn,n_i,n_j)::diag_ecogem_remin               !
 
   ! *** integrated (time-averaged) time-series storage scalars and vectors ***
   !
@@ -1026,9 +1054,13 @@ MODULE biogem_lib
   REAL,DIMENSION(n_sed)::int_focnsed_sig                         !
   REAL,DIMENSION(n_ocn)::int_fsedocn_sig                         !
   REAL,DIMENSION(n_ocn)::int_ocn_sur_sig                         !
+  REAL,DIMENSION(n_ocn)::int_ocn_opn_sig                         !
   REAL,DIMENSION(n_ocn)::int_ocn_ben_sig                         !
   REAL,DIMENSION(n_carb)::int_carb_sur_sig                       !
+  REAL,DIMENSION(n_carb)::int_carb_opn_sig                       !
   REAL,DIMENSION(n_carb)::int_carb_ben_sig                       !
+  REAL::int_misc_age_sig                                         !
+  real::int_misc_age_sur_sig,int_misc_age_ben_sig                !
   REAL::int_misc_seaice_sig                                      !
   real::int_misc_seaice_sig_th,int_misc_seaice_sig_vol           !
   real::int_misc_opsi_min_sig,int_misc_opsi_max_sig              !
@@ -1043,8 +1075,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm)::int_diag_forcing_sig                    ! forcing diagnostics
   REAL,DIMENSION(n_diag_misc_2D)::int_diag_misc_2D_sig           !
   ! misc
-  real::int_misc_ocn_solfor_sig                                  !
-  real::int_misc_ocn_fxsw_sig                                    !
+  real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
+  real::int_misc_ocn_fxsw_sig,int_misc_opn_fxsw_sig              !
   ! 'snap-shot' time-series arrays
   real::snap_misc_ocn_solfor_N_sig                               !
   real::snap_misc_ocn_solfor_S_sig                               !
@@ -1088,6 +1120,9 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm,n_i,n_j)::int_diag_airsea_timeslice       ! air-sea gas exchange diagnostics
   ! redox
   real,DIMENSION(:,:,:,:),ALLOCATABLE::int_diag_redox_timeslice  ! redox diagnostics 3D time-slice
+  ! ecogem
+  REAL,DIMENSION(n_sed,n_i,n_j)::int_diag_ecogem_part                !
+  REAL,DIMENSION(n_ocn,n_i,n_j)::int_diag_ecogem_remin               !
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
   !
   ! ############################################################################################################################## !

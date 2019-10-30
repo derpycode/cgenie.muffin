@@ -21,7 +21,7 @@ MODULE gem_cmn
   ! NOTE: these definitions must come FIRST, because the namelist arrays are dimensioned by these parameters ...
   ! WARNING: these values must be duplicated in genie_control.f90
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
-  INTEGER,PARAMETER::n_atm =  19
+  INTEGER,PARAMETER::n_atm =  21
   INTEGER,PARAMETER::n_ocn = 101
   INTEGER,PARAMETER::n_sed =  87
 
@@ -37,9 +37,7 @@ MODULE gem_cmn
   LOGICAL,DIMENSION(n_ocn)::ocn_select                                  !
   LOGICAL,DIMENSION(n_sed)::sed_select                                  !
   NAMELIST /ini_gem_nml/atm_select,ocn_select,sed_select
-  ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
-  real::par_grid_lon_offset                                             ! assumed lon grid offset (w.r.t. Prime Meridian)
-  NAMELIST /ini_gem_nml/par_grid_lon_offset
+  ! ------------------- GEOCHEM CONTROLS ----------------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_carbconstset_name                              ! carbonate dissociation constants set
   NAMELIST /ini_gem_nml/par_carbconstset_name
   real::par_carbchem_pH_tolerance                                       ! pH solution tolerance
@@ -47,6 +45,21 @@ MODULE gem_cmn
   NAMELIST /ini_gem_nml/par_carbchem_pH_tolerance,par_carbchem_pH_iterationmax
   logical::ctrl_carbchem_fail                                           ! Exit upon pH solution failure?
   NAMELIST /ini_gem_nml/ctrl_carbchem_fail
+  real::par_geochem_Tmin                                                ! minimum T used in empirical geochem calculations
+  real::par_geochem_Tmax                                                ! maximum T used in empirical geochem calculations
+  NAMELIST /ini_gem_nml/par_geochem_Tmin,par_geochem_Tmax
+  real::par_geochem_Smin                                                ! minimum S used in empirical geochem calculations
+  real::par_geochem_Smax                                                ! maximum S used in empirical geochem calculations
+  NAMELIST /ini_gem_nml/par_geochem_Smin,par_geochem_Smax
+  real::par_carbchem_Tmin                                                ! minimum T used in empirical carbchem calculations
+  real::par_carbchem_Tmax                                                ! maximum T used in empirical carbchem calculations
+  NAMELIST /ini_gem_nml/par_carbchem_Tmin,par_carbchem_Tmax
+  real::par_carbchem_Smin                                                ! minimum S used in empirical carbchem calculations
+  real::par_carbchem_Smax                                                ! maximum S used in empirical carbchem calculations
+  NAMELIST /ini_gem_nml/par_carbchem_Smin,par_carbchem_Smax
+  ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
+  real::par_grid_lon_offset                                             ! assumed lon grid offset (w.r.t. Prime Meridian)
+  NAMELIST /ini_gem_nml/par_grid_lon_offset
   integer::ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end               ! 
   NAMELIST /ini_gem_nml/ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
@@ -190,6 +203,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::ia_pH2S_34S                          = 17    ! pH2S
   INTEGER,PARAMETER::ia_pCFC11                            = 18    ! halo-carbon
   INTEGER,PARAMETER::ia_pCFC12                            = 19    ! halo-carbon
+  INTEGER,PARAMETER::ia_pcolr                             = 20    ! RED numerical (color) tracer
+  INTEGER,PARAMETER::ia_pcolr_13C                         = 21    ! 13C (RED)
   ! sediment tracer indicesqsub -j y -o cgenie_output -V -S /bin/bash
   INTEGER,PARAMETER::is_NULL1                             = 01    ! 
   INTEGER,PARAMETER::is_NULL2                             = 02    ! 
@@ -403,6 +418,7 @@ MODULE gem_cmn
   real,DIMENSION(n_ocn,n_sed)::conv_POM_DOM
   real,DIMENSION(n_sed,n_ocn)::conv_RDOM_POM
   real,DIMENSION(n_ocn,n_sed)::conv_POM_RDOM
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_O                           ! tracer conversion array for oxic conditions
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N                           ! tracer conversion array for N-reduction redox conditions
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_S                           ! tracer conversion array for S-reduction redox conditions
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_meth                        ! tracer conversion array for methanogenesis
@@ -412,19 +428,21 @@ MODULE gem_cmn
   real,DIMENSION(:,:),ALLOCATABLE::conv_lP_lD
   real,DIMENSION(:,:),ALLOCATABLE::conv_lRD_lP
   real,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD
+  real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_O                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_N                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_S                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_meth                        ! 
   ! tracer conversion - indices for non-zero transformation ratio values
   ! NOTE: the zero index place in the array is used in algorithms identifying null relationships (or something)
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_ocn_sed_i
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! tracer (remin) conversion array for oxygenic conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! 
   integer,DIMENSION(0:n_atm,0:n_ocn)::conv_ocn_atm_i
   integer,DIMENSION(0:n_ocn,0:n_atm)::conv_atm_ocn_i
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_DOM_POM_i
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_POM_DOM_i
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_RDOM_POM_i
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_POM_RDOM_i
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_O                  ! tracer conversion array for oxic conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_S                  ! tracer conversion array for S-reduction redox conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_meth               ! tracer conversion array for methanogenesis
@@ -432,8 +450,9 @@ MODULE gem_cmn
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i                ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_lD_lP_i                ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lD_i                ! 
-  integer,DIMENSION(:,:),ALLOCATABLE::conv_lRD_lP_i                ! 
-  integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD_i                ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lRD_lP_i               ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD_i               ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_O              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_N              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_S              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_meth           ! 
