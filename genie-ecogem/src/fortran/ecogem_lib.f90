@@ -236,6 +236,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::nutiso        !ckc isotopes of nutrient (iimaxiso, i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::plankiso      !ckc isotopes in plankton (npmax,iomaxiso,i,j,k) 
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::uptake_flux   ! inorganic nutrient uptake flux for each plankton (iomax,npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::export_flux   ! surface export flux for each plankton (iomax,npmax,i,j,k)    Fanny/Maria - Aug19
   !ckc isotope uptake flux array, to trace full food web interaction
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::up_flux_iso   !ckc rate of upstake isotopes (iimaxiso,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carb      ! carbonate chemistry variables
@@ -243,6 +244,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carbalk   ! carbonate chemistry alkalinity
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carbisor  ! carbonate (carbon) isotopic properties array
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::phys_limit    ! growth limitation factors
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::zoo_limit     ! zoo food limitation factors
   ! Size-dependent parameters (npmax)
   character(len=16),ALLOCATABLE,DIMENSION(:)    ::pft                                      ! Plankton functional type
   character(len=3) ,ALLOCATABLE,DIMENSION(:)    ::quotastrng                               ! Plankton biomass quota labels
@@ -252,6 +254,10 @@ MODULE ecogem_lib
   INTEGER          ,ALLOCATABLE,DIMENSION(:)    ::nut2quota                                ! match nutrients to quotas
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::volume,diameter ,logvol,logesd           ! Size parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::autotrophy,heterotrophy                  ! Trophic strategy
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::herbivory, carnivory                     ! Feeding behavior - Added by Grigoratou, Nov18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::prey_refuge, switch_feeding		   ! PFT dependent traits - Added by Grigoratou, Dec18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::grazing_protect, mort_protect      	   ! PFT dependent traits - Added by Grigoratou, Dec18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::pp_optC, pp_sig_C      		   ! Optimal predator:prey length ratio - intercept; standar deviation for PP ratio, plankton group dependent - added by Grigoratou, Dec2018
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::palatability                             ! Lower value for defence strategy
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::NO3up,Nfix,calcify,silicify              ! PFT dependent traits
   REAL             ,ALLOCATABLE,DIMENSION(:,:)  ::qmin,qmax,vmax,affinity,kexc             ! Nutrient quota parameters
@@ -313,6 +319,8 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_uptake_timeslice   !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_gamma_timeslice    !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_nutrient_timeslice !
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_zoogamma_timeslice !
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_export_timeslice   ! Surface export flux for each plankton (iomax,npmax,i,j,k)  Fanny/Maria - Aug19
 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
 

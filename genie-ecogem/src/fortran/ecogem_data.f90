@@ -122,7 +122,7 @@ CONTAINS
        write(*,68),'  - light attenuation by chlorophyll a    (k_chl) :   ',      k_chl
        write(*,*), '- Grazing parameters --------------------------------'
        write(*,68),'  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
-       write(*,67),'  - prey switching exponent (integer)        (ns) :   ',         ns
+       !write(*,67),'  - prey switching exponent (integer)        (ns) :   ',    using switch_feeding plankton specific parameter (rather than ns)!,         ns   - commented out for Grigoratou foram code, Sep18
        write(*,68),'  - hill number for grazing assimilation   (hill) :   ',       hill
        write(*,68),'  - grazing refuge parameter             (Lambda) :   ',     Lambda
        write(*,69),'  - maximum grazing rate                   (graz) : a=',     graz_a,', b=',     graz_b
@@ -311,85 +311,151 @@ CONTAINS
     do jp=1,npmax
        call lower_case(pft(jp))
        if (pft(jp).eq.'prochlorococcus') then
-          NO3up(jp)       = 0.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = 1.0
-          heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0
+          pp_sig_C(jp)        = 2.0
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff 
+          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'synechococcus') then
-          NO3up(jp)       = 1.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = 1.0
-          heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0
+          pp_sig_C(jp)        = 2.0
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff
+          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'picoeukaryote') then
-          NO3up(jp)       = 1.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = 1.0
-          heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0
+          pp_sig_C(jp)        = 2.0
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff 
+          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'diatom') then
-          NO3up(jp)       = 1.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 1.0
-          autotrophy(jp)  = 1.0
-          heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0
+          pp_sig_C(jp)        = 2.0
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff 
+          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'coccolithophore') then
-          NO3up(jp)       = 1.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 1.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = 1.0
-          heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0
+          pp_sig_C(jp)        = 2.0
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff  
+          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'diazotroph') then
-          NO3up(jp)       = 0.0
-          Nfix(jp)        = 1.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = 1.0
-          heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0
+          pp_sig_C(jp)        = 2.0
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff 
+          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'phytoplankton') then
-          NO3up(jp)       = 1.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = 1.0
-          heterotrophy(jp)= 0.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0
+          pp_sig_C(jp)        = 2.0
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff 
+          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'zooplankton') then
-          NO3up(jp)       = 0.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = 0.0
-          heterotrophy(jp)= 1.0
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 0.0
+	  heterotrophy(jp)    = 1.0               !omnivory
+          herbivory (jp)      = 0.0 
+	  carnivory (jp)      = 1.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0              !optimum PP ratio
+          pp_sig_C(jp)        = 2.0               !standard deviation for PP ratio
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff
+          switch_feeding(jp)  = 2.0               !active vs passive
        elseif (pft(jp).eq.'mixotroph') then
-          NO3up(jp)       = 0.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 0.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = trophic_tradeoff
-          heterotrophy(jp)= trophic_tradeoff
-          palatability(jp)= 1.0
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 0.0
+	  heterotrophy(jp)    = 1.0               !omnivory
+          herbivory (jp)      = 0.0 
+	  carnivory (jp)      = 0.0
+          palatability(jp)    = 1.0
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0              !optimum PP ratio
+          pp_sig_C(jp)        = 2.0               !standard deviation for PP ratio
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff
+          switch_feeding(jp)  = 2.0               !active vs passive
        elseif (pft(jp).eq.'foram') then
-          NO3up(jp)       = 0.0
-          Nfix(jp)        = 0.0
-          calcify(jp)     = 1.0
-          silicify(jp)    = 0.0
-          autotrophy(jp)  = trophic_tradeoff*0.5
-          heterotrophy(jp)= trophic_tradeoff*0.5
-          palatability(jp)= 0.5
+          NO3up(jp)           = 0.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 0.0
+	  heterotrophy(jp)    = trophic_tradeoff  *0.9   !omnivory
+          herbivory (jp)      = 1.0 
+	  carnivory (jp)      = 0.0
+          palatability(jp)    = 0.8
+          prey_refuge(jp)     = 1.0
+          pp_optC(jp)         = 10.0              !optimum PP ratio
+          pp_sig_C(jp)        = 6.0               !standard deviation for PP ratio
+          !grazing_protect(jp) = 1.0
+          mort_protect(jp)    = trophic_tradeoff * 0.70 
+          switch_feeding(jp)  = 1.0               !active vs passive
        else 
           print*," " 
           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" 
@@ -478,18 +544,18 @@ CONTAINS
     alphachl(:) =    alphachl_a * volume(:) ** alphachl_b
     graz(:)     =        graz_a * volume(:) ** graz_b     * heterotrophy(:)
     kg(:)       =          kg_a * volume(:) ** kg_b
-    pp_opt(:)   =      pp_opt_a * volume(:) ** pp_opt_b
-    pp_sig(:)   =      pp_sig_a * volume(:) ** pp_sig_b
+    !pp_opt(:)   =      pp_opta * volume(:) ** pp_opt_b      !commented out for foram project by Grigoratou, Dec2018, see ppot_mat defined below
+    !pp_sig(:)   =      pp_sig_C * volume(:) ** pp_sig_b     !commented out for foram project by Grigoratou, Dec2018, see ppsig_mat defined below
     respir(:)   =      respir_a * volume(:) ** respir_b
     biosink(:)  =     biosink_a * volume(:) ** biosink_b
-    mort(:)     =        mort_a * volume(:) ** mort_b
-
+    mort(:)     =        (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
     do jp=1,npmax ! grazing kernel (npred,nprey)
        ! pad predator dependent pp_opt and pp_sig so that they vary along matrix columns
        ! (they should be constant within each row)
-       ppopt_mat(:,jp)=pp_opt
-       ppsig_mat(:,jp)=pp_sig
+       ppopt_mat(:,jp)=pp_optC(jp) * volume(:) ** pp_opt_b   !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
+       ppsig_mat(:,jp)=pp_sig_C(jp) * volume(:) ** pp_sig_b  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
     enddo
+    PRINT*,ppsig_mat  
     pred_diam(:,1)=diameter(:) ! standard  prey diameter vector
     prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
     prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
@@ -560,18 +626,49 @@ CONTAINS
     ! close plankton parameter files
     close(301)
     close(302)
-
-    ! grazing matrix
+    
+    ! grazing matrix JDW
+    gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
     do jpred=1,npmax
-       if (heterotrophy(jpred).le.0.0) then
-          gkernel(jpred,:) = 0.0
-       endif
-       do jprey=1,npmax-1
-          WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
+	do jprey=1,npmax
+		select case(pft(jpred))
+			case('phytoplankton')
+				gkernel(jpred,jprey)=0.0
+			case('zooplankton','foram')
+				select case(pft(jprey))
+					case('phytoplankton')
+						if(carnivory(jpred).gt.0.0) gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+					case('zooplankton', 'foram')
+						if(herbivory(jpred).gt.0.0) gkernel(jpred,jprey)=0.0 ! if predator is herbivorous and prey is zooplanktonn - no grazing
+				end select
+		end select
+	end do
+    end do
+    
+    ! write out grazing matrix    
+    do jpred=1,npmax
+	do jprey=1,npmax-1
+		WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
        enddo
        WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
-    enddo
+    end do
     close(303)
+
+	
+
+     ! grazing matrix WARD17 copy
+    ! do jpred=1,npmax
+    ! print*,jpred,jprey
+    !    if (heterotrophy(jpred).le.0.0) then
+    !       gkernel(jpred,:) = 0.0
+     !       endif
+    !    endif
+    !    do jprey=1,npmax-1
+    !       WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
+    !    enddo
+    !    WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
+    ! enddo
+    ! close(303)
     ! ****************************************************************************************
     ! ****************************************************************************************
 
@@ -774,6 +871,8 @@ CONTAINS
     int_uptake_timeslice(:,:,:,:,:)   = 0.0
     int_gamma_timeslice(:,:,:,:,:)    = 0.0
     int_nutrient_timeslice(:,:,:,:)   = 0.0
+    int_zoogamma_timeslice(:,:,:,:)   = 0.0
+    int_export_timeslice(:,:,:,:,:)   = 0.0  !Fanny/Maria - Aug19
 
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
     !

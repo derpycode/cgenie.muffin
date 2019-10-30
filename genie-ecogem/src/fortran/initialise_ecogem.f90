@@ -137,12 +137,16 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(phys_limit(iomax+2,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(zoo_limit(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
   !ckc ISOTOPES
   ALLOCATE(nutiso(iimaxiso,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(plankiso(iomaxiso,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(up_flux_iso(iomaxiso,npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(export_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
   call check_iostat(alloc_error,__LINE__,__FILE__)
 
   ! ecogem time-slice arrays
@@ -153,6 +157,10 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(int_gamma_timeslice(iomax+2,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(int_nutrient_timeslice(iimax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_zoogamma_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_export_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Time-series storage arrays
   if (n_tser.gt.0) then
@@ -194,6 +202,9 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(autotrophy(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(heterotrophy(npmax),STAT=alloc_error)
+  ALLOCATE(herbivory(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(carnivory(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(palatability(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -204,6 +215,18 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(calcify(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(silicify(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(prey_refuge(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(grazing_protect(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(mort_protect(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(switch_feeding(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(pp_optC(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(pp_sig_C(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Nutrient and nutrient quota parameters
   ALLOCATE(qmin(iomax,npmax),STAT=alloc_error)

@@ -7779,7 +7779,7 @@
 	                  <description>Maximum assimilation efficiency</description>
                     </param>  
                     <param name="ns">
-			<value datatype="integer">2</value>
+			<value datatype="integer">1</value>
 	                  <description>Prey switching exponent (Holling 2 or 3 [= ns+1])</description>
                     </param>  
                     <param name="hill">

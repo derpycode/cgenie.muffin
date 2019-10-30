@@ -60,6 +60,8 @@ subroutine ecogem(          &
   REAL                                     ::gamma_T,totPP
   REAL                                     ::mld,totchl,k_tot
   INTEGER                                  ::imld
+  REAL,DIMENSION(npmax)                    ::Totzoolimit
+  REAL,DIMENSION(npmax,npmax)                    ::zoolimit
 
   REAL,DIMENSION(iomax+iChl,npmax)         ::loc_biomass
   REAL,DIMENSION(iimax)                    ::loc_nuts
@@ -79,6 +81,7 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomaxiso,npmax)           ::dbioisodt    !ckc isotopes
   REAL,DIMENSION(iimaxiso)                 ::dnutisodt    !ckc isotopes
   REAL,DIMENSION(iomaxiso,komax)           ::dorgmatisodt !ckc isotopes
+  REAL,DIMENSION(iomax,npmax)              ::dorgmatdt_plankton ! POM export for each plankton    Fanny/Maria - Aug19
   !REAL,DIMENSION(npmax)                    ::diameter     !ckc for size dependent fractionation
 
   REAL,DIMENSION(npmax)                    ::mortality,respiration
@@ -88,7 +91,7 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax+iChl,npmax)         ::GrazPredEat,GrazPreyEaten
   REAL,DIMENSION(npmax)                    ::BioCiso
   
-  real		   		     ::loc_total_weights ! JDW total weights
+  real		   		           ::loc_total_weights ! JDW total weights
   real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size 
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
@@ -117,6 +120,8 @@ subroutine ecogem(          &
   orgmatiso_flux(:,:,:,:,:) = 0.0 !ckc isotopes
   !
   phys_limit(:,:,:,:,:) = 0.0
+  zoo_limit(:,:,:,:) = 0.0
+  zoolimit(:,:)      = 0.0    
   ! initialise subroutine returns to null values
   ! quota_status outputs
   quota(:,:)              = 0.0
@@ -310,7 +315,7 @@ subroutine ecogem(          &
 
                  call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_T,up_inorg(iDIC,:),chlsynth,totPP)
 
-                 call grazing(loc_biomass,gamma_T,GrazMat(:,:,:))
+                 call grazing(loc_biomass,gamma_T,zoolimit(:,:),GrazMat(:,:,:))
 
                  !ckc isotopes uptake, from nutrient uptake, nutrient concentration and fractionation
                  if (c13trace) then 
@@ -325,7 +330,7 @@ subroutine ecogem(          &
                  mortality(:)   = mort(:)   * (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce mortality at very low biomass
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                  ! Stoopid calcification related moratlity
-                 mortality(:)   = mortality(:) + mortality(:) * calcify(:) / omega(i,j,k) ! Coccolithophores and Forams only
+                 !mortality(:)   = mortality(:) + mortality(:) * calcify(:) / omega(i,j,k) ! Coccolithophores and Forams only
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                  ! mortality(:) = mortality(:)  * gamma_T ! temp adjusted?
 
@@ -333,6 +338,7 @@ subroutine ecogem(          &
                  respiration(:) = respir(:) !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
 
                  ! calculate assimilation efficiency based on quota status
+                 Totzoolimit(:) = 0.0  !total food limitation - Maria May 2019 !!! Need to check if consistent!!!
                  do io=1,iomax+iChl
                     ! Integrate grazing interactions 
                     GrazPredEat(io,:)   = 0.0 ! Total prey biomass killed (pre-assimilation), summed by predator and by prey 
@@ -341,6 +347,9 @@ subroutine ecogem(          &
                        do jprey=1,npmax
                           GrazPredEat(io,jpred) = GrazPredEat(io,jpred)   + BioC(jpred) * GrazMat(io,jpred,jprey)
                           GrazPreyEaten(io,jprey) = GrazPreyEaten(io,jprey) + BioC(jpred) * GrazMat(io,jpred,jprey)
+                          if (io.eq.iCarb) then  !calculate total food limitation - Maria May 2019 !!! Need to check if consistent!!!
+                             Totzoolimit(jpred) = zoolimit(jpred,jprey)
+                          endif
                        enddo
                     enddo
 
@@ -443,6 +452,7 @@ subroutine ecogem(          &
                  ! ORGANIC MATTER
                  dorgmatdt(:,:) = 0.0 ! initialise
                  dorgmatisodt(:,:) = 0.0 
+                 dorgmatdt_plankton(:,:) = 0.0           ! Fanny/Maria Aug19
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  orgbGraz(:,:) = 0.0
 
@@ -452,11 +462,14 @@ subroutine ecogem(          &
                     dorgmatdt(io,2) = dorgmatdt(io,2) + sum(loc_biomass(io,:) * mortality(:)        * beta_mort_1(:)) ! fraction to POM
                     orgbGraz(io,1) = dorgmatdt(io,1)
                     orgbGraz(io,2) = dorgmatdt(io,2)
+                    dorgmatdt_plankton(io,:) = dorgmatdt_plankton(io,:) + loc_biomass(io,:) * mortality(:) * beta_mort_1(:) ! POM source from mortality per plankton group - Fanny/Maria Aug19
+
                     ! unassimilated grazing
                     dorgmatdt(io,1) = dorgmatdt(io,1) + sum(GrazPredEat(io,:) * unassimilated(io,:) * beta_graz(:)  ) ! fraction to DOM
                     dorgmatdt(io,2) = dorgmatdt(io,2) + sum(GrazPredEat(io,:) * unassimilated(io,:) * beta_graz_1(:)) ! fraction to POM
                     ratioGraz(io,1) = dorgmatdt(io,1)/orgbGraz(io,1)
                     ratioGraz(io,2) = dorgmatdt(io,2)/orgbGraz(io,2)
+                    dorgmatdt_plankton(io,:) = dorgmatdt_plankton(io,:) + GrazPredEat(io,:) * unassimilated(io,:) * beta_graz_1(:) ! Total POM source per plankton group - Fanny/Maria Aug19
                     !end/start
                  enddo
                  ! no organic matter production in fundamental niche experiment
@@ -503,6 +516,7 @@ subroutine ecogem(          &
                  ! collect fluxes for output
                  do io=1,iomax
                     uptake_flux(io,:,i,j,k) = up_inorg(io,:) * BioC(:) ! mmol/m^3/s
+                    export_flux(io,:,i,j,k) = dorgmatdt_plankton(io,:) ! mmol/m^3/s   - Fanny/Maria Aug19
                  enddo
 
                  if (c13trace) then
@@ -542,6 +556,7 @@ subroutine ecogem(          &
                  phys_limit(iomax+1,:,i,j,k) = 0.0
                  phys_limit(iomax+1,1,i,j,k) = gamma_T
                  phys_limit(iomax+2,:,i,j,k) = 0.0
+                 zoo_limit(:,i,j,k) = Totzoolimit(:)
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  !ckc ISOTOPES POC as Biogem
                  if (.NOT.c13trace) then
@@ -754,6 +769,8 @@ SUBROUTINE diag_ecogem_timeslice( &
      int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr *   uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
      int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) + loc_dtyr *    phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
      int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr *        nutrient(:,:,:,:)        ! mmol m^-3
+     int_zoogamma_timeslice(:,:,:,:) =   int_zoogamma_timeslice(:,:,:,:) + loc_dtyr * zoo_limit(:,:,:,:)              ! mmol m^-3
+     int_export_timeslice(:,:,:,:,:) =   int_export_timeslice(:,:,:,:,:) + loc_dtyr * export_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
   end if
 
   ! write time-slice data and re-set integration

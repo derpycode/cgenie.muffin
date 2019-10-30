@@ -531,6 +531,14 @@ CONTAINS
              call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
              call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
           endif
+          ! Write plankton export rate - Fanny/Maria - Aug19
+          if (io.le.iomax) then
+             loc_ij(:,:) = int_export_timeslice(io,jp,:,:,n_k)
+             write (shrtstrng, "(A8,A,A1,I3.3)") "_Export_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A,A17,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Export - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+             call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
+          endif
        end do
        ! Write community total biomasses and inorganic resource fluxes
        write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
@@ -550,6 +558,14 @@ CONTAINS
     write (longstrng, "(A22)") 'Temperature Limitation'
     call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
     call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+    ! Zoo food limitation status - Maria May 2019
+    DO jp=1,npmax
+       loc_ij(:,:) = int_zoogamma_timeslice(jp,:,:,n_k)
+       write (shrtstrng, "(A12,I3.3)") "_Gamma_Food_",jp
+       write (longstrng, "(A37,I3.3)") 'Zooplankton food limitation - Popn. #',jp
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+    end do
 
     DO ii=1,iimax
        ! Create description strings
