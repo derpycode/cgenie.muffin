@@ -104,9 +104,17 @@ MODULE ecogem_lib
   real :: biosynth                  !      cost of biosynthesis
   real :: k_w                       !      light attenuation by water
   real :: k_chl                     !      light attenuation by chlorophyll a
+  real :: vmaxDIC_a_pft_pico,vmaxDIC_b_pft_pico
+  real :: vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
+  real :: vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
+  real :: vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
   namelist/ini_ecogem_nml/vmaxDIC_a,vmaxDIC_b,vmaxDIC_c
   namelist/ini_ecogem_nml/qcarbon_a,alphachl_a,PARfrac,chl2nmax,biosynth,k_w,k_chl
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_pico,vmaxDIC_b_pft_pico
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
   logical::ctrl_restrict_mld    ! restrict MLD
   NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
   ! Grazing parameters

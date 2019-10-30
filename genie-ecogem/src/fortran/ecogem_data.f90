@@ -328,6 +328,14 @@ CONTAINS
           autotrophy(jp)  = 1.0
           heterotrophy(jp)= 0.0
           palatability(jp)= 1.0
+      elseif (pft(jp).eq.'picoplankton') then
+          NO3up(jp)       = 1.0
+          Nfix(jp)        = 0.0
+          calcify(jp)     = 0.0
+          silicify(jp)    = 0.0
+          autotrophy(jp)  = 1.0
+          heterotrophy(jp)= 0.0
+          palatability(jp)= 1.0
        elseif (pft(jp).eq.'picoeukaryote') then
           NO3up(jp)       = 1.0
           Nfix(jp)        = 0.0
@@ -368,6 +376,14 @@ CONTAINS
           autotrophy(jp)  = 1.0
           heterotrophy(jp)= 0.0
           palatability(jp)= 1.0
+        elseif (pft(jp).eq.'eukaryote') then
+           NO3up(jp)       = 1.0
+           Nfix(jp)        = 0.0
+           calcify(jp)     = 0.0
+           silicify(jp)    = 0.0
+           autotrophy(jp)  = 1.0
+           heterotrophy(jp)= 0.0
+           palatability(jp)= 1.0
        elseif (pft(jp).eq.'zooplankton') then
           NO3up(jp)       = 0.0
           Nfix(jp)        = 0.0
@@ -397,7 +413,7 @@ CONTAINS
           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           print*,"! Unknown plankton functional type '"//trim(pft(jp))//"'"
           print*,"! Specified in input file "//TRIM(par_indir_name)//TRIM(par_ecogem_plankton_file)
-          print*,"Choose from Prochlorococcus, Synechococcus, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Phytoplankton, Zooplankton or Mixotroph"
+          print*,"Choose from Prochlorococcus, Synechococcus, Picoplankton, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Phytoplankton, Zooplankton or Mixotroph"
           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           stop
        endif
@@ -424,8 +440,11 @@ CONTAINS
     !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
     vmax(iDIC,:)    = (vmaxDIC_a  + log10(volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(volume(:)) + log10(volume(:))**2) * autotrophy(:)
     ! modify rates for functional types
-    vmax(iDIC,:)    = merge(vmax(iDIC,:)*par_cocco_vmax_mod,vmax(iDIC,:),calcify.eq.1.0)
-    vmax(iDIC,:)    = merge(vmax(iDIC,:)*par_diatom_vmax_mod,vmax(iDIC,:),silicify.eq.1.0)
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_pico * volume(:) ** vmaxDIC_b_pft_pico,vmax(iDIC,:),pft.eq.'picoplankton')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_cocco * volume(:) ** vmaxDIC_b_pft_cocco,vmax(iDIC,:),pft.eq.'coccolithophore')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diatom * volume(:) ** vmaxDIC_b_pft_diatom,vmax(iDIC,:),pft.eq.'diatom')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_eukaryote * volume(:) ** vmaxDIC_b_pft_eukaryote,vmax(iDIC,:),pft.eq.'eukaryote')
+
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
        qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
@@ -458,8 +477,8 @@ CONTAINS
        affinity(iPO4,:) = affinPO4_a * volume(:) ** affinPO4_b * autotrophy(:)
        kexc(iPhos,:)    =   kexcP_a  * volume(:) **    kexcP_b
        ! modify for functional types
-       vmax(iPO4,:)    = merge(vmax(iPO4,:)*par_cocco_vmax_mod,vmax(iPO4,:),calcify.eq.1.0)
-       vmax(iPO4,:)    = merge(vmax(iPO4,:)*par_diatom_vmax_mod,vmax(iPO4,:),silicify.eq.1.0)
+       !vmax(iPO4,:)    = merge(vmax(iPO4,:)*par_cocco_vmax_mod,vmax(iPO4,:),calcify.eq.1.0)
+       !vmax(iPO4,:)    = merge(vmax(iPO4,:)*par_diatom_vmax_mod,vmax(iPO4,:),silicify.eq.1.0)
     endif
     !-----------------------------------------------------------------------------------------
     if (fquota) then ! iron parameters
