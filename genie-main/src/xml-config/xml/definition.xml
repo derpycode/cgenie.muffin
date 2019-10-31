@@ -4502,11 +4502,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="par_bio_remin_sinkingrate">
 			<value datatype="real">125.0</value>
-                        <description>prescribed particle sinking rate (m d-1)</description>
+                        <description>prescribed particle sinking rate (m d-1) [OLD PARAMETER NAMES]</description>
                     </param>
                     <param name="par_bio_remin_sinkingrate_scav">
 			<value datatype="real">125.0</value>
-                        <description>sinking rate (for calculating scavenging) (m d-1)</description>
+                        <description>sinking rate (for calculating scavenging) (m d-1) [OLD PARAMETER NAMES]</description>
+                    </param>
+                    <param name="par_bio_remin_sinkingrate_physical">
+			<value datatype="real">0.0</value>
+                        <description>Explicit physical particle sinking rate (m d-1) [NEW PARAMETER NAMES (disabled by zero)]</description>
+                    </param>
+                    <param name="par_bio_remin_sinkingrate_reaction">
+			<value datatype="real">0.0</value>
+                        <description>Implicit sinking rate for geochem reactions (m d-1) [NEW PARAMETER NAMES (disabled by zero)]</description>
                     </param>
                     <param name="par_bio_remin_ballast_kc">
 			<value datatype="real">0.130</value>

@@ -236,6 +236,9 @@ MODULE biogem_lib
   real::par_bio_remin_sinkingrate                                ! prescribed particle sinking rate (m d-1)
   real::par_bio_remin_sinkingrate_scav                           ! sinking rate (for calculating scavenging) (m d-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate,par_bio_remin_sinkingrate_scav
+  real::par_bio_remin_sinkingrate_physical                       ! Explicit physical particle sinking rate (m d-1)
+  real::par_bio_remin_sinkingrate_reaction                       ! Implicit sinking rate for geochem reactions (m d-1)
+  NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate_physical,par_bio_remin_sinkingrate_reaction
   real::par_bio_remin_ballast_kc                                 ! organic matter carrying capacity of CaCO3
   real::par_bio_remin_ballast_ko                                 ! organic matter carrying capacity of opal
   real::par_bio_remin_ballast_kl                                 ! organic matter carrying capacity of detital (lithogenic)
@@ -298,9 +301,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
-  real::par_bio_remin_POC_eL0                                    ! JDW size-dependent remin: e-folding depth of smallest ecogem size class (m)
-  real::par_bio_remin_POC_size0                                  ! JDW size-dependent remin: diameter of smallest ecogem size class (um)
-  real::par_bio_remin_POC_eta                                    ! JDW size-dependent remin: exponent linking sinking speed and size (Stemmann et al., 2004)
+  ! JDW size-dependent remin
+  real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m)
+  real::par_bio_remin_POC_size0                                  ! diameter of smallest ecogem size class (um)
+  real::par_bio_remin_POC_eta                                    ! exponent linking sinking speed and size (Stemmann et al., 2004)
   NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta
   ! kinetics
   real::par_bio_remin_k_O2
