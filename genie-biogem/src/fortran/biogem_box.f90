@@ -2719,8 +2719,6 @@ CONTAINS
     loc_bio_remin_opal_frac1 = 0.0
     loc_bio_remin_opal_frac2 = 0.0
     loc_bio_part_opal_ratio = 0.0
-    loc_bio_remin_dt = 0.0
-    loc_bio_remin_dt_scav = 0.0
     ! set 'virtua' dummy grid location indices
     dum_i = dum_vbio_part%i
     dum_j = dum_vbio_part%j
@@ -3410,23 +3408,24 @@ CONTAINS
                    SELECT CASE (trim(opt_geochem_Fe))
                    CASE ('OLD','ALT')
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
-                              & dum_dtyr,               &
-                              & loc_bio_remin_dt_reaction,  &
-                              & par_scav_Fe_k0,     &
-                              & loc_FeFeLL(1),          &
-                              & loc_bio_part_TMP(is2l(is_POC),kk)  &
+                         loc_scav_Fe = fun_box_scav_Fe(           & 
+                              & dum_dtyr,                         &
+                              & loc_bio_remin_dt_reaction,        &
+                              & par_scav_Fe_k0,                   &
+                              & loc_FeFeLL(1),                    &
+                              & loc_bio_part_TMP(is2l(is_POC),kk) &
                               & )
                          loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe 
                          loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
                       end if
                    CASE ('FeFe2TL')
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
-                         loc_scav_Fe = fun_box_scav_Fe( & 
-                              & dum_dtyr,               &
-                              & loc_bio_remin_dt_reaction,  &
-                              & par_scav_Fe_k0,     &
-                              & loc_FeFeLL(1),          &
-                              & loc_bio_part_TMP(is2l(is_POC),kk)  &
+                         loc_scav_Fe = fun_box_scav_Fe(           & 
+                              & dum_dtyr,                         &
+                              & loc_bio_remin_dt_reaction,        &
+                              & par_scav_Fe_k0,                   &
+                              & loc_FeFeLL(1),                    &
+                              & loc_bio_part_TMP(is2l(is_POC),kk) &
                               & )
                          if (sed_select(is_POM_FeOOH)) then
                             loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
@@ -3455,12 +3454,12 @@ CONTAINS
                       end if
                    CASE ('hybrid','lookup_4D')
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
-                         loc_scav_Fe = fun_box_scav_Fe( & 
-                              & dum_dtyr,               &
-                              & loc_bio_remin_dt_reaction,  &
-                              & par_scav_Fe_k0,     &
-                              & loc_FeFeLL(1),          &
-                              & loc_bio_part_TMP(is2l(is_POC),kk)  &
+                         loc_scav_Fe = fun_box_scav_Fe(           & 
+                              & dum_dtyr,                         &
+                              & loc_bio_remin_dt_reaction,        &
+                              & par_scav_Fe_k0,                   &
+                              & loc_FeFeLL(1),                    &
+                              & loc_bio_part_TMP(is2l(is_POC),kk) &
                               & )
                          loc_bio_remin(io2l(io_TDFe),kk) = loc_bio_remin(io2l(io_TDFe),kk) - loc_scav_Fe
                          loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
@@ -3493,15 +3492,15 @@ CONTAINS
                 ! *** Scavenge Os from water column ***
                 if ((ocn_select(io_Os) .AND. sed_select(is_POM_Os)) .AND. (par_bio_remin_kOstoPOMOS > const_real_nullsmall)) then
                    if (dum_vocn%mk(io2l(io_Os),kk) > const_real_nullsmall) then
-                      call sub_box_scav_Os(               &
-                           & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
-                           & dum_vocn%mk(io2l(io_Os),kk), &
+                      call sub_box_scav_Os(                     &
+                           & dum_dtyr,                          &
+                           & loc_bio_remin_dt_reaction,         &
+                           & dum_vocn%mk(io2l(io_Os),kk),       &
                            & dum_vocn%mk(io2l(io_Os_187Os),kk), &
                            & dum_vocn%mk(io2l(io_Os_188Os),kk), &
-                           & dum_vocn%mk(io2l(io_O2),kk), &
-                           & loc_bio_part_TMP(:,kk),       &
-                           & loc_bio_remin(:,kk)           &
+                           & dum_vocn%mk(io2l(io_O2),kk),       &
+                           & loc_bio_part_TMP(:,kk),            &
+                           & loc_bio_remin(:,kk)                &
                            & )
                    end if
                 end if
@@ -3513,7 +3512,7 @@ CONTAINS
                       if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
                          call sub_box_react_FeOOH_H2S(        &
                               & dum_i,dum_j,kk,               &
-                              & loc_bio_remin_dt_scav,        &
+                              & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
                               & loc_bio_part_TMP(:,kk),       &
                               & loc_bio_remin(:,kk)           &
@@ -3523,7 +3522,7 @@ CONTAINS
                       if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)>const_rns) then
                          call sub_box_react_POMFeOOH_H2S(     &
                               & dum_i,dum_j,kk,               &
-                              & loc_bio_remin_dt_scav,        &
+                              & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
                               & loc_bio_part_TMP(:,kk),       &
                               & loc_bio_remin(:,kk)           &
@@ -3639,7 +3638,7 @@ CONTAINS
     ! -------------------------------------------------------- ! extract density of FeOOH
     loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
     ! -------------------------------------------------------- ! calculate reaction rate
-    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1/2))
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
     loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
@@ -3716,7 +3715,7 @@ CONTAINS
     ! -------------------------------------------------------- ! extract density of FeOOH
     loc_part_den_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
     ! -------------------------------------------------------- ! calculate reaction rate
-    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1/2))
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
     loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_POM_FeOOH)) = dum_bio_part(is2l(is_POM_FeOOH)) - loc_dFeOOH
