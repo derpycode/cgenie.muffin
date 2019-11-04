@@ -34,7 +34,14 @@ LGM -- muffin.CB.GIteiiva.BASESFeTDTL_14Crbcol0137.config
 
 ### model experiments -- tuned ################################
 
+The paper focussed on 2 main model configurations for the HOL and LGM, both of which having tuned against 
+observed distributions of late HOlocene and LGM benthic d13C, respectively.
 
+The basic (no 14C, not preformed tracers) experiments can be spun-up as follows:
+
+./runmuffin.sh muffin.CB.GIteiiaa.BASESFeTDTL_rb MS/odalenetal.CP.2019 muffin.CB.GIteiiaa.BASESFeTDTL_rb.SPIN 10000
+
+./runmuffin.sh muffin.CB.GIteiiva.BASESFeTDTL_rb MS/odalenetal.CP.2019 muffin.CB.GIteiiva.BASESFeTDTL_rb.SPIN 10000
 
 ### model experiments - ensembles ############################
 
