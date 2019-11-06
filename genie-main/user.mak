@@ -2,7 +2,7 @@
 #
 #          === PLEASE MAKE YOUR EDITS IN THIS FILE ===
 #
-# These edits may include the name of your Fortran or C compiler, 
+# These edits may include the name of your Fortran or C compiler,
 # the location of your version of the NetCDF libraries.
 #
 # Please note that in addition to editing this file, variables can be
@@ -14,7 +14,7 @@
 # additions, e.g.:
 #       make GENIE_LDFLAGS=-L/path/to/mylibs
 # LDFLAGS is then seeded with GENIE_LDFLAGS--this is done
-# because command line overrides are immutable. 
+# because command line overrides are immutable.
 #
 # (genie_example.job uses the command-line override machanism to
 # pass compile-time configuration options through to makefile.arc
@@ -74,7 +74,7 @@ MODEXT=mod
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
 ### DEFAULT ###
-NETCDF_DIR=/usr/local
+#NETCDF_DIR=/usr/local
 ### domino ###
 #NETCDF_DIR=/share/apps
 ### eevee ###
@@ -82,7 +82,7 @@ NETCDF_DIR=/usr/local
 ### iwan ###
 #NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.4
 ### sprout ###
-#NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.6
+NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.6
 ### almond ###
 #NETCDF_DIR=/share/apps/netcdf-4.0/gcc-4.4.7
 ### VM ###
@@ -91,4 +91,3 @@ NETCDF_DIR=/usr/local
 #NETCDF_DIR=/opt/local
 
 NETCDF_NAME=netcdf
-
