@@ -1710,18 +1710,27 @@ c pbh read in time varying orbital forcing
 c AR (14/10/08) -- input format changed to 5 column format (time first)
 c AR (14/10/08) -- also re-order time(!)
       if(orbit_radfor.eq."y".or.orbit_radfor.eq."Y") then
-        open(unit=729,file=indir_name(1:lenin)// 
-     $ trim(filenameorbit),iostat=ios)
-        do i=1,norbit
-           read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
-        enddo
-        close(729)
-        do i=1,norbit
-           orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
-           orbitobl_vect(norbit-i+1) = orbitall_vect(i,3)
-           orbitpre_vect(norbit-i+1) = orbitall_vect(i,4)
-           orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
-        enddo
+        inquire(file=indir_name(1:lenin)//trim(filenameorbit),
+     $ exist=ioex)
+        if (ioex) then
+          open(unit=729,file=indir_name(1:lenin)//trim(filenameorbit),
+     $ iostat=ios)
+          do i=1,norbit
+             read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
+          enddo
+          close(729)
+          do i=1,norbit
+            orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
+            orbitobl_vect(norbit-i+1) = orbitall_vect(i,3)
+            orbitpre_vect(norbit-i+1) = orbitall_vect(i,4)
+            orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
+          enddo
+        else
+          print*,''
+          print*,' *** Missing file: '//
+     $ indir_name(1:lenin)//trim(filenameorbit)
+          stop
+        endif
       endif
 c end pbh
 
