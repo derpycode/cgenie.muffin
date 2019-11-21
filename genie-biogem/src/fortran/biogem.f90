@@ -1704,7 +1704,7 @@ subroutine biogem_tracercoupling( &
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
   INTEGER::k,l,n,io,is                                         ! counting indices
-  integer::loc_k1                                              ! local topography
+  integer::loc_k1,loc_k1in                                     ! local topography
   integer::loc_i,loc_j                                         !
   real::loc_ocn_tot_M,loc_ocn_rtot_M                           ! ocean mass and reciprocal
   real::loc_ocn_tot_V,loc_ocn_rtot_V                           ! ocean volume  and reciprocal
@@ -1718,6 +1718,7 @@ subroutine biogem_tracercoupling( &
   real,DIMENSION(:),ALLOCATABLE::loc_partialtot                !
   integer::matrix_tracer,nc_record_count ! matrix
   real::loc_t,loc_yr
+  real::loc_dilution
   ! ---------------------------------------------------------- !
   ! INITIALIZE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
@@ -1936,13 +1937,24 @@ subroutine biogem_tracercoupling( &
         loc_k1 = vocn(n)%k1 ! index of deepest layer at i,j (surface = n_k)
         ! ------------------------------------------------- ! add ECOGEM remin and part arrays to dBIOGEM arrays
         If (flag_ecogem) then
+           ! dilute tracers across the mixed layer if selected
+           if (ctrl_bio_remin_ecogemMLD) then
+              loc_k1in     = n_k
+              loc_dilution = vphys_ocn(n)%mk(ipo_dD,n_k)/sum(vphys_ocn(n)%mk(ipo_dD,phys_ocnatm(ipoa_mld_k,loc_i,loc_j):n_k))
+           else
+              loc_k1in     = loc_k1
+              loc_dilution = 1.0
+           end if
+           ! add ECOGEM tracers
            DO l=3,n_l_ocn
               io = conv_iselected_io(l)
-              vdocn(n)%mk(l,loc_k1:n_k) = vdocn(n)%mk(l,loc_k1:n_k) + dum_egbg_sfcremin(io,loc_i,loc_j,loc_k1:n_k)
+              vdocn(n)%mk(l,loc_k1:n_k) = vdocn(n)%mk(l,loc_k1:n_k) + &
+                 & loc_dilution*dum_egbg_sfcremin(io,loc_i,loc_j,loc_k1in:n_k)
            end do
            DO l=1,n_l_sed
               is = conv_iselected_is(l)
-              vdbio_part(n)%mk(l,loc_k1:n_k) = vdbio_part(n)%mk(l,loc_k1:n_k) + dum_egbg_sfcpart(is,loc_i,loc_j,loc_k1:n_k)
+              vdbio_part(n)%mk(l,loc_k1:n_k) = vdbio_part(n)%mk(l,loc_k1:n_k) + &
+                 & loc_dilution*dum_egbg_sfcpart(is,loc_i,loc_j,loc_k1in:n_k)
            end do
         end If
         ! ------------------------------------------------- !
@@ -2186,6 +2198,14 @@ subroutine biogem_climate( &
            phys_ocnatm(ipoa_cost,i,j)  = dum_cost(i,j)
            ! MLD
            phys_ocnatm(ipoa_mld,i,j)   = dum_mld(i,j)
+           ! MLD -- find corresponding 'k' layer to MLD
+           phys_ocnatm(ipoa_mld_k,i,j) = n_k      
+           DO k=n_k,loc_k1,-1
+              If (phys_ocn(ipo_Dbot,i,j,k) >= dum_mld(i,j)) then
+                 phys_ocnatm(ipoa_mld_k,i,j) = k
+                 exit
+              end if
+           end do
         end IF
         do k = loc_k1,n_k
            ! density

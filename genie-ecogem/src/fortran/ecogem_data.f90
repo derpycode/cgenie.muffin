@@ -121,6 +121,7 @@ CONTAINS
        write(*,68),'  - light attenuation by water              (k_w) :   ',        k_w
        write(*,68),'  - light attenuation by chlorophyll a    (k_chl) :   ',      k_chl
        write(*,66),'  - restrict MLD for mean light calculation?      :   ',      ctrl_restrict_mld
+       write(*,66),'  - PAR attenutation by sea-ice cover?            :   ',      ctrl_PARseaicelimit
        write(*,*), '- Grazing parameters --------------------------------'
        write(*,68),'  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
        write(*,67),'  - prey switching exponent (integer)        (ns) :   ',         ns

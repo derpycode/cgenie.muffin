@@ -275,6 +275,7 @@ CONTAINS
        print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
+       print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD 
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'CaCO3 44Ca fractionation scheme ID string           : ',trim(opt_d44Ca_Ca_CaCO3)
