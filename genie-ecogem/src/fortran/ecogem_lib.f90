@@ -109,6 +109,8 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
   logical::ctrl_restrict_mld    ! restrict MLD
   NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
+  logical::ctrl_PARseaicelimit    ! PAR attenutation by sea-ice cover?
+  NAMELIST /ini_ecogem_nml/ctrl_PARseaicelimit
   ! Grazing parameters
   real :: ass_eff                   !      maximum assimilation efficiency
   integer :: ns                     !      prey switching exponent

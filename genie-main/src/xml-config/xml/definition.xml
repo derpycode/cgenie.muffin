@@ -4432,6 +4432,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 						<value datatype="real">1.17</value>
                         <description>exponent relating e-folding depth to ecogem size class [Stemmann et al 2004]</description>
                     </param>
+                    <param name="ctrl_bio_remin_ecogemMLD">
+                       <value datatype="boolean">.false.</value>
+                        <description>Dilute tracers across the mixed layer</description>
+                    </param>
 <!-- kinetics -->
                     <param name="par_bio_remin_k_O2">
                         <value datatype="real">1.0</value>
@@ -7959,6 +7963,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_restrict_mld">
 			<value datatype="boolean">.false.</value>
 	                  <description>restrict MLD for mean light calculation?</description>
+                    </param>
+                    <param name="ctrl_PARseaicelimit">
+			<value datatype="boolean">.false.</value>
+	                  <description>PAR attenutation by sea-ice cover?</description>
                     </param>
        <!-- Grazing parameters -->  
                     <param name="trophic_tradeoff">
