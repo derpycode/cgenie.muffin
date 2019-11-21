@@ -1681,7 +1681,7 @@ end subroutine biogem
 subroutine biogem_tracercoupling( &
      & dum_ts,                    &
      & dum_ts1,                   &
-     & dum_genie_clock,        &
+     & dum_genie_clock,           &
      & dum_egbg_sfcpart,          &
      & dum_egbg_sfcremin,         &
      & dum_egbg_sfcocn            &
@@ -1704,7 +1704,7 @@ subroutine biogem_tracercoupling( &
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
   INTEGER::k,l,n,io,is                                         ! counting indices
-  integer::loc_k1,loc_k1in                                     ! local topography
+  integer::loc_k1,loc_k1mld                                    ! local topography +
   integer::loc_i,loc_j                                         !
   real::loc_ocn_tot_M,loc_ocn_rtot_M                           ! ocean mass and reciprocal
   real::loc_ocn_tot_V,loc_ocn_rtot_V                           ! ocean volume  and reciprocal
@@ -1939,23 +1939,30 @@ subroutine biogem_tracercoupling( &
         If (flag_ecogem) then
            ! dilute tracers across the mixed layer if selected
            if (ctrl_bio_remin_ecogemMLD) then
-              loc_k1in     = n_k
-              loc_dilution = vphys_ocn(n)%mk(ipo_dD,n_k)/sum(vphys_ocn(n)%mk(ipo_dD,phys_ocnatm(ipoa_mld_k,loc_i,loc_j):n_k))
+              loc_k1mld    = int(phys_ocnatm(ipoa_mld_k,loc_i,loc_j))
+              loc_dilution = vphys_ocn(n)%mk(ipo_dD,n_k)/sum(vphys_ocn(n)%mk(ipo_dD,loc_k1mld:n_k))
+              DO l=3,n_l_ocn
+                 io = conv_iselected_io(l)
+                 vdocn(n)%mk(l,loc_k1mld:n_k) = vdocn(n)%mk(l,loc_k1mld:n_k) + &
+                    & loc_dilution*dum_egbg_sfcremin(io,loc_i,loc_j,n_k)
+              end do
+              DO l=1,n_l_sed
+                 is = conv_iselected_is(l)
+                 vdbio_part(n)%mk(l,loc_k1mld:n_k) = vdbio_part(n)%mk(l,loc_k1mld:n_k) + &
+                    & loc_dilution*dum_egbg_sfcpart(is,loc_i,loc_j,n_k)
+              end do
            else
-              loc_k1in     = loc_k1
-              loc_dilution = 1.0
+              DO l=3,n_l_ocn
+                 io = conv_iselected_io(l)
+                 vdocn(n)%mk(l,loc_k1:n_k) = vdocn(n)%mk(l,loc_k1:n_k) + &
+                    & dum_egbg_sfcremin(io,loc_i,loc_j,loc_k1:n_k)
+              end do
+              DO l=1,n_l_sed
+                 is = conv_iselected_is(l)
+                 vdbio_part(n)%mk(l,loc_k1:n_k) = vdbio_part(n)%mk(l,loc_k1:n_k) + &
+                    & dum_egbg_sfcpart(is,loc_i,loc_j,loc_k1:n_k)
+              end do
            end if
-           ! add ECOGEM tracers
-           DO l=3,n_l_ocn
-              io = conv_iselected_io(l)
-              vdocn(n)%mk(l,loc_k1:n_k) = vdocn(n)%mk(l,loc_k1:n_k) + &
-                 & loc_dilution*dum_egbg_sfcremin(io,loc_i,loc_j,loc_k1in:n_k)
-           end do
-           DO l=1,n_l_sed
-              is = conv_iselected_is(l)
-              vdbio_part(n)%mk(l,loc_k1:n_k) = vdbio_part(n)%mk(l,loc_k1:n_k) + &
-                 & loc_dilution*dum_egbg_sfcpart(is,loc_i,loc_j,loc_k1in:n_k)
-           end do
         end If
         ! ------------------------------------------------- !
         DO k=n_k,loc_k1,-1
@@ -2017,7 +2024,6 @@ subroutine biogem_tracercoupling( &
           end select
         end if
       end do
-
 
       if(matrix_go.eq.0)then
         matrix_go=1 ! flag for starting out of sync matrix loops
@@ -2184,7 +2190,6 @@ subroutine biogem_climate( &
         end IF
      end DO
   end DO
-
   ! *** UPDATE CLIMATE PROPERTIES ***
   ! (i.e., just the physical properties of the ocean and ocean-atmosphere interface that BIOGEM needs to know about)
   DO i=1,n_i
