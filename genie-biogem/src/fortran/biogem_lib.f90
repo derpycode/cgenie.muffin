@@ -148,6 +148,8 @@ MODULE biogem_lib
   real::par_bio_kT0                                              ! coefficient for temperature-dependent uptake rate modifier
   real::par_bio_kT_eT                                            ! e-folding temp (K) for temp-dependent uptake rate modifier
   NAMELIST /ini_biogem_nml/par_bio_zc,par_bio_I_eL,par_bio_kT0,par_bio_kT_eT
+  real::par_bio_kT_dT                                            ! temperature offset for T-dependent bio schemes
+  NAMELIST /ini_biogem_nml/par_bio_kT_dT
   ! ------------------- ORGANIC MATTER EXPORT RATIOS ----------------------------------------------------------------------------- !
   real::par_bio_red_POP_PON                                             ! N/P organic matter Redfield ratio
   real::par_bio_red_POP_POC                                             ! C/P organic matter Redfield ratio

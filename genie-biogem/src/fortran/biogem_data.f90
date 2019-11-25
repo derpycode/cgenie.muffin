@@ -150,6 +150,7 @@ CONTAINS
        print*,'Light e-folding depth (m) (OCMIP-2)                 : ',par_bio_I_eL
        print*,'Coefficient for T-dep. uptake rate modifier         : ',par_bio_kT0
        print*,'e-folding temp. (K) for T-dep. uptake rate modifier : ',par_bio_kT_eT
+       print*,'temperature offset for T-dependent bio schemes      : ',par_bio_kT_dT
        ! --- ORGANIC MATTER EXPORT RATIOS ---------------------------------------------------------------------------------------- !
        print*,'--- ORGANIC MATTER EXPORT RATIOS -------------------'
        print*,'N/P organic matter Redfield ratio                   : ',par_bio_red_POP_PON

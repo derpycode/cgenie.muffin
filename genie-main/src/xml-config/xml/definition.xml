@@ -4029,6 +4029,10 @@
 			<value datatype="real">15.8</value>
                         <description>e-folding temperature (K) for T-dep. uptake rate modifier</description>
                     </param>
+                    <param name="par_bio_kT_dT">
+			<value datatype="real">0.0</value>
+                        <description>temperature offset for T-dependent bio schemes</description>
+                    </param>
 <!-- ORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POP_PON">
 			<value datatype="real">16.0</value>
