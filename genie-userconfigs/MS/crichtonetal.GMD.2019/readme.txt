@@ -18,11 +18,11 @@ All experiments are run from:$HOME/cgenie.muffin/genie-main
 
 ################ model experiments, steady state to Pre-industrial ################
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.2019/spin [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN 10000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2019/spin [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN 10000
 
 ###### model experiments, transient forcing from Pre-industrial to Present ###########
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.2019/trans [letter][no1]_[no2]_worjh2_PD_BASES.TRANS 310 [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2019/trans [letter][no1]_[no2]_worjh2_PD_BASES.TRANS 310 [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN
 
 ###### model settings ######
  
