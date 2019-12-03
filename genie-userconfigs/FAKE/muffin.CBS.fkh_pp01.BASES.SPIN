@@ -78,7 +78,7 @@ rg_par_weather_CaCO3_d13C=3.0
 #
 # --- DATA SAVING ---------------------------------------------------
 #
-bg_par_data_save_level=15
+bg_par_data_save_level=14
 bg_ctrl_debug_lvl0=.true.
 ma_debug_loop=1
 #
