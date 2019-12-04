@@ -603,7 +603,7 @@ CONTAINS
        if ( (loc_H2S>const_rns) .AND. (loc_Fe>const_rns) ) then
           ! calculate H2S oxidation, and cap value at H2S or Fe3 concentration if necessary
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
-          loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S**(1/2)
+          loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S**(1.0/2.0)
           ! cap at maximum of available Fe, H2S
           loc_Fe_reduction  = min(loc_Fe_reduction,loc_Fe,(8.0/1.0)*loc_H2S)
           loc_H2S_oxidation = (1.0/8.0)*loc_Fe_reduction
@@ -1018,7 +1018,7 @@ CONTAINS
 
        if ((loc_Fe2 > const_rns) .AND. (loc_CO3 > const_rns)) then
 
-          loc_IAP  = (loc_CO3*loc_Fe2*(loc_OH**(1/2)))
+          loc_IAP  = (loc_CO3*loc_Fe2*(loc_OH**(1.0/2.0)))
 
           if (loc_IAP > const_rns) then
              loc_FeCO3_precipitation = &
