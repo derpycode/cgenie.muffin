@@ -14,13 +14,16 @@
  POCd             09  09  03  'particulate organic cadmium (POCd)'   'wt%'     0.00     100.00
  POCd_114Cd       43  09  17  'd114Cd of POC incorporated cadmium'   'o/oo'   -9.99E+2    9.99E+2
  POFe             10  10  03  'particulate organic iron (POFe)'      'wt%'     0.00     100.002
+ POFe_56Fe        94  10  22  'd56Fe of POC incorporated iron'       'o/oo'   -9.99E+2    9.99E+2
  POI              79  79  03  'particulate organic iodine (POI)'     'wt%'     0.00     100.00
  POBa             80  80  03  'particulate organic iodine (POI)'     'wt%'     0.00     100.00
  POBa_138Ba       81  80  23  'd114Cd of POC incorporated cadmium'   'o/oo'   -9.99E+2    9.99E+2
  POM_231Pa        11  03  07  'POM scavenged 231Pa'                  'wt%'     0.00     100.00
  POM_230Th        12  03  07  'POM scavenged 230Th'                  'wt%'     0.00     100.00
  POM_Fe           13  03  07  'POM scavenged Fe'                     'wt%'     0.00     100.00
- POM_Fe_56Fe      75  13  22  '54Fe of POM scavenged Fe'             'o/oo'   -9.99E+2    9.99E+2
+ POM_Fe_56Fe      75  13  22  '56Fe of POM scavenged Fe'             'o/oo'   -9.99E+2    9.99E+2
+ POM_FeOOH       103  03  07  'POM scavenged FeOOH'                  'wt%'     0.00     100.00
+ POM_FeOOH_56Fe  104 103  22  '56Fe of POM scavenged FeOOH'          'o/oo'   -9.99E+2    9.99E+2
  POM_Nd           47  03  07  'POM scavenged Nd'                     'wt%'     0.00     100.00
  POM_Nd_144Nd     48  47  19  'POM scavenged 144Nd'                  'o/oo'   -9.99E+2    9.99E+2
  POM_MoS2         58  03  07  'POM scavenged MoS2'                   'wt%'     0.00     100.00
@@ -30,6 +33,9 @@
  POM_S_34S        74  73  15  'POM scavenged S-34S'                  'o/oo'   -9.99E+2    9.99E+2
  POM_BaSO4        82  03  07  'POM scavenged BaSO4'                  'wt%'     0.00     100.00
  POM_BaSO4_138Ba  83  82  23  'POM scavenged BaSO4-138Ba'            'o/oo'   -9.99E+2    9.99E+2
+ POM_Os           97  03  07  'POM scavenged Os'                     'wt%'     0.00     100.00
+ POM_Os_187Os     98  97  26  'POM scavenged Os-187Os'               'o/oo'   -9.99E+2    9.99E+2
+ POM_Os_188Os     99  97  27  'POM scavenged Os-188Os'               'o/oo'   -9.99E+2    9.99E+2
  CaCO3            14  14  01  'calcium carbonate (CaCO3)'            'wt%'     0.00     100.00
  CaCO3_13C        15  14  11  'd13C of CaCO3'                        'o/oo'   -9.99E+2    9.99E+2
  CaCO3_14C        16  14  12  'd14C of CaCO3'                        'o/oo'   -9.99E+5    9.99E+5
@@ -51,9 +57,20 @@
  SrCO3            84  84  04  'CaCO3 incorporated strontium'         'wt%'     0.00     100.00
  SrCO3_87Sr       85  84  24  'd87Sr of SrCO3'                       'o/oo'   -9.99E+2    9.99E+2
  SrCO3_88Sr       86  84  25  'd88Sr of SrCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ OsCO3           100 100  04  'CaCO3 incorporated osmium'            'wt%'     0.00     100.00
+ OsCO3_187Os     101 100  26  '187Os of OsCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ OsCO3_188Os     102 100  27  '188Os of OsCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ FeCO3            88  88  06  'Fe carbonate'                         'wt%'     0.00     100.00
+ FeCO3_13C        89  88  11  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
+ FeCO3_56Fe       90  88  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ FeS2             91  91  06  'Fe carbonate'                         'wt%'     0.00     100.00
+ FeS2_34S         92  91  15  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
+ FeS2_56Fe        93  91  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ FeOOH            95  95  06  'Fe (hydr)oxides'                      'wt%'     0.00     100.00
+ FeOOH_56Fe       96  95  22  'd56Fe of FeOOH'                       'o/oo'   -9.99E+2    9.99E+2
  det              22  22  02  'detrital (refractory) material'       'wt%'     0.00     100.00
- detLi            55  55  06  'detrital Li'                          'wt%'     0.00     100.00
- detLi_7Li        56  55  18  'detrital 7Li'                         'o/oo'   -9.99E+2    9.99E+2
+ detLi            55  55  06  'CAN BE REASSIGNED'                    'wt%'     0.00     100.00
+ detLi_7Li        56  55  18  'CAN BE REASSIGNED'                    'o/oo'   -9.99E+2    9.99E+2
  det_231Pa        23  22  07  'detrital scavenged 231Pa'             'wt%'     0.00     100.00
  det_230Th        24  22  07  'detrital scavenged 230Th'             'wt%'     0.00     100.00
  det_Fe           25  22  07  'detrital scavenged Fe'                'wt%'     0.00     100.00
@@ -120,7 +137,7 @@ INFO: TRACER ASSIGNMENT RULES
     '3' -> assigned to elemental components associated with POC; P, N, Cd, Fe
     '4' -> assigned to elemental components associated with CaCO3; Cd
     '5' -> assigned to elemental components associated with opal; Ge
-    '5' -> assigned to elemental components associated with det; Li
+    '6' -> assigned to elemental components associated with det; Li
     '7' -> assigned to particle-reactive scavenged elements; 231Pa, 230Th, Fe
     '8' -> assigned to carbonate 'age'
     '9' -> assigned to the fractional partitioning of biogenic material (for remineralization purposes)

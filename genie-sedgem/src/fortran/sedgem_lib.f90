@@ -195,6 +195,17 @@ MODULE sedgem_lib
   real::par_sed_hydroip_fDIC                                     ! hydrothermal CO2 outgassing (mol yr-1)    
   real::par_sed_hydroip_fDIC_d13C                                ! d13C                
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fDIC,par_sed_hydroip_fDIC_d13C
+  real::par_sed_Os_depTOT					 ! deposition rate of Os in oxic bottom waters (mol yr-1)
+  real::par_sed_Os_dep                                           ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_oxic					 ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_suboxic					 ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_O2_threshold                                  ! oxygen threshold for oxic/suboxic deposition
+  logical::ctrl_sed_Os_O2                                           ! switch to turn on oxygen dependent deposition
+  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic,par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
+  real::par_sed_hydroip_fOs					 ! hydrothermal Os flux (mol yr-1)
+  real::par_sed_hydroip_fOs_187Os_188Os				 ! 187Os/188Os ratio of hydrothermal Os flux
+  real::par_sed_hydroip_fOs_188Os_192Os				 ! 188Os/192Os ratio of hydrothermal Os flux
+  NAMELIST /ini_sedgem_nml/par_sed_hydroip_fOs,par_sed_hydroip_fOs_187Os_188Os,par_sed_hydroip_fOs_188Os_192Os
   ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
   logical::ctrl_sed_forcedohmega_ca                              ! Ca-only adjustment for forced ocean saturation?
   NAMELIST /ini_sedgem_nml/ctrl_sed_forcedohmega_ca

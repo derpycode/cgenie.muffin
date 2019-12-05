@@ -569,8 +569,8 @@ ccc BUT NEEDS BIOGEM TEST REPLACING (AND *CARE* TAKEN)
                      call diag_biogem_timeseries_wrapper
                   end if
                   call cpl_flux_ocnatm_wrapper
-                  if (flag_sedgem) call cpl_flux_ocnsed_wrapper
-                  if (flag_sedgem) call cpl_comp_ocnsed_wrapper
+                  call cpl_flux_ocnsed_wrapper
+                  call cpl_comp_ocnsed_wrapper
                   if (flag_rokgem) call reinit_flux_rokocn_wrapper
                   if (debug_loop.gt.0) call diag_biogem_wrapper
 c     If GEMlite: test for the end of the 1st (normal) part of cycle
