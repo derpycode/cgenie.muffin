@@ -2204,7 +2204,7 @@ subroutine biogem_climate( &
            ! MLD
            phys_ocnatm(ipoa_mld,i,j)   = dum_mld(i,j)
            ! MLD -- find corresponding 'k' layer to MLD
-           phys_ocnatm(ipoa_mld_k,i,j) = n_k      
+           phys_ocnatm(ipoa_mld_k,i,j) = loc_k1      
            DO k=n_k,loc_k1,-1
               If (phys_ocn(ipo_Dbot,i,j,k) >= dum_mld(i,j)) then
                  phys_ocnatm(ipoa_mld_k,i,j) = k

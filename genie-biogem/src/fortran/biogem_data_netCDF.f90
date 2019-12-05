@@ -1660,6 +1660,10 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,3,'phys_MLD','mixed layer depth',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('phys_MLD',loc_iou,n_i,n_j,loc_ntrec, &
             & int_phys_ocnatm_timeslice(ipoa_mld,:,:)/int_t_timeslice,loc_mask_surf)
+       loc_unitsname = 'n/a'
+       call sub_adddef_netcdf(loc_iou,3,'phys_MLD_k','mixed layer level',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('phys_MLD_k',loc_iou,n_i,n_j,loc_ntrec, &
+            & int_phys_ocnatm_timeslice(ipoa_mld_k,:,:)/int_t_timeslice,loc_mask_surf)
     end if
     !----------------------------------------------------------------
     !       FULL ATMOSPEHRE 'PHYSICS'
