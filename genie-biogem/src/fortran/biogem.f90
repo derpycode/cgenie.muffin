@@ -1516,6 +1516,10 @@ subroutine biogem(        &
               if (sed_select(is_FeCO3)) then
                  call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
               end if
+              ! *** Greenalite cycling ***
+              if (sed_select(is_Fe3Si2O4)) then
+                 call sub_calc_precip_Fe3Si2O4(i,j,loc_k1,loc_dtyr)
+              end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS ***'
