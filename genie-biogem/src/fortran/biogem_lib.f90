@@ -514,6 +514,14 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
   real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
+  real::par_d56Fe_Fe3Si2O4_alpha                                 ! 56/54Fe fractionation between Fe2 and greenalite
+  namelist /ini_biogem_nml/par_d56Fe_Fe3Si2O4_alpha
+  real::par_bio_Fe3Si2O4precip_cSi                               ! assumed SiO2 concentration for a diatom-free ocean
+  namelist /ini_biogem_nml/par_bio_Fe3Si2O4precip_cSi
+  real::par_bio_Fe3Si2O4precip_abioticohm_cte                    ! ohmega constant for greenalite formation
+  real::par_bio_Fe3Si2O4precip_sf                                ! Scale factor for Fe3Si2O4 precipitation
+  real::par_bio_Fe3Si2O4precip_exp                               ! Rate law power for Fe3Si2O4 precipitation
+  NAMELIST /ini_biogem_nml/par_bio_Fe3Si2O4precip_sf,par_bio_Fe3Si2O4precip_exp,par_bio_Fe3Si2O4precip_abioticohm_cte
   real::par_bio_FeS_part_abioticohm_cte                          ! Ohmega constant for nanoparticulate FeS formation
   real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
   NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k,par_bio_FeS_part_abioticohm_cte
