@@ -899,7 +899,7 @@
                         </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="99">
+                   <paramArray name="sed_select" dimension="1" extent="107">
                         <description>tracer selection</description>    
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -1314,6 +1314,18 @@
                             <description></description>
                         </param>
                         <param name="sed_select(104)" index="104">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(105)" index="105">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(106)" index="106">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(107)" index="107">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
@@ -5085,6 +5097,28 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0005</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
                     </param>
+                    
+                    <param name="par_bio_Fe3Si2O4precip_sf">
+			<value datatype="real">1.0e-50</value>
+                        <description>kinetic factor for Fe3Si2O4 precipitation in M yr-1</description>
+                    </param>
+                    <param name="par_bio_Fe3Si2O4precip_exp">
+			<value datatype="real">1.0</value>
+                        <description>Rate law power for Fe3Si2O4 precipitation</description>
+                    </param>
+                    <param name="par_bio_Fe3Si2O4precip_abioticohm_cte">
+			<value datatype="real">1.0</value>
+                        <description>Ohmega constant for Fe3Si2O4 precip</description>
+                    </param>
+                    <param name="par_d56Fe_Fe3Si2O4_alpha">
+			<value datatype="real">1.0</value>
+                        <description>fractionation factor d56/54 Fe in Fe3Si2O4 precipitation</description>
+                    </param>
+                    <param name="par_bio_Fe3Si2O4precip_cSi">
+			<value datatype="real">2.1e-6</value>
+                        <description>assumed SiO2 concentration in diatom-free ocean</description>
+                    </param>
+                    
                     <param name="ctrl_bio_FeOOHprecip_explicit">
 			<value datatype="boolean">.true.</value>
                         <description>precipitate FeOOH explicit?</description>
