@@ -994,7 +994,7 @@ CONTAINS
             & )
 
        loc_CO3 = carb(ic_conc_CO3,dum_i,dum_j,n_k)
-       loc_OH  = 10**(-(14-carb(ic_pHsws,dum_i,dum_j,n_k)))
+       loc_OH  = 10.0**(-(14.0-carb(ic_pHsws,dum_i,dum_j,n_k)))
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        
@@ -1092,6 +1092,152 @@ CONTAINS
   end SUBROUTINE sub_calc_precip_FeCO3
   ! ****************************************************************************************************************************** !
 
+ ! CALCULATE ABIOTIC FeCO3 precipitation
+  SUBROUTINE sub_calc_precip_Fe3Si2O4(dum_i,dum_j,dum_k1,dum_dt)
+    ! dummy arguments
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dt
+    ! local variables
+    INTEGER::k,l,io,is
+    integer::loc_i,loc_tot_i
+    real,dimension(n_ocn,n_k)::loc_bio_uptake
+    real,dimension(n_sed,n_k)::loc_bio_part
+    real,dimension(1:3)::loc_Fe2spec
+    real::loc_IAP
+    real::loc_delta_Fe3Si2O4,loc_Fe2,loc_SiO2,loc_H,loc_H2S,loc_Fe3Si2O4_precipitation
+    real::loc_alpha
+    real::loc_R, loc_r56Fe,loc_R_56Fe
+    integer::loc_kmax
+
+    ! *** INITIALIZE VARIABLES ***
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_uptake(io,:) = 0.0
+    end do
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       loc_bio_part(is,:) = 0.0
+    end DO
+
+    ! *** CALCULATE Fe3Si2O4 PRECIPITATION ***
+    DO k=n_k,dum_k1,-1
+       ! re-calculate carbonate dissociation constants
+       CALL sub_calc_carbconst(                 &
+            & phys_ocn(ipo_Dmid,dum_i,dum_j,k), &
+            & ocn(io_T,dum_i,dum_j,k),          &
+            & ocn(io_S,dum_i,dum_j,k),          &
+            & carbconst(:,dum_i,dum_j,k)        &
+            & )
+       ! adjust carbonate constants
+       if (ocn_select(io_Ca) .AND. ocn_select(io_Mg)) then
+          call sub_adj_carbconst(           &
+               & ocn(io_Ca,dum_i,dum_j,k),  &
+               & ocn(io_Mg,dum_i,dum_j,k),  &
+               & carbconst(:,dum_i,dum_j,k) &
+               & )
+       end if
+       ! re-estimate Ca and borate concentrations from salinity (if not selected and therefore explicitly treated)
+       IF (.NOT. ocn_select(io_Ca))  ocn(io_Ca,dum_i,dum_j,k)  = fun_calc_Ca(ocn(io_S,dum_i,dum_j,k))
+       IF (.NOT. ocn_select(io_B))   ocn(io_B,dum_i,dum_j,k)   = fun_calc_Btot(ocn(io_S,dum_i,dum_j,k))
+       IF (.NOT. ocn_select(io_SO4)) ocn(io_SO4,dum_i,dum_j,k) = fun_calc_SO4tot(ocn(io_S,dum_i,dum_j,k))
+       IF (.NOT. ocn_select(io_F))   ocn(io_F,dum_i,dum_j,k)   = fun_calc_Ftot(ocn(io_S,dum_i,dum_j,k))
+       ! re-calculate surface ocean carbonate chemistry
+       CALL sub_calc_carb(             &
+            & ocn(io_DIC,dum_i,dum_j,k),  &
+            & ocn(io_ALK,dum_i,dum_j,k),  &
+            & ocn(io_Ca,dum_i,dum_j,k),   &
+            & ocn(io_PO4,dum_i,dum_j,k),  &
+            & ocn(io_SiO2,dum_i,dum_j,k), &
+            & ocn(io_B,dum_i,dum_j,k),    &
+            & ocn(io_SO4,dum_i,dum_j,k),  &
+            & ocn(io_F,dum_i,dum_j,k),    &
+            & ocn(io_H2S,dum_i,dum_j,k),  &
+            & ocn(io_NH4,dum_i,dum_j,k),  &
+            & carbconst(:,dum_i,dum_j,k), &
+            & carb(:,dum_i,dum_j,k),      &
+            & carbalk(:,dum_i,dum_j,k)    &
+            & )
+
+       loc_SiO2 = par_bio_Fe3Si2O4precip_cSi
+       loc_H    = 10.0**(-carb(ic_pHsws,dum_i,dum_j,n_k))
+       loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
+       loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
+
+       loc_r56Fe  = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
+       loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)       
+
+       if (ctrl_bio_FeS2precip_explicit) then
+          loc_Fe2    = ocn(io_Fe2,dum_i,dum_j,k)
+       else 
+          if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
+             loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
+             loc_Fe2  = loc_Fe2spec(1) 
+                if (loc_Fe2 > ocn(io_Fe2,dum_i,dum_j,k)) then
+                    loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)   
+                end if                    
+          else
+             loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
+          end if
+       end if
+
+       if ((loc_Fe2 > const_rns) .AND. (loc_SiO2 > const_rns)) then
+
+          ! Calculate IAP according to Rasmussen et al., 2019, Geology
+          
+          loc_IAP  = (((loc_SiO2**2.0)*(loc_Fe2**3.0))/(loc_H**6.0))
+
+          if (loc_IAP > const_rns) then
+             loc_Fe3Si2O4_precipitation = &
+                  & dum_dt*par_bio_Fe3Si2O4precip_sf*exp(par_bio_Fe3Si2O4precip_exp*LOG10(loc_IAP/par_bio_Fe3Si2O4precip_abioticohm_cte))
+
+          else
+             loc_Fe3Si2O4_precipitation      = 0.0 
+             !loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
+          end if
+          if (loc_Fe3Si2O4_precipitation > MIN(loc_SiO2,loc_Fe2)) then
+             loc_Fe3Si2O4_precipitation = MIN(loc_SiO2,loc_Fe2)
+          end if
+          loc_bio_part(is_Fe3Si2O4,k) = loc_Fe3Si2O4_precipitation
+          loc_bio_part(is_Fe3Si2O4_56Fe,k) = &
+               & par_d56Fe_Fe3Si2O4_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe3Si2O4_alpha*loc_R_56Fe)*loc_bio_part(is_Fe3Si2O4,k)
+          
+       end if
+       ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          loc_tot_i = conv_sed_ocn_i(0,is)
+          do loc_i=1,loc_tot_i
+             io = conv_sed_ocn_i(loc_i,is)
+             loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+          end do
+       end DO
+    end DO
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
+    end do
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
+    end DO
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_FeCO3,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    !diag_precip(idiag_precip_Fe3Si2O4_dFe,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_precip_Fe3Si2O4
+  ! ****************************************************************************************************************************** !
 
   ! ****************************************************************************************************************************** !
   ! SULPHUR
