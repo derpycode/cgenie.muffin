@@ -368,6 +368,11 @@ CONTAINS
        print*,'Rate law power for FeCO3 precipitation              : ',par_bio_FeCO3precip_exp
        print*,'Ohnega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
        print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
+       print*,'Scale factor for Fe3Si2O4 precipitation             : ',par_bio_Fe3Si2O4precip_sf
+       print*,'Rate law power for Fe3Si2O4 precipitation           : ',par_bio_Fe3Si2O4precip_exp
+       print*,'Ohnega constant for Fe3Si2O4 preciptiation          : ',par_bio_Fe3Si2O4precip_abioticohm_cte
+       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_FeCO3_alpha
+       print*,'assumed SiO2 concentration in diatomfree ocean      : ',par_bio_Fe3Si2O4precip_cSi     
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte
        print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
