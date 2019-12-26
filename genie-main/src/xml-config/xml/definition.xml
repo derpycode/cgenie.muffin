@@ -5097,18 +5097,17 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0005</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
                     </param>
-                    
                     <param name="par_bio_Fe3Si2O4precip_sf">
-			<value datatype="real">1.0e-50</value>
-                        <description>kinetic factor for Fe3Si2O4 precipitation in M yr-1</description>
+			<value datatype="real">6.133e-09</value>
+                        <description>kinetic factor for Fe3Si2O4 precipitation in M yr-1 [Rasmussen et al. 2019]</description>
                     </param>
                     <param name="par_bio_Fe3Si2O4precip_exp">
-			<value datatype="real">1.0</value>
-                        <description>Rate law power for Fe3Si2O4 precipitation</description>
+			<value datatype="real">1.856</value>
+                        <description>Rate law power for Fe3Si2O4 precipitation [Rasmussen et al. 2019]</description>
                     </param>
                     <param name="par_bio_Fe3Si2O4precip_abioticohm_cte">
-			<value datatype="real">1.0</value>
-                        <description>Ohmega constant for Fe3Si2O4 precip</description>
+			<value datatype="real">3.98e27</value>
+                        <description>Ohmega constant for Fe3Si2O4 precip [Tosca et al. 2016]</description>
                     </param>
                     <param name="par_d56Fe_Fe3Si2O4_alpha">
 			<value datatype="real">1.0</value>
@@ -5118,7 +5117,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">2.1e-6</value>
                         <description>assumed SiO2 concentration in diatom-free ocean</description>
                     </param>
-                    
                     <param name="ctrl_bio_FeOOHprecip_explicit">
 			<value datatype="boolean">.true.</value>
                         <description>precipitate FeOOH explicit?</description>
