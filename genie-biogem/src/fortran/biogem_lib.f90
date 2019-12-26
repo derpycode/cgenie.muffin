@@ -509,16 +509,16 @@ MODULE biogem_lib
   real::par_bio_FeCO3precip_sf                                   ! Scale factor for FeCO3 precipitation
   real::par_bio_FeCO3precip_exp                                  ! Rate law power for FeCO3 precipitation
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_sf,par_bio_FeCO3precip_exp
-  real::par_bio_FeCO3precip_abioticohm_cte                       ! ohmega constant for siderite formation
+  real::par_bio_FeCO3precip_abioticohm_cte                       ! Ohmega constant for siderite formation
   real::par_bio_FeCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
   real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
   real::par_d56Fe_Fe3Si2O4_alpha                                 ! 56/54Fe fractionation between Fe2 and greenalite
   namelist /ini_biogem_nml/par_d56Fe_Fe3Si2O4_alpha
-  real::par_bio_Fe3Si2O4precip_cSi                               ! assumed SiO2 concentration for a diatom-free ocean
+  real::par_bio_Fe3Si2O4precip_cSi                               ! Assumed SiO2 concentration for a diatom-free ocean
   namelist /ini_biogem_nml/par_bio_Fe3Si2O4precip_cSi
-  real::par_bio_Fe3Si2O4precip_abioticohm_cte                    ! ohmega constant for greenalite formation
+  real::par_bio_Fe3Si2O4precip_abioticohm_cte                    ! Ohmega constant for Fe3Si2O4 precipitation
   real::par_bio_Fe3Si2O4precip_sf                                ! Scale factor for Fe3Si2O4 precipitation
   real::par_bio_Fe3Si2O4precip_exp                               ! Rate law power for Fe3Si2O4 precipitation
   NAMELIST /ini_biogem_nml/par_bio_Fe3Si2O4precip_sf,par_bio_Fe3Si2O4precip_exp,par_bio_Fe3Si2O4precip_abioticohm_cte
@@ -535,7 +535,7 @@ MODULE biogem_lib
   real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
   NAMELIST /ini_biogem_nml/par_bio_remin_kFe2toFe,par_d56Fe_Fe2ox_alpha
   real::par_bio_remin_kFetoFe2                                   ! k-value Fe reduction
-  real::par_bio_remin_kFeOOHtoFe2                                   ! k-value FeOOH reduction
+  real::par_bio_remin_kFeOOHtoFe2                                ! k-value FeOOH reduction
   real::par_d56Fe_Fered_alpha                                    ! 56/54Fe fractionation for iron reduction with S
   real::par_d34S_Fered_alpha                                     ! 34/32S fractionation for sulphide oxidation with Fe
   NAMELIST /ini_biogem_nml/par_bio_remin_kFetoFe2,par_bio_remin_kFeOOHtoFe2,par_d56Fe_Fered_alpha,par_d34S_Fered_alpha
