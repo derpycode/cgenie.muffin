@@ -1092,7 +1092,7 @@ CONTAINS
   end SUBROUTINE sub_calc_precip_FeCO3
   ! ****************************************************************************************************************************** !
 
- ! CALCULATE ABIOTIC FeCO3 precipitation
+ ! CALCULATE ABIOTIC greenalite precipitation
   SUBROUTINE sub_calc_precip_Fe3Si2O4(dum_i,dum_j,dum_k1,dum_dt)
     ! dummy arguments
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
