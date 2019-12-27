@@ -272,6 +272,10 @@ CONTAINS
        print*,'Activity coefficient for HCO3                       : ',par_bio_remin_gammaHCO3
        print*,'Activity coefficient for SO4                        : ',par_bio_remin_gammaSO4
        print*,'Activity coefficient for CH4                        : ',par_bio_remin_gammaCH4
+       print*,'Activity coefficient for Fe2+                       : ',par_bio_remin_gammaFe2
+       print*,'Activity coefficient for H+                         : ',par_bio_remin_gammaH
+       print*,'Activity coefficient for OH-                        : ',par_bio_remin_gammaOH
+       print*,'Activity coefficient for SiO2                       : ',par_bio_remin_gammaSiO2
        print*,'I -> IO3 oxidation option                           : ',trim(opt_bio_remin_oxidize_ItoIO3)
        print*,'IO3 -> I reduction option                           : ',trim(opt_bio_remin_reduce_IO3toI)
        print*,'(oxidation) lifetime for I (yrs)                    : ',par_bio_remin_Ilifetime
