@@ -1227,12 +1227,12 @@ CONTAINS
        bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
     end DO
     ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
-    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_FeCO3,:)
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_Fe3Si2O4,:)
     ! -------------------------------------------------------- !
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    !diag_precip(idiag_precip_Fe3Si2O4_dFe,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    diag_precip(idiag_precip_Fe3SiO4_dFe,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
