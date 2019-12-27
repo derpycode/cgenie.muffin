@@ -746,7 +746,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
   INTEGER,PARAMETER::n_diag_bio                           = 21 !
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
-  INTEGER,PARAMETER::n_diag_precip                        = 06 !
+  INTEGER,PARAMETER::n_diag_precip                        = 07 !
   INTEGER,PARAMETER::n_diag_react                         = 05 !
   INTEGER,PARAMETER::n_diag_iron                          = 07 !
   INTEGER,PARAMETER::n_diag_misc_2D                       = 07 !
@@ -865,6 +865,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_precip_FeCO3_dFe              = 04    !
   INTEGER,PARAMETER::idiag_precip_FeCO3_dDIC             = 05    !
   INTEGER,PARAMETER::idiag_precip_FeOOH_dFe              = 06    !
+  INTEGER,PARAMETER::idiag_precip_Fe3SiO4_dFe            = 07    !
   ! diagnostics - geochemistry -- iron speciation
   INTEGER,PARAMETER::idiag_iron_Fe                       = 01    !
   INTEGER,PARAMETER::idiag_iron_FeL                      = 02    !
@@ -984,7 +985,8 @@ MODULE biogem_lib
        & 'precip_FeS2_dSO4  ', &
        & 'precip_FeCO3_dFe  ', &
        & 'precip_FeCO3_dDIC ', &
-       & 'precip_FeOOH_dFe  '/)
+       & 'precip_FeOOH_dFe  ', &
+       & 'precip_Fe3SiO4_dFe'/)
   ! diagnostics - geochemistry -- Fe speciation
   CHARACTER(len=18),DIMENSION(n_diag_iron),PARAMETER::string_diag_iron = (/ &
        & 'iron_Fe           ', &
