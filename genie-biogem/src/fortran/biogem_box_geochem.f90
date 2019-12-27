@@ -1018,7 +1018,7 @@ CONTAINS
 
        if ((loc_Fe2 > const_rns) .AND. (loc_CO3 > const_rns)) then
 
-          loc_IAP  = (loc_CO3*loc_Fe2*(loc_OH**(1.0/2.0)))
+          loc_IAP  = ((par_bio_remin_gammaCO2*loc_CO3)*(par_bio_remin_gammaFe2*loc_Fe2)*((par_bio_remin_gammaOH*loc_OH)**(1.0/2.0)))
 
           if (loc_IAP > const_rns) then
              loc_FeCO3_precipitation = &
@@ -1185,7 +1185,7 @@ CONTAINS
 
           ! Calculate IAP according to Rasmussen et al., 2019, Geology
           
-          loc_IAP  = (((loc_SiO2**2.0)*(loc_Fe2**3.0))/(loc_H**6.0))
+          loc_IAP  = ((((par_bio_remin_gammaSiO2*loc_SiO2)**2.0)*((par_bio_remin_gammaFe2*loc_Fe2)**3.0))/((par_bio_remin_gammaH*loc_H)**6.0))
 
           if (loc_IAP > const_rns) then
              loc_Fe3Si2O4_precipitation = &
