@@ -4420,6 +4420,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
             <value datatype="real">1.20</value>
                         <description>Activity coefficient for aqueous CH4</description>
                     </param>
+                    <param name="par_bio_remin_gammaFe2">
+            <value datatype="real">0.23</value>
+                        <description>Activity coefficient for aqueous Fe2+</description>
+                    </param>
+                    <param name="par_bio_remin_gammaH">
+            <value datatype="real">0.729</value>
+                        <description>Activity coefficient for aqueous H+ ; Marion et al., 2011, Marine Chemistry</description>
+                    </param>
+                    <param name="par_bio_remin_gammaOH">
+            <value datatype="real">0.69</value>
+                        <description>Activity coefficient for aqueous OH-</description>
+                    </param>
+                     <param name="par_bio_remin_gammaSiO2">
+            <value datatype="real">1.13</value>
+                        <description>Activity coefficient for aqueous SiO2</description>
+                    </param>
                     <param name="ctrl_bio_remin_POC_fixed">
 			<value datatype="boolean">.true.</value>
                         <description>fixed-profile POM remineralization?</description>
@@ -5114,7 +5130,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>fractionation factor d56/54 Fe in Fe3Si2O4 precipitation</description>
                     </param>
                     <param name="par_bio_Fe3Si2O4precip_cSi">
-			<value datatype="real">2.1e-6</value>
+			<value datatype="real">2.2e-3</value>
                         <description>assumed SiO2 concentration in diatom-free ocean</description>
                     </param>
                     <param name="ctrl_bio_FeOOHprecip_explicit">
