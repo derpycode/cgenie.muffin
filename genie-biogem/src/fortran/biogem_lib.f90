@@ -301,6 +301,14 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSO4
   real::par_bio_remin_gammaCH4                                   ! Activity coefficient for aqueous CH4
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaCH4
+  real::par_bio_remin_gammaFe2                                   ! Activity coefficient for aqueous Fe2+
+  NAMELIST /ini_biogem_nml/par_bio_remin_gammaFe2
+  real::par_bio_remin_gammaH                                     ! Activity coefficient for aqueous H+
+  NAMELIST /ini_biogem_nml/par_bio_remin_gammaH
+  real::par_bio_remin_gammaOH                                    ! Activity coefficient for aqueous OH-
+  NAMELIST /ini_biogem_nml/par_bio_remin_gammaOH
+  real::par_bio_remin_gammaSiO2                                  ! Activity coefficient for aqueous SiO2
+  NAMELIST /ini_biogem_nml/par_bio_remin_gammaSiO2
   ! JDW size-dependent remin
   real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m)
   real::par_bio_remin_POC_size0                                  ! diameter of smallest ecogem size class (um)
