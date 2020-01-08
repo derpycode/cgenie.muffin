@@ -1932,12 +1932,9 @@ CONTAINS
     !----------------------------------------------------------------
     !       OCEAN SURFACE DATA
     !----------------------------------------------------------------
-    ! NOTE: exclude dissolved organic matter tracers
     If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
-          is = maxval(maxloc(abs(conv_DOM_POM(:,io))))-1
-          if (is == 0) then
              loc_ij(:,:) = const_real_zero
              DO i=1,n_i
                 DO j=1,n_j
@@ -1979,18 +1976,14 @@ CONTAINS
                      & 'surface-water '//trim(string_ocn(io)), trim(loc_unitsname),const_real_zero,const_real_zero)
                 call sub_putvar2d('ocn_sur_'//trim(string_ocn(io)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
              end SELECT
-          end if
        END DO
     end if
     !----------------------------------------------------------------
     !       OCEAN FLOOR DATA
     !----------------------------------------------------------------
-    ! NOTE: exclude dissolved organic matter tracers
     If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
-          is = maxval(maxloc(abs(conv_DOM_POM(:,io))))-1
-          if (is == 0) then
              loc_ij(:,:) = const_real_zero
              DO i=1,n_i
                 DO j=1,n_j
@@ -2032,7 +2025,6 @@ CONTAINS
                      & 'bottom-water '//trim(string_ocn(io)), trim(loc_unitsname),const_real_zero,const_real_zero)
                 call sub_putvar2d('ocn_ben_'//trim(string_ocn(io)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
              end SELECT
-          end if
        END DO
     end if
     !----------------------------------------------------------------
