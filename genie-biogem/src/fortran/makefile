@@ -13,7 +13,7 @@ INCLUDE_FILES =
 OTHER_FILES=../../../genie-main/makefile.arc makefile
 
 OBJECTS = biogem_lib.$(OBJ_EXT) \
-        biogem_box.$(OBJ_EXT) biogem_data_netCDF.$(OBJ_EXT) biogem_data_ascii.$(OBJ_EXT) \
+        biogem_box.$(OBJ_EXT) biogem_box_geochem.$(OBJ_EXT) biogem_data_netCDF.$(OBJ_EXT) biogem_data_ascii.$(OBJ_EXT) \
 	biogem_data.$(OBJ_EXT) initialise_biogem.$(OBJ_EXT) \
 	cpl_comp_biogem.$(OBJ_EXT) \
 	biogem.$(OBJ_EXT) end_biogem.$(OBJ_EXT)
