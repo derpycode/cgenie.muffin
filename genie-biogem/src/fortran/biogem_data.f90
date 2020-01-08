@@ -395,7 +395,8 @@ CONTAINS
        print*,'kinetic constant for Fe reduction                   : ',par_bio_remin_kFetoFe2
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
-       print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha       
+       print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
+       print*,'max frac of Fe pool oxidizing/reducing in time-step : ',par_bio_Feredox_maxfrac
        ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -788,10 +789,10 @@ CONTAINS
        bio_part_red(is_POC,is_POFe,:,:) = 1.0/bio_part_red(is_POFe,is_POC,:,:)
     end if
     ! denifrification and sulphate reduction
-    if (par_bio_red_POP_PO2 == -138.0 ) then
+    if (int(par_bio_red_POP_PO2) == -138 ) then
        par_bio_red_O2_H2SO4 = 53.0/(-par_bio_red_POP_PO2)
        par_bio_red_O2_NO3 = 84.8/(-par_bio_red_POP_PO2)
-    elseif (par_bio_red_POP_PO2 == -150.0 ) then
+    elseif (int(par_bio_red_POP_PO2) == -150 ) then
        par_bio_red_O2_H2SO4 = 59.0/(-par_bio_red_POP_PO2)
        par_bio_red_O2_NO3 = 104.0/(-par_bio_red_POP_PO2)
     else
@@ -962,7 +963,7 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_CH4toDIC_dCH4'
           n = n+1
-          loc_string(n) = 'redox_CH4toDIC_dCO2'
+          loc_string(n) = 'redox_CH4toDIC_dDIC'
           n = n+1
           loc_string(n) = 'redox_CH4toDIC_dO2'   
           n = n+1
@@ -2800,14 +2801,14 @@ CONTAINS
 			 & (/const_real_null/),.true. &
 			 & )
          end if
-        if((conv_kocn_ksedgem/par_data_save_slice_n).ne.par_data_TM_avg_n)then ! n.b. conv_ksedgem = n_timesteps!!
+        if(abs((conv_kocn_ksedgem/par_data_save_slice_n)-par_data_TM_avg_n) > const_rns) then ! n.b. conv_ksedgem = n_timesteps!!
                  call sub_report_error( &
 		         & 'biogem_data','sub_check_par', &
 			 & 'The intra-annual saving intervals you have chosen do not correspond to the transport matrix averaging', &
 			 & '[par_data_save_slice_n] HAS BEEN SET TO MATCH MATRIX AVERAGING INTERVAL', &
 			 & (/const_real_null/),.false. &
 			 & )
-                par_data_save_slice_n=conv_kocn_ksedgem/par_data_TM_avg_n
+                par_data_save_slice_n=int(conv_kocn_ksedgem/par_data_TM_avg_n)
          end if
     end if
 

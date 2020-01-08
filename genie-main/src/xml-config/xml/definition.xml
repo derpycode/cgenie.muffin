@@ -5209,6 +5209,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Explicit FeS2 precip stiochiometry?</description>
                     </param>
+                    <param name="par_bio_Feredox_maxfrac">
+			<value datatype="real">1.0</value>
+                        <description>max frac of Fe pool that can oxidize/reduce in a single time-step</description>
+                    </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
 			<value datatype="string"></value>

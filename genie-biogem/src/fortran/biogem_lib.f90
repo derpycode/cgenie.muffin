@@ -481,11 +481,11 @@ MODULE biogem_lib
   real::par_bio_red_POC_POI                                     ! Default cellular C:I (I/C) ratio
   real::par_bio_red_POC_POI_C0                                  ! Reference [IO3-] value @ default C:I ratio
   NAMELIST /ini_biogem_nml/par_bio_red_POC_POI,par_bio_red_POC_POI_C0
-  real::par_bio_remin_kOstoPOMOS					! Os scavenging efficiency
+  real::par_bio_remin_kOstoPOMOS                                ! Os scavenging efficiency
   NAMELIST /ini_biogem_nml/par_bio_remin_kOstoPOMOS
-  logical::ctrl_Os_scav_O2_dep					! Switch to turn on O2 dependency for Os scavenging
+  logical::ctrl_Os_scav_O2_dep                                  ! Switch to turn on O2 dependency for Os scavenging
   NAMELIST /ini_biogem_nml/ctrl_Os_scav_O2_dep
-  real::par_scav_Os_O2_threshold                             !O2 threshold for oxygen-dependent Os scavenging
+  real::par_scav_Os_O2_threshold                                ! O2 threshold for oxygen-dependent Os scavenging
   NAMELIST /ini_biogem_nml/par_scav_Os_O2_threshold
   ! ------------------- 230Th AND 231Pa CYCLING ---------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_scav_230Th_scavopt                     ! scavenging scheme ID string (e.g., 'equilibrium') for 230Th
@@ -559,8 +559,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte 
   LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
   NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
+  real::par_bio_Feredox_maxfrac                                  ! max frac of Fe pool oxidizing/reducing in a time-step 
+  NAMELIST /ini_biogem_nml/par_bio_Feredox_maxfrac
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
-  CHARACTER(len=255)::par_pindir_name                             !
+  CHARACTER(len=255)::par_pindir_name                            !
   CHARACTER(len=255)::par_indir_name                             !
   CHARACTER(len=255)::par_outdir_name                            !
   CHARACTER(len=255)::par_rstdir_name                            !
@@ -1014,6 +1016,24 @@ MODULE biogem_lib
        & 'FCa_44Ca      ' /)
   ! diagnostics - redox
   CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::string_diag_redox        !
+
+  ! *** array index linked information ***
+  ! diagnostics - geochemistry -- precip
+  integer,PARAMETER,DIMENSION(n_diag_precip)::is_diag_precip = (/ &
+       & is_FeS2,  &
+       & is_FeS2,  &
+       & is_FeS2,  &
+       & is_FeCO3, &
+       & is_FeCO3, &
+       & is_FeOOH, &
+       & is_Fe3Si2O4 /)
+  ! diagnostics - geochemistry -- solid-solute reactions
+  integer,PARAMETER,DIMENSION(n_diag_react)::is_diag_react = (/ &
+       & is_POM_S, &
+       & is_FeOOH, &
+       & is_FeOOH, &
+       & is_FeOOH, &
+       & is_FeOOH /)
 
   ! *** miscellaneous ***
   ! changes in T or S required to trigger re-calculation of carbonate dissociation constants and Schmidt number
