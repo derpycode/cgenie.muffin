@@ -27,7 +27,7 @@ The commands to run the main model ensembles are listed as follows:
 
 ./runmuffin.sh {BASE} MS/reinhardetal.Geobiology.2020 {USER} 10000
 
-where {BASE} is the base config --> eco.muffin.fm0635ca.BASESCH4.config
+where {BASE} is the base config --> muffin.CBE.fm0635ca.BASESCH4
 
 and {USER} is the user config for the ensemble member, named and configured as:
 
