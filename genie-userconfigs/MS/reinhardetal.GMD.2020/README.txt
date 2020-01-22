@@ -4,7 +4,7 @@
 
 For:
 'Oceanic and atmospheric methane cycling in the cGENIE Earth system model'
-Christopher T. Reinhard, Stephanie L. Olson, Sandra Kirtland Turner, Cecily Pälike, and Andy Ridgwell
+Christopher T. Reinhard, Stephanie L. Olson, Sandra Kirtland Turner, Cecily Pälike, Yoshiki Kanzaki, and Andy Ridgwell
 
 ################################################################
 08/02/2019 -- README.txt file creation (C.T.R.)
