@@ -364,7 +364,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     integer                         :: io,jpred,jprey
-    real   ,dimension(npmax)        :: Refuge 
+    real   ,dimension(npmax)        :: Refuge
     real                            :: tmp1,food1,food2
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -417,7 +417,7 @@ CONTAINS
           do jprey=1,npmax ! sum all the prey carbon of predator, weighted by availability (preference)
              if (gkernel(jpred,jprey).gt.0.0) then
                 food1 = food1 +  gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey)      ! available food
-                food2 = food2 + (gkernel(jpred,jprey)*palatability(jprey) * biomass(iCarb,jprey))**switch_feeding(jpred) ! available food ^ ns
+                food2 = food2 + (gkernel(jpred,jprey)*palatability(jprey) * biomass(iCarb,jprey))**ns_array(jpred) ! available food ^ ns
              endif
           enddo
           ! calculate grazing effort
@@ -429,12 +429,12 @@ CONTAINS
           do jprey=1,npmax
              if (biomass(iCarb,jprey).gt.0.0.and.food2.gt.0.0) then ! if any prey food available
                 GrazingMat(iCarb,jpred,jprey) = tmp1 * gamma_T * graz(jpred)   &                        ! total grazing rate
-                     &             * (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**switch_feeding(jpred)/food2 ! * switching
-                zoolimit(jpred,jprey) = tmp1 *(gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**switch_feeding(jpred)/food2 ! food limitation calulation for zooplankton - Maria May 2019					 				 
+                     &             * (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! * switching
+                zoolimit(jpred,jprey) = tmp1 *(gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! food limitation calulation for zooplankton - Maria May 2019
                 ! other organic elements (+ chlorophyll) are grazed in stoichiometric relation to carbon
                 do io=2,iomax+iChl
                    if (biomass(iCarb,jprey).gt.0.0) then
-                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) & 
+                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) &
                            &                                      * biomass(io,jprey)/biomass(iCarb,jprey)
                    endif
                 enddo ! io
@@ -453,7 +453,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
-  ! ****************************************************************************************************************************** !  
+  ! ****************************************************************************************************************************** !
   !ckc fractiontion to calculate nutrient isotopes uptake rates based on up_inorg
   SUBROUTINE nut_fractionation (           &
        up_inorg,    &
@@ -558,4 +558,3 @@ CONTAINS
   ! ****************************************************************************************************************************** !
 
 END MODULE ecogem_box
-

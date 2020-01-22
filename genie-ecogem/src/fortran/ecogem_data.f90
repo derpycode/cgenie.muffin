@@ -123,13 +123,10 @@ CONTAINS
        write(*,66),'  - restrict MLD for mean light calculation?      :   ',      ctrl_restrict_mld
        write(*,*), '- Grazing parameters --------------------------------'
        write(*,68),'  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
-       !write(*,67),'  - prey switching exponent (integer)        (ns) :   ',    using switch_feeding plankton specific parameter (rather than ns)!,         ns   - commented out for Grigoratou foram code, Sep18
        write(*,68),'  - hill number for grazing assimilation   (hill) :   ',       hill
        write(*,68),'  - grazing refuge parameter             (Lambda) :   ',     Lambda
        write(*,69),'  - maximum grazing rate                   (graz) : a=',     graz_a,', b=',     graz_b
        write(*,69),'  - half-sat. concentration for grazing      (kg) : a=',       kg_a,', b=',       kg_b
-       write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a=',   pp_opt_a,', b=',   pp_opt_b
-       write(*,69),'  - width of grazing kernel              (pp_sig) : a=',   pp_sig_a,', b=',   pp_sig_b
        write(*,*), '- Other loss parameters ------------------------------'
        write(*,69),'  - carbon respiration rate              (respir) : a=',   respir_a,', b=',   respir_b
        write(*,69),'  - biomass sinking rate                (biosink) : a=',  biosink_a,', b=',  biosink_b
@@ -139,6 +136,18 @@ CONTAINS
        write(*,*), '- Other stuff -----------------------------'
        write(*,71),'  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
        write(*,68),'  - maximum temperature                (temp_max) :   ',temp_max
+       if(ctrl_grazing_explicit)then
+         write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a=','plankton specific values set in:',par_ecogem_grazing_file, ', b=', pp_opt_b
+         write(*,69),'  - width of grazing kernel              (pp_sig) : a=','plankton specific values set in:',par_ecogem_grazing_file, ', b=',  pp_sig_b
+         write(*,67),'  - prey switching exponent (integer)        (ns) :   ','plankton specific values set in:',par_ecogem_grazing_file
+         write(*,67),'  - herbivory                                     :   ','plankton specific values set in:',par_ecogem_grazing_file
+         write(*,67),'  - carnivory                                     :   ','plankton specific values set in:',par_ecogem_grazing_file
+       else
+         write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a=',   pp_opt_a,', b=',   pp_opt_b
+         write(*,69),'  - width of grazing kernel              (pp_sig) : a=',   pp_sig_a,', b=',   pp_sig_b
+        write(*,67),'  - prey switching exponent (integer)        (ns) :   ',    ns
+      endif
+
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b
@@ -320,12 +329,6 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0
-          pp_sig_C(jp)        = 2.0
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'synechococcus') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -334,12 +337,6 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0
-          pp_sig_C(jp)        = 2.0
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'picoeukaryote') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -348,12 +345,6 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0
-          pp_sig_C(jp)        = 2.0
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'diatom') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -362,12 +353,6 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0
-          pp_sig_C(jp)        = 2.0
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'coccolithophore') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -376,12 +361,6 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0
-          pp_sig_C(jp)        = 2.0
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'diazotroph') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -390,12 +369,6 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0
-          pp_sig_C(jp)        = 2.0
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'phytoplankton') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -404,60 +377,30 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0
-          pp_sig_C(jp)        = 2.0
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 0.0
        elseif (pft(jp).eq.'zooplankton') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
-	        heterotrophy(jp)    = 1.0               !omnivory
-          herbivory (jp)      = 0.0
-	        carnivory (jp)      = 0.0
+	        heterotrophy(jp)    = 1.0
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0              !optimum PP ratio
-          pp_sig_C(jp)        = 2.0               !standard deviation for PP ratio
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 2.0               !active vs passive
        elseif (pft(jp).eq.'mixotroph') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
-          autotrophy(jp)      = 0.0
-	  heterotrophy(jp)    = 1.0               !omnivory
-          herbivory (jp)      = 0.0
-	  carnivory (jp)      = 0.0
+          autotrophy(jp)      = trophic_tradeoff
+	        heterotrophy(jp)    = trophic_tradeoff
           palatability(jp)    = 1.0
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0              !optimum PP ratio
-          pp_sig_C(jp)        = 2.0               !standard deviation for PP ratio
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff
-          switch_feeding(jp)  = 2.0               !active vs passive
        elseif (pft(jp).eq.'foram') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
-	  heterotrophy(jp)    = trophic_tradeoff  *0.9   !omnivory
-          herbivory (jp)      = 1.0
-	  carnivory (jp)      = 0.0
+	        heterotrophy(jp)    = trophic_tradeoff  * 0.9
           palatability(jp)    = 0.8
-          prey_refuge(jp)     = 1.0
-          pp_optC(jp)         = 10.0              !optimum PP ratio
-          pp_sig_C(jp)        = 6.0               !standard deviation for PP ratio
-          !grazing_protect(jp) = 1.0
-          mort_protect(jp)    = trophic_tradeoff * 0.70
-          switch_feeding(jp)  = 1.0               !active vs passive
        else
           print*," "
           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -540,22 +483,29 @@ CONTAINS
        kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
     endif
     !-----------------------------------------------------------------------------------------
+    ! populate array hack
+    if(ctrl_grazing_explicit==.false.)then
+       pp_opt_a_array(:)=pp_opt_a
+       pp_sig_a_array(:)=pp_sig_a
+       ns_array(:)=ns
+       mort_protect(:)=1.0
+    endif
 
     ! other parameters
     qcarbon(:)  =     qcarbon_a * volume(:) ** qcarbon_b
     alphachl(:) =    alphachl_a * volume(:) ** alphachl_b
     graz(:)     =        graz_a * volume(:) ** graz_b     * heterotrophy(:)
     kg(:)       =          kg_a * volume(:) ** kg_b
-    !pp_opt(:)   =      pp_opta * volume(:) ** pp_opt_b      !commented out for foram project by Grigoratou, Dec2018, see ppot_mat defined below
-    !pp_sig(:)   =      pp_sig_C * volume(:) ** pp_sig_b     !commented out for foram project by Grigoratou, Dec2018, see ppsig_mat defined below
+    pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
+    pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
     respir(:)   =      respir_a * volume(:) ** respir_b
     biosink(:)  =     biosink_a * volume(:) ** biosink_b
-    mort(:)     =        (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
+    mort(:)     =       (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
     do jp=1,npmax ! grazing kernel (npred,nprey)
        ! pad predator dependent pp_opt and pp_sig so that they vary along matrix columns
        ! (they should be constant within each row)
-       ppopt_mat(:,jp)=pp_optC(jp) * volume(:) ** pp_opt_b   !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
-       ppsig_mat(:,jp)=pp_sig_C(jp) * volume(:) ** pp_sig_b  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
+       ppopt_mat(:,jp)=pp_opt_a_array(jp) * volume(:) ** pp_opt_b   !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
+       ppsig_mat(:,jp)=pp_sig_a_array(jp) * volume(:) ** pp_sig_b  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
     enddo
     pred_diam(:,1)=diameter(:) ! standard  prey diameter vector
     prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
@@ -569,9 +519,9 @@ CONTAINS
       case('zooplankton','foram')
         select case(pft(jprey))
           case('phytoplankton')
-            if(carnivory(jpred).gt.0.0) gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
-          case('zooplankton', 'foram')
-            if(herbivory(jpred).gt.0.0) gkernel(jpred,jprey)=0.0 ! if predator is herbivorous and prey is zooplanktonn - no grazing
+            if(carnivory(jpred)) gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+          case('zooplankon','foram')
+            if(herbivory(jpred)) gkernel(jpred,jprey)=0.0 ! if predator is herbivorous and prey is zooplanktonn - no grazing
         end select
     end select
     end do
@@ -737,6 +687,11 @@ CONTAINS
     REAL              :: loc_plnktn_size
     INTEGER           :: loc_plnktn_n
     CHARACTER(len=255)::loc_filename
+    logical           ::loc_herbivory
+    logical           ::loc_carnivory
+    real              ::loc_pp_opt_a
+    real              ::loc_pp_sig_a
+    real              ::loc_ns
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_plankton_file)
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -782,6 +737,63 @@ CONTAINS
     npmax=loc_n_elements
     ! close file pipe
     CLOSE(unit=in)
+
+    ! if setting plankton specific parameters
+    if(ctrl_grazing_explicit)then
+      ! check file format and determine number of lines of data
+      loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+      CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
+
+
+        if (loc_n_elements.eq.0) then
+           print*," "
+           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+           print*,"! No plankton types specified in grazing input file ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+           stop
+        endif
+
+        if (loc_n_elements.neq.npmax) then
+           print*," "
+           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+           print*,"! Different number of plankton types defined in ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_plankton_file),'and',TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+           stop
+        endif
+
+        ! open file pipe
+        OPEN(unit=in,file=loc_filename,action='read')
+        ! goto start-of-file tag
+        ! DO n = 1,loc_n_start
+        !    READ(unit=in,fmt='(1X)')
+        ! END DO
+        !
+        ! ! re-set filepipe
+        ! REWIND(unit=in)
+        ! goto start-of-file tag
+        DO n = 1,loc_n_start
+           READ(unit=in,fmt='(1X)')
+        END DO
+        ! read in population specifications
+        DO n = 1,loc_n_elements
+           READ(unit=in,FMT=*)         &
+                & loc_plnktn_pft,      & ! COLUMN #01: plankton PFT (not used here)
+                & loc_herbivory,      & ! COLUMN #02: herbivory
+                & loc_carnivory,     & ! COLUMN #03: carnivory
+                & loc_pp_opt_a,     & ! COLUMN #04: pp_opt_a
+                & loc_pp_sig_a,     & ! COLUMN #05: pp_sig_a
+                & loc_ns           ! COLUMN #06: ns (prey switching)
+           herbivory(n) = loc_herbivory
+           carnivory(n) = loc_carnivory
+           pp_opt_a_array(n) = loc_pp_opt_a
+           pp_opt_sig_array(n) = loc_pp_sig_a
+           ns_array(n) = loc_ns
+        END DO
+        ! close file pipe
+        CLOSE(unit=in)
+    endif
+
+
   END SUBROUTINE sub_init_populations
 
 
