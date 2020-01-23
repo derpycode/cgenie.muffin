@@ -1117,7 +1117,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       P:C export cellular quotient ratio
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_bio) then
        IF (sed_select(is_POP) .AND. sed_select(is_POC)) THEN
           ! P/C
           loc_unitsname = 'n/a'
