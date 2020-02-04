@@ -6671,6 +6671,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0</value>
                         <description>dissolution rate factor for CaCO3 fracrion 2</description>
                     </param>
+                    <param name="par_sed_kanzaki2019_biotd1">
+			<value datatype="real">1.0</value>
+                        <description>bioturbation depth factor for CaCO3 fracrion 1</description>
+                    </param>
+                    <param name="par_sed_kanzaki2019_biotd2">
+			<value datatype="real">1.0</value>
+                        <description>bioturbation depth factor for CaCO3 fracrion 2</description>
+                    </param>
                     <param name="par_sed_kanzaki2019_oxonly">
 			<value datatype="real">.true.</value>
                         <description>om degradation scheme, oxonly (or not)?</description>

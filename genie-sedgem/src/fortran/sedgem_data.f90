@@ -122,6 +122,8 @@ CONTAINS
        print*,'aragonite rain fraction                             : ',par_sed_kanzaki2019_arg
        print*,'dissolution rate factor for CaCO3 fracrion 1        : ',par_sed_kanzaki2019_dissc1
        print*,'dissolution rate factor for CaCO3 fracrion 2        : ',par_sed_kanzaki2019_dissc2
+       print*,'bioturbation depth factor for CaCO3 fracrion 1      : ',par_sed_kanzaki2019_biotd1
+       print*,'bioturbation depth factor for CaCO3 fracrion 2      : ',par_sed_kanzaki2019_biotd2
        print*,'om degradation scheme, oxonly?                      : ',par_sed_kanzaki2019_oxonly
        ! --- DIAGENESIS SCHEME: opal --------------------------------------------------------------------------------------------- !
        print*,'base opal KSi value (yr-1)                          : ',par_sed_opal_KSi0

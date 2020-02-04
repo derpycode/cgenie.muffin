@@ -339,6 +339,7 @@ logical:: ox_degall
 logical:: dis_off_flg = .true.  
 !logical:: dis_off = .false.  
 real:: dis_off(nspcc) ! factor with which dissolution rate const. is multiplied (plus) or divided (minus)
+real:: biot_off(nspcc) ! factor with which bioturbation depth is multiplied wrt reference depth 12 cm
 integer:: itr_stst  ! iteration for steady state
 logical::arg_flg(nspcc)
 
@@ -373,6 +374,9 @@ dis_off(:) = 0d0
 if (par_sed_kanzaki2019_arg/=0d0) arg_flg(2) = .true.
 dis_off(1) = par_sed_kanzaki2019_dissc1
 dis_off(2) = par_sed_kanzaki2019_dissc2
+
+biot_off(1) = par_sed_kanzaki2019_biotd1
+biot_off(2) = par_sed_kanzaki2019_biotd2
 
 flg_500 = .false. 
 tol = 1d-6
@@ -546,6 +550,7 @@ endif
 call make_transmx(  &
     trans,izrec,izrec2,izml,nonlocal  & ! output 
     ,labs,nspcc,turbo2,nobio,dz,sporo,nz,z,file_tmp,zml_ref  & ! input
+    ,biot_off  &! input 
     )
 
 ! print*,'i am here 4'
@@ -728,6 +733,8 @@ ptx = pt
 
 omx = om
 o2x = o2
+
+wx = w
 
 ! calculating initial dissolution rate of caco3 for all caco3 species 
 do isp=1,nspcc 
@@ -1241,11 +1248,23 @@ do
         print*,loc_time,tol,dt,loc_nt,loc_time_proc,loc_time_fin
         print*
         ! go to 500
-        if (first_call) then 
+        ! if (first_call) then 
+        if (first_call .and. itr_w==0 ) then 
             dt = dt /10d0
             ccx(:,:) = cc(:,:)
             alkx(:) = alk(:)
             dicx(:) = dic(:)
+            print *, 'due to flg, return to previous values for cc, alk and dic ...',itr_stst
+            ! w = wx     
+            ! call burial_pre(  &
+                ! w,wi  & ! output
+                ! ,detflx,ccflx,nspcc,nz,poroi,msed,mvsed,mvcc  & ! input 
+                ! )
+            ! call calcupwindscheme(  &
+                ! up,dwn,cnr,adf & ! output 
+                ! ,w,nz   & ! input &
+                ! )
+            ! print*, w
             itr_stst = itr_stst + 1
             if (itr_stst > 100) then 
                 print *
@@ -1453,7 +1472,7 @@ do
         ,detflx,ccflx,nspcc,omflx,dw,dz,poro,nz    & ! input
         ,msed,mvsed,mvcc,mvom,poroi &
         )
-
+    if (loc_display) print*,'after burialcalc',itr_w
     ! ------------ determine calculation scheme for advection 
     call calcupwindscheme(  &
         up,dwn,cnr,adf & ! output 
@@ -2186,10 +2205,11 @@ endsubroutine sig2sp_pre
 subroutine make_transmx(  &
     trans,izrec,izrec2,izml,nonlocal  & ! output 
     ,labs,nspcc,turbo2,nobio,dz,sporo,nz,z,file_tmp,zml_ref  & ! input
+    ,biot_off  &
     )
 implicit none
 integer,intent(in)::nspcc,nz,file_tmp
-real,intent(in)::dz(nz),sporo(nz),z(nz),zml_ref
+real,intent(in)::dz(nz),sporo(nz),z(nz),zml_ref,biot_off(nspcc)
 logical,intent(in)::labs(nspcc+2),turbo2(nspcc+2),nobio(nspcc+2)
 real,intent(out)::trans(nz,nz,nspcc+2)
 logical,intent(inout)::nonlocal(nspcc+2)
@@ -2224,6 +2244,10 @@ if (.true.) then  ! devided by the time duration when transition matrices are cr
 endif
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 zml=zml_ref ! mixed layer depth assumed to be a reference value at first 
+
+do isp=1,nspcc
+    zml(isp+2)=zml_ref*biot_off(isp)
+enddo 
 
 zrec = 1.1d0*maxval(zml)  ! depth where recording is made, aimed at slightly below the bottom of mixed layer  
 zrec2 = 2.0d0*maxval(zml)  ! depth where recording is made ver. 2, aimed at 2 time bottom depth of mixed layer 
@@ -2992,7 +3016,7 @@ enddo
 omres = omadv + omdec + omdif + omrain + omtflx ! this is residual flux should be zero equations are exactly satisfied 
 
 if (any(omx<0d0)) then  ! if negative om conc. is detected, need to stop  
-    print*,'negative om, stop'
+    print*,'negative om, stop',dt
     open(unit=file_tmp,file=trim(adjustl(workdir))//'NEGATIVE_OM.res',status = 'unknown')
     do iz = 1, nz
         write (file_tmp,*) z(iz),omx(iz)*mom/rho(iz)*100d0,w(iz),up(iz),dwn(iz),cnr(iz),adf(iz)

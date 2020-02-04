@@ -117,6 +117,9 @@ MODULE sedgem_lib
   REAL::par_sed_kanzaki2019_dissc1                               ! dissolution rate factor for CaCO3 fracrion 1 
   REAL::par_sed_kanzaki2019_dissc2                               ! dissolution rate factor for CaCO3 fracrion 2 
   NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_arg,par_sed_kanzaki2019_dissc1,par_sed_kanzaki2019_dissc2
+  REAL::par_sed_kanzaki2019_biotd1                               ! bioturbation depth factor for CaCO3 fracrion 1 
+  REAL::par_sed_kanzaki2019_biotd2                               ! bioturbation depth factor for CaCO3 fracrion 2 
+  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_biotd1,par_sed_kanzaki2019_biotd2
   logical::par_sed_kanzaki2019_oxonly                            ! om degradation scheme, oxonly (or not)?
   NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_oxonly
   ! ------------------- DIAGENESIS SCHEME: opal ---------------------------------------------------------------------------------- !
