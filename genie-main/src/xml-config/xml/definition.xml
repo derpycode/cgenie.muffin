@@ -1347,6 +1347,10 @@
                         <value datatype="boolean">.true.</value>
                         <description>exit upon pH solution failure?</description>
                     </param>
+                    <param name="ctrl_carbchem_noH3SiO4">
+                        <value datatype="boolean">.false.</value>
+                        <description>Ignore H3SiO4 in the calculation of carbonate ALK?</description>
+                    </param>
                     <param name="par_geochem_Tmin">
                         <value datatype="real">0.0</value>
                         <description>minimum T used in empirical geochem calculations [default: 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]]</description>
@@ -3999,6 +4003,10 @@
 			<value datatype="boolean">.false.</value>
                         <description>Full (entire grid) carbonate chem update?</description>
                     </param>
+                    <param name="par_bio_geochem_tau">
+			<value datatype="real">0.001</value>
+                        <description>geochem reaction completion time-scale (days)</description>
+                    </param>
 <!-- BOUNDARY CONDITIONS  -->
                     <param name="ctrl_force_sed_closedsystem">
 			<value datatype="boolean">.true.</value>
@@ -5208,10 +5216,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_bio_FeS2precip_explicit">
 			<value datatype="boolean">.false.</value>
                         <description>Explicit FeS2 precip stiochiometry?</description>
-                    </param>
-                    <param name="par_bio_Feredox_maxfrac">
-			<value datatype="real">1.0</value>
-                        <description>max frac of Fe pool that can oxidize/reduce in a single time-step</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">

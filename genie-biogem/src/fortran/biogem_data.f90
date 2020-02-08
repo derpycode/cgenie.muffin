@@ -25,11 +25,19 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! LOAD BioGeM 'goin' FILE OPTIONS
-  SUBROUTINE sub_load_goin_biogem()
+  SUBROUTINE sub_load_goin_biogem(dum_dtyr)
     USE genie_util, ONLY: check_unit,check_iostat
+    ! ---------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! ---------------------------------------------------------- !
+    REAL,INTENT(IN)::dum_dtyr                                       ! biogem time-step length (years)
+    ! ---------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! ---------------------------------------------------------- !
     ! local variables
     integer::l,io,ia                                                    ! tracer counter
     integer::ios                                                        !
+    ! ---------------------------------------------------------- !
     ! read data_BIOGEM file
     call check_unit(in,__LINE__,__FILE__)
     open(unit=in,file='data_BIOGEM',status='old',action='read',iostat=ios)
@@ -87,6 +95,7 @@ CONTAINS
        print*,'Exclude DIC from geoenginering?                     : ',ctrl_misc_geoeng_noDIC
        print*,'Overwrite restart temperatures?                     : ',ctrl_ocn_rst_reset_T
        print*,'Full (entire grid) carbonate chem update?           : ',ctrl_carbchemupdate_full
+       print*,'geochem reaction completion time-scale (days)       : ',par_bio_geochem_tau
        ! --- BOUNDARY CONDITIONS ------------------------------------------------------------------------------------------------- !
        print*,'--- BOUNDARY CONDITIONS ----------------------------'
        print*,'Set dissolution flux = rain flux to close system?   : ',ctrl_force_sed_closedsystem
@@ -396,7 +405,6 @@ CONTAINS
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
        print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
-       print*,'max frac of Fe pool oxidizing/reducing in time-step : ',par_bio_Feredox_maxfrac
        ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -564,6 +572,18 @@ CONTAINS
     par_bio_remin_ballast_kc = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_cal_cm3_mol*conv_cal_g_cm3))*par_bio_remin_ballast_kc
     par_bio_remin_ballast_ko = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_opal_cm3_mol*conv_opal_g_cm3))*par_bio_remin_ballast_ko
     par_bio_remin_ballast_kl = (conv_POC_cm3_mol*conv_POC_g_cm3/(conv_det_cm3_mol*conv_det_g_cm3))*par_bio_remin_ballast_kl
+    ! -------------------------------------------------------- !
+    ! GEOCHEM
+    ! -------------------------------------------------------- !
+    ! adjust units of geochem reaction completion timescale from days to years
+    ! NOTE: cap geochemical uptake timescale to not lead to more than 100% reactant removal in a single time-step
+    par_bio_geochem_tau = conv_d_yr*par_bio_geochem_tau
+    if (dum_dtyr/par_bio_geochem_tau > 1.0) par_bio_geochem_tau = dum_dtyr
+    ! force full water column carbonate chemsitry re-calculation is geochemical reactions requiring it are selected
+    ! NOTE: determine geochemical reactions required by solid (or dissolved) tracers selected
+    if (sed_select(is_FeCO3))    ctrl_carbchemupdate_full = .true.
+    if (sed_select(is_Fe3Si2O4)) ctrl_carbchemupdate_full = .true.
+    if (ocn_select(io_CH4))      ctrl_carbchemupdate_full = .true.
     ! -------------------------------------------------------- !
     ! MISC
     ! -------------------------------------------------------- !
@@ -1168,7 +1188,7 @@ CONTAINS
     else
        conv_sed_ocn(io_O2,is_PON) = 0.0
     end if
-    ! N isotopes (from PON remin)
+    ! N isotopes (from PON remin) [???]
     if (sed_select(is_PON_15N)) then
        conv_sed_ocn(io_NO3_15N,is_PON_15N) = 1.0
        conv_sed_ocn(io_NH4_15N,is_PON_15N) = 0.0
@@ -1215,7 +1235,7 @@ CONTAINS
           conv_sed_ocn_O(io_NH4,is_PON) = 1.0
           conv_sed_ocn_O(io_N2,is_PON)  = 0.0
        end if
-       ! N isotopes (from PON remin)
+       ! N isotopes (from PON remin) [???]
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_O(io_NO3_15N,is_PON_15N) = conv_sed_ocn_O(io_NO3,is_PON)
           conv_sed_ocn_O(io_NH4_15N,is_PON_15N) = conv_sed_ocn_O(io_NH4,is_PON)
@@ -1270,7 +1290,7 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes (from PON remin)
+       ! N isotopes (from PON remin) [???]
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_N(io_NO3_15N,is_PON_15N) = conv_sed_ocn_N(io_NO3,is_PON)
           conv_sed_ocn_N(io_NH4_15N,is_PON_15N) = conv_sed_ocn_N(io_NH4,is_PON)
@@ -1323,7 +1343,7 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes
+       ! N isotopes [???]
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_Fe(io_NO3_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NO3,is_PON)
           conv_sed_ocn_Fe(io_NH4_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NH4,is_PON)
@@ -1336,11 +1356,13 @@ CONTAINS
        conv_sed_ocn_Fe(io_FeOOH,is_POC) = (4.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POC)
        conv_sed_ocn_Fe(io_Fe2,is_POC)   = -conv_sed_ocn_Fe(io_FeOOH,is_POC)
        conv_sed_ocn_Fe(io_O2,is_POC)    = 0.0
-       ! Fe isotopes
-       conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POP) = conv_sed_ocn_Fe(io_FeOOH,is_POP)
-       conv_sed_ocn_Fe(io_Fe_56Fe,is_POP)    = conv_sed_ocn_Fe(io_Fe,is_POP)
-       conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POC) = conv_sed_ocn_Fe(io_FeOOH,is_POC)
-       conv_sed_ocn_Fe(io_Fe_56Fe,is_POC)    = conv_sed_ocn_Fe(io_Fe,is_POC)
+       ! Fe isotopes [placeholder values -- corrected for local d34S in sub_box_remin_redfield]
+       ! NOTE: becasue of the complexity of solid vs. phantom dissolved FeOOH tracer
+       !       isotopes are instead, currently done explicitly in sub_box_remin_part
+       !conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POP) = conv_sed_ocn_Fe(io_FeOOH,is_POP)
+       !conv_sed_ocn_Fe(io_Fe_56Fe,is_POP)    = conv_sed_ocn_Fe(io_Fe,is_POP)
+       !conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POC) = conv_sed_ocn_Fe(io_FeOOH,is_POC)
+       !conv_sed_ocn_Fe(io_Fe_56Fe,is_POC)    = conv_sed_ocn_Fe(io_Fe,is_POC)
     else
        conv_sed_ocn_Fe(:,:) = 0.0
     end if
@@ -1370,7 +1392,7 @@ CONTAINS
        conv_sed_ocn_S(io_SO4,is_POC) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
        conv_sed_ocn_S(io_H2S,is_POC) = -conv_sed_ocn_S(io_SO4,is_POC)
        conv_sed_ocn_S(io_O2,is_POC)  = 0.0
-       ! S isotopes
+       ! S isotopes [placeholder values -- corrected for local d34S in sub_box_remin_redfield]
        conv_sed_ocn_S(io_SO4_34S,is_POP) = conv_sed_ocn_S(io_SO4,is_POP)
        conv_sed_ocn_S(io_H2S_34S,is_POP) = conv_sed_ocn_S(io_H2S,is_POP)
        conv_sed_ocn_S(io_SO4_34S,is_POC) = conv_sed_ocn_S(io_SO4,is_POC)

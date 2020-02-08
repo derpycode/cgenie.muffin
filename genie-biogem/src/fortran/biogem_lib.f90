@@ -34,7 +34,7 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_misc_t_start,par_misc_t_runtime
   LOGICAL::ctrl_misc_t_BP                                               ! years before present?
   NAMELIST /ini_biogem_nml/ctrl_misc_t_BP
-  REAL::par_misc_t_stop                                                ! stop time (years)
+  REAL::par_misc_t_stop                                                 ! stop time (years)
   NAMELIST /ini_biogem_nml/par_misc_t_stop
   ! ------------------- MISC CONTROL --------------------------------------------------------------------------------------------- !
   logical::ctrl_misc_Snorm                                              !
@@ -58,6 +58,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_ocn_rst_reset_T
   logical::ctrl_carbchemupdate_full                                     ! Full (entire grid) carbonate chem update?
   NAMELIST /ini_biogem_nml/ctrl_carbchemupdate_full
+  real::par_bio_geochem_tau                                             ! geochem reaction completion time-scale (days)
+  NAMELIST /ini_biogem_nml/par_bio_geochem_tau
   ! ------------------- BOUNDARY CONDITIONS -------------------------------------------------------------------------------------- !
   logical::ctrl_force_sed_closedsystem                                  ! Set dissolution flux = rain flux to close system?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closedsystem
@@ -559,8 +561,6 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte 
   LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
   NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
-  real::par_bio_Feredox_maxfrac                                  ! max frac of Fe pool oxidizing/reducing in a time-step 
-  NAMELIST /ini_biogem_nml/par_bio_Feredox_maxfrac
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            !
   CHARACTER(len=255)::par_indir_name                             !
@@ -749,7 +749,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_diag_bio                           = 21 !
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
-  INTEGER,PARAMETER::n_diag_react                         = 05 !
+  INTEGER,PARAMETER::n_diag_react                         = 09 !
   INTEGER,PARAMETER::n_diag_iron                          = 07 !
   INTEGER,PARAMETER::n_diag_misc_2D                       = 07 !
   INTEGER::n_diag_redox                                   =  0 !
@@ -882,6 +882,10 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_react_FeOOH_dH2S              = 03    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dSO4              = 04    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dALK              = 05    !
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dFe2           = 06    !
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dH2S           = 07    !
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dSO4           = 08    !
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dALK           = 09    !
   ! diagnostics - misc - 2D
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2                 = 01    !
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2_13C             = 02    !
@@ -999,12 +1003,16 @@ MODULE biogem_lib
        & 'iron_Fe3          ', &
        & 'iron_geo          ' /)
   ! diagnostics - geochemistry -- solid-solute reactions
-  CHARACTER(len=18),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &
-       & 'react_POMS_dH2S   ', &
-       & 'react_FeOOH_dFe2  ', &
-       & 'react_FeOOH_dH2S  ', &
-       & 'react_FeOOH_dSO4  ', &
-       & 'react_FeOOH_dALK  ' /)
+  CHARACTER(len=20),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &
+       & 'react_POMS_dH2S     ', &
+       & 'react_FeOOH_dFe2    ', &
+       & 'react_FeOOH_dH2S    ', &
+       & 'react_FeOOH_dSO4    ', &
+       & 'react_FeOOH_dALK    ', &
+       & 'react_POMFeOOH_dFe2 ', &
+       & 'react_POMFeOOH_dH2S ', &
+       & 'react_POMFeOOH_dSO4 ', &
+       & 'react_POMFeOOH_dALK ' /)
   ! diagnostics - misc - 2D
   CHARACTER(len=14),DIMENSION(n_diag_misc_2D),PARAMETER::string_diag_misc_2D = (/ &
        & 'FpCO2         ', &
@@ -1033,7 +1041,11 @@ MODULE biogem_lib
        & is_FeOOH, &
        & is_FeOOH, &
        & is_FeOOH, &
-       & is_FeOOH /)
+       & is_FeOOH, &
+       & is_POM_FeOOH, &
+       & is_POM_FeOOH, &
+       & is_POM_FeOOH, &
+       & is_POM_FeOOH /)
 
   ! *** miscellaneous ***
   ! changes in T or S required to trigger re-calculation of carbonate dissociation constants and Schmidt number

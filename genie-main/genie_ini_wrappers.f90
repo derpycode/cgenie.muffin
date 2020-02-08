@@ -128,6 +128,7 @@ contains
   subroutine initialise_biogem_wrapper
     implicit none
     call initialise_biogem(                                                                        &
+         & real(conv_kocn_kbiogem*kocn_loop)*genie_timestep,                                       & ! input
          & go_saln0,go_rhoair,go_cd,go_ds,go_dphi,                                                 &
          & go_usc,go_dsc,go_fsc,go_rh0sc,                                                          &
          & go_rhosc,go_cpsc,genie_solar_constant,go_scf,                                           &

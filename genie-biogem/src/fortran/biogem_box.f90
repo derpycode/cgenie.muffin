@@ -2939,19 +2939,19 @@ CONTAINS
                               & loc_bio_part_TMP(is2l(is_POC),k)  &
                               & )
                          if (sed_select(is_POM_FeOOH)) then
-                            loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_FeOOH),k) = loc_bio_part_TMP(is2l(is_POM_FeOOH),k) + loc_scav_Fe
+                            loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
                             If (ocn_select(io_Fe_56Fe)) then
-                               loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - loc_r56Fe*loc_scav_Fe
-                               loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k)  = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k) + &
+                               loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - &
+                                    & loc_r56Fe*loc_scav_Fe
+                               loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k) = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k) + &
                                     & loc_r56Fe*loc_scav_Fe
                             end if
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
-                            loc_bio_part_TMP(is2l(is_det),k) = loc_bio_part_TMP(is2l(is_det),k) + &
-                                 & loc_bio_part_TMP(is2l(is_POM_FeOOH),k)
+                            loc_bio_part_TMP(is2l(is_det),k) = loc_bio_part_TMP(is2l(is_det),k) + loc_scav_Fe
                             ! ----------------------------------- ! record geochem diagnostics (mol kg-1)
                             loc_diag_precip(idiag_precip_FeOOH_dFe,k) = &
-                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,k) - loc_scav_Fe
+                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,k) + loc_scav_Fe
                          else
                             loc_bio_part_TMP(is2l(is_POM_Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe),k) + loc_scav_Fe
                             loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
@@ -3307,9 +3307,9 @@ CONTAINS
                 ! (0) make tempoary conversion of is_POM_FeOOH -> io_FeOOH
                 if (sed_select(is_POM_FeOOH) .AND. ocn_select(io_FeOOH)) then
                    loc_vocn(io2l(io_FeOOH)) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
-                   if (ocn_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
-                      loc_vocn(io2l(io_FeOOH_56Fe)) = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)
-                   end if
+                   !if (ocn_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
+                   !   loc_vocn(io2l(io_FeOOH_56Fe)) = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)
+                   !end if
                 end if
                 ! (1) create temporary remin conversion array depending on prevailing redox conditions
                 call sub_box_remin_redfield(dum_vocn%mk(:,kk)+loc_vocn(:),loc_conv_ls_lo(:,:))
@@ -3331,17 +3331,24 @@ CONTAINS
                    end do
                 end DO
                 ! (3) make conversion of io_FeOOH -> is_POM_FeOOH
+                !     NOTE: io_Fe remin (release of Fe from FeOOH) is positive, meaning the pretend io_FeOOH remin is negative
                 if (sed_select(is_POM_FeOOH) .AND. ocn_select(io_FeOOH)) then
+                   if (sed_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
+                      if (loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) > const_rns) then
+                         loc_r56Fe = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)/loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
+                      else
+                         loc_r56Fe = 0.0
+                      end if
+                      loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) = &
+                           & loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
+                      loc_bio_remin(io2l(io_Fe2_56Fe),kk) = &
+                           & loc_bio_remin(io2l(io_Fe2_56Fe),kk) - loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
+                      !loc_bio_remin(io2l(io_FeOOH_56Fe),kk) = 0.0
+                   end if
                    loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = &
                         & loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_bio_remin(io2l(io_FeOOH),kk)
                    loc_bio_remin(io2l(io_FeOOH),kk) = 0.0
-                   if (ocn_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
-                     loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) = &
-                           & loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + loc_bio_remin(io2l(io_FeOOH_56Fe),kk)
-                      loc_bio_remin(io2l(io_FeOOH_56Fe),kk) = 0.0
-                   end if
                 end if
-
                 ! *** Scavenge Fe from water column ***
                 ! NOTE: Fe scavenging must be called AFTER particulates have been 'moved' to the next layer down
                 !       - they are assumed to start at the BASE of the originating layer,
@@ -3464,11 +3471,10 @@ CONTAINS
                                     & loc_r56Fe*loc_scav_Fe
                             end if
                             ! ----------------------------------- ! MODIFY DET TRACER FLUX
-                            loc_bio_part_TMP(is2l(is_det),kk) = loc_bio_part_TMP(is2l(is_det),kk) + &
-                                 & loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
+                            loc_bio_part_TMP(is2l(is_det),kk) = loc_bio_part_TMP(is2l(is_det),kk) + loc_scav_Fe
                             ! ----------------------------------- ! record geochem diagnostics (mol kg-1)
                             loc_diag_precip(idiag_precip_FeOOH_dFe,kk) = &
-                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,kk) - loc_scav_Fe
+                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,kk) + loc_scav_Fe
                          else
                             loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
                             loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
@@ -3768,13 +3774,13 @@ CONTAINS
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) + &
+    diag_react(idiag_react_POMFeOOH_dFe2,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dFe2,dum_i,dum_j,dum_k) + &
          & loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) - &
+    diag_react(idiag_react_POMFeOOH_dH2S,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dH2S,dum_i,dum_j,dum_k) - &
          & (1.0/8.0)*loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) + &
+    diag_react(idiag_react_POMFeOOH_dSO4,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dSO4,dum_i,dum_j,dum_k) + &
          & (1.0/8.0)*loc_dFeOOH
-    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) - &
+    diag_react(idiag_react_POMFeOOH_dALK,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dALK,dum_i,dum_j,dum_k) - &
          & 2.0*(1.0/8.0)*loc_dFeOOH
     ! -------------------------------------------------------- !
     ! END
@@ -3974,7 +3980,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! Calculate Fe scavenging
   ! *** OLD TRACER NOTATION ***
-  ! NOTE: note upgraded for either is_FeOOH nor 56Fe
+  ! NOTE: not upgraded for either is_FeOOH nor 56Fe
   SUBROUTINE sub_calc_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_bio_part,dum_bio_remin)
     ! dummy arguments
     REAL,INTENT(in)::dum_dtyr

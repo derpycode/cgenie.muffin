@@ -51,12 +51,14 @@ MODULE gem_cmn
   real::par_geochem_Smin                                                ! minimum S used in empirical geochem calculations
   real::par_geochem_Smax                                                ! maximum S used in empirical geochem calculations
   NAMELIST /ini_gem_nml/par_geochem_Smin,par_geochem_Smax
-  real::par_carbchem_Tmin                                                ! minimum T used in empirical carbchem calculations
-  real::par_carbchem_Tmax                                                ! maximum T used in empirical carbchem calculations
+  real::par_carbchem_Tmin                                               ! minimum T used in empirical carbchem calculations
+  real::par_carbchem_Tmax                                               ! maximum T used in empirical carbchem calculations
   NAMELIST /ini_gem_nml/par_carbchem_Tmin,par_carbchem_Tmax
-  real::par_carbchem_Smin                                                ! minimum S used in empirical carbchem calculations
-  real::par_carbchem_Smax                                                ! maximum S used in empirical carbchem calculations
+  real::par_carbchem_Smin                                               ! minimum S used in empirical carbchem calculations
+  real::par_carbchem_Smax                                               ! maximum S used in empirical carbchem calculations
   NAMELIST /ini_gem_nml/par_carbchem_Smin,par_carbchem_Smax
+  logical::ctrl_carbchem_noH3SiO4                                       ! Ignore H3SiO4 in the calculation of carbonate ALK 
+  NAMELIST /ini_gem_nml/ctrl_carbchem_noH3SiO4
   ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
   real::par_grid_lon_offset                                             ! assumed lon grid offset (w.r.t. Prime Meridian)
   NAMELIST /ini_gem_nml/par_grid_lon_offset

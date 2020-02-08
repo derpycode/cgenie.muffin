@@ -1494,7 +1494,7 @@ subroutine biogem(        &
               end if
               ! *** Fe-oxyhydroxide precip ***
               if (sed_select(is_FeOOH)) then
-                 call sub_calc_precip_FeOOH(i,j,loc_k1)
+                 call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
               end if
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
