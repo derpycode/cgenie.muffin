@@ -95,7 +95,9 @@ subroutine ecogem(          &
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
   REAL                                     ::loc_rdts,loc_rdtyr            ! time reciprocals
-
+  ! carbon re-partitioning between DOM and POM
+  REAL                                     ::loc_orgmat_flux_iCarb
+  REAL                                     ::loc_orgmatiso_flux_iCarb
 
   ! ------------------------------------------------------- !
   ! INITIALIZE LOCAL VARIABLES
@@ -491,6 +493,19 @@ subroutine ecogem(          &
                  ! no organic matter production in fundamental niche experiment
                  if (fundamental) dorgmatdt(:,:) = 0.0
 
+                 !**********************ckc ISOTOPES**********************************************************************
+
+                 if (c13trace) then
+                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort(:)  ) ! fraction to DOM
+                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort_1(:)) ! fraction to POM
+                    ! unassimilated grazing
+                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1)*ratioGraz(iCarb,1) ! fraction to DOM
+                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2)*ratioGraz(iCarb,2) ! fraction to POM
+                    if (fundamental) dorgmatisodt(:,:) = 0.0
+                 end if
+                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
                  ! ******* JDW size-dependent remineralisation *******
 		 ! calculate weighted mean size for size-dependent remineralisation scheme
 		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
@@ -515,19 +530,6 @@ subroutine ecogem(          &
                  	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
                  endif
                  ! ***************************************************
-
-                 !**********************ckc ISOTOPES**********************************************************************
-
-                 if (c13trace) then
-                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort(:)  ) ! fraction to DOM
-                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort_1(:)) ! fraction to POM
-                    ! unassimilated grazing
-                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1)*ratioGraz(iCarb,1) ! fraction to DOM
-                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2)*ratioGraz(iCarb,2) ! fraction to POM
-                    if (fundamental) dorgmatisodt(:,:) = 0.0
-                 end if
-                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
                  ! collect fluxes for output
                  do io=1,iomax
@@ -595,6 +597,23 @@ subroutine ecogem(          &
                  loc_alpha = 1.0 + loc_delta_CaCO3/1000.0
                  loc_R = eco_carbisor(ici_HCO3_r13C,i,j,k)/(1.0 - eco_carbisor(ici_HCO3_r13C,i,j,k))
                  CaCO3_Rfrac(i,j,k) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+
+                 ! ------------------------------------------- !
+                 ! ADJUST CARBON (REDFIELD) EXPORT PARTITIONING
+                 ! ------------------------------------------- !
+                 ! the idea here is to leave the distribution of nutrients etc. between DOM and POM alone, 
+                 ! and re-partition carbon (e.g. more to the DOM phase), hence reducing C/P of exported POM
+                 ! NOTE: for orgmat_flux array index 2 -- 1 == DOM, 2 == POM
+                 ! NOTE: tracers:: iCarb, iNitr, iPhos, iIron, and in isotope array orgmatiso_flux:: iCarb13C
+                 loc_orgmat_flux_iCarb    = orgmat_flux(iCarb,1,i,j,k) + orgmat_flux(iCarb,2,i,j,k)
+                 loc_orgmatiso_flux_iCarb = orgmatiso_flux(iCarb13C,1,i,j,k) + orgmatiso_flux(iCarb13C,2,i,j,k)
+                 if (loc_orgmat_flux_iCarb > const_real_nullsmall) then
+                    orgmat_flux(iCarb,1,i,j,k)       = par_beta_carb*orgmat_flux(iCarb,1,i,j,k)
+                    orgmat_flux(iCarb,2,i,j,k)       = loc_orgmat_flux_iCarb - orgmat_flux(iCarb,1,i,j,k)
+                    orgmatiso_flux(iCarb13C,1,i,j,k) = par_beta_carb*orgmatiso_flux(iCarb13C,1,i,j,k)
+                    orgmatiso_flux(iCarb13C,2,i,j,k) = loc_orgmatiso_flux_iCarb - orgmatiso_flux(iCarb13C,1,i,j,k)
+                 end if
+                 ! ------------------------------------------- !
 
               enddo ! end k
               !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
