@@ -5118,7 +5118,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Minimum ohmega threshold for precip</description>
                     </param>
                     <param name="par_d56Fe_FeCO3_alpha">
-			<value datatype="real">1.0005</value>
+			<value datatype="real">0.9997</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
                     </param>
                     <param name="par_bio_Fe3Si2O4precip_sf">
@@ -5162,7 +5162,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
                     </param>
                     <param name="par_d56Fe_Fered_alpha">
-			<value datatype="real">1.002</value>
+			<value datatype="real">0.9987</value>
                         <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
                     </param>
                     <param name="par_d56Fe_FeOOH_alpha">
@@ -5174,7 +5174,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>kinetic constant for Fe2 re-oxidation in M-1 yr-1</description>
                     </param>
                     <param name="par_d56Fe_Fe2ox_alpha">
-			<value datatype="real">0.9991</value>
+			<value datatype="real">1.0008</value>
                         <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
                     </param>
                     <param name="par_bio_FeS_sf">
@@ -5206,11 +5206,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>MM type limiting factor for FeS2 precipitation [was: K_lim_PYR]</description>
                     </param>
                     <param name="par_d56Fe_FeS2_alpha">
-			<value datatype="real">1.0022</value>
+			<value datatype="real">0.9978</value>
                         <description>fractionation factor d56/54 Fe in FeS2 precipitation</description>
                     </param>
                     <param name="par_d34S_FeS2_alpha">
-			<value datatype="real">1</value>
+			<value datatype="real">1.0000</value>
                         <description>fractionation factor d34/32 S in FeS2 precipitation</description>
                     </param>
                     <param name="ctrl_bio_FeS2precip_explicit">
