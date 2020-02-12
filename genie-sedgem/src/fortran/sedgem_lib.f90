@@ -176,6 +176,8 @@ MODULE sedgem_lib
   real::par_sed_clay_fLi_alpha                                   ! Li clay formation sink (mol yr-1) (Li/Ca norm)
   real::par_sed_clay_7Li_epsilon                                 ! Li clay formation sink 7Li epsilon (o/oo)              
   NAMELIST /ini_sedgem_nml/par_sed_clay_fLi_alpha,par_sed_clay_7Li_epsilon
+  LOGICAL::ctrl_sed_clay_7Li_epsilon_fixed                       ! fixed (non T-dependent) MACC 7Li epsilon?            
+  NAMELIST /ini_sedgem_nml/ctrl_sed_clay_7Li_epsilon_fixed
   real::par_sed_hydroip_fCa                                      ! hydrothermal Ca flux (mol yr-1) 
   real::par_sed_hydroip_fCa_d44Ca                                ! hydrothermal Ca flux d44Ca (o/oo)                      
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fCa,par_sed_hydroip_fCa_d44Ca

@@ -7271,6 +7271,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">-15.0</value>
                         <description>Li clay formation sink 7Li epsilon (o/oo)</description>
                     </param>
+                    <param name="ctrl_sed_clay_7Li_epsilon_fixed">
+			<value datatype="boolean">.true.</value>
+                        <description>fixed (non T-dependent) MACC 7Li epsilon?  </description>
+                    </param> 
                     <param name="par_sed_hydroip_fCa">
 			<value datatype="real">0.0</value>
                         <description>hydrothermal Ca flux (mol yr-1) -- 2.0E12 in Blattler et al. [2011] but set to zero here as a default</description>
