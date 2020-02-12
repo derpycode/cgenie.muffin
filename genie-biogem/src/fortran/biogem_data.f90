@@ -1154,11 +1154,11 @@ CONTAINS
        conv_sed_ocn(io_N2,is_PON)  = 0.0
     end if
     ! ALK
-    ! if NO3 is employed: calculate alkalnity corrections associated with the formation and destruction of organic matter from NO3
+    ! if PON is employed: calculate alkalnity corrections associated with the formation and destruction of organic matter from NO3
     ! otherwise: convert PO4 units to NO3 via the P:N Redfield ratio and then calculate the ALK correction from NO3
     ! NOTE: ensure that both corrections are mutually exclusive (i.e., make sure that there can be no double ALK correction)
     ! NOTE: catch any incidence of Redfield ratios (par_bio_red_xxx) set to 0.0
-    if (ocn_select(io_NO3)) then
+    if (sed_select(is_PON)) then
        conv_sed_ocn(io_ALK,is_PON) = par_bio_red_PON_ALK
        conv_sed_ocn(io_ALK,is_POP) = 0.0
        conv_sed_ocn(io_ALK,is_POC) = 0.0
@@ -1316,6 +1316,17 @@ CONTAINS
           conv_sed_ocn_N(io_NO3,is_POC) = (4.0/5.0)*conv_sed_ocn_N(io_O2,is_POC)
           conv_sed_ocn_N(io_N2,is_POC)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N(io_O2,is_POC)  = 0.0
+       elseif (ocn_select(io_NH4)) then
+          ! NOTE: simple NO3 + NH4 scheme
+          ! in the back-reaction: NH4+ + 2O2 -> NO3- + 2H+ + H2O => O2 == (1/2)NO3
+          conv_sed_ocn_N(io_NO3,is_POP) = (1.0/2.0)*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_NH4,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
+          conv_sed_ocn_N(io_ALK,is_POP) = -2.0*conv_sed_ocn_N(io_NO3,is_POP)
+          conv_sed_ocn_N(io_O2,is_POP)  = 0.0
+          conv_sed_ocn_N(io_NO3,is_POC) = (1.0/2.0)*conv_sed_ocn_N(io_O2,is_POC)
+          conv_sed_ocn_N(io_NH4,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N(io_ALK,is_POC) = -2.0*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        else
           ! [DEFAULT, oxic remin relationship]
