@@ -137,7 +137,7 @@ CONTAINS
        write(*,69),'  - basal mortality                        (mort) : a=',     mort_a,', b=',     mort_b
        write(*,70),'  - fraction messy feed. to dissolved (beta_graz) : a=',beta_graz_a,', b=',beta_graz_b,', c=',beta_graz_c
        write(*,70),'  - fraction mortality to dissolved   (beta_mort) : a=',beta_mort_a,', b=',beta_mort_b,', c=',beta_mort_c
-       write(*,70),'  - relative partitioning of C into DOM           :   ',par_beta_carb
+       write(*,70),'  - adjusted partitioning of C into POM vs. DOM   :   ',par_beta_POCtoDOC
        write(*,*), '- Other stuff -----------------------------'
        write(*,71),'  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
        write(*,68),'  - maximum temperature                (temp_max) :   ',temp_max

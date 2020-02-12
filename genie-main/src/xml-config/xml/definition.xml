@@ -8075,9 +8075,9 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">100.0</value>
 	                  <description>Fraction mortality to dissolved - midpoint vol.</description>
                     </param>
-                    <param name="par_beta_carb">
+                    <param name="par_beta_POCtoDOC">
 			<value datatype="real">1.0</value>
-	                  <description>relative partitioning of C into DOM</description>
+	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
                     </param>
 <!-- initial fractional abundance of particulate export -->  
                     <param name="par_bio_remin_POC_frac2">

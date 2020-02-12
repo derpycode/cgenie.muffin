@@ -514,11 +514,11 @@ subroutine ecogem(          &
                  ! NOTE: for dorgmatdt array index 2 -- 1 == DOM, 2 == POM
                  ! NOTE: tracers:: iCarb, iNitr, iPhos, iIron, and in isotope array dorgmatisodt:: iCarb13C
                  loc_dorgmatdt_iCarb = dorgmatdt(iCarb,1) + dorgmatdt(iCarb,2)
-                 dorgmatdt(iCarb,1)  = par_beta_carb*dorgmatdt(iCarb,1)
-                 dorgmatdt(iCarb,2)  = loc_dorgmatdt_iCarb - dorgmatdt(iCarb,1)
+                 dorgmatdt(iCarb,2)  = par_beta_POCtoDOC*dorgmatdt(iCarb,2)
+                 dorgmatdt(iCarb,1)  = loc_dorgmatdt_iCarb - dorgmatdt(iCarb,2)
                  loc_dorgmatisodt_iCarb   = dorgmatisodt(iCarb13C,1) + dorgmatisodt(iCarb13C,2)
-                 dorgmatisodt(iCarb13C,1) = par_beta_carb*dorgmatisodt(iCarb13C,1)
-                 dorgmatisodt(iCarb13C,2) = loc_dorgmatisodt_iCarb - dorgmatisodt(iCarb13C,1)
+                 dorgmatisodt(iCarb13C,2) = par_beta_POCtoDOC*dorgmatisodt(iCarb13C,2)
+                 dorgmatisodt(iCarb13C,1) = loc_dorgmatisodt_iCarb - dorgmatisodt(iCarb13C,2)
                  ! ------------------------------------------- !
 
                  ! ******* JDW size-dependent remineralisation *******
@@ -704,7 +704,7 @@ subroutine ecogem(          &
   ! CaCO3 production
   gamma = (omega-1.0)**par_bio_red_POC_CaCO3_pP
   gamma = MERGE(gamma,0.0,omega.gt.1.0)
-  dum_egbg_sfcpart(is_CaCO3,:,:,:) = dum_egbg_sfcpart(is_POC,:,:,:)       * par_bio_red_POC_CaCO3 * gamma
+  dum_egbg_sfcpart(is_CaCO3,:,:,:) = dum_egbg_sfcpart(is_POC,:,:,:)       * par_bio_red_POC_CaCO3 * gamma / par_beta_POCtoDOC
   dum_egbg_sfcdiss(io_DIC  ,:,:,:) = dum_egbg_sfcdiss(io_DIC,:,:,:) - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
   dum_egbg_sfcdiss(io_ALK  ,:,:,:) = dum_egbg_sfcdiss(io_ALK,:,:,:) - 2.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
   dum_egbg_sfcdiss(io_Ca  ,:,:,:)  = dum_egbg_sfcdiss(io_Ca,:,:,:)  - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)

@@ -3009,7 +3009,7 @@ CONTAINS
        loc_tot = SUM(int_focnsed_timeslice(is_POP,:,:))
        IF (loc_tot > const_real_nullsmall) THEN
           write(unit=out,fmt='(A22,f7.3)',iostat=ios) &
-               & ' Export C/P         : ',            &
+               & ' Sediment rain C/P  : ',          &
                & SUM(int_focnsed_timeslice(is_POC,:,:))/loc_tot
        else
           write(unit=out,fmt='(A22,A3)',iostat=ios) &
