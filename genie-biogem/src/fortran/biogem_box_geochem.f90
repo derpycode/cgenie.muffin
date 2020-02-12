@@ -414,14 +414,16 @@ CONTAINS
     ! OXIDIZE Fe2
     ! -------------------------------------------------------- !
     ! look for some Fe2 and see if it can be instantaneously oxidized (using O2; if there is any!)
-    ! Fe2 + 1/4*O2 -> Fe3 
+    ! Fe2 + 1/4*O2 + H -> Fe3 + 1/2H2O 
     ! NOTE: loc_Fe2_oxidation_const units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
        if ( (4.0/1.0*loc_O2 > const_rns) .AND. (loc_Fe2 > const_rns) ) then
           ! calculate Fe2 oxidation
-          ! NOTE: par_bio_remin_kFe2toFe units are (M-1 yr-1)
+          ! NOTE: par_bio_remin_kFe2toFe units are (M-1 yr-1) (default from Millero et al., 1987)
+          ! NOTE: the dependence on OH has been ignored because, well, Fe oxidizes 
+          !       so fast it does not really matter anymore 
           loc_Fe2_oxidation = dum_dtyr*par_bio_remin_kFe2toFe*loc_Fe2*loc_O2
           ! cap at some fraction of maximum of available Fe, O2
           loc_Fe2_oxidation = min(loc_Fe2_oxidation,loc_f*loc_Fe2,loc_f*(4.0/1.0)*loc_O2)
@@ -496,7 +498,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! REDUCE Fe3 (implicitly, FeOOH)
     ! -------------------------------------------------------- !
-    ! Fe3 + 1/8*H2S -> Fe2 + 1/8*SO4 + 1/4*H+
+    ! Fe3 + 1/8*H2S + 1/2H2O -> Fe2 + 1/8*SO4 + 5/4*H+
     ! NOTE: loc_Fe_reduction_const units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        loc_Fe  = ocn(io_Fe,dum_i,dum_j,k)
@@ -505,6 +507,7 @@ CONTAINS
        if ( loc_H2S>const_rns .AND. loc_Fe>const_rns ) then
           ! calculate H2S oxidation, and cap value at H2S or Fe3 concentration if necessary
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
+          ! NOTE: Reaction is taken from Poulton et al. (2004) - kinetic constant is assumed to be '2-line ferrihydrite'
           loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S**(1.0/2.0)
           ! cap at maximum of available Fe, H2S
           loc_Fe_reduction  = min(loc_Fe_reduction,loc_f*loc_Fe,loc_f*(8.0/1.0)*loc_H2S)
@@ -605,7 +608,7 @@ CONTAINS
     ! water column loop
     ! look for existing Fe3 see if it can be instantaneously precipitated
     ! Fe3+ + 2*H2O -> FeOOH + 3*H+
-    ! NOTE: Simple scheme: Fe3 > 1 nM precipitates
+    ! NOTE: Simple scheme: Fe3 > 1 nM precipitates - probably needs to be further developed
     DO k=n_k,dum_k1,-1
        ! set local concentrations
        loc_Fe = ocn(io_Fe,dum_i,dum_j,k)
@@ -686,8 +689,9 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! CALCULATE FeS formation (depending on relative concentrations
     ! -------------------------------------------------------- !
+    ! Fe2+ + H2S -> FeS + 2H+
     ! water column loop
-    ! look for co-existing Fe and H2S and see if they are in equilibrium with FeS
+    ! look for co-existing Fe and H2S and see if they are in equilibrium with dissolved FeS
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
@@ -705,6 +709,7 @@ CONTAINS
           if (loc_H2S < const_rns) then 
              loc_H2S = 0.0
           end if
+          ! Since FeS, we need to calculate the Fe-S speciation
           ! calculate solution for equilibrium:
           ! Fe2_eq*H2S_eq/FeS_eq = K
           ! Fe2_eq = Fe2_in - x; H2S_eq = H2S_in - x; FeS_eq = FeS_in + x
@@ -792,13 +797,15 @@ CONTAINS
     ! CALCULATE PYRITE PRECIPITATION
     ! -------------------------------------------------------- !
     ! water column loop
-    ! look for co-existing Fe and H2S and see if it can be instantaneously precipitated
-    ! 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
+    ! look for co-existing Fe and H2S. Pyrite precipitates from FeS, so we first calculate how much of Fe2+ is in complexed form of
+    ! FeS. unless FeS is calculated explicit (see above)
+    ! FeS + 3/4H2S + 1/4SO4 + 1/2H -> FeS2 + H2O (where: Fe2+ + H2S -> FeS + 2H, calculated first)
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        ! set local concentrations
        ! NOTE: Fe2 (not Fe(3))
        ! NOTE: cap diagnosed [loc_FeS] at [loc_Fe2]
+       ! NOTE: FeS2 precipitates from FeS -> first calculate speciation of Fe and H2S
        if (ctrl_bio_FeS2precip_explicit) then
           loc_FeS = ocn(io_FeS,dum_i,dum_j,k)
           loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
@@ -819,6 +826,7 @@ CONTAINS
        if ( loc_FeS>par_bio_FeS_part_abioticohm_cte .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
           ! calculate amount of FeS that could precipitate (as nanoparticulate precursor for pyrite)
           ! (loc_FeSp is the excess Fe available to precipitate as FeS2)
+          ! Reaction and default kinetic constants are taken from Rickard (1997)
           loc_FeSp = loc_FeS - par_bio_FeS_part_abioticohm_cte
           loc_FeS2_precipitation = dum_dtyr*par_bio_FeS2precip_k*loc_FeSp*loc_H2S
           ! cap at maximum of available H2S, SO4, FeS
@@ -918,6 +926,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! CALCULATE SIDERITE PRECIPITATION
     ! -------------------------------------------------------- !
+    ! Fe2+ + CO32- -> FeCO3
     ! NOTE: in selecting is_FeCO3, full water column carbonate chemsitry re-calculation has been automatically selected
     !       (ctrl_carbchemupdate_full = .true.)
     DO k=n_k,dum_k1,-1
@@ -927,7 +936,8 @@ CONTAINS
        loc_OH  = 10.0**(-(14.0-carb(ic_pHsws,dum_i,dum_j,n_k)))
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)    
        ! modify local Fe2 avialability
-       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated ... WHY?
+       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because FeCO3 precipitates
+       !       from free Fe2+, so we need to find the available free Fe2+ pool
        if (.NOT. ctrl_bio_FeS2precip_explicit) then
           if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
              loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
@@ -940,16 +950,17 @@ CONTAINS
        ! calculate precipitation
        ! NOTE: assume loc_CO3 is always greater than zero
        if (loc_Fe2 > const_rns) then
-          ! calculate IAP
+          ! calculate Ion Activity Product (IAP)
           ! NOTE: gamma parameters are activity coefficients
           loc_IAP = (par_bio_remin_gammaCO2*loc_CO3)*(par_bio_remin_gammaFe2*loc_Fe2)*((par_bio_remin_gammaOH*loc_OH)**(1.0/2.0))
-          ! calculate siderite precipitation based on IAP ...
+          ! calculate siderite precipitation based on IAP. Siderite precipitates at very high supersaturation (very unlikely to 
+          ! occur in the ocean). REFERENCE: Jiang and Tosca, 2019, Earth and Planetary Science Letters.
           if (loc_IAP > const_rns) then
              loc_FeCO3_precipitation = dum_dtyr*par_bio_FeCO3precip_sf*exp(par_bio_FeCO3precip_exp*LOG10(loc_IAP))
           else
              loc_FeCO3_precipitation = 0.0 
           end if
-          ! cap FeCO3 rpecip at maximum of available FeS, CO3
+          ! cap FeCO3 rpecip at maximum of available Fe2+, CO3
           ! NOTE: always allow all CO3 to be 'used' in a single time-step becasue the carbonate system is buffered
           !       (CO3 is always likely to be far in excess of Fe2)
           loc_FeCO3_precipitation = MIN(loc_FeCO3_precipitation,loc_f*loc_Fe2,loc_CO3)
@@ -1050,6 +1061,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! CALCULATE Fe3Si2O4 PRECIPITATION
     ! -------------------------------------------------------- !
+    ! 3Fe2+ + 2SiO2 + 5H2O -> Fe3Si2O5(OH)4 + 6H
     ! NOTE: in selecting is_FeCO3, full water column carbonate chemsitry re-calculation has been automatically selected
     !       (ctrl_carbchemupdate_full = .true.)
     DO k=n_k,dum_k1,-1
@@ -1061,9 +1073,9 @@ CONTAINS
        loc_H    = carb(ic_H,dum_i,dum_j,n_k)
        loc_H2S  = ocn(io_H2S,dum_i,dum_j,k)    
        ! set local Fe2 avialability
-       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated ... WHY?
+       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because greenalite precipitates
+       !       from free Fe2+, so we need to find the available free Fe2+ pool
        ! modify local Fe2 avialability
-       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated ... WHY?
        if (.NOT. ctrl_bio_FeS2precip_explicit) then
           if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
              loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
@@ -1080,7 +1092,7 @@ CONTAINS
           ! NOTE: Calculate IAP according to Rasmussen et al., 2019, Geology
           loc_IAP = (((par_bio_remin_gammaSiO2*loc_SiO2)**2.0)*((par_bio_remin_gammaFe2*loc_Fe2)**3.0)) / &
                & ((par_bio_remin_gammaH*loc_H)**6.0)
-          ! calculate Fe3Si2O4 precipitation based on IAP ...
+          ! calculate Fe3Si2O4 precipitation based on IAP, following Rasmussen et al., 2019, Geology
           if (loc_IAP > const_rns) then
              loc_Fe3Si2O4_precipitation = dum_dtyr*par_bio_Fe3Si2O4precip_sf* &
                   & exp(par_bio_Fe3Si2O4precip_exp*LOG10(loc_IAP/par_bio_Fe3Si2O4precip_abioticohm_cte))
