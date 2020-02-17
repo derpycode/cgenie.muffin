@@ -250,7 +250,13 @@ SUBROUTINE sedgem(          &
                  else
                     loc_r7Li = 0.0
                  end if
-                 loc_alpha = 1.0 + par_sed_clay_7Li_epsilon/1000.0
+                 ! determine whether to use fixed or temperature-dependent MACC 7Li fractionation -- Li and West [2014]
+                 if (ctrl_sed_clay_7Li_epsilon_fixed) then
+                    loc_alpha = 1.0 + par_sed_clay_7Li_epsilon/1000.0
+                 else
+                    loc_alpha = 1.83*1.0E6/dum_sfcsumocn(io_T,i,j)**2.0 - 0.72
+                    loc_alpha = exp(loc_alpha/1000.0)
+                 end if
                  loc_R = loc_r7Li/(1.0 - loc_r7Li)
                  loc_fsed = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_fsed
                  dum_sfxsumsed(is_detLi_7Li,i,j) = dum_sfxsumsed(is_detLi_7Li,i,j) + loc_fsed

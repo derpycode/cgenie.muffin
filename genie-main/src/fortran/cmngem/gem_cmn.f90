@@ -23,7 +23,7 @@ MODULE gem_cmn
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
   INTEGER,PARAMETER::n_atm =  21
   INTEGER,PARAMETER::n_ocn = 109
-  INTEGER,PARAMETER::n_sed = 104
+  INTEGER,PARAMETER::n_sed = 107
 
 
   ! ****************************************************************************************************************************** !
@@ -51,12 +51,14 @@ MODULE gem_cmn
   real::par_geochem_Smin                                                ! minimum S used in empirical geochem calculations
   real::par_geochem_Smax                                                ! maximum S used in empirical geochem calculations
   NAMELIST /ini_gem_nml/par_geochem_Smin,par_geochem_Smax
-  real::par_carbchem_Tmin                                                ! minimum T used in empirical carbchem calculations
-  real::par_carbchem_Tmax                                                ! maximum T used in empirical carbchem calculations
+  real::par_carbchem_Tmin                                               ! minimum T used in empirical carbchem calculations
+  real::par_carbchem_Tmax                                               ! maximum T used in empirical carbchem calculations
   NAMELIST /ini_gem_nml/par_carbchem_Tmin,par_carbchem_Tmax
-  real::par_carbchem_Smin                                                ! minimum S used in empirical carbchem calculations
-  real::par_carbchem_Smax                                                ! maximum S used in empirical carbchem calculations
+  real::par_carbchem_Smin                                               ! minimum S used in empirical carbchem calculations
+  real::par_carbchem_Smax                                               ! maximum S used in empirical carbchem calculations
   NAMELIST /ini_gem_nml/par_carbchem_Smin,par_carbchem_Smax
+  logical::ctrl_carbchem_noH3SiO4                                       ! Ignore H3SiO4 in the calculation of carbonate ALK 
+  NAMELIST /ini_gem_nml/ctrl_carbchem_noH3SiO4
   ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
   real::par_grid_lon_offset                                             ! assumed lon grid offset (w.r.t. Prime Meridian)
   NAMELIST /ini_gem_nml/par_grid_lon_offset
@@ -281,6 +283,9 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_FeS2_56Fe                         = 93    !
   INTEGER,PARAMETER::is_FeOOH                             = 95    ! 
   INTEGER,PARAMETER::is_FeOOH_56Fe                        = 96    !
+  INTEGER,PARAMETER::is_Fe3Si2O4                          = 105   ! 
+  INTEGER,PARAMETER::is_Fe3Si2O4_56Fe                     = 106   !
+  INTEGER,PARAMETER::is_Fe3Si2O4_30Si                     = 107   !
   INTEGER,PARAMETER::is_det                               = 22    ! 
   INTEGER,PARAMETER::is_detLi                             = 55    ! 
   INTEGER,PARAMETER::is_detLi_7Li                         = 56    !  

@@ -152,6 +152,10 @@ CONTAINS
     conv_sed_ocn(io_Fe2,is_FeCO3)                = 1.0
     conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)        = 1.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeCO3_56Fe)      = 1.0
+    conv_sed_ocn(io_Fe2,is_Fe3Si2O4)             = 3.0
+    conv_sed_ocn(io_SiO2,is_Fe3Si2O4)            = 2.0
+    conv_sed_ocn(io_Fe2_56Fe,is_Fe3Si2O4_56Fe)   = 3.0
+    conv_sed_ocn(io_SiO2_30Si,is_Fe3Si2O4_30Si)  = 2.0
     conv_sed_ocn(io_H2S,is_FeS2)                 = 7.0/4.0
     conv_sed_ocn(io_SO4,is_FeS2)                 = 1.0/4.0
     conv_sed_ocn(io_FeS,is_FeS2)                 = 0.0
@@ -166,7 +170,7 @@ CONTAINS
     conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)       = 1.0
     conv_sed_ocn(io_O2,is_FeOOH)                 = 0.0
     conv_sed_ocn(io_Fe,is_POM_FeOOH)             = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0 
     conv_sed_ocn(io_O2,is_POM_FeOOH)             = 0.0
     conv_sed_ocn(io_Os,is_POM_Os)                = 1.0
     conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)    = 1.0
