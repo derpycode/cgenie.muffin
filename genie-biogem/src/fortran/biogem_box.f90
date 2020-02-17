@@ -1882,11 +1882,13 @@ CONTAINS
                 CASE (io_col4)
                    if (ocn_select(io_NO3)) bio_remin(io,dum_i,dum_j,n_k)     = loc_ocn(io_NO3)     - loc_ocn(io)
                 CASE (io_col5)
-                   if (ocn_select(io_Ca)) bio_remin(io,dum_i,dum_j,n_k)      = loc_ocn(io_Ca)      - loc_ocn(io)
+                   if (ocn_select(io_Fe)) bio_remin(io,dum_i,dum_j,n_k)      = loc_ocn(io_Fe)      - loc_ocn(io)
                 CASE (io_col6)
                    if (ocn_select(io_SiO2)) bio_remin(io,dum_i,dum_j,n_k)    = loc_ocn(io_SiO2)    - loc_ocn(io)
                 CASE (io_col7)
                    if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,n_k) = loc_ocn(io_DIC_13C) - loc_ocn(io)
+                CASE (io_col8)
+                   if (ocn_select(io_DIC_14C)) bio_remin(io,dum_i,dum_j,n_k) = loc_ocn(io_DIC_14C) - loc_ocn(io)
                 end select
              end if
           end do

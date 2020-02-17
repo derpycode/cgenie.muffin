@@ -998,12 +998,12 @@ CONTAINS
                       loc_string = '% time (yr) / global total preformed NO3 (mol) / global mean (mol kg-1)'
                    end if
                 CASE (io_col5)
-                   if (ocn_select(io_Ca)) then
+                   if (ocn_select(io_Fe)) then
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
-                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Ca',string_results_ext &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Fe',string_results_ext &
                            & )
-                      loc_string = '% time (yr) / global total preformed Ca (mol) / global mean (mol kg-1)'
+                      loc_string = '% time (yr) / global total preformed Fe (mol) / global mean (mol kg-1)'
                    end if
                 CASE (io_col6)
                    if (ocn_select(io_SiO2)) then
@@ -1020,6 +1020,14 @@ CONTAINS
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d13C',string_results_ext &
                            & )
                       loc_string = '% time (yr) / global total preformed 13C (mol) / global mean (o/oo)'
+                   end if
+                CASE (io_col8)
+                   if (ocn_select(io_DIC_14C)) then
+                      loc_save = .true.
+                      loc_filename=fun_data_timeseries_filename( &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d14C',string_results_ext &
+                           & )
+                      loc_string = '% time (yr) / global total preformed 14C (mol) / global mean (o/oo)'
                    end if
                 end select
                 if (loc_save) then
@@ -2609,10 +2617,10 @@ CONTAINS
                            & )
                    end if
                 CASE (io_col5)
-                   if (ocn_select(io_Ca)) then
+                   if (ocn_select(io_Fe)) then
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
-                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Ca',string_results_ext &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Fe',string_results_ext &
                            & )
                    end if
                 CASE (io_col6)
@@ -2627,6 +2635,13 @@ CONTAINS
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d13C',string_results_ext &
+                           & )
+                   end if
+                CASE (io_col8)
+                   if (ocn_select(io_DIC_14C)) then
+                      loc_save = .true.
+                      loc_filename=fun_data_timeseries_filename( &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d14C',string_results_ext &
                            & )
                    end if
                 end select

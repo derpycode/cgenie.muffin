@@ -1073,6 +1073,11 @@ CONTAINS
                                loc_frac = int_ocn_timeslice(io_col7,i,j,k)/int_t_timeslice
                                loc_standard = const_standards(ocn_type(io_DIC_13C))
                                loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                            CASE (io_col8)
+                               loc_tot  = int_ocn_timeslice(io_col0,i,j,k)/int_t_timeslice
+                               loc_frac = int_ocn_timeslice(io_col8,i,j,k)/int_t_timeslice
+                               loc_standard = const_standards(ocn_type(io_DIC_14C))
+                               loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                             case default
                                ! NOTHING DOING
                             end select
@@ -1083,6 +1088,8 @@ CONTAINS
                    CASE (io_col0:io_col6)
                       loc_unitsname = 'mol kg-1'
                    CASE (io_col7)
+                      loc_unitsname = 'o/oo'
+                   CASE (io_col8)
                       loc_unitsname = 'o/oo'
                    case default
                       ! NOTHING DOING
@@ -1100,11 +1107,13 @@ CONTAINS
                    CASE (io_col4)
                       if (ocn_select(io_NO3))loc_name = 'diag_pre_'//trim(string_ocn(io_NO3))
                    CASE (io_col5)
-                      if (ocn_select(io_Ca)) loc_name = 'diag_pre_'//trim(string_ocn(io_Ca))
+                      if (ocn_select(io_Fe)) loc_name = 'diag_pre_'//trim(string_ocn(io_Fe))
                    CASE (io_col6)
                       if (ocn_select(io_SiO2)) loc_name = 'diag_pre_'//trim(string_ocn(io_SiO2))
                    CASE (io_col7)
                       if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
+                   CASE (io_col8)
+                      if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_14C))
                    case default
                       ! NOTHING DOING
                    end select
