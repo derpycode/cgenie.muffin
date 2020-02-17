@@ -166,6 +166,7 @@ CONTAINS
        print*,'Li low-T alteration sink 7Li epsilon (o/oo)         : ',par_sed_lowTalt_7Li_epsilon
        print*,'Li clay formation sink (mol yr-1) (Li/Ca norm)      : ',par_sed_clay_fLi_alpha
        print*,'Li clay formation sink 7Li epsilon (o/oo)           : ',par_sed_clay_7Li_epsilon
+       print*,'fixed (non T-dependent) MACC 7Li epsilon?           : ',ctrl_sed_clay_7Li_epsilon_fixed
        print*,'hydrothermal Ca flux (mol yr-1)                     : ',par_sed_hydroip_fCa
        print*,'hydrothermal Ca flux d44Ca (o/oo)                   : ',par_sed_hydroip_fCa_d44Ca
        print*,'hydrothermal Mg flux (mol yr-1)                     : ',par_sed_hydroip_fMg

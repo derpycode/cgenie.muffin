@@ -46,6 +46,7 @@ if (ctrl_debug_init > 0) then
     print*,'pH solution tolerance                               : ',par_carbchem_pH_tolerance
     print*,'pH solution maximum number of iterations            : ',par_carbchem_pH_iterationmax
     print*,'Exit upon pH solution failure?                      : ',ctrl_carbchem_fail
+    print*,'Ignore H3SiO4 in the calculation of carbonate ALK   : ',ctrl_carbchem_noH3SiO4
     ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
     print*,'--- MISC CONTROLS ---'
     print*,'minimum T used in empirical geochem calculations    : ',par_geochem_Tmin 

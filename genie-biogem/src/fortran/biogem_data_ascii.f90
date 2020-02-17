@@ -806,30 +806,34 @@ CONTAINS
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_precip
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
-          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_precip(id))) then
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+             loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_react
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
-          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_react(id))) then
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
+             loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
@@ -2331,36 +2335,40 @@ CONTAINS
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_precip
-          loc_sig = int_diag_precip_sig(id)/int_t_sig
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
-               & loc_t,                        &
-               & loc_ocn_tot_M*loc_sig,        &
-               & loc_sig
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_precip(id))) then
+             loc_sig = int_diag_precip_sig(id)/int_t_sig
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_ocn_tot_M*loc_sig,        &
+                  & loc_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_react
-          loc_sig = int_diag_react_sig(id)/int_t_sig
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
-               & loc_t,                        &
-               & loc_ocn_tot_M*loc_sig,        &
-               & loc_sig
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_react(id))) then
+             loc_sig = int_diag_react_sig(id)/int_t_sig
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_ocn_tot_M*loc_sig,        &
+                  & loc_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN

@@ -401,9 +401,15 @@ CONTAINS
             & loc_H_p3/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) &
             & )
        ! calculate carbonate alkalinity
-       loc_ALK_DIC = dum_ALK &
-            & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
-            & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       if (ctrl_carbchem_noH3SiO4) then
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       else
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       end if
        ! estimate the partitioning between the aqueous carbonate species, and then make two independent estimates of [H];
        ! -> one using the 1st carbonate dissociation constant and estimated [CO2] and [HCO3-] concentrations
        ! -> the other using the 2nd carbonate dissociation constant and estimated [HCO3-] and [CO32-] concentrations
@@ -626,9 +632,15 @@ CONTAINS
             & loc_H_p3/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) &
             & )
        ! calculate carbonate alkalinity
-       loc_ALK_DIC = dum_ALK &
-            & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
-            & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       if (ctrl_carbchem_noH3SiO4) then
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       else
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       end if
        ! estimate the partitioning between the aqueous carbonate species, and then make two independent estimates of [H]
        loc_zed = ( &
             &   (4.0*loc_ALK_DIC + loc_DIC_RFO*dum_carbconst(icc_k) - loc_ALK_DIC*dum_carbconst(icc_k))**2 + &
