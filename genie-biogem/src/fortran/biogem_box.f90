@@ -3819,6 +3819,12 @@ CONTAINS
     ! -------------------------------------------------------- !
     real::loc_scav_dFe
     real::loc_part_den
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! INITIALIZE RESULT VARIABLE
     ! -------------------------------------------------------- !
@@ -3844,7 +3850,9 @@ CONTAINS
           loc_scav_dFe = dum_dt_scav*dum_scav_Fe_k*dum_ocn_Fe
        end select
        ! ----------------------------------------------------- ! set output [Fe]
-       fun_box_scav_Fe = loc_scav_dFe
+       ! cap Fe scavenging at maximum of available Fe
+       fun_box_scav_Fe = MIN(loc_scav_dFe,loc_f*dum_ocn_Fe)
+       !!!fun_box_scav_Fe = loc_scav_dFe
        ! ----------------------------------------------------- !
     end if
     ! -------------------------------------------------------- !
@@ -3888,7 +3896,7 @@ CONTAINS
     !          = residence time / time-step
     !            (could also be: cell thickness / (time-step x local velocity))
     ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
-    ! NOTE: also calculate loc_part_den_POC if only is_FeOOH is selected
+    ! NOTE: also calculate loc_part_den_POC only if is_FeOOH is selected
     if (sed_select(is_POM_Fe)) then
        loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is2l(is_POC))/conv_kg_l) * dum_dt_scav/dum_dtyr
     else
