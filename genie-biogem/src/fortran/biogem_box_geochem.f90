@@ -419,7 +419,7 @@ CONTAINS
     DO k=n_k,dum_k1,-1
        loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
-       if ( (4.0/1.0*loc_O2 > const_rns) .AND. (loc_Fe2 > const_rns) ) then
+       if ( loc_O2>const_rns .AND. loc_Fe2>const_rns ) then
           ! calculate Fe2 oxidation
           ! NOTE: par_bio_remin_kFe2toFe units are (M-1 yr-1) (default from Millero et al., 1987)
           ! NOTE: the dependence on OH has been ignored because, well, Fe oxidizes 
@@ -505,11 +505,11 @@ CONTAINS
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        ! look for some Fe3 and H2S
        if ( loc_H2S>const_rns .AND. loc_Fe>const_rns ) then
-          ! calculate H2S oxidation, and cap value at H2S or Fe3 concentration if necessary
+          ! calculate H2S oxidation
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
           ! NOTE: Reaction is taken from Poulton et al. (2004) - kinetic constant is assumed to be '2-line ferrihydrite'
           loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S**(1.0/2.0)
-          ! cap at maximum of available Fe, H2S
+          ! cap according to available Fe, H2S
           loc_Fe_reduction  = min(loc_Fe_reduction,loc_f*loc_Fe,loc_f*(8.0/1.0)*loc_H2S)
           loc_H2S_oxidation = (1.0/8.0)*loc_Fe_reduction
           ! bulk tracer conversion
@@ -615,7 +615,10 @@ CONTAINS
        ! calculate FeOOH precipitation
        if (ctrl_bio_FeOOHprecip_explicit) then
           if (loc_Fe > par_FeOOH_Fethresh) then
-             loc_bio_part(is_FeOOH,k) = loc_f*(loc_Fe - par_FeOOH_Fethresh)
+             ! calculate FeOOH precip
+             loc_bio_part(is_FeOOH,k) = loc_Fe - par_FeOOH_Fethresh
+             ! cap according to available Fe, H2S
+             loc_bio_part(is_FeOOH,k)  = min(loc_bio_part(is_FeOOH,k),loc_f*(loc_Fe - par_FeOOH_Fethresh))
              ! calculate Fe fractionation
              if (ocn_select(io_Fe_56Fe)) then
                 loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
@@ -823,7 +826,7 @@ CONTAINS
        end if
        ! check for H2S and SO4 being greater than zero, 
        ! and loc_FeS greater than a critical threshold (par_bio_FeS_part_abioticohm_cte)
-       if ( loc_FeS>par_bio_FeS_part_abioticohm_cte .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
+       if ( loc_FeS>par_bio_FeS_part_abioticohm_cte .AND. loc_H2S>const_rns .AND. loc_SO4>const_rns ) then
           ! calculate amount of FeS that could precipitate (as nanoparticulate precursor for pyrite)
           ! (loc_FeSp is the excess Fe available to precipitate as FeS2)
           ! Reaction and default kinetic constants are taken from Rickard (1997)
@@ -939,12 +942,9 @@ CONTAINS
        ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because FeCO3 precipitates
        !       from free Fe2+, so we need to find the available free Fe2+ pool
        if (.NOT. ctrl_bio_FeS2precip_explicit) then
-          if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
-             loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
-             loc_Fe2     = loc_Fe2spec(1) 
-             if (loc_Fe2 > ocn(io_Fe2,dum_i,dum_j,k)) then
-                loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)   
-             end if
+          if ( loc_Fe2>const_rns .AND. loc_H2S>const_rns ) then
+             loc_Fe2spec = fun_box_calc_spec_Fe2(loc_Fe2,loc_H2S,par_bio_FeS_abioticohm_cte)
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
           end if
        end if
        ! calculate precipitation
@@ -1079,10 +1079,7 @@ CONTAINS
        if (.NOT. ctrl_bio_FeS2precip_explicit) then
           if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
              loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
-             loc_Fe2     = loc_Fe2spec(1) 
-             if (loc_Fe2 > ocn(io_Fe2,dum_i,dum_j,k)) then
-                loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)   
-             end if
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
           end if
        end if
        ! calculate precipitation
@@ -1270,6 +1267,7 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! WATER COLUMN REMINERALIZATION OF METHANE - DEFAULT
+  ! NOTE: old code!
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4(dum_i,dum_j,dum_k1,dum_dtyr)
     ! dummy arguments
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1

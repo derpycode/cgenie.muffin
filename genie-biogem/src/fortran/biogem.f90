@@ -1450,16 +1450,9 @@ subroutine biogem(        &
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***
-              select case (par_bio_remin_CH4ox)
-              case ('default')
-                 if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                    call sub_calc_bio_remin_oxidize_CH4(i,j,loc_k1,loc_dtyr)
-                 end If
-              case ('CH4ox_MM')
-                 if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                    call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
-                 end If
-              end select
+              if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
+                 call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
+              end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** WATER COLUMN REMINERALIZATION - ANAEROBIC CH4 OXIDATION ***'
