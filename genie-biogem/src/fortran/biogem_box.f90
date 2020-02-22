@@ -3286,8 +3286,11 @@ CONTAINS
                       if (kk == loc_bio_remin_min_k) then
                          ! set reflective boundary conditions for POM components
                          ! -> for use when the oxic-only / Redfield remin provided by SEDGEM is inappropriate / OMEN-SED not selected
-                         if ( (l2is(l) == is_POC) .OR. &
-                              & (sed_type(l2is(l)) == par_sed_type_POM) ) then
+                         if ( &
+                              & (l2is(l) == is_POC) .OR. &
+                              & (sed_type(l2is(l)) == par_sed_type_POM) .OR. &
+                              & (sed_type(sed_dep(l2is(l))) == par_sed_type_POM) &
+                              & ) then
                             loc_bio_part_TMP(l,kk) = 0.0
                          end if
                       end if
@@ -3689,7 +3692,7 @@ CONTAINS
     ! -------------------------------------------------------- ! calculate reaction rate
     loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
     ! cap scavenged POM_FeOOH and dissolved H2S consumption
-    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*loc_H2S)
+    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
     dum_bio_remin(io2l(io_H2S))  = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
@@ -3773,7 +3776,7 @@ CONTAINS
     ! -------------------------------------------------------- ! calculate reaction rate
     loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
     ! cap scavenged POM_FeOOH and dissolved H2S consumption
-    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*loc_H2S)
+    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_POM_FeOOH)) = dum_bio_part(is2l(is_POM_FeOOH)) - loc_dFeOOH
     dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
@@ -4183,7 +4186,6 @@ CONTAINS
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
        loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoSO4*loc_H2S*loc_part_den_POCl
-       loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
        !       print*, 'oxidationanalogue, par_bio_remin_kH2StoSO4 ', par_bio_remin_kH2StoSO4
        !       print*, 'loc_H2S, loc_H2S_scavenging', loc_H2S, loc_H2S_scavenging
     CASE ('kinetic')
@@ -4194,16 +4196,17 @@ CONTAINS
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
        loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoPOMS*loc_H2S*loc_part_den_POCl
-       loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
     CASE ('complete')
        loc_H2S_scavenging = min(loc_part_den_POCl,loc_H2S)
     case default
        !        print*, 'No sulphurization '
        loc_H2S_scavenging = 0.0
     end select
-    ! implement scavenging
-    ! NOTE: is_POC_frac2 should not end up with a value exceeding 1.0
+    ! cap scavenging
+    loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
     if (loc_H2S_scavenging < const_real_nullsmall) loc_H2S_scavenging = 0.0
+    ! bulk tracer conversion
+    ! NOTE: is_POC_frac2 should not end up with a value exceeding 1.0
     dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S)) - loc_H2S_scavenging
     dum_bio_part(is2l(is_POM_S))     = dum_bio_part(is2l(is_POM_S)) + loc_H2S_scavenging
     dum_bio_part(is2l(is_POC_frac2)) = dum_bio_part(is2l(is_POC_frac2)) + loc_H2S_scavenging/dum_bio_part(is2l(is_POC))

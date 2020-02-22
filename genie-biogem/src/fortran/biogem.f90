@@ -1391,7 +1391,7 @@ subroutine biogem(        &
                        !
                        ! ############################################################################################################ !
                     end IF
-                 case ('noflux')
+                 case default
                     ! no flux to atmosphere
                     locij_fatm(ia_pH2S,i,j)    = 0.0
                     locij_focnatm(ia_pH2S,i,j) = 0.0
@@ -1451,14 +1451,14 @@ subroutine biogem(        &
                    & '*** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***
               if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                 call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
+                 !call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** WATER COLUMN REMINERALIZATION - ANAEROBIC CH4 OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - ANAEROBIC CH4 OXIDATION ***
               if (ocn_select(io_O2) .AND. ocn_select(io_SO4) .AND. ocn_select(io_CH4)) then
-                 call sub_calc_bio_remin_oxidize_CH4_AOM(i,j,loc_k1,loc_dtyr)
+                 !call sub_calc_bio_remin_oxidize_CH4_AOM(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
