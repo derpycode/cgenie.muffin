@@ -3151,7 +3151,12 @@ CONTAINS
                             loc_bio_remin_POC_frac2 = 0.0
                          end if
                       else
-                         loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
+                         select case (par_bio_remin_fun)
+                         case ('Martin1987','Henson2012','KriestOschlies2008')
+                            loc_bio_remin_POC_frac2 = 0.0
+                         case default
+                            loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
+                         end select
                       end if
                    endif
                    ! calculate the ratio of particulate tracer between layers
@@ -3283,13 +3288,18 @@ CONTAINS
                 !       the difference in relative layer thickness
                 DO l=1,n_l_sed
                    if (ctrl_force_sed_reflective_POM) then
-                      if (kk == loc_bio_remin_min_k) then
+                      if (kk == loc_k1) then
                          ! set reflective boundary conditions for POM components
-                         ! -> for use when the oxic-only / Redfield remin provided by SEDGEM is inappropriate / OMEN-SED not selected
+                         ! -> for when the oxic-only / Redfield remin provided by SEDGEM is inappropriate / OMEN-SED not selected
+                         ! NOTE: sed_dep(l2is(l)) == is_POC covers C isotopes BUT needs to depdend on POC or POM)
+                         !       sed_type(l2is(l)) == par_sed_type_POM covers e.g. incorporated Fe
+                         !       sed_type(sed_dep(l2is(l))) == par_sed_type_POM covers isotopes of e.g. incorporated Fe
                          if ( &
-                              & (l2is(l) == is_POC) .OR. &
-                              & (sed_type(l2is(l)) == par_sed_type_POM) .OR. &
-                              & (sed_type(sed_dep(l2is(l))) == par_sed_type_POM) &
+                              & ( l2is(l) == is_POC ) .OR. &
+                              & ( (sed_type(l2is(l)) > 10) .AND. (sed_dep(l2is(l)) == is_POC) ) .OR. &
+                              & ( (sed_type(l2is(l)) > 10) .AND. (sed_dep(l2is(l)) == par_sed_type_POM) ) .OR. &
+                              & ( sed_type(l2is(l)) == par_sed_type_POM ) .OR. &
+                              & ( sed_type(sed_dep(l2is(l))) == par_sed_type_POM ) &
                               & ) then
                             loc_bio_part_TMP(l,kk) = 0.0
                          end if
