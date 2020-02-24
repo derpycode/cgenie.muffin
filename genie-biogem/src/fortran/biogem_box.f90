@@ -3150,7 +3150,12 @@ CONTAINS
                             loc_bio_remin_POC_frac2 = 0.0
                          end if
                       else
-                         loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
+                         select case (par_bio_remin_fun)
+                         case ('Martin1987','Henson2012','KriestOschlies2008')
+                            loc_bio_remin_POC_frac2 = 0.0
+                         case default
+                            loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
+                         end select
                       end if
                    endif
                    ! calculate the ratio of particulate tracer between layers
@@ -3281,6 +3286,24 @@ CONTAINS
                 ! NOTE: ensure the particulate concentration in the upper layer is scaled w.r.t.
                 !       the difference in relative layer thickness
                 DO l=1,n_l_sed
+                   if (ctrl_force_sed_reflective_POM) then
+                      if (kk == loc_k1) then
+                         ! set reflective boundary conditions for POM components
+                         ! -> for when the oxic-only / Redfield remin provided by SEDGEM is inappropriate / OMEN-SED not selected
+                         ! NOTE: sed_dep(l2is(l)) == is_POC covers C isotopes BUT needs to depdend on POC or POM)
+                         !       sed_type(l2is(l)) == par_sed_type_POM covers e.g. incorporated Fe
+                         !       sed_type(sed_dep(l2is(l))) == par_sed_type_POM covers isotopes of e.g. incorporated Fe
+                         if ( &
+                              & ( l2is(l) == is_POC ) .OR. &
+                              & ( (sed_type(l2is(l)) > 10) .AND. (sed_dep(l2is(l)) == is_POC) ) .OR. &
+                              & ( (sed_type(l2is(l)) > 10) .AND. (sed_dep(l2is(l)) == par_sed_type_POM) ) .OR. &
+                              & ( sed_type(l2is(l)) == par_sed_type_POM ) .OR. &
+                              & ( sed_type(sed_dep(l2is(l))) == par_sed_type_POM ) &
+                              & ) then
+                            loc_bio_part_TMP(l,kk) = 0.0
+                         end if
+                      end if
+                   end if
                    loc_bio_part_remin(l) = (loc_bio_remin_layerratio*loc_bio_part_TMP(l,kk+1) - loc_bio_part_TMP(l,kk))
 !!$                   ! create RDOM fraction
 !!$                   is = conv_iselected_is(l)
@@ -3306,9 +3329,6 @@ CONTAINS
                 ! (0) make tempoary conversion of is_POM_FeOOH -> io_FeOOH
                 if (sed_select(is_POM_FeOOH) .AND. ocn_select(io_FeOOH)) then
                    loc_vocn(io2l(io_FeOOH)) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
-                   !if (ocn_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
-                   !   loc_vocn(io2l(io_FeOOH_56Fe)) = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)
-                   !end if
                 end if
                 ! (1) create temporary remin conversion array depending on prevailing redox conditions
                 call sub_box_remin_redfield(dum_vocn%mk(:,kk)+loc_vocn(:),loc_conv_ls_lo(:,:))
@@ -3542,6 +3562,7 @@ CONTAINS
                       if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
                          call sub_box_react_FeOOH_H2S(        &
                               & dum_i,dum_j,kk,               &
+                           & dum_dtyr,                          &
                               & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
                               & loc_bio_part_TMP(:,kk),       &
@@ -3552,6 +3573,7 @@ CONTAINS
                       if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)>const_rns) then
                          call sub_box_react_POMFeOOH_H2S(     &
                               & dum_i,dum_j,kk,               &
+                           & dum_dtyr,                          &
                               & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
                               & loc_bio_part_TMP(:,kk),       &
@@ -3637,11 +3659,12 @@ CONTAINS
   ! Calculate FeOOH dissolution (reaction with H2S)
   ! NOTE: calling of this sub is conditional on both H2S and FeOOH not being zero
   !       (so divide-by-zero issues should already have be screened for ...)
-  SUBROUTINE sub_box_react_FeOOH_H2S(dum_i,dum_j,dum_k,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+  SUBROUTINE sub_box_react_FeOOH_H2S(dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k
+    REAL,INTENT(in)::dum_dtyr
     REAL,INTENT(in)::dum_dt_scav
     REAL,INTENT(in)::dum_ocn_H2S
     real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
@@ -3652,6 +3675,15 @@ CONTAINS
     real::loc_H2S
     real::loc_part_den_FeOOH
     real::loc_dFeOOH
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- ! set local solutes
+    loc_H2S = dum_ocn_H2S
+    ! -------------------------------------------------------- ! extract density of FeOOH
+    loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
     ! -------------------------------------------------------- !
     ! CALCULATE FeOOH dissolution rate
     ! -------------------------------------------------------- !
@@ -3663,13 +3695,10 @@ CONTAINS
     ! or, overall, ignoring water etc:
     !           Fe2 + 1/4O2 --> FeOOH
     ! NOTE: par_bio_remin_kFeOOHtoFe2 == kinetic constant for FeOOH reduction using sulphide in M-1 yr-1
-    ! -------------------------------------------------------- ! set local solutes
-    loc_H2S = dum_ocn_H2S
-    ! -------------------------------------------------------- ! extract density of FeOOH
-    loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
     ! -------------------------------------------------------- ! calculate reaction rate
     loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
-    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
+    ! cap scavenged POM_FeOOH and dissolved H2S consumption
+    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
     dum_bio_remin(io2l(io_H2S))  = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
@@ -3714,11 +3743,12 @@ CONTAINS
   !       (so divide-by-zero issues should already have be screened for ...)
   ! NOTE: for now, this is simply an edited copy of sub_box_react_FeOOH_H2S
   !       -> a cleaner solution (not involving duplicating code) should be possible and implemented ... sometime ...
-  SUBROUTINE sub_box_react_POMFeOOH_H2S(dum_i,dum_j,dum_k,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+  SUBROUTINE sub_box_react_POMFeOOH_H2S(dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k
+    REAL,INTENT(in)::dum_dtyr
     REAL,INTENT(in)::dum_dt_scav
     REAL,INTENT(in)::dum_ocn_H2S
     real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
@@ -3729,6 +3759,15 @@ CONTAINS
     real::loc_H2S
     real::loc_part_den_FeOOH
     real::loc_dFeOOH
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- ! set local solutes
+    loc_H2S = dum_ocn_H2S
+    ! -------------------------------------------------------- ! extract density of FeOOH
+    loc_part_den_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
     ! -------------------------------------------------------- !
     ! CALCULATE FeOOH dissolution rate
     ! -------------------------------------------------------- !
@@ -3740,13 +3779,10 @@ CONTAINS
     ! or, overall, ignoring water etc:
     !           Fe2 + 1/4O2 --> FeOOH
     ! NOTE: par_bio_remin_kFeOOHtoFe2 == kinetic constant for FeOOH reduction using sulphide in M-1 yr-1
-    ! -------------------------------------------------------- ! set local solutes
-    loc_H2S = dum_ocn_H2S
-    ! -------------------------------------------------------- ! extract density of FeOOH
-    loc_part_den_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
     ! -------------------------------------------------------- ! calculate reaction rate
     loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
-    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH)
+    ! cap scavenged POM_FeOOH and dissolved H2S consumption
+    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_POM_FeOOH)) = dum_bio_part(is2l(is_POM_FeOOH)) - loc_dFeOOH
     dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
@@ -3833,14 +3869,14 @@ CONTAINS
     real::loc_part_den
     real::loc_f
     ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! maximum fraction consumed in any given geochemical reaction
-    loc_f = dum_dtyr/par_bio_geochem_tau
-    ! -------------------------------------------------------- !
     ! INITIALIZE RESULT VARIABLE
     ! -------------------------------------------------------- !
     fun_box_scav_Fe = 0.0
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! CALCULATE Fe SCAVENGING
     ! -------------------------------------------------------- !
@@ -4167,7 +4203,6 @@ CONTAINS
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
        loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoSO4*loc_H2S*loc_part_den_POCl
-       loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
        !       print*, 'oxidationanalogue, par_bio_remin_kH2StoSO4 ', par_bio_remin_kH2StoSO4
        !       print*, 'loc_H2S, loc_H2S_scavenging', loc_H2S, loc_H2S_scavenging
     CASE ('kinetic')
@@ -4178,16 +4213,17 @@ CONTAINS
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
        loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoPOMS*loc_H2S*loc_part_den_POCl
-       loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
     CASE ('complete')
        loc_H2S_scavenging = min(loc_part_den_POCl,loc_H2S)
     case default
        !        print*, 'No sulphurization '
        loc_H2S_scavenging = 0.0
     end select
-    ! implement scavenging
-    ! NOTE: is_POC_frac2 should not end up with a value exceeding 1.0
+    ! cap scavenging
+    loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
     if (loc_H2S_scavenging < const_real_nullsmall) loc_H2S_scavenging = 0.0
+    ! bulk tracer conversion
+    ! NOTE: is_POC_frac2 should not end up with a value exceeding 1.0
     dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S)) - loc_H2S_scavenging
     dum_bio_part(is2l(is_POM_S))     = dum_bio_part(is2l(is_POM_S)) + loc_H2S_scavenging
     dum_bio_part(is2l(is_POC_frac2)) = dum_bio_part(is2l(is_POC_frac2)) + loc_H2S_scavenging/dum_bio_part(is2l(is_POC))

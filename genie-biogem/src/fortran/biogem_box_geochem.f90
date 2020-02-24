@@ -419,7 +419,7 @@ CONTAINS
     DO k=n_k,dum_k1,-1
        loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
-       if ( (4.0/1.0*loc_O2 > const_rns) .AND. (loc_Fe2 > const_rns) ) then
+       if ( loc_O2>const_rns .AND. loc_Fe2>const_rns ) then
           ! calculate Fe2 oxidation
           ! NOTE: par_bio_remin_kFe2toFe units are (M-1 yr-1) (default from Millero et al., 1987)
           ! NOTE: the dependence on OH has been ignored because, well, Fe oxidizes 
@@ -505,11 +505,11 @@ CONTAINS
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        ! look for some Fe3 and H2S
        if ( loc_H2S>const_rns .AND. loc_Fe>const_rns ) then
-          ! calculate H2S oxidation, and cap value at H2S or Fe3 concentration if necessary
+          ! calculate H2S oxidation
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
           ! NOTE: Reaction is taken from Poulton et al. (2004) - kinetic constant is assumed to be '2-line ferrihydrite'
           loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S**(1.0/2.0)
-          ! cap at maximum of available Fe, H2S
+          ! cap according to available Fe, H2S
           loc_Fe_reduction  = min(loc_Fe_reduction,loc_f*loc_Fe,loc_f*(8.0/1.0)*loc_H2S)
           loc_H2S_oxidation = (1.0/8.0)*loc_Fe_reduction
           ! bulk tracer conversion
@@ -615,7 +615,10 @@ CONTAINS
        ! calculate FeOOH precipitation
        if (ctrl_bio_FeOOHprecip_explicit) then
           if (loc_Fe > par_FeOOH_Fethresh) then
-             loc_bio_part(is_FeOOH,k) = loc_f*(loc_Fe - par_FeOOH_Fethresh)
+             ! calculate FeOOH precip
+             loc_bio_part(is_FeOOH,k) = loc_Fe - par_FeOOH_Fethresh
+             ! cap according to available Fe, H2S
+             loc_bio_part(is_FeOOH,k)  = min(loc_bio_part(is_FeOOH,k),loc_f*(loc_Fe - par_FeOOH_Fethresh))
              ! calculate Fe fractionation
              if (ocn_select(io_Fe_56Fe)) then
                 loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
@@ -800,6 +803,7 @@ CONTAINS
     ! look for co-existing Fe and H2S. Pyrite precipitates from FeS, so we first calculate how much of Fe2+ is in complexed form of
     ! FeS. unless FeS is calculated explicit (see above)
     ! FeS + 3/4H2S + 1/4SO4 + 1/2H -> FeS2 + H2O (where: Fe2+ + H2S -> FeS + 2H, calculated first)
+    ! => NET: Fe2+ + 7/4H2S + 1/4SO4 -> FeS2
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        ! set local concentrations
@@ -823,14 +827,14 @@ CONTAINS
        end if
        ! check for H2S and SO4 being greater than zero, 
        ! and loc_FeS greater than a critical threshold (par_bio_FeS_part_abioticohm_cte)
-       if ( loc_FeS>par_bio_FeS_part_abioticohm_cte .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
+       if ( loc_FeS>par_bio_FeS_part_abioticohm_cte .AND. loc_H2S>const_rns .AND. loc_SO4>const_rns ) then
           ! calculate amount of FeS that could precipitate (as nanoparticulate precursor for pyrite)
           ! (loc_FeSp is the excess Fe available to precipitate as FeS2)
           ! Reaction and default kinetic constants are taken from Rickard (1997)
           loc_FeSp = loc_FeS - par_bio_FeS_part_abioticohm_cte
           loc_FeS2_precipitation = dum_dtyr*par_bio_FeS2precip_k*loc_FeSp*loc_H2S
           ! cap at maximum of available H2S, SO4, FeS
-          loc_FeS2_precipitation = MIN(loc_FeS2_precipitation,loc_f*4.0/3.0*loc_H2S,loc_f*loc_FeSp,loc_f*4.0/1.0*loc_SO4)
+          loc_FeS2_precipitation = MIN(loc_FeS2_precipitation,loc_f*loc_FeSp,loc_f*(4.0/7.0)*loc_H2S,loc_f*(4.0/1.0)*loc_SO4)
           ! bulk tracer conversion
           loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
           ! calculate isotopic fractionation -- 56Fe
@@ -939,12 +943,9 @@ CONTAINS
        ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because FeCO3 precipitates
        !       from free Fe2+, so we need to find the available free Fe2+ pool
        if (.NOT. ctrl_bio_FeS2precip_explicit) then
-          if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
-             loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
-             loc_Fe2     = loc_Fe2spec(1) 
-             if (loc_Fe2 > ocn(io_Fe2,dum_i,dum_j,k)) then
-                loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)   
-             end if
+          if ( loc_Fe2>const_rns .AND. loc_H2S>const_rns ) then
+             loc_Fe2spec = fun_box_calc_spec_Fe2(loc_Fe2,loc_H2S,par_bio_FeS_abioticohm_cte)
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
           end if
        end if
        ! calculate precipitation
@@ -1079,10 +1080,7 @@ CONTAINS
        if (.NOT. ctrl_bio_FeS2precip_explicit) then
           if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
              loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
-             loc_Fe2     = loc_Fe2spec(1) 
-             if (loc_Fe2 > ocn(io_Fe2,dum_i,dum_j,k)) then
-                loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)   
-             end if
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
           end if
        end if
        ! calculate precipitation
@@ -1099,7 +1097,7 @@ CONTAINS
           else
              loc_Fe3Si2O4_precipitation = 0.0 
           end if
-          ! cap Fe3Si2O4 rpecip at maximum of available Fe2, SiO2
+          ! cap Fe3Si2O4 precip at maximum of available Fe2, SiO2
           loc_Fe3Si2O4_precipitation = MIN(loc_Fe3Si2O4_precipitation,loc_f*loc_Fe2,loc_f*loc_SiO2)
           ! bulk tracer conversion
           loc_bio_part(is_Fe3Si2O4,k) = loc_Fe3Si2O4_precipitation
@@ -1196,7 +1194,7 @@ CONTAINS
     ! H2S + 2O2 -> SO4 + 2H
     ! NOTE: loc_H2S_oxidation_const units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        if ( (loc_O2 > const_rns) .AND. (loc_H2S > const_rns) ) then
           ! calculate H2S oxidation, and cap value at H2S, O2 concentration if necessary
@@ -1204,20 +1202,22 @@ CONTAINS
           CASE ('linear')
              ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
              loc_H2S_oxidation_const = par_bio_remin_kH2StoSO4
-             loc_H2S_oxidation = min(dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2,loc_f*loc_H2S,loc_f*0.5*loc_O2)
+             loc_H2S_oxidation = dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2
           CASE ('OLD')
              ! change units of H2S oxidation constant from mM-2 hr-1 to M-2 yr-1
              ! and convert from O2 consumption units to H2S units (i.e., divide by 2)
              loc_H2S_oxidation_const = 0.5*const_oxidation_coeff_H2S/conv_hr_yr/(conv_mmol_mol)**2
              loc_H2S_oxidation = dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2**2
           case ('complete')
-             loc_H2S_oxidation = min(loc_f*loc_H2S,loc_f*0.5*loc_O2)
+             loc_H2S_oxidation = min(loc_H2S,0.5*loc_O2)
           CASE ('OLDDEFAULT')
              ! entirely spurious ... but here for completness
-             loc_H2S_oxidation = min(loc_f*0.5*loc_H2S,loc_f*loc_O2)
+             loc_H2S_oxidation = min(loc_H2S,0.5*loc_O2)
           case default
              loc_H2S_oxidation = 0.0
           end select
+          ! cap H2S oxidation & O2 consumption
+          loc_H2S_oxidation = min(loc_H2S_oxidation,loc_f*loc_H2S,loc_f*(1.0/2.0)*loc_O2)
           ! bulk tracer conversion
           loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
           loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
@@ -1270,27 +1270,34 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! WATER COLUMN REMINERALIZATION OF METHANE - DEFAULT
+  ! NOTE: old code -- no longer selectable as an option!!!
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
     real,intent(in)::dum_dtyr
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_potO2cap
     real::loc_CH4
     real::loc_r13C,loc_r14C
     real::loc_frac
     real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     ! initialize local variables
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
-
-    ! *** OXIDIZE CH4 ***
+    ! -------------------------------------------------------- !
+    ! OXIDIZE CH4
+    ! -------------------------------------------------------- !
     ! look for some CH4 and see if it can be oxidized
     ! allow different rate constant depending on availability of O2 or not
     ! CH4 + 2O2 -> CO2 + 2H2O
@@ -1361,10 +1368,14 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! AEROBIC WATER COLUMN REMINERALIZATION OF METHANE - new Michaelis-Menten scheme [CTR|2018]
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AER(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
     real,intent(in)::dum_dtyr
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2
     real::loc_CH4,loc_CO2
@@ -1373,16 +1384,21 @@ CONTAINS
     real::loc_MM,loc_AER
     real::loc_r13C,loc_r14C
     real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     ! initialize local variables
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
-
-    ! *** OXIDIZE CH4 ***
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! OXIDIZE CH4
+    ! -------------------------------------------------------- !
     ! look for some CH4 and see if it can be oxidized
     ! allow different rate constant depending on availability of O2 or not
     ! CH4 + 2O2 -> CO2 + 2H2O
@@ -1423,7 +1439,7 @@ CONTAINS
           ! (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, and temperature control)
           loc_AER = par_bio_remin_AER_kAER*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
           ! but don't oxidize too much CH4!
-          loc_AER = min(loc_AER,loc_CH4,0.5*loc_O2)
+          loc_AER = min(loc_AER,loc_f*loc_CH4,loc_f*(1.0/2.0)*loc_O2)
           ! calculate isotopic ratios
           loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
           loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
@@ -1469,10 +1485,14 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! ANAEROBIC WATER COLUMN REMINERALIZATION OF METHANE [SLO|2015 CTR|2018]
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AOM(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
     real,intent(in)::dum_dtyr
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2
     real::loc_CH4,loc_HCO3
@@ -1482,16 +1502,21 @@ CONTAINS
     real::loc_MM,loc_AOM
     real::loc_r13C,loc_r14C
     real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     ! initialize local variables
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
-
-    ! *** OXIDIZE CH4 ANAEROBICALLY WITH SO4 ***
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! OXIDIZE CH4 ANAEROBICALLY WITH SO4
+    ! -------------------------------------------------------- !
     ! look for some CH4 and see if it can be oxidized with SO4
     ! CH4 + SO4 --> HCO3- + HS- + H2O
     DO k=n_k,dum_k1,-1
@@ -1533,7 +1558,7 @@ CONTAINS
           ! (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, temperature, and thermodynamic control)
           loc_AOM = par_bio_remin_AOM_kAOM*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
           ! but don't oxidize too much CH4!
-          loc_AOM = min(loc_AOM,loc_CH4,loc_SO4)
+          loc_AOM = min(loc_AOM,loc_f*loc_CH4,loc_f*loc_SO4)
           ! calculate isotopic ratios
           loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
           loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
