@@ -1476,7 +1476,7 @@ subroutine biogem(        &
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** SET PREFORMED TRACERS ***'
               ! *** SET PREFORMED TRACERS ***
-              call sub_calc_bio_preformed(i,j)
+              call sub_calc_bio_preformed(i,j,dum_sfcatm1(:,i,j))
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN ABIOTIC PRECIPITATION ***'
@@ -3123,7 +3123,7 @@ SUBROUTINE diag_biogem_timeslice( &
               ! re-open netcdf file, update record number, close file -- 2D
               if (ctrl_data_save_2d) then
                  call sub_save_netcdf(loc_yr_save,2)
-                 CALL sub_save_netcdf_2d()
+                 CALL sub_save_netcdf_2d(loc_dtyr)
                  ncout2d_ntrec = ncout2d_ntrec + 1
                  call sub_closefile(ncout2d_iou)
               end if

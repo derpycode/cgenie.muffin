@@ -1862,26 +1862,33 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE PREFORMED TRACERS
-  SUBROUTINE sub_calc_bio_preformed(dum_i,dum_j)
+  SUBROUTINE sub_calc_bio_preformed(dum_i,dum_j,dum_atm)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j
+    REAL,dimension(n_atm),INTENT(in)::dum_atm
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     INTEGER::io
-    real,dimension(n_ocn)::loc_ocn       
+    real,dimension(n_ocn)::loc_ocn
+    real::loc_tot,loc_frac,loc_standard
+    real::loc_d14Catm,loc_d14Cocn
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
-    !
-    loc_ocn = 0.0
-    ! ocean surface tracers
+    ! zero local array
+    loc_ocn(:) = 0.0
+    ! set array equal to ocean surface tracer concentrations
     loc_ocn(:) = ocn(:,dum_i,dum_j,n_k)
     ! -------------------------------------------------------- !
     ! SET PRE-FORMED TRACERS
     ! -------------------------------------------------------- !
+    ! NOTE: Preformed C14 age is just 8033*ln((D14Catm+1000)/(D14Cocn+1000)) at the surface
+    !       d14C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+    !       where: loc_tot = io_DIC; loc_frac = io_DIC_14C; loc_standard = const_standards(ocn_type(io_DIC_14C))
+    !       D14C = fun_convert_delta14CtoD14C(loc_d13C,loc_d14C)
     if (ctrl_bio_preformed) then
           do io=io_col0,io_col9
              if (ocn_select(io)) then
@@ -1903,7 +1910,26 @@ CONTAINS
                 CASE (io_col7)
                    if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,n_k) = loc_ocn(io_DIC_13C) - loc_ocn(io)
                 CASE (io_col8)
-                   if (ocn_select(io_DIC_14C)) bio_remin(io,dum_i,dum_j,n_k) = loc_ocn(io_DIC_14C) - loc_ocn(io)
+                   if (ocn_select(io_DIC_14C) .AND. ctrl_force_ocn_age) then
+                      loc_standard = const_standards(ocn_type(io_DIC_14C))
+                      loc_tot     = dum_atm(ia_pCO2)
+                      loc_frac    = dum_atm(ia_pCO2_14C)
+                      loc_d14Catm = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      loc_standard = const_standards(ocn_type(io_DIC_14C))
+                      loc_tot     = loc_ocn(io_DIC)
+                      loc_frac    = loc_ocn(io_DIC_14C)
+                      loc_d14Cocn = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      bio_remin(io,dum_i,dum_j,n_k) = &
+                           & const_lamda_14C_libby*log( (loc_d14Catm+1000.0)/(loc_d14Cocn+1000.0) ) - loc_ocn(io)
+                   else
+                      !!! (alternative preformed tracer?)
+                   end if
+                CASE (io_col9)
+                   if (ocn_select(io_DIC) .AND. ctrl_bio_remin_redox_save) then
+                      bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)
+                   else
+                      !!! (alternative preformed tracer?)
+                   end if
                 end select
              end if
           end do
@@ -2661,12 +2687,18 @@ CONTAINS
     end DO
 
     ! *** WRITE GLOBAL ARRAY DATA ***
+    ! remin diagnostics
+    if (ctrl_bio_remin_redox_save) then
+       diag_redox(:,loc_i,loc_j,:) = diag_redox(:,loc_i,loc_j,:) + loc_diag_redox(:,:)
+       if (ocn_select(io_col9)) then
+          loc_string = 'reminD_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          loc_vbio_remin(io2l(io_DIC),:) = loc_vbio_remin(io2l(io_DIC),:) + loc_diag_redox(id,:)
+       end if
+    end if
     ! write ocean tracer remineralization field (global array)
     dum_vbio_remin%mk(:,:) = loc_vbio_remin(:,:)
-    !
-    if (ctrl_bio_remin_redox_save) diag_redox(:,loc_i,loc_j,:) = diag_redox(:,loc_i,loc_j,:) + loc_diag_redox(:,:)
-
-    ! 
+    ! deallocate local arrays
     DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
   end SUBROUTINE sub_box_remin_DOM
@@ -3634,20 +3666,25 @@ CONTAINS
     ! *** WRITE GLOBAL ARRAY DATA ***
     ! NOTE: because sub_calc_bio_remin is the first call in the sequence of events (in biogem_main),
     !       data arrays are over-written rather than incremented
-    ! write ocean tracer field and settling flux arrays (global array)
-    dum_vbio_part%mk(:,:) = loc_bio_part(:,:)
-    ! write ocean tracer remineralization field (global array)
-    dum_vbio_remin%mk(:,:) = dum_vbio_remin%mk(:,:) + loc_bio_remin(:,:)
     ! remin diagnostics
     if (ctrl_bio_remin_redox_save) then 
        diag_redox(:,dum_i,dum_j,:)  = diag_redox(:,dum_i,dum_j,:)  + loc_diag_redox(:,:)
        diag_precip(:,dum_i,dum_j,:) = diag_precip(:,dum_i,dum_j,:) + loc_diag_precip(:,:)
+       if (ocn_select(io_col9)) then
+          loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          loc_bio_remin(io2l(io_DIC),:) = loc_bio_remin(io2l(io_DIC),:) + loc_diag_redox(id,:)
+       end if
     end if
     ! record settling fluxes
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        bio_settle(is,dum_i,dum_j,:) = loc_bio_settle(l,:)
     end do
+    ! write ocean tracer field and settling flux arrays (global array)
+    dum_vbio_part%mk(:,:) = loc_bio_part(:,:)
+    ! write ocean tracer remineralization field (global array)
+    dum_vbio_remin%mk(:,:) = dum_vbio_remin%mk(:,:) + loc_bio_remin(:,:)
     ! deallocate local arrays
     DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
