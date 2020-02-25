@@ -8,7 +8,7 @@ what can we learn about how the ocean changed across the deglaciation?'
 Malin Ödalen, Carlye D. Peterson, Andy Ridgwell, Kevin I. C. Oliver, and Paul J. Valdes
 
 ################################################################
-19/11/01 -- README.txt file creation 
+20/02/24 -- README.txt file creation 
 ################################################################
 
 Provided are all the configuration files and forcing files necessary to run the model experiments presented in the paper.
