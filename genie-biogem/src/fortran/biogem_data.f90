@@ -238,6 +238,7 @@ CONTAINS
        print*,'H2S -> SO4 oxidation option                         : ',trim(opt_bio_remin_oxidize_H2StoSO4)
        print*,'H2S -> POCS scavenging option                       : ',trim(opt_bio_remin_scavenge_H2StoPOMS)
        print*,'Old local residence time in layer for H2S?          : ',ctrl_scav_H2S_dt_old
+       print*,'Fix for negative O2 ...                             : ',ctrl_bio_remin_negO2_fix
        print*,'Remin rate -- oxic (yr-1)                           : ',par_bio_remin_k_O2
        print*,'Remin rate -- denitrification (yr-1)                : ',par_bio_remin_k_NO3
        print*,'Remin rate -- FeOOH reduction (yr-1)                : ',par_bio_remin_k_FeOOH

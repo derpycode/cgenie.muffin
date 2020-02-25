@@ -1522,6 +1522,10 @@ subroutine biogem(        &
               if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
                  call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
               end if
+              ! *** negative O2 fix ... ***
+              if (ocn_select(io_O2) .AND. ocn_select(io_SO4) .AND. ocn_select(io_H2S)) then
+                 if (ctrl_bio_remin_negO2_fix) call sub_box_reduce_SO4(i,j,loc_k1,loc_dtyr)
+              end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) &
                    & print*,'*** WATER COLUMN GEOCHEMISTRY - Fe SPECIATION ***'
