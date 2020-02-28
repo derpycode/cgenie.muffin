@@ -3594,7 +3594,7 @@ CONTAINS
                       if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
                          call sub_box_react_FeOOH_H2S(        &
                               & dum_i,dum_j,kk,               &
-                           & dum_dtyr,                          &
+                              & dum_dtyr,                     &
                               & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
                               & loc_bio_part_TMP(:,kk),       &
@@ -3605,7 +3605,7 @@ CONTAINS
                       if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)>const_rns) then
                          call sub_box_react_POMFeOOH_H2S(     &
                               & dum_i,dum_j,kk,               &
-                           & dum_dtyr,                          &
+                              & dum_dtyr,                     &
                               & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
                               & loc_bio_part_TMP(:,kk),       &
@@ -3735,7 +3735,7 @@ CONTAINS
     ! -------------------------------------------------------- ! calculate reaction rate
     loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
     ! cap scavenged POM_FeOOH and dissolved H2S consumption
-    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
+    loc_dFeOOH = min(loc_dFeOOH,loc_f*loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
     dum_bio_remin(io2l(io_H2S))  = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
@@ -3819,7 +3819,7 @@ CONTAINS
     ! -------------------------------------------------------- ! calculate reaction rate
     loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
     ! cap scavenged POM_FeOOH and dissolved H2S consumption
-    loc_dFeOOH = min(loc_dFeOOH,loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
+    loc_dFeOOH = min(loc_dFeOOH,loc_f*loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
     ! -------------------------------------------------------- ! implement reaction
     dum_bio_part(is2l(is_POM_FeOOH)) = dum_bio_part(is2l(is_POM_FeOOH)) - loc_dFeOOH
     dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH

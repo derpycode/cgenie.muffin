@@ -1264,6 +1264,88 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! 'REDUCTION' OF SULPHATE [fix for negative oxygen!!!]
+  SUBROUTINE sub_box_reduce_SO4(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    integer::l,io,k,id
+    real::loc_O2,loc_SO4,loc_r34S
+    real::loc_SO4_reduction
+    real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_remin(io,:) = 0.0
+    end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! REDUCE SO4
+    ! -------------------------------------------------------- !
+    ! look for some negative O2 and positive SO4 and see if it can be 'reacted' ... :o)
+    ! SO4 + 2H -> H2S + 2O2
+    DO k=n_k,dum_k1,-1
+       loc_O2  = ocn(io_O2,dum_i,dum_j,k)
+       loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
+       if ( (loc_O2 < -const_rns) .AND. (loc_SO4 > const_rns) ) then
+          ! calculate SO4 'reduction'
+          loc_SO4_reduction = (1.0/2.0)*abs(loc_O2)
+          ! cap SO4 'reduction' & negative O2 consumption
+          loc_SO4_reduction = min(loc_SO4_reduction,loc_f*loc_SO4,loc_f*(2.0/1.0)*abs(loc_O2))
+          ! bulk tracer conversion
+          loc_bio_remin(io_H2S,k) = loc_SO4_reduction
+          loc_bio_remin(io_SO4,k) = -loc_SO4_reduction
+          loc_bio_remin(io_O2,k)  = 2.0*loc_SO4_reduction
+          loc_bio_remin(io_ALK,k) = 2.0*loc_SO4_reduction
+          ! calculate isotopic fractionation -- 34S
+          ! NOTE: we already know that loc_SO4 is non-zero
+          if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
+             loc_r34S  = ocn(io_SO4_34S,dum_i,dum_j,k)/loc_SO4
+             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
+             loc_bio_remin(io_H2S_34S,k) = loc_r34S*loc_SO4_reduction
+             loc_bio_remin(io_SO4_34S,k) = -loc_r34S*loc_SO4_reduction
+             ! ################################################################################################################### !
+          end if
+       end if
+    end DO
+    ! -------------------------------------------------------- !
+    ! WRITE GLOBAL ARRAY DATA
+    ! -------------------------------------------------------- !
+    ! write ocean tracer remineralization field (global array)
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
+    end do
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
+    !id = fun_find_str_i('redox_H2StoSO4_dH2S',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
+    !id = fun_find_str_i('redox_H2StoSO4_dSO4',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
+    !id = fun_find_str_i('redox_H2StoSO4_dO2',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
+    !id = fun_find_str_i('redox_H2StoSO4_dALK',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_reduce_SO4
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! METHANE
   ! ****************************************************************************************************************************** !
 

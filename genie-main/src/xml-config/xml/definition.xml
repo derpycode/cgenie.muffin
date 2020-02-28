@@ -4726,6 +4726,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                        <value datatype="boolean">.true.</value>
                         <description>Old local residence time in layer for H2S?</description>
                     </param>
+                    <param name="ctrl_bio_remin_negO2_fix">
+                       <value datatype="boolean">.false.</value>
+                        <description>Fix for negative O2 ... ?</description>
+                    </param>
 <!-- N -->
                     <param name="par_bio_remin_kNH4toNO2">
                         <value datatype="real">0.0</value>
