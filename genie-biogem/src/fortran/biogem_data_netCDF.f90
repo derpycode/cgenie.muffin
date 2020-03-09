@@ -313,6 +313,7 @@ CONTAINS
   END SUBROUTINE sub_init_netcdf
   ! ****************************************************************************************************************************** !
 
+
   ! ****************************************************************************************************************************** !
   SUBROUTINE sub_init_netcdf_TM(dum_wet_grid)
     !-----------------------------------------------------------------------
@@ -369,6 +370,7 @@ CONTAINS
   END SUBROUTINE sub_init_netcdf_TM
   ! ****************************************************************************************************************************** !
 
+
   ! ****************************************************************************************************************************** !
   SUBROUTINE sub_save_netcdf_TM(dum_TM_flag,dum_start,dum_val,dum_col,dum_row,dum_avg_n,dum_i,dum_j,dum_k)
 
@@ -420,6 +422,7 @@ CONTAINS
 
   END SUBROUTINE sub_save_netcdf_TM
   ! ****************************************************************************************************************************** !
+
 
   ! ****************************************************************************************************************************** !
   SUBROUTINE sub_save_netcdf(dum_yr,dum_dd)
@@ -552,7 +555,7 @@ CONTAINS
                & loc_lat_moc_e(:), loc_c1, loc_c0)
           loc_zt_moc_e(0) = 0.0
           loc_zt_moc_e(1:n_k) = phys_ocn(ipo_Dmid,1,1,n_k:1:-1)
-          loc_zt_moc_e(n_k+1) = goldstein_dsc
+          loc_zt_moc_e(n_k+1) = phys_ocn(ipo_Dbot,1,1,1)
           call sub_putvar1d ('zt_moc_edges', loc_iou, n_k+2, loc_ntrec, n_k+2, &
                & loc_zt_moc_e(:), loc_c1, loc_c0)
           ! PSI
@@ -2838,15 +2841,15 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou, loc_ntrec
+    INTEGER::loc_iou,loc_ntrec
     REAL::loc_scale
     real,DIMENSION(0:n_j,0:n_k)::loc_mask,loc_tmp_jk
     real,DIMENSION(1:n_i,0:n_j)::loc_mask_surf,loc_tmp_ij
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    loc_iou = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
+    loc_iou = ncout2d_iou
     loc_scale = goldstein_dsc*goldstein_usc*const_rEarth*1.0E-6
     !-----------------------------------------------------------------------
     !       WRITE MOC

@@ -2557,6 +2557,10 @@
                         <value datatype="real">5000.0</value>
                         <description>ocean depth scale (m)</description>
                     </param>
+                    <param name="par_dk">
+                        <value datatype="integer">0</value>
+                        <description>Additional ocean layers (deeper than go_par_dsc)</description>
+                    </param>
                 </namelist>
             </file>
         </model>
