@@ -1905,6 +1905,7 @@ CONTAINS
                    if (ocn_select(io_NO3)) bio_remin(io,dum_i,dum_j,n_k)     = loc_ocn(io_NO3)     - loc_ocn(io)
                 CASE (io_col5)
                    if (ocn_select(io_Fe)) bio_remin(io,dum_i,dum_j,n_k)      = loc_ocn(io_Fe)      - loc_ocn(io)
+                   if (ocn_select(io_TDFe)) bio_remin(io,dum_i,dum_j,n_k)    = loc_ocn(io_TDFe)    - loc_ocn(io)
                 CASE (io_col6)
                    if (ocn_select(io_SiO2)) bio_remin(io,dum_i,dum_j,n_k)    = loc_ocn(io_SiO2)    - loc_ocn(io)
                 CASE (io_col7)

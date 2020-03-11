@@ -1101,6 +1101,7 @@ CONTAINS
                       if (ocn_select(io_NO3))     loc_name = 'diag_pre_'//trim(string_ocn(io_NO3))
                    CASE (io_col5)
                       if (ocn_select(io_Fe))      loc_name = 'diag_pre_'//trim(string_ocn(io_Fe))
+                      if (ocn_select(io_TDFe))    loc_name = 'diag_pre_'//trim(string_ocn(io_TDFe))
                    CASE (io_col6)
                       if (ocn_select(io_SiO2))    loc_name = 'diag_pre_'//trim(string_ocn(io_SiO2))
                    CASE (io_col7)

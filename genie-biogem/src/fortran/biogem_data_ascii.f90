@@ -1002,7 +1002,7 @@ CONTAINS
                       loc_string = '% time (yr) / global total preformed NO3 (mol) / global mean (mol kg-1)'
                    end if
                 CASE (io_col5)
-                   if (ocn_select(io_Fe)) then
+                   if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Fe',string_results_ext &
@@ -2625,7 +2625,7 @@ CONTAINS
                            & )
                    end if
                 CASE (io_col5)
-                   if (ocn_select(io_Fe)) then
+                   if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Fe',string_results_ext &
