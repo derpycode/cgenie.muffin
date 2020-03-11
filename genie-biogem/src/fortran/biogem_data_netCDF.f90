@@ -2543,6 +2543,7 @@ CONTAINS
     INTEGER::l,i,j,k,io,is,ip,ic,icc,loc_iou,loc_ntrec
     integer::id
     CHARACTER(len=255)::loc_unitsname
+    real,DIMENSION(n_i,n_j)::loc_ij
     real,DIMENSION(n_i,n_j,n_k)::loc_ijk,loc_mask,loc_sed_mask
     real::loc_ocn_mean_S
     real::loc_tot,loc_frac,loc_standard
@@ -2614,11 +2615,23 @@ CONTAINS
        end if
        ! radiocarbon AGE
        ! NOTE: assuming the values already in loc_ijk (above)
+       !       BUT need to (re)calculate atmospheric D14C ...
        IF (ocn_select(io_DIC_13C) .AND. ocn_select(io_DIC_14C)) THEN
+          loc_ij(:,:) = const_real_zero
           DO i=1,n_i
              DO j=1,n_j
+                ! first calculate D14C for the atmopshere
+                loc_tot  = int_sfcatm1_timeslice(ia_pCO2,i,j)/int_t_timeslice
+                loc_frac = int_sfcatm1_timeslice(ia_pCO2_13C,i,j)/int_t_timeslice
+                loc_standard = const_standards(atm_type(ia_pCO2_13C))
+                loc_d13C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                loc_frac = int_sfcatm1_timeslice(ia_pCO2_14C,i,j)/int_t_timeslice
+                loc_standard = const_standards(atm_type(ia_pCO2_14C))
+                loc_d14C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                loc_ij(i,j) = fun_convert_delta14CtoD14C(loc_d13C,loc_d14C)
+                ! now convert to radiocarbon age
                 DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = fun_convert_D14Ctoage(loc_ijk(i,j,k))
+                   loc_ijk(i,j,k) = fun_convert_D14Ctoage(loc_ijk(i,j,k),loc_ij(i,j))
                 end do
              end do
           end do

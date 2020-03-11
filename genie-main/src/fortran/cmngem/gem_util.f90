@@ -1012,15 +1012,15 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CONVERT: D14C -> RADIOCARBON AGE
-  FUNCTION fun_convert_D14Ctoage(dum_D14C)
+  FUNCTION fun_convert_D14Ctoage(dum_D14Cocn,dum_D14Catm)
     IMPLICIT NONE
     ! result variable
     REAL::fun_convert_D14Ctoage
     ! dummy arguments
-    REAL,INTENT(in)::dum_D14C
+    REAL,INTENT(in)::dum_D14Cocn,dum_D14Catm
     ! return function value
-    IF ((1.0 + dum_D14C/1000.0) > const_real_nullsmall) THEN
-       fun_convert_D14Ctoage = -1.*log(1.0 + dum_D14C/1000.0)/const_lambda_14C_libby
+    IF ( (dum_D14Cocn+1000.0)/(dum_D14Catm+1000.0) > const_real_nullsmall ) THEN
+       fun_convert_D14Ctoage = -1.*log( (dum_D14Cocn+1000.0)/(dum_D14Catm+1000.0) )/const_lambda_14C_libby
     else
        fun_convert_D14Ctoage = 0.0
     endif
