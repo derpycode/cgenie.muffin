@@ -163,7 +163,7 @@ MODULE ecogem_lib
   ! explicit grazing parameters
   logical::ctrl_grazing_explicit
   namelist /ini_ecogem_nml/ctrl_grazing_explicit
-  character::par_ecogem_grazing_file
+  character(len=127)::par_ecogem_grazing_file
   namelist /ini_ecogem_nml/par_ecogem_grazing_file
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
   CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
@@ -272,10 +272,10 @@ MODULE ecogem_lib
   INTEGER          ,ALLOCATABLE,DIMENSION(:)    ::nut2quota                                ! match nutrients to quotas
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::volume,diameter ,logvol,logesd           ! Size parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::autotrophy,heterotrophy                  ! Trophic strategy
-  logical          ,ALLOCATABLE,DIMENSION(:)    ::herbivory, carnivory                     ! Feeding behavior - Added by Grigoratou, Nov18
-  real,            ,ALLOCATABLE,DIMENSION(:)    ::pp_opt_a_array,pp_sig_a_array,ns_array   ! grazing parameters as arrays
-  REAL             ,ALLOCATABLE,DIMENSION(:)    ::prey_refuge 		                         ! PFT dependent traits - Added by Grigoratou, Dec18
-  REAL             ,ALLOCATABLE,DIMENSION(:)    ::mort_protect      	                     ! PFT dependent traits - Added by Grigoratou, Dec18
+  LOGICAL          ,ALLOCATABLE,DIMENSION(:)    ::herbivory,carnivory                      ! Feeding behavior - Added by Grigoratou, Nov18
+  real             ,ALLOCATABLE,DIMENSION(:)    ::pp_opt_a_array,pp_sig_a_array,ns_array   ! grazing parameters as arrays
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::prey_refuge                              ! PFT dependent traits - Added by Grigoratou, Dec18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::mort_protect                             ! PFT dependent traits - Added by Grigoratou, Dec18
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::palatability                             ! Lower value for defence strategy
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::NO3up,Nfix,calcify,silicify              ! PFT dependent traits
   REAL             ,ALLOCATABLE,DIMENSION(:,:)  ::qmin,qmax,vmax,affinity,kexc             ! Nutrient quota parameters

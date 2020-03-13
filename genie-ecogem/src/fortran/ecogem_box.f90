@@ -359,7 +359,7 @@ CONTAINS
     real,                                  intent(in)  :: gamma_T
     real,dimension(iomax+iChl,npmax)      ,intent(in)  :: biomass
     real,dimension(iomax+iChl,npmax,npmax),intent(out) :: GrazingMat
-	real,dimension(npmax,npmax),intent(out)            :: zoolimit
+    real,dimension(npmax,npmax),intent(out)            :: zoolimit
     ! ---------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !

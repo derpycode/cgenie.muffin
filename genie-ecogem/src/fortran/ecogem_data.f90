@@ -484,11 +484,13 @@ CONTAINS
     endif
     !-----------------------------------------------------------------------------------------
     ! populate array hack
-    if(ctrl_grazing_explicit==.false.)then
+    if(ctrl_grazing_explicit.eqv..false.)then
        pp_opt_a_array(:)=pp_opt_a
        pp_sig_a_array(:)=pp_sig_a
        ns_array(:)=ns
        mort_protect(:)=1.0
+       herbivory(:)=.false.
+       carnivory(:)=.false.
     endif
 
     ! other parameters
@@ -504,8 +506,8 @@ CONTAINS
     do jp=1,npmax ! grazing kernel (npred,nprey)
        ! pad predator dependent pp_opt and pp_sig so that they vary along matrix columns
        ! (they should be constant within each row)
-       ppopt_mat(:,jp)=pp_opt_a_array(jp) * volume(:) ** pp_opt_b   !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
-       ppsig_mat(:,jp)=pp_sig_a_array(jp) * volume(:) ** pp_sig_b  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
+       ppopt_mat(:,jp)=pp_opt  !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
+       ppsig_mat(:,jp)=pp_sig  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
     enddo
     pred_diam(:,1)=diameter(:) ! standard  prey diameter vector
     prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
@@ -514,8 +516,8 @@ CONTAINS
     do jpred=1,npmax
     do jprey=1,npmax
     select case(pft(jpred))
-      case('phytoplankton')
-        gkernel(jpred,jprey)=0.0
+      !case('phytoplankton')
+      !  gkernel(jpred,jprey)=0.0
       case('zooplankton','foram')
         select case(pft(jprey))
           case('phytoplankton')
@@ -593,32 +595,19 @@ CONTAINS
     close(301)
     close(302)
 
-    ! write out grazing matrix
-    do jpred=1,npmax
-	do jprey=1,npmax-1
-		WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
-       enddo
-       WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
-    end do
-    close(303)
-
-
-
-     ! grazing matrix WARD17 copy
-    ! do jpred=1,npmax
-    ! print*,jpred,jprey
-    !    if (heterotrophy(jpred).le.0.0) then
-    !       gkernel(jpred,:) = 0.0
-     !       endif
-    !    endif
-    !    do jprey=1,npmax-1
-    !       WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
-    !    enddo
-    !    WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
-    ! enddo
-    ! close(303)
-    ! ****************************************************************************************
-    ! ****************************************************************************************
+  ! grazing matrix
+  do jpred=1,npmax
+     if (heterotrophy(jpred).le.0.0) then
+        gkernel(jpred,:) = 0.0
+     endif
+     do jprey=1,npmax-1
+        WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
+     enddo
+     WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
+  enddo
+  close(303)
+    !****************************************************************************************
+    !****************************************************************************************
 
     !-------------------------------------------------
     ! convert all rates form per day to per second
@@ -687,11 +676,7 @@ CONTAINS
     REAL              :: loc_plnktn_size
     INTEGER           :: loc_plnktn_n
     CHARACTER(len=255)::loc_filename
-    logical           ::loc_herbivory
-    logical           ::loc_carnivory
-    real              ::loc_pp_opt_a
-    real              ::loc_pp_sig_a
-    real              ::loc_ns
+
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_plankton_file)
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -738,63 +723,79 @@ CONTAINS
     ! close file pipe
     CLOSE(unit=in)
 
-    ! if setting plankton specific parameters
-    if(ctrl_grazing_explicit)then
-      ! check file format and determine number of lines of data
-      loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
-      CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
-
-
-        if (loc_n_elements.eq.0) then
-           print*," "
-           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-           print*,"! No plankton types specified in grazing input file ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
-           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-           stop
-        endif
-
-        if (loc_n_elements.neq.npmax) then
-           print*," "
-           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-           print*,"! Different number of plankton types defined in ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_plankton_file),'and',TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
-           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-           stop
-        endif
-
-        ! open file pipe
-        OPEN(unit=in,file=loc_filename,action='read')
-        ! goto start-of-file tag
-        ! DO n = 1,loc_n_start
-        !    READ(unit=in,fmt='(1X)')
-        ! END DO
-        !
-        ! ! re-set filepipe
-        ! REWIND(unit=in)
-        ! goto start-of-file tag
-        DO n = 1,loc_n_start
-           READ(unit=in,fmt='(1X)')
-        END DO
-        ! read in population specifications
-        DO n = 1,loc_n_elements
-           READ(unit=in,FMT=*)         &
-                & loc_plnktn_pft,      & ! COLUMN #01: plankton PFT (not used here)
-                & loc_herbivory,      & ! COLUMN #02: herbivory
-                & loc_carnivory,     & ! COLUMN #03: carnivory
-                & loc_pp_opt_a,     & ! COLUMN #04: pp_opt_a
-                & loc_pp_sig_a,     & ! COLUMN #05: pp_sig_a
-                & loc_ns           ! COLUMN #06: ns (prey switching)
-           herbivory(n) = loc_herbivory
-           carnivory(n) = loc_carnivory
-           pp_opt_a_array(n) = loc_pp_opt_a
-           pp_opt_sig_array(n) = loc_pp_sig_a
-           ns_array(n) = loc_ns
-        END DO
-        ! close file pipe
-        CLOSE(unit=in)
-    endif
-
-
   END SUBROUTINE sub_init_populations
+
+  ! ****************************************************************************************************************************** !
+  ! DEFINE AND INITIALIZE EXPLICIT GRAZER PARMAETERS FROM INPUT FILE
+  SUBROUTINE sub_init_explicit_grazing_params
+
+    ! local variables
+    INTEGER::n
+    INTEGER           :: loc_n_elements,loc_n_start
+    CHARACTER(len=16) :: loc_plnktn_pft
+    CHARACTER(len=255)::loc_filename
+    logical           ::loc_herbivory
+    logical           ::loc_carnivory
+    real              ::loc_pp_opt_a
+    real              ::loc_pp_sig_a
+    real              ::loc_ns
+    real              ::loc_mort_protect
+
+    ! if setting plankton specific parameters
+   ! check file format and determine number of lines of data
+    loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+    CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
+
+
+      if (loc_n_elements.eq.0) then
+         print*," "
+         print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         print*,"! No plankton types specified in grazing input file ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+         print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         stop
+      endif
+
+      if (loc_n_elements.ne.npmax) then
+         print*," "
+         print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         print*,"! Different number of plankton types defined in ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_plankton_file),'and',TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+         print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         stop
+      endif
+
+      !open file pipe
+      OPEN(unit=in,file=loc_filename,action='read')
+      DO n = 1,loc_n_start
+         READ(unit=in,fmt='(1X)')
+      END DO
+
+      ! re-set filepipe
+      REWIND(unit=in)
+      DO n = 1,loc_n_start
+         READ(unit=in,fmt='(1X)')
+      END DO
+      !read in population specifications
+      DO n = 1,loc_n_elements
+         READ(unit=in,FMT=*)         &
+              & loc_plnktn_pft,      & ! COLUMN #01: plankton PFT (not used here)
+              & loc_herbivory,      & ! COLUMN #02: herbivory
+              & loc_carnivory,     & ! COLUMN #03: carnivory
+              & loc_pp_opt_a,     & ! COLUMN #04: pp_opt_a
+              & loc_pp_sig_a,     & ! COLUMN #05: pp_sig_a
+              & loc_ns,           &! COLUMN #06: ns (prey switching)
+              & loc_mort_protect ! COLUMN #07: mortality_protection
+         herbivory(n) = loc_herbivory
+         carnivory(n) = loc_carnivory
+         pp_opt_a_array(n) = loc_pp_opt_a
+         pp_sig_a_array(n) = loc_pp_sig_a
+         ns_array(n) = loc_ns
+         mort_protect(n)=loc_mort_protect
+
+      END DO
+      !close file pipe
+      CLOSE(unit=in)
+
+  END SUBROUTINE sub_init_explicit_grazing_params
 
 
   ! ****************************************************************************************************************************** !

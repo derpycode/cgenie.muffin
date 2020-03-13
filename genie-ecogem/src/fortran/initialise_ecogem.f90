@@ -218,12 +218,8 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(prey_refuge(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-  ALLOCATE(grazing_protect(npmax),STAT=alloc_error)
-  call check_iostat(alloc_error,__LINE__,__FILE__)
-  ALLOCATE(herbivory(npmax),STAT=alloc_error)
-  call check_iostat(alloc_error,__LINE__,__FILE__)
-  ALLOCATE(carnivory(npmax),STAT=alloc_error)
-  call check_iostat(alloc_error,__LINE__,__FILE__)
+  !ALLOCATE(grazing_protect(npmax),STAT=alloc_error)
+  !call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(pp_opt_a_array(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(pp_sig_a_array(npmax),STAT=alloc_error)
@@ -326,6 +322,11 @@ SUBROUTINE initialise_ecogem(    &
   do k=1,n_k
      wet_mask_ijk(:,:,k) = MERGE(1,0,goldstein_k1.le.k)
   enddo
+
+  ! get explicit grazing parameters from input file
+  if(ctrl_grazing_explicit)then
+    CALL sub_init_explicit_grazing_params()
+  endif
 
   ! *** initialise plankton biomass array
   call sub_init_plankton()
