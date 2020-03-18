@@ -112,6 +112,8 @@ CONTAINS
        print*,'Include explicit P-cycle in OMEN-SED?               : ',par_sed_huelse2017_P_cycle
        print*,'Remove implicit Alk associated with buried sulf-OM? : ',par_sed_huelse2017_remove_impl_sulALK
        print*,'Simulate ocean Porg loss with buried sulf-OM?       : ',par_sed_huelse2017_sim_P_loss
+       print*,'Simulate ocean Porg loss related to Corg burial?    : ',par_sed_huelse2017_sim_P_loss_pres_fracC
+       print*,'Simulate increased P-regeneration under anoxia?     : ',par_sed_huelse2017_sim_P_regeneration
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
