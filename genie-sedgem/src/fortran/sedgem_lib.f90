@@ -97,7 +97,9 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_redox,par_sed_huelse2017_P_cycle
   logical::par_sed_huelse2017_remove_impl_sulALK                 ! Remove implicit Alk associated with buried sulf-OM? / no permanent ALk gain?
   logical::par_sed_huelse2017_sim_P_loss                         ! Simulate ocean Porg loss with buried sulf-OM?
-  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_remove_impl_sulALK,par_sed_huelse2017_sim_P_loss
+  logical::par_sed_huelse2017_sim_P_loss_pres_fracC              ! Simulate ocean Porg loss related to Corg burial?
+  logical::par_sed_huelse2017_sim_P_regeneration                 ! Simulate increased P-regeneration under anoxia?
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_remove_impl_sulALK,par_sed_huelse2017_sim_P_loss,par_sed_huelse2017_sim_P_loss_pres_fracC,par_sed_huelse2017_sim_P_regeneration
   REAL::par_sed_huelse2017_k1                                    ! labile degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2                                    ! refractory degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2_order                              ! k2 = k1/par_sed_huelse2017_k2_order
@@ -195,6 +197,17 @@ MODULE sedgem_lib
   real::par_sed_hydroip_fDIC                                     ! hydrothermal CO2 outgassing (mol yr-1)    
   real::par_sed_hydroip_fDIC_d13C                                ! d13C                
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fDIC,par_sed_hydroip_fDIC_d13C
+  real::par_sed_Os_depTOT					 ! deposition rate of Os in oxic bottom waters (mol yr-1)
+  real::par_sed_Os_dep                                           ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_oxic					 ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_suboxic					 ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_O2_threshold                                  ! oxygen threshold for oxic/suboxic deposition
+  logical::ctrl_sed_Os_O2                                           ! switch to turn on oxygen dependent deposition
+  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic,par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
+  real::par_sed_hydroip_fOs					 ! hydrothermal Os flux (mol yr-1)
+  real::par_sed_hydroip_fOs_187Os_188Os				 ! 187Os/188Os ratio of hydrothermal Os flux
+  real::par_sed_hydroip_fOs_188Os_192Os				 ! 188Os/192Os ratio of hydrothermal Os flux
+  NAMELIST /ini_sedgem_nml/par_sed_hydroip_fOs,par_sed_hydroip_fOs_187Os_188Os,par_sed_hydroip_fOs_188Os_192Os
   ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
   logical::ctrl_sed_forcedohmega_ca                              ! Ca-only adjustment for forced ocean saturation?
   NAMELIST /ini_sedgem_nml/ctrl_sed_forcedohmega_ca

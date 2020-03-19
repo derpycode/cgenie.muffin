@@ -14,8 +14,10 @@ subroutine biogem(        &
      & )
   use omp_lib
   use gem_carbchem
+  use gem_geochem
   USE biogem_lib
   USE biogem_box
+  USE biogem_box_geochem
   USE biogem_data
   USE biogem_data_ascii
   IMPLICIT NONE
@@ -87,7 +89,10 @@ subroutine biogem(        &
      bio_remin(io,:,:,:) = 0.0
   end do
   ! redox remin diag
-  if (ctrl_bio_remin_redox_save) diag_redox(:,:,:,:) = 0.0
+  if (ctrl_bio_remin_redox_save) then
+     diag_redox(:,:,:,:)  = 0.0
+     diag_precip(:,:,:,:) = 0.0
+  end if
 
   ! *** INITIALIZE LOCAL ARRAYS ***
   ! NOTE: only bother initializing for selected tracers
@@ -405,6 +410,8 @@ subroutine biogem(        &
                  else
                     ! set dissolution flux equal to rain flux
                     ! NOTE: force return of S from POM-S in a closed system, despite it being a 'scavenged' type
+                    ! NOTE: par_sed_type_det should not be treated like det re. remin(?)
+                    !       (for now, allow is to be reflected back from the sediment-water interface)
                     DO l=1,n_l_ocn
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
@@ -414,12 +421,20 @@ subroutine biogem(        &
                        do loc_i=1,loc_tot_i
                           lo = conv_ls_lo_i(loc_i,ls)
                           if (lo > 0) then
-                             if (sed_type(l2is(ls)) == par_sed_type_scavenged) then
+                             if ( (sed_type(l2is(ls)) == par_sed_type_scavenged) .OR. &
+                                  & ( sed_type(sed_dep(l2is(ls))) == par_sed_type_scavenged) ) then
                                 if ((l2is(ls) == is_POM_S) .OR. (sed_dep(l2is(ls)) == is_POM_S)) then
                                    loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                                 else
                                    loc_remin = par_scav_fremin*loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                                 end if
+                             else if ( &
+                                  & (sed_dep(l2is(ls)) == is_det) &
+                                  !& (sed_dep(l2is(ls)) == is_det) .OR. &
+                                  !& (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
+                                  !& (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
+                                  & ) then
+                                loc_remin = 0.0
                              else
                                 loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                              end if
@@ -1351,11 +1366,14 @@ subroutine biogem(        &
                        locij_fatm(ia_pO2,i,j)      = locij_fatm(ia_pO2,i,j)      - 2.0*locij_focnatm(ia_pH2S,i,j)
                        locij_fatm(ia_pH2S,i,j)     = 0.0
                        ! update flux reporting
-                       locij_focnatm(ia_pO2,i,j)   = locij_focnatm(ia_pO2,i,j)   - 2.0*locij_focnatm(ia_pH2S,i,j)
-                       locij_focnatm(ia_pH2S,i,j)  = 0.0
-                       ! ### INSERT CODE FOR ISOTOPES ############################################################################### !
-                       !
-                       ! ############################################################################################################ !
+                       locij_focnatm(ia_pO2,i,j)  = locij_focnatm(ia_pO2,i,j) - 2.0*locij_focnatm(ia_pH2S,i,j)
+                       locij_focnatm(ia_pH2S,i,j) = 0.0
+                       ! update isotope mass balance and reporting
+                       if (atm_select(ia_pH2S_34S)) then
+                          locijk_focn(io_SO4_34S,i,j,n_k) = locijk_focn(io_SO4_34S,i,j,n_k) + locij_focnatm(ia_pH2S_34S,i,j)
+                          locij_fatm(ia_pH2S_34S,i,j)     = 0.0
+                          locij_focnatm(ia_pH2S_34S,i,j)  = 0.0
+                       end IF
                     end IF
                  case ('KMM_lowO2')
                     IF (                                                       &
@@ -1378,6 +1396,12 @@ subroutine biogem(        &
                     locij_fatm(ia_pH2S,i,j)    = 0.0
                     locij_focnatm(ia_pH2S,i,j) = 0.0
                     diag_airsea(ia_pH2S,i,j)   = 0.0
+                    ! update isotope mass balance and reporting
+                    if (atm_select(ia_pH2S_34S)) then
+                       locij_fatm(ia_pH2S_34S,i,j)    = 0.0
+                       locij_focnatm(ia_pH2S_34S,i,j) = 0.0
+                       diag_airsea(ia_pH2S_34S,i,j)   = 0.0
+                    end IF
                  end select
               END IF
               IF (opt_select(iopt_select_carbchem)) THEN
@@ -1465,8 +1489,32 @@ subroutine biogem(        &
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN ABIOTIC PRECIPITATION ***'
               ! *** OCEAN ABIOTIC PRECIPITATION ***
+              ! *** Ca-CO3 cycling ***
               if (ctrl_bio_CaCO3precip .AND. sed_select(is_CaCO3)) then
                  call sub_calc_bio_uptake_abio(i,j,loc_k1,loc_dtyr)
+              end if
+              ! *** simple oxic iron cycle ***
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
+                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+              end if
+              if (sed_select(is_FeOOH)) then
+                 call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
+              end if
+              ! *** Fe-S cycling ***
+              if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
+                if (ctrl_bio_FeS2precip_explicit) then
+                   call sub_calc_form_FeS(i,j,loc_k1,loc_dtyr)
+                end if   
+              end if
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
+                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
+              end if
+              if (sed_select(is_FeS2)) then
+                 call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
+              end if
+              ! *** Fe-CO3 cycling ***
+              if (sed_select(is_FeCO3)) then
+                 call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
               end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -1483,7 +1531,7 @@ subroutine biogem(        &
               ! NOTE: although <locijk_focn> Fe is added to the remin array within the sub_calc_geochem_Fe subroutine,
               !       the same flux is subtracted again after equilibrium has been calculated,
               !       hence <locijk_focn> Fe later can be added 'as normal' in updating the <ocn> array
-              ! NOTE: the above of course makes no sense at all and newer schemes are called earier without this shit
+              ! NOTE: the above, of course, makes no sense at all, and all newer schemes are called earier without all this shit
               if (sed_select(is_det) .AND. ocn_select(io_Fe)) then
                  SELECT CASE (trim(opt_geochem_Fe))
                  CASE ('OLD')
@@ -2946,26 +2994,26 @@ SUBROUTINE diag_biogem_timeslice( &
            if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
               SELECT CASE (trim(opt_geochem_Fe))
               CASE ('hybrid')
-                 diag_Fe(idiag_Fe_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
-                 diag_Fe(idiag_Fe_TL,:,:,:)   = ocn(io_TL,:,:,:)
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
+                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
                  DO i=1,n_i
                     DO j=1,n_j
                        loc_k1 = goldstein_k1(i,j)
                        IF (n_k >= loc_k1) THEN
                           DO k=loc_k1,n_k
                              loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
-                                  & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k) &
+                                  & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k),par_K_FeL &
                                   & )
-                             diag_Fe(idiag_Fe_Fe,i,j,k)  = loc_FeFeLL(1)
-                             diag_Fe(idiag_Fe_FeL,i,j,k) = loc_FeFeLL(2)
-                             diag_Fe(idiag_Fe_L,i,j,k)   = loc_FeFeLL(3)
+                             diag_iron(idiag_iron_Fe,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_FeL,i,j,k) = loc_FeFeLL(2)
+                             diag_iron(idiag_iron_L,i,j,k)   = loc_FeFeLL(3)
                           end DO
                        end IF
                     end DO
                  end DO
               CASE ('lookup_4D')
-                 diag_Fe(idiag_Fe_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
-                 diag_Fe(idiag_Fe_TL,:,:,:)   = ocn(io_TL,:,:,:)
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
+                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
                  DO i=1,n_i
                     DO j=1,n_j
                        loc_k1 = goldstein_k1(i,j)
@@ -2975,22 +3023,22 @@ SUBROUTINE diag_biogem_timeslice( &
                                   & (/ ocn(io_T,i,j,k), carb(ic_H,i,j,k),   &
                                   & ocn(io_TDFe,i,j,k), ocn(io_TL,i,j,k) /) &
                                   & )
-                             diag_Fe(idiag_Fe_Fe3,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_Fe3,i,j,k)  = loc_FeFeLL(1)
                              loc_FeFeLL(1) = fun_box_calc_lookup_Fe_4D_geo( &
                                   & (/ ocn(io_T,i,j,k), carb(ic_H,i,j,k),   &
                                   & ocn(io_TDFe,i,j,k), ocn(io_TL,i,j,k) /) &
                                   & )
-                             diag_Fe(idiag_Fe_geo,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_geo,i,j,k)  = loc_FeFeLL(1)
                           end DO
                        end IF
                     end DO
                  end DO
               CASE default
-                 diag_Fe(idiag_Fe_Fe,:,:,:)   = ocn(io_Fe,:,:,:)
-                 diag_Fe(idiag_Fe_FeL,:,:,:)  = ocn(io_FeL,:,:,:)
-                 diag_Fe(idiag_Fe_L,:,:,:)    = ocn(io_L,:,:,:)
-                 diag_Fe(idiag_Fe_TDFe,:,:,:) = ocn(io_Fe,:,:,:) + ocn(io_FeL,:,:,:)
-                 diag_Fe(idiag_Fe_TL,:,:,:)   = ocn(io_L,:,:,:)  + ocn(io_FeL,:,:,:)
+                 diag_iron(idiag_iron_Fe,:,:,:)   = ocn(io_Fe,:,:,:)
+                 diag_iron(idiag_iron_FeL,:,:,:)  = ocn(io_FeL,:,:,:)
+                 diag_iron(idiag_iron_L,:,:,:)    = ocn(io_L,:,:,:)
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_Fe,:,:,:) + ocn(io_FeL,:,:,:)
+                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_L,:,:,:)  + ocn(io_FeL,:,:,:)
               end SELECT
            end IF
 
@@ -3024,10 +3072,12 @@ SUBROUTINE diag_biogem_timeslice( &
            int_psi_timeslice(:,:)   = int_psi_timeslice(:,:)   + loc_dtyr*diag_misc_psi(:,:)
            int_u_timeslice(:,:,:,:) = int_u_timeslice(:,:,:,:) + loc_dtyr*phys_ocn(ipo_gu:ipo_gw,:,:,:)
            ! update time-slice data - diagnostics
-           int_diag_bio_timeslice(:,:,:)       = int_diag_bio_timeslice(:,:,:)       + diag_bio(:,:,:)
-           int_diag_geochem_timeslice(:,:,:,:) = int_diag_geochem_timeslice(:,:,:,:) + diag_geochem(:,:,:,:)
-           int_diag_Fe_timeslice(:,:,:,:)      = int_diag_Fe_timeslice(:,:,:,:)      + loc_dtyr*diag_Fe(:,:,:,:)
-           int_diag_redox_timeslice(:,:,:,:)   = int_diag_redox_timeslice(:,:,:,:)   + diag_redox(:,:,:,:)
+           int_diag_bio_timeslice(:,:,:)           = int_diag_bio_timeslice(:,:,:)           + diag_bio(:,:,:)
+           int_diag_geochem_old_timeslice(:,:,:,:) = int_diag_geochem_old_timeslice(:,:,:,:) + diag_geochem_old(:,:,:,:)
+           int_diag_precip_timeslice(:,:,:,:)      = int_diag_precip_timeslice(:,:,:,:)      + diag_precip(:,:,:,:)
+           int_diag_react_timeslice(:,:,:,:)       = int_diag_react_timeslice(:,:,:,:)       + diag_react(:,:,:,:)
+           int_diag_redox_timeslice(:,:,:,:)       = int_diag_redox_timeslice(:,:,:,:)       + diag_redox(:,:,:,:)
+           int_diag_iron_timeslice(:,:,:,:)        = int_diag_iron_timeslice(:,:,:,:)        + loc_dtyr*diag_iron(:,:,:,:)
            ! gemlite
            if (dum_gemlite) then
               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + loc_dtyr*dum_sfxsumrok1(:,:,:)
@@ -3583,9 +3633,17 @@ SUBROUTINE diag_biogem_timeseries( &
                  int_diag_bio_sig(ib) = int_diag_bio_sig(ib) + &
                       & SUM(phys_ocn(ipo_A,:,:,n_k)*diag_bio(ib,:,:))/loc_tot_A
               END DO
-              DO id=1,n_diag_geochem
-                 int_diag_geochem_sig(id) = int_diag_geochem_sig(id) + &
-                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_geochem(id,:,:,:))*loc_ocn_rtot_M
+              DO id=1,n_diag_geochem_old
+                 int_diag_geochem_old_sig(id) = int_diag_geochem_old_sig(id) + &
+                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_geochem_old(id,:,:,:))*loc_ocn_rtot_M
+              END DO
+              DO id=1,n_diag_precip
+                 int_diag_precip_sig(id) = int_diag_precip_sig(id) + &
+                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_precip(id,:,:,:))*loc_ocn_rtot_M
+              END DO
+              DO id=1,n_diag_react
+                 int_diag_react_sig(id) = int_diag_react_sig(id) + &
+                      & SUM(phys_ocn(ipo_M,:,:,:)*diag_react(id,:,:,:))*loc_ocn_rtot_M
               END DO
               DO id=1,n_diag_redox
                  int_diag_redox_sig(id) = int_diag_redox_sig(id) + &

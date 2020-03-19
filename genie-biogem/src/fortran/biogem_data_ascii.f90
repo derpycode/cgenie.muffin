@@ -10,7 +10,6 @@ MODULE biogem_data_ascii
 
   USE biogem_lib
   USE biogem_box
-  USE biogem_data_netCDF
   IMPLICIT NONE
   SAVE
 
@@ -686,6 +685,63 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)  
           end if
        end if
+       ! Os diagnostics
+       IF (ocn_select(io_Os_187Os) .AND. ocn_select(io_Os_188Os)) THEN
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_Os',string_results_ext)
+          loc_string = '% time (yr) / Os / 188Os / 187Os / 192Os'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_r187Os',string_results_ext)
+          loc_string = '% time (yr) / mean ocean 187Os / mean ocean 187/188 ratio'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          if (flag_rokgem) then
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_Os',string_results_ext)
+             loc_string = '% time (yr) / Os (mol yr-1) / 188Os (mol yr-1) / 187Os (mol yr-1) / 192Os (mol yr-1)'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_r187Os',string_results_ext)
+             loc_string = '% time (yr) / weathering 187Os (mol yr-1) / weathering 187/188 ratio'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)  
+          end if
+          if (force_flux_ocn_select(io_Os_187Os) .AND. force_flux_ocn_select(io_Os_188Os)) then
+             loc_filename=fun_data_timeseries_filename(loc_t,par_outdir_name, &
+                  & trim(par_outfile_name)//'_series_diag_misc','specified_forcing_Os_r187Os',string_results_ext)
+             loc_string = '% time (yr) / 187Os (mol yr-1) / 187/188 ratio'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
+       end if
        ! insolation (wet grid only)
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_insol',string_results_ext)
@@ -733,10 +789,39 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end DO
     end if
-    IF (ctrl_data_save_sig_diag_geochem .AND. ctrl_data_save_sig_diag_redox_old) THEN
-       DO id=1,n_diag_geochem
+    IF (ctrl_data_save_sig_diag_redox_old) THEN
+       DO id=1,n_diag_geochem_old
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem',trim(string_diag_geochem(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem_old', &
+               & trim(string_diag_geochem_old(id)),string_results_ext)
+          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_precip
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_react
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
           loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
@@ -750,7 +835,7 @@ CONTAINS
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_redox
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_redox',trim(string_diag_redox(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_redox(id)),string_results_ext)
           loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
@@ -948,6 +1033,23 @@ CONTAINS
                 end if
              end if
           END DO
+    end if
+    ! DINex
+    IF (ctrl_data_save_sig_diag) THEN
+       if (ocn_select(io_NO3) .AND. ocn_select(io_NH4)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_DINex',string_results_ext &
+               & )
+          loc_string = '% time (yr) / global mean DINex (mol kg-1)'// &
+               & ' / surface mean DINex (mol kg-1) / benthic mean DINex (mol kg-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       END IF
     end if
     ! Save 3D water column DIC d13C data for specific ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN
@@ -2073,6 +2175,78 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)  
           end if
        end if
+       ! Os diagnostics
+       IF (ocn_select(io_Os_187Os) .AND. ocn_select(io_Os_188Os)) THEN
+          ! all Sr species
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_Os',string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
+               & loc_t, &
+               & int_ocn_sig(io_Os)/int_t_sig, &
+               & int_ocn_sig(io_Os_188Os)/int_t_sig, &
+               & int_ocn_sig(io_Os_187Os)/int_t_sig, &
+               & (int_ocn_sig(io_Os)-int_ocn_sig(io_Os_187Os)-int_ocn_sig(io_Os_188Os))/int_t_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          ! 187Os
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_ocn_r187Os',string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          loc_frac = int_ocn_sig(io_Os_187Os)/int_t_sig
+          if (int_ocn_sig(io_Os_188Os) > const_real_nullsmall) then
+             loc_sig = int_ocn_sig(io_Os_187Os)/int_ocn_sig(io_Os_188Os)
+          else
+             loc_sig = -999.9
+          end if
+          WRITE(unit=out,fmt='(f12.3,e15.7,f12.7)',iostat=ios) &
+               & loc_t, &
+               & loc_frac, &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          if (flag_rokgem) then
+             ! all Os species
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_Os',string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
+                  & loc_t, &
+                  & int_diag_weather_sig(io_Os)/int_t_sig, &
+                  & int_diag_weather_sig(io_Os_188Os), &
+                  & int_diag_weather_sig(io_Os_187Os)/int_t_sig, &
+                  & (int_diag_weather_sig(io_Os)-int_diag_weather_sig(io_Os_187Os)-int_diag_weather_sig(io_Os_188Os))/int_t_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             ! 187Os
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_r187Os',string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             if (int_diag_weather_sig(io_Os_188Os) > const_real_nullsmall) then
+                loc_sig = int_diag_weather_sig(io_Os_187Os)/loc_tot
+             else
+                loc_sig = -999.9
+             end if
+             WRITE(unit=out,fmt='(f12.3,e15.7,f12.7)',iostat=ios) &
+                  & loc_t, &
+                  & int_diag_weather_sig(io_Os_187Os)/int_t_sig, &
+                  & loc_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__) 
+          end if
+       end if
        ! insolation (wet grid only)
        loc_filename=fun_data_timeseries_filename( &
             & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_insol',string_results_ext)
@@ -2129,11 +2303,46 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end DO
     end if
-    IF (ctrl_data_save_sig_diag_geochem .AND. ctrl_data_save_sig_diag_redox_old) THEN
-       DO id=1,n_diag_geochem
-          loc_sig = int_diag_geochem_sig(id)/int_t_sig
+    IF (ctrl_data_save_sig_diag_redox_old) THEN
+       DO id=1,n_diag_geochem_old
+          loc_sig = int_diag_geochem_old_sig(id)/int_t_sig
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem',trim(string_diag_geochem(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag_geochem_old', &
+               & trim(string_diag_geochem_old(id)),string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+               & loc_t,                        &
+               & loc_ocn_tot_M*loc_sig,        &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_precip
+          loc_sig = int_diag_precip_sig(id)/int_t_sig
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+               & loc_t,                        &
+               & loc_ocn_tot_M*loc_sig,        &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end DO
+    end if
+    IF (ctrl_data_save_sig_diag_geochem) THEN
+       DO id=1,n_diag_react
+          loc_sig = int_diag_react_sig(id)/int_t_sig
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2150,7 +2359,7 @@ CONTAINS
        DO id=1,n_diag_redox
           loc_sig = int_diag_redox_sig(id)/int_t_sig
           loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag_redox',trim(string_diag_redox(id)),string_results_ext)
+               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_redox(id)),string_results_ext)
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2455,6 +2664,28 @@ CONTAINS
                 end if
              end if
           END DO
+    end if
+    ! DINex
+    IF (ctrl_data_save_sig_diag) THEN
+       if (ocn_select(io_NO3) .AND. ocn_select(io_NH4)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_misc_DINex',string_results_ext &
+               & )
+          loc_sig = ((int_ocn_sig(io_NO3)+int_ocn_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_sig(io_PO4)))/int_t_sig
+          loc_sig_sur = ((int_ocn_sur_sig(io_NO3)+int_ocn_sur_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_sur_sig(io_PO4)))/int_t_sig
+          loc_sig_ben = ((int_ocn_ben_sig(io_NO3)+int_ocn_ben_sig(io_NH4))-(par_bio_red_POP_PON*int_ocn_ben_sig(io_PO4)))/int_t_sig
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,3e15.7)',iostat=ios) &
+               & loc_t,                                  &
+               & loc_sig,                                &
+               & loc_sig_sur,                            &
+               & loc_sig_ben
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
     end if
     ! Save 3D data from a particular ij location
     IF (ctrl_data_save_ocn_3D_ij .AND. (ocn_select(io_DIC_13C))) THEN
@@ -3316,6 +3547,85 @@ CONTAINS
     end if
 
   END SUBROUTINE sub_echo_maxmin
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! Copy of GOLDSTEIn overturning streamfunction calculation
+  SUBROUTINE sub_calc_psi(dum_u,dum_opsi,dum_opsia,dum_opsip,dum_zpsi,dum_opsia_minmax,dum_opsip_minmax)
+    ! dummy arguments
+    REAL,INTENT(in),DIMENSION(3,n_i,n_j,n_k)::dum_u
+    REAL,INTENT(out),DIMENSION(0:n_j,0:n_k)::dum_opsi,dum_opsia,dum_opsip,dum_zpsi
+    REAL,INTENT(out),DIMENSION(2)::dum_opsia_minmax,dum_opsip_minmax
+    ! local variables
+    INTEGER::i,j,k
+    REAL::loc_ominp,loc_omaxp
+    REAL::loc_omina,loc_omaxa
+    REAL,DIMENSION(n_j,n_k)::loc_ou,loc_zu
+    REAL,DIMENSION(0:n_j,0:n_k)::loc_opsi,loc_opsia,loc_opsip,loc_zpsi
+    ! Calculate meridional overturning streamfunction opsi on C grid only
+    loc_opsi(:,:)  = 0.0
+    loc_opsia(:,:) = 0.0
+    loc_opsip(:,:) = 0.0
+    DO j=1,n_j-1
+       DO k=1,n_k-1
+          loc_ou(j,k) = 0.0
+          DO i=1,n_i
+             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
+          END DO
+          loc_opsi(j,k) = loc_opsi(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
+       END DO
+    END DO
+    ! Pacific overturning streamfunction
+    loc_ominp = 0.0
+    loc_omaxp = 0.0
+    DO j=goldstein_jsf+1,n_j-1
+       DO k=1,n_k-1
+          loc_ou(j,k) = 0.0
+          DO i=goldstein_ips(j),goldstein_ipf(j)
+             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
+          ENDDO
+          loc_opsip(j,k) = loc_opsip(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
+          IF(loc_opsip(j,k) < loc_ominp) loc_ominp = loc_opsip(j,k)
+          IF(loc_opsip(j,k) > loc_omaxp) loc_omaxp = loc_opsip(j,k)
+       ENDDO
+    ENDDO
+    dum_opsip_minmax(1) = loc_ominp
+    dum_opsip_minmax(2) = loc_omaxp
+    ! Atlantic overturning streamfunction
+    ! NOTE: Atlantic calculation hacked so that only the deeper 1/2 of the maximum is calculated
+    loc_omina = 0.0
+    loc_omaxa = 0.0
+    DO j=goldstein_jsf+1,n_j-1
+       DO k=1,n_k-1
+          loc_ou(j,k) = 0.0
+          DO i=goldstein_ias(j),goldstein_iaf(j)
+             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
+          ENDDO
+          loc_opsia(j,k) = loc_opsia(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
+          IF((loc_opsia(j,k) < loc_omina) .AND. (k <= n_k/2)) loc_omina = loc_opsia(j,k)
+          IF((loc_opsia(j,k) > loc_omaxa) .AND. (k <= n_k/2)) loc_omaxa = loc_opsia(j,k)
+       ENDDO
+    ENDDO
+    dum_opsia_minmax(1) = loc_omina
+    dum_opsia_minmax(2) = loc_omaxa
+    !
+    loc_zpsi(:,:) = 0.0
+    DO i=1,n_i-1
+       DO k=1,n_k-1
+          loc_zu(i,k) = 0
+          DO j=1,n_j
+             loc_zu(i,k) = loc_zu(i,k) + dum_u(1,i,j,k)/goldstein_c(j)*goldstein_ds
+          ENDDO
+          loc_zpsi(i,k) = loc_zpsi(i,k-1) - goldstein_dz(k)*loc_zu(i,k)
+       ENDDO
+    ENDDO
+    ! set results arrays
+    dum_opsi(1:n_j,1:n_k)  = loc_opsi(1:n_j,1:n_k)
+    dum_opsia(1:n_j,1:n_k) = loc_opsia(1:n_j,1:n_k)
+    dum_opsip(1:n_j,1:n_k) = loc_opsip(1:n_j,1:n_k)
+    dum_zpsi(1:n_j,1:n_k)  = loc_zpsi(1:n_j,1:n_k)
+  END SUBROUTINE sub_calc_psi
   ! ****************************************************************************************************************************** !
 
 
