@@ -514,19 +514,13 @@ CONTAINS
     prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
     gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
     do jpred=1,npmax
-    do jprey=1,npmax
     select case(pft(jpred))
-      !case('phytoplankton')
-      !  gkernel(jpred,jprey)=0.0
-      case('zooplankton','foram')
-        select case(pft(jprey))
-          case('phytoplankton')
-            if(carnivory(jpred)) gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
-          case('zooplankon','foram')
-            if(herbivory(jpred)) gkernel(jpred,jprey)=0.0 ! if predator is herbivorous and prey is zooplanktonn - no grazing
-        end select
+      case('foram')
+        do jprey=1,npmax
+          if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+          if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+        end do
     end select
-    end do
     end do
     gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0
     gkernelT(:,:) =transpose(gkernel(:,:))
