@@ -7029,6 +7029,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Simulate ocean Porg loss with buried sulf-OM?</description>
                     </param>
+					<param name="par_sed_huelse2017_sim_P_loss_pres_fracC">
+			<value datatype="boolean">.false.</value>
+                        <description>Simulate ocean Porg loss related to Corg burial</description>
+                    </param>                   
+                    <param name="par_sed_huelse2017_sim_P_regeneration">
+			<value datatype="boolean">.false.</value>
+                        <description>Simulate P-regeneration under anoxia</description>
+                    </param>
                     <param name="par_sed_huelse2017_k1">
 			<value datatype="real">0.0065</value>
                         <description>global labile Corg degradation rate constant, units of 1/yr</description>
