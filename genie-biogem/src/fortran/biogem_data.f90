@@ -160,6 +160,7 @@ CONTAINS
        print*,'Light e-folding depth (m) (OCMIP-2)                 : ',par_bio_I_eL
        print*,'Coefficient for T-dep. uptake rate modifier         : ',par_bio_kT0
        print*,'e-folding temp. (K) for T-dep. uptake rate modifier : ',par_bio_kT_eT
+       print*,'temperature offset for T-dependent bio schemes      : ',par_bio_kT_dT
        ! --- ORGANIC MATTER EXPORT RATIOS ---------------------------------------------------------------------------------------- !
        print*,'--- ORGANIC MATTER EXPORT RATIOS -------------------'
        print*,'N/P organic matter Redfield ratio                   : ',par_bio_red_POP_PON
@@ -295,6 +296,7 @@ CONTAINS
        print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
+       print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD 
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'CaCO3 44Ca fractionation scheme ID string           : ',trim(opt_d44Ca_Ca_CaCO3)
@@ -462,6 +464,7 @@ CONTAINS
        ! --- DATA SAVING: DIAGNOSTICS -------------------------------------------------------------------------------------------- !
        print*,'--- BIOGEM DATA SAVING: DIAGNOSTICS ----------------'
        print*,'Create pre-formed tracers?                          : ',ctrl_bio_preformed
+       print*,'Only include POC remin in Csoft (exclude DOC)?      : ',ctrl_bio_preformed_CsoftPOConly
        print*,'Create redox/remin data for saving?                 : ',ctrl_bio_remin_redox_save
        ! --- DATA SAVING: MISC --------------------------------------------------------------------------------------------------- !
        print*,'--- BIOGEM DATA SAVING: MISC -----------------------'
@@ -515,7 +518,7 @@ CONTAINS
        print*,'Scaling C burial flux relative to emissions         : ',par_force_invert_fCorgburial
        print*,'Force explicit inversion?                           : ',ctrl_force_invert_explicit
        print*,'Automatic ocean age tracer?                         : ',ctrl_force_ocn_age
-       ! --- TRANSPORT MATRIX ------------------------------------------------------------------------------------------------------ !
+       ! --- TRANSPORT MATRIX ---------------------------------------------------------------------------------------------------- !
        print*,'Diagnose transport matrix during run?		: ',ctrl_data_diagnose_TM
        print*,'Year to start diagnosing transport matrix	: ',par_data_TM_start
        print*,'Number of intervals within a year to diagnose transport matrix		: ',par_data_TM_avg_n
@@ -2534,7 +2537,8 @@ CONTAINS
                 CALL sub_report_error( &
                      & 'biogem_data','sub_check_par', &
                      & 'An isotope tracer '//TRIM(loc_string1)//' and associated bulk tracer '//TRIM(loc_string2)// &
-                     & ' have been selected, but a restoring forcing for only one of them has been selected.', &
+                     & ' have been selected, but a restoring forcing for only one of them has been selected,'// &
+                     & ' just checking that this is what you intended ...', &
                      & 'CONTINUING', &
                      & (/const_real_null/),.false. &
                      & )
@@ -2746,7 +2750,7 @@ CONTAINS
                            & 'biogem_data','sub_check_par', &
                            & 'Particulate tracer '//TRIM(loc_string2)// &
                            & ' does does not have *all possible* corresponding ocean tracers selected, such as '//TRIM(loc_string1)// &
-                           & ' (BUT may not ened them ...)', &
+                           & ' (BUT may not need them, esp. if involving the Fe sytem ...)', &
                            & 'CONTINUING', &
                            & (/const_real_null/),.false. &
                            & )
@@ -2920,6 +2924,7 @@ CONTAINS
     end select
 
     select case (par_data_save_level)
+
     case (0)
        ! save NOTHING
     case (1)
@@ -2968,16 +2973,22 @@ CONTAINS
        ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (6)
-       ! BASIC + tracer diagnostics
-       ctrl_data_save_slice_diag_tracer = .true.
-       ctrl_data_save_sig_diag = .true.
-    case (7)
        ! BASIC + tracer + proxy diagnostics
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_sig_diag = .true.
+    case (7)
+       ! BASIC + biology + tracer + proxy diagnostics
+       ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_diag_bio = .true.
+       ctrl_data_save_slice_diag_proxy = .true.
+       ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
+       ctrl_data_save_sig_diag = .true.
     case (8)
-       ! BASIC + biology + geochem + tracer + proxy diagnostics
+       ! BASIC + biology + tracer + proxy + geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
@@ -3020,8 +3031,19 @@ CONTAINS
        ctrl_data_save_sig_diag_geochem = .true.
        ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
+    case (11)
+       ! BASIC + biology + tracer + proxy + redox diagnostics
+       ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_diag_bio = .true.
+       ctrl_data_save_slice_diag_proxy = .true.
+       ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_bio_remin_redox_save=.true.
     case (14)
-       ! BASIC + FULL geochem diagnostics
+       ! BASIC + FULL (inc. redox) geochem diagnostics
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_geochem = .true.
        if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
@@ -3035,7 +3057,7 @@ CONTAINS
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (15)
-       ! BASIC + biology + geochem diagnostics
+       ! BASIC + biology + FULL (inc. redox) geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
@@ -3054,8 +3076,45 @@ CONTAINS
        ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
+    case (16)
+       ! BASIC + tracer diagnostics + FULL (inc. redox) geochem diagnostics
+       ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_slice_carb = .true.
+       ctrl_data_save_slice_diag_geochem = .true.
+       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
+       ctrl_data_save_sig_fairsea = .true.
+       ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_carb_sur = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
+       ctrl_bio_remin_redox_save=.true.
+    case (17)
+       ! BASIC + biology + tracer + proxy diagnostics + FULL (inc. redox) geochem
+       ctrl_data_save_slice_focnatm = .true.
+       ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_carb = .true.
+       ctrl_data_save_slice_diag_bio = .true.
+       ctrl_data_save_slice_diag_geochem = .true.
+       ctrl_data_save_slice_diag_proxy = .true.
+       ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_slice_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
+       ctrl_data_save_sig_carb_sur = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_fairsea = .true.
+       ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
+       ctrl_data_save_derived = .true.
+       ctrl_bio_remin_redox_save=.true.
     case (18)
-       ! BASIC + biology + geochem + tracer + proxy diagnostics
+       ! BASIC + biology + tracer + proxy diagnostics + FULL (inc. redox) geochem
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
