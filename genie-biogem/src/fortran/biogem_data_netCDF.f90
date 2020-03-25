@@ -1112,7 +1112,7 @@ CONTAINS
                    CASE (io_col8)
                       if (ocn_select(io_DIC_14C)) loc_name = 'diag_pre_d14C_age'
                    CASE (io_col9)
-                      if (ocn_select(io_DIC)      loc_name = 'diag_pre_Csoft'
+                      if (ocn_select(io_DIC))     loc_name = 'diag_pre_Csoft'
                    end select
                    call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
                         & trim(loc_unitsname),const_real_zero,const_real_zero)
