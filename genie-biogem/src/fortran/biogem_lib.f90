@@ -640,12 +640,13 @@ MODULE biogem_lib
   LOGICAL::ctrl_data_save_ocn_3D_ij                              ! save 3D data for a single ij location?
   NAMELIST /ini_biogem_nml/ctrl_data_save_ocn_3D_ij
   ! ------------------- DATA SAVING: MISC ---------------------------------------------------------------------------------------- !
-  LOGICAL::ctrl_bio_preformed                                  ! Create pre-formed tracers? (requires #x numerical tracers)
-  NAMELIST /ini_biogem_nml/ctrl_bio_preformed
+  LOGICAL::ctrl_bio_preformed                                    ! Create pre-formed tracers? (requires #x numerical tracers)
+  LOGICAL::ctrl_bio_preformed_CsoftPOConly                       ! Only include POC remin in Csoft (exclude DOC)?
+  NAMELIST /ini_biogem_nml/ctrl_bio_preformed,ctrl_bio_preformed_CsoftPOConly
   LOGICAL::ctrl_bio_remin_redox_save                             ! Create redox/remin data for saving?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_redox_save
   ! ------------------- DATA SAVING: MISC ---------------------------------------------------------------------------------------- !
-  integer::par_data_save_level                                 ! Degree of comprehensivity of data saving
+  integer::par_data_save_level                                   ! Degree of comprehensivity of data saving
   NAMELIST /ini_biogem_nml/par_data_save_level
   LOGICAL::ctrl_data_save_derived                                ! save 'derived' data (e.g., salinity-normalized ocean tracers)?
   LOGICAL::ctrl_data_save_GLOBAL                                 ! save global diagnostics (at time-slice intervals)?

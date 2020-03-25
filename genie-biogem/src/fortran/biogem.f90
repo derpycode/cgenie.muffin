@@ -1418,7 +1418,7 @@ subroutine biogem(        &
               ! *** TERRESTRIAL WEATHERING INPUT ***
               ! modify remineralization array according to terrestrial weathering input
               ! NOTE: <dum_sfxsumrok1> in units of (mol) (per time-step)
-              ! NOTE: no screening for a 'closed system' is made as substractions are made appropriatly from
+              ! NOTE: no screening for a 'closed system' is made as subtractions are made appropriately from
               !       'SEDIMENT DISSOLUTION INPUT' if a weathering flux exists
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)

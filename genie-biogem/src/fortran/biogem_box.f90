@@ -2685,10 +2685,10 @@ CONTAINS
     ! remin diagnostics
     if (ctrl_bio_remin_redox_save) then
        diag_redox(:,loc_i,loc_j,:) = diag_redox(:,loc_i,loc_j,:) + loc_diag_redox(:,:)
-       if (ocn_select(io_col9)) then
+       if (ocn_select(io_col9) .AND. (.NOT. ctrl_bio_preformed_CsoftPOConly)) then
           loc_string = 'reminD_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
           id = fun_find_str_i(trim(loc_string),string_diag_redox)
-          loc_vbio_remin(io2l(io_DIC),:) = loc_vbio_remin(io2l(io_DIC),:) + loc_diag_redox(id,:)
+          loc_vbio_remin(io2l(io_col9),:) = loc_vbio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
        end if
     end if
     ! write ocean tracer remineralization field (global array)
@@ -3668,7 +3668,7 @@ CONTAINS
        if (ocn_select(io_col9)) then
           loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
           id = fun_find_str_i(trim(loc_string),string_diag_redox)
-          loc_bio_remin(io2l(io_DIC),:) = loc_bio_remin(io2l(io_DIC),:) + loc_diag_redox(id,:)
+          loc_bio_remin(io2l(io_col9),:) = loc_bio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
        end if
     end if
     ! record settling fluxes

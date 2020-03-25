@@ -5417,6 +5417,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Create pre-formed tracers? (requires #x numerical tracers)</description>
                     </param>
+                    <param name="ctrl_bio_preformed_CsoftPOConly">
+			<value datatype="boolean">.false.</value>
+                        <description>Only include POC remin in Csoft (exclude DOC)? (requires #9 numerical tracer)</description>
+                    </param>
                     <param name="ctrl_bio_remin_redox_save">
 			<value datatype="boolean">.false.</value>
                         <description>Create redox/remin data for saving?</description>
