@@ -3014,23 +3014,23 @@ CONTAINS
     Write(unit=out,fmt=*) '--------------------------'
     Write(unit=out,fmt=*) 'MISCELLANEOUS PROPERTIES'
     Write(unit=out,fmt=*) ' '
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global surface area ............. : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global surface area ............................ : ', &
          & loc_ocnatm_tot_A, &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean k = n_k (surface) area ............. : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global ocean k = n_k (surface) area ............ : ', &
          & SUM(loc_phys_ocn(ipo_A,:,:,n_k)), &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean k = (n_k - 1) (sub-surface layer) area : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global ocean k=(n_k-1) (sub-surface layer) area  : ', &
          & SUM(loc_phys_ocn(ipo_A,:,:,n_k - 1)), &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean volume ......................... : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global ocean volume ............................ : ', &
          & SUM(loc_phys_ocn(ipo_V,:,:,:)), &
          & ' m3'
     call check_iostat(ios,__LINE__,__FILE__)
@@ -3043,8 +3043,8 @@ CONTAINS
          & phys_ocnatm(ipoa_A,:,:)*int_phys_ocn_timeslice(ipo_mask_ocn,:,:,n_k)* &
          & (1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)) &
          & )
-    Write(unit=out,fmt='(A49,f8.6,A24)',iostat=ios) &
-         & ' Global mean air-sea coefficient, K(CO2) ..... : ', &
+    Write(unit=out,fmt='(A52,f8.6,A24)',iostat=ios) &
+         & ' Global mean air-sea coefficient, K(CO2) ........ : ', &
          & loc_K, &
          & '     mol m-2 yr-1 uatm-1'
     call check_iostat(ios,__LINE__,__FILE__)

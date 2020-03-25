@@ -1911,7 +1911,7 @@ CONTAINS
                 CASE (io_col7)
                    if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,n_k) = loc_ocn(io_DIC_13C) - loc_ocn(io)
                 CASE (io_col8)
-                   if (ocn_select(io_DIC_14C) .AND. ctrl_force_ocn_age) then
+                   if (ocn_select(io_DIC_14C)) then
                       loc_standard = const_standards(ocn_type(io_DIC_14C))
                       loc_tot     = dum_atm(ia_pCO2)
                       loc_frac    = dum_atm(ia_pCO2_14C)
@@ -1922,15 +1922,9 @@ CONTAINS
                       loc_d14Cocn = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                       bio_remin(io,dum_i,dum_j,n_k) = &
                            & const_lamda_14C_libby*log( (loc_d14Catm+1000.0)/(loc_d14Cocn+1000.0) ) - loc_ocn(io)
-                   else
-                      !!! (alternative preformed tracer?)
                    end if
                 CASE (io_col9)
-                   if (ocn_select(io_DIC) .AND. ctrl_bio_remin_redox_save) then
-                      bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)
-                   else
-                      !!! (alternative preformed tracer?)
-                   end if
+                   if (ocn_select(io_DIC) bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)
                 end select
              end if
           end do

@@ -1070,7 +1070,7 @@ CONTAINS
                       DO j=1,n_j
                          DO k=goldstein_k1(i,j),n_k
                             select case (io)
-                            CASE (io_col0:io_col6,io_col9)
+                            CASE (io_col0:io_col6)
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
                                loc_unitsname  = 'mol kg-1'
                             CASE (io_col7)
@@ -1082,6 +1082,9 @@ CONTAINS
                             CASE (io_col8)
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
                                loc_unitsname  = 'yrs'
+                            CASE (io_col9)
+                               loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                               loc_unitsname  = 'mol kg-1'
                             case default
                                ! NOTHING DOING
                             end select
@@ -1107,17 +1110,9 @@ CONTAINS
                    CASE (io_col7)
                       if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
                    CASE (io_col8)
-                      if (ocn_select(io_DIC_14C) .AND. ctrl_force_ocn_age) then
-                         loc_name = 'diag_pre_d14C_age'
-                      else
-                         !!! (alternative preformed tracer?)
-                      end if
+                      if (ocn_select(io_DIC_14C)) loc_name = 'diag_pre_d14C_age'
                    CASE (io_col9)
-                      if (ocn_select(io_DIC) .AND. ctrl_bio_remin_redox_save) then
-                         loc_name = 'diag_pre_Csoft'
-                      else
-                         !!! (alternative preformed tracer?)
-                      end if
+                      if (ocn_select(io_DIC)      loc_name = 'diag_pre_Csoft'
                    end select
                    call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
                         & trim(loc_unitsname),const_real_zero,const_real_zero)
