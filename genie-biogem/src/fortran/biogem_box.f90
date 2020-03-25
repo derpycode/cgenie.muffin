@@ -3937,7 +3937,7 @@ CONTAINS
           loc_scav_dFe = dum_ocn_Fe
        end select
        ! ----------------------------------------------------- ! set output [Fe]
-       ! cap Fe scavenging
+       ! cap Fe scavenging at maximum of available Fe
        fun_box_scav_Fe = MIN(loc_scav_dFe,loc_f*dum_ocn_Fe)
        ! ----------------------------------------------------- !
     end if
