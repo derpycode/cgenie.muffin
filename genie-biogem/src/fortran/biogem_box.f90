@@ -647,7 +647,7 @@ CONTAINS
          & '2N2T_PN_Tdep',          &
          & '3N2T_PNFe_Tdep'         &
          & )
-       loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
+       loc_kT = par_bio_kT0*exp((loc_TC+par_bio_kT_dT)/par_bio_kT_eT)
     case (           &
          & 'bio_PFe_OCMIP2' &
          & )

@@ -3139,7 +3139,7 @@ CONTAINS
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        SELECT CASE (sed_type(is))
-       CASE (1,2,4)
+       CASE (1,2,3,4)
           loc_sed_ave = SUM(int_bio_settle_timeslice(is,:,:,n_k))/int_t_timeslice/loc_ocn_tot_A
           write(unit=out,fmt='(A13,A16,A3,f10.3,A15,A5,E15.7,A9)',iostat=ios) &
                & ' Export flux ',string_sed(is),' : ', &
@@ -3171,7 +3171,7 @@ CONTAINS
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        SELECT CASE (sed_type(is))
-       CASE (1,2,4)
+       CASE (1,2,3,4)
           loc_sed_ave = SUM(int_focnsed_timeslice(is,:,:))/int_t_timeslice/loc_ocn_tot_A
           write(unit=out,fmt='(A13,A16,A3,f10.3,A15,A5,E15.7,A9)',iostat=ios) &
                & ' Export flux ',string_sed(is),' : ', &
@@ -3225,6 +3225,29 @@ CONTAINS
          & ' mol yr-1 = ', &
          & 1.0E-12*conv_CaCO3_mol_kgC*SUM(int_focnsed_timeslice(is_CaCO3,:,:))/int_t_timeslice, &
          & ' PgC yr-1'
+    Write(unit=out,fmt=*) ' '
+    IF (sed_select(is_POP)) THEN
+       loc_tot = SUM(int_bio_settle_timeslice(is_POP,:,:,n_k))
+       IF (loc_tot > const_real_nullsmall) THEN
+          write(unit=out,fmt='(A22,f7.3)',iostat=ios) &
+               & ' Export C/P         : ',            &
+               & SUM(int_bio_settle_timeslice(is_POC,:,:,n_k))/loc_tot
+       else
+          write(unit=out,fmt='(A22,A3)',iostat=ios) &
+               & ' Export C/P         : ',          &
+               & 'NaN'
+       end if
+       loc_tot = SUM(int_focnsed_timeslice(is_POP,:,:))
+       IF (loc_tot > const_real_nullsmall) THEN
+          write(unit=out,fmt='(A22,f7.3)',iostat=ios) &
+               & ' Sediment rain C/P  : ',          &
+               & SUM(int_focnsed_timeslice(is_POC,:,:))/loc_tot
+       else
+          write(unit=out,fmt='(A22,A3)',iostat=ios) &
+               & ' Sediment rain C/P  : ',          &
+               & 'NaN'
+       end if
+    end if
     if (int_diag_bio_sig(idiag_bio_dPO4) < const_real_nullsmall) then
        int_diag_bio_sig(idiag_bio_dPO4) = const_real_nullsmall
     end if

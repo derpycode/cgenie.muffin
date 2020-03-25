@@ -2665,6 +2665,10 @@
                         <value datatype="real">5000.0</value>
                         <description>ocean depth scale (m)</description>
                     </param>
+                    <param name="par_dk">
+                        <value datatype="integer">0</value>
+                        <description>Additional ocean layers (deeper than go_par_dsc)</description>
+                    </param>
                 </namelist>
             </file>
         </model>
@@ -4201,6 +4205,10 @@
 			<value datatype="real">15.8</value>
                         <description>e-folding temperature (K) for T-dep. uptake rate modifier</description>
                     </param>
+                    <param name="par_bio_kT_dT">
+			<value datatype="real">0.0</value>
+                        <description>temperature offset for T-dependent bio schemes</description>
+                    </param>
 <!-- ORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POP_PON">
 			<value datatype="real">16.0</value>
@@ -4619,6 +4627,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_POC_eta">
 						<value datatype="real">1.17</value>
                         <description>exponent relating e-folding depth to ecogem size class [Stemmann et al 2004]</description>
+                    </param>
+                    <param name="ctrl_bio_remin_ecogemMLD">
+                       <value datatype="boolean">.false.</value>
+                        <description>Dilute tracers across the mixed layer</description>
                     </param>
 <!-- kinetics -->
                     <param name="par_bio_remin_k_O2">
@@ -8412,6 +8424,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
 	                  <description>restrict MLD for mean light calculation?</description>
                     </param>
+                    <param name="ctrl_PARseaicelimit">
+			<value datatype="boolean">.false.</value>
+	                  <description>PAR attenutation by sea-ice cover?</description>
+                    </param>
        <!-- Grazing parameters -->  
                     <param name="trophic_tradeoff">
 			<value datatype="real">1.0</value>
@@ -8514,6 +8530,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="beta_mort_c">
 			<value datatype="real">100.0</value>
 	                  <description>Fraction mortality to dissolved - midpoint vol.</description>
+                    </param>
+                    <param name="par_beta_POCtoDOC">
+			<value datatype="real">1.0</value>
+	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
                     </param>
 <!-- initial fractional abundance of particulate export -->  
                     <param name="par_bio_remin_POC_frac2">
