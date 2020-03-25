@@ -152,6 +152,8 @@ MODULE biogem_lib
   real::par_bio_kT0                                              ! coefficient for temperature-dependent uptake rate modifier
   real::par_bio_kT_eT                                            ! e-folding temp (K) for temp-dependent uptake rate modifier
   NAMELIST /ini_biogem_nml/par_bio_zc,par_bio_I_eL,par_bio_kT0,par_bio_kT_eT
+  real::par_bio_kT_dT                                            ! temperature offset for T-dependent bio schemes
+  NAMELIST /ini_biogem_nml/par_bio_kT_dT
   ! ------------------- ORGANIC MATTER EXPORT RATIOS ----------------------------------------------------------------------------- !
   real::par_bio_red_POP_PON                                             ! N/P organic matter Redfield ratio
   real::par_bio_red_POP_POC                                             ! C/P organic matter Redfield ratio
@@ -370,6 +372,9 @@ MODULE biogem_lib
   real::par_bio_remin_cO2_ItoIO3
   real::par_bio_remin_cIO3_IO3toI
   NAMELIST /ini_biogem_nml/par_bio_remin_cO2_IO3toI,par_bio_remin_cO2_ItoIO3,par_bio_remin_cIO3_IO3toI
+  ! ECOGEM coupling
+  LOGICAL::ctrl_bio_remin_ecogemMLD                              ! dilute tracers across the mixed layer
+  NAMELIST /ini_biogem_nml/ctrl_bio_remin_ecogemMLD
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
   CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
   NAMELIST /ini_biogem_nml/opt_d13C_DIC_Corg
@@ -742,7 +747,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_k = inl1_ocn                            !
   ! misc arrays dimensions
   INTEGER,PARAMETER::n_phys_ocn                           = 24 ! number of ocean box physical descriptors
-  INTEGER,PARAMETER::n_phys_ocnatm                        = 25 ! number of ocean-atmosphere interface physical descriptors
+  INTEGER,PARAMETER::n_phys_ocnatm                        = 26 ! number of ocean-atmosphere interface physical descriptors
   INTEGER,PARAMETER::n_data_max     = 32767                    ! (maximum) number of (time series) data points (2^15 - 1)
   ! options arrays dimensions
   INTEGER,PARAMETER::n_opt_misc                           = 14 ! miscellaneous
@@ -813,6 +818,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::ipoa_totFe                           = 17   ! total aeolian Fe input (mol yr-1)
   INTEGER,PARAMETER::ipoa_solFe                           = 18   ! aeolian Fe solubility (fraction)
   INTEGER,PARAMETER::ipoa_mld                             = 19   ! MDL (m below surface)
+  INTEGER,PARAMETER::ipoa_mld_k                           = 26   ! k value of MDL (m below surface)
   INTEGER,PARAMETER::ipoa_evap                            = 20   ! evap
   INTEGER,PARAMETER::ipoa_pptn                            = 21   ! pptn
   INTEGER,PARAMETER::ipoa_seaice_dV                       = 22   ! change in sea-ice volumn
@@ -953,7 +959,8 @@ MODULE biogem_lib
        & 'seaice_dV       ', &
        & 'u               ', &
        & 'v               ', &
-       & 'usurf           ' /)
+       & 'usurf           ', &
+       & 'MLD_k           ' /)
   ! diagnostics - biology
   CHARACTER(len=14),DIMENSION(n_diag_bio),PARAMETER::string_diag_bio = (/ &
        & 'dPO4          ', &
