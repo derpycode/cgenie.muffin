@@ -2972,12 +2972,17 @@ CONTAINS
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_sig_diag = .true.
     case (7)
-       ! BASIC + tracer + proxy diagnostics
+       ! BASIC + biology + tracer + proxy diagnostics
+       ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag = .true.
     case (8)
-       ! BASIC + biology + geochem + tracer + proxy diagnostics
+       ! BASIC + biology + tracer + proxy + geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
@@ -3035,7 +3040,7 @@ CONTAINS
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (15)
-       ! BASIC + biology + geochem diagnostics
+       ! BASIC + biology + FULL geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
@@ -3054,8 +3059,45 @@ CONTAINS
        ctrl_data_save_sig_focnsed = .true.
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
+    case (16)
+       ! BASIC + tracer diagnostics + FULL geochem diagnostics
+       ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_slice_carb = .true.
+       ctrl_data_save_slice_diag_geochem = .true.
+       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
+       ctrl_data_save_sig_fairsea = .true.
+       ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_carb_sur = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
+       ctrl_bio_remin_redox_save=.true.
+    case (17)
+       ! BASIC + biology + tracer + proxy diagnostics + FULL geochem
+       ctrl_data_save_slice_focnatm = .true.
+       ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_carb = .true.
+       ctrl_data_save_slice_diag_bio = .true.
+       ctrl_data_save_slice_diag_geochem = .true.
+       ctrl_data_save_slice_diag_proxy = .true.
+       ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_slice_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
+       ctrl_data_save_sig_carb_sur = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_fairsea = .true.
+       ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_diag = .true.
+       ctrl_data_save_sig_diag_bio = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
+       ctrl_data_save_derived = .true.
+       ctrl_bio_remin_redox_save=.true.
     case (18)
-       ! BASIC + biology + geochem + tracer + proxy diagnostics
+       ! BASIC + biology + tracer + proxy diagnostics + FULL geochem
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
