@@ -4066,21 +4066,15 @@ CONTAINS
     ! CALCULATE Os SCAVENGING
     ! -------------------------------------------------------- !
     ! estimate Os scavenging
-    ! NOTE: cap Os removal at the minimum of ([Os], [POC])
     ! NOTE: select if scavenging should be dependent on ambient O2 concentration. 
-    !       If yes, Os is only scavenged below an adjustable O2 threshold
+    !       If yes, Os is only scavenged below an adjustable O2 threshold.
     if ((ctrl_Os_scav_O2_dep) .and. (dum_ocn_O2 < par_scav_Os_O2_threshold)) then
        loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*dum_dt_scav*dum_bio_part(is2l(is_POC))
-       !!! UNNECESSARY? !!! loc_Os_scavenging = min(loc_Os_scavenging,dum_bio_part(is2l(is_POC)),loc_Os)
     elseif (.not. ctrl_Os_scav_O2_dep) then
        loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*dum_dt_scav*dum_bio_part(is2l(is_POC))
-       !!! UNNECESSARY? !!! loc_Os_scavenging = min(loc_Os_scavenging,dum_bio_part(is2l(is_POC)),loc_Os)
     else
        loc_Os_scavenging = 0.0
     end if
-    ! cap Os scavenging
-    loc_Os_scavenging = MIN(loc_Os_scavenging,loc_f*loc_Os)
-    !!! UNNECESSARY !!! if (loc_Os_scavenging < const_real_nullsmall) loc_Os_scavenging = 0.0
     ! Assume no isotopic fractionation during scavenging
     loc_Os_187Os_scavenging = loc_Os_187Os*loc_Os_scavenging/loc_Os
     loc_Os_188Os_scavenging = loc_Os_188Os*loc_Os_scavenging/loc_Os
