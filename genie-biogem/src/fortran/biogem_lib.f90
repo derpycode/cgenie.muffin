@@ -702,20 +702,21 @@ MODULE biogem_lib
   integer::par_force_point_j                                     ! 'j' coordinate of point forcing
   integer::par_force_point_k                                     ! 'k' coordinate of point forcing
   NAMELIST /ini_biogem_nml/par_force_point_i,par_force_point_j,par_force_point_k
-  REAL::par_force_invert_ohmega                                ! surface ocean saturation state target
+  REAL::par_force_invert_ohmega                                 ! surface ocean saturation state target
   NAMELIST /ini_biogem_nml/par_force_invert_ohmega
-  logical::ctrl_force_invert_noneg                               ! prevent negative inversion fluxes (i.e. no removal)
+  logical::ctrl_force_invert_noneg                              ! prevent negative inversion fluxes (i.e. no removal)
   NAMELIST /ini_biogem_nml/ctrl_force_invert_noneg
-  logical::ctrl_force_ohmega_calcite                             ! Calcite saturation as the saturation target?
+  logical::ctrl_force_ohmega_calcite                            ! Calcite saturation as the saturation target?
   NAMELIST /ini_biogem_nml/ctrl_force_ohmega_calcite
-  logical::ctrl_force_invert_Corgburial                        ! Allow carbon removal via Corg?
+  logical::ctrl_force_invert_Corgburial                         ! Allow carbon removal via Corg?
   NAMELIST /ini_biogem_nml/ctrl_force_invert_Corgburial
-  real::par_force_invert_fCorgburial                           ! Scaling C burial flux relative to emissions
+  real::par_force_invert_fCorgburial                            ! Scaling C burial flux relative to emissions
   NAMELIST /ini_biogem_nml/par_force_invert_fCorgburial
-  logical::ctrl_force_invert_explicit                        ! Force explicit inversion?
+  logical::ctrl_force_invert_explicit                           ! Force explicit inversion?
   NAMELIST /ini_biogem_nml/ctrl_force_invert_explicit
   logical::ctrl_force_ocn_age                                   ! automatic ocean age tracer
-  NAMELIST /ini_biogem_nml/ctrl_force_ocn_age
+  logical::ctrl_force_ocn_age1                                  ! Or ... automatic ocean age single-tracer tracer?
+  NAMELIST /ini_biogem_nml/ctrl_force_ocn_age,ctrl_force_ocn_age1
   ! ---------------- TRANSPORT MATRIX---------------------------!
   LOGICAL::ctrl_data_diagnose_TM !                              ! diagnose matrix in run?
   NAMELIST /ini_biogem_nml/ctrl_data_diagnose_TM

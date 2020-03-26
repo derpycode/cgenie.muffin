@@ -940,7 +940,7 @@ CONTAINS
        END DO
     END IF
     ! age tracers
-    IF (ctrl_data_save_sig_ocn .AND. ctrl_force_ocn_age) THEN
+    IF (ctrl_data_save_sig_ocn .AND. (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1)) THEN
        loc_filename=fun_data_timeseries_filename(loc_t, &
             & par_outdir_name,trim(par_outfile_name)//'_series','misc_col_age',string_results_ext)
        IF (ctrl_data_save_sig_ocn_sur) THEN
@@ -2553,13 +2553,22 @@ CONTAINS
        END DO
     end IF
     ! age tracers
-    IF (ctrl_data_save_sig_ocn .AND. ctrl_force_ocn_age) THEN
+    IF (ctrl_data_save_sig_ocn .AND. (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1)) THEN
        loc_filename=fun_data_timeseries_filename( &
             & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_col_age',string_results_ext)
-       loc_sig = int_misc_age_sig - dum_t
+       if (ctrl_force_ocn_age) then
+          loc_sig = int_misc_age_sig - dum_t
+       elseif (ctrl_force_ocn_age1) then
+          loc_sig = int_misc_age_sig
+       end if
        IF (ctrl_data_save_sig_ocn_sur .OR. (par_data_save_level > 3)) THEN
-          loc_sig_sur = int_misc_age_sur_sig - dum_t
-          loc_sig_ben = int_misc_age_ben_sig - dum_t
+          if (ctrl_force_ocn_age) then
+             loc_sig_sur = int_misc_age_sur_sig - dum_t
+             loc_sig_ben = int_misc_age_ben_sig - dum_t
+          elseif (ctrl_force_ocn_age1) then
+             loc_sig_sur = int_misc_age_sur_sig
+             loc_sig_ben = int_misc_age_ben_sig
+          end if
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
