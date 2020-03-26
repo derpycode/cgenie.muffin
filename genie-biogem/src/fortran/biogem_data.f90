@@ -724,10 +724,9 @@ CONTAINS
        if (ctrl_ocn_rst_reset_T) then
           ocn(io_T,:,:,:) = ocn_init(io_T)
        end if
+       ! NOTE: no adjustment needed for single tracer age (ctrl_force_ocn_age1)
        if (ctrl_force_ocn_age) then
           ocn(io_colb,:,:,:) = ocn(io_colb,:,:,:) + par_misc_t_runtime*ocn(io_colr,:,:,:)
-       elseif (ctrl_force_ocn_age1) then
-          ocn(io_colr,:,:,:) = par_misc_t_runtime
        end if
     end If
     ! -------------------------------------------------------- !
