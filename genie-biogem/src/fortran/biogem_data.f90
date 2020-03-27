@@ -150,6 +150,7 @@ CONTAINS
        print*,'Light e-folding depth (m) (OCMIP-2)                 : ',par_bio_I_eL
        print*,'Coefficient for T-dep. uptake rate modifier         : ',par_bio_kT0
        print*,'e-folding temp. (K) for T-dep. uptake rate modifier : ',par_bio_kT_eT
+       print*,'temperature offset for T-dependent bio schemes      : ',par_bio_kT_dT
        ! --- ORGANIC MATTER EXPORT RATIOS ---------------------------------------------------------------------------------------- !
        print*,'--- ORGANIC MATTER EXPORT RATIOS -------------------'
        print*,'N/P organic matter Redfield ratio                   : ',par_bio_red_POP_PON
@@ -280,6 +281,7 @@ CONTAINS
        print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
+       print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD 
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'CaCO3 44Ca fractionation scheme ID string           : ',trim(opt_d44Ca_Ca_CaCO3)
