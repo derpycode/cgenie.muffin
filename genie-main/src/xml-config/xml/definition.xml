@@ -358,7 +358,7 @@
                         <description></description>
                     </param>
                     <param name="debug_loop">
-                        <value datatype="integer">2</value>
+                        <value datatype="integer">1</value>
                         <description></description>
                     </param>
                     <param name="debug_end">
