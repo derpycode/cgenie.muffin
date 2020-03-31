@@ -3052,6 +3052,11 @@ CONTAINS
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_bio_remin_redox_save=.true.
+    case (12)
+       ! BASIC + tracer + full physics
+       ctrl_data_save_slice_phys_atm = .true.
+       ctrl_data_save_slice_phys_ocn = .true.
+       ctrl_data_save_slice_diag_tracer = .true.
     case (14)
        ! BASIC + FULL (inc. redox) geochem diagnostics
        ctrl_data_save_slice_carb = .true.
