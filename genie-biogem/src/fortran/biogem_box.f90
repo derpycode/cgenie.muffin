@@ -609,7 +609,6 @@ CONTAINS
          & '2N2T_PO4MM_NO3',    &
          & '2N2T_PN_Tdep',      &
          & '3N2T_PNFe_Tdep'     &
-         
          & )
        loc_kI = phys_ocnatm(ipoa_solfor,dum_i,dum_j)/phys_solar_constant
     case (                        &
@@ -4504,6 +4503,7 @@ CONTAINS
     END DO
     ! normalize flux forcings (if selected) so that the total flux is equal to the magnitude (at the current time step)
     ! defined in the forcing signal file
+    ! NOTE: add det tracer to normalization
     IF (force_flux_sed_scale(dum_is)) THEN
        if (abs(loc_force_flux_sed_tot) > const_real_nullsmall) then
           loc_force_flux_sed_rtot = 1.0/loc_force_flux_sed_tot
@@ -4513,7 +4513,7 @@ CONTAINS
        DO i=1,n_i
           DO j=1,n_j
              SELECT CASE (sed_type(dum_is))
-             CASE (par_sed_type_bio)
+             CASE (par_sed_type_bio,par_sed_type_abio)
                 force_flux_sed(dum_is,i,j) = force_flux_sed(dum_is,i,j)*force_flux_sed_sig_x(dum_is)*loc_force_flux_sed_rtot
              end SELECT
           END DO
