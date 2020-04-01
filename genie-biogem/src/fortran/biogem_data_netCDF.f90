@@ -1828,7 +1828,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       WATER-COLUMN INTEGRATED TRACER INVENTORIES
     !----------------------------------------------------------------
-    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_tracer) .OR. (par_data_save_level == 10)) then
+    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_geochem) .OR. (par_data_save_level == 10)) then
        loc_unitsname = 'mol m-2'
        DO l=3,n_l_ocn
           io = conv_iselected_io(l)
@@ -2154,7 +2154,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       save ocn->sed interface flux data
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_focnsed) then
+    If (ctrl_data_save_slice_focnsed .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           loc_ij(:,:) = const_real_zero
@@ -2642,7 +2642,7 @@ CONTAINS
                & loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end if
        ! color tracer ratios -- as an age tracer
-       IF (ctrl_force_ocn_age) then
+       IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) then
           CALL sub_save_netcdf_ocn_col_extra(dum_t)
        end IF
     end if
@@ -3194,6 +3194,10 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,4,'misc_col_Dage','color tracers; ventilation age','(yrs)',loc_c0,loc_c0)
        call sub_putvar3d_g('misc_col_Dage',loc_iou,n_i,n_j,n_k,loc_ntrec, &
             & loc_colage(:,:,:)-dum_t,loc_mask)
+    elseif (ctrl_force_ocn_age1) then
+       call sub_adddef_netcdf(loc_iou,4,'misc_col_Dage','color tracer; ventilation age','(yrs)',loc_c0,loc_c0)
+       call sub_putvar3d_g('misc_col_Dage',loc_iou,n_i,n_j,n_k,loc_ntrec, &
+            & int_ocn_timeslice(io_colr,:,:,:),loc_mask)
     else
        call sub_adddef_netcdf(loc_iou,4,'misc_bMINUSr','color tracers; [b] minus [r]','mol kg-1',loc_c0,loc_c0)
        call sub_putvar3d_g ('misc_bMINUSr',loc_iou,n_i,n_j,n_k,loc_ntrec, &

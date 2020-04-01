@@ -518,6 +518,7 @@ CONTAINS
        print*,'Scaling C burial flux relative to emissions         : ',par_force_invert_fCorgburial
        print*,'Force explicit inversion?                           : ',ctrl_force_invert_explicit
        print*,'Automatic ocean age tracer?                         : ',ctrl_force_ocn_age
+       print*,'Or ... automatic ocean age single-tracer tracer?    : ',ctrl_force_ocn_age1
        ! --- TRANSPORT MATRIX ---------------------------------------------------------------------------------------------------- !
        print*,'Diagnose transport matrix during run?		: ',ctrl_data_diagnose_TM
        print*,'Year to start diagnosing transport matrix	: ',par_data_TM_start
@@ -723,6 +724,7 @@ CONTAINS
        if (ctrl_ocn_rst_reset_T) then
           ocn(io_T,:,:,:) = ocn_init(io_T)
        end if
+       ! NOTE: no adjustment needed for single tracer age (ctrl_force_ocn_age1)
        if (ctrl_force_ocn_age) then
           ocn(io_colb,:,:,:) = ocn(io_colb,:,:,:) + par_misc_t_runtime*ocn(io_colr,:,:,:)
        end if
@@ -2431,7 +2433,7 @@ CONTAINS
        end if
     end if
     ! check color tracers
-    if (ctrl_force_ocn_age .AND. (.NOT.(ocn_select(io_colr) .AND. ocn_select(io_colb)))) then
+    if ( ctrl_force_ocn_age .AND. (.NOT.(ocn_select(io_colr) .AND. ocn_select(io_colb))) ) then
           CALL sub_report_error( &
                & 'biogem_data','sub_check_par', &
                & 'Parameter: ctrl_force_ocn_age is selected (true), but the necessary red and blue ocean tracers are not.'// &
@@ -2440,6 +2442,16 @@ CONTAINS
                & (/const_real_null/),.FALSE. &
                & )
        ctrl_force_ocn_age = .false.
+    end if
+    if ( ctrl_force_ocn_age1 .AND. (.NOT. ocn_select(io_colr)) ) then
+          CALL sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'Parameter: ctrl_force_ocn_age1 is selected (true), but the necessary red ocean tracer is not.'// &
+               & 'The automatic age tracer option is hence deselected.', &
+               & 'CONTINUING', &
+               & (/const_real_null/),.FALSE. &
+               & )
+       ctrl_force_ocn_age1 = .false.
     end if
 
     ! *** parameter consistency check - isotopes, forcings ***
@@ -2912,13 +2924,13 @@ CONTAINS
        ctrl_data_save_slice_ocnatm = .true.
        ctrl_data_save_slice_ocn = .true.
        ctrl_data_save_slice_misc = .true.
-       ctrl_data_save_slice_ocnsed = .true.
+       if (flag_sedgem) ctrl_data_save_slice_ocnsed = .true.
        ctrl_data_save_sig_ocnatm = .true.
        ctrl_data_save_sig_ocn = .true.
        ctrl_data_save_sig_ocn_sur = .true.
        ctrl_data_save_sig_misc = .true.
        ctrl_data_save_GLOBAL = .true.
-       ctrl_data_save_sig_ocnsed = .true.
+       if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
     case default
        ! NOTHING
     end select
@@ -3040,8 +3052,12 @@ CONTAINS
        ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
-       ctrl_data_save_sig_diag = .true.
        ctrl_bio_remin_redox_save=.true.
+    case (12)
+       ! BASIC + tracer + full physics
+       ctrl_data_save_slice_phys_atm = .true.
+       ctrl_data_save_slice_phys_ocn = .true.
+       ctrl_data_save_slice_diag_tracer = .true.
     case (14)
        ! BASIC + FULL (inc. redox) geochem diagnostics
        ctrl_data_save_slice_carb = .true.
@@ -3077,43 +3093,6 @@ CONTAINS
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (16)
-       ! BASIC + tracer diagnostics + FULL (inc. redox) geochem diagnostics
-       ctrl_data_save_slice_diag_tracer = .true.
-       ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_fairsea = .true.
-       ctrl_data_save_sig_focnatm = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_diag = .true.
-       ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
-       ctrl_bio_remin_redox_save=.true.
-    case (17)
-       ! BASIC + biology + tracer + proxy diagnostics + FULL (inc. redox) geochem
-       ctrl_data_save_slice_focnatm = .true.
-       ctrl_data_save_slice_bio = .true.
-       ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_diag_bio = .true.
-       ctrl_data_save_slice_diag_geochem = .true.
-       ctrl_data_save_slice_diag_proxy = .true.
-       ctrl_data_save_slice_diag_tracer = .true.
-       ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_fexport = .true.
-       ctrl_data_save_sig_fairsea = .true.
-       ctrl_data_save_sig_focnatm = .true.
-       ctrl_data_save_sig_diag = .true.
-       ctrl_data_save_sig_diag_bio = .true.
-       ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
-       ctrl_data_save_derived = .true.
-       ctrl_bio_remin_redox_save=.true.
-    case (18)
        ! BASIC + biology + tracer + proxy diagnostics + FULL (inc. redox) geochem
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.

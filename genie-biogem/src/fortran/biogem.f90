@@ -268,12 +268,14 @@ subroutine biogem(        &
                  if (force_restore_ocn_select(io_DIC_13C)) then
                     loc_standard = const_standards(ocn_type(io_DIC_13C))
                     loc_force_actual_d13C = loc_force_actual_d13C + loc_k_icefree*&
-                         & fun_calc_isotope_delta(ocn(io_DIC,i,j,n_k),ocn(io_DIC_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
+                         & fun_calc_isotope_delta &
+                              & (ocn(io_DIC,i,j,n_k),ocn(io_DIC_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
                          & loc_k_tot_icefree
                  elseif (force_restore_ocn_select(io_DOM_C_13C)) then
                     loc_standard = const_standards(ocn_type(io_DOM_C_13C))
                     loc_force_actual_d13C = loc_force_actual_d13C + loc_k_icefree*&
-                         & fun_calc_isotope_delta(ocn(io_DOM_C,i,j,n_k),ocn(io_DOM_C_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
+                         & fun_calc_isotope_delta &
+                              & (ocn(io_DOM_C,i,j,n_k),ocn(io_DOM_C_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
                          & loc_k_tot_icefree
                  end if
               end IF
@@ -285,7 +287,8 @@ subroutine biogem(        &
                    & ) THEN
                  loc_standard = const_standards(ocn_type(io_Ca_44Ca))
                  loc_force_actual_d44Ca = loc_force_actual_d44Ca + loc_k_icefree*&
-                      & fun_calc_isotope_delta(ocn(io_Ca,i,j,n_k),ocn(io_Ca_44Ca,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
+                      & fun_calc_isotope_delta &
+                           & (ocn(io_Ca,i,j,n_k),ocn(io_Ca_44Ca,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
                       & loc_k_tot_icefree
               end IF
            end IF
@@ -324,11 +327,20 @@ subroutine biogem(        &
                    & '*** AGE TRACERS ***'
               ! *** AGE TRACERS ***
               ! NOTE: red has unit concentraton input to the surface per year
+              ! NOTE: ctrl_force_ocn_age1 enables a single tracer -- as a 'preformed' age
+              ! force surface value
               if (ctrl_force_ocn_age) then
-                 bio_remin(io_colr,i,j,n_k) = bio_remin(io_colr,i,j,n_k) + &
-                      & 1.0 - ocn(io_colr,i,j,n_k)
-                 bio_remin(io_colb,i,j,n_k) = bio_remin(io_colb,i,j,n_k) + &
-                      & loc_t*1.0 - ocn(io_colb,i,j,n_k)
+                 bio_remin(io_colr,i,j,n_k) = bio_remin(io_colr,i,j,n_k) + (1.0 - ocn(io_colr,i,j,n_k))
+                 bio_remin(io_colb,i,j,n_k) = bio_remin(io_colb,i,j,n_k) + (loc_t*1.0 - ocn(io_colb,i,j,n_k))
+              elseif (ctrl_force_ocn_age1) then
+                 bio_remin(io_colr,i,j,n_k) = bio_remin(io_colr,i,j,n_k) + (0.0 - ocn(io_colr,i,j,n_k))
+              end if
+              ! age ocean interior
+              ! NOTE: exclude surface layer
+              if (ctrl_force_ocn_age1) then
+                 DO k=loc_k1,n_k-1
+                    bio_remin(io_colr,i,j,k) = bio_remin(io_colr,i,j,k) + loc_dtyr
+                 END DO
               end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -1451,14 +1463,14 @@ subroutine biogem(        &
                    & '*** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***
               if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                 !call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
+                 call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** WATER COLUMN REMINERALIZATION - ANAEROBIC CH4 OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - ANAEROBIC CH4 OXIDATION ***
               if (ocn_select(io_O2) .AND. ocn_select(io_SO4) .AND. ocn_select(io_CH4)) then
-                 !call sub_calc_bio_remin_oxidize_CH4_AOM(i,j,loc_k1,loc_dtyr)
+                 call sub_calc_bio_remin_oxidize_CH4_AOM(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -3408,8 +3420,20 @@ SUBROUTINE diag_biogem_timeseries( &
                           DO k=loc_k1,n_k
                              if (ocn(io_colr,i,j,k) > const_real_nullsmall) then
                                 int_misc_age_sig = int_misc_age_sig + &
-                                     & loc_dtyr*phys_ocn(ipo_M,i,j,k)*ocn(io_colb,i,j,k)/ocn(io_colr,i,j,k)*loc_ocn_rtot_M
+                                     & loc_dtyr*loc_ocn_rtot_M*phys_ocn(ipo_M,i,j,k)*ocn(io_colb,i,j,k)/ocn(io_colr,i,j,k)
                              end if
+                          end DO
+                       end IF
+                    end DO
+                 end DO
+              elseIF (ctrl_force_ocn_age1) THEN
+                 DO i=1,n_i
+                    DO j=1,n_j
+                       loc_k1 = goldstein_k1(i,j)
+                       IF (n_k >= loc_k1) THEN
+                          DO k=loc_k1,n_k
+                             int_misc_age_sig = int_misc_age_sig + &
+                                  & loc_dtyr*loc_ocn_rtot_M*phys_ocn(ipo_M,i,j,k)*ocn(io_colr,i,j,k)
                           end DO
                        end IF
                     end DO
@@ -3466,9 +3490,19 @@ SUBROUTINE diag_biogem_timeseries( &
                        loc_k1 = goldstein_k1(i,j)
                        IF (n_k >= loc_k1) THEN
                           if (ocn(io_colr,i,j,n_k) > const_real_nullsmall) then
-                             int_misc_age_sur_sig = int_misc_age_sur_sig + loc_dtyr*loc_ocn_rtot_A*&
-                                  & phys_ocn(ipo_A,i,j,n_k)*ocn(io_colb,i,j,n_k)/ocn(io_colr,i,j,n_k)
+                             int_misc_age_sur_sig = int_misc_age_sur_sig + &
+                                  & loc_dtyr*loc_ocn_rtot_A*phys_ocn(ipo_A,i,j,n_k)*ocn(io_colb,i,j,n_k)/ocn(io_colr,i,j,n_k)
                           end if
+                       end IF
+                    end DO
+                 end DO
+              elseIF (ctrl_force_ocn_age1) THEN
+                 DO i=1,n_i
+                    DO j=1,n_j
+                       loc_k1 = goldstein_k1(i,j)
+                       IF (n_k >= loc_k1) THEN
+                          int_misc_age_sur_sig = int_misc_age_sur_sig + &
+                               & loc_dtyr*loc_ocn_rtot_A*phys_ocn(ipo_A,i,j,n_k)*ocn(io_colr,i,j,n_k)
                        end IF
                     end DO
                  end DO
@@ -3497,6 +3531,16 @@ SUBROUTINE diag_biogem_timeseries( &
                              int_misc_age_ben_sig = int_misc_age_ben_sig + loc_dtyr*loc_ocnsed_rtot_A_ben*locij_mask_ben(i,j)*&
                                   & phys_ocn(ipo_A,i,j,n_k)*locij_ocn_ben(io_colb,i,j)/locij_ocn_ben(io_colr,i,j)
                           end if
+                       end IF
+                    end DO
+                 end DO
+              elseIF (ctrl_force_ocn_age1) THEN
+                 DO i=1,n_i
+                    DO j=1,n_j
+                       loc_k1 = goldstein_k1(i,j)
+                       IF (n_k >= loc_k1) THEN
+                          int_misc_age_ben_sig = int_misc_age_ben_sig + loc_dtyr*loc_ocnsed_rtot_A_ben*locij_mask_ben(i,j)*&
+                               & phys_ocn(ipo_A,i,j,n_k)*locij_ocn_ben(io_colr,i,j)
                        end IF
                     end DO
                  end DO
