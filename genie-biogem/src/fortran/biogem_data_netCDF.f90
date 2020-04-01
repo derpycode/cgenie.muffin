@@ -1065,17 +1065,26 @@ CONTAINS
              do io=io_col0,io_col9
                 if (ocn_select(io)) then
                    loc_ijk(:,:,:) = const_real_null
+                   loc_unitsname = '???'
                    DO i=1,n_i
                       DO j=1,n_j
                          DO k=goldstein_k1(i,j),n_k
                             select case (io)
                             CASE (io_col0:io_col6)
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                               loc_unitsname  = 'mol kg-1'
                             CASE (io_col7)
-                               loc_tot  = int_ocn_timeslice(io_col0,i,j,k)/int_t_timeslice
-                               loc_frac = int_ocn_timeslice(io_col7,i,j,k)/int_t_timeslice
-                               loc_standard = const_standards(ocn_type(io_DIC_13C))
+                               loc_tot        = int_ocn_timeslice(io_col0,i,j,k)/int_t_timeslice
+                               loc_frac       = int_ocn_timeslice(io_col7,i,j,k)/int_t_timeslice
+                               loc_standard   = const_standards(ocn_type(io_DIC_13C))
                                loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                               loc_unitsname  = 'o/oo'
+                            CASE (io_col8)
+                               loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                               loc_unitsname  = 'yrs'
+                            CASE (io_col9)
+                               loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                               loc_unitsname  = 'mol kg-1'
                             case default
                                ! NOTHING DOING
                             end select
@@ -1083,33 +1092,27 @@ CONTAINS
                       END DO
                    END DO
                    select case (io)
-                   CASE (io_col0:io_col6)
-                      loc_unitsname = 'mol kg-1'
-                   CASE (io_col7)
-                      loc_unitsname = 'o/oo'
-                   case default
-                      ! NOTHING DOING
-                   end select
-                   loc_name = 'diag_pre_NULL'
-                   select case (io)
                    CASE (io_col0)
-                      if (ocn_select(io_DIC)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC))
+                      if (ocn_select(io_DIC))     loc_name = 'diag_pre_'//trim(string_ocn(io_DIC))
                    CASE (io_col1)
-                      if (ocn_select(io_ALK)) loc_name = 'diag_pre_'//trim(string_ocn(io_ALK))
+                      if (ocn_select(io_ALK))     loc_name = 'diag_pre_'//trim(string_ocn(io_ALK))
                    CASE (io_col2)
-                      if (ocn_select(io_O2)) loc_name = 'diag_pre_'//trim(string_ocn(io_O2))
+                      if (ocn_select(io_O2))      loc_name = 'diag_pre_'//trim(string_ocn(io_O2))
                    CASE (io_col3)
-                      if (ocn_select(io_PO4)) loc_name = 'diag_pre_'//trim(string_ocn(io_PO4))
+                      if (ocn_select(io_PO4))     loc_name = 'diag_pre_'//trim(string_ocn(io_PO4))
                    CASE (io_col4)
-                      if (ocn_select(io_NO3))loc_name = 'diag_pre_'//trim(string_ocn(io_NO3))
+                      if (ocn_select(io_NO3))     loc_name = 'diag_pre_'//trim(string_ocn(io_NO3))
                    CASE (io_col5)
-                      if (ocn_select(io_Ca)) loc_name = 'diag_pre_'//trim(string_ocn(io_Ca))
+                      if (ocn_select(io_Fe))      loc_name = 'diag_pre_'//trim(string_ocn(io_Fe))
+                      if (ocn_select(io_TDFe))    loc_name = 'diag_pre_'//trim(string_ocn(io_TDFe))
                    CASE (io_col6)
-                      if (ocn_select(io_SiO2)) loc_name = 'diag_pre_'//trim(string_ocn(io_SiO2))
+                      if (ocn_select(io_SiO2))    loc_name = 'diag_pre_'//trim(string_ocn(io_SiO2))
                    CASE (io_col7)
                       if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
-                   case default
-                      ! NOTHING DOING
+                   CASE (io_col8)
+                      if (ocn_select(io_DIC_14C)) loc_name = 'diag_pre_d14C_age'
+                   CASE (io_col9)
+                      if (ocn_select(io_DIC))     loc_name = 'diag_pre_Csoft'
                    end select
                    call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
                         & trim(loc_unitsname),const_real_zero,const_real_zero)
@@ -1608,7 +1611,11 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! *** save time-slice data ***
-  SUBROUTINE sub_save_netcdf_2d()
+  SUBROUTINE sub_save_netcdf_2d(dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    real,intent(in)::dum_dtyr
     !-----------------------------------------------------------------------
     !       local variables
     !-----------------------------------------------------------------------
@@ -1616,7 +1623,7 @@ CONTAINS
     integer::ib,id,ip,ic
     integer::loc_k1
     integer::loc_iou,loc_ntrec
-    CHARACTER(len=255)::loc_unitsname
+    CHARACTER(len=255)::loc_unitsname,loc_longname
     real,DIMENSION(n_i,n_j)::loc_ij,loc_mask_surf,loc_mask_surf_ALL
     real::loc_tot,loc_frac,loc_standard
     real::loc_d13C,loc_d14C
@@ -1742,11 +1749,12 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,3,'phys_tau_v','wind stress (v)',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('phys_tau_v',loc_iou,n_i,n_j,loc_ntrec, &
             & int_phys_ocnatm_timeslice(ipoa_tau_v,:,:)/int_t_timeslice,loc_mask_surf)
-       ! (8) convective 'cost'
-       loc_unitsname = '???'
-       call sub_adddef_netcdf(loc_iou,3,'phys_cost','convective cost',trim(loc_unitsname),const_real_zero,const_real_zero)
+       ! (8) convective 'cost' (need to un-do the time-step weighting)
+       loc_unitsname = 'yr-1'
+       loc_longname = 'convective cost (column integrated adjustments per year)'
+       call sub_adddef_netcdf(loc_iou,3,'phys_cost',trim(loc_longname),trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('phys_cost',loc_iou,n_i,n_j,loc_ntrec, &
-            & int_phys_ocnatm_timeslice(ipoa_cost,:,:)/int_t_timeslice,loc_mask_surf)
+            & int_phys_ocnatm_timeslice(ipoa_cost,:,:)/int_t_timeslice/dum_dtyr,loc_mask_surf)
        ! (9) air-sea gas exchange coefficient
        if (opt_select(iopt_select_ocnatm_CO2) .AND. ctrl_data_save_slice_carb) then
           loc_unitsname = 'mol m-2 yr-1 uatm-1'
@@ -2535,6 +2543,7 @@ CONTAINS
     INTEGER::l,i,j,k,io,is,ip,ic,icc,loc_iou,loc_ntrec
     integer::id
     CHARACTER(len=255)::loc_unitsname
+    real,DIMENSION(n_i,n_j)::loc_ij
     real,DIMENSION(n_i,n_j,n_k)::loc_ijk,loc_mask,loc_sed_mask
     real::loc_ocn_mean_S
     real::loc_tot,loc_frac,loc_standard
@@ -2595,13 +2604,41 @@ CONTAINS
                    loc_standard = const_standards(ocn_type(io_DIC_14C))
                    loc_d14C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                    loc_ijk(i,j,k) = fun_convert_delta14CtoD14C(loc_d13C,loc_d14C)
-                   loc_unitsname = 'o/oo'
                 end do
              end do
           end do
+         loc_unitsname = 'o/oo'
           call sub_adddef_netcdf(loc_iou,4,'ocn_DIC_D14C', &
                & ' oceanic D14C (big delta)',trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar3d_g('ocn_DIC_D14C',loc_iou,n_i,n_j,n_k, &
+               & loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       end if
+       ! radiocarbon AGE
+       ! NOTE: assuming the values already in loc_ijk (above)
+       !       BUT need to (re)calculate atmospheric D14C ...
+       IF (ocn_select(io_DIC_13C) .AND. ocn_select(io_DIC_14C)) THEN
+          loc_ij(:,:) = const_real_zero
+          DO i=1,n_i
+             DO j=1,n_j
+                ! first calculate D14C for the atmopshere
+                loc_tot  = int_sfcatm1_timeslice(ia_pCO2,i,j)/int_t_timeslice
+                loc_frac = int_sfcatm1_timeslice(ia_pCO2_13C,i,j)/int_t_timeslice
+                loc_standard = const_standards(atm_type(ia_pCO2_13C))
+                loc_d13C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                loc_frac = int_sfcatm1_timeslice(ia_pCO2_14C,i,j)/int_t_timeslice
+                loc_standard = const_standards(atm_type(ia_pCO2_14C))
+                loc_d14C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                loc_ij(i,j) = fun_convert_delta14CtoD14C(loc_d13C,loc_d14C)
+                ! now convert to radiocarbon age
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = fun_convert_D14Ctoage(loc_ijk(i,j,k),loc_ij(i,j))
+                end do
+             end do
+          end do
+          loc_unitsname = 'years'
+          call sub_adddef_netcdf(loc_iou,4,'ocn_DIC_D14C_age', &
+               & ' oceanic D14C age',trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar3d_g('ocn_DIC_D14C_age',loc_iou,n_i,n_j,n_k, &
                & loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end if
        ! color tracer ratios -- as an age tracer

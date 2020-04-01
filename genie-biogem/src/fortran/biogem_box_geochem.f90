@@ -399,6 +399,7 @@ CONTAINS
     real::loc_O2,loc_Fe2,loc_r56Fe, loc_R_56Fe
     real::loc_Fe2_oxidation
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
@@ -407,43 +408,38 @@ CONTAINS
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! OXIDIZE Fe2
     ! -------------------------------------------------------- !
     ! look for some Fe2 and see if it can be instantaneously oxidized (using O2; if there is any!)
-    ! Fe2 + 1/4*O2 -> Fe3 
+    ! Fe2 + 1/4*O2 + H -> Fe3 + 1/2H2O 
     ! NOTE: loc_Fe2_oxidation_const units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
-       if ((4.0/1.0*loc_O2 > const_rns) .AND. (loc_Fe2 > const_rns)) then
-          ! calculate H2S oxidation, and cap value at H2S concentration if necessary
-          ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
-          loc_Fe2_oxidation = min(dum_dtyr*par_bio_remin_kFe2toFe*loc_Fe2*loc_O2,4.0/1.0*loc_O2)
-          ! calculate isotopic ratio
-          loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
-          if (loc_Fe2_oxidation > loc_Fe2) then
-             ! complete Fe2 oxidation (no S fractionation)
-             loc_Fe2_oxidation = loc_Fe2
-             loc_bio_remin(io_Fe2,k) = -loc_Fe2
-             loc_bio_remin(io_Fe,k)  = loc_Fe2
-             loc_bio_remin(io_O2,k)  = -1.0/4.0*loc_Fe2
-             loc_bio_remin(io_Fe2_56Fe,k) = -loc_r56Fe*loc_Fe2
-             loc_bio_remin(io_Fe_56Fe,k) = loc_r56Fe*loc_Fe2
-          else
-             ! partial Fe2 oxidation (=> Fe isotope Rayleigh fractionation)
-             loc_bio_remin(io_Fe2,k) = -loc_Fe2_oxidation
-             loc_bio_remin(io_Fe,k)  = loc_Fe2_oxidation
-             loc_bio_remin(io_O2,k)  = -1.0/4.0*loc_Fe2_oxidation
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
-             !loc_bio_remin(io_Fe2_56Fe,k) = -loc_r56Fe*loc_Fe2_oxidation
-             !loc_bio_remin(io_Fe_56Fe,k) = loc_r56Fe*loc_Fe2_oxidation
+       if ( loc_O2>const_rns .AND. loc_Fe2>const_rns ) then
+          ! calculate Fe2 oxidation
+          ! NOTE: par_bio_remin_kFe2toFe units are (M-1 yr-1) (default from Millero et al., 1987)
+          ! NOTE: the dependence on OH has been ignored because, well, Fe oxidizes 
+          !       so fast it does not really matter anymore 
+          loc_Fe2_oxidation = dum_dtyr*par_bio_remin_kFe2toFe*loc_Fe2*loc_O2
+          ! cap at some fraction of maximum of available Fe, O2
+          loc_Fe2_oxidation = min(loc_Fe2_oxidation,loc_f*loc_Fe2,loc_f*(4.0/1.0)*loc_O2)
+          ! bulk tracer conversion
+          loc_bio_remin(io_Fe2,k) = -loc_Fe2_oxidation
+          loc_bio_remin(io_Fe,k)  = loc_Fe2_oxidation
+          loc_bio_remin(io_O2,k)  = -1.0/4.0*loc_Fe2_oxidation
+          ! isotopic fractionation
+          ! NOTE: we already know that loc_Fe2 is non-zero
+          if (ocn_select(io_Fe2_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
              loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
              loc_bio_remin(io_Fe2_56Fe,k)  &
                   & = -par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
              loc_bio_remin(io_Fe_56Fe,k)  &
                   & = par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation
-             ! ################################################################################################################### !
           end if
        end if
     end DO
@@ -474,101 +470,6 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! CALCULATE ABIOTIC FeOOH PRECIPITATION
-  SUBROUTINE sub_calc_precip_FeOOH(dum_i,dum_j,dum_k1,dum_dt)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dt
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    INTEGER::k,l,io,is
-    integer::loc_i,loc_tot_i
-    real,dimension(n_ocn,n_k)::loc_bio_uptake
-    real,dimension(n_sed,n_k)::loc_bio_part
-    real::loc_Fe
-    real::loc_r56Fe
-    real::loc_R_56Fe
-    real::loc_alpha_56Fe
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_uptake(io,:) = 0.0
-    end do
-    DO l=3,n_l_sed
-       is = conv_iselected_is(l)
-       loc_bio_part(is,:) = 0.0
-    end DO
-    ! -------------------------------------------------------- !
-    ! CALCULATE FeOOH precipitation
-    ! -------------------------------------------------------- !
-    ! water column loop
-    ! look for existing Fe3 see if it can be instantaneously precipitated
-    ! Fe3+ + 2*H2O -> FeOOH + 3*H+
-    ! NOTE: Simple scheme: Fe3 > 1 nM precipitates
-    DO k=n_k,dum_k1,-1
-       ! set local concentrations
-       loc_Fe = ocn(io_Fe,dum_i,dum_j,k)
-       ! calculate FeOOH precipitation
-       if (ctrl_bio_FeOOHprecip_explicit) then
-          if (loc_Fe > par_FeOOH_Fethresh) then
-             loc_bio_part(is_FeOOH,k) = loc_Fe - par_FeOOH_Fethresh
-             loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
-          else   
-             loc_bio_part(is_FeOOH,k) = 0.0  
-             loc_r56Fe = 0.0
-          end if
-       else   
-          loc_bio_part(is_FeOOH,k) = 0.0  
-          loc_r56Fe = 0.0
-       end if
-       ! calculate isotopic ratio
-       loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
-       ! Potential Fe fractionation
-       loc_bio_part(is_FeOOH_56Fe,k) = &
-            & par_d56Fe_FeOOH_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeOOH_alpha*loc_R_56Fe)*loc_bio_part(is_FeOOH,k)
-       ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          loc_tot_i = conv_sed_ocn_i(0,is)
-          do loc_i=1,loc_tot_i
-             io = conv_sed_ocn_i(loc_i,is)
-             loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
-          end do
-       end DO
-    end DO
-    ! -------------------------------------------------------- !
-    ! SET GLOBAL ARRAYS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
-    end do
-    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
-    DO l=3,n_l_sed
-       is = conv_iselected_is(l)
-       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
-    end DO
-    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
-    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_FeOOH,:)
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
-    diag_precip(idiag_precip_FeOOH_dFe,dum_i,dum_j,:) = -loc_bio_uptake(io_Fe,:)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_precip_FeOOH
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
   ! Reduction of oxidised dissolved Fe3
   SUBROUTINE sub_box_reduce_Fe(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
@@ -583,6 +484,7 @@ CONTAINS
     real::loc_H2S,loc_Fe,loc_r56Fe,loc_R_56Fe,loc_r34S,loc_R_34S
     real::loc_Fe_reduction,loc_H2S_oxidation
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
@@ -591,66 +493,45 @@ CONTAINS
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! REDUCE Fe3 (implicitly, FeOOH)
     ! -------------------------------------------------------- !
-    ! Fe3 + 1/8*H2S -> Fe2 + 1/8*SO4 + 1/4*H+
+    ! Fe3 + 1/8*H2S + 1/2H2O -> Fe2 + 1/8*SO4 + 5/4*H+
     ! NOTE: loc_Fe_reduction_const units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        loc_Fe  = ocn(io_Fe,dum_i,dum_j,k)
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
        ! look for some Fe3 and H2S
-       if ( (loc_H2S>const_rns) .AND. (loc_Fe>const_rns) ) then
-          ! calculate H2S oxidation, and cap value at H2S or Fe3 concentration if necessary
+       if ( loc_H2S>const_rns .AND. loc_Fe>const_rns ) then
+          ! calculate H2S oxidation
           ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
+          ! NOTE: Reaction is taken from Poulton et al. (2004) - kinetic constant is assumed to be '2-line ferrihydrite'
           loc_Fe_reduction = dum_dtyr*par_bio_remin_kFetoFe2*loc_Fe*loc_H2S**(1.0/2.0)
-          ! cap at maximum of available Fe, H2S
-          loc_Fe_reduction  = min(loc_Fe_reduction,loc_Fe,(8.0/1.0)*loc_H2S)
+          ! cap according to available Fe, H2S
+          loc_Fe_reduction  = min(loc_Fe_reduction,loc_f*loc_Fe,loc_f*(8.0/1.0)*loc_H2S)
           loc_H2S_oxidation = (1.0/8.0)*loc_Fe_reduction
-          ! calculate isotopic ratios 
-          ! and check for the isotope fraction being zero or less (to try and avoid spurious isotopic values appearing)
-          if (ocn_select(io_Fe2_56Fe)) then
-             loc_r56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,k)/loc_Fe
-             if (loc_r56Fe<const_rns) then
-                loc_Fe_reduction  = 0.0
-                loc_H2S_oxidation = 0.0
-             end if
-          end if
-          if (ocn_select(io_H2S_34S)) then
-             loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
-             if (loc_r34S<const_rns) then
-                loc_Fe_reduction  = 0.0
-                loc_H2S_oxidation = 0.0
-             end if
-          end if
           ! bulk tracer conversion
           loc_bio_remin(io_Fe,k)  = -loc_Fe_reduction
           loc_bio_remin(io_Fe2,k) = loc_Fe_reduction
           loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
           loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
           loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation
-          ! isotopic fractionation (depending on the existence of partial conversion of either species)
-          ! NOTE: assume that the (4th) case of exactly complete Fe3 and H2S reaction is impossible
-          ! Fe
-          if (abs(loc_Fe_reduction-loc_Fe) < const_rns) then
-             ! complete Fe reduction (no Fe fractionation) & assuming excess H2S
-             loc_bio_remin(io_Fe_56Fe,k)  = -loc_r56Fe*loc_Fe_reduction
-             loc_bio_remin(io_Fe2_56Fe,k) = loc_r56Fe*loc_Fe_reduction
-          else
-             ! partial Fe3 reductuion (& Fe fractionation)
+          ! calculate isotopic fractionation -- 56Fe
+          ! NOTE: we already know that loc_Fe2 is non-zero
+          if (ocn_select(io_Fe2_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
+             loc_r56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,k)/loc_Fe
              loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
              loc_bio_remin(io_Fe_56Fe,k)  = &
                   & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
              loc_bio_remin(io_Fe2_56Fe,k) = &
                   & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction
           end if
-          ! S
-          if (abs(loc_H2S_oxidation-loc_H2S) < const_rns) then
-             ! complete H2S oxidation (no S fractionation) & assuming excess Fe3
-             loc_bio_remin(io_H2S_34S,k)  = -loc_r34S*loc_H2S_oxidation
-             loc_bio_remin(io_SO4_34S,k)  = loc_r34S*loc_H2S_oxidation
-          else
-             ! partial H2S oxidation (& S fractionation)
+          ! calculate isotopic fractionation -- 34S
+          ! NOTE: we already know that loc_H2S is non-zero
+          if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
+             loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
              loc_R_34S = loc_r34S/(1.0 - loc_r34S) 
              loc_bio_remin(io_H2S_34S,k) = &
                   & -par_d34S_Fered_alpha*loc_R_34S/(1.0 + par_d34S_Fered_alpha*loc_R_34S)*loc_H2S_oxidation
@@ -690,18 +571,111 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! CALCULATE AQUATIC IRONSULPHIDE FORMATION
-  SUBROUTINE sub_calc_form_FeS(dum_i,dum_j,dum_k1,dum_dt)
+  ! CALCULATE ABIOTIC FeOOH PRECIPITATION
+  SUBROUTINE sub_calc_precip_FeOOH(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dt
+    real,intent(in)::dum_dtyr
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     INTEGER::k,l,io,is
     integer::loc_i,loc_tot_i
+    real,dimension(n_ocn,n_k)::loc_bio_uptake
+    real,dimension(n_sed,n_k)::loc_bio_part
+    real::loc_Fe
+    real::loc_r56Fe
+    real::loc_R_56Fe
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_uptake(io,:) = 0.0
+    end do
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       loc_bio_part(is,:) = 0.0
+    end DO
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! CALCULATE FeOOH precipitation
+    ! -------------------------------------------------------- !
+    ! water column loop
+    ! look for existing Fe3 see if it can be instantaneously precipitated
+    ! Fe3+ + 2*H2O -> FeOOH + 3*H+
+    ! NOTE: Simple scheme: Fe3 > 1 nM precipitates - probably needs to be further developed
+    DO k=n_k,dum_k1,-1
+       ! set local concentrations
+       loc_Fe = ocn(io_Fe,dum_i,dum_j,k)
+       ! calculate FeOOH precipitation
+       if (ctrl_bio_FeOOHprecip_explicit) then
+          if (loc_Fe > par_FeOOH_Fethresh) then
+             ! calculate FeOOH precip
+             loc_bio_part(is_FeOOH,k) = loc_Fe - par_FeOOH_Fethresh
+             ! cap according to available Fe, H2S
+             loc_bio_part(is_FeOOH,k)  = min(loc_bio_part(is_FeOOH,k),loc_f*(loc_Fe - par_FeOOH_Fethresh))
+             ! calculate Fe fractionation
+             if (ocn_select(io_Fe_56Fe)) then
+                loc_r56Fe  = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
+                loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+                loc_bio_part(is_FeOOH_56Fe,k) = &
+                     & par_d56Fe_FeOOH_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeOOH_alpha*loc_R_56Fe)*loc_bio_part(is_FeOOH,k)
+            end if
+          end if
+       end if
+       ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          loc_tot_i = conv_sed_ocn_i(0,is)
+          do loc_i=1,loc_tot_i
+             io = conv_sed_ocn_i(loc_i,is)
+             loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+          end do
+       end DO
+    end DO
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
+    end do
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
+    end DO
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_FeOOH,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_precip(idiag_precip_FeOOH_dFe,dum_i,dum_j,:) = -loc_bio_uptake(io_Fe,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_precip_FeOOH
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE AQUATIC IRONSULPHIDE FORMATION
+  SUBROUTINE sub_calc_form_FeS(dum_i,dum_j,dum_k1)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k,l,io
     real,dimension(n_ocn,n_k)::loc_bio_remin
     real::loc_Fe2,loc_H2S,loc_FeS
     real::loc_r56Fe, loc_r34S
@@ -718,8 +692,9 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! CALCULATE FeS formation (depending on relative concentrations
     ! -------------------------------------------------------- !
+    ! Fe2+ + H2S -> FeS + 2H+
     ! water column loop
-    ! look for co-existing Fe and H2S and see if they are in equilibrium with FeS
+    ! look for co-existing Fe and H2S and see if they are in equilibrium with dissolved FeS
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
@@ -737,6 +712,7 @@ CONTAINS
           if (loc_H2S < const_rns) then 
              loc_H2S = 0.0
           end if
+          ! Since FeS, we need to calculate the Fe-S speciation
           ! calculate solution for equilibrium:
           ! Fe2_eq*H2S_eq/FeS_eq = K
           ! Fe2_eq = Fe2_in - x; H2S_eq = H2S_in - x; FeS_eq = FeS_in + x
@@ -786,12 +762,13 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ABIOTIC PYRITE PRECIPITATION
-  SUBROUTINE sub_calc_precip_FeS2(dum_i,dum_j,dum_k1,dum_dt)
+  ! NOTE: const_rns == const_real_nullsmall
+  SUBROUTINE sub_calc_precip_FeS2(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dt
+    real,intent(in)::dum_dtyr
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
@@ -801,10 +778,10 @@ CONTAINS
     real,dimension(n_sed,n_k)::loc_bio_part
     real,dimension(1:3)::loc_Fe2spec
     real::loc_H2S,loc_SO4,loc_FeS,loc_FeSp,loc_Fe2
-    real::loc_r56Fe, loc_r34S, loc_r34S_SO4, loc_r34S_FeS
+    real::loc_r56Fe,loc_r34S
     real::loc_R_56Fe
-    real::loc_alpha_56Fe
     real::loc_FeS2_precipitation
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
@@ -817,84 +794,74 @@ CONTAINS
        is = conv_iselected_is(l)
        loc_bio_part(is,:) = 0.0
     end DO
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
-    ! CALCULATE PYRITE SPECIATION
+    ! CALCULATE PYRITE PRECIPITATION
     ! -------------------------------------------------------- !
     ! water column loop
-    ! look for co-existing Fe and H2S and see if it can be instantaneously precipitated
-    ! 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
+    ! look for co-existing Fe and H2S. Pyrite precipitates from FeS, so we first calculate how much of Fe2+ is in complexed form of
+    ! FeS. unless FeS is calculated explicit (see above)
+    ! FeS + 3/4H2S + 1/4SO4 + 1/2H -> FeS2 + H2O (where: Fe2+ + H2S -> FeS + 2H, calculated first)
+    ! => NET: Fe2+ + 7/4H2S + 1/4SO4 -> FeS2
     ! NOTE: par_bio_FeS2precip_k units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
        ! set local concentrations
        ! NOTE: Fe2 (not Fe(3))
        ! NOTE: cap diagnosed [loc_FeS] at [loc_Fe2]
+       ! NOTE: FeS2 precipitates from FeS -> first calculate speciation of Fe and H2S
        if (ctrl_bio_FeS2precip_explicit) then
-          loc_FeS  = ocn(io_FeS,dum_i,dum_j,k)
-          loc_H2S  = ocn(io_H2S,dum_i,dum_j,k)
+          loc_FeS = ocn(io_FeS,dum_i,dum_j,k)
+          loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
           loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
           loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
        else 
           loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
-          loc_FeS  = loc_Fe2spec(3)
-          loc_H2S  = loc_Fe2spec(2)
+          loc_FeS = loc_Fe2spec(3)
+          loc_H2S = loc_Fe2spec(2)
           loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
           loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
           if (loc_FeS > loc_Fe2) then
              loc_FeS = loc_Fe2
           end if
        end if
-       ! calculate pyrite precipitation
-       ! NOTE: const_rns == const_real_nullsmall
-      if (loc_FeS > par_bio_FeS_part_abioticohm_cte) then
-          ! Calculate amount of FeS that precipitates (as nanoparticulate precursor for pyrite)
+       ! check for H2S and SO4 being greater than zero, 
+       ! and loc_FeS greater than a critical threshold (par_bio_FeS_part_abioticohm_cte)
+       if ( loc_FeS>par_bio_FeS_part_abioticohm_cte .AND. loc_H2S>const_rns .AND. loc_SO4>const_rns ) then
+          ! calculate amount of FeS that could precipitate (as nanoparticulate precursor for pyrite)
+          ! (loc_FeSp is the excess Fe available to precipitate as FeS2)
+          ! Reaction and default kinetic constants are taken from Rickard (1997)
           loc_FeSp = loc_FeS - par_bio_FeS_part_abioticohm_cte
-              if ( (loc_FeSp > const_rns) .AND. (4.0/3.0*loc_H2S > const_rns) .AND. (4.0/1.0*loc_SO4 > const_rns) ) then
-              loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*loc_FeSp*loc_H2S
-              ! loc_FeS2_precipitation = dum_dt*par_bio_FeS2precip_k*(loc_FeS/(par_k_lim_pyr + loc_FeS))*loc_FeSp*loc_H2S
-              ! calculate isotopic ratio
-                  if (loc_Fe2 > const_rns) then
-                      loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
-                  else
-                    loc_r56Fe = 0.0
-                  end if
-                  loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
-                  ! test for limitation by one of the reactants
-                  if (loc_FeS2_precipitation > MIN(4.0/3.0*loc_H2S,loc_FeSp,4.0/1.0*loc_SO4)) then
-                  ! reactant limited
-                      loc_bio_part(is_FeS2,k) = MIN(4.0/3.0*loc_H2S,loc_FeSp,4.0/1.0*loc_SO4)
-                      if (loc_FeS2_precipitation == loc_FeSp) then
-                         loc_bio_part(is_FeS2_56Fe,k) = loc_r56Fe*loc_bio_part(is_FeS2,k)
-                      else 
-                        ! Potential Fe fractionation
-                         loc_bio_part(is_FeS2_56Fe,k) = &
-                             & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
-                      end if
-                  else
-                      ! no limitation
-                      loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
-                      ! isotopes
-                      loc_bio_part(is_FeS2_56Fe,k) = &
-                           & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)	
-                  end if
-                  ! no fractionation of S during pyrite formation
-                  ! calculate isotopic ratio
-                 if (loc_H2S > const_rns) then
-                      loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
-                 else
-                      loc_r34S = 0.0
-                 end if
-               loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
-              end if
+          loc_FeS2_precipitation = dum_dtyr*par_bio_FeS2precip_k*loc_FeSp*loc_H2S
+          ! cap at maximum of available H2S, SO4, FeS
+          loc_FeS2_precipitation = MIN(loc_FeS2_precipitation,loc_f*loc_FeSp,loc_f*(4.0/7.0)*loc_H2S,loc_f*(4.0/1.0)*loc_SO4)
+          ! bulk tracer conversion
+          loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
+          ! calculate isotopic fractionation -- 56Fe
+          ! NOTE: we already know that loc_FeSp is non-zero
+          if (ocn_select(io_Fe2_56Fe)) then
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_bio_part(is_FeS2_56Fe,k) = &
+                 & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
+          end if
+          ! calculate isotopic fractionation -- 34S
+          ! NOTE: we already know that loc_H2S is non-zero
+          ! NOTE: no 34S fractionation assumed in the formation of pyrite (fractionation takes place between SO4 and H2S)
+          if (ocn_select(io_H2S_34S)) then
+             loc_r34S  = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
+             loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
+          end if
+          ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
+          DO l=1,n_l_sed
+             is = conv_iselected_is(l)
+             loc_tot_i = conv_sed_ocn_i(0,is)
+             do loc_i=1,loc_tot_i
+                io = conv_sed_ocn_i(loc_i,is)
+                loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+             end do
+          end DO
        end if
-       ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          loc_tot_i = conv_sed_ocn_i(0,is)
-          do loc_i=1,loc_tot_i
-             io = conv_sed_ocn_i(loc_i,is)
-             loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
-          end do
-       end DO
     end DO
     ! -------------------------------------------------------- !
     ! SET GLOBAL ARRAYS
@@ -927,11 +894,15 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ABIOTIC FeCO3 precipitation
-  SUBROUTINE sub_calc_precip_FeCO3(dum_i,dum_j,dum_k1,dum_dt)
-    ! dummy arguments
+  SUBROUTINE sub_calc_precip_FeCO3(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dt
-    ! local variables
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     INTEGER::k,l,io,is
     integer::loc_i,loc_tot_i
     real,dimension(n_ocn,n_k)::loc_bio_uptake
@@ -940,10 +911,11 @@ CONTAINS
     real::loc_IAP
     real::loc_delta_FeCO3,loc_CO3,loc_Fe2,loc_OH,loc_H2S,loc_FeCO3_precipitation
     real::loc_alpha
-    real::loc_R, loc_r56Fe,loc_R_56Fe
-    integer::loc_kmax
-
-    ! *** INITIALIZE VARIABLES ***
+    real::loc_R,loc_r56Fe,loc_R_56Fe
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
@@ -953,99 +925,59 @@ CONTAINS
        is = conv_iselected_is(l)
        loc_bio_part(is,:) = 0.0
     end DO
-
-    ! *** CALCULATE FeCO3 PRECIPITATION ***
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! CALCULATE SIDERITE PRECIPITATION
+    ! -------------------------------------------------------- !
+    ! Fe2+ + CO32- -> FeCO3
+    ! NOTE: in selecting is_FeCO3, full water column carbonate chemsitry re-calculation has been automatically selected
+    !       (ctrl_carbchemupdate_full = .true.)
     DO k=n_k,dum_k1,-1
-       ! re-calculate carbonate dissociation constants
-       CALL sub_calc_carbconst(                 &
-            & phys_ocn(ipo_Dmid,dum_i,dum_j,k), &
-            & ocn(io_T,dum_i,dum_j,k),          &
-            & ocn(io_S,dum_i,dum_j,k),          &
-            & carbconst(:,dum_i,dum_j,k)        &
-            & )
-       ! adjust carbonate constants
-       if (ocn_select(io_Ca) .AND. ocn_select(io_Mg)) then
-          call sub_adj_carbconst(           &
-               & ocn(io_Ca,dum_i,dum_j,k),  &
-               & ocn(io_Mg,dum_i,dum_j,k),  &
-               & carbconst(:,dum_i,dum_j,k) &
-               & )
-       end if
-       ! re-estimate Ca and borate concentrations from salinity (if not selected and therefore explicitly treated)
-       IF (.NOT. ocn_select(io_Ca))  ocn(io_Ca,dum_i,dum_j,k)  = fun_calc_Ca(ocn(io_S,dum_i,dum_j,k))
-       IF (.NOT. ocn_select(io_B))   ocn(io_B,dum_i,dum_j,k)   = fun_calc_Btot(ocn(io_S,dum_i,dum_j,k))
-       IF (.NOT. ocn_select(io_SO4)) ocn(io_SO4,dum_i,dum_j,k) = fun_calc_SO4tot(ocn(io_S,dum_i,dum_j,k))
-       IF (.NOT. ocn_select(io_F))   ocn(io_F,dum_i,dum_j,k)   = fun_calc_Ftot(ocn(io_S,dum_i,dum_j,k))
-       ! re-calculate surface ocean carbonate chemistry
-       CALL sub_calc_carb(             &
-            & ocn(io_DIC,dum_i,dum_j,k),  &
-            & ocn(io_ALK,dum_i,dum_j,k),  &
-            & ocn(io_Ca,dum_i,dum_j,k),   &
-            & ocn(io_PO4,dum_i,dum_j,k),  &
-            & ocn(io_SiO2,dum_i,dum_j,k), &
-            & ocn(io_B,dum_i,dum_j,k),    &
-            & ocn(io_SO4,dum_i,dum_j,k),  &
-            & ocn(io_F,dum_i,dum_j,k),    &
-            & ocn(io_H2S,dum_i,dum_j,k),  &
-            & ocn(io_NH4,dum_i,dum_j,k),  &
-            & carbconst(:,dum_i,dum_j,k), &
-            & carb(:,dum_i,dum_j,k),      &
-            & carbalk(:,dum_i,dum_j,k)    &
-            & )
-
-       loc_CO3 = carb(ic_conc_CO3,dum_i,dum_j,n_k)
-       loc_OH  = 10**(-(14-carb(ic_pHsws,dum_i,dum_j,n_k)))
+       ! set local species concentrations
        loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
-       loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
-       
-
-       loc_r56Fe  = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
-       loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)       
-
-       if (ctrl_bio_FeS2precip_explicit) then
-          loc_Fe2    = ocn(io_Fe2,dum_i,dum_j,k)
-       else 
-          if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
-             loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
-             loc_Fe2  = loc_Fe2spec(1) 
-                if (loc_Fe2 > ocn(io_Fe2,dum_i,dum_j,k)) then
-                    loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)   
-                end if                    
-          else
-             loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
+       loc_CO3 = carb(ic_conc_CO3,dum_i,dum_j,n_k)
+       loc_OH  = 10.0**(-(14.0-carb(ic_pHsws,dum_i,dum_j,n_k)))
+       loc_H2S = ocn(io_H2S,dum_i,dum_j,k)    
+       ! modify local Fe2 avialability
+       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because FeCO3 precipitates
+       !       from free Fe2+, so we need to find the available free Fe2+ pool
+       if (.NOT. ctrl_bio_FeS2precip_explicit) then
+          if ( loc_Fe2>const_rns .AND. loc_H2S>const_rns ) then
+             loc_Fe2spec = fun_box_calc_spec_Fe2(loc_Fe2,loc_H2S,par_bio_FeS_abioticohm_cte)
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
           end if
        end if
-
-       if ((loc_Fe2 > const_rns) .AND. (loc_CO3 > const_rns)) then
-
-          loc_IAP  = (loc_CO3*loc_Fe2*(loc_OH**(1.0/2.0)))
-
+       ! calculate precipitation
+       ! NOTE: assume loc_CO3 is always greater than zero
+       if (loc_Fe2 > const_rns) then
+          ! calculate Ion Activity Product (IAP)
+          ! NOTE: gamma parameters are activity coefficients
+          loc_IAP = (par_bio_remin_gammaCO2*loc_CO3)*(par_bio_remin_gammaFe2*loc_Fe2)*((par_bio_remin_gammaOH*loc_OH)**(1.0/2.0))
+          ! calculate siderite precipitation based on IAP. Siderite precipitates at very high supersaturation (very unlikely to 
+          ! occur in the ocean). REFERENCE: Jiang and Tosca, 2019, Earth and Planetary Science Letters.
           if (loc_IAP > const_rns) then
-             loc_FeCO3_precipitation = &
-                  & dum_dt*par_bio_FeCO3precip_sf*exp(par_bio_FeCO3precip_exp*LOG10(loc_IAP))
-
+             loc_FeCO3_precipitation = dum_dtyr*par_bio_FeCO3precip_sf*exp(par_bio_FeCO3precip_exp*LOG10(loc_IAP))
           else
-             loc_FeCO3_precipitation      = 0.0 
-             !loc_bio_part(is_FeCO3_56Fe,k) = loc_r56Fe*loc_FeCO3_prec
+             loc_FeCO3_precipitation = 0.0 
           end if
-          if (loc_FeCO3_precipitation > MIN(loc_CO3,loc_Fe2)) then
-             loc_FeCO3_precipitation = MIN(loc_CO3,loc_Fe2)
-          end if
+          ! cap FeCO3 rpecip at maximum of available Fe2+, CO3
+          ! NOTE: always allow all CO3 to be 'used' in a single time-step becasue the carbonate system is buffered
+          !       (CO3 is always likely to be far in excess of Fe2)
+          loc_FeCO3_precipitation = MIN(loc_FeCO3_precipitation,loc_f*loc_Fe2,loc_CO3)
+          ! bulk tracer conversion
           loc_bio_part(is_FeCO3,k) = loc_FeCO3_precipitation
-          loc_bio_part(is_FeCO3_56Fe,k) = &
-               & par_d56Fe_FeCO3_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeCO3_alpha*loc_R_56Fe)*loc_bio_part(is_FeCO3,k)
-
+          ! calculate isotopic fractionation -- 56Fe
+          ! NOTE: we already know that loc_Fe2 is non-zero, and to have got this far, io_Fe2 must also be non-zero
+          ! NOTE: loc_Fe2 may differ from ocn(io_Fe2,dum_i,dum_j,k) and hence the isotopic ratio of the Fe reservoir
+          !       needs to be calculated w.r.t. the latter
+          if (sed_select(is_FeCO3_56Fe)) then
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_bio_part(is_FeCO3_56Fe,k) = &
+                  & par_d56Fe_FeCO3_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeCO3_alpha*loc_R_56Fe)*loc_bio_part(is_FeCO3,k)
+          end if
           if (sed_select(is_FeCO3_13C)) then
-             ! re-calculate carbonate system isotopic properties
-             if (ocn_select(io_DIC_13C)) then
-                call sub_calc_carb_r13C(           &
-                     & ocn(io_T,dum_i,dum_j,k),       &
-                     & ocn(io_DIC,dum_i,dum_j,k),     &
-                     & ocn(io_DIC_13C,dum_i,dum_j,k), &
-                     & carb(:,dum_i,dum_j,k),         &
-                     & carbisor(:,dum_i,dum_j,k)      &
-                     & )
-             end IF
              ! calculate 13C/12C fractionation between DIC and FeCO3
              ! NOTE: T-dependent fractionation for calcite following Mook [1986]
              ! NOTE: FeCO3 fractionation w.r.t. CO3-
@@ -1094,6 +1026,137 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! CALCULATE ABIOTIC greenalite precipitation
+  SUBROUTINE sub_calc_precip_Fe3Si2O4(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k,l,io,is
+    integer::loc_i,loc_tot_i
+    real,dimension(n_ocn,n_k)::loc_bio_uptake
+    real,dimension(n_sed,n_k)::loc_bio_part
+    real,dimension(1:3)::loc_Fe2spec
+    real::loc_IAP
+    real::loc_Fe2,loc_SiO2,loc_H,loc_H2S,loc_Fe3Si2O4_precipitation
+    real::loc_r56Fe,loc_R_56Fe,loc_r30Si
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_uptake(io,:) = 0.0
+    end do
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       loc_bio_part(is,:) = 0.0
+    end DO
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! CALCULATE Fe3Si2O4 PRECIPITATION
+    ! -------------------------------------------------------- !
+    ! 3Fe2+ + 2SiO2 + 5H2O -> Fe3Si2O5(OH)4 + 6H
+    ! NOTE: in selecting is_FeCO3, full water column carbonate chemsitry re-calculation has been automatically selected
+    !       (ctrl_carbchemupdate_full = .true.)
+    DO k=n_k,dum_k1,-1
+       ! set local species concentrations
+       ! NOTE: loc_SiO2 now the ambient dissolved silica concentration 
+       !       (previously it was hard-set via par_bio_Fe3Si2O4precip_cSi -- 'assumed SiO2 concentration in diatom-free ocean')
+       loc_Fe2  = ocn(io_Fe2,dum_i,dum_j,k)   
+       loc_SiO2 = ocn(io_SiO2,dum_i,dum_j,k)
+       loc_H    = carb(ic_H,dum_i,dum_j,n_k)
+       loc_H2S  = ocn(io_H2S,dum_i,dum_j,k)    
+       ! set local Fe2 avialability
+       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because greenalite precipitates
+       !       from free Fe2+, so we need to find the available free Fe2+ pool
+       ! modify local Fe2 avialability
+       if (.NOT. ctrl_bio_FeS2precip_explicit) then
+          if ((loc_Fe2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
+             loc_Fe2spec = fun_box_calc_spec_Fe2(ocn(io_Fe2,dum_i,dum_j,k),ocn(io_H2S,dum_i,dum_j,k),par_bio_FeS_abioticohm_cte)
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
+          end if
+       end if
+       ! calculate precipitation
+       if ((loc_Fe2 > const_rns) .AND. (loc_SiO2 > const_rns)) then
+          ! calculate IAP
+          ! NOTE: gamma parameters are activity coefficients
+          ! NOTE: Calculate IAP according to Rasmussen et al., 2019, Geology
+          loc_IAP = (((par_bio_remin_gammaSiO2*loc_SiO2)**2.0)*((par_bio_remin_gammaFe2*loc_Fe2)**3.0)) / &
+               & ((par_bio_remin_gammaH*loc_H)**6.0)
+          ! calculate Fe3Si2O4 precipitation based on IAP, following Rasmussen et al., 2019, Geology
+          if (loc_IAP > const_rns) then
+             loc_Fe3Si2O4_precipitation = dum_dtyr*par_bio_Fe3Si2O4precip_sf* &
+                  & exp(par_bio_Fe3Si2O4precip_exp*LOG10(loc_IAP/par_bio_Fe3Si2O4precip_abioticohm_cte))
+          else
+             loc_Fe3Si2O4_precipitation = 0.0 
+          end if
+          ! cap Fe3Si2O4 precip at maximum of available Fe2, SiO2
+          loc_Fe3Si2O4_precipitation = MIN(loc_Fe3Si2O4_precipitation,loc_f*loc_Fe2,loc_f*loc_SiO2)
+          ! bulk tracer conversion
+          loc_bio_part(is_Fe3Si2O4,k) = loc_Fe3Si2O4_precipitation
+          ! calculate isotopic fractionation -- 56Fe
+          ! NOTE: we already know that loc_Fe2 is non-zero, and to have got this far, io_Fe2 must also be non-zero
+          ! NOTE: loc_Fe2 may differ from ocn(io_Fe2,dum_i,dum_j,k) and hence the isotopic ratio of the Fe reservoir
+          !       needs to be calculated w.r.t. the latter
+          if (sed_select(is_Fe3Si2O4_56Fe)) then
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_bio_part(is_Fe3Si2O4_56Fe,k) = &
+                  & par_d56Fe_Fe3Si2O4_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe3Si2O4_alpha*loc_R_56Fe)*loc_bio_part(is_Fe3Si2O4,k)
+          end if
+          ! calculate isotopic fractionation -- 30Si
+          ! NOTE: we already know that loc_SiO2 is non-zero
+          ! NOTE: assume no fractionation for now
+          if (sed_select(is_Fe3Si2O4_30Si)) then
+             loc_r30Si = ocn(io_SiO2_30Si,dum_i,dum_j,k)/ocn(io_SiO2,dum_i,dum_j,k)
+             loc_bio_part(is_Fe3Si2O4_30Si,k) = loc_r30Si*loc_bio_part(is_Fe3Si2O4,k)
+          end if          
+       end if
+       ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          loc_tot_i = conv_sed_ocn_i(0,is)
+          do loc_i=1,loc_tot_i
+             io = conv_sed_ocn_i(loc_i,is)
+             loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+          end do
+       end DO
+    end DO
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
+    end do
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
+    end DO
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_Fe3Si2O4,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_precip(idiag_precip_Fe3SiO4_dFe,dum_i,dum_j,:) = loc_bio_uptake(io_Fe2,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_precip_Fe3Si2O4
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! SULPHUR
   ! ****************************************************************************************************************************** !
 
@@ -1113,6 +1176,7 @@ CONTAINS
     real::loc_O2,loc_H2S,loc_r34S
     real::loc_H2S_oxidation_const,loc_H2S_oxidation
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
@@ -1121,6 +1185,8 @@ CONTAINS
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! OXIDIZE H2S
     ! -------------------------------------------------------- !
@@ -1128,15 +1194,15 @@ CONTAINS
     ! H2S + 2O2 -> SO4 + 2H
     ! NOTE: loc_H2S_oxidation_const units are (M-1 yr-1)
     DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_H2S > 1e-11)) then
-          ! calculate H2S oxidation, and cap value at H2S concentration if necessary
+       if ( (loc_O2 > const_rns) .AND. (loc_H2S > const_rns) ) then
+          ! calculate H2S oxidation, and cap value at H2S, O2 concentration if necessary
           SELECT CASE (opt_bio_remin_oxidize_H2StoSO4)
           CASE ('linear')
              ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
              loc_H2S_oxidation_const = par_bio_remin_kH2StoSO4
-             loc_H2S_oxidation = min(dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2,0.5*loc_O2)
+             loc_H2S_oxidation = dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2
           CASE ('OLD')
              ! change units of H2S oxidation constant from mM-2 hr-1 to M-2 yr-1
              ! and convert from O2 consumption units to H2S units (i.e., divide by 2)
@@ -1146,27 +1212,21 @@ CONTAINS
              loc_H2S_oxidation = min(loc_H2S,0.5*loc_O2)
           CASE ('OLDDEFAULT')
              ! entirely spurious ... but here for completness
-             loc_H2S_oxidation = min(0.5*loc_H2S,loc_O2)
+             loc_H2S_oxidation = min(loc_H2S,0.5*loc_O2)
           case default
              loc_H2S_oxidation = 0.0
           end select
-          ! calculate isotopic ratio
-          loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
-          if (loc_H2S_oxidation > loc_H2S) then
-             ! complete H2S oxidation (no S fractionation)
-             loc_H2S_oxidation = loc_H2S
-             loc_bio_remin(io_H2S,k) = -loc_H2S
-             loc_bio_remin(io_SO4,k) = loc_H2S
-             loc_bio_remin(io_O2,k)  = -2.0*loc_H2S
-             loc_bio_remin(io_ALK,k) = -2.0*loc_H2S
-             loc_bio_remin(io_H2S_34S,k) = -loc_r34S*loc_H2S
-             loc_bio_remin(io_SO4_34S,k) = loc_r34S*loc_H2S
-          else
-             ! partial H2S oxidation (=> S isotope Rayleigh fractionation)
-             loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
-             loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
-             loc_bio_remin(io_O2,k)  = -2.0*loc_H2S_oxidation
-             loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation
+          ! cap H2S oxidation & O2 consumption
+          loc_H2S_oxidation = min(loc_H2S_oxidation,loc_f*loc_H2S,loc_f*(1.0/2.0)*loc_O2)
+          ! bulk tracer conversion
+          loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
+          loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
+          loc_bio_remin(io_O2,k)  = -2.0*loc_H2S_oxidation
+          loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation
+          ! calculate isotopic fractionation -- 34S
+          ! NOTE: we already know that loc_H2S is non-zero
+          if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
+             loc_r34S  = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
              ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
              loc_bio_remin(io_H2S_34S,k) = -loc_r34S*loc_H2S_oxidation
              loc_bio_remin(io_SO4_34S,k) = loc_r34S*loc_H2S_oxidation
@@ -1204,33 +1264,122 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! 'REDUCTION' OF SULPHATE [fix for negative oxygen!!!]
+  SUBROUTINE sub_box_reduce_SO4(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    integer::l,io,k,id
+    real::loc_O2,loc_SO4,loc_r34S
+    real::loc_SO4_reduction
+    real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_remin(io,:) = 0.0
+    end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! REDUCE SO4
+    ! -------------------------------------------------------- !
+    ! look for some negative O2 and positive SO4 and see if it can be 'reacted' ... :o)
+    ! SO4 + 2H -> H2S + 2O2
+    DO k=n_k,dum_k1,-1
+       loc_O2  = ocn(io_O2,dum_i,dum_j,k)
+       loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
+       if ( (loc_O2 < -const_rns) .AND. (loc_SO4 > const_rns) ) then
+          ! calculate SO4 'reduction'
+          loc_SO4_reduction = (1.0/2.0)*abs(loc_O2)
+          ! cap SO4 'reduction' & negative O2 consumption
+          loc_SO4_reduction = min(loc_SO4_reduction,loc_f*loc_SO4,loc_f*(2.0/1.0)*abs(loc_O2))
+          ! bulk tracer conversion
+          loc_bio_remin(io_H2S,k) = loc_SO4_reduction
+          loc_bio_remin(io_SO4,k) = -loc_SO4_reduction
+          loc_bio_remin(io_O2,k)  = 2.0*loc_SO4_reduction
+          loc_bio_remin(io_ALK,k) = 2.0*loc_SO4_reduction
+          ! calculate isotopic fractionation -- 34S
+          ! NOTE: we already know that loc_SO4 is non-zero
+          if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
+             loc_r34S  = ocn(io_SO4_34S,dum_i,dum_j,k)/loc_SO4
+             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
+             loc_bio_remin(io_H2S_34S,k) = loc_r34S*loc_SO4_reduction
+             loc_bio_remin(io_SO4_34S,k) = -loc_r34S*loc_SO4_reduction
+             ! ################################################################################################################### !
+          end if
+       end if
+    end DO
+    ! -------------------------------------------------------- !
+    ! WRITE GLOBAL ARRAY DATA
+    ! -------------------------------------------------------- !
+    ! write ocean tracer remineralization field (global array)
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
+    end do
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
+    !id = fun_find_str_i('redox_H2StoSO4_dH2S',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
+    !id = fun_find_str_i('redox_H2StoSO4_dSO4',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
+    !id = fun_find_str_i('redox_H2StoSO4_dO2',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
+    !id = fun_find_str_i('redox_H2StoSO4_dALK',string_diag_redox)
+    !diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_reduce_SO4
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! METHANE
   ! ****************************************************************************************************************************** !
 
 
   ! ****************************************************************************************************************************** !
   ! WATER COLUMN REMINERALIZATION OF METHANE - DEFAULT
+  ! NOTE: old code -- no longer selectable as an option!!!
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
     real,intent(in)::dum_dtyr
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_potO2cap
     real::loc_CH4
     real::loc_r13C,loc_r14C
     real::loc_frac
     real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     ! initialize local variables
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
-
-    ! *** OXIDIZE CH4 ***
+    ! -------------------------------------------------------- !
+    ! OXIDIZE CH4
+    ! -------------------------------------------------------- !
     ! look for some CH4 and see if it can be oxidized
     ! allow different rate constant depending on availability of O2 or not
     ! CH4 + 2O2 -> CO2 + 2H2O
@@ -1285,7 +1434,7 @@ CONTAINS
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('redox_CH4toDIC_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('redox_CH4toDIC_dCO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dDIC',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
     id = fun_find_str_i('redox_CH4toDIC_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
@@ -1301,10 +1450,14 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! AEROBIC WATER COLUMN REMINERALIZATION OF METHANE - new Michaelis-Menten scheme [CTR|2018]
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AER(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
     real,intent(in)::dum_dtyr
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2
     real::loc_CH4,loc_CO2
@@ -1313,16 +1466,21 @@ CONTAINS
     real::loc_MM,loc_AER
     real::loc_r13C,loc_r14C
     real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     ! initialize local variables
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
-
-    ! *** OXIDIZE CH4 ***
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! OXIDIZE CH4
+    ! -------------------------------------------------------- !
     ! look for some CH4 and see if it can be oxidized
     ! allow different rate constant depending on availability of O2 or not
     ! CH4 + 2O2 -> CO2 + 2H2O
@@ -1363,7 +1521,7 @@ CONTAINS
           ! (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, and temperature control)
           loc_AER = par_bio_remin_AER_kAER*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
           ! but don't oxidize too much CH4!
-          loc_AER = min(loc_AER,loc_CH4,0.5*loc_O2)
+          loc_AER = min(loc_AER,loc_f*loc_CH4,loc_f*(1.0/2.0)*loc_O2)
           ! calculate isotopic ratios
           loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
           loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
@@ -1393,7 +1551,7 @@ CONTAINS
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('redox_CH4toDIC_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('redox_CH4toDIC_dCO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDIC_dDIC',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
     id = fun_find_str_i('redox_CH4toDIC_dO2',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
@@ -1409,29 +1567,38 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! ANAEROBIC WATER COLUMN REMINERALIZATION OF METHANE [SLO|2015 CTR|2018]
   SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AOM(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
     real,intent(in)::dum_dtyr
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2
-    real::loc_CH4,loc_DIC,loc_HCO3
+    real::loc_CH4,loc_HCO3
     real::loc_SO4,loc_H2S
     real::loc_T,loc_TC,loc_kT
     real::loc_dG,loc_Ft,loc_Ft_min
     real::loc_MM,loc_AOM
     real::loc_r13C,loc_r14C
     real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     ! initialize local variables
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
-
-    ! *** OXIDIZE CH4 ANAEROBICALLY WITH SO4 ***
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! OXIDIZE CH4 ANAEROBICALLY WITH SO4
+    ! -------------------------------------------------------- !
     ! look for some CH4 and see if it can be oxidized with SO4
     ! CH4 + SO4 --> HCO3- + HS- + H2O
     DO k=n_k,dum_k1,-1
@@ -1473,7 +1640,7 @@ CONTAINS
           ! (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, temperature, and thermodynamic control)
           loc_AOM = par_bio_remin_AOM_kAOM*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
           ! but don't oxidize too much CH4!
-          loc_AOM = min(loc_AOM,loc_CH4,loc_SO4)
+          loc_AOM = min(loc_AOM,loc_f*loc_CH4,loc_f*loc_SO4)
           ! calculate isotopic ratios
           loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
           loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
@@ -1505,7 +1672,7 @@ CONTAINS
     ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
     id = fun_find_str_i('redox_CH4toDICaom_dCH4',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('redox_CH4toDICaom_dCO2',string_diag_redox)
+    id = fun_find_str_i('redox_CH4toDICaom_dDIC',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
     id = fun_find_str_i('redox_CH4toDICaom_dH2S',string_diag_redox)
     diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
@@ -1538,7 +1705,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2,loc_I
-    real::loc_I_oxidation_const,loc_I_oxidation
+    real::loc_I_oxidation
     real,dimension(n_ocn,n_k)::loc_bio_remin
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
@@ -1624,7 +1791,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2,loc_IO3
-    real::loc_IO3_reduction_const,loc_IO3_reduction
+    real::loc_IO3_reduction
     real,dimension(n_ocn,n_k)::loc_bio_remin
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES

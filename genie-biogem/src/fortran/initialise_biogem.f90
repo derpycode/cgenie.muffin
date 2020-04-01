@@ -3,6 +3,7 @@
 ! SETUP BioGeM
 ! ******************************************************************************************************************************** !
 SUBROUTINE initialise_biogem(                       &
+     & dum_dts,                                     &
      & dum_saln0,dum_rhoair,dum_cd,dum_ds,dum_dphi, &
      & dum_usc,dum_dsc,dum_fsc,dum_rh0sc,           &
      & dum_rhosc,dum_cpsc,dum_solconst,dum_scf,     &
@@ -26,6 +27,7 @@ SUBROUTINE initialise_biogem(                       &
   ! ---------------------------------------------------------- !
   ! DUMMY ARGUMENTS
   ! ---------------------------------------------------------- !
+  REAL,INTENT(IN)::dum_dts                                       ! biogem time-step length (seconds)
   REAL,INTENT(in)::dum_saln0,dum_rhoair,dum_cd,dum_ds,dum_dphi   !
   real,INTENT(in)::dum_usc,dum_dsc,dum_fsc,dum_rh0sc             !
   real,INTENT(in)::dum_rhosc,dum_cpsc,dum_solconst,dum_scf       !
@@ -55,7 +57,7 @@ SUBROUTINE initialise_biogem(                       &
   print*,'======================================================='
   print*,' >>> Initialising BIOGEM ocean biogeochem. module ...'
   ! ---------------------------------------------------------- ! load GOIN
-  call sub_load_goin_biogem()
+  call sub_load_goin_biogem(dum_dts/conv_yr_s)
   ! ---------------------------------------------------------- ! set time
   ! NOTE: modify 'par_misc_t_start' according to the run-time accumulated in any requested restart,
   !       so that the time that BioGeM starts with is the same as the requested start time

@@ -1391,7 +1391,7 @@ subroutine biogem(        &
                        !
                        ! ############################################################################################################ !
                     end IF
-                 case ('noflux')
+                 case default
                     ! no flux to atmosphere
                     locij_fatm(ia_pH2S,i,j)    = 0.0
                     locij_focnatm(ia_pH2S,i,j) = 0.0
@@ -1418,7 +1418,7 @@ subroutine biogem(        &
               ! *** TERRESTRIAL WEATHERING INPUT ***
               ! modify remineralization array according to terrestrial weathering input
               ! NOTE: <dum_sfxsumrok1> in units of (mol) (per time-step)
-              ! NOTE: no screening for a 'closed system' is made as substractions are made appropriatly from
+              ! NOTE: no screening for a 'closed system' is made as subtractions are made appropriately from
               !       'SEDIMENT DISSOLUTION INPUT' if a weathering flux exists
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
@@ -1450,22 +1450,15 @@ subroutine biogem(        &
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - CH4 OXIDATION ***
-              select case (par_bio_remin_CH4ox)
-              case ('default')
-                 if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                    call sub_calc_bio_remin_oxidize_CH4(i,j,loc_k1,loc_dtyr)
-                 end If
-              case ('CH4ox_MM')
-                 if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
-                    call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
-                 end If
-              end select
+              if (ocn_select(io_O2) .AND. ocn_select(io_CH4)) then
+                 !call sub_calc_bio_remin_oxidize_CH4_AER(i,j,loc_k1,loc_dtyr)
+              end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** WATER COLUMN REMINERALIZATION - ANAEROBIC CH4 OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - ANAEROBIC CH4 OXIDATION ***
               if (ocn_select(io_O2) .AND. ocn_select(io_SO4) .AND. ocn_select(io_CH4)) then
-                 call sub_calc_bio_remin_oxidize_CH4_AOM(i,j,loc_k1,loc_dtyr)
+                 !call sub_calc_bio_remin_oxidize_CH4_AOM(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -1480,49 +1473,58 @@ subroutine biogem(        &
               ! *** SURFACE OCEAN BIOLOGICAL PRODUCTIVITY ***
               call sub_calc_bio(i,j,loc_k1,loc_dtyr)
 
-
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** SET PREFORMED TRACERS ***'
               ! *** SET PREFORMED TRACERS ***
-              call sub_calc_bio_preformed(i,j)
+              call sub_calc_bio_preformed(i,j,dum_sfcatm1(:,i,j))
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN ABIOTIC PRECIPITATION ***'
               ! *** OCEAN ABIOTIC PRECIPITATION ***
-              ! *** Ca-CO3 cycling ***
+              ! *** Ca-CO3 precip ***
               if (ctrl_bio_CaCO3precip .AND. sed_select(is_CaCO3)) then
                  call sub_calc_bio_uptake_abio(i,j,loc_k1,loc_dtyr)
               end if
-              ! *** simple oxic iron cycle ***
-              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
-                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
-              end if
+              ! *** Fe-oxyhydroxide precip ***
               if (sed_select(is_FeOOH)) then
                  call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
               end if
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
                 if (ctrl_bio_FeS2precip_explicit) then
-                   call sub_calc_form_FeS(i,j,loc_k1,loc_dtyr)
+                   call sub_calc_form_FeS(i,j,loc_k1)
                 end if   
-              end if
-              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
-                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
               end if
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
               end if
-              ! *** Fe-CO3 cycling ***
+              ! *** Fe-CO3 precip ***
               if (sed_select(is_FeCO3)) then
                  call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
               end if
+              ! *** Greenalite precip ***
+              if (sed_select(is_Fe3Si2O4)) then
+                 call sub_calc_precip_Fe3Si2O4(i,j,loc_k1,loc_dtyr)
+              end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
-                   & '*** MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS ***'
-              ! *** MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS ***
+                   & '*** MISCELLANEOUS REDOX TRANSFORMATIONS ***'
+              ! *** MISCELLANEOUS REDOX TRANSFORMATIONS ***
               call sub_box_misc_geochem(i,j,loc_k1,loc_dtyr)
+              ! *** IO3 reduction ***
               if (ocn_select(io_IO3)) then
                  call sub_calc_bio_remin_reduce_IO3(i,j,loc_k1,loc_dtyr)
+              end If
+              ! *** Fe2 oxidation ***
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
+                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
+              end if
+              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
+                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
+              end if
+              ! *** negative O2 fix ... ***
+              if (ocn_select(io_O2) .AND. ocn_select(io_SO4) .AND. ocn_select(io_H2S)) then
+                 if (ctrl_bio_remin_negO2_fix) call sub_box_reduce_SO4(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) &
@@ -1868,11 +1870,12 @@ subroutine biogem_tracercoupling( &
     matrix_avg_count=matrix_avg_count+1 ! keep track of number of steps integrated
     matrix_vocn_n=matrix_vocn_n+1  ! one full initialise/recover cycle complete so advance counter
 
-    if(mod(real(matrix_vocn_n),(conv_kocn_ksedgem/par_data_TM_avg_n)).eq.0)then! if at set point, average results, write to file, advance some control counters, n.b. conv_kocn_ksedgem = n_timsteps!!
+    ! if at set point, average results, write to file, advance some control counters, n.b. conv_kocn_ksedgem = n_timsteps!!
+    if(mod(real(matrix_vocn_n),(conv_kocn_ksedgem/par_data_TM_avg_n)) < const_rns)then
 
       call matrix_recover_exp(matrix_k)
 
-      if(matrix_season.eq.par_data_TM_avg_n)then !
+      if(abs(matrix_season - par_data_TM_avg_n) < const_rns)then !
         matrix_season=1 ! need to reset season
       else
         matrix_season=matrix_season+1 ! otherwise advance season
@@ -3149,7 +3152,7 @@ SUBROUTINE diag_biogem_timeslice( &
               ! re-open netcdf file, update record number, close file -- 2D
               if (ctrl_data_save_2d) then
                  call sub_save_netcdf(loc_yr_save,2)
-                 CALL sub_save_netcdf_2d()
+                 CALL sub_save_netcdf_2d(loc_dtyr)
                  ncout2d_ntrec = ncout2d_ntrec + 1
                  call sub_closefile(ncout2d_iou)
               end if

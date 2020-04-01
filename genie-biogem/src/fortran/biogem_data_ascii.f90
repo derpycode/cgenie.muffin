@@ -806,30 +806,34 @@ CONTAINS
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_precip
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
-          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_precip(id))) then
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+             loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_react
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
-          loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_react(id))) then
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
+             loc_string = '% time (yr) / global rate (mol yr-1) / mean rate (mol kg-1 yr-1)'
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
@@ -998,12 +1002,12 @@ CONTAINS
                       loc_string = '% time (yr) / global total preformed NO3 (mol) / global mean (mol kg-1)'
                    end if
                 CASE (io_col5)
-                   if (ocn_select(io_Ca)) then
+                   if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
-                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Ca',string_results_ext &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Fe',string_results_ext &
                            & )
-                      loc_string = '% time (yr) / global total preformed Ca (mol) / global mean (mol kg-1)'
+                      loc_string = '% time (yr) / global total preformed Fe (mol) / global mean (mol kg-1)'
                    end if
                 CASE (io_col6)
                    if (ocn_select(io_SiO2)) then
@@ -1020,6 +1024,14 @@ CONTAINS
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d13C',string_results_ext &
                            & )
                       loc_string = '% time (yr) / global total preformed 13C (mol) / global mean (o/oo)'
+                   end if
+                CASE (io_col8)
+                   if (ocn_select(io_DIC_14C)) then
+                      loc_save = .true.
+                      loc_filename=fun_data_timeseries_filename( &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d14C',string_results_ext &
+                           & )
+                      loc_string = '% time (yr) / global total preformed 14C (mol) / global mean (o/oo)'
                    end if
                 end select
                 if (loc_save) then
@@ -2323,36 +2335,40 @@ CONTAINS
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_precip
-          loc_sig = int_diag_precip_sig(id)/int_t_sig
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
-               & loc_t,                        &
-               & loc_ocn_tot_M*loc_sig,        &
-               & loc_sig
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_precip(id))) then
+             loc_sig = int_diag_precip_sig(id)/int_t_sig
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_precip(id)),string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_ocn_tot_M*loc_sig,        &
+                  & loc_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
        DO id=1,n_diag_react
-          loc_sig = int_diag_react_sig(id)/int_t_sig
-          loc_filename=fun_data_timeseries_filename(loc_t, &
-               & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
-          call check_unit(out,__LINE__,__FILE__)
-          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
-          WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
-               & loc_t,                        &
-               & loc_ocn_tot_M*loc_sig,        &
-               & loc_sig
-          call check_iostat(ios,__LINE__,__FILE__)
-          CLOSE(unit=out,iostat=ios)
-          call check_iostat(ios,__LINE__,__FILE__)
+          if (sed_select(is_diag_react(id))) then
+             loc_sig = int_diag_react_sig(id)/int_t_sig
+             loc_filename=fun_data_timeseries_filename(loc_t, &
+                  & par_outdir_name,trim(par_outfile_name)//'_series_diag',trim(string_diag_react(id)),string_results_ext)
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f16.3,2e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_ocn_tot_M*loc_sig,        &
+                  & loc_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end if
        end DO
     end if
     IF (ctrl_data_save_sig_diag_geochem) THEN
@@ -2609,10 +2625,10 @@ CONTAINS
                            & )
                    end if
                 CASE (io_col5)
-                   if (ocn_select(io_Ca)) then
+                   if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
-                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Ca',string_results_ext &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Fe',string_results_ext &
                            & )
                    end if
                 CASE (io_col6)
@@ -2627,6 +2643,13 @@ CONTAINS
                       loc_save = .true.
                       loc_filename=fun_data_timeseries_filename( &
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d13C',string_results_ext &
+                           & )
+                   end if
+                CASE (io_col8)
+                   if (ocn_select(io_DIC_14C)) then
+                      loc_save = .true.
+                      loc_filename=fun_data_timeseries_filename( &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d14C',string_results_ext &
                            & )
                    end if
                 end select
@@ -2991,23 +3014,23 @@ CONTAINS
     Write(unit=out,fmt=*) '--------------------------'
     Write(unit=out,fmt=*) 'MISCELLANEOUS PROPERTIES'
     Write(unit=out,fmt=*) ' '
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global surface area ............. : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global surface area ............................ : ', &
          & loc_ocnatm_tot_A, &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean k = n_k (surface) area ............. : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global ocean k = n_k (surface) area ............ : ', &
          & SUM(loc_phys_ocn(ipo_A,:,:,n_k)), &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean k = (n_k - 1) (sub-surface layer) area : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global ocean k=(n_k-1) (sub-surface layer) area  : ', &
          & SUM(loc_phys_ocn(ipo_A,:,:,n_k - 1)), &
          & ' m2'
     call check_iostat(ios,__LINE__,__FILE__)
-    Write(unit=out,fmt='(A49,E15.7,A3)',iostat=ios) &
-         & ' Global ocean volume ......................... : ', &
+    Write(unit=out,fmt='(A52,E15.7,A3)',iostat=ios) &
+         & ' Global ocean volume ............................ : ', &
          & SUM(loc_phys_ocn(ipo_V,:,:,:)), &
          & ' m3'
     call check_iostat(ios,__LINE__,__FILE__)
@@ -3020,8 +3043,8 @@ CONTAINS
          & phys_ocnatm(ipoa_A,:,:)*int_phys_ocn_timeslice(ipo_mask_ocn,:,:,n_k)* &
          & (1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)) &
          & )
-    Write(unit=out,fmt='(A49,f8.6,A24)',iostat=ios) &
-         & ' Global mean air-sea coefficient, K(CO2) ..... : ', &
+    Write(unit=out,fmt='(A52,f8.6,A24)',iostat=ios) &
+         & ' Global mean air-sea coefficient, K(CO2) ........ : ', &
          & loc_K, &
          & '     mol m-2 yr-1 uatm-1'
     call check_iostat(ios,__LINE__,__FILE__)

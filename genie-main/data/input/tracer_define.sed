@@ -48,7 +48,7 @@
  CaCO3_231Pa      19  14  07  'CaCO3 scavenged 231Pa'                'wt%'     0.00     100.00
  CaCO3_230Th      20  14  07  'CaCO3 scavenged 230Th'                'wt%'     0.00     100.00
  CaCO3_Fe         21  14  07  'CaCO3 scavenged Fe'                   'wt%'     0.00     100.00
- CaCO3_Fe_56Fe    76  21  22  '54Fe of CaCO3 scavenged Fe'           'o/oo'   -9.99E+2    9.99E+2
+ CaCO3_Fe_56Fe    76  21  22  '56Fe of CaCO3 scavenged Fe'           'o/oo'   -9.99E+2    9.99E+2
  CaCO3_Nd         49  14  07  'CaCO3 scavenged Nd'                   'wt%'     0.00     100.00
  CaCO3_Nd_144Nd   50  49  19  'CaCO3 scavenged 144Nd'                'o/oo'   -9.99E+2    9.99E+2
  CaCO3_MoS2       61  14  07  'CaCO3 scavenged MoS2'                 'wt%'     0.00     100.00
@@ -63,11 +63,14 @@
  FeCO3            88  88  06  'Fe carbonate'                         'wt%'     0.00     100.00
  FeCO3_13C        89  88  11  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
  FeCO3_56Fe       90  88  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
- FeS2             91  91  06  'Fe carbonate'                         'wt%'     0.00     100.00
- FeS2_34S         92  91  15  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
- FeS2_56Fe        93  91  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ FeS2             91  91  06  'Fe pyrite'                            'wt%'     0.00     100.00
+ FeS2_34S         92  91  15  'd13C of FeS2'                         'o/oo'   -9.99E+2    9.99E+2
+ FeS2_56Fe        93  91  22  'd56Fe of FeS2'                        'o/oo'   -9.99E+2    9.99E+2
  FeOOH            95  95  06  'Fe (hydr)oxides'                      'wt%'     0.00     100.00
  FeOOH_56Fe       96  95  22  'd56Fe of FeOOH'                       'o/oo'   -9.99E+2    9.99E+2
+ Fe3Si2O4        105 105  06  'greenalite'                           'wt%'     0.00     100.00
+ Fe3Si2O4_56Fe   106 105  22  '56Fe of greenalite'                   'o/oo'   -9.99E+2    9.99E+2
+ Fe3Si2O4_30Si   107 105  16  '30Si of greenalite'                   'o/oo'   -9.99E+2    9.99E+2
  det              22  22  02  'detrital (refractory) material'       'wt%'     0.00     100.00
  detLi            55  55  06  'CAN BE REASSIGNED'                    'wt%'     0.00     100.00
  detLi_7Li        56  55  18  'CAN BE REASSIGNED'                    'o/oo'   -9.99E+2    9.99E+2

@@ -766,6 +766,9 @@ CONTAINS
        end do
        ! ----------------------------------------------------- ! (i) calculate D14C and radiocarbon age
        ! NOTE: this will be saved regardless of whether 14C is a included tracer in the model or not ...
+       ! NOTE: rather than trying to obtain and pass atmospheric D14C, 
+       !       a dummy pre-industrila value of 0.0 is passed instead to fun_convert_D14Ctoage
+       !       (a recent code change/correction added atmospheric D14C to the calculation of radiocarbon age)
        loc_sedcore_age_14C(m,:) = const_real_zero
        if (sed_select(is_CaCO3_14C)) then
           DO o = 1,loc_n_sedcore_tot
@@ -775,7 +778,7 @@ CONTAINS
                      &   loc_vsedcore(m)%lay(is2l(is_CaCO3_14C),o) &
                      & )
                 loc_sedcore_age_14C(m,o) = &
-                     & fun_convert_D14Ctoage(loc_CaCO3_D14C)
+                     & fun_convert_D14Ctoage(loc_CaCO3_D14C,0.0)
              end if
           end DO
        end if
