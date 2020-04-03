@@ -551,6 +551,11 @@ ifeq ($(MACHINE),WIN32)
   NETCDF += $(LIB_FLAG)netcdf_f90.lib
 endif
 
+# === openBLAS path ===
+OPENBLAS_NAME=OpenBLAS-0.3.9
+OPENBLAS_PATH=/share/apps/
+OPENBLAS= $(LIB_SEARCH_FLAG)$(PATH_QUOTE)$(OPENBLAS_PATH)$(OPENBLAS_NAME)/lib$(PATH_QUOTE) $(LIB_FLAG)openblas 
+
 # === Tcl/Tk (wishx and xqplot.tcl) ===
 LOCFLAGS=-DWISHX=\"$(CODE_DIR)/genie-main/inputdata/wishx\" -DXQPLOTTCL=\"$(CODE_DIR)/genie-main/inputdata/xqplot.tcl\" -DXFONT=\"$(CODE_DIR)/genie-main/inputdata/fonts\"
 

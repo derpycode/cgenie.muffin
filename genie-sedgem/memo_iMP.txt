@@ -1,6 +1,6 @@
 Memo for iMP
 
-A. OpenBLAS library is needed
+A1. OpenBLAS library is needed
     How to install (see also instruction at iMP repository in GitHub https://github.com/imuds/iMP):
         1. download: http://www.openblas.net/ -> TAR
         2. tar zxvf OpenBLAS-0.2.20.tar.gz
@@ -12,6 +12,11 @@ A. OpenBLAS library is needed
     If you get the error 'libopenblas.so.0: cannot open shared object file: No such file or directory' then try the following:
         1. sudo apt-get install libopenblas-base
         2. export LD_LIBRARY_PATH=/usr/lib/openblas-base/
+
+A2. Compiling cGENIE with iMP on a cluster
+    	1. edit the openBLAS options for the cluster-specific library name and path in cgenie.muffin/genie-main/makefile.arc
+	2. add the following lines in the .bashrc file in your home directory with the relevant name of the openBLAS installation, e.g., openBLAS-0.2.20:
+		module add openBLAS-#-#-##   
     
 B. Choose option 'kanzaki2019trs' for sg_par_sed_diagen_CaCO3opt in userconfig files.
     Currently you can also play around with fraction of aragonite 
