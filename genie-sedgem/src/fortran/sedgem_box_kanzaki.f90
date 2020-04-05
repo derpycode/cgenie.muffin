@@ -342,6 +342,7 @@ real:: dis_off(nspcc) ! factor with which dissolution rate const. is multiplied 
 real:: biot_off(nspcc) ! factor with which bioturbation depth is multiplied wrt reference depth 12 cm
 integer:: itr_stst  ! iteration for steady state
 logical::arg_flg(nspcc)
+real:: frc_flx  ! flx fraction of caco3 when assuming two different classes of caco3 
 
 call cpu_time(loc_start)
 
@@ -371,7 +372,12 @@ labs=.false.
 
 arg_flg(:) = .false.
 dis_off(:) = 0d0
-if (par_sed_kanzaki2019_arg/=0d0) arg_flg(2) = .true.
+if (par_sed_kanzaki2019_arg/=0d0) then 
+    arg_flg(2) = .true.
+    frc_flx = par_sed_kanzaki2019_arg
+else 
+    frc_flx = par_sed_kanzaki2019_dissc2frc 
+endif 
 dis_off(1) = par_sed_kanzaki2019_dissc1
 dis_off(2) = par_sed_kanzaki2019_dissc2
 
@@ -453,6 +459,12 @@ if (signal_tracking) then
 endif 
 ! #endif
 !!!!!!!!!!!!!!
+if (first_call) then 
+    open(unit=file_tmp,file=trim(adjustl(par_outdir_name))//'/imp/list_vars.txt',action='write',status='unknown',access='append') 
+    write(file_tmp,*)dum_i,dum_j,temp,dep,o2i,dici,alki,sal,ccflxi,omflx,detflx  &
+        ,dum_DIC,dum_ALK,dum_Ca,dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot
+    close(file_tmp)
+endif 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!  MAKING GRID !!!!!!!!!!!!!!!!! 
 beta = 1.00000000005d0  ! a parameter to make a grid; closer to 1, grid space is more concentrated around the sediment-water interface (SWI)
@@ -843,7 +855,8 @@ do
         ! ccflx(1:nspcc/2) = ccflxi/2d0
         ! ccflx(1+nspcc/2:nspcc) = ccflxi/2d0
         ! ccflx(1) = ccflxi*1.0d0
-        ccflx(1) = ccflxi*max(0d0,1d0-par_sed_kanzaki2019_arg)
+        ! ccflx(1) = ccflxi*max(0d0,1d0-par_sed_kanzaki2019_arg)
+        ccflx(1) = ccflxi*max(0d0,1d0-frc_flx)
         ccflx(2) = ccflxi-ccflx(1)
     endif 
     
@@ -882,6 +895,8 @@ do
     dt = dt_save 
     itr_stst = 0
     700 continue
+    
+    if (.not. first_call .and. loc_time_proc + dt >= loc_time_fin) dt = loc_time_fin - loc_time_proc
 
     itr_w = 0  ! # of iteration made to converge w 
     err_w_min = 1d4 ! minimum relative difference of w compared to the previous w 
@@ -934,13 +949,24 @@ do
             ,om,nz,sporo,sporoi,sporof &! input 
             ,w,wi,dt_om_o2,up,dwn,cnr,adf,trans,nspcc,labs,turbo2,nonlocal,omflx,poro,dz &! input 
             ) 
+        ! call omcalc_newton( &
+            ! omx & ! output 
+            ! ,kom   &  ! input
+            ! ,om,nz,sporo,sporoi,sporof &! input 
+            ! ,w,wi,dt_om_o2,up,dwn,cnr,adf,trans,nspcc,labs,turbo2,nonlocal,omflx,poro,dz &! input 
+            ! ,flg_500  &
+            ! ) 
         ! calculating the fluxes relevant to om diagenesis (and checking the calculation satisfies the difference equations )
         call calcflxom(  &
             omadv,omdec,omdif,omrain,omres,omtflx  & ! output 
             ,sporo,om,omx,dt_om_o2,w,dz,z,nz,turbo2,labs,nonlocal,poro,up,dwn,cnr,adf,rho,mom  &
             ,trans,kom,sporof,sporoi,wi,nspcc,omflx  & ! input 
-            ,file_tmp,workdir &
+            ,file_tmp,workdir,flg_500 &
             )
+        if (flg_500) then 
+            print *, 'error detected in om calc: exit om-o2 loop'
+            exit
+        endif 
         !~~~~~~~~~~~~~~~~~ O2 calculation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         ! if (izox == nz) then ! fully oxic; lower boundary condition ---> no diffusive out flow  
@@ -1181,6 +1207,34 @@ do
         endif 
 
     enddo 
+    
+    if (flg_500) then 
+        ! nt = nt*10
+        ! tol = tol/10d0
+        if (.not. first_call) then 
+            print *,'*** error detected in om calculation'
+            print *,'reduce dt and restart time-integration from the begining'
+            dt = dt /10d0
+            ! dt_save = dt_save/10d0 ! permanently reduce dt within one time step 
+            flg_500 = .false. 
+            ccx = cc
+            dicx = dic
+            alkx = alk 
+            co2x = co2
+            hco3x = hco3
+            co3x = co3
+            ptx = pt
+            omx = om
+            o2x = o2
+            wx = w
+            call calcupwindscheme(  &
+                up,dwn,cnr,adf & ! output 
+                ,w,nz   & ! input &
+                )
+            ! cycle
+            go to 700
+        endif 
+    endif 
 
     !~~  OM & O2 calculation END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ! print*,it,'om calc finished'
@@ -1599,7 +1653,7 @@ do
         if (loc_time_proc>=loc_time_fin) exit 
     else
         ! if (first_call) then 
-        if (first_call .and. (.not.loc_reading)) then 
+        if (first_call .and. (.not.loc_reading)) then ! initial integration for steady state
             ! if (.not.loc_reading) then 
                 if (err_f<tol) then 
                     if (loc_display) print*,'enough iterations',err_f,tol,err_f<tol
@@ -2958,17 +3012,218 @@ endsubroutine omcalc
 !**************************************************************************************************************************************
 
 !**************************************************************************************************************************************
+subroutine omcalc_newton( &
+    omx & ! output 
+    ,kom   &  ! input
+    ,om,nz,sporo,sporoi,sporof &! input 
+    ,w,wi,dt,up,dwn,cnr,adf,trans,nspcc,labs,turbo2,nonlocal,omflx,poro,dz &! input 
+    ,flg_500  &
+    ) 
+implicit none 
+integer,intent(in)::nz,nspcc
+real,dimension(nz),intent(in)::om,sporo,w,up,dwn,cnr,adf,poro,dz
+real,intent(in)::sporoi,sporof,wi,dt,trans(nz,nz,nspcc+2),omflx
+logical,dimension(nspcc+2),intent(in)::labs,turbo2,nonlocal
+logical,intent(inout)::flg_500
+real,intent(inout)::omx(nz)
+real,intent(in)::kom(nz)
+integer :: nsp,nmx,iz,row,col,iiz,infobls
+integer,allocatable::ipiv(:)
+real,allocatable :: amx(:,:),ymx(:),emx(:)
+real::loc_error,loc_tol,loc_itr,loc_itr_max
+
+!  om calculation adopting newton's method
+    
+nsp=1 ! number of species considered here; 1, only om 
+nmx = nz*nsp ! # of col (& row) of matrix A to in linear equations Ax = B to be solved, each species has nz (# of grids) unknowns 
+if (allocated(amx)) deallocate(amx)
+if (allocated(ymx)) deallocate(ymx)
+if (allocated(emx)) deallocate(emx)
+if (allocated(ipiv)) deallocate(ipiv)
+allocate(amx(nmx,nmx),ymx(nmx),emx(nmx),ipiv(nmx))
+
+loc_error = 1d4
+loc_tol = 1d-6
+loc_itr = 0
+loc_itr_max = 100
+flg_500 = .false.
+do while (loc_error>loc_tol) 
+
+amx = 0d0
+ymx = 0d0
+
+do iz = 1,nz 
+    row = 1 + (iz-1)*nsp ! row number is obtained from grid number; here simply gird 1 corresponds to row 1 
+    if (iz == 1) then ! need to reflect upper boundary, rain flux; and be careful that iz - 1 does not exit  
+        ymx(row) = &
+            ! time change term 
+            + sporo(iz)*(omx(iz)-om(iz))/dt &
+            ! advection terms 
+            + adf(iz)*up(iz)*(sporo(iz)*w(iz)*omx(iz)-sporoi*wi*0d0)/dz(1)   &
+            + adf(iz)*dwn(iz)*(sporo(iz+1)*w(iz+1)*omx(iz+1)-sporo(iz)*w(iz)*omx(iz))/dz(1)   &
+            + adf(iz)*cnr(iz)*(sporo(iz+1)*w(iz+1)*omx(iz+1)-sporoi*wi*0d0)/dz(1)   &
+            !  rxn term 
+            + sporo(iz)*kom(iz)*omx(Iz)   &
+            ! rain flux term 
+            - omflx/dz(1)
+        amx(row,row) = (&
+            ! time change term 
+            + sporo(iz)*(1d0)/dt &
+            ! advection terms 
+            + adf(iz)*up(iz)*(sporo(iz)*w(iz)*1d0-sporoi*wi*0d0)/dz(1)   &
+            + adf(iz)*dwn(iz)*(sporo(iz+1)*w(iz+1)*0d0-sporo(iz)*w(iz)*1d0)/dz(1)   &
+            + adf(iz)*cnr(iz)*(sporo(iz+1)*w(iz+1)*0d0-sporoi*wi*0d0)/dz(1)   &
+            !  rxn term 
+            + sporo(iz)*kom(iz)   &
+            ) *omx(iz)
+        ! matrix filling at grid iz but for unknwon at grid iz + 1 (here only advection terms) 
+        amx(row,row+nsp) =  (&
+            + adf(iz)*dwn(iz)*(sporo(iz+1)*w(iz+1)*1d0-sporo(iz)*w(iz)*0d0)/dz(1)   &
+            + adf(iz)*cnr(iz)*(sporo(iz+1)*w(iz+1)*1d0-sporoi*wi*0d0)/dz(1)   &
+            )*omx(iz+1)
+    else if (iz == nz) then ! need to reflect lower boundary; none; but must care that iz + 1 does not exist 
+        ymx(row) = 0d0   &
+            ! time change term 
+            + sporo(iz)*(omx(iz)-om(iz))/dt &
+            ! advection terms 
+            + adf(iz)*up(iz)*(sporo(iz)*w(iz)*omx(iz)-sporo(iz-1)*w(iz-1)*omx(iz-1))/dz(iz)   &
+            + adf(iz)*dwn(iz)*(sporof*w(iz)*omx(iz)-sporo(iz)*w(iz)*omx(iz))/dz(iz)   &
+            + adf(iz)*cnr(iz)*(sporof*w(iz)*omx(iz)-sporo(iz-1)*w(iz-1)*omx(iz-1))/dz(iz)   &
+            !  rxn term 
+            + sporo(iz)*kom(iz)*omx(Iz)   
+        amx(row,row) = (&
+            ! time change term 
+            + sporo(iz)*(1d0)/dt &
+            ! advection terms 
+            + adf(iz)*up(iz)*(sporo(iz)*w(iz)*1d0-sporo(iz-1)*w(iz-1)*0d0)/dz(iz)  &
+            + adf(iz)*dwn(iz)*(sporof*w(iz)*1d0-sporo(iz)*w(iz)*1d0)/dz(iz)  &
+            + adf(iz)*cnr(iz)*(sporof*w(iz)*1d0-sporo(iz-1)*w(iz-1)*0d0)/dz(iz)  &
+            ! rxn term 
+            + sporo(iz)*kom(iz)   &
+            )*omx(iz)
+        ! filling matrix at grid iz but for unknown at grid iz-1 (only advection terms) 
+        amx(row,row-nsp) = ( &
+            + adf(iz)*up(iz)*(sporof*w(iz)*0d0-sporo(iz-1)*w(iz-1)*1d0)/dz(iz)  &
+            + adf(iz)*cnr(iz)*(sporof*w(iz)*0d0-sporo(iz-1)*w(iz-1)*1d0)/dz(iz)  &
+            )*omx(iz-1)
+    else ! do not have to care about boundaries 
+        ymx(row) = 0d0  &
+            ! time change term 
+            + sporo(iz)*(omx(iz)-om(iz))/dt &
+            ! advection terms 
+            + adf(iz)*up(iz)*(sporo(iz)*w(iz)*omx(iz)-sporo(iz-1)*w(iz-1)*omx(iz-1))/dz(iz)   &
+            + adf(iz)*dwn(iz)*(sporo(iz+1)*w(iz+1)*omx(iz+1)-sporo(iz)*w(iz)*omx(iz))/dz(iz)   &
+            + adf(iz)*cnr(iz)*(sporo(iz+1)*w(iz+1)*omx(iz+1)-sporo(iz-1)*w(iz-1)*omx(iz-1))/dz(iz)   &
+            !  rxn term 
+            + sporo(iz)*kom(iz)*omx(Iz)   
+        amx(row,row) = (&
+            ! time change term 
+            + sporo(Iz)*(1d0)/dt &
+            ! advection terms 
+            + adf(iz)*up(iz)*(sporo(iz)*w(iz)*1d0-sporo(iz-1)*w(iz-1)*0d0)/dz(iz)  &
+            + adf(iz)*dwn(iz)*(sporo(iz+1)*w(iz+1)*0d0-sporo(iz)*w(iz)*1d0)/dz(iz)  &
+            + adf(iz)*cnr(iz)*(sporo(iz+1)*w(iz+1)*0d0-sporo(iz-1)*w(iz-1)*0d0)/dz(iz)  &
+            ! rxn term 
+            + sporo(iz)*kom(iz)   &
+            )*omx(iz)
+        ! filling matrix at grid iz but for unknown at grid iz+1 (only advection terms) 
+        amx(row,row+nsp) =  (&
+            + adf(iz)*dwn(iz)*(sporo(iz+1)*w(iz+1)*1d0-sporo(iz)*w(iz)*0d0)/dz(iz)  &
+            + adf(iz)*cnr(iz)*(sporo(iz+1)*w(iz+1)*1d0-sporo(iz-1)*w(iz-1)*0d0)/dz(iz)  &
+            )*omx(iz+1)
+        ! filling matrix at grid iz but for unknown at grid iz-1 (only advection terms) 
+        amx(row,row-nsp) =  (&
+            + adf(iz)*up(iz)*(sporo(iz)*w(iz)*0d0-sporo(iz-1)*w(iz-1)*1d0)/dz(iz)  &
+            + adf(iz)*cnr(iz)*(sporo(iz+1)*w(iz+1)*0d0-sporo(iz-1)*w(iz-1)*1d0)/dz(iz)  &
+            )*omx(iz-1)
+    endif
+    ! diffusion terms are reflected with transition matrices 
+    if (turbo2(1).or.labs(1)) then 
+        do iiz = 1, nz
+            col = 1 + (iiz-1)*nsp 
+            if (trans(iiz,iz,1)==0d0) cycle
+            amx(row,col) = amx(row,col) -trans(iiz,iz,1)/dz(iz)*dz(iiz)*(1d0-poro(iiz))*omx(iiz)
+        enddo
+    else 
+        do iiz = 1, nz
+            col = 1 + (iiz-1)*nsp 
+            if (trans(iiz,iz,1)==0d0) cycle
+            amx(row,col) = amx(row,col) -trans(iiz,iz,1)/dz(iz)*omx(iiz)
+        enddo
+    endif
+enddo
+
+ymx = - ymx  ! I have filled matrix B without changing signs; here I change signs at once 
+
+call dgesv(nmx,int(1),amx,nmx,ipiv,ymx,nmx,infobls) 
+
+do iz = 1, nz 
+    row = 1 + (iz-1)*nsp ! row number is obtained from grid number; here simply gird 1 corresponds to row 1 
+    if (ymx(row)>10d0) then ! this help conversion 
+        omx(iz) = omx(iz)*1.5d0
+    elseif (ymx(row)<-10d0) then ! this help conversion  
+        omx(iz) = omx(iz)*0.5d0
+    else
+        omx(iz) = omx(iz)*exp(ymx(row))
+    endif
+    if (omx(iz)<1d-300) then ! too small trancate value and not be accounted for error 
+        omx(iz)=1d-300
+        ymx(row) = 0d0
+    endif
+enddo
+
+loc_error = maxval(exp(abs(ymx))) - 1d0
+loc_itr = loc_itr + 1
+! #ifdef showiter
+! print*,'co2 iteration',itr,loc_error,infobls
+! #endif
+
+!  if negative or NAN calculation stops 
+if (any(omx<0d0) .or. any(isnan(omx))) then
+    print*,'negative or NAN omx, stop'
+    print*,omx
+    stop
+endif
+
+if (loc_itr > loc_itr_max) then 
+    flg_500 = .true.
+    ! dt=dt/10d0
+    print *
+    print *
+    print *
+    print *,' ******* WARNING ******* '
+    print *,' raising flag to repeat calculation with reduced dt and increased nt '
+    print *,' here is om system calculation subroutine:',loc_error 
+    print *,' ... too many iterations but cannot get convergence '
+    print *,' *********************** '
+    print *
+    print *
+    exit 
+endif 
+
+enddo
+
+do iz=1,nz
+    print*,omx(iz)
+enddo 
+
+endsubroutine omcalc_newton
+!**************************************************************************************************************************************
+
+!**************************************************************************************************************************************
 subroutine calcflxom(  &
     omadv,omdec,omdif,omrain,omres,omtflx  & ! output 
     ,sporo,om,omx,dt,w,dz,z,nz,turbo2,labs,nonlocal,poro,up,dwn,cnr,adf,rho,mom,trans,kom,sporof,sporoi,wi,nspcc,omflx  & ! input 
-    ,file_tmp,workdir &
+    ,file_tmp,workdir,flg_500 &
     )
 implicit none 
 integer,intent(in)::nz,nspcc,file_tmp
-real,dimension(nz),intent(in)::sporo,om,omx,poro,up,dwn,cnr,adf,rho,kom,w,dz,z
+real,dimension(nz),intent(in)::sporo,om,poro,up,dwn,cnr,adf,rho,kom,w,dz,z
+real,dimension(nz),intent(inout)::omx
 real,intent(in)::dt,mom,trans(nz,nz,nspcc+2),sporof,sporoi,wi
 real,intent(out)::omadv,omdec,omdif,omrain,omflx,omres,omtflx
 logical,dimension(nspcc+2),intent(in)::turbo2,labs,nonlocal
+logical,intent(inout)::flg_500
 character*255,intent(in)::workdir
 integer :: iz,row,iiz,col,isp,nsp=1
 
@@ -3017,17 +3272,31 @@ omres = omadv + omdec + omdif + omrain + omtflx ! this is residual flux should b
 
 if (any(omx<0d0)) then  ! if negative om conc. is detected, need to stop  
     print*,'negative om, stop',dt
+    print*, workdir
     open(unit=file_tmp,file=trim(adjustl(workdir))//'NEGATIVE_OM.res',status = 'unknown')
     do iz = 1, nz
         write (file_tmp,*) z(iz),omx(iz)*mom/rho(iz)*100d0,w(iz),up(iz),dwn(iz),cnr(iz),adf(iz)
     enddo
     close(file_tmp)
-    stop
+    ! stop
+    flg_500 = .true.
+    if (dt < 1d-2) then 
+        print*
+        print*,'*** because it is unlikely to obtain reasonable OM profile'
+        print*,'    om with negative values are set to 0 and proceed'
+        print*
+        do iz=1,nz
+            if (omx(iz)<0d0) omx(iz)= 0d0
+        enddo 
+        flg_500 = .false.
+    endif             
 endif 
 if (any(isnan(omx))) then  ! if NAN, ... the same ... stop
     print*,'nan om, stop'
+    print*, workdir
     print*,omx
-    stop
+    ! stop
+    flg_500 = .true.
 endif 
 
 endsubroutine calcflxom

@@ -114,9 +114,10 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_archer1991_iterationmax
   ! ------------------- DIAGENESIS SCHEME: KANZAKI 2019 --------------------------------------------------------------------------- !
   REAL::par_sed_kanzaki2019_arg                                  ! aragonite rain fraction
+  REAL::par_sed_kanzaki2019_dissc2frc                            ! rain flx fraction of CaCO3 fraction 2
   REAL::par_sed_kanzaki2019_dissc1                               ! dissolution rate factor for CaCO3 fracrion 1 
   REAL::par_sed_kanzaki2019_dissc2                               ! dissolution rate factor for CaCO3 fracrion 2 
-  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_arg,par_sed_kanzaki2019_dissc1,par_sed_kanzaki2019_dissc2
+  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_arg,par_sed_kanzaki2019_dissc2frc,par_sed_kanzaki2019_dissc1,par_sed_kanzaki2019_dissc2
   REAL::par_sed_kanzaki2019_biotd1                               ! bioturbation depth factor for CaCO3 fracrion 1 
   REAL::par_sed_kanzaki2019_biotd2                               ! bioturbation depth factor for CaCO3 fracrion 2 
   NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_biotd1,par_sed_kanzaki2019_biotd2

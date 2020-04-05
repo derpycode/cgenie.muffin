@@ -6663,6 +6663,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
                         <description>aragonite rain fraction</description>
                     </param>
+                    <param name="par_sed_kanzaki2019_dissc2frc">
+			<value datatype="real">0.0</value>
+                        <description>rain flux fraction for CaCO3 fracrion 2</description>
+                    </param>
                     <param name="par_sed_kanzaki2019_dissc1">
 			<value datatype="real">1.0</value>
                         <description>dissolution rate factor for CaCO3 fracrion 1</description>

@@ -120,6 +120,7 @@ CONTAINS
       ! --- DIAGENESIS SCHEME: KANZAKI 2019 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: KANZAKI 2019 -----------------'
        print*,'aragonite rain fraction                             : ',par_sed_kanzaki2019_arg
+       print*,'rain flux fraction for CaCO3 fracrion 2             : ',par_sed_kanzaki2019_dissc2frc
        print*,'dissolution rate factor for CaCO3 fracrion 1        : ',par_sed_kanzaki2019_dissc1
        print*,'dissolution rate factor for CaCO3 fracrion 2        : ',par_sed_kanzaki2019_dissc2
        print*,'bioturbation depth factor for CaCO3 fracrion 1      : ',par_sed_kanzaki2019_biotd1
