@@ -15,8 +15,11 @@ A1. OpenBLAS library is needed
 
 A2. Compiling cGENIE with iMP on a cluster
     	1. edit the openBLAS options for the cluster-specific library name and path in cgenie.muffin/genie-main/makefile.arc
-	2. add the following lines in the .bashrc file in your home directory with the relevant name of the openBLAS installation, e.g., openBLAS-0.2.20:
-		module add openBLAS-#-#-##   
+        2. add the following lines in the .bashrc file in your home directory with the relevant name of the openBLAS installation, e.g., openBLAS-0.2.20:
+            module add openBLAS-#-#-##   
+
+A3. Compiling cGENIE with iMP on a local computer
+    	1. edit the openBLAS options in cgenie.muffin/genie-main/makefile.arc: comment out lines 556-558 and uncomment line 560
     
 B. Choose option 'kanzaki2019trs' for sg_par_sed_diagen_CaCO3opt in userconfig files.
     Currently you can also play around with fraction of aragonite 
@@ -65,3 +68,22 @@ C. Analyze the results.
     currently sp001 means calcite species while sp002 means aragonite.
     Other number (e.g., 100) means time in yr but divided by 10 (e.g., 100 means 1000 yr) (I do not remember why I did this...).
 
+
+D. Extra stuffs 
+    One can also change dissolution rate constants of two different classes of CaCO3 particles
+    to run such models, you need to do the following parameterizations in userconfig files:
+        sg_par_sed_diagen_CaCO3opt = 'kanzaki2019trs'
+        sg_par_sed_kanzaki2019_arg = 0.0           # no aragonite (although you can use aragonite)
+        sg_par_sed_kanzaki2019_dissc2frc=0.5       # rain flux fraction of class#2; here 0.5 means a half of total rain flux is assigned as class#2  
+        sg_par_sed_kanzaki2019_dissc1=100.0        # a factor with which a reference rate constant is multiplied for class#1 CaCO3 particles
+        sg_par_sed_kanzaki2019_dissc2=0.01         # a factor with which a reference rate constant is multipled for class#2 CaCO3 particles
+    Or you can choose different bioturbation depths for different classes of CaCO3 particles 
+    In userconfig files, you need specify:
+        sg_par_sed_diagen_CaCO3opt = 'kanzaki2019trs'
+        sg_par_sed_kanzaki2019_arg = 0.0           # no aragonite (although you can use aragonite)
+        sg_par_sed_kanzaki2019_dissc2frc=0.5       # rain flux fraction of class#2; here 0.5 means a half of total rain flux is assigned as class#2  
+        sg_par_sed_kanzaki2019_biotd1=1.0          # a factor with which a reference bioturbation depth is multipled for class#1 CaCO3 particles
+        sg_par_sed_kanzaki2019_biotd2=2.0          # a factor with which a reference bioturbation depth is multipled for class#2 CaCO3 particles
+    These kinds of simulations run OK for spin-ups but not necessarily transient simulations. 
+    
+    Follow experimental procedures (A-C) explained above for experiments with different fractions of aragonite.  
