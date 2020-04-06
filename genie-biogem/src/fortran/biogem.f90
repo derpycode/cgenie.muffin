@@ -419,7 +419,7 @@ subroutine biogem(        &
                        if (abs(loc_fsedpres_tot(io)) < const_real_nullsmall) &
                             & dum_sfxsumrok1(io,i,j) = 0.0
                     end do
-                 else
+                 else ! [not (flag_sedgem)]
                     ! set dissolution flux equal to rain flux
                     ! NOTE: force return of S from POM-S in a closed system, despite it being a 'scavenged' type
                     ! NOTE: par_sed_type_det should not be treated like det re. remin(?)
@@ -451,6 +451,7 @@ subroutine biogem(        &
                                 loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                              end if
                              locij_fsedocn(l2io(lo),i,j) = locij_fsedocn(l2io(lo),i,j) + loc_remin
+                             ! remin diagnostics
                              if (ctrl_bio_remin_redox_save) then
                                 loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
                                 id = fun_find_str_i(trim(loc_string),string_diag_redox)
@@ -459,10 +460,18 @@ subroutine biogem(        &
                           end if
                        end do
                     end DO
-                 end If
+                    ! Csoft tracer
+                    if (ctrl_bio_remin_redox_save) then 
+                       if (ocn_select(io_col9)) then
+                          loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+                          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                          locij_fsedocn(io_col9,i,j) = locij_fsedocn(io_col9,i,j) + diag_redox(id,i,j,loc_k1)
+                       end if
+                    end if
+                 end If ! [(flag_sedgem)]
                  ! prevent return of dissolved Fe?
                  if (ctrl_bio_NO_fsedFe) locij_fsedocn(io_Fe,i,j) = 0.0
-              else
+              else ! [not (ctrl_force_sed_closedsystem)]
                  ! set dissolution fluxes
                  DO l=3,n_l_ocn
                     io = conv_iselected_io(l)
@@ -493,7 +502,8 @@ subroutine biogem(        &
                        end if
                     end do
                  end if
-              end if
+              end if ! [(ctrl_force_sed_closedsystem)]
+              ! convert fluxes to remin
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
                  bio_remin(io,i,j,loc_k1) = bio_remin(io,i,j,loc_k1) + &
