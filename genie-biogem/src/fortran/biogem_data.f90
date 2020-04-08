@@ -265,7 +265,6 @@ CONTAINS
        print*,'O2 half-saturation for for NO2 -> N2O               : ',par_bio_remin_cO2_NO2toN2O
        print*,'Fraction of NH4 oxidation -> N2O (rather than NO2)  : ',par_bio_remin_fracN2O
        print*,'Reaction rate constant for H2S -> POMS              : ',par_bio_remin_kH2StoPOMS
-       print*,'Aerobic methanotrophy scheme ID string              : ',par_bio_remin_CH4ox
        print*,'Specific CH4 oxidation rate (d-1)                   : ',par_bio_remin_CH4rate
        print*,'AER rate constant (yr-1)                            : ',par_bio_remin_AER_kAER
        print*,'AER O2 half sat constant (mol kg-1)                 : ',par_bio_remin_AER_Km_O2
