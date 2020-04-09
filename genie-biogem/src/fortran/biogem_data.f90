@@ -2329,7 +2329,6 @@ CONTAINS
             & 'STOPPING', &
             & (/const_real_null/),.true. &
             & )
-       loc_flag = .FALSE.
     end IF
     ! #### ADD CHECKS OF ADDITIONAL BIOLOGICAL OPTIONS HERE ###################################################################### !
     !
@@ -2394,29 +2393,29 @@ CONTAINS
           loc_flag = .FALSE.
        end if
     else
-       if (loc_flag) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'although the production of dissolved organic matter production is set to zero '//&
-               & 'you have carelessly left some DOM tracers selected (FILE: gem_config_ocn.par) '// &
-               & 'The model will run quicker by de-selecting all currently selected DOM tracers.', &
-               & 'CONTINUING', &
-               & (/const_real_null/),.FALSE. &
-               & )
-          loc_flag = .FALSE.
-       end if
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'although the production of dissolved organic matter production is set to zero '//&
+            & 'you have carelessly left some DOM tracers selected (FILE: gem_config_ocn.par) '// &
+            & 'The model will run quicker by de-selecting all currently selected DOM tracers.', &
+            & 'CONTINUING', &
+            & (/const_real_null/),.FALSE. &
+            & )
     end if
     ! check Fe cycle self-consistency
+    ! check first that one of the key iron tracers are selected (iron (3+) or total dissolved Fe)
     if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
        SELECT CASE (trim(opt_geochem_Fe))
        CASE ('OLD','ALT')
-          ! NOTE: do not need to explicitly check for io_Fe (again!)
-          if ((.NOT. ocn_select(io_L)) .OR. (.NOT. ocn_select(io_FeL))) THEN
+          if ((.NOT. ocn_select(io_Fe)) .OR. (.NOT. ocn_select(io_L)) .OR. (.NOT. ocn_select(io_FeL))) THEN
+             loc_flag = .TRUE.
+          end if
+       CASE ('FeFe2TL')
+          if ((.NOT. ocn_select(io_Fe)) .OR. (.NOT. ocn_select(io_Fe2)) .OR. (.NOT. ocn_select(io_TL))) THEN
              loc_flag = .TRUE.
           end if
        CASE ('hybrid','lookup_4D')
-          ! NOTE: do not need to explicitly check for io_TDFe (again!)
-          if (.NOT. ocn_select(io_TL)) THEN
+          if ((.NOT. ocn_select(io_TDFe)) .OR. (.NOT. ocn_select(io_TL))) THEN
              loc_flag = .TRUE.
           end if
        case default
@@ -2425,7 +2424,8 @@ CONTAINS
        if (loc_flag) then
           CALL sub_report_error( &
                & 'biogem_data','sub_check_par', &
-               & 'The selected Fe tracers (base config) does not match the selected Fe scheme (user config).', &
+               & 'The selected Fe tracers (base config) does not match the selected Fe scheme (user config): ' // &
+               & trim(opt_geochem_Fe), &
                & 'STOPPING', &
                & (/const_real_null/),.TRUE. &
                & )

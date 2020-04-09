@@ -829,7 +829,7 @@ CONTAINS
     !       Fe SPECIATION [complete]
     !----------------------------------------------------------------
     If ( &
-         & (ctrl_data_save_slice_ocn)) &
+         & (ctrl_data_save_slice_ocn) &
          & .AND. &
          & (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) &
          & ) then

@@ -461,11 +461,13 @@ subroutine biogem(        &
                        end do
                     end DO
                     ! Csoft tracer
+                    ! NOTE: un-do scaling by 1/mass of ocean box
                     if (ctrl_bio_remin_redox_save) then 
                        if (ocn_select(io_col9)) then
                           loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
                           id = fun_find_str_i(trim(loc_string),string_diag_redox)
-                          locij_fsedocn(io_col9,i,j) = locij_fsedocn(io_col9,i,j) + diag_redox(id,i,j,loc_k1)
+                          locij_fsedocn(io_col9,i,j) = locij_fsedocn(io_col9,i,j) + &
+                               & phys_ocn(ipo_M,i,j,loc_k1)*diag_redox(id,i,j,loc_k1)
                        end if
                     end if
                  end If ! [(flag_sedgem)]
