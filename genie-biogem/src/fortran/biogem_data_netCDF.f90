@@ -856,7 +856,7 @@ CONTAINS
           DO i=1,n_i
              DO j=1,n_j
                 DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)                                                       
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)
                 END DO
              END DO
           END DO
@@ -904,7 +904,7 @@ CONTAINS
           DO i=1,n_i
              DO j=1,n_j
                 DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)                                            
+                   loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)
 
                 END DO
              END DO
@@ -1112,7 +1112,7 @@ CONTAINS
                    CASE (io_col8)
                       if (ocn_select(io_DIC_14C)) loc_name = 'diag_pre_d14C_age'
                    CASE (io_col9)
-                      if (ocn_select(io_DIC))     loc_name = 'diag_pre_Csoft'
+                      if (ocn_select(io_DIC))     loc_name = 'diag_reg_DIC'
                    end select
                    call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
                         & trim(loc_unitsname),const_real_zero,const_real_zero)
@@ -2908,7 +2908,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- OLD
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_redox_old) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_geochem_old
@@ -2922,7 +2922,7 @@ CONTAINS
     end If
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- PRECIP
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_precip
@@ -2935,7 +2935,7 @@ CONTAINS
     end If
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- REACTION
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_react
