@@ -1091,6 +1091,7 @@ CONTAINS
                          END DO
                       END DO
                    END DO
+                   loc_name = 'diag_pre_NULL_'//fun_conv_num_char_n(2,io)
                    select case (io)
                    CASE (io_col0)
                       if (ocn_select(io_DIC))     loc_name = 'diag_pre_'//trim(string_ocn(io_DIC))

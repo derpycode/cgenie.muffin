@@ -2453,6 +2453,16 @@ CONTAINS
                & )
        ctrl_force_ocn_age1 = .false.
     end if
+    if ( ctrl_force_ocn_age .AND. ctrl_force_ocn_age1 ) then
+          CALL sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You cannot select BOTH ctrl_force_ocn_age AND ctrl_force_ocn_age1.'// &
+               & 'The dual-tracer age tracer option (ctrl_force_ocn_age) will hence be deselected.', &
+               & 'CONTINUING', &
+               & (/const_real_null/),.FALSE. &
+               & )
+       ctrl_force_ocn_age = .false.
+    end if
 
     ! *** parameter consistency check - isotopes, forcings ***
     ! OCEAN TRACERS
