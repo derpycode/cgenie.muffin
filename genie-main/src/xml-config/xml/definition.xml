@@ -4364,96 +4364,92 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>RDOM degradation by (surface) photolysis only?</description>
                     </param>
-                    <param name="par_bio_remin_CH4ox">
-            <value datatype="string">default</value>
-                        <description>Aerobic methanotrophy scheme ID string</description>
-                    </param>
                     <param name="par_bio_remin_CH4rate">
 			<value datatype="real">1.0e-4</value>
                         <description>Specific CH4 oxidation rate (d-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_kAER">
-            <value datatype="real">0.10</value>
+                        <value datatype="real">0.10</value>
                         <description>Aerobic methanotrophy rate constant (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_Km_O2">
-            <value datatype="real">20.0E-06</value>
+                        <value datatype="real">20.0E-06</value>
                         <description>Aerobic methanotrophy O2 half sat constant (mol kg-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_thermo">
-            <value datatype="string">off</value>
+                        <value datatype="string">off</value>
                         <description>Aerobic methanotrophy thermodynamic term</description>
                     </param>
                     <param name="par_bio_remin_AER_dG0">
-            <value datatype="real">-858.967</value>
+                        <value datatype="real">-858.967</value>
                         <description>Std Gibbs free energy of AER (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_BEQ">
-            <value datatype="real">15.0</value>
+                        <value datatype="real">15.0</value>
                         <description>AER biological energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_kAOM">
-            <value datatype="real">0.01</value>
+                        <value datatype="real">0.01</value>
                         <description>AOM rate constant (yr-1) (see also Olson et al., 2016)</description>
                     </param>
                     <param name="par_bio_remin_AOM_Km_SO4">
-            <value datatype="real">500.0E-6</value>
+                        <value datatype="real">500.0E-6</value>
                         <description>AOM SO4 half sat constant (mol kg-1) [Olson et al., 2016]</description>
                     </param>
                     <param name="par_bio_remin_AOM_thermo">
-            <value datatype="string">off</value>
+                        <value datatype="string">off</value>
                         <description>AOM thermodynamic term</description>
                     </param>
                     <param name="par_bio_remin_AOM_dG0">
-            <value datatype="real">-33.242</value>
+                        <value datatype="real">-33.242</value>
                         <description>Std Gibbs free energy of AOM (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_BEQ">
-            <value datatype="real">15.0</value>
+                        <value datatype="real">15.0</value>
                         <description>AOM bio energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_Rgas">
-            <value datatype="real">8.3144598E-03</value>
+                        <value datatype="real">8.3144598E-03</value>
                         <description>Gas constant for thermo calculations (kJ K-1 mol-1)</description>
                     </param>
                     <param name="par_bio_remin_gammaO2">
-            <value datatype="real">1.14</value>
+                        <value datatype="real">1.14</value>
                         <description>Activity coefficient for dissolved O2</description>
                     </param>
                     <param name="par_bio_remin_gammaCO2">
-            <value datatype="real">1.17</value>
+                        <value datatype="real">1.17</value>
                         <description>Activity coefficient for aqueous CO2</description>
                     </param>
                     <param name="par_bio_remin_gammaHS">
-            <value datatype="real">0.75</value>
+                        <value datatype="real">0.75</value>
                         <description>Activity coefficient for dissolved HS</description>
                     </param>
                     <param name="par_bio_remin_gammaHCO3">
-            <value datatype="real">0.58</value>
+                        <value datatype="real">0.58</value>
                         <description>Activity coefficient for dissolved HCO3</description>
                     </param>
                     <param name="par_bio_remin_gammaSO4">
-            <value datatype="real">0.10</value>
+                        <value datatype="real">0.10</value>
                         <description>Activity coefficient for dissolved SO4</description>
                     </param>
                     <param name="par_bio_remin_gammaCH4">
-            <value datatype="real">1.20</value>
+                        <value datatype="real">1.20</value>
                         <description>Activity coefficient for aqueous CH4</description>
                     </param>
                     <param name="par_bio_remin_gammaFe2">
-            <value datatype="real">0.23</value>
+                        <value datatype="real">0.23</value>
                         <description>Activity coefficient for aqueous Fe2+</description>
                     </param>
                     <param name="par_bio_remin_gammaH">
-            <value datatype="real">0.729</value>
+                        <value datatype="real">0.729</value>
                         <description>Activity coefficient for aqueous H+ ; Marion et al., 2011, Marine Chemistry</description>
                     </param>
                     <param name="par_bio_remin_gammaOH">
-            <value datatype="real">0.69</value>
+                        <value datatype="real">0.69</value>
                         <description>Activity coefficient for aqueous OH-</description>
                     </param>
                      <param name="par_bio_remin_gammaSiO2">
-            <value datatype="real">1.13</value>
+                        <value datatype="real">1.13</value>
                         <description>Activity coefficient for aqueous SiO2</description>
                     </param>
                     <param name="ctrl_bio_remin_POC_fixed">

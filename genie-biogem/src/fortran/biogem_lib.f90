@@ -269,10 +269,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS
   LOGICAL::ctrl_scav_H2S_dt_old                                  ! Old local residence time in layer for H2S? 
   NAMELIST /ini_biogem_nml/ctrl_scav_H2S_dt_old
-  LOGICAL::ctrl_bio_remin_negO2_fix                                  ! Old local residence time in layer for H2S? 
-  NAMELIST /ini_biogem_nml/ctrl_bio_remin_negO2_fix              ! Fix for negative O2 ... 
-  CHARACTER(len=63)::par_bio_remin_CH4ox                         ! aerobic methanotrophy scheme ID string
-  NAMELIST /ini_biogem_nml/par_bio_remin_CH4ox
+  LOGICAL::ctrl_bio_remin_negO2_fix                              ! Fix for negative O2 
+  NAMELIST /ini_biogem_nml/ctrl_bio_remin_negO2_fix
   real::par_bio_remin_CH4rate                                    ! specific CH4 oxidation rate (d-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_CH4rate
   real::par_bio_remin_AER_kAER                                   ! AER rate constant (yr-1)
