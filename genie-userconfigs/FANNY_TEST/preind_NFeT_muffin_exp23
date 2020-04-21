@@ -1,4 +1,10 @@
 #
+#
+# --- CLIMATE -------------------------------------------------------
+#
+# set climate feedback
+ea_36=y
+#
 # --- BIOLOGICAL NEW PRODUCTION -------------------------------------
 #
 #F production with N2 fixation
@@ -28,49 +34,48 @@ bg_par_nitri_c0_NH4=0.01E-06
 # O2 half-saturatation constant for NH4 oxidation (mol kg-1)
 bg_par_nitri_c0_O2=0.02E-06
 #
-# ------------------- ORGANIC MATTER EXPORT RATIOS ------------------
+# --- ORGANIC MATTER EXPORT RATIOS ----------------------------------
 #
-#production fraction of dissolved organic matter
+# production fraction of dissolved organic matter
 bg_par_bio_red_DOMfrac=0.66
 #
 # --- INORGANIC MATTER EXPORT RATIOS --------------------------------
 #
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
 bg_par_bio_red_POC_CaCO3=0.0485
-#exponent for modifier of CaCO3:POC export ratio
+# exponent for modifier of CaCO3:POC export ratio
 bg_par_bio_red_POC_CaCO3_pP=0.7440
 #
 # --- REMINERALIZATION ----------------------------------------------
 #
-#DOC lifetime (yrs)
+# DOC lifetime (yrs)
 bg_par_bio_remin_DOMlifetime=1.0
-#initial fractional abundance of POC component #2
+# initial fractional abundance of POC component #2
 bg_par_bio_remin_POC_frac2=0.055
 # depth of remineralization or particulate organic matter
 bg_par_bio_remin_POC_eL1=589.9451
-#remineralization length #2 for POC
+# remineralization length #2 for POC
 bg_par_bio_remin_POC_eL2=1000000.0
-#initial fractional abundance of CaCO3 component #2
+# initial fractional abundance of CaCO3 component #2
 bg_par_bio_remin_CaCO3_frac2=0.45
 # depth of remineralization or CaCO3
 bg_par_bio_remin_CaCO3_eL1=1.8905e+003
-#remineralization length #2 for CaCO3
+# remineralization length #2 for CaCO3
 bg_par_bio_remin_CaCO3_eL2=1000000.0
 #F switch hard threshold scheme for OM remineralisation
 bg_ctrl_bio_remin_thresh = .true.
 #F denitrification O2 threshold (40E-6, Naafs etal 2019)
 bg_par_bio_remin_cthresh_O2=40E-6
-#F remineralisation into NH4
-#bg_ctrl_bio_remin_ONtoNH4=.true.
 #
-# --- IRON ----------------------------------------------
+# --- IRON ----------------------------------------------------------
 #
+bg_opt_geochem_Fe='hybrid'
 # aeolian Fe solubility
-bg_par_det_Fe_sol=0.003
+bg_par_det_Fe_sol=0.002014275
 #exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
 bg_par_det_Fe_sol_exp=0.500
 # modifier of the scavenging rate of dissolved Fe
-bg_par_scav_Fe_sf_POC=1.34
+bg_par_scav_Fe_sf_POC=0.344104
 bg_par_scav_Fe_sf_CaCO3=0.000
 bg_par_scav_Fe_sf_opal=0.000
 bg_par_scav_Fe_sf_det=0.000
@@ -91,13 +96,7 @@ bg_par_bio_FetoC_K=103684.0
 #[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- constant
 bg_par_bio_FetoC_C=0.0
 #
-# --- SEDIMENTS ------------------------------------------------
-#
-#
-# --- WEATHERING -----------------------------------------------
-#
-#
-# --- DATA SAVING ----------------------------------------------
+# --- DATA SAVING -----------------------------------------------------
 #
 bg_ctrl_data_save_slice_ocnsed=.true.
 bg_ctrl_data_save_slice_focnsed=.false.
@@ -107,20 +106,22 @@ bg_ctrl_data_save_slice_diag=.true.
 bg_ctrl_data_save_slice_misc=.true.
 bg_ctrl_data_save_derived=.true.
 #
-# --- FORCINGS ----------------------------------------------
+#F savings from wardetal.2018
+#bg_par_data_save_level=10
+#bg_ctrl_debug_lvl0=.true.
+#ma_debug_loop=1
 #
-bg_ctrl_force_oldformat=.false.
-#bg_par_forcing_name="worjh2_RpCO2_Rp13CO2_FeMahowald2006"
+# --- FORCINGS ------------------------------------------------------
+#
+# specify forcings
 bg_par_forcing_name="worlg4.RpCO2_Rp13CO2.FeMahowald2006"
 bg_par_atm_force_scale_val_3=278.0E-06
 bg_par_atm_force_scale_val_4=-6.5
 #
-# --- MISC -----------------------------------------------------
+# --- MISC ----------------------------------------------------------
 #
 # turn off tracer 'auditing'
 bg_ctrl_audit=.false.
-# set a 'closed' system
-bg_ctrl_force_sed_closedsystem=.true.
 #
-# --- ADDITIONAL -----------------------------------------------
+# --- END -----------------------------------------------------------
 #
