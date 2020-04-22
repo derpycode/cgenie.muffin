@@ -1037,9 +1037,9 @@ CONTAINS
                     if (ocn_select(io_DIC)) then
                        loc_save = .true.
                        loc_filename=fun_data_timeseries_filename( &
-                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','regenerated_DIC',string_results_ext &
+                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft',string_results_ext &
                             & )
-                       loc_string = '% time (yr) / global total regenerated DIC (mol) / global mean (mol kg-1)'
+                       loc_string = '% time (yr) / global total regenerated Csoft (mol) / global mean (mol kg-1)'
                     end if
                 end select
                 if (loc_save) then
@@ -2673,7 +2673,7 @@ CONTAINS
                     if (ocn_select(io_DIC)) then
                        loc_save = .true.
                        loc_filename=fun_data_timeseries_filename( &
-                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','regenerated_DIC',string_results_ext &
+                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft',string_results_ext &
                             & )
                     end if
                 end select
