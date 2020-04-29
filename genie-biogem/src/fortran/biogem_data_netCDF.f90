@@ -2078,7 +2078,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       PARTICULATE FLUXES
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_bio) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           loc_ij(:,:) = const_real_zero
@@ -2129,6 +2129,7 @@ CONTAINS
     ! CDR-MIP
     !--------------------------------------------------------- !
     if (ctrl_data_save_slice_cdrmip) CALL sub_save_netcdf_2d_cdrmip()
+    !--------------------------------------------------------- !
     !--------------------------------------------------------- !
   END SUBROUTINE sub_save_netcdf_2d
   ! ****************************************************************************************************************************** !
@@ -2642,10 +2643,6 @@ CONTAINS
           call sub_putvar3d_g('ocn_DIC_D14C_age',loc_iou,n_i,n_j,n_k, &
                & loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end if
-       ! color tracer ratios -- as an age tracer
-       IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) then
-          CALL sub_save_netcdf_ocn_col_extra(dum_t)
-       end IF
     end if
     !----------------------------------------------------------------
     !       SAVE SALINITY-NORMALIZED OCEAN TRACER FIELD
@@ -2974,6 +2971,12 @@ CONTAINS
     !--------------------------------------------------------- !
     if (ctrl_data_save_slice_cdrmip) CALL sub_save_netcdf_3d_cdrmip()
     !--------------------------------------------------------- !
+    !----------------------------------------------------------------
+    ! COLOR AGE TRACERS
+    !----------------------------------------------------------------
+    IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) CALL sub_save_netcdf_ocn_col_extra(dum_t)
+    !----------------------------------------------------------------
+    !----------------------------------------------------------------
   END SUBROUTINE sub_save_netcdf_3d
   ! ****************************************************************************************************************************** !
 
@@ -3170,17 +3173,24 @@ CONTAINS
        DO j=1,n_j
           DO k=1,n_k
              IF (k >= goldstein_k1(i,j)) THEN
-                loc_colbminusr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k) - int_ocn_timeslice(io_colr,i,j,k)
-                IF(int_ocn_timeslice(io_colr,i,j,k) > const_real_nullsmall) THEN
-                   loc_colboverr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
-                   loc_colage(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
-                ENDIF
-                IF((int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k)) > const_real_nullsmall) THEN
-                   loc_colroverrplusb(i,j,k) = &
-                        & int_ocn_timeslice(io_colr,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
-                   loc_colboverrplusb(i,j,k) = &
-                        & int_ocn_timeslice(io_colb,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
-                ENDIF
+                if (ctrl_force_ocn_age) then
+                   IF(int_ocn_timeslice(io_colr,i,j,k) > const_real_nullsmall) THEN
+                      loc_colage(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
+                   ENDIF
+                elseif (ctrl_force_ocn_age1) then
+                   loc_colage(i,j,k) = int_ocn_timeslice(io_colr,i,j,k)/int_t_timeslice
+                else
+                   loc_colbminusr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k) - int_ocn_timeslice(io_colr,i,j,k)
+                   IF(int_ocn_timeslice(io_colr,i,j,k) > const_real_nullsmall) THEN
+                      loc_colboverr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
+                   ENDIF
+                   IF((int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k)) > const_real_nullsmall) THEN
+                      loc_colroverrplusb(i,j,k) = &
+                           & int_ocn_timeslice(io_colr,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
+                      loc_colboverrplusb(i,j,k) = &
+                           & int_ocn_timeslice(io_colb,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
+                   ENDIF
+                endif
              ENDIF
           END DO
        END DO
@@ -3198,7 +3208,7 @@ CONTAINS
     elseif (ctrl_force_ocn_age1) then
        call sub_adddef_netcdf(loc_iou,4,'misc_col_Dage','color tracer; ventilation age','(yrs)',loc_c0,loc_c0)
        call sub_putvar3d_g('misc_col_Dage',loc_iou,n_i,n_j,n_k,loc_ntrec, &
-            & int_ocn_timeslice(io_colr,:,:,:),loc_mask)
+            & loc_colage(:,:,:),loc_mask)
     else
        call sub_adddef_netcdf(loc_iou,4,'misc_bMINUSr','color tracers; [b] minus [r]','mol kg-1',loc_c0,loc_c0)
        call sub_putvar3d_g ('misc_bMINUSr',loc_iou,n_i,n_j,n_k,loc_ntrec, &
