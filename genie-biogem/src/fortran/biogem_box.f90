@@ -2793,7 +2793,7 @@ CONTAINS
     loc_bio_settle(:,:) = 0.0
     !
     loc_vocn(:) = 0.0
-    ! set water column particulate tracer loop limit and sinking rate
+    ! -------------------------------------------------------- ! set water column particulate tracer loop limit and sinking rate
     ! => test for sinking in any one time-step being less than the max depth of the ocean
     if (dum_dtyr*par_bio_remin_sinkingrate_physical <= goldstein_dsc) then
        ! assume particules could be present at any/every depth in the local water column
@@ -2807,13 +2807,12 @@ CONTAINS
        loc_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical
        loc_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_reaction
     end if
-
+    ! replace reaction sinking rate if size-dependent sinking is selected
     select case (par_bio_remin_fun)
     case ('KriestOschlies2008_explicit')
       loc_bio_remin_sinkingrate_reaction = &
       & par_bio_remin_POC_w0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta
     end select
-
     ! -------------------------------------------------------- ! test for possibilty of precip in water column
     ! if so: assume particules could be present at any/every depth in the local water column
     ! if not: assume particulates present only in surface layer
