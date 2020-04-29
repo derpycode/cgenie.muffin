@@ -1715,6 +1715,7 @@ subroutine biogem(        &
   ! if local (BioGeM) model time has surpassed the set model end time, then set the flag updating system biogeochemistry to false
   IF (loc_t < const_real_nullsmall) par_misc_t_go = .FALSE.
   If (error_stop) then
+     PRINT*,' '
      PRINT*,'*** END BioGeM - ERROR ***'
      PRINT*,' '
      ! reset array values
@@ -1735,6 +1736,7 @@ subroutine biogem(        &
      STOP
   end If
   If ((par_misc_t_start + real(dum_genie_clock)/(1000.0*conv_yr_s)) > par_misc_t_stop) then
+     PRINT*,' '
      PRINT*,'*** END BioGeM - saving restart and terminating early ***'
      PRINT*,' '
      call biogem_save_restart(dum_genie_clock)

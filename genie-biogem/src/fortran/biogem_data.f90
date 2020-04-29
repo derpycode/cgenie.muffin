@@ -2994,15 +2994,21 @@ CONTAINS
        if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (6)
        ! BASIC + tracer + proxy diagnostics
+       ctrl_data_save_slice_carb = .true.
+       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
     case (7)
        ! BASIC + biology + tracer + proxy diagnostics
        ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_carb = .true.
+       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
@@ -3054,9 +3060,12 @@ CONTAINS
     case (11)
        ! BASIC + biology + tracer + proxy + redox diagnostics
        ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_carb = .true.
+       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.

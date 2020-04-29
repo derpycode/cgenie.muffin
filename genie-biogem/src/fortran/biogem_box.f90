@@ -2738,7 +2738,7 @@ CONTAINS
     !!!real::loc_bio_part_FeOOH_ratio,loc_bio_part_FeS2_ratio,loc_bio_part_FeCO3_ratio
     real::loc_eL_size                                                   ! local efolding depth varying with ecosystem size structure JDW
     real::loc_size0                                                     ! JDW
-    real::loc_part_tot
+    real::loc_part_tot,loc_part_tot_mineral
     real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo            !
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part_TMP
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part_OLD
@@ -2808,10 +2808,9 @@ CONTAINS
     ! -------------------------------------------------------- ! test for possibilty of precip in water column
     ! if so: assume particules could be present at any/every depth in the local water column
     ! if not: assume particulates present only in surface layer
-    ! ### INSERT CODE ############################################################################################################ ! 
-    loc_klim = loc_k1 ! for now: search throughout the water column
-    !!!loc_klim = n_k
-    ! ############################################################################################################################ !
+    if (sed_select(is_Fe3Si2O4) .OR. sed_select(is_FeCO3) .OR. sed_select(is_FeS2) .OR. sed_select(is_FeOOH)) then
+       loc_klim = loc_k1
+    end if
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
@@ -2827,12 +2826,14 @@ CONTAINS
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     DO k=n_k,loc_klim,-1
-       ! find some particulates (POC) in the water column
+       ! find some particulates in the water column
+       ! NOTE: save total mineral load (seperately from total particulate load)
        loc_part_tot = 0.0
-       if (sed_select(is_POC)) loc_part_tot   = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
        if (sed_select(is_CaCO3)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_CaCO3),k)
-       if (sed_select(is_opal)) loc_part_tot  = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
-       if (sed_select(is_det)) loc_part_tot   = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
+       if (sed_select(is_opal))  loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
+       if (sed_select(is_det))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
+       loc_part_tot_mineral = loc_part_tot
+       if (sed_select(is_POC))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
        If (loc_part_tot  > const_real_nullsmall) then
           ! if the identified particulate material is already residing in the bottom-most ocean layer, flag as sediment flux
           If (k == loc_k1) then
@@ -3157,9 +3158,9 @@ CONTAINS
                       end select
                       ! FRACTION #2
                       if (ctrl_bio_remin_POC_ballast) then
-                         if (loc_bio_part_TMP(is2l(is_POC_frac2),kk+1)*loc_bio_part_TMP(is2l(is_POC),kk+1) &
-                              & > &
-                              & const_real_nullsmall) then
+                         ! NOTE: check that there is a non-zero mineral particule load
+                         ! NOTE: previously, it was checked that both the POC flux and frac are non zero
+                         if (loc_part_tot_mineral > const_real_nullsmall) then
                             loc_bio_remin_POC_frac2 = 1.0 -                                                                   &
                                  & (                                                                                          &
                                  &   loc_bio_part_CaCO3_ratio*par_bio_remin_kc(dum_i,dum_j)*loc_bio_part_TMP(is_CaCO3,kk+1) + &

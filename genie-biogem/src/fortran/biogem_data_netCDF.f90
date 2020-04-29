@@ -652,7 +652,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       pH FIELD
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_diag_geochem) then
+    if (ctrl_data_save_slice_bio .OR. ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'pH units (SWS)'
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ijk(:,:,:) = const_real_zero
@@ -1201,7 +1201,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       pH FIELD
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_diag_geochem) then
+    if (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'pH units (SWS)'
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ij(:,:) = const_real_zero
@@ -1220,7 +1220,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       P:C export cellular quotient ratio
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio) then
+    if (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
        IF (sed_select(is_POP) .AND. sed_select(is_POC)) THEN
           ! P/C
           loc_unitsname = 'n/a'
@@ -1257,7 +1257,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       CaCO3:POC surface ocean export 'rain ratio'
     !-----------------------------------------------------------------------
-    IF (ctrl_data_save_slice_bio) THEN
+    IF (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) THEN
        loc_unitsname = 'n/a'
        IF (sed_select(is_CaCO3) .AND. sed_select(is_POC)) THEN
           loc_ij(:,:) = const_real_null
@@ -1280,7 +1280,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       opal:POC surface ocean export 'rain ratio'
     !-----------------------------------------------------------------------
-    IF (ctrl_data_save_slice_bio) THEN
+    IF (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) THEN
        loc_unitsname = 'n/a'
        IF (sed_select(is_opal) .AND. sed_select(is_POC)) THEN
           loc_ij(:,:) = const_real_null
@@ -1303,7 +1303,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       POC frac2 surface ocean export ratio
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        loc_unitsname = 'n/a'
        loc_ij(:,:) = const_real_null
        DO i=1,n_i
@@ -1322,7 +1322,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Cd particulate surface ocean export trace metal ratios
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_proxy) then
+    If (ctrl_data_save_slice_diag_proxy) then
        IF (ocn_select(io_Cd)) THEN
           loc_unitsname = 'nmol kg-1 (umol kg-1)-1'
           IF (sed_select(is_POCd) .AND. sed_select(is_POC)) THEN
@@ -1377,7 +1377,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Fe diagnostics
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_geochem) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_bio) then
        IF (ocn_select(io_Fe) .OR. ocn_select(io_Fe)) THEN
           ! total aeolian Fe flux (mass)
           loc_unitsname = 'mg Fe m-2 yr-1'
@@ -1428,7 +1428,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Fe:C export cellular quotient ratio
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        IF (sed_select(is_POFe) .AND. sed_select(is_POC)) THEN
           ! C/Fe
           loc_unitsname = 'n/a'
@@ -1465,7 +1465,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Biological productivity controls
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        DO ib=1,n_diag_bio
           select case (ib)
           CASE (idiag_bio_dPO4,idiag_bio_dPO4_1,idiag_bio_dPO4_2)
@@ -1509,7 +1509,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     ! ECOGEM diagnostics
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio .AND. flag_ecogem) then
+    if (ctrl_data_save_slice_diag_bio .AND. flag_ecogem) then
        ! calculate POM equivalnt of DOM
        loc_isij(:,:,:) = 0.0
        DO i=1,n_i
@@ -1550,7 +1550,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     ! nutrient availablity diagnostics
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        if ( ocn_select(io_PO4) .AND. ocn_select(io_SiO2) ) then
           loc_unitsname = 'n/a'
           loc_ij(:,:) = const_real_null
@@ -1829,7 +1829,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       WATER-COLUMN INTEGRATED TRACER INVENTORIES
     !----------------------------------------------------------------
-    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_geochem) .OR. (par_data_save_level == 10)) then
+    If (ctrl_data_save_slice_diag_geochem .OR. (par_data_save_level == 10)) then
        loc_unitsname = 'mol m-2'
        DO l=3,n_l_ocn
           io = conv_iselected_io(l)
@@ -1948,7 +1948,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       OCEAN SURFACE DATA
     !----------------------------------------------------------------
-    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
              loc_ij(:,:) = const_real_zero
@@ -1997,7 +1997,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       OCEAN FLOOR DATA
     !----------------------------------------------------------------
-    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
              loc_ij(:,:) = const_real_zero
