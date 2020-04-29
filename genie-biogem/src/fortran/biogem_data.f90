@@ -212,6 +212,10 @@ CONTAINS
        print*,'Activation energy #2 for POC                        : ',par_bio_remin_POC_Ea2
        print*,'Range of fractional abundance of POC component #2   : ',par_bio_remin_POC_dfrac2
        print*,'Fractional abundance of POC #2 half sat             : ',par_bio_remin_POC_c0frac2
+       print*,'Size-dependent sinking: reference remin. length     : ',par_bio_remin_POC_eL0
+       print*,'Size-dependent sinking: power-law exponent          : ',par_bio_remin_POC_eta
+       print*,'Size-dependent sinking: smallest size ecogem class  : ',par_bio_remin_POC_size0
+       print*,'Size-dependent sinking: reference sinking rate      : ',par_bio_remin_POC_w0
        print*,'Apply fixed-profile for CaCO3 remineralization?     : ',ctrl_bio_remin_CaCO3_fixed
        print*,'Initial fractional abundance of CaCO3 component #2  : ',par_bio_remin_CaCO3_frac2
        print*,'Remineralization length #1 for CaCO3                : ',par_bio_remin_CaCO3_eL1
@@ -295,7 +299,7 @@ CONTAINS
        print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
-       print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD 
+       print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'CaCO3 44Ca fractionation scheme ID string           : ',trim(opt_d44Ca_Ca_CaCO3)
@@ -388,7 +392,7 @@ CONTAINS
        print*,'Rate law power for Fe3Si2O4 precipitation           : ',par_bio_Fe3Si2O4precip_exp
        print*,'Ohmega constant for Fe3Si2O4 precipitation          : ',par_bio_Fe3Si2O4precip_abioticohm_cte
        print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_FeCO3_alpha
-       print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi     
+       print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte
        print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
@@ -398,11 +402,11 @@ CONTAINS
        print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
        print*,'pyrite precip stiochiometry                         : ',ctrl_bio_FeS2precip_explicit
-       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte       
+       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
        print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
-       print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha 
-       print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha 
-       print*,'let FeOOH precipitate explictely?                   : ',ctrl_bio_FeOOHprecip_explicit 
+       print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha
+       print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha
+       print*,'let FeOOH precipitate explictely?                   : ',ctrl_bio_FeOOHprecip_explicit
        print*,'threshold of dissolved Fe for FeOOH repcip          : ',par_FeOOH_Fethresh
        print*,'kinetic constant for Fe reduction                   : ',par_bio_remin_kFetoFe2
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
@@ -569,6 +573,7 @@ CONTAINS
     ! adjust units of prescribed particulates sinking rate (m d-1 -> m yr-1)
     par_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical/conv_d_yr
     par_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_reaction/conv_d_yr
+    par_bio_remin_POC_w0 = par_bio_remin_POC_w0/conv_d_yr
     ! adjust units of CH4 oxidation (d-1 -> yr-1)
     par_bio_remin_CH4rate = par_bio_remin_CH4rate/conv_d_yr
     ! opal dissolution
@@ -967,9 +972,9 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_H2StoSO4_dSO4'
           n = n+1
-          loc_string(n) = 'redox_H2StoSO4_dO2' 
+          loc_string(n) = 'redox_H2StoSO4_dO2'
           n = n+1
-          loc_string(n) = 'redox_H2StoSO4_dALK'  
+          loc_string(n) = 'redox_H2StoSO4_dALK'
        end if
     end if
     if (ocn_select(io_NH4)) then
@@ -979,9 +984,9 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_NH4toNO3_dNO3'
           n = n+1
-          loc_string(n) = 'redox_NH4toNO3_dO2'  
+          loc_string(n) = 'redox_NH4toNO3_dO2'
           n = n+1
-          loc_string(n) = 'redox_NH4toNO3_dALK'  
+          loc_string(n) = 'redox_NH4toNO3_dALK'
        end if
     end if
     if (ocn_select(io_CH4)) then
@@ -991,9 +996,9 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_CH4toDIC_dDIC'
           n = n+1
-          loc_string(n) = 'redox_CH4toDIC_dO2'   
+          loc_string(n) = 'redox_CH4toDIC_dO2'
           n = n+1
-          loc_string(n) = 'redox_CH4toDIC_dALK'   
+          loc_string(n) = 'redox_CH4toDIC_dALK'
        end if
        if (ocn_select(io_SO4)) then
           n = n+1
@@ -1001,11 +1006,11 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_CH4toDICaom_dDIC'
           n = n+1
-          loc_string(n) = 'redox_CH4toDICaom_dH2S'   
+          loc_string(n) = 'redox_CH4toDICaom_dH2S'
           n = n+1
-          loc_string(n) = 'redox_CH4toDICaom_dSO4'  
+          loc_string(n) = 'redox_CH4toDICaom_dSO4'
           n = n+1
-          loc_string(n) = 'redox_CH4toDICaom_dALK'  
+          loc_string(n) = 'redox_CH4toDICaom_dALK'
        end if
     end if
     if (ocn_select(io_I) .AND. ocn_select(io_I)) then
@@ -1015,13 +1020,13 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_ItoIO3_dIO3'
           n = n+1
-          loc_string(n) = 'redox_ItoIO3_dO2'  
+          loc_string(n) = 'redox_ItoIO3_dO2'
           n = n+1
           loc_string(n) = 'redox_IO3toI_dI'
           n = n+1
           loc_string(n) = 'redox_IO3toI_dIO3'
           n = n+1
-          loc_string(n) = 'redox_IO3toI_dO2'  
+          loc_string(n) = 'redox_IO3toI_dO2'
        end if
     end if
     if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe)) then
@@ -1031,7 +1036,7 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_Fe2toFe3_dFe'
           n = n+1
-          loc_string(n) = 'redox_Fe2toFe3_dO2'  
+          loc_string(n) = 'redox_Fe2toFe3_dO2'
        end if
     end if
     if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
@@ -1041,11 +1046,11 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_Fe3toFe2_dFe2'
           n = n+1
-          loc_string(n) = 'redox_Fe3toFe2_dH2S'  
+          loc_string(n) = 'redox_Fe3toFe2_dH2S'
           n = n+1
-          loc_string(n) = 'redox_Fe3toFe2_dSO4'  
+          loc_string(n) = 'redox_Fe3toFe2_dSO4'
           n = n+1
-          loc_string(n) = 'redox_Fe3toFe2_dALK'  
+          loc_string(n) = 'redox_Fe3toFe2_dALK'
        end if
     end if
     ! -------------------------------------------------------- ! (2) solid -> dissolved
@@ -1103,7 +1108,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! UPDATE RELATIONSHIPS BETWEEN TRACERS
   ! NOTE: the reverse transformation array <conv_ocn_sed> was never used and hence is no longer updated here
-  !       (01/01/2019 UPDATE: as has now been removed entirely ...) 
+  !       (01/01/2019 UPDATE: as has now been removed entirely ...)
   ! NOTE: update the basic oxic transformation (<conv_sed_ocn>) first:
   !       this is used to create particulate matter (e.g. biological uptake) as well as in the tracer auditing calculations
   SUBROUTINE sub_data_update_tracerrelationships()
@@ -1607,7 +1612,7 @@ CONTAINS
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
     int_diag_redox_sig(:)   = 0.0
-    int_diag_ecogem_part    = 0.0 
+    int_diag_ecogem_part    = 0.0
     int_diag_ecogem_remin   = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
@@ -2314,7 +2319,7 @@ CONTAINS
        if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
           IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
           IF (.NOT. ocn_select(io_FeL)) loc_flag = .TRUE.
-          IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.       
+          IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.
        end if
        IF (.NOT. sed_select(is_POFe)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_POM_Fe)) loc_flag = .TRUE.
