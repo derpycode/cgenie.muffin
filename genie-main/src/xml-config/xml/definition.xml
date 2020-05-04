@@ -1343,9 +1343,9 @@
                         <value datatype="integer">100</value>
                         <description>pH solution maximum number of iterations</description>
                     </param>
-                    <param name="ctrl_carbchem_fail">
-                        <value datatype="boolean">.true.</value>
-                        <description>exit upon pH solution failure?</description>
+                    <param name="ctrl_carbchem_pHseed_retry">
+                        <value datatype="boolean">.false.</value>
+                        <description>Attempt pH re-seed if solution fails (else exit)?</description>
                     </param>
                     <param name="ctrl_carbchem_noH3SiO4">
                         <value datatype="boolean">.false.</value>
