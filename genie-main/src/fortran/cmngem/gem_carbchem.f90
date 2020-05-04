@@ -435,7 +435,7 @@ CONTAINS
        loc_H2 = dum_carbconst(icc_k2)*loc_conc_HCO3/loc_conc_CO3
        ! test for -ve [H]
        IF ((loc_H1 < const_real_nullsmall) .OR. (loc_H2 < const_real_nullsmall)) THEN
-          if (.NOT. ctrl_carbchem_pHseed_retry) then
+          if ((.NOT. ctrl_carbchem_pHseed_retry) .OR. (m > par_carbchem_pH_iterationmax)) then
              CALL sub_report_error(                                                         &
                   & 'gem_carbchem.f90','sub_calc_carb',                                     &
                   & 'Numerical instability at step; '//fun_conv_num_char_n(4,n)//           &
@@ -473,13 +473,14 @@ CONTAINS
              Print*,' > Refer to user-manual for info on altering the error behavior.'
              Print*,' '
              error_carbchem = .TRUE.
-             error_stop = .TRUE.
+             error_stop     = .TRUE.
              exit
           else
              ! re-seed [H+]
              call RANDOM_NUMBER(loc_r)
              loc_H1 = 10**(-4.7 - 2.5*dum_ALK/dum_DIC - (loc_r - 0.5))
              loc_H2 = loc_H1
+             m = m + 1
           end if
        ENDIF
        ! the implicit bit!
@@ -521,7 +522,7 @@ CONTAINS
        end if
        ! test for whether we are likely to be waiting all bloody day for the algorithm to solve sweet FA
        IF (n > par_carbchem_pH_iterationmax) THEN
-          if (.NOT. ctrl_carbchem_pHseed_retry) then
+          if ((.NOT. ctrl_carbchem_pHseed_retry) .OR. (m > par_carbchem_pH_iterationmax)) then
              CALL sub_report_error(                                                                            &
                   & 'gem_carbchem.f90','sub_calc_carb',                                                        &
                   & 'Number of steps taken without successfully solving for pH = '//fun_conv_num_char_n(4,n)// &
@@ -550,21 +551,6 @@ CONTAINS
              loc_H2 = loc_H1
              n = 1
              m = m + 1
-             IF (m > par_carbchem_pH_iterationmax) THEN
-                CALL sub_report_error(                                                                             &
-                     & 'gem_carbchem.f90','sub_calc_carb',                                                         &
-                     & 'Number of seeds tested without successfully solving for pH = '//fun_conv_num_char_n(4,m)// &
-                     & ' out of: '//fun_conv_num_char_n(4,par_carbchem_pH_iterationmax)//' maximum allowed'//      &
-                     & ' / Data; dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,'//                       &
-                     & 'pH(SWS), pH (OLD), pH (guess #1), pH (guess #2)',                                          &
-                     & 'CARBONATE CHEMISTRY COULD NOT BE UPDATED :(',                                              &
-                     & (/dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,                                  &
-                     & -LOG10(loc_H),-LOG10(loc_H_old),-LOG10(loc_H1),-LOG10(loc_H2)/),.false.                     &
-                     & )
-                error_carbchem = .TRUE.
-                error_stop     = .TRUE.
-                exit
-             END IF
           end if
        END IF
 
