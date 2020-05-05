@@ -170,7 +170,7 @@ CONTAINS
     conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)       = 1.0
     conv_sed_ocn(io_O2,is_FeOOH)                 = 0.0
     conv_sed_ocn(io_Fe,is_POM_FeOOH)             = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0 
+    conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0
     conv_sed_ocn(io_O2,is_POM_FeOOH)             = 0.0
     conv_sed_ocn(io_Os,is_POM_Os)                = 1.0
     conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)    = 1.0
@@ -210,9 +210,29 @@ CONTAINS
     ! RDISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between RDOM and POM
     ! convert POM -> RDOM
-    conv_POM_RDOM(:,:) = conv_POM_DOM(:,:)
+    conv_POM_RDOM(:,:) = 0.0
+    conv_POM_RDOM(io_RDOM_C,is_POC)               = 1.0
+    conv_POM_RDOM(io_RDOM_C_13C,is_POC_13C)       = 1.0
+    conv_POM_RDOM(io_RDOM_C_14C,is_POC_14C)       = 1.0
+    conv_POM_RDOM(io_RDOM_N,is_PON)               = 1.0
+    conv_POM_RDOM(io_RDOM_N_15N,is_PON_15N)       = 1.0
+    conv_POM_RDOM(io_RDOM_P,is_POP)               = 1.0
+    conv_POM_RDOM(io_RDOM_Cd,is_POCd)             = 1.0
+    conv_POM_RDOM(io_RDOM_Cd_114Cd,is_POCd_114Cd) = 1.0
+    conv_POM_RDOM(io_RDOM_Fe,is_POFe)             = 1.0
+    conv_POM_RDOM(io_RDOM_I,is_POI)               = 1.0
     ! convert RDOM -> POM
-    conv_RDOM_POM(:,:) = conv_DOM_POM(:,:)
+    conv_RDOM_POM(:,:) = 0.0
+    conv_RDOM_POM(is_POC,io_RDOM_C)               = 1.0/conv_POM_RDOM(io_RDOM_C,is_POC)
+    conv_RDOM_POM(is_POC_13C,io_RDOM_C_13C)       = 1.0/conv_POM_RDOM(io_RDOM_C_13C,is_POC_13C)
+    conv_RDOM_POM(is_POC_14C,io_RDOM_C_14C)       = 1.0/conv_POM_RDOM(io_RDOM_C_14C,is_POC_14C)
+    conv_RDOM_POM(is_PON,io_RDOM_N)               = 1.0/conv_POM_RDOM(io_RDOM_N,is_PON)
+    conv_RDOM_POM(is_PON_15N,io_RDOM_N_15N)       = 1.0/conv_POM_RDOM(io_RDOM_N_15N,is_PON_15N)
+    conv_RDOM_POM(is_POP,io_RDOM_P)               = 1.0/conv_POM_RDOM(io_RDOM_P,is_POP)
+    conv_RDOM_POM(is_POCd,io_RDOM_Cd)             = 1.0/conv_POM_RDOM(io_RDOM_Cd,is_POCd)
+    conv_RDOM_POM(is_POCd_114Cd,io_RDOM_Cd_114Cd) = 1.0/conv_POM_RDOM(io_RDOM_Cd_114Cd,is_POCd_114Cd)
+    conv_RDOM_POM(is_POFe,io_RDOM_Fe)             = 1.0/conv_POM_RDOM(io_RDOM_Fe,is_POFe)
+    conv_RDOM_POM(is_POI,io_RDOM_I)               = 1.0/conv_POM_RDOM(io_RDOM_I,is_POI)
   END SUBROUTINE sub_def_tracerrelationships
   ! ****************************************************************************************************************************** !
 
@@ -280,7 +300,7 @@ CONTAINS
     loc_imax = size(dum_data)
     i = 0
     do i=1,loc_imax
-       if (dum_str == dum_data(i)) exit 
+       if (dum_str == dum_data(i)) exit
     end do
     ! -------------------------------------------------------- !
     ! END
@@ -832,7 +852,7 @@ CONTAINS
   END FUNCTION fun_calc_isotope_fraction
   ! ****************************************************************************************************************************** !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE DELTA (FROM mol light mass ISOTOPE AND mol ISOTOPE ABUNDANCE)
   ! NOTE: based on a ratio of one mass to the other, rather than to total
@@ -872,7 +892,7 @@ CONTAINS
   END FUNCTION fun_calc_isotope_fractionR
   ! ****************************************************************************************************************************** !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE lightest isotope abundance (from total and ratios)
   ! NOTE: assuming 3 different masses
@@ -887,7 +907,7 @@ CONTAINS
   END FUNCTION fun_calc_isotope_abundanceR0
   ! ****************************************************************************************************************************** !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE isotope abundance
   ! NOTE: assuming 3 different masses
@@ -928,7 +948,7 @@ CONTAINS
   END FUNCTION fun_calc_isotope_abundanceR012ocn
   ! ****************************************************************************************************************************** !
 
-  
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE isotope abundance
   ! NOTE: assuming 3 different masses
@@ -2563,4 +2583,3 @@ CONTAINS
 
 
 END MODULE gem_util
-
