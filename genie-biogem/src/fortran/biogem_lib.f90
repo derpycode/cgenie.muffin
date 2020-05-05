@@ -203,7 +203,8 @@ MODULE biogem_lib
   real::par_bio_remin_DOMlifetime                                       ! DOC lifetime (yrs)
   NAMELIST /ini_biogem_nml/par_bio_remin_DOMlifetime
   real::par_bio_remin_RDOMlifetime                                      ! RDOC lifetime (yrs)
-  NAMELIST /ini_biogem_nml/par_bio_remin_RDOMlifetime
+  real::par_bio_remin_RDOPlifetime                                      ! RDOP lifetime (yrs)
+  NAMELIST /ini_biogem_nml/par_bio_remin_RDOMlifetime,par_bio_remin_RDOPlifetime
   LOGICAL::ctrl_bio_remin_RDOM_photolysis                               ! RDOM degradation by (surface) photolysis only?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_RDOM_photolysis
   LOGICAL::ctrl_bio_remin_POC_fixed                              ! fixed-profile POM remineralization
@@ -267,9 +268,9 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_NH4toNO3,opt_bio_remin_oxidize_H2StoSO4
   CHARACTER(len=63)::opt_bio_remin_scavenge_H2StoPOMS            ! H2S -> POMS
   NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS
-  LOGICAL::ctrl_scav_H2S_dt_old                                  ! Old local residence time in layer for H2S? 
+  LOGICAL::ctrl_scav_H2S_dt_old                                  ! Old local residence time in layer for H2S?
   NAMELIST /ini_biogem_nml/ctrl_scav_H2S_dt_old
-  LOGICAL::ctrl_bio_remin_negO2_fix                              ! Fix for negative O2 
+  LOGICAL::ctrl_bio_remin_negO2_fix                              ! Fix for negative O2
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_negO2_fix
   real::par_bio_remin_CH4rate                                    ! specific CH4 oxidation rate (d-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_CH4rate
@@ -398,16 +399,16 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d44Ca_CaCO3_epsilon
   real::par_d88Sr_SrCO3_epsilon                                  ! 88/86Sr fractionation between Sr and SrCO3
   namelist /ini_biogem_nml/par_d88Sr_SrCO3_epsilon
-  real::par_d187Os_OsCO3_epsilon                                  ! 187/192Os fractionation between Os and OsCO3 
-  real::par_d188Os_OsCO3_epsilon                                  ! 188/192Os fractionation between Os and OsCO3 
+  real::par_d187Os_OsCO3_epsilon                                  ! 187/192Os fractionation between Os and OsCO3
+  real::par_d188Os_OsCO3_epsilon                                  ! 188/192Os fractionation between Os and OsCO3
   namelist /ini_biogem_nml/par_d187Os_OsCO3_epsilon,par_d188Os_OsCO3_epsilon
   real::par_d13C_Corg_CH4_epsilon                                ! methanogenesis fractionation
   namelist /ini_biogem_nml/par_d13C_Corg_CH4_epsilon
   real::par_d34S_Corg_SO4_epsilon                                ! sulphate reduction fractionation (in S isotopes)
   namelist /ini_biogem_nml/par_d34S_Corg_SO4_epsilon
-  real::par_bio_uptake_dN2_epsilon                               ! N2 fixation 15N fractionation 
+  real::par_bio_uptake_dN2_epsilon                               ! N2 fixation 15N fractionation
   real::par_bio_uptake_dNH4_epsilon                              ! NH4 assimilation 15N fractionation
-  real::par_bio_uptake_dNO3_epsilon                              ! NO3 uptake 15N fractionation  
+  real::par_bio_uptake_dNO3_epsilon                              ! NO3 uptake 15N fractionation
   namelist /ini_biogem_nml/par_bio_uptake_dN2_epsilon,par_bio_uptake_dNH4_epsilon,par_bio_uptake_dNO3_epsilon
   ! ------------------- IRON CYCLING --------------------------------------------------------------------------------------------- !
   real::par_det_Fe_sol                                           ! fractional solubility of Fe in dust
@@ -528,7 +529,7 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_sf,par_bio_FeCO3precip_exp
   real::par_bio_FeCO3precip_abioticohm_cte                       ! Ohmega constant for siderite formation
   real::par_bio_FeCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
-  NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte 
+  NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte
   real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
   real::par_d56Fe_Fe3Si2O4_alpha                                 ! 56/54Fe fractionation between Fe2 and greenalite
@@ -544,9 +545,9 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k,par_bio_FeS_part_abioticohm_cte
   real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
-  real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2 
+  real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
-  real::par_k_lim_pyr                                            ! MM type limiting factor for FeS2 precipitation 
+  real::par_k_lim_pyr                                            ! MM type limiting factor for FeS2 precipitation
   namelist /ini_biogem_nml/par_k_lim_pyr
   real::par_bio_remin_kFe2toFe                                   ! k-value Fe oxidation
   real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
@@ -565,7 +566,7 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS_sf,par_bio_FeS_exp
   real::par_bio_FeS_abioticohm_cte                               ! ohmega constant for FeS formation
   real::par_bio_FeS_abioticohm_min                               ! Minimum ohmega threshold for precip
-  NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte 
+  NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte
   LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
   NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
@@ -982,7 +983,7 @@ MODULE biogem_lib
        & 'k_SiO2_sp     ', &
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
-       & 'fspPOC        ' /)       
+       & 'fspPOC        ' /)
   ! diagnostics - geochemistry -- OLD
   CHARACTER(len=14),DIMENSION(n_diag_geochem_old),PARAMETER::string_diag_geochem_old = (/ &
        & 'dNO3_NH4_oxid ', &
@@ -994,7 +995,7 @@ MODULE biogem_lib
        & 'dH2S          ', &
        & 'dCH4          ', &
        & 'dCH4_AOM      ', &
-       & 'H2StoPOMS_dH2S'/)    
+       & 'H2StoPOMS_dH2S'/)
   ! diagnostics - geochemistry -- precip
   CHARACTER(len=18),DIMENSION(n_diag_precip),PARAMETER::string_diag_precip = (/ &
        & 'precip_FeS2_dFe   ', &
