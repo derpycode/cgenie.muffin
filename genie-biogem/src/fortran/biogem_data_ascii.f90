@@ -940,7 +940,7 @@ CONTAINS
        END DO
     END IF
     ! age tracers
-    IF (ctrl_data_save_sig_ocn .AND. (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1)) THEN
+    IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) THEN
        loc_filename=fun_data_timeseries_filename(loc_t, &
             & par_outdir_name,trim(par_outfile_name)//'_series','misc_col_age',string_results_ext)
        IF (ctrl_data_save_sig_ocn_sur) THEN
@@ -2561,7 +2561,7 @@ CONTAINS
        END DO
     end IF
     ! age tracers
-    IF (ctrl_data_save_sig_ocn .AND. (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1)) THEN
+    IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) THEN
        loc_filename=fun_data_timeseries_filename( &
             & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_col_age',string_results_ext)
        if (ctrl_force_ocn_age) then

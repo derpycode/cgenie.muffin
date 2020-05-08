@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- notes
-    Edited by CWA 17/7/07. Added new style variable declarations and references 
+    Edited by CWA 17/7/07. Added new style variable declarations and references
     and validated against schema.
 
     Did we say all model flags should be set to False in control? I
@@ -14,7 +14,7 @@
     "diffamp(1)", "diffamp(2)" etc. This will need changing if it's incorrect.
     -> CWA: array elements may optionally have names.
 
-   in embm and goldstein: 
+   in embm and goldstein:
    <param name="lout">
     <value datatype="string">spn</value>
     <description>output file number</description>
@@ -73,7 +73,7 @@
         <model name="gemlite" type="chem" flagname="flag_gemlite" state="off"/>
         <model name="ecogem" type="chem" flagname="flag_ecogem" state="off"/>
     </config>
-    
+
     <build>
       <!--macros are also translated (e.g. -D or \DEFINE are compiler dependent) and passed to the compile line-->
       <macro handle="GENIENXOPTS" status="undefined">
@@ -161,7 +161,7 @@
         <replacement>36</replacement>
       </macro>
     </build>
-    
+
     <testing>
       <var name="TEST_NAME"><varref>EXPID</varref>_regtest</var>
       <var name="ASSUMEDGOOD_NAME"><varref>EXPID</varref>_assumedgood</var>
@@ -169,9 +169,9 @@
       <var name="TESTFILE">xxxx</var>
       <var name="CHECKFLUXES">FALSE</var>
     </testing>
-    
+
     <parameters>
-        
+
         <!-- *******************************************************************-->
         <!-- MAIN MODULE-->
         <!-- *******************************************************************-->
@@ -281,7 +281,7 @@
                     <param name="gem_adapt_DpCO2">
                         <value datatype="real">0.1</value>
                         <description>cumulative pCO2 threshold for wtiching out of GEMlite (ppm)</description>
-                    </param>    
+                    </param>
                     <param name="gem_adapt_diag_biogem_full">
                         <value datatype="logical">.false.</value>
                         <description>Normal data save, otherwise skip time-series and slice data saving and just update time point?</description>
@@ -372,7 +372,7 @@
                 <namelist name="INI_GEM_NML">
 <!-- TRACER SELECTION -->
                    <paramArray name="atm_select" dimension="1" extent="19">
-                        <description>tracer selection</description>    
+                        <description>tracer selection</description>
                         <param name="atm_select(1)" index="1">
                             <value datatype="boolean">.true.</value>
                             <description></description>
@@ -460,7 +460,7 @@
                   </paramArray>
 <!-- ocn_select -->
                    <paramArray name="ocn_select" dimension="1" extent="107">
-                        <description>tracer selection</description>    
+                        <description>tracer selection</description>
                         <param name="ocn_select(1)" index="1">
                             <value datatype="boolean">.true.</value>
                             <description></description>
@@ -900,7 +900,7 @@
                   </paramArray>
 <!-- sed_select -->
                    <paramArray name="sed_select" dimension="1" extent="107">
-                        <description>tracer selection</description>    
+                        <description>tracer selection</description>
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
                             <description></description>
@@ -1343,9 +1343,9 @@
                         <value datatype="integer">100</value>
                         <description>pH solution maximum number of iterations</description>
                     </param>
-                    <param name="ctrl_carbchem_fail">
-                        <value datatype="boolean">.true.</value>
-                        <description>exit upon pH solution failure?</description>
+                    <param name="ctrl_carbchem_pHseed_retry">
+                        <value datatype="boolean">.false.</value>
+                        <description>Attempt pH re-seed if solution fails (else exit)?</description>
                     </param>
                     <param name="ctrl_carbchem_noH3SiO4">
                         <value datatype="boolean">.false.</value>
@@ -1414,19 +1414,19 @@
                         <description>filetype for series output files for GEM modules</description>
                     </param>
                 </namelist>
-            </file>            
-        </control>    
-        
+            </file>
+        </control>
+
         <model name="embm">
             <!-- *******************************************************************-->
             <!-- ATMOSPHERIC MODULE: EMBM-->
             <!-- *******************************************************************-->
-            <!-- 
+            <!--
     For restarts set new/continuing='c' and restart filename = yyy.x, where
-    yyy = output file number and x = [1 -> 0]. Put file yyy.x into directory 
+    yyy = output file number and x = [1 -> 0]. Put file yyy.x into directory
     $CODEDIR/genie-embm/data/input
 -->
-            
+
             <!-- namelist outdir="$OUTDIR/data_EMBM" -->
             <file name="data_EMBM">
                 <namelist name="INI_EMBM_NML">
@@ -1505,10 +1505,10 @@
                     <param name="scf">
                         <value datatype="real">2.00</value>
                         <description>
-                          scl_tau: scales the wind stress to drive correct gyre strengths. 
+                          scl_tau: scales the wind stress to drive correct gyre strengths.
                           Should be same as GOLDSTEIN's value.
                           Plausible range 1 to 3 (dimensionless)
-			  Tuned values: 1.6674 (EnKF), 1.1841 (ACCPM), 1.3005 (NSGA-II) 
+			  Tuned values: 1.6674 (EnKF), 1.1841 (ACCPM), 1.3005 (NSGA-II)
                         </description>
                     </param>
                     <param name="rmax">
@@ -1692,7 +1692,7 @@
                     <param name="scl_fwf">
                         <value datatype="real">1.00</value>
                         <description>i
-                          Scales the total Atlantic to Pacific freshwater flux 
+                          Scales the total Atlantic to Pacific freshwater flux
                           Applied uniformly to extra1a, extra1b and extra1c
                         </description>
                     </param>
@@ -1741,7 +1741,7 @@
                         <description>conversion used in humidity data for error calc (will be used to calculate "data/scaling-offset"): scaling</description>
                     </param>
                     <param name="qdata_offset">
-			<value datatype="real">0.0</value> 
+			<value datatype="real">0.0</value>
                         <description>conversion used in humidity data for error calc (will be used to calculate "data/scaling-offset"): offset</description>
                     </param>
 		    <param name="qdata_rhum">
@@ -1994,15 +1994,15 @@
                     <param name="t_d18o">
                         <value datatype="integer">0</value>
                         <description>switch 0(off)1(time varying)2(fixed) for benthic d18o derived ice sheets. Alternative to t_orog and t_lice</description>
-                    </param> 
+                    </param>
                     <param name="nd18o">
                         <value datatype="integer">0</value>
                         <description>number of inputs in d18o time series</description>
-                    </param> 
+                    </param>
                     <param name="d18osteps">
                         <value datatype="integer">0</value>
                         <description>interval (ocean timesteps) between d18o time series data points</description>
-                    </param> 
+                    </param>
                     <param name="d18o_k">
                         <value datatype="real">1.0</value>
                         <description>constant for saturation of ice sheets (see Holden 2009 Clim Past Disc)</description>
@@ -2042,20 +2042,20 @@
                     <param name="par_runoff_scheme">
                         <value datatype="integer">0</value>
                         <description>scheme to allocate land runoff:
-                        0 - precip. (default); 
+                        0 - precip. (default);
                         1 - bucket overflow
-                        2 - Leaky bucket (Meissner et al '03); 
+                        2 - Leaky bucket (Meissner et al '03);
                         3 - soil moisture 'half-life'</description>
                     </param>
                     <param name="par_runoff_b">
                         <value datatype="real">6.63</value>
-                        <description>if ea_par_runoff_scheme=2, 
-                        this determines the Clapp-Hornberger exponent 
+                        <description>if ea_par_runoff_scheme=2,
+                        this determines the Clapp-Hornberger exponent
                         (4.50 for coarse grain soil; 6.63 for medium and 11.20 for fine grain) </description>
                     </param>
                     <param name="par_runoff_tau">
                         <value datatype="integer">1.5</value>
-                        <description>if ea_par_runoff_scheme=3, 
+                        <description>if ea_par_runoff_scheme=3,
                         this is the half-life of soil moisture in months</description>
                     </param>
                     <param name="par_wind_polar_avg">
@@ -2063,12 +2063,12 @@
                         <description>option to bypass polar wind averaging in embm:
                         0 - As in March et al. 2011 (default). genie-wind is inconsistent with embm input method.
                         1 - Remove polar wind averaging of uatm on embm input winds.
-                        This makes the embm input winds compatible with the genie-wind module input winds. 
-                        2 - Removed polar wind averaging of usurf and on ENTS input winds.</description> 
+                        This makes the embm input winds compatible with the genie-wind module input winds.
+                        2 - Removed polar wind averaging of usurf and on ENTS input winds.</description>
                     </param>
                     <param name="unify_winds">
                         <value datatype="integer">0</value>
-                        <description>uses embm input winds even with ents on. 
+                        <description>uses embm input winds even with ents on.
                          0 - (default behaviour) ENTS modifies uatm and usurf winds.
                          1 - even with ENTS, use EMBM input winds for both uatm and usurf.
                          2 - even with ENTS, use embm uatm, but replace usurf with ENTS usurfl
@@ -2166,7 +2166,7 @@
                    <param name="mars">
                        <value datatype="integer">0</value>
                        <description>shortcut for mars simulation
-                                    untested and probably not working in plasim-genie 
+                                    untested and probably not working in plasim-genie
                                     left in for possible development</description>
                    </param>
                    <param name="runtime_root">
@@ -2379,9 +2379,9 @@
             <!-- OCEAN MODULE: GOLDSTEIN-->
             <!-- *******************************************************************-->
             <!---->
-            <!-- 
+            <!--
     For restarts set new/continuing='c' and restart filename = yyy.x, where
-    yyy = output file number and x = [1 -> 0]. Put file yyy.x into directory 
+    yyy = output file number and x = [1 -> 0]. Put file yyy.x into directory
     $CODEDIR/genie-goldstein/data/input
 -->
             <!-- namelist outdir="$OUTDIR" -->
@@ -2462,10 +2462,10 @@
                         <units>dimensionless</units>
                         <description>scl_tau: scales the wind stress to drive
                             correct gyre strengths.  Plausible range 1 to 3
-                            (dimensionless). Tuned values: 1.6674 (EnKF), 1.1841 (ACCPM), 1.3005 (NSGA-II) 
+                            (dimensionless). Tuned values: 1.6674 (EnKF), 1.1841 (ACCPM), 1.3005 (NSGA-II)
                         </description>
                     </param>
-                    
+
                     <paramArray name="diff" dimension="1" extent="2">
                         <description>ocean diffusivites iso/dia (or horiz/vert)</description>
                         <param name="diff(1)" index="1">
@@ -2479,7 +2479,7 @@
                             <description>Ocean vertical (diapycnal) diffusivity</description>
                             <units>m<sup>2</sup>s<sup>-1</sup></units>
                         </param>
-                    </paramArray>                    
+                    </paramArray>
                     <param name="adrag">
                         <value datatype="real">2.5</value>
                         <description>inverse minimum drag in days</description>
@@ -2540,7 +2540,7 @@
                     <param name="ctrl_diagmld">
 			<value datatype="boolean">.false.</value>
                         <description>diagnose (only) MLD?</description>
-                    </param>                    
+                    </param>
                     <param name="iediff">
                         <value datatype="integer">0</value>
                         <description>ocean diapycnal mixing scheme (0 = uniform; 1, 2 = variable)</description>
@@ -2606,7 +2606,7 @@
                         <description>conversion used in salinity data for error calc (will be used to calculate "data/scaling-offset"): scaling</description>
                     </param>
                     <param name="sdata_offset">
-			<value datatype="real">0.0</value> 
+			<value datatype="real">0.0</value>
                         <description>conversion used in salinity data for error calc (will be used to calculate "data/scaling-offset"): offset</description>
                     </param>
                     <param name="lout">
@@ -2651,7 +2651,7 @@
                     </param>
                     <param name="ssmaxdeep">
                         <value datatype="real">10.</value>
-                        <description>Isopycnal slope limiting vertical flux due to isopycnal mixing.This is NOT a tunable parameter; reducing it is a quick fix for unwanted negative tracers. It is better to reduce ssmaxsurf than ssmaxdeep. </description> 
+                        <description>Isopycnal slope limiting vertical flux due to isopycnal mixing.This is NOT a tunable parameter; reducing it is a quick fix for unwanted negative tracers. It is better to reduce ssmaxsurf than ssmaxdeep. </description>
                     </param>
                     <param name="ctrl_diagend">
 			<value datatype="boolean">.true.</value>
@@ -2688,20 +2688,20 @@
                 </namelist>
             </file>
         </model>
-                
+
         <model name="goldsteinseaice">
             <!---->
             <!-- *******************************************************************-->
             <!-- SEA-ICE MODULE: GOLDSTEIN sea-ice-->
             <!-- *******************************************************************-->
             <!---->
-            
-            <!-- 
+
+            <!--
     For restarts set new/continuing='c' and restart filename = yyy.x, where
-    yyy = output file number and x = [1 -> 0]. Put file yyy.x into directory 
+    yyy = output file number and x = [1 -> 0]. Put file yyy.x into directory
     $CODEDIR/genie-goldstein/data/input
 -->
-            
+
             <!-- namelist outdir="$OUTDIR" -->
             <file name="data_goldSIC">
                 <namelist name="INI_SIC_NML">
@@ -2738,7 +2738,7 @@
                     </param>
                     <param name="itstp">
                         <value datatype="integer">100</value>
-                        <description>frequency at which integral diagnostics are written to time series files, in timesteps. 
+                        <description>frequency at which integral diagnostics are written to time series files, in timesteps.
                                      500 gives output every 5 years, given nyear=100</description>
                     </param>
                     <param name="ianav">
@@ -2833,7 +2833,7 @@
                 </namelist>
             </file>
         </model>
-        
+
         <model name="ents">
             <!---->
             <!-- *******************************************************************-->
@@ -3026,7 +3026,7 @@
             </param>
             <param name="opt_append_data">
 			<value datatype="boolean">.false.</value>
-               <description>append data to output files on restart (if the same run - 
+               <description>append data to output files on restart (if the same run -
                             i.e. if output directory name (outdir_name) = restart directory name (rstdir_name))</description>
             </param>
             <param name="par_output_years_file_0d">
@@ -3040,19 +3040,19 @@
                 </namelist>
             </file>
         </model>
-                
+
         <model name="biogem">
             <!---->
             <!-- *******************************************************************-->
             <!-- BIOGEM-->
             <!-- *******************************************************************-->
-            
+
             <!-- namelist outdir="$OUTDIR" -->
             <file name="data_BIOGEM">
                 <namelist name="INI_BIOGEM_NML">
 
                     <paramArray name="ocn_init" dimension="1" extent="107">
-                        <description>tracer initialisation</description>    
+                        <description>tracer initialisation</description>
                         <param name="ocn_init(1)" index="1">
                             <value datatype="real">0.0</value>
                             <description></description>
@@ -3491,7 +3491,7 @@
                         </param>
                     </paramArray>
                     <paramArray name="ocn_dinit" dimension="1" extent="107">
-                        <description>tracer restart perturbation (re-initialisation)</description>    
+                        <description>tracer restart perturbation (re-initialisation)</description>
                         <param name="ocn_dinit(1)" index="1">
                             <value datatype="real">0.0</value>
                             <description></description>
@@ -4503,7 +4503,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_POC_Ea2">
 			<value datatype="real">80000.0</value>
                         <description>'Activation energy #2 for POC (J)</description>
-                    </param>                    
+                    </param>
                     <param name="par_bio_remin_POC_dfrac2">
 			<value datatype="real">0.0</value>
                         <description>Range in initial fractional abundance of POC component #2</description>
@@ -4655,6 +4655,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_POC_eL0">
 						<value datatype="real">187.5</value>
                         <description>e-folding depth of smallest ecogem size class (m)</description>
+                    </param>
+                    <param name="par_bio_remin_POC_w0">
+						<value datatype="real">3.52</value>
+                        <description>sinking rate of smallest ecogem size class (m day-1)</description>
                     </param>
                 	<param name="par_bio_remin_POC_size0">
 						<value datatype="real">0.6</value>
@@ -4854,7 +4858,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="par_bio_uptake_dNO3_epsilon">
 			<value datatype="real">0.0</value>
-                        <description>NO3 uptake 15N fractionation</description> 
+                        <description>NO3 uptake 15N fractionation</description>
                     </param>
 <!-- IRON  -->
                     <param name="par_det_Fe_sol">
@@ -5456,7 +5460,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="opt_append_data">
 			<value datatype="boolean">.false.</value>
-                        <description>append data to output files on restart 
+                        <description>append data to output files on restart
                                      (if the same run - i.e. if par_outdir_name = par_rstdir_name) (.FALSE./.TRUE.)</description>
                     </param>
                     <param name="par_data_save_ben_Dmin">
@@ -5541,7 +5545,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description></description>
                     </param>
                     <paramArray name="par_atm_force_scale_val" dimension="1" extent="19">
-                        <description>atmospheric tracer forcing scaling - value</description>    
+                        <description>atmospheric tracer forcing scaling - value</description>
                         <param name="par_atm_force_scale_val(1)" index="1">
                             <value datatype="real">1.0</value>
                             <description></description>
@@ -5628,7 +5632,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         </param>
                     </paramArray>
                     <paramArray name="par_atm_force_scale_time" dimension="1" extent="19">
-                        <description>atmospheric tracer forcing scaling - time</description>    
+                        <description>atmospheric tracer forcing scaling - time</description>
                         <param name="par_atm_force_scale_time(1)" index="1">
                             <value datatype="real">1.0</value>
                             <description></description>
@@ -5715,7 +5719,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         </param>
                     </paramArray>
                     <paramArray name="par_ocn_force_scale_val" dimension="1" extent="107">
-                        <description>ocean tracer forcing scaling - value</description>    
+                        <description>ocean tracer forcing scaling - value</description>
                         <param name="par_ocn_force_scale_val(1)" index="1">
                             <value datatype="real">1.0</value>
                             <description></description>
@@ -6154,7 +6158,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         </param>
                     </paramArray>
                     <paramArray name="par_ocn_force_scale_time" dimension="1" extent="107">
-                        <description>ocean tracer forcing scaling - time</description>    
+                        <description>ocean tracer forcing scaling - time</description>
                         <param name="par_ocn_force_scale_time(1)" index="1">
                             <value datatype="real">1.0</value>
                             <description></description>
@@ -6645,22 +6649,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 		</param>
 		<param name="par_data_TM_avg_n">
                      	<value datatype="real">1.0</value>
-		</param>    
+		</param>
                 </namelist>
             </file>
         </model>
-        
+
         <model name="atchem">
             <!---->
             <!-- *******************************************************************-->
             <!-- Embryonic ATMOSPHERIC CHEMISTRY MODULE.-->
             <!-- *******************************************************************-->
-            
+
             <!-- namelist outdir="$OUTDIR" -->
             <file name="data_ATCHEM">
                 <namelist name="INI_ATCHEM_NML">
                     <paramArray name="atm_init" dimension="1" extent="19">
-                        <description>tracer initialisation</description>    
+                        <description>tracer initialisation</description>
                         <param name="atm_init(1)" index="1">
                             <value datatype="real">0.0</value>
                             <description></description>
@@ -6747,7 +6751,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         </param>
                     </paramArray>
                     <paramArray name="atm_dinit" dimension="1" extent="19">
-                        <description>tracer perturbation</description>    
+                        <description>tracer perturbation</description>
                         <param name="atm_dinit(1)" index="1">
                             <value datatype="real">0.0</value>
                             <description></description>
@@ -6920,13 +6924,13 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                 </namelist>
             </file>
         </model>
-        
+
         <model name="sedgem">
             <!---->
             <!-- *******************************************************************-->
             <!-- sediment model-->
             <!-- *******************************************************************-->
-            <!---->            
+            <!---->
             <!-- namelist outdir="$OUTDIR" -->
             <file name="data_SEDGEM">
                 <namelist name="INI_SEDGEM_NML">
@@ -7112,7 +7116,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 					<param name="par_sed_huelse2017_sim_P_loss_pres_fracC">
 			<value datatype="boolean">.false.</value>
                         <description>Simulate ocean Porg loss related to Corg burial</description>
-                    </param>                   
+                    </param>
                     <param name="par_sed_huelse2017_sim_P_regeneration">
 			<value datatype="boolean">.false.</value>
                         <description>Simulate P-regeneration under anoxia</description>
@@ -7306,7 +7310,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_sed_clay_7Li_epsilon_fixed">
 			<value datatype="boolean">.true.</value>
                         <description>fixed (non T-dependent) MACC 7Li epsilon?  </description>
-                    </param> 
+                    </param>
                     <param name="par_sed_hydroip_fCa">
 			<value datatype="real">0.0</value>
                         <description>hydrothermal Ca flux (mol yr-1) -- 2.0E12 in Blattler et al. [2011] but set to zero here as a default</description>
@@ -7492,7 +7496,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="ctrl_append_data">
 			<value datatype="boolean">.false.</value>
-                        <description>append data to output files on restart 
+                        <description>append data to output files on restart
                                      (if the same run - i.e. if sg_par_outdir_name = sg_par_rstdir_name) (.FALSE./.TRUE.)</description>
                     </param>
                     <param name="ctrl_data_save_ascii">
@@ -7561,7 +7565,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
             <!-- *******************************************************************-->
             <!--     ROKGEM WEATHERING MODULE.-->
             <!-- *******************************************************************-->
-            
+
             <!-- namelist outdir="$OUTDIR" -->
             <file name="data_ROKGEM">
                 <namelist name="INI_ROKGEM_NML">
@@ -7621,16 +7625,16 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="opt_append_data">
 			<value datatype="boolean">.false.</value>
-                        <description>append data to output files on restart 
+                        <description>append data to output files on restart
                                      (if the same run - i.e. if rg_par_outdir_name = rg_par_rstdir_name) (.FALSE./.TRUE.)</description>
                     </param>
 	            <!-- *** RIVER ROUTING PARAMETERS ******************************** -->
 	          <param name="routing_scheme">
 			<value datatype="integer">1</value>
-                        <description>routing scheme to use: 1 = 'roof' routing using k1 file; 
+                        <description>routing scheme to use: 1 = 'roof' routing using k1 file;
                                      2 = intermediate using detailed map, but roof for stuff that ends up on genie land grid (about half)
                                      3 = detailed scheme using only flux that reaches the ocean
-                                     for 2 and 3, the coastal ocean flux is scaled to match the total number of genie land cells 
+                                     for 2 and 3, the coastal ocean flux is scaled to match the total number of genie land cells
                                      (minus antarctica, as that isn't included in the data)</description>
                     </param>
                     <param name="topo">
@@ -7837,7 +7841,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_CaSiO3_fracSi_d30Si">
 			<value datatype="real">0.0</value>
 			      <description>global silicate d30Si (o/oo)</description>
-                    </param>                  
+                    </param>
                     <param name="par_weather_CaSiO3_fracFeS2">
 			<value datatype="real">0.0</value>
 			      <description>global silicate pyrite abundance; a reasonable value woudl be to assume an S:Si ratio in the crust of 420:270000, and all S is pyrite (FeS2), i.e. 0.5*420/270000 = 7.8E-4</description>
@@ -7849,7 +7853,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_CaSiO3_fracFeS2_d56Fe">
 			<value datatype="real">0.0</value>
 			      <description>global pyrite d56Fe (o/oo)</description>
-                    </param>    
+                    </param>
                     <param name="par_weather_CaCO3_fracCaSO4">
 			<value datatype="real">0.0</value>
 			      <description>global carbonate gypsum abundance</description>
@@ -7901,15 +7905,15 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_CaCO3_d44Ca">
 			<value datatype="real">0.8</value>
                         <description>mean carbonate d44Ca (o/oo) -- consistent with mean riverine weathering input of Blattler et al. [2011]</description>
-                    </param>	
+                    </param>
                     <param name="par_weather_CaSiO3_fracSr">
 			<value datatype="real">0.00532</value>
                         <description>global silicate Sr abundance (as a proportion of [Ca+Mg]) [Wallmann]</description>
-                    </param>	
+                    </param>
                     <param name="par_weather_CaSiO3b_fracSr">
 			<value datatype="real">0.0057471</value>
                         <description>basaltic silicate Sr abundance (as a proportion of [Ca+Mg]) [Wallmann]</description>
-                    </param>	
+                    </param>
                     <param name="par_weather_CaSiO3g_fracSr">
 			<value datatype="real">0.0050847</value>
                         <description>granitic silicate Sr abundance (as a proportion of [Ca+Mg]) [Wallmann]</description>
@@ -8030,27 +8034,27 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                       <!-- *** 2D WEATHERING PARAMETERS ********************************* -->
                     <param name="par_lith_data">
 			<value datatype="string">GEM_CO2</value>
-                        <description>name of lithological data set - corresponding to directory 
+                        <description>name of lithological data set - corresponding to directory
                                      genie-rokgem/data/input/lithologies_par_lith_datapar_lith_data2par_lith_data3_036_036</description>
                     </param>
                     <param name="par_lith_data2">
 			<value datatype="string"></value>
-                        <description>name of lithological data set - corresponding to directory 
+                        <description>name of lithological data set - corresponding to directory
                                      genie-rokgem/data/input/lithologies_par_lith_datapar_lith_data2par_lith_data3_036_036</description>
                     </param>
                     <param name="par_lith_data3">
 			<value datatype="string"></value>
-                        <description>name of lithological data set - corresponding to directory 
+                        <description>name of lithological data set - corresponding to directory
                                      genie-rokgem/data/input/lithologies_par_lith_datapar_lith_data2par_lith_data3_036_036</description>
                     </param>
                     <param name="truncate_to_land">
 			<value datatype="boolean">.TRUE.</value>
-                        <description>truncate lithological maps to genie land-mask - 
+                        <description>truncate lithological maps to genie land-mask -
                                      if option is set to false than flux from land in genie ocean, goes direct to ocean</description>
                     </param>
                     <param name="scale_to_landarea">
 			<value datatype="boolean">.TRUE.</value>
-                        <description>scale lithological areas to total the land surface area 
+                        <description>scale lithological areas to total the land surface area
                                      (switch off if altering lithological areas e.g. for enhanced weathering)</description>
                     </param>
                     <param name="calibrate_weath">
@@ -8060,25 +8064,25 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="calibrate_weather_GKWM_CaCO3">
 			<value datatype="real">1.583</value>
                         <description>calibratation value for 2D CaCO3 weathering for GKWM scheme - to avoid drift, set equal to
-                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
                                      (e.g. 1.583 for spun-up model)</description>
                     </param>
                     <param name="calibrate_weather_GEM_CO2_CaCO3">
 			<value datatype="real">1.178</value>
-                        <description>calibratation value for 2D CaCO3 weathering for GEM-CO2 scheme - to avoid drift, set equal to 
-                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
+                        <description>calibratation value for 2D CaCO3 weathering for GEM-CO2 scheme - to avoid drift, set equal to
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
                                      (e.g. 1.178 for spun-up model)</description>
                     </param>
                     <param name="calibrate_weather_GKWM_CaSiO3">
 			<value datatype="real">0.8548</value>
-                        <description>alibration value for 2D CaSiO3 weathering for GKWM scheme - to avoid drift, set equal to 
-                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
+                        <description>alibration value for 2D CaSiO3 weathering for GKWM scheme - to avoid drift, set equal to
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
                                      (e.g. 0.8548 for spun-up model)</description>
                     </param>
                     <param name="calibrate_weather_GEM_CO2_CaSiO3">
 			<value datatype="real">0.8878</value>
-                        <description>calibration value for 2D CaSiO3 weathering for GEM-CO2 scheme - to avoid drift, set equal to 
-                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
+                        <description>calibration value for 2D CaSiO3 weathering for GEM-CO2 scheme - to avoid drift, set equal to
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
                                      (e.g. 0.8878 for spun-up model)</description>
                     </param>
                     <param name="opt_calibrate_T_2D">
@@ -8095,19 +8099,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
 	                <param name="par_ref_T0_2D">
 			<value datatype="string">T0_036_036.dat</value>
-                        <description>land surface temperature (C) calibration file containing base pattern for calibration 
+                        <description>land surface temperature (C) calibration file containing base pattern for calibration
                                      (model field is scaled by rg_par_data_T_2D divided by this if rg_opt_calibrate_T_2D=.true.)</description>
                     </param>
 	                <param name="par_ref_R0_2D">
 			<value datatype="string">R0_036_036.dat</value>
-                        <description>land surface runoff (mm/yr) calibration file containing base pattern for calibration 
+                        <description>land surface runoff (mm/yr) calibration file containing base pattern for calibration
                                      (model field is scaled by rg_par_data_R_2D divided by this if rg_opt_calibrate_R_2D=.true.)</description>
                     </param>
 	                <param name="par_ref_P0_2D">
 			<value datatype="string">P0.dat</value>
-                        <description>land surface productivity (kgC m-2 yr-1) calibration file containing base pattern for calibration 
+                        <description>land surface productivity (kgC m-2 yr-1) calibration file containing base pattern for calibration
                                      (model field is scaled by rg_par_data_P_2D divided by this if rg_opt_calibrate_P_2D=.true.)</description>
-                    </param>	                
+                    </param>
                     <param name="par_data_T_2D">
 			<value datatype="string">data_temp_036_036.dat</value>
                         <description>file containing weathering reference land surface productivity (mm/yr) data field to calibrate to</description>
@@ -8122,7 +8126,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
 	                <param name="opt_weath_regimes">
 			<value datatype="boolean">.FALSE.</value>
-                        <description>Apply orogeny mask, so that only active mountain building areas have interactive weathering 
+                        <description>Apply orogeny mask, so that only active mountain building areas have interactive weathering
                         (marked by a 2 on the landmask specified by rg_weath_regimes).</description>
                     </param>
                     <param name="weath_regimes">
@@ -8132,8 +8136,8 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                 </namelist>
             </file>
         </model>
-        
-        <model name="ecogem"> 
+
+        <model name="ecogem">
             <!---->
             <!-- *******************************************************************-->
             <!-- ECOGEM-->
@@ -8155,7 +8159,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                       <value datatype="boolean">.FALSE.</value>
                       <description></description>
                     </param>
-                    <param name="ctrl_force_T"> 
+                    <param name="ctrl_force_T">
                       <value datatype="boolean">.FALSE.</value>
                       <description>Force ecogem with a temperature field</description>
                     </param>
@@ -8177,8 +8181,8 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="integer">2</value>
 	                  <description>Number of organic matter classes.</description>
                     </param>
-<!-- Boolean switches specifying plankton quotas --> 
-<!--   Note C an N are by default --> 
+<!-- Boolean switches specifying plankton quotas -->
+<!--   Note C an N are by default -->
                     <param name="nquota">
 			<value datatype="boolean">.TRUE.</value>
 	                  <description>Dynamic nitrogen quotas</description>
@@ -8203,152 +8207,152 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.FALSE.</value>
 	               <description>select to trace carbon13 in food web</description>
 	               </param>
-				   <!-- Boolean switches specifying which inorganic nutrients seen by plankton  --> 
-<!--   Note NO3 is by default --> 
+				   <!-- Boolean switches specifying which inorganic nutrients seen by plankton  -->
+<!--   Note NO3 is by default -->
                     <param name="useDIC">
 			<value datatype="boolean">.TRUE.</value>
 	                  <description>Use DIC</description>
-	                  </param> 
+	                  </param>
                     <param name="useNO3">
 			<value datatype="boolean">.TRUE.</value>
 	                  <description>Use Nitrate</description>
-	                  </param> 
+	                  </param>
                     <param name="useNO2">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>Use Nitrite</description>
-	                  </param> 
+	                  </param>
 	                  <param name="useNH4">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>Use Ammonium</description>
-                    </param> 
+                    </param>
                     <param name="usePO4">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>Use Phosphate</description>
-                    </param> 
+                    </param>
                     <param name="useFe">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>Use Dissolved Iron</description>
-                    </param> 
+                    </param>
                     <param name="useSiO2">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>Use Silicate</description>
-                    </param> 
+                    </param>
                     <param name="useDIC_13C">
 			<value datatype="boolean">.TRUE.</value>
 	                  <description>Use DIC_13C</description>
-	                  </param> 
-<!-- Ecosystem model rate and relationship parameters  -->  
-<!-- Nitrogen parameters --> 
-      <!-- Nitrogen quota --> 
+	                  </param>
+<!-- Ecosystem model rate and relationship parameters  -->
+<!-- Nitrogen parameters -->
+      <!-- Nitrogen quota -->
                     <param name="qminN_a">
 			<value datatype="real">5.0e-2</value>
 	                  <description>Nitrogen minimum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qminN_b">
 			<value datatype="real">0.00</value>
 	                  <description>Nitrogen minimum quota - exponent</description>
-                    </param> 
+                    </param>
                     <param name="qmaxN_a">
 			<value datatype="real">1.7e-1</value>
 	                  <description>Nitrogen maximum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qmaxN_b">
 			<value datatype="real">0.00</value>
 	                  <description>Nitrogen maximum quota - exponent</description>
                     </param>
-      <!-- Nitrate parameters --> 
+      <!-- Nitrate parameters -->
                     <param name="vmaxNO3_a">
 			<value datatype="real">0.44</value>
 	                  <description>Maximum nitrate uptake rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="vmaxNO3_b">
 			<value datatype="real">-0.12</value>
 	                  <description>Maximum nitrate uptake rate - exponent</description>
-                    </param> 
+                    </param>
                     <param name="affinNO3_a">
 			<value datatype="real">3.14</value>
 	                  <description>Nitrate uptake affinity (Michaelis-Menten) - intercept</description>
-                    </param> 
+                    </param>
                     <param name="affinNO3_b">
 			<value datatype="real">-0.45</value>
 	                  <description>Nitrate uptake affinity (Michaelis-Menten) - exponent</description>
-                    </param> 
-      <!-- Nitrite parameters --> 
+                    </param>
+      <!-- Nitrite parameters -->
                     <param name="vmaxNO2_a">
 			<value datatype="real">0.44</value>
 	                  <description>Maximum nitrite uptake rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="vmaxNO2_b">
 			<value datatype="real">-0.12</value>
 	                  <description>Maximum nitrite uptake rate - exponent</description>
-                    </param> 
+                    </param>
                     <param name="affinNO2_a">
 			<value datatype="real">3.14</value>
 	                  <description>Nitrite uptake affinity (Michaelis-Menten) - intercept</description>
-                    </param> 
+                    </param>
                     <param name="affinNO2_b">
 			<value datatype="real">-0.45</value>
 	                  <description>Nitrite uptake affinity (Michaelis-Menten) - exponent</description>
-                    </param> 
-      <!-- Ammonium parameters --> 
+                    </param>
+      <!-- Ammonium parameters -->
                     <param name="vmaxNH4_a">
 			<value datatype="real">0.22</value>
 	                  <description>Maximum ammonium uptake rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="vmaxNH4_b">
 			<value datatype="real">-0.12</value>
 	                  <description>Maximum ammonium uptake rate - exponent</description>
-                    </param> 
+                    </param>
                     <param name="affinNH4_a">
 			<value datatype="real">3.14</value>
 	                  <description>Ammonium uptake affinity (Michaelis-Menten) - intercept</description>
-                    </param> 
+                    </param>
                     <param name="affinNH4_b">
 			<value datatype="real">-0.45</value>
 	                  <description>Ammonium uptake affinity (Michaelis-Menten) - exponent</description>
-                    </param> 
-      <!-- other nitrogen parameters --> 
+                    </param>
+      <!-- other nitrogen parameters -->
                     <param name="kexcN_a">
 			<value datatype="real">0.0</value>
 	                  <description>Nitrogen excretion rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="kexcN_b">
 			<value datatype="real">0.0</value>
 	                  <description>Nitrogen excretion rate - exponent</description>
-                    </param>  
+                    </param>
                     <param name="amminhib">
 			<value datatype="real">4.6</value>
 	                  <description>Ammonium inhibition of NO3 and NO2 uptake</description>
-                    </param>  
-<!-- Phosphorus parameters --> 
+                    </param>
+<!-- Phosphorus parameters -->
                     <param name="qminP_a">
 			<value datatype="real">2.1e-3</value>
 	                  <description>Phosphorus minimum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qminP_b">
 			<value datatype="real">0.00</value>
 	                  <description>Phosphorus minimum quota - exponent</description>
-                    </param> 
+                    </param>
                     <param name="qmaxP_a">
 			<value datatype="real">1.1e-2</value>
 	                  <description>Phosphorus maximum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qmaxP_b">
 			<value datatype="real">0.00</value>
 	                  <description>Phosphorus maximum quota - exponent</description>
-                    </param>  
+                    </param>
                     <param name="vmaxPO4_a">
 			<value datatype="real">4.4e-2</value>
 	                  <description>Maximum phosphate uptake rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="vmaxPO4_b">
 			<value datatype="real">0.06</value>
 	                  <description>Maximum phosphate uptake rate - exponent</description>
-                    </param> 
+                    </param>
                     <param name="affinPO4_a">
 			<value datatype="real">1.10</value>
 	                  <description>Phosphate uptake affinity (Michaelis-Menten) - intercept</description>
-                    </param> 
+                    </param>
                     <param name="affinPO4_b">
 			<value datatype="real">-0.35</value>
 	                  <description>Phosphate uptake affinity (Michaelis-Menten) - exponent</description>
@@ -8356,40 +8360,40 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="kexcP_a">
 			<value datatype="real">0.0</value>
 	                  <description>Phosphorus excretion rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="kexcP_b">
 			<value datatype="real">0.0</value>
 	                  <description>Phosphorus excretion rate - exponent</description>
                     </param>
-<!-- Iron parameters --> 
+<!-- Iron parameters -->
                     <param name="qminFe_a">
 			<value datatype="real">1.0e-6</value>
 	                  <description>Iron minimum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qminFe_b">
 			<value datatype="real">0.0</value>
 	                  <description>Iron minimum quota - exponent</description>
-                    </param> 
+                    </param>
                     <param name="qmaxFe_a">
 			<value datatype="real">4.0e-6</value>
 	                  <description>Iron maximum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qmaxFe_b">
 			<value datatype="real">0.0</value>
 	                  <description>Iron maximum quota - exponent</description>
-                    </param> 
+                    </param>
                     <param name="vmaxFe_a">
 			<value datatype="real">1.40e-4</value>
 	                  <description>Maximum iron uptake rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="vmaxFe_b">
 			<value datatype="real">-0.09</value>
 	                  <description>Maximum iron uptake rate - exponent</description>
-                    </param> 
+                    </param>
                     <param name="affinFe_a">
 			<value datatype="real">0.175</value>
 	                  <description>Iron uptake affinity (Michaelis-Menten) - intercept</description>
-                    </param> 
+                    </param>
                     <param name="affinFe_b">
 			<value datatype="real">-0.36</value>
 	                  <description>Iron uptake affinity (Michaelis-Menten) - exponent</description>
@@ -8397,40 +8401,40 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="kexcFe_a">
 			<value datatype="real">0.0</value>
 	                  <description>Iron excretion rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="kexcFe_b">
 			<value datatype="real">0.0</value>
 	                  <description>Iron excretion rate - exponent</description>
                     </param>
-<!-- Silicon parameters --> 
+<!-- Silicon parameters -->
                     <param name="qminSi_a">
 			<value datatype="real">0.0</value>
 	                  <description>Silicon minimum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qminSi_b">
 			<value datatype="real">0.0</value>
 	                  <description>Silicon minimum quota - exponent</description>
-                    </param> 
+                    </param>
                     <param name="qmaxSi_a">
 			<value datatype="real">0.0</value>
 	                  <description>Silicon maximum quota - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qmaxSi_b">
 			<value datatype="real">0.0</value>
 	                  <description>Silicon maximum quota - exponent</description>
-                    </param> 
+                    </param>
                     <param name="vmaxSiO2_a">
 			<value datatype="real">0.0</value>
 	                  <description>Maximum silica uptake rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="vmaxSiO2_b">
 			<value datatype="real">0.0</value>
 	                  <description>Maximum silica uptake rate - exponent</description>
-                    </param> 
+                    </param>
                     <param name="affinSiO2_a">
 			<value datatype="real">0.0</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - intercept</description>
-                    </param> 
+                    </param>
                     <param name="affinSiO2_b">
 			<value datatype="real">0.0</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - exponent</description>
@@ -8438,12 +8442,12 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="kexcSi_a">
 			<value datatype="real">0.0</value>
 	                  <description>Silicon excretion rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="kexcSi_b">
 			<value datatype="real">0.0</value>
 	                  <description>Silicon excretion rate - exponent</description>
                     </param>
-<!-- Carbon quota and Photosynthesis parameters --> 
+<!-- Carbon quota and Photosynthesis parameters -->
                     <param name="vmaxDIC_a">
 			<value datatype="real">3.08</value>
 	                  <description>maximum photosynthetic rate - a</description>
@@ -8459,35 +8463,35 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="qcarbon_a">
 			<value datatype="real">1.45e-11</value>
 	                  <description>Carbon per cell - intercept</description>
-                    </param> 
+                    </param>
                     <param name="qcarbon_b">
 			<value datatype="real">0.88</value>
 	                  <description>Carbon per cell - exponent</description>
-                    </param> 
+                    </param>
                     <param name="alphachl_a">
 			<value datatype="real">3.83e-7</value>
 	                  <description>Initial slope of PI curve - intercept</description>
-                    </param> 
+                    </param>
                     <param name="alphachl_b">
 			<value datatype="real">0.0</value>
 	                  <description>Initial slope of PI curve - exponent</description>
-                    </param> 
+                    </param>
                     <param name="PARfrac">
 			<value datatype="real">0.43</value>
 	                  <description>PAR fraction of solar radiation</description>
-                    </param> 
+                    </param>
                     <param name="chl2nmax">
 			<value datatype="real">3.0</value>
 	                  <description>Maximum chlorophyll to nitrogen ratio</description>
-                    </param> 
+                    </param>
                     <param name="biosynth">
 			<value datatype="real">2.33</value>
 	                  <description>Cost of biosynthesis</description>
-                    </param> 
+                    </param>
                     <param name="k_w">
 			<value datatype="real">0.04</value>
 	                  <description>Light attenuation by water</description>
-                    </param> 
+                    </param>
                     <param name="k_chl">
 			<value datatype="real">0.03</value>
 	                  <description>Light attenuation by chlorophyll a</description>
@@ -8500,24 +8504,24 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
 	                  <description>PAR attenutation by sea-ice cover?</description>
                     </param>
-       <!-- Grazing parameters -->  
+       <!-- Grazing parameters -->
                     <param name="trophic_tradeoff">
 			<value datatype="real">1.0</value>
 	                  <description>Auto/Hetero trade-off parameter</description>
-                    </param>   
-<!-- Grazing parameters -->  
+                    </param>
+<!-- Grazing parameters -->
                     <param name="ass_eff">
 			<value datatype="real">0.7</value>
 	                  <description>Maximum assimilation efficiency</description>
-                    </param>  
+                    </param>
                     <param name="ns">
 			<value datatype="integer">2</value>
 	                  <description>Prey switching exponent (Holling 2 or 3 [= ns+1])</description>
-                    </param>  
+                    </param>
                     <param name="hill">
 			<value datatype="real">0.1</value>
 	                  <description>Hill number for grazing</description>
-                    </param>  
+                    </param>
                     <param name="Lambda">
 			<value datatype="real">-1.0</value>
 	                  <description>Grazing refuge parameter</description>
@@ -8525,7 +8529,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="graz_a">
 			<value datatype="real">21.9</value>
 	                  <description>Maximum grazing rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="graz_b">
 			<value datatype="real">-0.16</value>
 	                  <description>Maximum grazing rate - exponent</description>
@@ -8533,7 +8537,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="kg_a">
 			<value datatype="real">5.0</value>
 	                  <description>Half-saturation concentration for grazing - intercept</description>
-                    </param> 
+                    </param>
                     <param name="kg_b">
 			<value datatype="real">0.0</value>
 	                  <description>Half-saturation concentration for grazing - exponent</description>
@@ -8541,7 +8545,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="pp_opt_a">
 			<value datatype="real">10.0</value>
 	                  <description>Optimal predator:prey length ratio - intercept</description>
-                    </param> 
+                    </param>
                     <param name="pp_opt_b">
 			<value datatype="real">0.0</value>
 	                  <description>Optimal predator:prey length ratio - exponent</description>
@@ -8549,7 +8553,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="pp_sig_a">
 			<value datatype="real">2.0</value>
 	                  <description>Width of grazing kernel - intercept</description>
-                    </param> 
+                    </param>
                     <param name="pp_sig_b">
 			<value datatype="real">0.0</value>
 	                  <description>Width of grazing kernel - exponent</description>
@@ -8558,7 +8562,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="respir_a">
 			<value datatype="real">0.05</value>
 	                  <description>Carbon respiration rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="respir_b">
 			<value datatype="real">0.0</value>
 	                  <description>Carbon respiration rate - exponent</description>
@@ -8566,7 +8570,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="biosink_a">
 			<value datatype="real">0.0</value>
 	                  <description>Biomass sinking rate - intercept</description>
-                    </param> 
+                    </param>
                     <param name="biosink_b">
 			<value datatype="real">0.0</value>
 	                  <description>Biomass sinking rate - exponent</description>
@@ -8574,7 +8578,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="mort_a">
 			<value datatype="real">0.05</value>
 	                  <description>Basal mortality - intercept</description>
-                    </param> 
+                    </param>
                     <param name="mort_b">
 			<value datatype="real">0.0</value>
 	                  <description>Basal mortality - exponent</description>
@@ -8582,7 +8586,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="beta_graz_a">
 			<value datatype="real">0.8</value>
 	                  <description>Fraction messy feeding to dissolved - max</description>
-                    </param> 
+                    </param>
                     <param name="beta_graz_b">
 			<value datatype="real">0.4</value>
 	                  <description>Fraction messy feeding to dissolved - min</description>
@@ -8594,7 +8598,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="beta_mort_a">
 			<value datatype="real">0.8</value>
 	                  <description>Fraction mortality to dissolved - max</description>
-                    </param> 
+                    </param>
                     <param name="beta_mort_b">
 			<value datatype="real">0.4</value>
 	                  <description>Fraction mortality to dissolved - min</description>
@@ -8607,7 +8611,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0</value>
 	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
                     </param>
-<!-- initial fractional abundance of particulate export -->  
+<!-- initial fractional abundance of particulate export -->
                     <param name="par_bio_remin_POC_frac2">
 			<value datatype="real">0.05</value>
                         <description>initial fractional abundance of POC component #2</description>
@@ -8616,11 +8620,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.5</value>
                         <description>initial fractional abundance of CaCO3 component #2</description>
                     </param>
-<!-- Temperature dependence -->  
+<!-- Temperature dependence -->
                     <param name="temp_A">
 			<value datatype="real">0.05</value>
 	                  <description>Slope of Arrhenius-like function</description>
-                    </param>  
+                    </param>
                     <param name="temp_T0">
 			<value datatype="real">20.0</value>
 	                  <description>Reference temperature</description>
@@ -8628,7 +8632,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="temp_max">
 			<value datatype="real">99.9</value>
 	                  <description>Maximum applied temperature</description>
-                    </param>                  
+                    </param>
 <!-- INORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POC_CaCO3">
 			<value datatype="real">0.0285</value>
@@ -8637,7 +8641,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_red_POC_CaCO3_pP">
 			<value datatype="real">0.744</value>
                         <description>exponent for modifier of CaCO3:POC export ratio</description>
-                    </param>  
+                    </param>
 <!-- ISOTOPIC FRACTIONATION -->
                     <param name="opt_d13C_DIC_Corg">
 			<value datatype="string">Ridgwell2001</value>
@@ -8651,12 +8655,12 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                        <value datatype="real">25.</value>
                        <description>Fractionation for intercellular C fixation (Ridgwell, 2001, PhD. Thesis)</description>
                     </param>
-<!-- Subtimestep -->  
+<!-- Subtimestep -->
                     <param name="nsubtime">
 			<value datatype="integer">25</value>
 	                  <description>Number of ecogem timesteps per biogem timestep</description>
-                    </param>  
-<!-- I/O filenames --> 
+                    </param>
+<!-- I/O filenames -->
 
                     <param name="par_ecogem_plankton_file">
                         <value datatype="string">one_plankton.eco</value>
@@ -8713,9 +8717,9 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                 </namelist>
             </file>
         </model>
-        
-        
-        <model name="gemlite"> 
+
+
+        <model name="gemlite">
             <!---->
             <!-- GEMlite! -->
             <!---->
@@ -8733,8 +8737,8 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                 </namelist>
             </file>
         </model>
-        
-        <model name="goldlite"> 
+
+        <model name="goldlite">
             <!---->
             <!-- GOLDlite! -->
             <!---->
@@ -8748,8 +8752,8 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                 </namelist>
             </file>
         </model>
-        
-        <model name="ocnlite"> 
+
+        <model name="ocnlite">
             <!---->
             <!-- OCNlite! -->
             <!---->
@@ -8761,5 +8765,5 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
         </model>
 
     </parameters>
-    
+
 </definition>
