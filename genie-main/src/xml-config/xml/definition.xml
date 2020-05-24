@@ -4610,7 +4610,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="opt_bio_remin_oxidize_NH4toNO3">
 			<value datatype="string">Fanny</value>
-                        <description>NH4 -> NO3 oxidation option</description>
+                        <description>NH4 -> NO3 oxidation option (Naafs et al., 2019)</description>
                     </param>
                     <param name="opt_bio_remin_oxidize_H2StoSO4">
 			<value datatype="string">linear</value>
