@@ -7137,6 +7137,63 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.001</value>
                         <description>refractory Corg deg. rate order compared to labile</description>
                     </param>
+<!-- DIAGENESIS HYDRATE  -->
+                    <param name="par_sed_hydrate_on">
+			<value datatype="boolean">.false.</value>
+                        <description>including hydrate simulation</description>
+                    </param>
+                    <param name="par_sed_hydrate_hunter2013">
+			<value datatype="boolean">.false.</value>
+                        <description>global data by Hunter et al. 2013</description>
+                    </param>
+                    <param name="par_sed_hydrate_feedback">
+			<value datatype="boolean">.false.</value>
+                        <description>switch to enable feedback from hydrate dissociation</description>
+                    </param>
+                    <param name="par_sed_hydrate_restart">
+			<value datatype="boolean">.false.</value>
+                        <description>switch to enable restart from different run</description>
+                    </param>
+                    <param name="par_sed_bubble_limit">
+			<value datatype="boolean">.false.</value>
+                        <description>switch to limit bubble formation</description>
+                    </param>
+                    <param name="par_sed_hydrate_opt_org">
+			<value datatype="string">muds</value>
+                        <description>option for how Corg is calculated</description>
+                    </param>
+                    <param name="par_sed_hydrate_opt_margin">
+			<value datatype="string">depth</value>
+                        <description>option for how margin is chosen</description>
+                    </param>
+                    <param name="par_sed_hydrate_opt_geotherm">
+			<value datatype="string">cnst</value>
+                        <description>option for how geotherm is chosen</description>
+                    </param>
+                    <param name="par_sed_hydrate_opt_therm">
+			<value datatype="string">duan</value>
+                        <description>option for which thermodynamics is chosen</description>
+                    </param>
+                    <param name="par_sed_hydrate_resdir">
+			<value datatype="string">.</value>
+                        <description>name of run from which run is restarted</description>
+                    </param>
+                    <param name="par_sed_hydrate_threshold">
+			<value datatype="real">3000</value>
+                        <description>depth threshold for hydrate formation m</description>
+                    </param>
+                    <param name="par_sed_bubble_threshold">
+			<value datatype="real">0.05</value>
+                        <description>threshold (volume ratio) for bubble escape to ocean</description>
+                    </param>
+                    <param name="par_sed_hydrate_geotherm">
+			<value datatype="real">0.03</value>
+                        <description>geothermal gradient oC/m</description>
+                    </param>
+                    <param name="par_sed_hydrate_savefreq">
+			<value datatype="integer">10</value>
+                        <description>frequency to save data</description>
+                    </param>
 <!-- DIAGENESIS SCHEME: ARCHER 1991  -->
                     <param name="par_sed_archer1991_dissc">
 			<value datatype="real">1.1574e-5</value>

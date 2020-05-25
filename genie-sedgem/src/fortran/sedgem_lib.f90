@@ -105,6 +105,26 @@ MODULE sedgem_lib
   REAL::par_sed_huelse2017_k2_order                              ! k2 = k1/par_sed_huelse2017_k2_order
   REAL::par_sed_huelse2017_k2_anoxic                             ! refractory degradation rate constant under anoxia, units of 1/yr
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_k1,par_sed_huelse2017_k2,par_sed_huelse2017_k2_order,par_sed_huelse2017_k2_anoxic 
+  ! ------------------- DIAGENESIS HYDRATE --------------------------------------------------------------------------------------- !
+  logical::par_sed_hydrate_on                                    ! including hydrate simulation
+  logical::par_sed_hydrate_hunter2013                            ! use global maps of temperature, depth and DO in Hunter et al. (2013).
+  logical::par_sed_hydrate_feedback                              ! switch to enable feedback from hydrate dissociation
+  logical::par_sed_hydrate_restart                               ! switch to enable restart from different run 
+  logical::par_sed_bubble_limit                                  ! switch to limit bubble formation  
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_on,par_sed_hydrate_hunter2013,par_sed_hydrate_feedback,par_sed_hydrate_restart,par_sed_bubble_limit
+  character(len=63)::par_sed_hydrate_opt_org                     ! option for how Corg is calculated
+  character(len=63)::par_sed_hydrate_opt_margin                  ! option for how margin is chosen
+  character(len=63)::par_sed_hydrate_opt_geotherm                ! option for how geotherm is chosen
+  character(len=63)::par_sed_hydrate_opt_therm                   ! option for whic thermodynamics is chosen
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_opt_org,par_sed_hydrate_opt_margin,par_sed_hydrate_opt_geotherm,par_sed_hydrate_opt_therm
+  character(len=126)::par_sed_hydrate_resdir                     ! name of run from which run is restarted
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_resdir
+  REAL::par_sed_hydrate_threshold                                ! depth threshold above which is not considered as location of hydrate formation
+  REAL::par_sed_hydrate_geotherm                                 ! geothermal gradient oC/m
+  REAL::par_sed_bubble_threshold                                 ! threshold (volume ratio) for bubble escape to ocean/muds/omen
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_threshold,par_sed_hydrate_geotherm,par_sed_bubble_threshold
+  integer::par_sed_hydrate_savefreq                              ! frequency to save data 
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_savefreq
   ! ------------------- DIAGENESIS SCHEME: ARCHER 1991 --------------------------------------------------------------------------- !
   REAL::par_sed_archer1991_dissc                                 ! dissolution rate constant, units of 1/s
   REAL::par_sed_archer1991_disscpct                              ! dissolution rate scaling (%)

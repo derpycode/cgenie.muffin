@@ -114,6 +114,22 @@ CONTAINS
        print*,'Simulate ocean Porg loss with buried sulf-OM?       : ',par_sed_huelse2017_sim_P_loss
        print*,'Simulate ocean Porg loss related to Corg burial?    : ',par_sed_huelse2017_sim_P_loss_pres_fracC
        print*,'Simulate increased P-regeneration under anoxia?     : ',par_sed_huelse2017_sim_P_regeneration
+       ! --- DIAGENESIS HYDRATE -------------------------------------------------------------------------------------------------- !
+       print*,'--- DIAGENESIS HYDRATE -----------------------------'
+       print*,'Including hydrate simulation                        : ',par_sed_hydrate_on
+       print*,'Global data by Hunter et al. (2013).                : ',par_sed_hydrate_hunter2013
+       print*,'Switch to enable feedback from hydrate dissociation : ',par_sed_hydrate_feedback
+       print*,'switch to enable restart from different run         : ',par_sed_hydrate_restart
+       print*,'switch to limit bubble formation                    : ',par_sed_bubble_limit
+       print*,'Option for how Corg is calculated                   : ',par_sed_hydrate_opt_org
+       print*,'Option for how margin is chosen                     : ',par_sed_hydrate_opt_margin
+       print*,'Option for how geotherm is chosen                   : ',par_sed_hydrate_opt_geotherm
+       print*,'Option for which thermodynamics is chosen           : ',par_sed_hydrate_opt_therm
+       print*,'name of run from which run is restarted             : ',par_sed_hydrate_resdir
+       print*,'Depth threshold for hydrate formation               : ',par_sed_hydrate_threshold
+       print*,'Geothermal gradient oC/m                            : ',par_sed_hydrate_geotherm
+       print*,'threshold (volume ratio) for bubble escape to ocean : ',par_sed_bubble_threshold
+       print*,'frequency to save data                              : ',par_sed_hydrate_savefreq
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
@@ -1366,6 +1382,7 @@ CONTAINS
     ! POC
     loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:))
     loc_tot2_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fdis(is_POC,:,:))
+    print*,loc_tot1_sedgrid,loc_tot2_sedgrid
     if (abs(loc_tot1_sedgrid) > const_real_nullsmall) then 
        loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
     else

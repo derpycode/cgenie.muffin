@@ -307,8 +307,24 @@ SUBROUTINE sedgem(          &
         ! NOTE: <sed_fsed> in units of (mol cm-2)
         ! NOTE: <sedocn_fnet> in units of (mol cm-2)
         ! NOTE: <dum_sfxsumsed> in units of (mol m-2)
-        sed_fsed(:,i,j)         = conv_cm2_m2*dum_sfxsumsed(:,i,j)
-        loc_sed_fsed_OLD(:,i,j) = conv_cm2_m2*loc_sfxsumsed_OLD(:,i,j)
+        ! *** YK changed that type: par_sed_type_frac is dt-independent 
+        ! (this modification is only meaningful when one adopt different dt than 1 year) ***
+        ! sed_fsed(:,i,j)         = conv_cm2_m2*dum_sfxsumsed(:,i,j)  ! YK commment out 
+        ! loc_sed_fsed_OLD(:,i,j) = conv_cm2_m2*loc_sfxsumsed_OLD(:,i,j) ! YK commment out 
+        ! YK inseted below 
+        DO l=1,n_l_sed
+           is = conv_iselected_is(l)
+           SELECT CASE (sed_type(is))
+           CASE (par_sed_type_frac)
+              sed_fsed(is,i,j)         = conv_cm2_m2*dum_sfxsumsed(is,i,j)/loc_dtyr  ! remove  the dt dependence 
+              loc_sed_fsed_OLD(is,i,j) = conv_cm2_m2*loc_sfxsumsed_OLD(is,i,j)/loc_dtyr 
+           case default
+              sed_fsed(is,i,j)         = conv_cm2_m2*dum_sfxsumsed(is,i,j) ! these should be dt-dependent 
+              loc_sed_fsed_OLD(is,i,j) = conv_cm2_m2*loc_sfxsumsed_OLD(is,i,j)
+           end SELECT
+        end do
+        ! YK insertion end 
+        ! *** YK change end ***
         IF (sed_mask(i,j)) THEN
            ! call sediment composition update
            ! NOTE: the values in both <sed_fsed> and <ocnsed_fnet> are updated by this routine
@@ -595,6 +611,60 @@ SUBROUTINE sedgem(          &
         end if
      end DO
   end DO
+  
+  ! *** HYDRATE & BUBBLE DISSOCIATION ***
+  DO i=1,n_i
+     DO j=1,n_j
+        IF (sed_mask(i,j)) THEN
+        
+           ! IF (mhinv_map_OLD(i,j)>=0. .and. mhinv_map(i,j)>=0. .and. margin_map(i,j)>=0.) THEN
+              ! IF (irec_hydrate == 0) THEN 
+                 ! h_diss_map(i,j) = 0.
+              ! ELSEIF (irec_hydrate > 0) THEN
+                 ! h_diss_map(i,j) = margin_map(i,j)*(mhinv_map_OLD(i,j)-mhinv_map(i,j))*1e3/16./loc_dtyr/conv_yr_s
+              ! end IF
+              ! IF (par_sed_hydrate_feedback) dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) + h_diss_map(i,j)
+           ! end IF 
+           ! IF (mbinv_map_OLD(i,j)>=0. .and. mbinv_map(i,j)>=0. .and. margin_map(i,j)>=0.) THEN
+              ! IF (irec_hydrate == 0) THEN 
+                 ! b_diss_map(i,j) = 0.
+              ! ELSEIF (irec_hydrate > 0) THEN
+                 ! b_diss_map(i,j) = margin_map(i,j)*(mbinv_map_OLD(i,j)-mbinv_map(i,j))*1e3/16./loc_dtyr/conv_yr_s
+              ! end IF
+              ! IF (par_sed_bubble_feedback) dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) + b_diss_map(i,j)
+           ! end IF 
+           
+           ! NEED TO CHECK FLUX CONSISTENCY 
+           ! positive --> release to the ocean 
+           IF (irec_hydrate == 0) then 
+              ch4flx_map(i,j) = 0.
+           ELSEIF (irec_hydrate > 0) then 
+              IF (par_sed_hydrate_feedback .and. margin_map(i,j)>=0.) THEN
+                 if (.not. ocn_select(io_CH4)) then 
+                    dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*dicflx_map(i,j)/conv_yr_s
+                    dum_sfxocn(io_ALK,i,j) = dum_sfxocn(io_ALK,i,j) +  margin_map(i,j)*alkflx_map(i,j)/conv_yr_s
+                    dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) +  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                    dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) -  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                    ! dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                    ! if (ocn_select(io_SO4)) then 
+                       ! dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) -  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                    ! endif 
+                    ! if (ocn_select(io_H2S)) then 
+                       ! dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                    ! endif 
+                 elseif (ocn_select(io_CH4)) then 
+                    dum_sfxocn(io_CH4,i,j) = dum_sfxocn(io_CH4,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                    dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*dicflx_map(i,j)/conv_yr_s
+                    dum_sfxocn(io_ALK,i,j) = dum_sfxocn(io_ALK,i,j) +  margin_map(i,j)*alkflx_map(i,j)/conv_yr_s
+                    dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) +  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                    dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) -  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                 endif 
+              end IF               
+           end IF 
+           
+        end IF
+     end DO
+  end DO
 
   ! *** UPDATE INTERFACE ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE INTERFACE ***'
@@ -652,6 +722,7 @@ SUBROUTINE sedgem(          &
   end if
   ! catch any carbonate chemistry errors arising in sub_update_sed
   if (error_stop) then
+     print*, 'error_stop detected'
      call end_sedgem(     &
           & dum_dts,      &
           & dum_sfcsumocn &
@@ -686,6 +757,15 @@ SUBROUTINE sedgem(          &
   IF (ctrl_misc_debug4) print*,'*** UPDATE SEDGEM TIME ***'
   ! update sediment age (== current time in years)
   sed_age = sed_age - loc_dtyr
+  
+  
+  ! YK added for hydrate recording
+  if (par_sed_hydrate_on .and. dum_reinit_sfxsumsed) then 
+     irec_hydrate = irec_hydrate + 1
+     if (mod(irec_hydrate,par_sed_hydrate_savefreq)==0) then 
+        call sub_save_hydrate()
+     endif 
+  endif 
 
 end SUBROUTINE sedgem
 ! ******************************************************************************************************************************** !

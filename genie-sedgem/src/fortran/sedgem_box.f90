@@ -14,6 +14,7 @@ MODULE sedgem_box
   use sedgem_box_archer1991_sedflx
   use sedgem_box_ridgwelletal2003_sedflx
   use sedgem_box_benthic
+  use sedgem_box_hydrate
   IMPLICIT NONE
   SAVE
 
@@ -251,6 +252,15 @@ CONTAINS
             & )
        ! set fractional flux of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = (1.0 - loc_sed_pres_fracC)*loc_new_sed(is_POC)
+       ! For hydrate coupling 
+       if (par_sed_hydrate_on .and. trim(par_sed_hydrate_opt_org) =='omen') then 
+          om_map(dum_i,dum_j) = loc_sed_mean_OM_bot
+          ! om_map(dum_i,dum_j) = loc_sed_mean_OM_top
+          omfrc_map(dum_i,dum_j) = loc_sed_pres_fracC
+          ombur_map(dum_i,dum_j) = sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2  ! converting mol/cm2 to mol/m2/yr
+          loc_sed_pres_fracC = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracC   ! taking 0.25 of remaining for hydrate model 
+          loc_sed_pres_fracP = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracP   ! taking 0.25 of remaining for hydrate model 
+       endif 
        ! calculate the return rain flux back to ocean
        ! NOTE: diagenetic function calculates all (dissolved) exchange fluxes
        !       => 'sed' dissolution is effectively zero
@@ -352,6 +362,10 @@ CONTAINS
             & loc_dis_sed(:),loc_new_sed(:),sed_top(:,dum_i,dum_j),                  &
             & phys_sed(ips_mix_k0,dum_i,dum_j)                                       &
             & )
+       ! if (dum_i==2 .and. dum_j==20) then 
+           ! print*,'after carbonate dissolution'
+           ! pause
+       ! endif 
        if (error_Archer .AND. ctrl_misc_report_err) then
           CALL sub_report_error(                                                                                           &
                & 'sedgem_box','sub_update_sed','Failure of Archer [1991] sediment scheme calculation (singular matrix)',   &
@@ -701,6 +715,17 @@ CONTAINS
           sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
        end do
     end DO
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!! attempt to call hydrate model !!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (par_sed_hydrate_on) then
+       call hydrate_update(                                                       &
+          dum_i,dum_j,dum_dtyr,                                                   &
+          dum_D,dum_sfcsumocn,                                                    &
+          loc_new_sed,loc_dis_sed                                                 &
+          )
+    endif 
 
 !!$    ! ############################################################################################################################ !
 !!$    ! ### FIX THIS UP!!! ######################################################################################################### !
@@ -1297,6 +1322,17 @@ CONTAINS
           PRINT*,'---'
        end if
     endif
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!! attempt to call hydrate model !!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ! if (par_sed_hydrate_on) then
+       ! call hydrate_update(                                                       &
+          ! dum_i,dum_j,dum_dtyr,                                                   &
+          ! dum_D,dum_sfcsumocn,                                                    &
+          ! loc_new_sed,loc_dis_sed                                                 &
+          ! )
+    ! endif 
 
   END SUBROUTINE sub_update_sed_reef
   ! ****************************************************************************************************************************** !
@@ -1482,6 +1518,15 @@ CONTAINS
             & loc_new_sed(:),sed_fsed(is_POC_frac2,dum_i,dum_j),dum_sfcsumocn(:), &
             & loc_sed_pres_fracC,loc_sed_pres_fracP,loc_exe_ocn(:),loc_sed_mean_OM_top, loc_sed_mean_OM_bot &
             & )
+       ! For hydrate coupling 
+       if (par_sed_hydrate_on .and. trim(par_sed_hydrate_opt_org) =='omen') then 
+          om_map(dum_i,dum_j) = loc_sed_mean_OM_bot
+          ! om_map(dum_i,dum_j) = loc_sed_mean_OM_top
+          omfrc_map(dum_i,dum_j) = loc_sed_pres_fracC
+          ombur_map(dum_i,dum_j) = sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2  ! converting mol/cm2 to mol/m2/yr
+          loc_sed_pres_fracC = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracC   ! taking 0.25 of remaining for hydrate model 
+          loc_sed_pres_fracP = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracP   ! taking 0.25 of remaining for hydrate model 
+       endif 
        ! calculate the return rain flux back to ocean
        ! NOTE: diagenetic function calculates all (dissolved) exchange fluxes
        !       => 'sed' dissolution is effectively zero
@@ -1822,6 +1867,17 @@ CONTAINS
           sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
        end do
     end DO
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!! attempt to call hydrate model !!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (par_sed_hydrate_on) then
+       call hydrate_update(                                                       &
+          dum_i,dum_j,dum_dtyr,                                                   &
+          dum_D,dum_sfcsumocn,                                                    &
+          loc_new_sed,loc_dis_sed                                                 &
+          )
+    endif 
 
   END SUBROUTINE sub_update_sed_mud
   ! ****************************************************************************************************************************** !
@@ -1964,6 +2020,8 @@ CONTAINS
 !!$       ! *** <INSERT CODE> ***
 !!$       ! *********************
     end select
+    
+    ! print*, ' loc_fPOC ',' loc_dis ',loc_fPOC,loc_dis 
 
     ! *** calculate actual dissolution flux ***
     IF (loc_dis > const_real_nullsmall) THEN
