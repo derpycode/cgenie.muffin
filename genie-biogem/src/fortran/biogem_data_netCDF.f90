@@ -1512,6 +1512,34 @@ CONTAINS
     ! ECOGEM diagnostics
     !-----------------------------------------------------------------------
     if (ctrl_data_save_slice_diag_bio .AND. flag_ecogem) then
+       ! save POM
+       DO l=1,n_l_sed
+          loc_ij(:,:) = 0.0
+          is = conv_iselected_is(l)
+          if ( (is == is_POC) .OR. (sed_type(is) == par_sed_type_POM)) then
+             loc_ij(:,:) = int_diag_ecogem_part(is,:,:)/int_t_timeslice
+             call sub_adddef_netcdf(loc_iou,3,'eco_diag_POM_'//trim(string_sed(is)), &
+                  & 'ECOGEM particulate organic matter production - '//trim(string_sed(is)), &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('eco_diag_POM_'//trim(string_sed(is)),loc_iou, &
+                  & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
+          end if
+       end do
+       ! save DOM
+       ! NOTE: only save the io tracers that convert (non zero) to POM (i.e. DOM)
+       DO l=3,n_l_ocn
+          loc_ij(:,:) = 0.0
+          io = conv_iselected_io(l)
+          loc_tot_m = conv_DOM_POM_i(0,io)
+          do loc_m=1,loc_tot_m
+             loc_ij(:,:) = int_diag_ecogem_remin(io,:,:)/int_t_timeslice
+             call sub_adddef_netcdf(loc_iou,3,'eco_diag_DOM_'//trim(string_ocn(io)), &
+                  & 'ECOGEM dissolved matter production - '//trim(string_ocn(io)), &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('eco_diag_DOM_'//trim(string_ocn(io)),loc_iou, &
+                  & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+          end do
+       end DO
        ! calculate POM equivalnt of DOM
        loc_isij(:,:,:) = 0.0
        DO i=1,n_i
@@ -1528,25 +1556,27 @@ CONTAINS
              end If
           end DO
        end DO
-       ! calculate DOM ratio (replace values in same local array)
+       ! calculate DOM ratio (replace values in same local array) and save as netCDF
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
-          DO i=1,n_i
-             DO j=1,n_j
-                If (goldstein_k1(i,j) <= n_k) then
-                   if ((loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j)) > const_real_nullsmall) then
-                      loc_isij(is,i,j) = loc_isij(is,i,j)/(loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j))
-                   else
-                      loc_isij(is,i,j) = 0.0
-                   end if
-                end If
+          if ( (is == is_POC) .OR. (sed_type(is) == par_sed_type_POM)) then
+             DO i=1,n_i
+                DO j=1,n_j
+                   If (goldstein_k1(i,j) <= n_k) then
+                      if ((loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j)) > const_real_nullsmall) then
+                         loc_isij(is,i,j) = loc_isij(is,i,j)/(loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j))
+                      else
+                         loc_isij(is,i,j) = 0.0
+                      end if
+                   end If
+                end DO
              end DO
-          end DO
-          call sub_adddef_netcdf(loc_iou,3,'eco_diag_DOMfract_'//trim(string_sed(is)), &
-               & 'ECOGEM dissolved matter production fraction - '//trim(string_sed(is)), &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('eco_diag_DOMfract_'//trim(string_sed(is)),loc_iou, &
-               & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
+             call sub_adddef_netcdf(loc_iou,3,'eco_diag_DOMfract_'//trim(string_sed(is)), &
+                  & 'ECOGEM dissolved matter production fraction - '//trim(string_sed(is)), &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('eco_diag_DOMfract_'//trim(string_sed(is)),loc_iou, &
+                  & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
+          end if
        end do
     end if
     !-----------------------------------------------------------------------
