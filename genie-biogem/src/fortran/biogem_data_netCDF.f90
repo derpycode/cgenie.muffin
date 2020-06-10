@@ -1472,6 +1472,8 @@ CONTAINS
              loc_unitsname = 'mol kg-1 yr-1'
           CASE (idiag_bio_N2fixation,idiag_bio_NH4assim)
              loc_unitsname = 'mol kg-1 yr-1'
+          CASE (idiag_bio_DOMlifetime)
+             loc_unitsname = 'yr'
           case default
              loc_unitsname = 'n/a'
           end select

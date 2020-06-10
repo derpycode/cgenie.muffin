@@ -197,6 +197,8 @@ CONTAINS
        print*,'DOM lifetime (yrs)                                  : ',par_bio_remin_DOMlifetime
        print*,'RDOM lifetime (yrs)                                 : ',par_bio_remin_RDOMlifetime
        print*,'RDOM degradation by (surface) photolysis only?      : ',ctrl_bio_remin_RDOM_photolysis
+       print*,'T-dependent DOM production?                         : ',ctrl_bio_red_DOMfrac_Tdep
+       print*,'T-dependent DOM remineralization?                   : ',ctrl_bio_remin_DOM_Tdep
        print*,'Apply fixed-profile for POM remineralization?       : ',ctrl_bio_remin_POC_fixed
        print*,'Kinetic-based POM remineralization?                 : ',ctrl_bio_remin_POC_kinetic
        print*,'Remineralization functional form                    : ',par_bio_remin_fun
@@ -210,6 +212,7 @@ CONTAINS
        print*,'Degradation rate constant #2 for POC                : ',par_bio_remin_POC_K2
        print*,'Activation energy #1 for POC                        : ',par_bio_remin_POC_Ea1
        print*,'Activation energy #2 for POC                        : ',par_bio_remin_POC_Ea2
+       print*,'Degradation rate constant #1 for DOC                : ',par_bio_remin_DOC_K1
        print*,'Range of fractional abundance of POC component #2   : ',par_bio_remin_POC_dfrac2
        print*,'Fractional abundance of POC #2 half sat             : ',par_bio_remin_POC_c0frac2
        print*,'Size-dependent sinking: reference remin. length     : ',par_bio_remin_POC_eL0

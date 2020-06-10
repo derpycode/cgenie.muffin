@@ -206,6 +206,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_RDOMlifetime
   LOGICAL::ctrl_bio_remin_RDOM_photolysis                               ! RDOM degradation by (surface) photolysis only?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_RDOM_photolysis
+  LOGICAL::ctrl_bio_red_DOMfrac_Tdep                                    ! T-dependent DOM production?
+  NAMELIST /ini_biogem_nml/ctrl_bio_red_DOMfrac_Tdep
+  LOGICAL::ctrl_bio_remin_DOM_Tdep                                      ! T-dependent DOM remineralization?
+  NAMELIST /ini_biogem_nml/ctrl_bio_remin_DOM_Tdep
   LOGICAL::ctrl_bio_remin_POC_fixed                              ! fixed-profile POM remineralization
   LOGICAL::ctrl_bio_remin_CaCO3_fixed                            ! fixed-profile CaCO3 remineralization
   LOGICAL::ctrl_bio_remin_opal_fixed                             ! fixed-profile opal remineralization
@@ -239,6 +243,9 @@ MODULE biogem_lib
   real::par_bio_remin_POC_Ea1,par_bio_remin_POC_Ea2
   NAMELIST /ini_biogem_nml/par_bio_remin_POC_K1,par_bio_remin_POC_K2
   NAMELIST /ini_biogem_nml/par_bio_remin_POC_Ea1,par_bio_remin_POC_Ea2
+  real::par_bio_remin_DOC_K1                                     ! DOC K(1)
+  NAMELIST /ini_biogem_nml/par_bio_remin_DOC_K1
+  NAMELIST /ini_biogem_nml/par_bio_remin_POC_K1,par_bio_remin_POC_K2
   real::par_bio_remin_sinkingrate                                ! prescribed particle sinking rate (m d-1)
   real::par_bio_remin_sinkingrate_scav                           ! sinking rate (for calculating scavenging) (m d-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate,par_bio_remin_sinkingrate_scav
@@ -756,7 +763,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_force                          = 08 ! forcings
   INTEGER,PARAMETER::n_opt_data                           = 30 ! data (I/O)
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
-  INTEGER,PARAMETER::n_diag_bio                           = 21 !
+  INTEGER,PARAMETER::n_diag_bio                           = 22 !
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
   INTEGER,PARAMETER::n_diag_react                         = 09 !
@@ -860,6 +867,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_bio_CaCO3toPOC_nsp            = 19    !
   INTEGER,PARAMETER::idiag_bio_opaltoPOC_sp              = 20    !
   INTEGER,PARAMETER::idiag_bio_fspPOC                    = 21    !
+  INTEGER,PARAMETER::idiag_bio_DOMlifetime               = 22    !
   ! diagnostics - OLD
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNO3        = 01    !
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNH4        = 02    !
@@ -983,7 +991,8 @@ MODULE biogem_lib
        & 'k_SiO2_sp     ', &
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
-       & 'fspPOC        ' /)
+       & 'fspPOC        ', &
+       & 'DOMlifetime   ' /)
   ! diagnostics - geochemistry -- OLD
   CHARACTER(len=14),DIMENSION(n_diag_geochem_old),PARAMETER::string_diag_geochem_old = (/ &
        & 'dNO3_NH4_oxid ', &

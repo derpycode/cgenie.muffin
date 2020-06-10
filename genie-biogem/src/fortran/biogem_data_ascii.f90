@@ -2313,6 +2313,10 @@ CONTAINS
              WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
                   & loc_t,                        &
                   & loc_sig/real(int_t_sig_count)
+          CASE (idiag_bio_DOMfrac,idiag_bio_DOMlifetime)
+             WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
+                  & loc_t,                        &
+                  & loc_sig
           case default
              WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
                   & loc_t,                        &
