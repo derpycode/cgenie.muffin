@@ -8484,7 +8484,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
       <value datatype="real">-0.08</value>
                     <description>maximum photosynthetic rate - a</description>
                     </param>
-                    <param name="vmaxDIC_b_pft_eukaryote">
+                    <param name="vmaxDIC_a_pft_eukaryote">
       <value datatype="real">1.7</value>
                     <description>maximum photosynthetic rate - a</description>
                     </param>
