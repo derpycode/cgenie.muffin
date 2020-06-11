@@ -1,0 +1,97 @@
+% ==============================================================
+% === 'fake' worlds ============================================
+% ==============================================================
+% 
+% 
+% ==============================================================
+% === KEY ======================================================
+% ==============================================================
+% 
+% The 'world' (.k1) filename can be up to 8 characters as of svn revision 10017.
+% (This is backwards compatable and 6 can still be used.)
+% 
+% The translation of the character positions is as follows:
+% 
+% 1-2 ==  input code:
+%         fk == 'fake'
+% 3   ==  resulting:
+%         h == 'high' == 36x36
+%         l == 'low'  == 18x18
+% 4   == n/a
+% 5-6 ==  continental configuration code:
+%         pp == 'pole-to-pole'
+% 7   == n/a
+% 8   ==  number of shelf steps:
+%         0 == (none)
+%         l == level 15
+%         2 == level 15 + 14
+%         3 == level 15 + 14 + 13
+%         4 == level 15 + 14 + 13 + 12
+%         5 == level 15 + 14 + 13 + 12 + 11
+%                            
+% ==============================================================
+% === CONFIGURATION LIST =======================================
+% ==============================================================
+% 
+% NOTE: where shelves are present, they are positioned on all ocean-facing sides of land
+%       the addition of shelves removes land area, keeping ocena volumn approximately invarient
+%       i.e. you could look at the appearance of, or increase in, the number of shevles, as a progressive flooding of the craton
+%       the shallowest possible (level 16) shelf is omitted as it is impossible to represent a biological pump in the ocean
+%       all configurations assume modern S0 and pO2, orbits, ocean Ca/Mg, and (preindustrial) pCO2 and 13C
+% 
+% --------------------------------------------------------------
+% --------------------------------------------------------------
+% world   | created ...       | muffingen | *BRIEF* NOTES
+% name    | by, on (dd/mm/yy) | version   | (enclosed in "")
+% --------------------------------------------------------------
+% --------------------------------------------------------------
+% 
+% --------------------------------------------------------------
+% --- single pole-to-pole supercontinent @ 36x36x16 ------------
+% --------------------------------------------------------------
+fkh_pp00    AR  191203          0.85        "no shelf"
+fkh_pp01    AR  191203          0.85        "x1 shelf -- level 15"
+fkh_pp02    AR  191203          0.85        "x2 shelf -- level 15 + 14"
+fkh_pp03    AR  191203          0.85        "x3 shelf -- level 15 + 14 + 13"
+fkh_pp04    AR  191203          0.85        "x4 shelf -- level 15 + 14 + 13 + 12"
+fkh_pp05    AR  191203          0.85        "x5 shelf -- level 15 + 14 + 13 + 12 + 11"
+% --------------------------------------------------------------
+% --- single pole-to-pole supercontinent @ 18x18x16 ------------
+% --------------------------------------------------------------
+fkl_pp00    AR  191203          0.85        "no shelf"
+fkl_pp01    AR  191203          0.85        "x1 shelf -- level 15"
+fkl_pp02    AR  191203          0.85        "x2 shelf -- level 15 + 14"
+% --------------------------------------------------------------
+% --------------------------------------------------------------
+% 
+% ==============================================================
+% === CONFIG FILE NAMING =======================================
+% ==============================================================
+% 
+% format:
+% 
+% muffin.x.y.z.config
+% 
+% x -> a series of letters designating the modules: 
+%     C == climate (eb_go_gs)
+%     B == (ocean+atm) biogeochemsitry (ac_bg)
+%     S == sediments (& weathering) (sg_rg)
+%     G == gemlite (gl)
+%     E == ecogem (eg)
+% 
+% y -> the 'world' (continental configuration & physical boundary conditions) name (8 characters)
+% 
+% z -> mnemonics for the biogeochem tracer selection (as before)
+% 
+% =============================================================
+% === MISC NOTES ==============================================
+% =============================================================
+% 
+% to run ocean only: 
+% ./runmuffin.sh muffin.CB.fkh_pp00.BASES FAKE muffin.CB.fkh_pp00.BASES.SPIN 10000
+% to run with basic marine CaCO3 cycle:
+% ./runmuffin.sh muffin.CBS.fkh_pp00.BASES FAKE muffin.CBS.fkh_pp00.BASES.SPIN 50000
+% 
+% =============================================================
+% =============================================================
+% =============================================================

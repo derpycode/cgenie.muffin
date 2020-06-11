@@ -358,7 +358,7 @@
                         <description></description>
                     </param>
                     <param name="debug_loop">
-                        <value datatype="integer">2</value>
+                        <value datatype="integer">1</value>
                         <description></description>
                     </param>
                     <param name="debug_end">
@@ -459,7 +459,7 @@
                         </param>
                   </paramArray>
 <!-- ocn_select -->
-                   <paramArray name="ocn_select" dimension="1" extent="100">
+                   <paramArray name="ocn_select" dimension="1" extent="107">
                         <description>tracer selection</description>
                         <param name="ocn_select(1)" index="1">
                             <value datatype="boolean">.true.</value>
@@ -861,9 +861,45 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="ocn_select(101)" index="101">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(102)" index="102">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(103)" index="103">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(104)" index="104">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(105)" index="105">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(106)" index="106">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(107)" index="107">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(108)" index="108">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_select(109)" index="109">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="86">
+                   <paramArray name="sed_select" dimension="1" extent="107">
                         <description>tracer selection</description>
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -1213,6 +1249,86 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="sed_select(88)" index="88">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(89)" index="89">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(90)" index="90">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(91)" index="91">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(92)" index="92">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(93)" index="93">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(94)" index="94">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(95)" index="95">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(96)" index="96">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(97)" index="97">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(98)" index="98">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(99)" index="99">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(100)" index="100">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(101)" index="101">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(102)" index="102">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(103)" index="103">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(104)" index="104">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(105)" index="105">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(106)" index="106">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(107)" index="107">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- GEOCHEM CONTROLS  -->
                     <param name="par_carbconstset_name">
@@ -1227,9 +1343,13 @@
                         <value datatype="integer">100</value>
                         <description>pH solution maximum number of iterations</description>
                     </param>
-                    <param name="ctrl_carbchem_fail">
-                        <value datatype="boolean">.true.</value>
-                        <description>exit upon pH solution failure?</description>
+                    <param name="ctrl_carbchem_pHseed_retry">
+                        <value datatype="boolean">.false.</value>
+                        <description>Attempt pH re-seed if solution fails (else exit)?</description>
+                    </param>
+                    <param name="ctrl_carbchem_noH3SiO4">
+                        <value datatype="boolean">.false.</value>
+                        <description>Ignore H3SiO4 in the calculation of carbonate ALK?</description>
                     </param>
                     <param name="par_geochem_Tmin">
                         <value datatype="real">0.0</value>
@@ -1279,6 +1399,10 @@
                     <param name="ctrl_debug_loop">
                         <value datatype="integer">0</value>
                         <description></description>
+                    </param>
+                    <param name="ctrl_debug_reportwarnings">
+                        <value datatype="boolean">.false.</value>
+                        <description>Report all run-time warnings?</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS -->
                     <param name="par_gem_indir_name">
@@ -2557,6 +2681,10 @@
                         <value datatype="real">5000.0</value>
                         <description>ocean depth scale (m)</description>
                     </param>
+                    <param name="par_dk">
+                        <value datatype="integer">0</value>
+                        <description>Additional ocean layers (deeper than go_par_dsc)</description>
+                    </param>
                 </namelist>
             </file>
         </model>
@@ -2923,7 +3051,7 @@
             <file name="data_BIOGEM">
                 <namelist name="INI_BIOGEM_NML">
 
-                    <paramArray name="ocn_init" dimension="1" extent="101">
+                    <paramArray name="ocn_init" dimension="1" extent="107">
                         <description>tracer initialisation</description>
                         <param name="ocn_init(1)" index="1">
                             <value datatype="real">0.0</value>
@@ -3329,8 +3457,40 @@
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
+                        <param name="ocn_init(102)" index="102">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(103)" index="103">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(104)" index="104">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(105)" index="105">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(106)" index="106">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(107)" index="107">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(108)" index="108">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_init(109)" index="100">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
-                    <paramArray name="ocn_dinit" dimension="1" extent="101">
+                    <paramArray name="ocn_dinit" dimension="1" extent="107">
                         <description>tracer restart perturbation (re-initialisation)</description>
                         <param name="ocn_dinit(1)" index="1">
                             <value datatype="real">0.0</value>
@@ -3736,6 +3896,38 @@
                             <value datatype="real">0.0</value>
                             <description></description>
                         </param>
+                        <param name="ocn_dinit(102)" index="102">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(103)" index="103">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(104)" index="104">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(105)" index="105">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(106)" index="106">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(107)" index="107">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(108)" index="108">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
+                        <param name="ocn_dinit(109)" index="109">
+                            <value datatype="real">0.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <param name="ctrl_ocn_dinit">
 			<value datatype="boolean">.true.</value>
@@ -3815,6 +4007,10 @@
 			<value datatype="boolean">.false.</value>
                         <description>Full (entire grid) carbonate chem update?</description>
                     </param>
+                    <param name="par_bio_geochem_tau">
+			<value datatype="real">0.001</value>
+                        <description>geochem reaction completion time-scale (days)</description>
+                    </param>
 <!-- BOUNDARY CONDITIONS  -->
                     <param name="ctrl_force_sed_closedsystem">
 			<value datatype="boolean">.true.</value>
@@ -3823,6 +4019,10 @@
                     <param name="ctrl_force_sed_closed_P">
 			<value datatype="boolean">.false.</value>
                         <description>Balance the P cycle (with weathering)?</description>
+                    </param>
+                    <param name="ctrl_force_sed_reflective_POM">
+			<value datatype="boolean">.false.</value>
+                        <description>Set reflective boundary condition for POM? </description>
                     </param>
                     <param name="ctrl_force_GOLDSTEInTS">
 			<value datatype="boolean">.true.</value>
@@ -4029,6 +4229,10 @@
 			<value datatype="real">15.8</value>
                         <description>e-folding temperature (K) for T-dep. uptake rate modifier</description>
                     </param>
+                    <param name="par_bio_kT_dT">
+			<value datatype="real">0.0</value>
+                        <description>temperature offset for T-dependent bio schemes</description>
+                    </param>
 <!-- ORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POP_PON">
 			<value datatype="real">16.0</value>
@@ -4056,6 +4260,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_red_PC_alpha2">
                         <value datatype="real">1.0</value>
                         <description>offset of C/P organic matter flexible stoichiometry </description>
+                    </param>
+                    <param name="par_bio_red_PC_max">
+                        <value datatype="real">1.8182e-02</value>
+                        <description>maximum C/P (1.8182e-02 == 1.0/55.0 -- see Galbraith and Martiny, 2015)</description>
                     </param>
 <!-- malod: flexible stoichiometry  end -->
                     <param name="par_bio_red_POP_PO2">
@@ -4156,81 +4364,93 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>RDOM degradation by (surface) photolysis only?</description>
                     </param>
-                    <param name="par_bio_remin_CH4ox">
-            <value datatype="string">default</value>
-                        <description>Aerobic methanotrophy scheme ID string</description>
-                    </param>
                     <param name="par_bio_remin_CH4rate">
 			<value datatype="real">1.0e-4</value>
                         <description>Specific CH4 oxidation rate (d-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_kAER">
-            <value datatype="real">0.40</value>
+                        <value datatype="real">0.10</value>
                         <description>Aerobic methanotrophy rate constant (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_Km_O2">
-            <value datatype="real">20.0E-06</value>
+                        <value datatype="real">20.0E-06</value>
                         <description>Aerobic methanotrophy O2 half sat constant (mol kg-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_thermo">
-            <value datatype="string">off</value>
+                        <value datatype="string">off</value>
                         <description>Aerobic methanotrophy thermodynamic term</description>
                     </param>
                     <param name="par_bio_remin_AER_dG0">
-            <value datatype="real">-858.967</value>
+                        <value datatype="real">-858.967</value>
                         <description>Std Gibbs free energy of AER (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AER_BEQ">
-            <value datatype="real">15.0</value>
+                        <value datatype="real">15.0</value>
                         <description>AER biological energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_kAOM">
-            <value datatype="real">0.035</value>
-                        <description>AOM rate constant (yr-1) (see Olson et al., 2016)</description>
+                        <value datatype="real">0.01</value>
+                        <description>AOM rate constant (yr-1) (see also Olson et al., 2016)</description>
                     </param>
                     <param name="par_bio_remin_AOM_Km_SO4">
-            <value datatype="real">500.0E-6</value>
+                        <value datatype="real">500.0E-6</value>
                         <description>AOM SO4 half sat constant (mol kg-1) [Olson et al., 2016]</description>
                     </param>
                     <param name="par_bio_remin_AOM_thermo">
-            <value datatype="string">off</value>
+                        <value datatype="string">off</value>
                         <description>AOM thermodynamic term</description>
                     </param>
                     <param name="par_bio_remin_AOM_dG0">
-            <value datatype="real">-33.242</value>
+                        <value datatype="real">-33.242</value>
                         <description>Std Gibbs free energy of AOM (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_AOM_BEQ">
-            <value datatype="real">15.0</value>
+                        <value datatype="real">15.0</value>
                         <description>AOM bio energy quantum (kJ mol-1)</description>
                     </param>
                     <param name="par_bio_remin_Rgas">
-            <value datatype="real">8.3144598E-03</value>
+                        <value datatype="real">8.3144598E-03</value>
                         <description>Gas constant for thermo calculations (kJ K-1 mol-1)</description>
                     </param>
                     <param name="par_bio_remin_gammaO2">
-            <value datatype="real">1.14</value>
+                        <value datatype="real">1.14</value>
                         <description>Activity coefficient for dissolved O2</description>
                     </param>
                     <param name="par_bio_remin_gammaCO2">
-            <value datatype="real">1.17</value>
+                        <value datatype="real">1.17</value>
                         <description>Activity coefficient for aqueous CO2</description>
                     </param>
                     <param name="par_bio_remin_gammaHS">
-            <value datatype="real">0.75</value>
+                        <value datatype="real">0.75</value>
                         <description>Activity coefficient for dissolved HS</description>
                     </param>
                     <param name="par_bio_remin_gammaHCO3">
-            <value datatype="real">0.58</value>
+                        <value datatype="real">0.58</value>
                         <description>Activity coefficient for dissolved HCO3</description>
                     </param>
                     <param name="par_bio_remin_gammaSO4">
-            <value datatype="real">0.10</value>
+                        <value datatype="real">0.10</value>
                         <description>Activity coefficient for dissolved SO4</description>
                     </param>
                     <param name="par_bio_remin_gammaCH4">
-            <value datatype="real">1.20</value>
+                        <value datatype="real">1.20</value>
                         <description>Activity coefficient for aqueous CH4</description>
+                    </param>
+                    <param name="par_bio_remin_gammaFe2">
+                        <value datatype="real">0.23</value>
+                        <description>Activity coefficient for aqueous Fe2+</description>
+                    </param>
+                    <param name="par_bio_remin_gammaH">
+                        <value datatype="real">0.729</value>
+                        <description>Activity coefficient for aqueous H+ ; Marion et al., 2011, Marine Chemistry</description>
+                    </param>
+                    <param name="par_bio_remin_gammaOH">
+                        <value datatype="real">0.69</value>
+                        <description>Activity coefficient for aqueous OH-</description>
+                    </param>
+                     <param name="par_bio_remin_gammaSiO2">
+                        <value datatype="real">1.13</value>
+                        <description>Activity coefficient for aqueous SiO2</description>
                     </param>
                     <param name="ctrl_bio_remin_POC_fixed">
 			<value datatype="boolean">.true.</value>
@@ -4326,11 +4546,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="par_bio_remin_sinkingrate">
 			<value datatype="real">125.0</value>
-                        <description>prescribed particle sinking rate (m d-1)</description>
+                        <description>prescribed particle sinking rate (m d-1) [OLD PARAMETER NAMES]</description>
                     </param>
                     <param name="par_bio_remin_sinkingrate_scav">
 			<value datatype="real">125.0</value>
-                        <description>sinking rate (for calculating scavenging) (m d-1)</description>
+                        <description>sinking rate (for calculating scavenging) (m d-1) [OLD PARAMETER NAMES]</description>
+                    </param>
+                    <param name="par_bio_remin_sinkingrate_physical">
+			<value datatype="real">0.0</value>
+                        <description>Explicit physical particle sinking rate (m d-1) [NEW PARAMETER NAMES (disabled by zero)]</description>
+                    </param>
+                    <param name="par_bio_remin_sinkingrate_reaction">
+			<value datatype="real">0.0</value>
+                        <description>Implicit sinking rate for geochem reactions (m d-1) [NEW PARAMETER NAMES (disabled by zero)]</description>
                     </param>
                     <param name="par_bio_remin_ballast_kc">
 			<value datatype="real">0.130</value>
@@ -4392,6 +4620,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">NONE</value>
                         <description>H2S -> POCS scavenging option</description>
                     </param>
+                    <param name="par_bio_remin_kOstoPOMOS">
+			<value datatype="real">0.0</value>
+                        <description>Os scavening efficiency</description>
+                    </param>
+                    <param name="ctrl_Os_scav_O2_dep">
+			<value datatype="boolean">.false.</value>
+                        <description>switch to turn on O2 dependency of Os scavenging</description>
+                    </param>
+                    <param name="par_scav_Os_O2_threshold">
+			<value datatype="real">5e-9</value>
+                        <description>O2 threshold for O2-dependent Os scavenging [mol/kg]</description>
+                    </param>
                     <param name="ctrl_bio_remin_thresh">
 			<value datatype="boolean">.false.</value>
                         <description>Apply a hard tracer oxidant remin threshold?</description>
@@ -4404,6 +4644,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">0.0</value>
                         <description>Hard threshold for denitrification (mol kg-1)</description>
                     </param>
+                    <param name="par_bio_remin_cthresh_FeOOH">
+                        <value datatype="real">0.0</value>
+                        <description>Hard threshold for FeOOH reduction  (mol kg-1)</description>
+                    </param>
                     <param name="par_bio_remin_cthresh_SO4">
                         <value datatype="real">0.0</value>
                         <description>Hard threshold for sulphate reduction (mol kg-1)</description>
@@ -4411,6 +4655,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_POC_eL0">
 						<value datatype="real">187.5</value>
                         <description>e-folding depth of smallest ecogem size class (m)</description>
+                    </param>
+                    <param name="par_bio_remin_POC_w0">
+						<value datatype="real">3.52</value>
+                        <description>sinking rate of smallest ecogem size class (m day-1)</description>
                     </param>
                 	<param name="par_bio_remin_POC_size0">
 						<value datatype="real">0.6</value>
@@ -4420,6 +4668,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 						<value datatype="real">1.17</value>
                         <description>exponent relating e-folding depth to ecogem size class [Stemmann et al 2004]</description>
                     </param>
+                    <param name="ctrl_bio_remin_ecogemMLD">
+                       <value datatype="boolean">.false.</value>
+                        <description>Dilute tracers across the mixed layer</description>
+                    </param>
 <!-- kinetics -->
                     <param name="par_bio_remin_k_O2">
                         <value datatype="real">1.0</value>
@@ -4428,6 +4680,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_k_NO3">
                         <value datatype="real">1.0</value>
                         <description>Remin rate -- denitrification (yr-1) [IDEALIZED DEFAULT]</description>
+                    </param>
+                    <param name="par_bio_remin_k_FeOOH">
+                        <value datatype="real">1.0</value>
+                        <description>Remin rate -- FeOOH reduction (yr-1) [IDEALIZED DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_k_SO4">
                         <value datatype="real">1.0</value>
@@ -4445,6 +4701,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">30.0e-6</value>
                         <description>Half-saturation for denitrification (mol kg-1) [Boudreau, 1996]</description>
                     </param>
+                    <param name="par_bio_remin_c0_FeOOH">
+                        <value datatype="real">10.0e-6</value>
+                        <description>Half-saturation for FeOOH reduction (mol kg-1) [RANDOM DEFAULT]</description>
+                    </param>
                     <param name="par_bio_remin_c0_SO4">
                         <value datatype="real">500.0E-6</value>
                         <description>Half-saturation for sulphate reduction (mol kg-1) [Olson et al, 2016]</description>
@@ -4456,6 +4716,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_ci_NO3">
                         <value datatype="real">30.0e-6</value>
                         <description>Nitrate inhibition constant (mol kg-1) [Boudreau, 1996]</description>
+                    </param>
+                    <param name="par_bio_remin_ci_FeOOH">
+                        <value datatype="real">10.0e-6</value>
+                        <description>FeOOH reduction inhibition constant (mol kg-1) [RANDOM DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_ci_SO4">
                         <value datatype="real">1.0E-3</value>
@@ -4469,6 +4733,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_kH2StoPOMS">
                         <value datatype="real">1.0</value>
                         <description>Reaction rate constant for H2S -> POMS</description>
+                    </param>
+                    <param name="ctrl_scav_H2S_dt_old">
+                       <value datatype="boolean">.true.</value>
+                        <description>Old local residence time in layer for H2S?</description>
+                    </param>
+                    <param name="ctrl_bio_remin_negO2_fix">
+                       <value datatype="boolean">.false.</value>
+                        <description>Fix for negative O2 ... ?</description>
                     </param>
 <!-- N -->
                     <param name="par_bio_remin_kNH4toNO2">
@@ -4560,9 +4832,33 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">-0.236</value>
                         <description>88/86Sr fractionation between Sr and SrCO3 -- modified from Vollstaedt et al. [2014] (87/86Sr fractionation is simply half as large)</description>
                     </param>
+                    <param name="par_d187Os_OsCO3_epsilon">
+			<value datatype="real">1.0</value>
+                        <description>187/192Os fractionation between Os and OsCO3</description>
+                    </param>
+                    <param name="par_d188Os_OsCO3_epsilon">
+			<value datatype="real">1.0</value>
+                        <description>188/192Os fractionation between Os and OsCO3</description>
+                    </param>
                     <param name="par_d13C_Corg_CH4_epsilon">
 			<value datatype="real">-35.0</value>
                         <description>methanogenesis fractionation</description>
+                    </param>
+                    <param name="par_d34S_Corg_SO4_epsilon">
+			<value datatype="real">-40.0</value>
+                        <description>sulphate reduction S fractionation</description>
+                    </param>
+                    <param name="par_bio_uptake_dN2_epsilon">
+			<value datatype="real">0.0</value>
+                        <description>N2 fixation 15N fractionation</description>
+                    </param>
+                    <param name="par_bio_uptake_dNH4_epsilon">
+			<value datatype="real">0.0</value>
+                        <description>NH4 assimilation 15N fractionation</description>
+                    </param>
+                    <param name="par_bio_uptake_dNO3_epsilon">
+			<value datatype="real">0.0</value>
+                        <description>NO3 uptake 15N fractionation</description>
                     </param>
 <!-- IRON  -->
                     <param name="par_det_Fe_sol">
@@ -4585,25 +4881,29 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Fixed scavening rate (if not: Parekh scheme)?</description>
                     </param>
+                    <param name="opt_bio_Fe_scav">
+			<value datatype="string">Parekh</value>
+                        <description>Fe scavening scheme ID string</description>
+                    </param>
                     <param name="par_scav_Fe_Ks">
 			<value datatype="real">0.1E-3</value>
                         <description>Fixed Fe scavenging rate (d-1)</description>
                     </param>
                     <param name="par_scav_Fe_sf_POC">
-			<value datatype="real">0.300</value>
-                        <description>Parekh (POC) Fe scavenging rate scale factor</description>
+			<value datatype="real">0.000</value>
+                        <description>(POC) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_Fe_sf_CaCO3">
 			<value datatype="real">0.000</value>
-                        <description>Parekh (CaCO3) Fe scavenging rate scale factor</description>
+                        <description>(CaCO3) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_Fe_sf_opal">
 			<value datatype="real">0.000</value>
-                        <description>Parekh (opal) Fe scavenging rate scale factor</description>
+                        <description>(opal) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_Fe_sf_det">
 			<value datatype="real">0.000</value>
-                        <description>Parekh (detrital) Fe scavenging rate scale factor</description>
+                        <description>(detrital) Fe scavenging rate scale factor</description>
                     </param>
                     <param name="par_scav_fremin">
 			<value datatype="real">1.0</value>
@@ -4748,6 +5048,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.176</value>
                         <description>partition coefficient (alpha) [Stoll and Schrag [1998]</description>
                     </param>
+                    <param name="par_bio_red_CaCO3_OsCO3">
+			<value datatype="real">0.0E-6</value>
+                        <description>Default CaCO3 Ca:Os ratio</description>
+                    </param>
+                    <param name="par_bio_red_CaCO3_OsCO3_alpha">
+			<value datatype="real">0.0</value>
+                        <description>partition coefficient (alpha)</description>
+                    </param>
                     <param name="par_bio_red_POC_POI">
 			<value datatype="real">1.0E-4</value>
                         <description>Default cellular C:I (I/C) ratio</description>
@@ -4812,6 +5120,122 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_CaCO3precip_abioticohm_min">
 			<value datatype="real">10.0</value>
                         <description>Minimum ohmega threshold for precip</description>
+                    </param>
+                    <param name="par_bio_FeCO3precip_sf">
+			<value datatype="real">1.72e-10</value>
+                        <description>kinetic factor for FeCO3 precipitation in M yr-1</description>
+                    </param>
+                    <param name="par_bio_FeCO3precip_exp">
+			<value datatype="real">9.042</value>
+                        <description>Rate law power for FeCO3 precipitation</description>
+                    </param>
+                    <param name="par_bio_FeCO3precip_abioticohm_cte">
+			<value datatype="real">1.58e-11</value>
+                        <description>Ohmega constant for FeCO3 precip</description>
+                    </param>
+                    <param name="par_bio_FeCO3precip_abioticohm_min">
+			<value datatype="real">1.0</value>
+                        <description>Minimum ohmega threshold for precip</description>
+                    </param>
+                    <param name="par_d56Fe_FeCO3_alpha">
+			<value datatype="real">0.9997</value>
+                        <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
+                    </param>
+                    <param name="par_bio_Fe3Si2O4precip_sf">
+			<value datatype="real">6.133e-09</value>
+                        <description>kinetic factor for Fe3Si2O4 precipitation in M yr-1 [Rasmussen et al. 2019]</description>
+                    </param>
+                    <param name="par_bio_Fe3Si2O4precip_exp">
+			<value datatype="real">1.856</value>
+                        <description>Rate law power for Fe3Si2O4 precipitation [Rasmussen et al. 2019]</description>
+                    </param>
+                    <param name="par_bio_Fe3Si2O4precip_abioticohm_cte">
+			<value datatype="real">3.98e27</value>
+                        <description>Ohmega constant for Fe3Si2O4 precip [Tosca et al. 2016]</description>
+                    </param>
+                    <param name="par_d56Fe_Fe3Si2O4_alpha">
+			<value datatype="real">1.0</value>
+                        <description>fractionation factor d56/54 Fe in Fe3Si2O4 precipitation</description>
+                    </param>
+                    <param name="par_bio_Fe3Si2O4precip_cSi">
+			<value datatype="real">2.2e-3</value>
+                        <description>assumed SiO2 concentration in diatom-free ocean</description>
+                    </param>
+                    <param name="ctrl_bio_FeOOHprecip_explicit">
+			<value datatype="boolean">.true.</value>
+                        <description>precipitate FeOOH explicit?</description>
+                    </param>
+                    <param name="par_FeOOH_Fethresh">
+			<value datatype="real">1.0E-9</value>
+                        <description>dissovled Fe threshold for FeOOH precipitation</description>
+                    </param>
+                    <param name="par_bio_remin_kFetoFe2">
+			<value datatype="real">2.3e+06</value>
+                        <description>kinetic constant for Fe reduction using sulphide in M^(-1/2) yr-1</description>
+                    </param>
+                    <param name="par_bio_remin_kFeOOHtoFe2">
+			<value datatype="real">1.6e+04</value>
+                        <description>kinetic constant for FeOOH reduction using sulphide in M^(-1/2) yr-1</description>
+                    </param>
+                    <param name="par_d34S_Fered_alpha">
+			<value datatype="real">0.9982</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_d56Fe_Fered_alpha">
+			<value datatype="real">0.9987</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_d56Fe_FeOOH_alpha">
+			<value datatype="real">1.000</value>
+                        <description>fractionation factor d56/54 Fe during FeOOH precipitation</description>
+                    </param>
+                    <param name="par_bio_remin_kFe2toFe">
+			<value datatype="real">1.0e+09</value>
+                        <description>kinetic constant for Fe2 re-oxidation in M-1 yr-1</description>
+                    </param>
+                    <param name="par_d56Fe_Fe2ox_alpha">
+			<value datatype="real">1.0008</value>
+                        <description>fractionation factor d56/54 Fe during Fe2 reoxidation</description>
+                    </param>
+                    <param name="par_bio_FeS_sf">
+			<value datatype="real">1.0e+04</value>
+                        <description>Scale factor for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_exp">
+			<value datatype="real">1.0</value>
+                        <description>Rate law power for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_abioticohm_cte">
+			<value datatype="real">8.3e-6</value>
+                        <description>Ohmega constant for FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS_abioticohm_min">
+			<value datatype="real">1.0</value>
+                        <description>Minimum ohmega threshold for precip</description>
+                    </param>
+                     <param name="par_bio_FeS_part_abioticohm_cte">
+			<value datatype="real">2e-6</value>
+                        <description>Ohmega constant for nanoparticulate FeS formation</description>
+                    </param>
+                    <param name="par_bio_FeS2precip_k">
+			<value datatype="real">3250.43</value>
+                        <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
+                    </param>
+                    <param name="par_k_lim_pyr">
+			<value datatype="real">0.0</value>
+                        <description>MM type limiting factor for FeS2 precipitation [was: K_lim_PYR]</description>
+                    </param>
+                    <param name="par_d56Fe_FeS2_alpha">
+			<value datatype="real">0.9978</value>
+                        <description>fractionation factor d56/54 Fe in FeS2 precipitation</description>
+                    </param>
+                    <param name="par_d34S_FeS2_alpha">
+			<value datatype="real">1.0000</value>
+                        <description>fractionation factor d34/32 S in FeS2 precipitation</description>
+                    </param>
+                    <param name="ctrl_bio_FeS2precip_explicit">
+			<value datatype="boolean">.false.</value>
+                        <description>Explicit FeS2 precip stiochiometry?</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
@@ -5005,6 +5429,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Create pre-formed tracers? (requires #x numerical tracers)</description>
                     </param>
+                    <param name="ctrl_bio_preformed_CsoftPOConly">
+			<value datatype="boolean">.false.</value>
+                        <description>Only include POC remin in Csoft (exclude DOC)? (requires #9 numerical tracer)</description>
+                    </param>
                     <param name="ctrl_bio_remin_redox_save">
 			<value datatype="boolean">.false.</value>
                         <description>Create redox/remin data for saving?</description>
@@ -5080,7 +5508,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>j location for water column timeseries saving</description>
                     </param>
                     <param name="n_orb_pts_nmax">
-			<value datatype="integer">10000</value>
+			<value datatype="integer">0</value>
                         <description></description>
                     </param>
                     <param name="par_infile_orb_pts_loc_name">
@@ -5103,10 +5531,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_misc_audit_relerr">
 			<value datatype="real">1.0E-08</value>
                         <description>threshold of relative inventory change to trigger audit error</description>
-                    </param>
-                    <param name="ctrl_debug_reportwarnings">
-			<value datatype="boolean">.false.</value>
-                        <description>report all run-time warnings?</description>
                     </param>
                     <param name="ctrl_debug_lvl0">
 			<value datatype="boolean">.true.</value>
@@ -5294,7 +5718,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                             <description></description>
                         </param>
                     </paramArray>
-                    <paramArray name="par_ocn_force_scale_val" dimension="1" extent="101">
+                    <paramArray name="par_ocn_force_scale_val" dimension="1" extent="107">
                         <description>ocean tracer forcing scaling - value</description>
                         <param name="par_ocn_force_scale_val(1)" index="1">
                             <value datatype="real">1.0</value>
@@ -5700,8 +6124,40 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
+                        <param name="par_ocn_force_scale_val(102)" index="102">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(103)" index="103">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(104)" index="104">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(105)" index="105">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(106)" index="106">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(107)" index="107">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(108)" index="108">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_val(109)" index="109">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
-                    <paramArray name="par_ocn_force_scale_time" dimension="1" extent="101">
+                    <paramArray name="par_ocn_force_scale_time" dimension="1" extent="107">
                         <description>ocean tracer forcing scaling - time</description>
                         <param name="par_ocn_force_scale_time(1)" index="1">
                             <value datatype="real">1.0</value>
@@ -6107,6 +6563,38 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                             <value datatype="real">1.0</value>
                             <description></description>
                         </param>
+                        <param name="par_ocn_force_scale_time(102)" index="102">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(103)" index="103">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(104)" index="104">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(105)" index="105">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(106)" index="106">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(107)" index="107">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(108)" index="108">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
+                        <param name="par_ocn_force_scale_time(109)" index="109">
+                            <value datatype="real">1.0</value>
+                            <description></description>
+                        </param>
                     </paramArray>
                     <param name="par_force_point_i">
 			<value datatype="integer">0</value>
@@ -6147,6 +6635,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_force_ocn_age">
 			<value datatype="boolean">.false.</value>
                         <description>Automatic ocean age tracer?</description>
+                    </param>
+                    <param name="ctrl_force_ocn_age1">
+			<value datatype="boolean">.false.</value>
+                        <description>Or ... automatic ocean age single-tracer tracer?</description>
                     </param>
 <!-- TRANSPORT MATRIX  -->
 		<param name="ctrl_data_diagnose_TM">
@@ -6621,6 +7113,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Simulate ocean Porg loss with buried sulf-OM?</description>
                     </param>
+					<param name="par_sed_huelse2017_sim_P_loss_pres_fracC">
+			<value datatype="boolean">.false.</value>
+                        <description>Simulate ocean Porg loss related to Corg burial</description>
+                    </param>
+                    <param name="par_sed_huelse2017_sim_P_regeneration">
+			<value datatype="boolean">.false.</value>
+                        <description>Simulate P-regeneration under anoxia</description>
+                    </param>
                     <param name="par_sed_huelse2017_k1">
 			<value datatype="real">0.0065</value>
                         <description>global labile Corg degradation rate constant, units of 1/yr</description>
@@ -6807,6 +7307,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">-15.0</value>
                         <description>Li clay formation sink 7Li epsilon (o/oo)</description>
                     </param>
+                    <param name="ctrl_sed_clay_7Li_epsilon_fixed">
+			<value datatype="boolean">.true.</value>
+                        <description>fixed (non T-dependent) MACC 7Li epsilon?  </description>
+                    </param>
                     <param name="par_sed_hydroip_fCa">
 			<value datatype="real">0.0</value>
                         <description>hydrothermal Ca flux (mol yr-1) -- 2.0E12 in Blattler et al. [2011] but set to zero here as a default</description>
@@ -6846,6 +7350,42 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_lowTalt_fCO2">
 			<value datatype="real">0.0</value>
                         <description>CO2 low-T alteration (weathering) sink (mol yr-1) (0.5E12 in Payton et al.)</description>
+                    </param>
+                    <param name="par_sed_hydroip_fOs">
+			<value datatype="real">0.0</value>
+                        <description>hydrothermal Os flux (mol yr-1)</description>
+                    </param>
+                    <param name="par_sed_hydroip_fOs_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>187Os/188Os ratio of hydrothermal Os flux</description>
+                    </param>
+                    <param name="par_sed_hydroip_fOs_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>188Os/192Os ratio of hydrothermal Os flux</description>
+                    </param>
+                    <param name="par_sed_Os_depTOT">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol yr-1)</description>
+                    </param>
+                    <param name="ctrl_sed_Os_O2">
+			<value datatype="boolean">.false.</value>
+                        <description>switch for turning on oxygen-dependent Os deposition</description>
+                    </param>
+                    <param name="par_sed_Os_O2_threshold">
+			<value datatype="real">0.0</value>
+                        <description>[O2] threshold for switching from oxic to suboxic Os deposition (mol)</description>
+                    </param>
+                    <param name="par_sed_Os_dep">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
+                    </param>
+                    <param name="par_sed_Os_dep_oxic">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under oxic conditions (mol m-2 yr-1)</description>
+                    </param>
+                    <param name="par_sed_Os_dep_suboxic">
+			<value datatype="real">0.0</value>
+                        <description>Os deposition rate under suboxic conditions (mol m-2 yr-1)</description>
                     </param>
                     <param name="par_sed_hydroip_fDIC">
 			<value datatype="real">0.0</value>
@@ -7414,6 +7954,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.16</value>
                         <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
                     </param>
+                    <param name="par_weather_fracOs">
+			<value datatype="real">0.0</value>
+                        <description>mean Os:Ca2+ ratio of weathering flux</description>
+                    </param>
+                    <param name="par_weather_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 187Os/188Os ratio of weathering flux</description>
+                    </param>
+                    <param name="par_weather_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of weathering flux</description>
+                    </param>
                     <param name="par_weather_CaSiO3_fracCa5PO43">
 			<value datatype="real">0.0</value>
 			      <description>global silicate apatite abundance</description>
@@ -7980,6 +8532,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
 	                  <description>restrict MLD for mean light calculation?</description>
                     </param>
+                    <param name="ctrl_PARseaicelimit">
+			<value datatype="boolean">.false.</value>
+	                  <description>PAR attenutation by sea-ice cover?</description>
+                    </param>
        <!-- Grazing parameters -->
                     <param name="trophic_tradeoff">
 			<value datatype="real">1.0</value>
@@ -8082,6 +8638,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="beta_mort_c">
 			<value datatype="real">100.0</value>
 	                  <description>Fraction mortality to dissolved - midpoint vol.</description>
+                    </param>
+                    <param name="par_beta_POCtoDOC">
+			<value datatype="real">1.0</value>
+	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
                     </param>
 <!-- initial fractional abundance of particulate export -->
                     <param name="par_bio_remin_POC_frac2">

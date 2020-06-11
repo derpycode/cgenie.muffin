@@ -117,6 +117,8 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
   logical::ctrl_restrict_mld    ! restrict MLD
   NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
+  logical::ctrl_PARseaicelimit    ! PAR attenutation by sea-ice cover?
+  NAMELIST /ini_ecogem_nml/ctrl_PARseaicelimit
   ! Grazing parameters
   real :: ass_eff                   !      maximum assimilation efficiency
   integer :: ns                     !      prey switching exponent
@@ -135,10 +137,12 @@ MODULE ecogem_lib
   real :: beta_graz_a,beta_graz_b,beta_graz_c   ! a/b/c: fraction messy feeding to dissolved
   real :: beta_mort_a,beta_mort_b,beta_mort_c   ! a/b/c: fraction mortality to dissolved
   real :: par_bio_remin_POC_frac2,par_bio_remin_CaCO3_frac2
+  real :: par_beta_POCtoDOC
   namelist/ini_ecogem_nml/respir_a,biosink_a,mort_a
   namelist/ini_ecogem_nml/respir_b,biosink_b,mort_b
   namelist/ini_ecogem_nml/beta_graz_a,beta_graz_b,beta_graz_c,beta_mort_a,beta_mort_b,beta_mort_c
   namelist/ini_ecogem_nml/par_bio_remin_POC_frac2,par_bio_remin_CaCO3_frac2
+  namelist/ini_ecogem_nml/par_beta_POCtoDOC
   ! Mixotrophy parameters
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff

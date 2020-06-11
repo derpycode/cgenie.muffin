@@ -112,6 +112,8 @@ CONTAINS
        print*,'Include explicit P-cycle in OMEN-SED?               : ',par_sed_huelse2017_P_cycle
        print*,'Remove implicit Alk associated with buried sulf-OM? : ',par_sed_huelse2017_remove_impl_sulALK
        print*,'Simulate ocean Porg loss with buried sulf-OM?       : ',par_sed_huelse2017_sim_P_loss
+       print*,'Simulate ocean Porg loss related to Corg burial?    : ',par_sed_huelse2017_sim_P_loss_pres_fracC
+       print*,'Simulate increased P-regeneration under anoxia?     : ',par_sed_huelse2017_sim_P_regeneration
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
@@ -166,6 +168,7 @@ CONTAINS
        print*,'Li low-T alteration sink 7Li epsilon (o/oo)         : ',par_sed_lowTalt_7Li_epsilon
        print*,'Li clay formation sink (mol yr-1) (Li/Ca norm)      : ',par_sed_clay_fLi_alpha
        print*,'Li clay formation sink 7Li epsilon (o/oo)           : ',par_sed_clay_7Li_epsilon
+       print*,'fixed (non T-dependent) MACC 7Li epsilon?           : ',ctrl_sed_clay_7Li_epsilon_fixed
        print*,'hydrothermal Ca flux (mol yr-1)                     : ',par_sed_hydroip_fCa
        print*,'hydrothermal Ca flux d44Ca (o/oo)                   : ',par_sed_hydroip_fCa_d44Ca
        print*,'hydrothermal Mg flux (mol yr-1)                     : ',par_sed_hydroip_fMg
@@ -2128,6 +2131,9 @@ CONTAINS
 
              ! *** (j) calculate D14C and radiocarbon age
              !         NOTE: this will be saved regardless of whether 14C is a included tracer in the model or not ...
+             ! NOTE: rather than trying to obtain and pass atmospheric D14C, 
+             !       a dummy pre-industrila value of 0.0 is passed instead to fun_convert_D14Ctoage
+             !       (a recent code change/correction added atmospheric D14C to the calculation of radiocarbon age)
              loc_sed_save_CaCO3_D14C(i,j,:) = const_real_zero
              loc_sed_save_age_14C(i,j,:) = const_real_zero
              if (sed_select(is_CaCO3_14C)) then
@@ -2136,7 +2142,7 @@ CONTAINS
                       loc_sed_save_CaCO3_D14C(i,j,o) = &
                            & fun_convert_delta14CtoD14C(loc_sed_save(is_CaCO3_13C,i,j,o),loc_sed_save(is_CaCO3_14C,i,j,o))
                       loc_sed_save_age_14C(i,j,o) = &
-                           & fun_convert_D14Ctoage(loc_sed_save_CaCO3_D14C(i,j,o))
+                           & fun_convert_D14Ctoage(loc_sed_save_CaCO3_D14C(i,j,o),0.0)
                    end if
                 end DO
              end if

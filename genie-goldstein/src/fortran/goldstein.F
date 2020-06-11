@@ -830,14 +830,14 @@ c SG <
             go_cost(i,j)  = real(cost(i,j))
             go_tau(1,i,j) = real(tau(1,i,j))
             go_tau(2,i,j) = real(tau(2,i,j))
-            go_mldta(i,j) = real(-5000.*mld(i,j))
+            go_mldta(i,j) = real(-dsc*mld(i,j))
 ccSR
 
          enddo
       enddo 
       do j=0,jmax
          do i=0,imax
-            go_psi(i,j) = 1592.5*real(psi(i,j))
+            go_psi(i,j) = opsisc*real(psi(i,j))
          enddo
       enddo 
 

@@ -548,7 +548,7 @@ CONTAINS
   END SUBROUTINE check_egbg_compatible
   ! ****************************************************************************************************************************** !
   ! convert a word to lower case
-  elemental subroutine lower_case(word)
+  subroutine lower_case(word)
     character (len=*) , intent(in out) :: word
     integer                            :: i,ic,nlen
     nlen = len(word)

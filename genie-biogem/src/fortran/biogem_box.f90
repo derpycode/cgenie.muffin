@@ -141,8 +141,8 @@ CONTAINS
     real::loc_alpha_sa,loc_alpha_as
     real::loc_rho
     real::loc_TC
-    real::loc_r13C_ocn,loc_r14C_ocn,loc_r18O_ocn
-    real::loc_r13C_atm,loc_r14C_atm,loc_r18O_atm
+    real::loc_r13C_ocn,loc_r14C_ocn,loc_r18O_ocn,loc_r34S_ocn
+    real::loc_r13C_atm,loc_r14C_atm,loc_r18O_atm,loc_r34S_atm
     real::loc_R_atm,loc_R_ocn
     real::loc_ocn,loc_atm
     real::loc_A
@@ -303,6 +303,15 @@ CONTAINS
                    loc_r18O_ocn = ocn(io_O2_18O,dum_i,dum_j,n_k)/ocn(io_O2,dum_i,dum_j,n_k)
                    loc_focnatm(ia_pO2_18O) = loc_r18O_ocn*loc_focnatm(ia_pO2)
                 end if
+             CASE (ia_pH2S_34S)
+                if (dum_atm(ia_pH2S) > const_real_nullsmall) then
+                   loc_r34S_atm = dum_atm(ia_pH2S_34S)/dum_atm(ia_pH2S)
+                   loc_fatmocn(ia_pH2S_34S) = loc_r34S_atm*loc_fatmocn(ia_pH2S)
+                end if
+                if (ocn(io_H2S,dum_i,dum_j,n_k) > const_real_nullsmall) then
+                   loc_r34S_ocn = ocn(io_H2S_34S,dum_i,dum_j,n_k)/ocn(io_H2S,dum_i,dum_j,n_k)
+                   loc_focnatm(ia_pH2S_34S) = loc_r34S_ocn*loc_focnatm(ia_pH2S)
+                end if
              case default
                 ! ### INSERT CODE TO DEAL WITH ADDITIONAL ISOTOPES ############################################################### !
                 !
@@ -319,7 +328,7 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! WATER-COLUMN TRANSFORMATION PROCESSES
+  ! SURFACE OCEAN PROCESSES
   ! ****************************************************************************************************************************** !
 
 
@@ -383,8 +392,10 @@ CONTAINS
     real::loc_alpha,loc_delta,loc_standard
     real::loc_r15N,loc_r30Si,loc_r114Cd,loc_r7Li,loc_r44Ca
     real::loc_86Sr,loc_87Sr,loc_88Sr
+    real::loc_192Os,loc_188Os,loc_187Os
     real::loc_R,loc_r18O
     real::loc_PO4,loc_Cd,loc_FeT,loc_SiO2,loc_N,loc_IO3
+    real::loc_FeT_56Fe,loc_r56Fe
     real::loc_kPO4,loc_kPO4_sp,loc_kPO4_nsp,loc_kN
     real::loc_kFe,loc_kFe_sp,loc_kFe_nsp
     real::loc_kSiO2,loc_kSiO2_sp,loc_kSiO2_nsp
@@ -394,7 +405,8 @@ CONTAINS
     real::loc_r_POM_DOM,loc_r_POM_RDOM                                  !
     real::loc_bio_red_POC_POFe_sp,loc_bio_red_POC_POFe_nsp
     real::loc_d13C_DIC_Corg_ef
-    real::loc_bio_NP
+    real::loc_bio_NP,loc_red
+    real::loc_dN2,loc_dNH4,loc_dNO3
     integer::loc_k_mld
     real,dimension(n_ocn)::loc_ocn                             !
 
@@ -422,7 +434,7 @@ CONTAINS
     loc_dPO4_2 = 0.0
     loc_dPO4_sp = 0.0
     loc_dPO4_nsp = 0.0
-    loc_frac_N2fix = 0.0 
+    loc_frac_N2fix = 0.0
     loc_bio_uptake(:,:) = 0.0
     loc_bio_part_DOM(:,:) = 0.0
     loc_bio_part_RDOM(:,:) = 0.0
@@ -433,8 +445,6 @@ CONTAINS
     loc_bio_red_DOMtotal = 0.0
     !
     loc_ocn = 0.0
-    
-
 
     ! *** APPLY VARIABLE P:C RATIO ? ***
     ! par_bio_red_PC_flex = 1 --> activate variable stoichiometry
@@ -445,20 +455,22 @@ CONTAINS
        ! default par_bio_red_PC_alpha2 = 1.0
        ! to achieve average P:C more similar to fixed Redfield modern run, use  PC_alpha1 = 1.1643
        ! an alternative is to scale only PC_alpha2 = 1.16
-       bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,dum_i,dum_j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
-       if (par_bio_red_PC_flex > 1) then   ! limit C:P at high PO4 (because no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
-          if (bio_part_red(is_POC,is_POP,dum_i,dum_j) > 1.0/55.0) then
-             bio_part_red(is_POC,is_POP,dum_i,dum_j) = 1.0/55.0
+       bio_part_red(is_POC,is_POP,dum_i,dum_j) = &
+          & par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,dum_i,dum_j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+       if (par_bio_red_PC_flex == 2) then   ! limit C:P at high PO4 (because no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
+          if (bio_part_red(is_POC,is_POP,dum_i,dum_j) > par_bio_red_PC_max) then
+             bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
           end if
        end if
        bio_part_red(is_POP,is_POC,dum_i,dum_j) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
+    elseif (par_bio_red_PC_flex == -1) then
+       bio_part_red(is_POC,is_POP,:,:) = par_bio_red_PC_max
+       bio_part_red(is_POP,is_POC,:,:) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
     else
        bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
        bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
     end if
-
-
-    !
+    ! set local N:P
     loc_bio_NP = bio_part_red(is_POC,is_PON,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)
 
     ! *** CALCULATE MIXED LAYER PROPERTIES ***
@@ -497,17 +509,37 @@ CONTAINS
     end if
     if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
        SELECT CASE (trim(opt_geochem_Fe))
+       CASE ('OLD','ALT')
+          ! NOTE: combine free and ligand-bound tracers for total 'bioavailable' iron
+          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_FeL,dum_i,dum_j,n_k)
+          if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k) + ocn(io_FeL_56Fe,dum_i,dum_j,n_k)
+       CASE ('FeFe2TL')
+          !! combine Fe2 and Fe3 tracers for total 'bioavailable' iron
+          !loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_Fe2,dum_i,dum_j,n_k)
+          !if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k) + ocn(io_Fe2_56Fe,dum_i,dum_j,n_k)
+          ! leave as just Fe (3) representing total 'bioavailable' iron
+          ! (otherwise there are redox complicatons of varying proportions of Fe3 vs. Fe2 being taken up, and later, remin-ed)
+          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k)
+          if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k)
        CASE ('hybrid')
-          ! NOTE: do not need to sum separate tracers, as io_TDFe *is* total dissolved and assumed bioavailable Fe
+          ! NOTE: no need to sum separate tracers, as io_TDFe *is* total dissolved and assumed bioavailable Fe pool
           loc_FeT = ocn(io_TDFe,dum_i,dum_j,n_k)
+          if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_TDFe_56Fe,dum_i,dum_j,n_k)
        CASE ('lookup_4D')
           ! NOTE: function takes inputs: temperature, [H+], TDFe, TL as a single array
           loc_FeT = fun_box_calc_lookup_Fe_4D_Fe3(                           &
                & (/ ocn(io_T,dum_i,dum_j,n_k), carb(ic_H,dum_i,dum_j,n_k),   &
                & ocn(io_TDFe,dum_i,dum_j,n_k), ocn(io_TL,dum_i,dum_j,n_k) /) &
                & )
+          if (sed_select(is_POFe_56Fe) .AND. ocn(io_TDFe,dum_i,dum_j,n_k)>const_rns) then
+             loc_FeT_56Fe = ocn(io_TDFe_56Fe,dum_i,dum_j,n_k)*(loc_FeT/ocn(io_TDFe,dum_i,dum_j,n_k))
+          else
+             loc_FeT_56Fe = 0.0
+          end if
        case default
-          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_FeL,dum_i,dum_j,n_k)
+          ! NOTHING!
+          loc_FeT      = 0.0
+          loc_FeT_56Fe = 0.0
        end SELECT
        select case (par_bio_prodopt)
        CASE (                        &
@@ -551,7 +583,7 @@ CONTAINS
     else
        loc_SiO2 = 0.0
     end if
-    if (ocn_select(io_NO3).and. ocn_select(io_NH4)) then
+    if (ocn_select(io_NO3) .and. ocn_select(io_NH4)) then
        loc_N = ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k)
        loc_kN = loc_N/(loc_N + par_bio_c0_N)
     else
@@ -577,7 +609,6 @@ CONTAINS
          & '2N2T_PO4MM_NO3',    &
          & '2N2T_PN_Tdep',      &
          & '3N2T_PNFe_Tdep'     &
-         
          & )
        loc_kI = phys_ocnatm(ipoa_solfor,dum_i,dum_j)/phys_solar_constant
     case (                        &
@@ -631,7 +662,7 @@ CONTAINS
          & '2N2T_PN_Tdep',          &
          & '3N2T_PNFe_Tdep'         &
          & )
-       loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
+       loc_kT = par_bio_kT0*exp((loc_TC+par_bio_kT_dT)/par_bio_kT_eT)
     case (           &
          & 'bio_PFe_OCMIP2' &
          & )
@@ -828,26 +859,29 @@ CONTAINS
        ! 2 x nutrient, 2 x 'taxa': PO4, NO3 Michaelis-Menton
        ! calculate PO4 depletion; loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
        ! (after Fennel et al., 2005)
-       if ((ocn(io_PO4,dum_i,dum_j,n_k) > const_real_nullsmall) .and. &
-            & (ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k) > const_real_nullsmall)) then
-          loc_dPO4_1 = &
-               & dum_dt* &
-               & loc_ficefree* &
-               & loc_kI* &
-               & min(loc_kPO4, &
-               &     (ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k))/ &
-               &     (par_bio_c0_N + ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k))) * &
-               &     par_bio_mu1*ocn(io_PO4,dum_i,dum_j,n_k)
+       ! NOTE: tidied up and also adjusted to allow N2 fixation when no fixed N of any sort exists
+       ! NOTE: assume that dissolved N2 is never limiting
+       if (loc_PO4 > const_real_nullsmall) then
+          if (loc_N > const_real_nullsmall) then
+             loc_dPO4_1 =                 &
+                  & dum_dt*               &
+                  & loc_ficefree*         &
+                  & loc_kI*               &
+                  & min(loc_kPO4,loc_kN)* &
+                  & par_bio_mu1*          &
+                  & min(loc_PO4,loc_N/par_bio_red_POP_PON)
+          else
+             loc_dPO4_1 = 0.0
+          endif
           ! Need to add productivity from nitrogen fixation if conditions are right
-          if ((ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k) < par_bio_N2fixthresh) .and. &
-               & ((ocn(io_NO3,dum_i,dum_j,n_k) + ocn(io_NH4,dum_i,dum_j,n_k))/ocn(io_PO4,dum_i,dum_j,n_k) &
-               & <  par_bio_red_POP_PON)) then
-             loc_dPO4_2 = &
-                  & dum_dt* &
+          if (loc_N < par_bio_N2fixthresh .and. (loc_N/loc_PO4) < par_bio_red_POP_PON) then
+             loc_dPO4_2 =         &
+                  & dum_dt*       &
                   & loc_ficefree* &
-                  & loc_kI* &
-                  & par_bio_mu2*ocn(io_PO4,dum_i,dum_j,n_k)* &
-                  & loc_kPO4
+                  & loc_kI*       &
+                  & loc_kPO4*     &
+                  & par_bio_mu2*  &
+                  & loc_PO4
           else
              loc_dPO4_2 = 0.0
           endif
@@ -857,7 +891,7 @@ CONTAINS
        end if
        ! calculate total production (= PO4 uptate)
        loc_dPO4 = loc_dPO4_1 + loc_dPO4_2
-       ! calculate fraction of total production supported by N2 fixation
+       ! calculate fraction of total (phosphate based) production supported by N2 fixation
        if(loc_dPO4 > const_real_nullsmall) loc_frac_N2fix = loc_dPO4_2/loc_dPO4
     CASE ( &
          & 'bio_POCflux' &
@@ -873,6 +907,7 @@ CONTAINS
        ! 2 x nutrient, 2 x 'taxa': PO4, DIN Michaelis-Menten - Fanny (July 2010)
        ! biomass=limiting nutrient, dynamical threshold and higher N:P ratio for nitrogen fixers
        ! loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
+       ! NOTE: as it stands: if there is no fixed nitrogen of any sort, there will be no N2 fixation either(!)
        if (loc_PO4 > const_real_nullsmall .and. loc_N > const_real_nullsmall) then
           loc_dPO4_1 =                          &
                & dum_dt*                        &
@@ -917,6 +952,7 @@ CONTAINS
        ! 3 x nutrient, 2 x 'taxa': PO4, DIN, Fe Michaelis-Menten - Fanny (July 2010)
        ! calculate PO4 depletion; loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
        ! (similar to 2N2T_TPN with Fe limitation)
+       ! NOTE: as it stands: if there is no fixed nitrogen of any sort, there will be no N2 fixation either(!)
        if (loc_PO4 > const_real_nullsmall .and. loc_N > const_real_nullsmall   &
             & .and. loc_FeT > const_real_nullsmall) then
           loc_dPO4_1 =                            &
@@ -1174,6 +1210,12 @@ CONTAINS
        bio_part_red(is_CaCO3,is_SrCO3,dum_i,dum_j) = par_bio_red_CaCO3_SrCO3 + par_bio_red_CaCO3_SrCO3_alpha* &
             & ocn(io_Sr,dum_i,dum_j,n_k)/ocn(io_Ca,dum_i,dum_j,n_k)
     end if
+    !
+    ! TRACE METALS: Os
+    if (ocn_select(io_Os) .AND. ocn_select(io_Os)) then
+       bio_part_red(is_CaCO3,is_OsCO3,dum_i,dum_j) = par_bio_red_CaCO3_OsCO3 + par_bio_red_CaCO3_OsCO3_alpha* &
+            & ocn(io_Os,dum_i,dum_j,n_k)/ocn(io_Ca,dum_i,dum_j,n_k)
+    end if
 
     ! *** CALCULATE ISOTOPIC FRACTIONATION ************************************************************************************** !
     ! NOTE: implement isotopic fraction as a 'Redfield' ratio (populate array <bio_part_red>)
@@ -1230,7 +1272,22 @@ CONTAINS
                & carbisor(ici_CO2_r14C,dum_i,dum_j,n_k),loc_d13C_DIC_Corg_ef,.true.)
        end select
     end if
-    !
+    ! ---------------------------------------------------------- !
+    ! d56Fe [POFe]
+    ! ---------------------------------------------------------- !
+    if (sed_select(is_POFe_56Fe)) then
+       ! NOTE: no need to specify Fe scheme, as the values of loc_FeT and loc_FeT_56Fe have already been populated according to
+       !       the specific configuration of explicit (tracer) dissolved Fe pools
+       if (loc_FeT>const_rns) then
+          loc_r56Fe = loc_FeT_56Fe/loc_FeT
+       else
+          loc_r56Fe = 0.0
+       end if
+       bio_part_red(is_POFe,is_POFe_56Fe,dum_i,dum_j) = loc_r56Fe
+    end if
+    ! ---------------------------------------------------------- !
+    ! carbon isotopes in CaCO3
+    ! ---------------------------------------------------------- !
     ! d13C [CaCO3]
     if (sed_select(is_CaCO3_13C)) then
        ! calculate 13C/12C fractionation between DIC and CaCO3
@@ -1263,23 +1320,7 @@ CONTAINS
           ! fixed fractionation
           loc_alpha = 1.0 + par_d44Ca_CaCO3_epsilon/1000.0
        end select
-          bio_part_red(is_CaCO3,is_CaCO3_44Ca,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)       
-    end if
-    !
-    ! d15N [PON]
-    if (sed_select(is_PON_15N)) then
-       ! calculate the 15N/14N fractionation between NO3 and PON
-       ! NOTE: ASSUME NO FRACTIONATION
-       ! NOTE; check first for non-zero nitrate concentration to prevent potential unpleasantness ...
-       if (ocn(io_NO3,dum_i,dum_j,n_k) > const_real_nullsmall) then
-          loc_r15N = ocn(io_NO3_15N,dum_i,dum_j,n_k)/ocn(io_NO3,dum_i,dum_j,n_k)
-       else
-          loc_r15N = 0.0
-       end if
-       ! ****************************
-       loc_alpha = 0.0
-       ! ****************************
-       bio_part_red(is_PON,is_PON_15N,dum_i,dum_j) = loc_alpha*loc_r15N
+          bio_part_red(is_CaCO3,is_CaCO3_44Ca,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
     end if
     !
     ! d30Si [opal]
@@ -1366,6 +1407,36 @@ CONTAINS
           bio_part_red(is_SrCO3,is_SrCO3_88Sr,dum_i,dum_j) = 0.0
        end if
     end if
+    !
+    ! 187 + 188Os [CaCO3]
+    ! NOTE: be lazy and add deltas ...
+    if (sed_select(is_OsCO3_187Os) .AND. sed_select(is_OsCO3_187Os)) then
+       if (ocn(io_Os,dum_i,dum_j,n_k) > const_real_nullsmall) then
+          ! initialization
+          loc_192Os = ocn(io_Os,dum_i,dum_j,n_k)-ocn(io_Os_187Os,dum_i,dum_j,n_k)-ocn(io_Os_188Os,dum_i,dum_j,n_k)
+          loc_ocn(io_Os) = ocn(io_Os,dum_i,dum_j,n_k)
+          ! calculate 187Os/192Os of export
+          loc_187Os = ocn(io_Os_187Os,dum_i,dum_j,n_k)
+          loc_standard = const_standardsR(ocn_type(io_Os_187Os))
+          loc_delta = fun_calc_isotope_deltaR(loc_192Os,loc_187Os,loc_standard,const_real_null) + par_d187Os_OsCO3_epsilon
+          loc_ocn(io_Os_187Os) = loc_delta
+          ! calculate 188Os/192Os of export
+          loc_188Os = ocn(io_Os_188Os,dum_i,dum_j,n_k)
+          loc_standard = const_standardsR(ocn_type(io_Os_188Os))
+          loc_delta = fun_calc_isotope_deltaR(loc_192Os,loc_188Os,loc_standard,const_real_null) + par_d188Os_OsCO3_epsilon
+          loc_ocn(io_Os_188Os) = loc_delta
+          ! calculate new Os ISOTOPE abundance -- 187Os
+          loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_ocn(:),1)
+          ! calculate new Os ISOTOPE abundance -- 188Os
+          loc_188Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_ocn(:),2)
+          ! calculate equivalent Redfield ratios (comapred to bulk Os)
+          bio_part_red(is_OsCO3,is_OsCO3_187Os,dum_i,dum_j) = loc_187Os/ocn(io_Os,dum_i,dum_j,n_k)
+          bio_part_red(is_OsCO3,is_OsCO3_188Os,dum_i,dum_j) = loc_188Os/ocn(io_Os,dum_i,dum_j,n_k)
+       else
+          bio_part_red(is_OsCO3,is_OsCO3_187Os,dum_i,dum_j) = 0.0
+          bio_part_red(is_OsCO3,is_OsCO3_188Os,dum_i,dum_j) = 0.0
+       end if
+    end if
 
     ! ### INSERT CODE TO DEAL WITH ADDITIONAL ISOTOPES ########################################################################### !
     !
@@ -1426,6 +1497,18 @@ CONTAINS
                   & + par_bio_c0_Fe_Diaz/par_bio_c0_PO4*loc_dPO4_2
           END select
        end if
+       ! ----------------------------------------------------- ! Kick the can down the road & deal with all the complex N shit later
+                                                               ! settings zeros (and no N in POM) for now
+                                                               ! (e.g. as isotopes will be complex to unravel after the fact)
+                                                               ! NOTE: AR 19/01/16
+       if (is == is_PON) then
+          SELECT CASE (par_bio_prodopt)
+          CASE ( &
+               & '2N2T_PO4MM_NO3' &
+               & )
+             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = 0.0
+          END select
+       end if
     end DO
     ! -------------------------------------------------------- !
     ! CALCULATE ASSOCIATED ISOTOPIC EXPORT
@@ -1441,7 +1524,6 @@ CONTAINS
                & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,loc_k_mld:n_k)
        end select
     end do
-
     ! -------------------------------------------------------- !
     ! CALCULATE INORGANIC UPTAKE
     ! -------------------------------------------------------- !
@@ -1468,10 +1550,72 @@ CONTAINS
        loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k) - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
        loc_bio_uptake(io_I,loc_k_mld:n_k)   = 0.0
     end if
+    ! N cycle
     ! non-standard productivity schemes
     SELECT CASE (par_bio_prodopt)
     CASE ( &
-         & '2N2T_PO4MM_NO3', &
+         & '2N2T_PO4MM_NO3' &
+         & )
+       ! diazatrophs -- simply (but then assuming, ultimately: PON --> 0.5N2):
+       ! N2 --> 2PON
+       loc_dN2 = par_bio_NPdiaz*loc_dPO4_2
+       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + loc_dN2
+       loc_bio_uptake(io_N2,n_k) = loc_bio_uptake(io_N2,n_k) + 0.5*loc_dN2
+       ! ammonia assimilation (consistent with the assumed remin conservation equation):
+       ! NH4+ + (3/4)O2 --> PON + (3/2)H2O + H+
+       If (par_bio_red_POP_PON*loc_dPO4_1 < ocn(io_NH4,dum_i,dum_j,n_k)) then
+          loc_dNH4 = par_bio_red_POP_PON*loc_dPO4_1
+       else
+          loc_dNH4 = ocn(io_NH4,dum_i,dum_j,n_k)
+       end if
+       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + loc_dNH4
+       loc_bio_uptake(io_NH4,n_k) = loc_bio_uptake(io_NH4,n_k) + loc_dNH4
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + (3.0/4.0)*loc_dNH4
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + loc_dNH4
+       loc_dNO3 = par_bio_red_POP_PON*loc_dPO4_1 - loc_dNH4
+       ! nitrate uptake, assuming:
+       ! H+ + NO3- --> PON + (5/4)O2 + (1/2)H2O
+       bio_part(is_PON,dum_i,dum_j,n_k) = bio_part(is_PON,dum_i,dum_j,n_k) + loc_dNO3
+       loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) + loc_dNO3
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - (5.0/4.0)*loc_dNO3
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) - loc_dNO3
+       ! isotopes
+       if (sed_select(is_PON_15N)) then
+          ! N2
+          if (ocn(io_N2,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_N2_15N,dum_i,dum_j,n_k)/ocn(io_N2,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dN2_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dN2
+          loc_bio_uptake(io_N2_15N,n_k) = loc_bio_uptake(io_N2_15N,n_k) + 0.5*loc_red*loc_dN2
+          ! NH4
+          if (ocn(io_NH4,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,n_k)/ocn(io_NH4,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dNH4_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dNH4
+          loc_bio_uptake(io_NH4_15N,n_k) = loc_bio_uptake(io_NH4_15N,n_k) + loc_red*loc_dNH4
+          ! NO3
+          if (ocn(io_NO3,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_NO3_15N,dum_i,dum_j,n_k)/ocn(io_NO3,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dNO3_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dNO3
+          loc_bio_uptake(io_NO3_15N,n_k) = loc_bio_uptake(io_NO3_15N,n_k) + loc_red*loc_dNO3
+       end if
+    CASE ( &
          & '2N2T_PN_Tdep',   &
          & '3N2T_PNFe_Tdep'  &
          & )
@@ -1636,20 +1780,20 @@ CONTAINS
     !       MUST BE REFORMULATED IN THE COMPACT TRACER NOTATION
     if (ocn_select(io_Fe)) then
        SELECT CASE (trim(opt_geochem_Fe))
-       CASE ('ALT','hybrid','lookup_4D')
-          ! DO NOTHING
-       case default
+       CASE ('OLD')
           DO k=n_k,loc_k_mld,-1
              if (ocn(io_Fe,dum_i,dum_j,k) > const_real_nullsmall) then
-                call sub_calc_scav_Fe(                                                  &
-                     & dum_dt,                                                          &
-                     & phys_ocn(ipo_Dbot,dum_i,dum_j,k)/par_bio_remin_sinkingrate_scav, &
-                     & ocn(io_Fe,dum_i,dum_j,k),                                        &
-                     & bio_part(:,dum_i,dum_j,k),                                       &
-                     & bio_remin(:,dum_i,dum_j,k)                                       &
+                call sub_calc_scav_Fe(                                                      &
+                     & dum_dt,                                                              &
+                     & phys_ocn(ipo_Dbot,dum_i,dum_j,k)/par_bio_remin_sinkingrate_reaction, &
+                     & ocn(io_Fe,dum_i,dum_j,k),                                            &
+                     & bio_part(:,dum_i,dum_j,k),                                           &
+                     & bio_remin(:,dum_i,dum_j,k)                                           &
                      & )
              end if
           end DO
+       case default
+          ! DO NOTHING
        end SELECT
     end if
 
@@ -1717,22 +1861,33 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE PREFORMED TRACERS
-  SUBROUTINE sub_calc_bio_preformed(dum_i,dum_j)
-    ! dummy arguments
+  SUBROUTINE sub_calc_bio_preformed(dum_i,dum_j,dum_atm)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j
-    ! local variables
+    REAL,dimension(n_atm),INTENT(in)::dum_atm
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     INTEGER::io
-    integer::loc_k_mld
-    real,dimension(n_ocn)::loc_ocn                             !
-
-    ! *** INITIALIZE VARIABLES ***
-    !
-    loc_ocn = 0.0
-    ! ocean surface tracers
+    real,dimension(n_ocn)::loc_ocn
+    real::loc_tot,loc_frac,loc_standard
+    real::loc_d14Catm,loc_d14Cocn
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! zero local array
+    loc_ocn(:) = 0.0
+    ! set array equal to ocean surface tracer concentrations
     loc_ocn(:) = ocn(:,dum_i,dum_j,n_k)
-
-    ! *** create pre-formed tracers ***
-    ! 
+    ! -------------------------------------------------------- !
+    ! SET PRE-FORMED TRACERS
+    ! -------------------------------------------------------- !
+    ! NOTE: Preformed C14 age is just 8033*ln((D14Catm+1000)/(D14Cocn+1000)) at the surface
+    !       d14C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+    !       where: loc_tot = io_DIC; loc_frac = io_DIC_14C; loc_standard = const_standards(ocn_type(io_DIC_14C))
+    !       D14C = fun_convert_delta14CtoD14C(loc_d13C,loc_d14C)
     if (ctrl_bio_preformed) then
           do io=io_col0,io_col9
              if (ocn_select(io)) then
@@ -1748,16 +1903,34 @@ CONTAINS
                 CASE (io_col4)
                    if (ocn_select(io_NO3)) bio_remin(io,dum_i,dum_j,n_k)     = loc_ocn(io_NO3)     - loc_ocn(io)
                 CASE (io_col5)
-                   if (ocn_select(io_Ca)) bio_remin(io,dum_i,dum_j,n_k)      = loc_ocn(io_Ca)      - loc_ocn(io)
+                   if (ocn_select(io_Fe)) bio_remin(io,dum_i,dum_j,n_k)      = loc_ocn(io_Fe)      - loc_ocn(io)
+                   if (ocn_select(io_TDFe)) bio_remin(io,dum_i,dum_j,n_k)    = loc_ocn(io_TDFe)    - loc_ocn(io)
                 CASE (io_col6)
                    if (ocn_select(io_SiO2)) bio_remin(io,dum_i,dum_j,n_k)    = loc_ocn(io_SiO2)    - loc_ocn(io)
                 CASE (io_col7)
                    if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,n_k) = loc_ocn(io_DIC_13C) - loc_ocn(io)
+                CASE (io_col8)
+                   if (ocn_select(io_DIC_14C)) then
+                      loc_standard = const_standards(ocn_type(io_DIC_14C))
+                      loc_tot     = dum_atm(ia_pCO2)
+                      loc_frac    = dum_atm(ia_pCO2_14C)
+                      loc_d14Catm = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      loc_standard = const_standards(ocn_type(io_DIC_14C))
+                      loc_tot     = loc_ocn(io_DIC)
+                      loc_frac    = loc_ocn(io_DIC_14C)
+                      loc_d14Cocn = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      bio_remin(io,dum_i,dum_j,n_k) = &
+                           & const_lamda_14C_libby*log( (loc_d14Catm+1000.0)/(loc_d14Cocn+1000.0) ) - loc_ocn(io)
+                   end if
+                CASE (io_col9)
+                   if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,n_k)     = 0.0 - loc_ocn(io)
                 end select
              end if
           end do
     end if
-
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
   end SUBROUTINE sub_calc_bio_preformed
   ! ****************************************************************************************************************************** !
 
@@ -1787,7 +1960,7 @@ CONTAINS
     end do
     DO l=3,n_l_sed
        is = conv_iselected_is(l)
-       loc_bio_uptake(is,:) = 0.0
+       loc_bio_part(is,:) = 0.0
     end DO
     ! restrict abiotic precipitation to the surface if requested
     if (ctrl_bio_CaCO3precip_sur) then
@@ -1913,6 +2086,11 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! IRON SPECIATION
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! Fe SPECIATION -- goethite
   ! NOTE: this scheme assumes the conservation and transport of: total dissolved Fe and total L
   ! NOTE: not used in this function, but [Fe] is used to interface with old Fe-tracer based code
@@ -2001,84 +2179,6 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! Fe SPECIATION
-  function fun_box_calc_geochem_Fe(dum_FeT,dum_LT)
-    ! -------------------------------------------------------- !
-    ! RESULT VARIABLE
-    ! -------------------------------------------------------- !
-    real,DIMENSION(1:3)::fun_box_calc_geochem_Fe
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    real,INTENT(in)::dum_FeT,dum_LT
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    real::loc_Fe,loc_FeL,loc_L
-    real,DIMENSION(2)::loc_roots
-    ! -------------------------------------------------------- !
-    ! CALCULATE IRON SPECIATION
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! solve Fe speciation equation
-    ! K = FeL / (Fe*L) (e.g. see: Parekth et al. [2005])
-    ! => FeL = Fe*L*K
-    !    conservation relations:
-    !    FeL + Fe = FeT => Fe = FeT - FeL
-    !    FeL + L  = LT  => L  = LT  - FeL
-    !    substitute:
-    !    FeL = (FeT - FeL)*(LT - FeL)*K
-    !    => FeL/K = FeT*LT + FeL^2 - LT*FeL - FeT*FeL
-    !    => FeL/K = FeL^2 - (LT + FeT)*FeL + FeT*LT
-    !    => 1.0*FeL^2 - (LT + FeT + 1.0/K)*FeL + FeT*LT = 0.0
-    !       solve as: ax2 + bx + c = 0.0
-    !                 where x = FeL
-    loc_roots(:) = fun_quad_root(1.0,-(dum_LT + dum_FeT + 1.0/par_K_FeL),dum_FeT*dum_LT)
-    ! -------------------------------------------------------- ! filter returned roots
-    if (maxval(loc_roots(:)) < const_real_nullsmall) then
-       IF (ctrl_audit) THEN
-          CALL sub_report_error( &
-               & 'biogem_box.f90','sub_calc_geochem_Fe', &
-               & 'No REAL root in Fe speciation calculation (or maybe zero ...).'// &
-               & ' / Data: loc_FeL(OLD),loc_Fe(OLD),loc_L(OLD),dum_FeT,dum_LT,', &
-               & 'SOD THIS FOR A GAME OF SOLDIERS: calculation abondoned ...', &
-               & (/loc_FeL,loc_Fe,loc_L,dum_FeT,dum_LT/),.false. &
-               & )
-          error_stop = .FALSE.
-       end IF
-    elseif ((minval(loc_roots(:)) > dum_FeT) .AND. (minval(loc_roots(:)) > dum_LT)) then
-       IF (ctrl_audit) THEN
-          CALL sub_report_error( &
-               & 'biogem_box.f90','sub_calc_geochem_Fe', &
-               & 'No solution to Fe speciation calculation possible ... :('// &
-               & ' / Data: loc_FeL(OLD),loc_Fe(OLD),loc_L(OLD),dum_FeT,dum_LT,', &
-               & 'SOD THIS FOR A GAME OF SOLDIERS: calculation abondoned ...', &
-               & (/loc_FeL,loc_Fe,loc_L,dum_FeT,dum_LT/),.false. &
-               & )
-          error_stop = .FALSE.
-       end IF
-    else
-       if (minval(loc_roots(:)) < const_real_nullsmall) then
-          loc_FeL = maxval(loc_roots(:))
-       else
-          loc_FeL = minval(loc_roots(:))
-       end if
-       loc_Fe  = dum_FeT - loc_FeL
-       loc_L   = dum_LT - loc_FeL
-    end if
-    ! -------------------------------------------------------- !
-    ! RETURN RESULT
-    ! -------------------------------------------------------- !
-    fun_box_calc_geochem_Fe(1) = loc_Fe
-    fun_box_calc_geochem_Fe(2) = loc_FeL
-    fun_box_calc_geochem_Fe(3) = loc_L
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end function fun_box_calc_geochem_Fe
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! Fe SPECIATION
   SUBROUTINE sub_calc_geochem_Fe(dum_i,dum_j,dum_k1,dum_focnFe)
     ! dummy arguments
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
@@ -2113,7 +2213,7 @@ CONTAINS
        loc_roots(:) = fun_quad_root(1.0,-(loc_LT + loc_FeT + 1.0/par_K_FeL),loc_FeT*loc_LT)
        ! filter returned roots
        if (maxval(loc_roots(:)) < const_real_nullsmall) then
-          IF (ctrl_audit) THEN
+          IF (ctrl_debug_reportwarnings) THEN
              CALL sub_report_error( &
                   & 'biogem_box.f90','sub_calc_geochem_Fe', &
                   & 'No REAL root in Fe speciation calculation (or maybe zero ...).'// &
@@ -2124,7 +2224,7 @@ CONTAINS
              error_stop = .FALSE.
           end IF
        elseif ((minval(loc_roots(:)) > loc_FeT) .AND. (minval(loc_roots(:)) > loc_LT)) then
-          IF (ctrl_audit) THEN
+          IF (ctrl_debug_reportwarnings) THEN
              CALL sub_report_error( &
                   & 'biogem_box.f90','sub_calc_geochem_Fe', &
                   & 'No solution to Fe speciation calculation possible ... :('// &
@@ -2155,936 +2255,7 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! CALCULATE THE OXIDATION OF NH4
-  SUBROUTINE sub_box_oxidize_NH4toNO3(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k,id
-    real::loc_O2,loc_NH4,loc_r15N
-    real::loc_potO2cap
-    real::loc_NH4_oxidation
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! OXIDIZE NH4
-    ! -------------------------------------------------------- !
-    ! look for some NH4 and see if it can be oxidized (using O2; if there is any!)
-    ! NH4+ + 2O2 -> NO3- + 2H+ + H2O
-    DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_NH4 = ocn(io_NH4,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_NH4 > const_real_nullsmall)) then
-          ! calculate potential NH4 oxidation
-          SELECT CASE (opt_bio_remin_oxidize_NH4toNO3)
-          CASE ('Fennel')
-             ! from: Fennel et al. [2005]
-             ! oxidation rate constant: 6 yr-1 (NOTE: corrected from 0.1666 in original model)
-             ! oxidation half saturation for oxygen: 2.0E-05 mol kg-1
-             loc_NH4_oxidation = dum_dtyr*6.0*loc_NH4*(loc_O2/(2.0E-05 + loc_O2))
-          CASE ('FennelOLD')
-             ! from: Fennel et al. [2005]
-             loc_NH4_oxidation = dum_dtyr*0.16667*loc_NH4*(loc_O2/(2.0E-05 + loc_O2))
-          CASE ('Ozaki')
-             ! from: Ozaki et al. [EPSL ... ?]
-             loc_NH4_oxidation = dum_dtyr*(18250.0/conv_m3_kg)*loc_NH4*loc_O2
-          CASE ('Fanny')
-	     ! Second order equation of enzyme kinetics which accounts for both O2 and NH4 limitations on nitrification
-             loc_potO2cap = ocn(io_O2,dum_i,dum_j,k) + bio_remin(io_O2,dum_i,dum_j,k)
-             loc_NH4_oxidation = dum_dtyr*par_nitri_mu*loc_NH4*loc_potO2cap &
-                  & /(par_nitri_c0_NH4*par_nitri_c0_O2 +par_nitri_c0_O2*loc_NH4 &
-                  & +par_nitri_c0_NH4*loc_potO2cap +loc_NH4*loc_potO2cap) &
-                  & *min(loc_NH4,loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))
-             If (loc_NH4_oxidation > min(loc_NH4,loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))) then
-                loc_NH4_oxidation = min(loc_NH4,loc_potO2cap*loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))
-             end if
-          CASE ('NONE')
-             loc_NH4_oxidation = 0.0
-          case default
-             loc_NH4_oxidation = min(0.5*loc_NH4,loc_O2)
-          end select
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/ocn(io_NH4,dum_i,dum_j,k)
-          if (loc_NH4_oxidation > loc_NH4) then
-             ! complete NH4 oxidation (no N fractionation)
-             loc_bio_remin(io_NH4,k) = -loc_NH4
-             loc_bio_remin(io_NO3,k) = loc_NH4
-             loc_bio_remin(io_O2,k)  = -2.0*loc_NH4
-             loc_bio_remin(io_ALK,k) = loc_bio_remin(io_NH4,k) - loc_bio_remin(io_NO3,k)
-             loc_bio_remin(io_NH4_15N,k) = -loc_r15N*loc_NH4
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NH4
-          else
-             ! partial NH4 oxidation (=> N isotope Rayleigh fractionation)
-             loc_bio_remin(io_NH4,k) = -loc_NH4_oxidation
-             loc_bio_remin(io_NO3,k) = loc_NH4_oxidation
-             loc_bio_remin(io_O2,k)  = -2.0*loc_NH4_oxidation
-             loc_bio_remin(io_ALK,k) = loc_bio_remin(io_NH4,k) - loc_bio_remin(io_NO3,k)
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ########################################################## !
-             loc_bio_remin(io_NH4_15N,k) = -loc_r15N*loc_NH4_oxidation
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NH4_oxidation
-             ! ################################################################################################################### !
-          end if
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_ammox_dNH4,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
-    diag_geochem(idiag_geochem_ammox_dNO3,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('NH4toNO3_dNH4',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
-    id = fun_find_str_i('NH4toNO3_dNO3',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_oxidize_NH4toNO3
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE THE OXIDATION OF NH4
-  SUBROUTINE sub_box_oxidize_NH4toNO2(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k
-    real::loc_O2,loc_NH4,loc_r15N
-    real::loc_NH4_oxidation,loc_N2Ofrac
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! OXIDIZE NH4
-    ! -------------------------------------------------------- !
-    ! look for some NH4 and see if it can be oxidized (using O2; if there is any!)
-    ! 2NH4+ + 2O2 -> N2O + 2H+ + 3H2O
-    ! (2NH4+ + 3O2 -> 2NO2- + 4H+ + 2H2O)
-    DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_NH4 = ocn(io_NH4,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_NH4 > const_real_nullsmall)) then
-          ! calculate potential NH4 oxidation
-          loc_NH4_oxidation = dum_dtyr*par_bio_remin_kNH4toNO2*min(loc_NH4,loc_O2)* &
-               & (loc_NH4/(loc_NH4 + par_bio_remin_cNH4_NH4toNO2))*(loc_O2/(loc_O2 + par_bio_remin_cO2_NH4toNO2))
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/ocn(io_NH4,dum_i,dum_j,k)
-          ! calculate fraction to be transformed into N2O (if selected) rather than NO2
-          if (ocn_select(io_N2O)) then
-             loc_N2Ofrac = par_bio_remin_fracN2O
-          else
-             loc_N2Ofrac = 0.0
-          end if
-          if (loc_NH4_oxidation > loc_NH4) then
-             ! complete NH4 oxidation (no N fractionation)
-             loc_bio_remin(io_NH4,k) = -(1.0 - loc_N2Ofrac)*loc_NH4
-             loc_bio_remin(io_NO2,k) = -loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_ALK,k) = loc_bio_remin(io_NH4,k) - loc_bio_remin(io_NO2,k)
-             loc_bio_remin(io_NH4_15N,k) = loc_r15N*loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_NO2_15N,k) = loc_r15N*loc_bio_remin(io_NO2,k)
-             if (ocn_select(io_N2O)) then
-                loc_bio_remin(io_NH4,k) = loc_bio_remin(io_NH4,k) - loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_N2O,k) = loc_bio_remin(io_NO2,k) + 0.5*loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_O2,k)  = loc_bio_remin(io_O2,k) - loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_ALK,k) = loc_bio_remin(io_ALK,k) - loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_NH4_15N,k) = loc_bio_remin(io_NH4_15N,k) - loc_r15N*loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_N2O_15N,k) = loc_bio_remin(io_N2O_15N,k) + loc_r15N*0.5*loc_N2Ofrac*loc_NH4
-             end if
-          else
-             ! partial NH4 oxidation (=> N isotope Rayleigh fractionation)
-             loc_bio_remin(io_NH4,k) = -(1.0 - loc_N2Ofrac)*loc_NH4_oxidation
-             loc_bio_remin(io_NO2,k) = -loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_ALK,k) = loc_bio_remin(io_NH4,k) - loc_bio_remin(io_NO2,k)
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ########################################################## !
-             loc_bio_remin(io_NH4_15N,k) = loc_r15N*loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_NO2_15N,k) = loc_r15N*loc_bio_remin(io_NO2,k)
-             ! ################################################################################################################### !
-             if (ocn_select(io_N2O)) then
-                loc_bio_remin(io_NH4,k) = loc_bio_remin(io_NH4,k) - loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_N2O,k) = loc_bio_remin(io_N2O,k) + 0.5*loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_O2,k)  = loc_bio_remin(io_O2,k) - loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_ALK,k) = loc_bio_remin(io_ALK,k) - loc_N2Ofrac*loc_NH4_oxidation
-                ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ####################################################### !
-                loc_bio_remin(io_NH4_15N,k) = loc_bio_remin(io_NH4_15N,k) - loc_r15N*loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_N2O_15N,k) = loc_bio_remin(io_N2O_15N,k) + loc_r15N*0.5*loc_N2Ofrac*loc_NH4_oxidation
-                ! ################################################################################################################ !
-             end if
-          end if
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_oxidize_NH4toNO2
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE THE OXIDATION OF NO2
-  SUBROUTINE sub_box_oxidize_NO2(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k
-    real::loc_O2,loc_NO2,loc_r15N
-    real::loc_NO2_oxidation
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! OXIDIZE NO2
-    ! -------------------------------------------------------- !
-    ! oxic conditions: 2NO2- + O2 -> 2N03-
-    DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_NO2 = ocn(io_NO2,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_NO2 > const_real_nullsmall)) then
-          ! calculate potential NH4 oxidation
-          loc_NO2_oxidation = dum_dtyr*par_bio_remin_kNO2toNO3*min(loc_NO2,loc_O2)* &
-               & (loc_NO2/(loc_NO2 + par_bio_remin_cNO2_NO2toNO3))*(loc_O2/(loc_O2 + par_bio_remin_cO2_NO2toNO3))
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/ocn(io_NO2,dum_i,dum_j,k)
-          if (loc_NO2_oxidation > loc_NO2) then
-             ! complete NO2 oxidation (no N fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2
-             loc_bio_remin(io_NO3,k) = loc_NO2
-             loc_bio_remin(io_O2,k)  = -0.5*loc_NO2
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO3,k)
-             loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2
-          else
-             ! partial NO2 oxidation (=> N isotope Rayleigh fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2_oxidation
-             loc_bio_remin(io_NO3,k) = loc_NO2_oxidation
-             loc_bio_remin(io_O2,k)  = -0.5*loc_NO2_oxidation
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO3,k)
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ########################################################## !
-             loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2_oxidation
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2_oxidation
-             ! ################################################################################################################### !
-          end if
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_oxidize_NO2
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE THE REDUCTION OF NO2
-  SUBROUTINE sub_box_reduce_NO2(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k
-    real::loc_O2,loc_NO2,loc_r15N
-    real::loc_NO2_reduction
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! REDUCE NO2
-    ! -------------------------------------------------------- !
-    ! anoxic conditions: 2NO2- + 2H+ -> N2O + O2 + H2O
-    DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_NO2 = ocn(io_NO2,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_NO2 > const_real_nullsmall)) then
-          ! calculate potential NO2 reduction
-          loc_NO2_reduction = dum_dtyr*par_bio_remin_kNO2toN2O*loc_NO2* &
-               & (loc_NO2/(loc_NO2 + par_bio_remin_cNO2_NO2toN2O))*(1.0 - loc_O2/(loc_O2 + par_bio_remin_cO2_NO2toN2O))
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/ocn(io_NO2,dum_i,dum_j,k)
-          if (loc_NO2_reduction > loc_NO2) then
-             ! complete NO2 reduction (no N fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2
-             loc_bio_remin(io_N2O,k) = 0.5*loc_NO2
-             loc_bio_remin(io_O2,k)  = 0.5*loc_NO2
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO2,k)
-             loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2
-          else
-             ! partial NO2 reduction (=> N isotope Rayleigh fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2_reduction
-             loc_bio_remin(io_N2O,k) = 0.5*loc_NO2_reduction
-             loc_bio_remin(io_O2,k)  = 0.5*loc_NO2_reduction
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO2,k)
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ########################################################## !
-             loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2_reduction
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2_reduction
-             ! ################################################################################################################### !
-          end if
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_reduce_NO2
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! OXIDATION OF HYDROGEN SULPHIDE
-  SUBROUTINE sub_box_oxidize_H2S(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k,id
-    real::loc_O2,loc_H2S,loc_r34S
-    real::loc_H2S_oxidation_const,loc_H2S_oxidation
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! OXIDIZE H2S
-    ! -------------------------------------------------------- !
-    ! look for some H2S and see if it can be instantaneously oxidized (using O2; if there is any!)
-    ! H2S + 2O2 -> SO4 + 2H
-    ! NOTE: loc_H2S_oxidation_const units are (M-1 yr-1)
-    DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_H2S > const_real_nullsmall)) then
-          ! calculate H2S oxidation, and cap value at H2S concentration if necessary
-          SELECT CASE (opt_bio_remin_oxidize_H2StoSO4)
-          CASE ('linear')
-             ! NOTE: par_bio_remin_kH2StoSO4 units are (M-1 yr-1)
-             loc_H2S_oxidation_const = par_bio_remin_kH2StoSO4
-             loc_H2S_oxidation = min(dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2,0.5*loc_O2)
-          CASE ('OLD')
-             ! change units of H2S oxidation constant from mM-2 hr-1 to M-2 yr-1
-             ! and convert from O2 consumption units to H2S units (i.e., divide by 2)
-             loc_H2S_oxidation_const = 0.5*const_oxidation_coeff_H2S/conv_hr_yr/(conv_mmol_mol)**2
-             loc_H2S_oxidation = dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2**2
-          case ('complete')
-             loc_H2S_oxidation = min(loc_H2S,0.5*loc_O2)
-          CASE ('OLDDEFAULT')
-             ! entirely spurious ... but here for completness
-             loc_H2S_oxidation = min(0.5*loc_H2S,loc_O2)
-          case default
-             loc_H2S_oxidation = 0.0
-          end select
-          ! calculate isotopic ratio
-          loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
-          if (loc_H2S_oxidation > loc_H2S) then
-             ! complete H2S oxidation (no S fractionation)
-             loc_H2S_oxidation = loc_H2S
-             loc_bio_remin(io_H2S,k) = -loc_H2S
-             loc_bio_remin(io_SO4,k) = loc_H2S
-             loc_bio_remin(io_O2,k)  = -2.0*loc_H2S
-             loc_bio_remin(io_ALK,k) = -2.0*loc_H2S
-             loc_bio_remin(io_H2S_34S,k) = -loc_r34S*loc_H2S
-             loc_bio_remin(io_SO4_34S,k) = loc_r34S*loc_H2S
-          else
-             ! partial H2S oxidation (=> S isotope Rayleigh fractionation)
-             loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
-             loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
-             loc_bio_remin(io_O2,k)  = -2.0*loc_H2S_oxidation
-             loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
-             loc_bio_remin(io_H2S_34S,k) = -loc_r34S*loc_H2S_oxidation
-             loc_bio_remin(io_SO4_34S,k) = loc_r34S*loc_H2S_oxidation
-             ! ################################################################################################################### !
-          end if
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dH2S,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('H2StoSO4_dH2S',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
-    id = fun_find_str_i('H2StoSO4_dSO4',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
-    id = fun_find_str_i('H2StoSO4_dO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    id = fun_find_str_i('H2StoSO4_dALK',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:) 
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_oxidize_H2S
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! WATER COLUMN REMINERALIZATION OF METHANE - DEFAULT
-  SUBROUTINE sub_calc_bio_remin_oxidize_CH4(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! local variables
-    integer::l,io,k,id
-    real::loc_potO2cap
-    real::loc_CH4
-    real::loc_r13C,loc_r14C
-    real::loc_frac
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
-    ! initialize local variables
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-
-    ! *** OXIDIZE CH4 ***
-    ! look for some CH4 and see if it can be oxidized
-    ! allow different rate constant depending on availability of O2 or not
-    ! CH4 + 2O2 -> CO2 + 2H2O
-    DO k=n_k,dum_k1,-1
-       ! calculate potential oxidation capacity
-       loc_potO2cap = ocn(io_O2,dum_i,dum_j,k) + bio_remin(io_O2,dum_i,dum_j,k)
-       if ((ocn(io_CH4,dum_i,dum_j,k) > const_real_nullsmall) .AND. (loc_potO2cap > const_real_nullsmall)) then
-          ! calculate CH4 oxidation
-          ! NOTE: units of par_bio_remin_CH4rate == per year
-          loc_frac = dum_dtyr*par_bio_remin_CH4rate
-          if (loc_frac > 1.0) loc_frac = 1.0
-          loc_CH4 = loc_frac*ocn(io_CH4,dum_i,dum_j,k)
-          ! calculate isotopic ratio
-          loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-          loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-          if (loc_CH4 <= 0.5*loc_potO2cap) then
-             ! complete CH4 oxidation (no C fractionation)
-             loc_bio_remin(io_CH4,k) = -loc_CH4
-             loc_bio_remin(io_DIC,k) = loc_CH4
-             loc_bio_remin(io_O2,k)  = -2.0*loc_CH4
-             loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_CH4
-             loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_CH4
-             loc_bio_remin(io_DIC_13C,k) = loc_r13C*loc_CH4
-             loc_bio_remin(io_DIC_14C,k) = loc_r14C*loc_CH4
-          else
-             ! partial CH4 oxidation (=> C isotope Rayleigh fractionation)
-             loc_bio_remin(io_CH4,k) = -0.5*loc_potO2cap
-             loc_bio_remin(io_DIC,k) = 0.5*loc_potO2cap
-             loc_bio_remin(io_O2,k)  = -loc_potO2cap
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO C FRACTIONATION ########################################################## !
-             loc_bio_remin(io_CH4_13C,k) = -loc_r13C*0.5*loc_potO2cap
-             loc_bio_remin(io_CH4_14C,k) = -loc_r14C*0.5*loc_potO2cap
-             loc_bio_remin(io_DIC_13C,k) = loc_r13C*0.5*loc_potO2cap
-             loc_bio_remin(io_DIC_14C,k) = loc_r14C*0.5*loc_potO2cap
-             ! ################################################################################################################### !
-          end if
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('CH4toDIC_dCH4',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('CH4toDIC_dCO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
-    id = fun_find_str_i('CH4toDIC_dO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    id = fun_find_str_i('CH4toDIC_dALK',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_bio_remin_oxidize_CH4
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! AEROBIC WATER COLUMN REMINERALIZATION OF METHANE - new Michaelis-Menten scheme [CTR|2018]
-  SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AER(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! local variables
-    integer::l,io,k,id
-    real::loc_O2
-    real::loc_CH4,loc_CO2
-    real::loc_T,loc_TC,loc_kT
-    real::loc_dG,loc_Ft,loc_Ft_min
-    real::loc_MM,loc_AER
-    real::loc_r13C,loc_r14C
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
-    ! initialize local variables
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-
-    ! *** OXIDIZE CH4 ***
-    ! look for some CH4 and see if it can be oxidized
-    ! allow different rate constant depending on availability of O2 or not
-    ! CH4 + 2O2 -> CO2 + 2H2O
-    DO k=n_k,dum_k1,-1
-       ! pull relevant tracers
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_CH4 = ocn(io_CH4,dum_i,dum_j,k)
-       if ((loc_CH4 > const_real_nullsmall) .AND. (loc_O2 > const_real_nullsmall)) then
-          SELECT CASE (par_bio_remin_AER_thermo)
-          CASE('off')
-             ! thermo term disabled
-             loc_Ft = 1.0
-          CASE('on')
-             ! estimate free energy available for aerobic methanotrophy
-             loc_CO2 = carb(ic_conc_CO2,dum_i,dum_j,k)
-             loc_T = ocn(io_T,dum_i,dum_j,k)
-             loc_dG = par_bio_remin_AER_dG0 +                                                     &
-                  & ( par_bio_remin_Rgas *                                                     &
-                  &   loc_T *                                                                  &
-                  &   LOG( (par_bio_remin_gammaCO2*loc_CO2) /                                  &
-                  &        ((par_bio_remin_gammaO2*loc_O2)*(par_bio_remin_gammaCH4*loc_CH4)) ) &
-                  & )
-             ! calculate thermodynamic drive
-             loc_Ft_min = 0
-             loc_Ft = max(loc_Ft_min,1-exp((loc_dG+par_bio_remin_AER_BEQ)/(par_bio_remin_Rgas*loc_T)))
-             if (loc_Ft > 1 .OR. loc_Ft < 0) then
-                print*,' WARNING: AER thermodynamic drive out of bounds; DIC = ',ocn(io_DIC,dum_i,dum_j,k), &
-                     &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
-             end if
-          END SELECT
-          ! allow CH4 oxidation with O2 (units: mol CH4 kg-1)
-          ! Michaelis-Menten term
-          loc_MM = loc_O2/(loc_O2+par_bio_remin_AER_Km_O2)
-          ! temperature term
-          loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
-          loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
-          ! rate of aerobic methanotrophy (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, and temperature control)
-          loc_AER = par_bio_remin_AER_kAER*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
-          ! but don't oxidize too much CH4!
-          loc_AER = min(loc_AER,loc_CH4,0.5*loc_O2)
-          ! calculate isotopic ratios
-          loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-          loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-          ! perform aerobic methanotrophy
-          loc_bio_remin(io_CH4,k)     = -loc_AER
-          loc_bio_remin(io_DIC,k)     =  loc_AER
-          loc_bio_remin(io_O2,k)      = -2.0*loc_AER
-          loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AER
-          loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AER
-          loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AER
-          loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AER
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dCH4,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('CH4toDIC_dCH4',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('CH4toDIC_dCO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
-    id = fun_find_str_i('CH4toDIC_dO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    id = fun_find_str_i('CH4toDIC_dALK',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AER
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! ANAEROBIC WATER COLUMN REMINERALIZATION OF METHANE [SLO|2015 CTR|2018]
-  SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AOM(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! dummy arguments
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! local variables
-    integer::l,io,k,id
-    real::loc_O2
-    real::loc_CH4,loc_DIC,loc_HCO3
-    real::loc_SO4,loc_H2S
-    real::loc_T,loc_TC,loc_kT
-    real::loc_dG,loc_Ft,loc_Ft_min
-    real::loc_MM,loc_AOM
-    real::loc_r13C,loc_r14C
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-
-    ! *** INITIALIZE VARIABLES ***
-    ! initialize local variables
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-
-    ! *** OXIDIZE CH4 ANAEROBICALLY WITH SO4 ***
-    ! look for some CH4 and see if it can be oxidized with SO4
-    ! CH4 + SO4 --> HCO3- + HS- + H2O
-    DO k=n_k,dum_k1,-1
-       ! pull relevant tracers, and check for the presence of O2
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
-       loc_CH4 = ocn(io_CH4,dum_i,dum_j,k)
-       if ((loc_O2 < const_real_nullsmall) .AND. (loc_SO4 > const_real_nullsmall) .AND. (loc_CH4 > const_real_nullsmall)) then
-          SELECT CASE (par_bio_remin_AOM_thermo)
-          CASE('off')
-             ! thermo term disabled
-             loc_Ft = 1.0
-          CASE('on')
-             ! estimate free energy available for anaerobic oxidation of methane           
-             loc_H2S = ocn(io_H2S,dum_i,dum_j,k)
-             loc_HCO3 = carb(ic_conc_HCO3,dum_i,dum_j,k)
-             loc_T = ocn(io_T,dum_i,dum_j,k)
-             loc_dG = par_bio_remin_AOM_dG0 +                                                        &
-                  & ( par_bio_remin_Rgas *                                                        &
-                  &   loc_T *                                                                     &
-                  &   LOG( ((par_bio_remin_gammaHS*loc_H2S)*(par_bio_remin_gammaHCO3*loc_HCO3)) / &
-                  &        ((par_bio_remin_gammaSO4*loc_SO4)*(par_bio_remin_gammaCH4*loc_CH4)) )  &
-                  & )
-             ! calculate thermodynamic drive
-             loc_Ft_min = 0
-             loc_Ft = max(loc_Ft_min,1 - exp((loc_dG+par_bio_remin_AOM_BEQ)/(par_bio_remin_Rgas*loc_T)))
-             if (loc_Ft > 1 .OR. loc_Ft < 0) then
-                print*,' WARNING: AOM thermodynamic drive out of bounds; DIC = ',ocn(io_DIC,dum_i,dum_j,k), &
-                     &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
-             end if
-          END SELECT
-          ! allow CH4 oxidation coupled to SO4 reduction (units: mol CH4 kg-1)
-          ! Michaelis-Menten term
-          loc_MM = loc_SO4/(loc_SO4*par_bio_remin_AOM_Km_SO4)
-          ! temperature term
-          loc_TC = ocn(io_T,dum_i,dum_j,k) - const_zeroC
-          loc_kT = par_bio_kT0*exp(loc_TC/par_bio_kT_eT)
-          ! rate of AOM (first-order term for 'bloom' conditions, Michaelis-Menten kinetics, temperature, and thermodynamic control)
-          loc_AOM = par_bio_remin_AOM_kAOM*loc_CH4*loc_MM*loc_kT*loc_Ft*dum_dtyr
-          ! but don't oxidize too much CH4!
-          loc_AOM = min(loc_AOM,loc_CH4,loc_SO4)
-          ! calculate isotopic ratios
-          loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-          loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
-          ! perform AOM
-          loc_bio_remin(io_CH4,k)     = -loc_AOM
-          loc_bio_remin(io_DIC,k)     =  loc_AOM
-          loc_bio_remin(io_SO4,k)     = -loc_AOM
-          loc_bio_remin(io_H2S,k)     =  loc_AOM
-          loc_bio_remin(io_ALK,k)     =  2.0*loc_AOM
-          loc_bio_remin(io_CH4_13C,k) = -loc_r13C*loc_AOM
-          loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AOM
-          loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AOM
-          loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AOM
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dCH4_AOM,dum_i,dum_j,:) = -loc_bio_remin(io_CH4,:)
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('CH4toDICaom_dCH4',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_CH4,:)
-    id = fun_find_str_i('CH4toDICaom_dCO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_DIC,:)
-    id = fun_find_str_i('CH4toDICaom_dH2S',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_H2S,:)
-    id = fun_find_str_i('CH4toDICaom_dSO4',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_SO4,:)
-    id = fun_find_str_i('CH4toDICaom_dALK',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_ALK,:)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_bio_remin_oxidize_CH4_AOM
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! OXIDATION OF IODIDE
-  SUBROUTINE sub_calc_bio_remin_oxidize_I(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k,id
-    real::loc_O2,loc_I
-    real::loc_I_oxidation_const,loc_I_oxidation
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! OXIDIZE IODIDE
-    ! -------------------------------------------------------- !
-    ! look for some I and see if it can be instantaneously oxidized (using O2; if there is any!)
-    ! 2I + 3O2 -> 2IO3
-    ! NOTE: loc_I_oxidation_const units are (???)
-    DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
-       loc_I  = ocn(io_I,dum_i,dum_j,k)
-       if ((loc_O2 > const_real_nullsmall) .AND. (loc_I > const_real_nullsmall)) then
-          ! calculate I oxidation, and cap value at I concentration if necessary
-          SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
-          CASE ('Fennel')
-             ! from: Fennel et al. [2005]
-             ! oxidation rate constant: 6 yr-1
-             ! oxidation half saturation for oxygen: 2.0E-05 mol kg-1
-             loc_I_oxidation = dum_dtyr*par_bio_remin_kItoIO3*loc_I*(loc_O2/(par_bio_remin_cO2_ItoIO3 + loc_O2))
-          case ('lifetime')
-             if (par_bio_remin_Ilifetime > dum_dtyr) then
-                loc_I_oxidation = min((dum_dtyr/par_bio_remin_Ilifetime)*loc_I,(2.0/3.0)*loc_O2)
-             else
-                loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
-             end if
-          case ('complete')
-             loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
-          case default
-             loc_I_oxidation = 0.0
-          end select
-          ! double-check on I removal ...
-          if (loc_I_oxidation > loc_I) loc_I_oxidation = loc_I
-          ! calculate tracer remin changes
-          loc_bio_remin(io_I,k)   = -loc_I_oxidation
-          loc_bio_remin(io_IO3,k) = loc_I_oxidation
-          loc_bio_remin(io_O2,k)  = -(3.0/2.0)*loc_I_oxidation
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('ItoIO3_dI',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_I,:)
-    id = fun_find_str_i('ItoIO3_dIO3',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_IO3,:)
-    id = fun_find_str_i('ItoIO3_dO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_bio_remin_oxidize_I
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! ### >>> TEMPORARY CODE ... ################################################################################################### !
-  ! ****************************************************************************************************************************** !
-  ! REDUCTION OF IODATE
-  SUBROUTINE sub_calc_bio_remin_reduce_IO3(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k,id
-    real::loc_O2,loc_IO3
-    real::loc_IO3_reduction_const,loc_IO3_reduction
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    ! initialize remineralization tracer arrays
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! REDUCE IODATE
-    ! -------------------------------------------------------- !
-    ! look for some IO3 and see if it can be instantaneously reduced
-    ! 2IO3 -> 2I + 3O2
-    DO k=n_k,dum_k1,-1
-       loc_O2   = ocn(io_O2,dum_i,dum_j,k)
-       loc_IO3  = ocn(io_IO3,dum_i,dum_j,k)
-       if (loc_IO3 > const_real_nullsmall) then
-          ! calculate IO3 reduction
-          SELECT CASE (opt_bio_remin_reduce_IO3toI)
-          case ('inhibition')
-             loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
-                  & (loc_IO3/(loc_IO3 + par_bio_remin_cIO3_IO3toI))*(1.0 - loc_O2/(loc_O2 + par_bio_remin_cO2_IO3toI))
-          case ('threshold')
-             if (loc_O2 < par_bio_remin_cO2_IO3toI) then
-                loc_IO3_reduction = loc_IO3
-             else
-                loc_IO3_reduction = 0.0
-             endif
-          case default
-             loc_IO3_reduction = 0.0
-          end select
-          ! double-check on IO3 removal ...
-          if (loc_IO3_reduction > loc_IO3) loc_IO3_reduction = loc_IO3
-          ! calculate tracer remin changes
-          loc_bio_remin(io_IO3,k) = -loc_IO3_reduction
-          loc_bio_remin(io_I,k)   = loc_IO3_reduction
-          loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_IO3_reduction
-       end if
-    end DO
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! DIAGNOSTICS
-    ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
-    id = fun_find_str_i('IO3toI_dI',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_I,:)
-    id = fun_find_str_i('IO3toI_dIO3',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_IO3,:)
-    id = fun_find_str_i('IO3toI_dO2',string_diag_redox)
-    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_bio_remin_reduce_IO3
-  ! ****************************************************************************************************************************** !
-  ! ### <<< TEMPORARY CODE ... ################################################################################################### !
+  ! REMINERALIZATION
   ! ****************************************************************************************************************************** !
 
 
@@ -3099,11 +2270,16 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     real::loc_k
-    real::loc_O2,loc_NO3,loc_SO4
-    real::loc_kO2,loc_kNO3,loc_kSO4,loc_kmeth
-    real::loc_kiO2,loc_kiNO3,loc_kiSO4
+    real::loc_O2,loc_NO3,loc_FeOOH,loc_SO4
+    real::loc_kO2,loc_kNO3,loc_kFeOOH,loc_kSO4,loc_kmeth
+    real::loc_kiO2,loc_kiNO3,loc_kiFeOOH,loc_kiSO4
+    real::loc_r15N,loc_r56Fe,loc_r34S
+    real::loc_alpha,loc_R
     ! ---------------------------------------------------------- ! initialize
-    loc_k   = 0.0
+    loc_k     = 0.0
+    loc_r15N  = 0.0
+    loc_r56Fe = 0.0
+    loc_r34S  = 0.0
     ! ---------------------------------------------------------- !
     ! CREATE REMIN ARRAY
     ! ---------------------------------------------------------- !
@@ -3147,6 +2323,22 @@ CONTAINS
        loc_kNO3  = 0.0
        loc_kiNO3 = 1.0
     end if
+    if (ocn_select(io_FeOOH)) then
+       loc_FeOOH = dum_ocn(io2l(io_FeOOH))
+       if (loc_FeOOH <= const_real_nullsmall) then
+          loc_FeOOH   = 0.0
+          loc_kFeOOH  = 0.0
+          loc_kiFeOOH = 1.0
+       else
+          loc_kFeOOH = loc_FeOOH/(loc_FeOOH + par_bio_remin_c0_FeOOH)
+          loc_kiFeOOH = par_bio_remin_ci_FeOOH/(par_bio_remin_ci_FeOOH + loc_FeOOH)
+       end if
+       loc_k     = loc_k + par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2
+    else
+       loc_FeOOH   = 0.0
+       loc_kFeOOH  = 0.0
+       loc_kiFeOOH = 1.0
+    end if
     if (ocn_select(io_SO4)) then
        loc_SO4 = dum_ocn(io2l(io_SO4))
        if (loc_SO4 <= const_real_nullsmall) then
@@ -3157,7 +2349,7 @@ CONTAINS
           loc_kSO4  = loc_SO4/(loc_SO4 + par_bio_remin_c0_SO4)
           loc_kiSO4 = par_bio_remin_ci_SO4/(par_bio_remin_ci_SO4 + loc_SO4)
        end if
-       loc_k     = loc_k + par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
     else
        loc_SO4   = 0.0
        loc_kSO4  = 0.0
@@ -3165,7 +2357,7 @@ CONTAINS
     end if
     if (ocn_select(io_CH4)) then
        loc_kmeth = 1.0
-       loc_k     = loc_k + par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2
+       loc_k     = loc_k + par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
     else
        loc_kmeth = 0.0
     end if
@@ -3183,25 +2375,35 @@ CONTAINS
     ! ---------------------------------------------------------- ! modify for hard threshold scheme
     if (ctrl_bio_remin_thresh) then
        if (loc_O2 > par_bio_remin_cthresh_O2) then
-          loc_k     = par_bio_remin_k_O2*loc_kO2
-          loc_kNO3  = 0.0
-          loc_kSO4  = 0.0
-          loc_kmeth = 0.0
+          loc_k      = par_bio_remin_k_O2*loc_kO2
+          loc_kNO3   = 0.0
+          loc_kFeOOH = 0.0
+          loc_kSO4   = 0.0
+          loc_kmeth  = 0.0
        elseif (loc_NO3 > par_bio_remin_cthresh_NO3) then
-          loc_kO2   = 0.0
-          loc_k     = par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
-          loc_kSO4  = 0.0
-          loc_kmeth = 0.0
+          loc_kO2    = 0.0
+          loc_k      = par_bio_remin_k_NO3*loc_kNO3*loc_kiO2
+          loc_kFeOOH = 0.0
+          loc_kSO4   = 0.0
+          loc_kmeth  = 0.0
+       elseif (loc_FeOOH > par_bio_remin_cthresh_FeOOH) then
+          loc_kO2    = 0.0
+          loc_kNO3   = 0.0
+          loc_k      = par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2
+          loc_kSO4   = 0.0
+          loc_kmeth  = 0.0
        elseif (loc_SO4 > par_bio_remin_cthresh_SO4) then
-          loc_kO2   = 0.0
-          loc_kNO3  = 0.0
-          loc_k     = par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2
-          loc_kmeth = 0.0
+          loc_kO2    = 0.0
+          loc_kNO3   = 0.0
+          loc_kFeOOH = 0.0
+          loc_k      = par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
+          loc_kmeth  = 0.0
        else
-          loc_kO2   = 0.0
-          loc_kNO3  = 0.0
-          loc_kSO4  = 0.0
-          loc_k     = par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2
+          loc_kO2    = 0.0
+          loc_kNO3   = 0.0
+          loc_kFeOOH = 0.0
+          loc_kSO4   = 0.0
+          loc_k      = par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2
        end if
     end if
     ! ---------------------------------------------------------- ! calculate weighted remin array
@@ -3209,41 +2411,97 @@ CONTAINS
     !       (an exception is the basic temperature-only scheme which also needs to be normalized)
     if (ocn_select(io_O2)) then
        if (ocn_select(io_NO3)) then
-          if (ocn_select(io_SO4)) then
-             if (ocn_select(io_CH4)) then
-                dum_conv_ls_lo(:,:) = &
-                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                     & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
-                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
-                     & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+          if (ocn_select(io_FeOOH)) then
+             if (ocn_select(io_SO4)) then
+                if (ocn_select(io_CH4)) then
+                   ! O2 + NO3 + FeOOH + SO4 + CH4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                        & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                else
+                   ! O2 + NO3 + FeOOH + SO4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                end if
              else
+                ! O2 + NO3 + FeOOH
                 dum_conv_ls_lo(:,:) = &
                      & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
                      & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
-                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                     & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:)
              end if
           else
+             if (ocn_select(io_SO4)) then
+                if (ocn_select(io_CH4)) then
+                   ! O2 + NO3 + SO4 + CH4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                        & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                else
+                   ! O2 + NO3 + SO4
+                   dum_conv_ls_lo(:,:) = &
+                        & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                        & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:) + &
+                        & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                end if
+             else
+                ! O2 + NO3
+                dum_conv_ls_lo(:,:) = &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                     & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:)
+             end if
+          endif
+       elseif (ocn_select(io_FeOOH)) then
+          if (ocn_select(io_SO4)) then
+             if (ocn_select(io_CH4)) then
+                ! O2 + FeOOH + SO4 + CH4
+                dum_conv_ls_lo(:,:) = &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                     & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                     & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiFeOOH*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+             else
+                ! O2 + FeOOH + SO4
+                dum_conv_ls_lo(:,:) = &
+                     & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
+                     & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:) + &
+                     & (par_bio_remin_k_SO4*loc_kSO4*loc_kiFeOOH*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+             end if
+          else
+            ! O2 + FeOOH
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_NO3*loc_kNO3*loc_kiO2/loc_k)*conv_ls_lo_N(:,:)
+                  & (par_bio_remin_k_FeOOH*loc_kFeOOH*loc_kiO2/loc_k)*conv_ls_lo_Fe(:,:)
           end if
        elseif (ocn_select(io_SO4)) then
           if (ocn_select(io_CH4)) then
+             ! O2 + SO4 + CH4
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
-                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiO2/loc_k)*conv_ls_lo_S(:,:) + &
+                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
+             ! O2 + SO4
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
+                  & (par_bio_remin_k_SO4*loc_kSO4*loc_kiO2/loc_k)*conv_ls_lo_S(:,:)
           end if
        else
           if (ocn_select(io_CH4)) then
+             ! O2 + CH4
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:) + &
-                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiSO4*loc_kiNO3*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
+                  & (par_bio_remin_k_meth*loc_kmeth*loc_kiO2/loc_k)*conv_ls_lo_meth(:,:)
           else
+             ! O2
              dum_conv_ls_lo(:,:) = &
                   & (par_bio_remin_k_O2*loc_kO2/loc_k)*conv_ls_lo_O(:,:)
           end if
@@ -3252,87 +2510,43 @@ CONTAINS
        dum_conv_ls_lo(:,:) = 0.0
     end if
     ! ---------------------------------------------------------- !
+    ! CORRECT FOR ISOTOPES (in SO4 and NO3)
+    ! ---------------------------------------------------------- !
+    ! test for N isotopes selected
+    ! NOTE: value of loc_NO3 already determined
+    ! ### INSERT CODE TO DEAL WITH N ISOTOPES #################################################################################### !
+    !
+    ! ############################################################################################################################ !
+    ! test for S isotopes selected
+    ! NOTE: value of loc_SO4 already determined
+    if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
+       if (loc_SO4 > const_real_nullsmall) then
+          loc_r34S  = dum_ocn(io2l(io_SO4_34S)) / loc_SO4
+       else
+          loc_r34S  = 0.0
+       end if
+       loc_alpha = 1.0 + par_d34S_Corg_SO4_epsilon/1000.0
+       loc_R     = loc_r34S/(1.0 - loc_r34S)
+       dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_SO4_34S),:)
+       dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_H2S_34S),:)
+    end if
+    !! test for Fe isotopes selected
+    !! NOTE: value of loc_FeOOH already determined
+    !if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
+    !   if (loc_FeOOH > const_real_nullsmall) then
+    !      loc_r56Fe  = dum_ocn(io2l(io_FeOOH_56Fe)) / loc_FeOOH
+    !   else
+    !      loc_r56Fe  = 0.0
+    !   end if
+    !   loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
+    !   loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
+    !   dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:)
+    !   dum_conv_ls_lo(io2l(io_Fe_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe_56Fe),:)
+    !end if
+    ! ---------------------------------------------------------- !
     ! END
     ! ---------------------------------------------------------- !
   end SUBROUTINE sub_box_remin_redfield
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS
-  SUBROUTINE sub_box_misc_geochem(dum_i,dum_j,dum_k1,dum_dtyr)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
-    real,intent(in)::dum_dtyr
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    integer::l,io,k
-    integer::loc_l_min,loc_l_max,loc_k
-    real::loc_flux
-    real,dimension(n_ocn,n_k)::loc_bio_remin
-    ! -------------------------------------------------------- !
-    ! INITIALIZE VARIABLES
-    ! -------------------------------------------------------- !
-    if (ctrl_force_GOLDSTEInTS .OR. (n_l_ocn < 3)) then
-       loc_l_min = 1
-       if (ctrl_force_GOLDSTEInTSonly) then
-          loc_l_max = 2
-       else
-          loc_l_max = n_l_ocn
-       endif
-    else
-       loc_l_min = 3
-       loc_l_max = n_l_ocn
-       if (ctrl_misc_geoeng_noDIC) loc_l_min = 4
-    endif
-    ! initialize remineralization tracer arrays
-    DO l=loc_l_min,loc_l_max
-       io = conv_iselected_io(l)
-       loc_bio_remin(io,:) = 0.0
-    end do
-    ! -------------------------------------------------------- !
-    ! GEOENGINEERING
-    ! -------------------------------------------------------- !
-    IF ((trim(opt_misc_geoeng) /= 'NONE') .AND. (par_misc_kmin_pipe < n_k)) THEN
-       select case (opt_misc_geoeng)
-       case('pipes')
-          ! -------------------------------------------------- ! initialize
-          ! NOTE: flux in units of m-3 per time step (rather than in kg units)
-          loc_flux = dum_dtyr*par_misc_2D_scale*par_misc_2D(dum_i,dum_j)
-          ! set source k level
-          ! NOTE: cap at deepest ocean level
-          loc_k = par_misc_kmin_pipe
-          if (loc_k < dum_k1) loc_k = dum_k1
-          DO l=loc_l_min,loc_l_max
-             io = conv_iselected_io(l)
-             loc_bio_remin(io,n_k) = loc_bio_remin(io,n_k) + &
-                  & loc_flux*ocn(io,dum_i,dum_j,loc_k)/phys_ocn(ipo_V,dum_i,dum_j,n_k) - &
-                  & loc_flux*ocn(io,dum_i,dum_j,n_k)/phys_ocn(ipo_V,dum_i,dum_j,n_k)
-             DO k=n_k-1,loc_k,-1
-                loc_bio_remin(io,k) = loc_bio_remin(io,k) + &
-                     & loc_flux*ocn(io,dum_i,dum_j,k+1)/phys_ocn(ipo_V,dum_i,dum_j,k) - &
-                     & loc_flux*ocn(io,dum_i,dum_j,k)/phys_ocn(ipo_V,dum_i,dum_j,k)
-             end do
-          end do
-       case default
-          ! -------------------------------------------------- ! nothing doing ...
-       end select
-    end IF
-    ! -------------------------------------------------------- !
-    ! WRITE GLOBAL ARRAY DATA
-    ! -------------------------------------------------------- !
-    ! write ocean tracer remineralization field (global array)
-    DO l=loc_l_min,loc_l_max
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_misc_geochem
   ! ****************************************************************************************************************************** !
 
 
@@ -3354,7 +2568,7 @@ CONTAINS
     real,dimension(n_sed,n_k)::loc_bio_part                             !
     integer::loc_i,loc_j,loc_k1
     real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                       !
-    CHARACTER(len=31)::loc_string     ! 
+    CHARACTER(len=31)::loc_string     !
 
     real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
     allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
@@ -3467,12 +2681,18 @@ CONTAINS
     end DO
 
     ! *** WRITE GLOBAL ARRAY DATA ***
+    ! remin diagnostics
+    if (ctrl_bio_remin_redox_save) then
+       diag_redox(:,loc_i,loc_j,:) = diag_redox(:,loc_i,loc_j,:) + loc_diag_redox(:,:)
+       if (ocn_select(io_col9) .AND. (.NOT. ctrl_bio_preformed_CsoftPOConly)) then
+          loc_string = 'reminD_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          loc_vbio_remin(io2l(io_col9),:) = loc_vbio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
+       end if
+    end if
     ! write ocean tracer remineralization field (global array)
     dum_vbio_remin%mk(:,:) = loc_vbio_remin(:,:)
-    !
-    if (ctrl_bio_remin_redox_save) diag_redox(:,loc_i,loc_j,:) = diag_redox(:,loc_i,loc_j,:) + loc_diag_redox(:,:)
-
-    ! 
+    ! deallocate local arrays
     DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
   end SUBROUTINE sub_box_remin_DOM
@@ -3489,52 +2709,46 @@ CONTAINS
     type(fieldocn),INTENT(inout)::dum_vbio_part                         !
     type(fieldocn),INTENT(inout)::dum_vbio_remin                        !
     ! local variables
+    integer::dum_i, dum_j                                      ! 'virtual' dummy indices (derived from dum_vocn)
     integer::l,is
     integer::lo,ls                                                      !
     integer::id
     INTEGER::k,kk,loc_bio_remin_min_k,loc_klim
     integer::loc_k1
     integer::loc_m,loc_tot_m
+    real,dimension(1:n_l_ocn)::loc_vocn                                 !
     real,dimension(1:3)::loc_FeFELL
     real::loc_T,loc_SiO2                                                !
-    real::loc_Si_eq,loc_u   
+    real::loc_Si_eq,loc_u
+    real::loc_scav_Fe,loc_r56Fe
     real::tmp_bio_remin    !
     real::loc_bio_remin_dD
     real::loc_bio_remin_max_D                                         !
     real::loc_bio_remin_layerratio
-    real::loc_bio_remin_sinkingrate                                     ! prescribed particle sinking rate
-    real::loc_bio_remin_sinkingrate_scav                                ! sinking rate (for calculating scavenging)
-    real::loc_bio_remin_dt                                              ! layer residence time (in years)
-    real::loc_bio_remin_dt_scav                                         ! layer residence time (for calculating scavenging)
+    real::loc_bio_remin_sinkingrate_physical                            ! particle sinking rate -- physical
+    real::loc_bio_remin_sinkingrate_reaction                            ! particle sinking rate -- for geochemical reactions
+    real::loc_bio_remin_dt_physical                                     ! layer residence time (in years)
+    real::loc_bio_remin_dt_reaction                                     ! layer residence time (for calculating scavenging)
     real::loc_bio_remin_POC_frac1,loc_bio_remin_POC_frac2
     real::loc_bio_part_POC_ratio
     real::loc_bio_remin_CaCO3_frac1,loc_bio_remin_CaCO3_frac2
     real::loc_bio_part_CaCO3_ratio
     real::loc_bio_remin_opal_frac1,loc_bio_remin_opal_frac2
     real::loc_bio_part_opal_ratio
-    real::loc_eL_size												   ! local efolding depth varying with ecosystem size structure JDW
-    real::loc_size0													! JDW
-!!!real::loc_r_POM_RDOM                                                ! factor to modify nutrient:C ratio in POM->RDOM
-    real::loc_part_tot
-!!$    real,dimension(n_sed,n_k)::loc_bio_part_TMP
-!!$    real,dimension(n_sed,n_k)::loc_bio_part_OLD
-!!$    real,dimension(n_sed,n_k)::loc_bio_part
-!!$    real,dimension(n_ocn,n_k)::loc_bio_remin
-!!$    real,dimension(n_sed,n_k)::loc_bio_settle
-!!$    real,dimension(n_sed)::loc_bio_part_remin                           !
-    real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                       !
-
-    integer::dum_i,dum_j
-
+    !!!real::loc_bio_part_FeOOH_ratio,loc_bio_part_FeS2_ratio,loc_bio_part_FeCO3_ratio
+    real::loc_eL_size                                                   ! local efolding depth varying with ecosystem size structure JDW
+    real::loc_size0                                                     ! JDW
+    real::loc_part_tot,loc_part_tot_mineral
+    real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo            !
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part_TMP
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part_OLD
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part
     real,dimension(1:n_l_ocn,1:n_k)::loc_bio_remin
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_settle
     real,dimension(1:n_l_sed)::loc_bio_part_remin
-
-    CHARACTER(len=31)::loc_string     ! 
-
+    real,DIMENSION(n_diag_precip,n_k)::loc_diag_precip
+    CHARACTER(len=31)::loc_string     !
+    ! define and allocate local arrays
     real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
     allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
 
@@ -3549,8 +2763,7 @@ CONTAINS
     loc_bio_remin_opal_frac1 = 0.0
     loc_bio_remin_opal_frac2 = 0.0
     loc_bio_part_opal_ratio = 0.0
-    loc_bio_remin_dt = 0.0
-    !
+    ! set 'virtua' dummy grid location indices
     dum_i = dum_vbio_part%i
     dum_j = dum_vbio_part%j
     loc_k1 = dum_vbio_part%k1
@@ -3561,41 +2774,72 @@ CONTAINS
     loc_bio_part(:,:) = 0.0
     ! initialize remineralization tracer array
     loc_bio_remin(:,:) = 0.0
+    ! initialize diagnostics tracers (reset array)
+    if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2) .AND. sed_select(is_FeOOH)) then
+       diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,:) = 0.0
+    end if
+    if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2) .AND. sed_select(is_POM_FeOOH)) then
+       diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,:) = 0.0
+    end if
+    ! pre-calculate size reciprocal
+    loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
     !
     loc_bio_settle(:,:) = 0.0
-    ! set water column particulate tracer loop limit and sinking rate
+    !
+    loc_vocn(:) = 0.0
+    ! -------------------------------------------------------- ! set water column particulate tracer loop limit and sinking rate
     ! => test for sinking in any one time-step being less than the max depth of the ocean
-    if (dum_dtyr*par_bio_remin_sinkingrate <= goldstein_dsc) then
+    if (dum_dtyr*par_bio_remin_sinkingrate_physical <= goldstein_dsc) then
        ! assume particules could be present at any/every depth in the local water column
-       ! set sinking rate for scavenging to sinking rate
+       ! set sinking rate for geochemical reactions to the physical sinking rate
        loc_klim = loc_k1
-       loc_bio_remin_sinkingrate = par_bio_remin_sinkingrate
-       loc_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate
+       loc_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical
+       loc_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_physical
     else
-       ! assume particulates present only in surface layer
        ! leave sinking rate alone ... but could e.g. set to exactly match the ocean depth in one time-step
        loc_klim = n_k
-       loc_bio_remin_sinkingrate = par_bio_remin_sinkingrate
-       loc_bio_remin_sinkingrate_scav = par_bio_remin_sinkingrate_scav
+       loc_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical
+       loc_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_reaction
+    end if
+    ! replace reaction sinking rate if size-dependent sinking is selected
+    select case (par_bio_remin_fun)
+    case ('KriestOschlies2008_explicit')
+      loc_bio_remin_sinkingrate_reaction = &
+      & par_bio_remin_POC_w0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta
+    end select
+    ! -------------------------------------------------------- ! test for possibilty of precip in water column
+    ! if so: assume particules could be present at any/every depth in the local water column
+    ! if not: assume particulates present only in surface layer
+    if (sed_select(is_Fe3Si2O4) .OR. sed_select(is_FeCO3) .OR. sed_select(is_FeS2) .OR. sed_select(is_FeOOH)) then
+       loc_klim = loc_k1
     end if
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
-    if (ctrl_bio_remin_redox_save) loc_diag_redox(:,:) = 0.0
-    
-    loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
+    if (ctrl_bio_remin_redox_save) then
+       loc_diag_redox(:,:)  = 0.0
+       loc_diag_precip(:,:) = 0.0
+    end if
 
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ! *** k WATER-COLUMN LOOP START ***
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     DO k=n_k,loc_klim,-1
-       ! find some particulates (POC) in the water column
+       ! find some particulates in the water column
+       ! NOTE: save total mineral load (seperately from total particulate load)
        loc_part_tot = 0.0
-       if (sed_select(is_POC)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
        if (sed_select(is_CaCO3)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_CaCO3),k)
-       if (sed_select(is_opal)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
-       if (sed_select(is_det)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
+       if (sed_select(is_opal))  loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
+       if (sed_select(is_det))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
+       loc_part_tot_mineral = loc_part_tot
+       if (sed_select(is_POC))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
        If (loc_part_tot  > const_real_nullsmall) then
           ! if the identified particulate material is already residing in the bottom-most ocean layer, flag as sediment flux
           If (k == loc_k1) then
@@ -3608,7 +2852,7 @@ CONTAINS
              ! NOTE: trap the situation where the depth of the sediment surface is surpassed
              ! NOTE: start loop from the layer lying below the one in which the identified particulate material resides
              loc_bio_remin_min_k = loc_k1 - 1
-             loc_bio_remin_max_D = dum_vphys_ocn%mk(ipo_Dbot,k) + dum_dtyr*loc_bio_remin_sinkingrate
+             loc_bio_remin_max_D = dum_vphys_ocn%mk(ipo_Dbot,k) + dum_dtyr*loc_bio_remin_sinkingrate_physical
              do kk=k-1,loc_k1,-1
                 If (dum_vphys_ocn%mk(ipo_Dbot,kk) > loc_bio_remin_max_D) then
                    loc_bio_remin_min_k = kk
@@ -3619,29 +2863,45 @@ CONTAINS
           ! zero local (temporary) particulate field array, and seed value at location in water column identified
           loc_bio_part_TMP(:,:) = 0.0
           loc_bio_part_TMP(:,k) = loc_bio_part_OLD(:,k)
-          ! surface particle scavenging
+
+          ! -------------------------------------------------- !
+          ! SURFACE PARTICLE PROCESSES
+          ! -------------------------------------------------- !
           ! NOTE: special case (remin loop if for n_k-1 down)
-          ! NOTE: calculate Fe speciation first!
-          ! NOTE: for the lookup table, the goethite concentration is assigned to the first array index (otherwise used for [Fe])
           If (k == n_k) then
+             ! ----------------------------------------------- ! surface particle scavenging
+             ! NOTE: special case (remin loop if for n_k-1 down)
+             ! NOTE: calculate Fe speciation first!
+             ! NOTE: for the lookup table, the goethite concentration is assigned to the first array index (otherwise used for [Fe])
              if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                 ! calculate surface residence time (yr) of particulates in ocean layer (from layer thickness and sinking speed)
-                loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,kk)
-                if (loc_bio_remin_sinkingrate_scav > const_real_nullsmall) &
-                     & loc_bio_remin_dt_scav = loc_bio_remin_dD/loc_bio_remin_sinkingrate_scav
+                loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,k)
+                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) &
+                     & loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
                 ! calculate Fe scavenging
                 SELECT CASE (trim(opt_geochem_Fe))
+                case ('OLD')
+                   loc_FeFeLL(:) = 0.0
                 CASE ('ALT')
                    loc_FeFeLL(:) = fun_box_calc_geochem_Fe(                         &
                         & dum_vocn%mk(io2l(io_Fe),k) + dum_vocn%mk(io2l(io_FeL),k), &
-                        & dum_vocn%mk(io2l(io_L),k) + dum_vocn%mk(io2l(io_FeL),k)   &
+                        & dum_vocn%mk(io2l(io_L),k) + dum_vocn%mk(io2l(io_FeL),k),  &
+                        & par_K_FeL &
                         & )
                    loc_bio_remin(io2l(io_Fe),k)  = loc_bio_remin(io2l(io_Fe),k)  + (loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe),k))
                    loc_bio_remin(io2l(io_FeL),k) = loc_bio_remin(io2l(io_FeL),k) + (loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL),k))
                    loc_bio_remin(io2l(io_L),k)   = loc_bio_remin(io2l(io_L),k)   + (loc_FeFeLL(3) - dum_vocn%mk(io2l(io_L),k))
+                CASE ('FeFe2TL')
+                   loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
+                        & dum_vocn%mk(io2l(io_Fe),k), &
+                        & dum_vocn%mk(io2l(io_TL),k), &
+                        & par_K_FeL &
+                        & )
                 CASE ('hybrid')
                    loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
-                        & dum_vocn%mk(io2l(io_TDFe),k),dum_vocn%mk(io2l(io_TL),k) &
+                        & dum_vocn%mk(io2l(io_TDFe),k), &
+                        & dum_vocn%mk(io2l(io_TL),k), &
+                        & par_K_FeL &
                         & )
                 CASE ('lookup_4D')
                    loc_FeFeLL(1) = fun_box_calc_lookup_Fe_4D_geo(                 &
@@ -3651,29 +2911,112 @@ CONTAINS
                 case default
                    loc_FeFeLL(:) = 0.0
                 end SELECT
+                   ! calculate mean Fe isotopic composition
+                   ! NOTE: isotopes not enabled for all of the Fe schemes
+                   If ( ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe) ) then
+                      SELECT CASE (trim(opt_geochem_Fe))
+                      CASE ('OLD','ALT')
+                         ! re-partition (homogonise) Fe isotopes in proportion to the Fe and FeL pools
+                         if ( (loc_FeFeLL(1)+loc_FeFeLL(2)) > const_rns ) then
+                         loc_r56Fe = (dum_vocn%mk(io2l(io_Fe_56Fe),kk) + dum_vocn%mk(io2l(io_FeL_56Fe),kk))/ &
+                              & (loc_FeFeLL(1) + loc_FeFeLL(2))
+                         else
+                            loc_r56Fe = 0.0
+                         end if
+                         loc_bio_remin(io2l(io_Fe_56Fe),kk)  = loc_bio_remin(io2l(io_Fe_56Fe),kk)  + &
+                              & (loc_r56Fe*loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe_56Fe),kk))
+                         loc_bio_remin(io2l(io_FeL_56Fe),kk) = loc_bio_remin(io2l(io_FeL_56Fe),kk) + &
+                              & (loc_r56Fe*loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL_56Fe),kk))
+                      CASE ('FeFe2TL')
+                         ! assume only a single total pool (Fe3) is scavenged => no need to homogenize ...
+                         if (dum_vocn%mk(io2l(io_Fe),k) > const_rns) then
+                            loc_r56Fe = dum_vocn%mk(io2l(io_Fe_56Fe),k)/dum_vocn%mk(io2l(io_Fe),k)
+                         else
+                            loc_r56Fe = 0.0
+                         end if
+                      CASE ('hybrid','lookup_4D')
+                         ! single total pool ... no need to homogenize ...
+                         if (dum_vocn%mk(io2l(io_TDFe),k) > const_rns) then
+                            loc_r56Fe = dum_vocn%mk(io2l(io_TDFe_56Fe),k)/dum_vocn%mk(io2l(io_TDFe),k)
+                         else
+                            loc_r56Fe = 0.0
+                         end if
+                      case default
+                      ! NOTHING!
+                      end SELECT
+                   end if
                 SELECT CASE (trim(opt_geochem_Fe))
+                CASE ('ALT','OLD')
+                   if (loc_FeFeLL(1) > const_real_nullsmall) then
+                         loc_scav_Fe = fun_box_scav_Fe(          &
+                              & dum_dtyr,                        &
+                              & loc_bio_remin_dt_reaction,       &
+                              & loc_FeFeLL(1),                   &
+                              & loc_bio_part_TMP(is2l(is_POC),k) &
+                              & )
+                      loc_bio_part_TMP(is2l(is_POM_Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe),k) + loc_scav_Fe
+                      loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
+                      If (ocn_select(io_Fe_56Fe)) then
+                         loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - &
+                              & loc_r56Fe*loc_scav_Fe
+                         loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),k) + &
+                              & loc_r56Fe*loc_scav_Fe
+                      end if
+                   end if
+                CASE ('FeFe2TL')
+                   if (loc_FeFeLL(1) > const_real_nullsmall) then
+                         loc_scav_Fe = fun_box_scav_Fe(          &
+                              & dum_dtyr,                        &
+                              & loc_bio_remin_dt_reaction,       &
+                              & loc_FeFeLL(1),                   &
+                              & loc_bio_part_TMP(is2l(is_POC),k) &
+                              & )
+                         if (sed_select(is_POM_FeOOH)) then
+                            loc_bio_part_TMP(is2l(is_POM_FeOOH),k) = loc_bio_part_TMP(is2l(is_POM_FeOOH),k) + loc_scav_Fe
+                            loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
+                            If (ocn_select(io_Fe_56Fe)) then
+                               loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - &
+                                    & loc_r56Fe*loc_scav_Fe
+                               loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k) = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),k) + &
+                                    & loc_r56Fe*loc_scav_Fe
+                            end if
+                            ! ----------------------------------- ! MODIFY DET TRACER FLUX
+                            loc_bio_part_TMP(is2l(is_det),k) = loc_bio_part_TMP(is2l(is_det),k) + loc_scav_Fe
+                            ! ----------------------------------- ! record geochem diagnostics (mol kg-1)
+                            loc_diag_precip(idiag_precip_FeOOH_dFe,k) = &
+                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,k) + loc_scav_Fe
+                         else
+                            loc_bio_part_TMP(is2l(is_POM_Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe),k) + loc_scav_Fe
+                            loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - loc_scav_Fe
+                            If (ocn_select(io_Fe_56Fe)) then
+                               loc_bio_remin(io2l(io_Fe_56Fe),k) = loc_bio_remin(io2l(io_Fe_56Fe),k) - &
+                                    & loc_r56Fe*loc_scav_Fe
+                               loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),k) + &
+                                    & loc_r56Fe*loc_scav_Fe
+                            end if
+                         end if
+                   end if
                 CASE ('hybrid','lookup_4D')
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
-                      loc_bio_remin(io2l(io_TDFe),k) = loc_bio_remin(io2l(io_TDFe),k) - &
-                           fun_box_scav_Fe(                                                  &
-                           & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
-                           & loc_FeFeLL(1),  &
-                           & loc_bio_part_TMP(:,k)       &
-                           & )
+                         loc_scav_Fe = fun_box_scav_Fe(          &
+                              & dum_dtyr,                        &
+                              & loc_bio_remin_dt_reaction,       &
+                              & loc_FeFeLL(1),                   &
+                              & loc_bio_part_TMP(is2l(is_POC),k) &
+                              & )
+                      loc_bio_part_TMP(is2l(is_POM_Fe),k) = loc_bio_part_TMP(is2l(is_POM_Fe),k) + loc_scav_Fe
+                      loc_bio_remin(io2l(io_TDFe),k) = loc_bio_remin(io2l(io_TDFe),k) - loc_scav_Fe
                    end if
                 CASE default
-                   if (loc_FeFeLL(1) > const_real_nullsmall) then
-                      loc_bio_remin(io2l(io_Fe),k) = loc_bio_remin(io2l(io_Fe),k) - &
-                           fun_box_scav_Fe(                                                  &
-                           & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
-                           & loc_FeFeLL(1),  &
-                           & loc_bio_part_TMP(:,k)       &
-                           & )
-                   end if
+                   ! NOTHING
                 end SELECT
              end if
+             ! ----------------------------------------------- ! ADDITIONAL (OCEAN SURFACE) PARTICLE TRANSFORMATIONS
+             ! ----------------------------------------------- ! example
+             ! ### INSERT CODE ################################################################################################### !
+             ! if (sed_select(is_xxx)) then
+             ! end if
+             ! ################################################################################################################### !
           end If
 
           ! >>>>>>>>>>>>>>>>>>>>>>>>>
@@ -3698,13 +3041,14 @@ CONTAINS
                 loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,kk)
                 ! calculate residence time (yr) of particulates in ocean layer (from layer thickness and sinking speed)
                 ! NOTE: sinking rate has units of (m yr-1) (converted from parameter file input units)
-                if (loc_bio_remin_sinkingrate > const_real_nullsmall) &
-                     & loc_bio_remin_dt = loc_bio_remin_dD/loc_bio_remin_sinkingrate
-                if (loc_bio_remin_sinkingrate_scav > const_real_nullsmall) &
-                     & loc_bio_remin_dt_scav = loc_bio_remin_dD/loc_bio_remin_sinkingrate_scav
+                if (loc_bio_remin_sinkingrate_physical > const_real_nullsmall) &
+                     & loc_bio_remin_dt_physical = loc_bio_remin_dD/loc_bio_remin_sinkingrate_physical
+                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) &
+                     & loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
 
                 ! *** Calculate fractional change in particulate fluxes ***
-                ! carbonate
+
+                ! -------------------------------------------- ! carbonate
                 if (sed_select(is_CaCO3)) then
                    If (.NOT. ctrl_bio_remin_CaCO3_fixed) then
                       ! ### INSERT CODE ########################################################################################## !
@@ -3742,7 +3086,8 @@ CONTAINS
                       loc_bio_part_TMP(l,kk) = 0.0
                    end if
                 end if
-                ! opal
+
+                ! -------------------------------------------- ! opal
                 if (sed_select(is_opal)) then
                    If (.NOT. ctrl_bio_remin_opal_fixed) then
                       ! set local variables - temperature (K) and silicic acid concentration (mol kg-1)
@@ -3757,7 +3102,7 @@ CONTAINS
                       ! calculate opal fractional dissolution
                       ! NOTE: for now, assume that both opal 'fractions' behave identically
                       loc_bio_remin_opal_frac1 = 1.0 - EXP(                                  &
-                           & -loc_bio_remin_dt*par_bio_remin_opal_K*                         &
+                           & -loc_bio_remin_dt_reaction*par_bio_remin_opal_K*                &
                            & (1.0/0.71)*                                                     &
                            & (                                                               &
                            &   (0.16*(1.0 + (loc_T - const_zeroC)/15.0)*loc_u) +             &
@@ -3785,16 +3130,20 @@ CONTAINS
                       loc_bio_part_TMP(l,kk) = 0.0
                    end if
                 end if
-                ! particulate organic matter
+
+                ! -------------------------------------------- ! particulate organic matter
                 if (sed_select(is_POC)) then
                    If (.NOT. ctrl_bio_remin_POC_fixed) then
                       ! set local variables - temperature (K)
                       loc_T = dum_vocn%mk(conv_io_lselected(io_T),kk)
                       ! calculate POC fractional remin
                       loc_bio_remin_POC_frac1 = &
-                           & loc_bio_remin_dt*par_bio_remin_POC_K1*exp(-par_bio_remin_POC_Ea1/(const_R_SI*loc_T))
+                           & loc_bio_remin_dt_reaction*par_bio_remin_POC_K1*exp(-par_bio_remin_POC_Ea1/(const_R_SI*loc_T))
                       loc_bio_remin_POC_frac2 = &
-                           & loc_bio_remin_dt*par_bio_remin_POC_K2*exp(-par_bio_remin_POC_Ea2/(const_R_SI*loc_T))
+                           & loc_bio_remin_dt_reaction*par_bio_remin_POC_K2*exp(-par_bio_remin_POC_Ea2/(const_R_SI*loc_T))
+                      ! check for an impossible >1.0 degradation fraction
+                      if (loc_bio_remin_POC_frac1 >= 1.0) loc_bio_remin_POC_frac1 = 1.0
+                      if (loc_bio_remin_POC_frac2 >= 1.0) loc_bio_remin_POC_frac2 = 1.0
                    else
                       ! FRACTION #1
                       select case (par_bio_remin_fun)
@@ -3806,18 +3155,20 @@ CONTAINS
                               & (phys_ocn(ipo_Dbot,dum_i,dum_j,kk+1)/par_bio_remin_z0)**(par_bio_remin_b(dum_i,dum_j)) &
                               & )
                       case ('KriestOschlies2008') ! efolding depth dependent on mean plankton diameter JDW
-                      	 loc_eL_size=par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta ! n.b. size is in esd
-                      	 loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/loc_eL_size)) 	
+                         ! NOTE: size is in esd
+                         loc_eL_size = &
+                              & par_bio_remin_POC_eL0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta
+                         loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/loc_eL_size))
                       case default
                          loc_bio_remin_POC_frac1 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL1))
                       end select
                       ! FRACTION #2
                       if (ctrl_bio_remin_POC_ballast) then
-                         if (loc_bio_part_TMP(is2l(is_POC_frac2),kk+1)*loc_bio_part_TMP(is2l(is_POC),kk+1) &
-                              & > &
-                              & const_real_nullsmall) then
-                            loc_bio_remin_POC_frac2 = 1.0 -                                                              &
-                                 & (                                                                                     &
+                         ! NOTE: check that there is a non-zero mineral particule load
+                         ! NOTE: previously, it was checked that both the POC flux and frac are non zero
+                         if (loc_part_tot_mineral > const_real_nullsmall) then
+                            loc_bio_remin_POC_frac2 = 1.0 -                                                                   &
+                                 & (                                                                                          &
                                  &   loc_bio_part_CaCO3_ratio*par_bio_remin_kc(dum_i,dum_j)*loc_bio_part_TMP(is_CaCO3,kk+1) + &
                                  &   loc_bio_part_opal_ratio*par_bio_remin_ko(dum_i,dum_j)*loc_bio_part_TMP(is_opal,kk+1) +   &
                                  &   1.0*par_bio_remin_kl(dum_i,dum_j)*loc_bio_part_TMP(is_det,kk+1)                          &
@@ -3832,7 +3183,12 @@ CONTAINS
                             loc_bio_remin_POC_frac2 = 0.0
                          end if
                       else
-                         loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
+                         select case (par_bio_remin_fun)
+                         case ('Martin1987','Henson2012','KriestOschlies2008')
+                            loc_bio_remin_POC_frac2 = 0.0
+                         case default
+                            loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
+                         end select
                       end if
                    endif
                    ! calculate the ratio of particulate tracer between layers
@@ -3850,6 +3206,25 @@ CONTAINS
                       loc_bio_part_TMP(l,kk) = 0.0
                    end if
                 end if
+                ! -------------------------------------------- ! ADDITIONAL (OCEAN SURFACE) PARTICLE TRANSFORMATIONS
+                ! additional particle transformations
+                ! NOTE: the layer where the particles originate is kk+1,
+                !       and the current layer (where particle transformations are aplied), is kk
+                ! NOTE: tracer concentrations are accessed from the vbectorised array, e.g.
+                !       loc_SiO2 = dum_vocn%mk(conv_io_lselected(io_SiO2),kk)
+                ! NOTE: the particle tracer concentration in layer kk, before any particle transformation, is:
+                !       loc_bio_part_TMP(l,kk+1)*loc_bio_remin_layerratio
+                !       (i.e., the concentration in layer kk+1, multiplied by a dilution factor (as deeper layers are thicker)
+                !       where l is derived from the is particle index:
+                !       l = is2l(is)
+                ! NOTE: the time (years) spent by a particle in the layer (kk) is given by the variable: loc_bio_remin_dt
+                ! -------------------------------------------- ! example
+                ! ### INSERT CODE ################################################################################################ !
+                ! if (sed_select(is_xxx)) then
+                !    ! default, no dissolution (particle reduction/oxidation)
+                !   loc_bio_part_xxx_ratio = 1.0
+                ! end if
+                ! ################################################################################################################ !
 
                 ! *** Calculate particle concentrations in layer below ***
                 ! calculate local (temporary) particulate tracer concentration;
@@ -3864,65 +3239,104 @@ CONTAINS
                 ! NOTE: par_sed_type_misc => no remin (e.g. S bound refractory organic matter)
                 DO l=1,n_l_sed
                    is = conv_iselected_is(l)
+                   ! -------------------------------------- ! particulate organic matter
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    if ( &
                         & (sed_dep(is) == is_POC) .OR. &
                         & (sed_type(is) == par_sed_type_POM) .OR. &
-                        & (sed_type(sed_dep(is)) == is_POC) &
+                        & (sed_type(sed_dep(is)) == par_sed_type_POM) .OR. &
+                        & (sed_type(sed_dep(is)) == par_sed_type_scavenged) &
                         & ) then
-                      ! particulate organic matter (plus elemental components, and particle-reactive scavenged elements)
-                      if (sed_type(is) == par_sed_type_scavenged) then
+                      if ( (sed_type(is) == par_sed_type_scavenged) .OR. (sed_type(sed_dep(is)) == par_sed_type_scavenged) ) then
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*(1.0 - par_scav_fremin*(1.0 - loc_bio_part_POC_ratio))
                       else
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*loc_bio_part_POC_ratio
                       end if
+                   ! -------------------------------------- ! carbonate
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    else if ( &
                         & (sed_dep(is) == is_CaCO3) .OR. &
                         & (sed_type(is) == par_sed_type_CaCO3) .OR. &
-                        & (sed_type(sed_dep(is)) == par_sed_type_CaCO3) &
+                        & (sed_type(sed_dep(is)) == par_sed_type_CaCO3) .OR. &
+                        & (sed_type(sed_dep(is)) == par_sed_type_scavenged) &
                         & ) then
-                      ! carbonate (plus elemental components, and particle-reactive scavenged elements)
-                      if (sed_type(is) == par_sed_type_scavenged) then
+                      if ( (sed_type(is) == par_sed_type_scavenged) .OR. (sed_type(sed_dep(is)) == par_sed_type_scavenged) ) then
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*(1.0 - par_scav_fremin*(1.0 - loc_bio_part_CaCO3_ratio))
                       else
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*loc_bio_part_CaCO3_ratio
                       end if
+                   ! -------------------------------------- ! opal
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    else if ( &
                         & (sed_dep(is) == is_opal) .OR. &
                         & (sed_type(is) == par_sed_type_opal) .OR. &
-                        & (sed_type(sed_dep(is)) == par_sed_type_opal) &
+                        & (sed_type(sed_dep(is)) == par_sed_type_opal) .OR. &
+                        & (sed_type(sed_dep(is)) == par_sed_type_scavenged) &
                         & ) then
-                      ! opal (plus elemental components, and particle-reactive scavenged elements)
-                      if (sed_type(is) == par_sed_type_scavenged) then
+                      if ( (sed_type(is) == par_sed_type_scavenged) .OR. (sed_type(sed_dep(is)) == par_sed_type_scavenged) ) then
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*(1.0 - par_scav_fremin*(1.0 - loc_bio_part_opal_ratio))
                       else
                          loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                               & loc_bio_remin_layerratio*loc_bio_part_opal_ratio
-                      endif
+                      end if
+                   ! -------------------------------------- ! SPECIAL CASES EXAMPLE
+                                                            ! (comes before generic detrital tracer handling)
+                   ! ### INSERT CODE ############################################################################################# !
+                   ! else if ( &
+                   !      & (is == is_xxx) .OR. &
+                   !      & (sed_dep(is) == is_xxx) &
+                   !      & ) then
+                   !    loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
+                   !         & loc_bio_remin_layerratio*loc_bio_part_xxx_ratio
+                   ! ############################################################################################################# !
+                   ! -------------------------------------- ! (remaining) detrital
+                                                            ! (plus elemental components, particle-reactive scavenged elements)
                    else if ( &
                         & (sed_dep(is) == is_det) .OR. &
                         & (sed_type(is) == par_sed_type_det) .OR. &
-                        & (sed_type(sed_dep(is)) == par_sed_type_det) &
+                        & (sed_type(sed_dep(is)) == par_sed_type_det) .OR. &
+                        & (sed_type(sed_dep(is)) == par_sed_type_scavenged) &
                         & ) then
-                      !
                       loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                            & loc_bio_remin_layerratio
                    end if
-                   ! exceptions:
+                   ! ----------------------------------------- ! exceptions
                    ! (1) do not remineralize S in S-linked POM (assumed a refractory fraction)
+                   !     i.e. just re-apply a layer ratio concentration change
                    if (is == is_POM_S) loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)*loc_bio_remin_layerratio
 
                 end do
 
-                ! *** Calculate increase in tracer concentrations due to particle remineralization ***
+                ! -------------------------------------------- !
+                ! CALCULATE INCREASE IN TRACER CONCENTRATIONS DUE TO PARTICLE REMINERALIZATION
+                ! -------------------------------------------- !
                 ! add 'missing' (remineralized) particulate sediment tracers to respective remineralization array components
                 ! NOTE: ensure the particulate concentration in the upper layer is scaled w.r.t.
                 !       the difference in relative layer thickness
                 DO l=1,n_l_sed
+                   if (ctrl_force_sed_reflective_POM) then
+                      if (kk == loc_k1) then
+                         ! set reflective boundary conditions for POM components
+                         ! -> for when the oxic-only / Redfield remin provided by SEDGEM is inappropriate / OMEN-SED not selected
+                         ! NOTE: sed_dep(l2is(l)) == is_POC covers C isotopes BUT needs to depdend on POC or POM)
+                         !       sed_type(l2is(l)) == par_sed_type_POM covers e.g. incorporated Fe
+                         !       sed_type(sed_dep(l2is(l))) == par_sed_type_POM covers isotopes of e.g. incorporated Fe
+                         if ( &
+                              & ( l2is(l) == is_POC ) .OR. &
+                              & ( (sed_type(l2is(l)) > 10) .AND. (sed_dep(l2is(l)) == is_POC) ) .OR. &
+                              & ( (sed_type(l2is(l)) > 10) .AND. (sed_dep(l2is(l)) == par_sed_type_POM) ) .OR. &
+                              & ( sed_type(l2is(l)) == par_sed_type_POM ) .OR. &
+                              & ( sed_type(sed_dep(l2is(l))) == par_sed_type_POM ) &
+                              & ) then
+                            loc_bio_part_TMP(l,kk) = 0.0
+                         end if
+                      end if
+                   end if
                    loc_bio_part_remin(l) = (loc_bio_remin_layerratio*loc_bio_part_TMP(l,kk+1) - loc_bio_part_TMP(l,kk))
 !!$                   ! create RDOM fraction
 !!$                   is = conv_iselected_is(l)
@@ -3945,8 +3359,12 @@ CONTAINS
 !!$                   end do
                 end DO
                 ! carry out the remineralization (POM -> inorganic constitutents) itself
+                ! (0) make tempoary conversion of is_POM_FeOOH -> io_FeOOH
+                if (sed_select(is_POM_FeOOH) .AND. ocn_select(io_FeOOH)) then
+                   loc_vocn(io2l(io_FeOOH)) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
+                end if
                 ! (1) create temporary remin conversion array depending on prevailing redox conditions
-                call sub_box_remin_redfield(dum_vocn%mk(:,kk),loc_conv_ls_lo(:,:))
+                call sub_box_remin_redfield(dum_vocn%mk(:,kk)+loc_vocn(:),loc_conv_ls_lo(:,:))
                 ! (2) carry out actual remin
                 !     NOTE: catch non-selected tracers (index 0 in the conversion io -> l)
                 DO ls=1,n_l_sed
@@ -3964,68 +3382,237 @@ CONTAINS
                       end if
                    end do
                 end DO
-
+                ! (3) make conversion of io_FeOOH -> is_POM_FeOOH
+                !     NOTE: io_Fe remin (release of Fe from FeOOH) is positive, meaning the pretend io_FeOOH remin is negative
+                if (sed_select(is_POM_FeOOH) .AND. ocn_select(io_FeOOH)) then
+                   if (sed_select(is_POM_FeOOH_56Fe) .AND. ocn_select(io_FeOOH_56Fe)) then
+                      if (loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) > const_rns) then
+                         loc_r56Fe = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)/loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)
+                      else
+                         loc_r56Fe = 0.0
+                      end if
+                      loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) = &
+                           & loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
+                      loc_bio_remin(io2l(io_Fe2_56Fe),kk) = &
+                           & loc_bio_remin(io2l(io_Fe2_56Fe),kk) - loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
+                      !loc_bio_remin(io2l(io_FeOOH_56Fe),kk) = 0.0
+                   end if
+                   loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = &
+                        & loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_bio_remin(io2l(io_FeOOH),kk)
+                   loc_bio_remin(io2l(io_FeOOH),kk) = 0.0
+                end if
                 ! *** Scavenge Fe from water column ***
                 ! NOTE: Fe scavenging must be called AFTER particulates have been 'moved' to the next layer down
                 !       - they are assumed to start at the BASE of the originating layer,
                 !         which is why they are not scavenged from level (kk+1)
                 ! NOTE: calculate Fe speciation first!
-                ! NOTE: for the lookup table, the goethite concentration is assigned to the first array index (otherwise used for [Fe])
+                ! NOTE: for the lookup table, the goethite concentration is assigned to the first array index
+                !       (otherwise used for [Fe])
+                ! NOTE: in the re-balancing of Fe-FeL-L (scheme 'ALT') -- this can only occur once in each layer per time-step
+                !       (as particlaes cannot over take themselves ...
+                !        except in the special case of non instantaneous remin and particle-size dependent sinking ...)
                 if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
+                   loc_r56Fe = 0.0
+                   ! calculate Fe speciation
                    SELECT CASE (trim(opt_geochem_Fe))
+                   case ('OLD')
+                      loc_FeFeLL(1) = dum_vocn%mk(io2l(io_Fe),kk)
                    CASE ('ALT')
                       loc_FeFeLL(:) = fun_box_calc_geochem_Fe(                                  &
                            & dum_vocn%mk(io2l(io_Fe),kk) + dum_vocn%mk(io2l(io_FeL),kk), &
-                           & dum_vocn%mk(io2l(io_L),kk) + dum_vocn%mk(io2l(io_FeL),kk)   &
+                           & dum_vocn%mk(io2l(io_L),kk) + dum_vocn%mk(io2l(io_FeL),kk),   &
+                           & par_K_FeL &
                            & )
-                      loc_bio_remin(io2l(io_Fe),kk)  = loc_bio_remin(io2l(io_Fe),kk)  + (loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe),kk))
-                      loc_bio_remin(io2l(io_FeL),kk) = loc_bio_remin(io2l(io_FeL),kk) + (loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL),kk))
-                      loc_bio_remin(io2l(io_L),kk)   = loc_bio_remin(io2l(io_L),kk)   + (loc_FeFeLL(3) - dum_vocn%mk(io2l(io_L),kk))
+                      ! re-partition Fe species
+                      loc_bio_remin(io2l(io_Fe),kk)  = loc_bio_remin(io2l(io_Fe),kk)  + &
+                           & (loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe),kk))
+                      loc_bio_remin(io2l(io_FeL),kk) = loc_bio_remin(io2l(io_FeL),kk) + &
+                           & (loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL),kk))
+                      loc_bio_remin(io2l(io_L),kk)   = loc_bio_remin(io2l(io_L),kk)   + &
+                           & (loc_FeFeLL(3) - dum_vocn%mk(io2l(io_L),kk))
+                   CASE ('FeFe2TL')
+                      loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
+                           & dum_vocn%mk(io2l(io_Fe),kk), &
+                           & dum_vocn%mk(io2l(io_TL),kk), &
+                           & par_K_FeL &
+                           & )
                    CASE ('hybrid')
-                      loc_FeFeLL(:) = fun_box_calc_geochem_Fe(dum_vocn%mk(io2l(io_TDFe),kk),dum_vocn%mk(io2l(io_TL),kk))
+                      loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
+                           & dum_vocn%mk(io2l(io_TDFe),kk), &
+                           & dum_vocn%mk(io2l(io_TL),kk), &
+                           & par_K_FeL &
+                           & )
                    CASE ('lookup_4D')
                       loc_FeFeLL(1) = fun_box_calc_lookup_Fe_4D_geo( &
                            & (/ ocn(io_T,dum_i,dum_j,kk), carb(ic_H,dum_i,dum_j,kk), &
                            &  ocn(io_TDFe,dum_i,dum_j,kk), ocn(io_TL,dum_i,dum_j,kk) /) &
                            & )
                    case default
-                      loc_FeFeLL(1) = dum_vocn%mk(io2l(io_Fe),kk)
+                      loc_FeFeLL(:) = 0.0
                    end SELECT
+                   ! calculate mean Fe isotopic composition
+                   ! NOTE: isotopes not enabled for all of the Fe schemes
+                   If ( ocn_select(io_Fe_56Fe) .OR. ocn_select(io_TDFe_56Fe) ) then
+                      SELECT CASE (trim(opt_geochem_Fe))
+                      CASE ('OLD','ALT')
+                         ! re-partition (homogonise) Fe isotopes across Fe and FeL pools
+                         if ( (loc_FeFeLL(1)+loc_FeFeLL(2)) > const_rns ) then
+                            loc_r56Fe = (dum_vocn%mk(io2l(io_Fe_56Fe),kk) + dum_vocn%mk(io2l(io_FeL_56Fe),kk))/ &
+                                 & (loc_FeFeLL(1) + loc_FeFeLL(2))
+                         else
+                            loc_r56Fe = 0.0
+                         end if
+                         loc_bio_remin(io2l(io_Fe_56Fe),kk)  = loc_bio_remin(io2l(io_Fe_56Fe),kk)  + &
+                              & (loc_r56Fe*loc_FeFeLL(1) - dum_vocn%mk(io2l(io_Fe_56Fe),kk))
+                         loc_bio_remin(io2l(io_FeL_56Fe),kk) = loc_bio_remin(io2l(io_FeL_56Fe),kk) + &
+                              & (loc_r56Fe*loc_FeFeLL(2) - dum_vocn%mk(io2l(io_FeL_56Fe),kk))
+                      CASE ('FeFe2TL')
+                         ! assume single total pool (Fe3) ... no need to homogenize ...
+                         if (dum_vocn%mk(io2l(io_Fe),kk) > const_rns) then
+                            loc_r56Fe = dum_vocn%mk(io2l(io_Fe_56Fe),kk)/dum_vocn%mk(io2l(io_Fe),kk)
+                         else
+                            loc_r56Fe = 0.0
+                         end if
+                      CASE ('hybrid','lookup_4D')
+                         ! single total pool ... no need to homogenize ...
+                         if (dum_vocn%mk(io2l(io_TDFe),kk) > const_rns) then
+                            loc_r56Fe = dum_vocn%mk(io2l(io_TDFe_56Fe),kk)/dum_vocn%mk(io2l(io_TDFe),kk)
+                         else
+                            loc_r56Fe = 0.0
+                         end if
+                      case default
+                      ! NOTHING!
+                      end SELECT
+                   end if
+                   ! calculate scavenging (and isotopes)
+                   ! NOTE: isotopes not enabled for all of the Fe schemes
                    SELECT CASE (trim(opt_geochem_Fe))
+                   CASE ('OLD','ALT')
+                      if (loc_FeFeLL(1) > const_real_nullsmall) then
+                         loc_scav_Fe = fun_box_scav_Fe(           &
+                              & dum_dtyr,                         &
+                              & loc_bio_remin_dt_reaction,        &
+                              & loc_FeFeLL(1),                    &
+                              & loc_bio_part_TMP(is2l(is_POC),kk) &
+                              & )
+                         loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
+                         loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
+                         If (ocn_select(io_Fe_56Fe)) then
+                            loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - &
+                                 & loc_r56Fe*loc_scav_Fe
+                            loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),kk) + &
+                                 & loc_r56Fe*loc_scav_Fe
+                         end if
+                      end if
+                   CASE ('FeFe2TL')
+                      if (loc_FeFeLL(1) > const_real_nullsmall) then
+                         loc_scav_Fe = fun_box_scav_Fe(           &
+                              & dum_dtyr,                         &
+                              & loc_bio_remin_dt_reaction,        &
+                              & loc_FeFeLL(1),                    &
+                              & loc_bio_part_TMP(is2l(is_POC),kk) &
+                              & )
+                         if (sed_select(is_POM_FeOOH)) then
+                            loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
+                            loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_scav_Fe
+                            If (ocn_select(io_Fe_56Fe)) then
+                               loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - loc_r56Fe*loc_scav_Fe
+                               loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk)  = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + &
+                                    & loc_r56Fe*loc_scav_Fe
+                            end if
+                            ! ----------------------------------- ! MODIFY DET TRACER FLUX
+                            loc_bio_part_TMP(is2l(is_det),kk) = loc_bio_part_TMP(is2l(is_det),kk) + loc_scav_Fe
+                            ! ----------------------------------- ! record geochem diagnostics (mol kg-1)
+                            loc_diag_precip(idiag_precip_FeOOH_dFe,kk) = &
+                                 & loc_diag_precip(idiag_precip_FeOOH_dFe,kk) + loc_scav_Fe
+                         else
+                            loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - loc_scav_Fe
+                            loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
+                            If (ocn_select(io_Fe_56Fe)) then
+                               loc_bio_remin(io2l(io_Fe_56Fe),kk) = loc_bio_remin(io2l(io_Fe_56Fe),kk) - &
+                                    & loc_r56Fe*loc_scav_Fe
+                               loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),kk) + &
+                                    & loc_r56Fe*loc_scav_Fe
+                            end if
+                         end if
+                      end if
                    CASE ('hybrid','lookup_4D')
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
-                         loc_bio_remin(io2l(io_TDFe),kk) = loc_bio_remin(io2l(io_TDFe),kk) - &
-                              fun_box_scav_Fe(                                                  &
-                              & dum_dtyr,                     &
-                              & loc_bio_remin_dt_scav,        &
-                              & loc_FeFeLL(1),  &
-                              & loc_bio_part_TMP(:,kk)       &
+                         loc_scav_Fe = fun_box_scav_Fe(           &
+                              & dum_dtyr,                         &
+                              & loc_bio_remin_dt_reaction,        &
+                              & loc_FeFeLL(1),                    &
+                              & loc_bio_part_TMP(is2l(is_POC),kk) &
                               & )
+                         loc_bio_remin(io2l(io_TDFe),kk) = loc_bio_remin(io2l(io_TDFe),kk) - loc_scav_Fe
+                         loc_bio_part_TMP(is2l(is_POM_Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe),kk) + loc_scav_Fe
+                         If (ocn_select(io_TDFe_56Fe)) then
+                            loc_bio_remin(io2l(io_TDFe_56Fe),kk) = loc_bio_remin(io2l(io_TDFe_56Fe),kk) - &
+                                 & loc_r56Fe*loc_scav_Fe
+                            loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),kk) = loc_bio_part_TMP(is2l(is_POM_Fe_56Fe),kk) + &
+                                 & loc_r56Fe*loc_scav_Fe
+                         end if
                       end if
                    case default
-                      if (loc_FeFeLL(1) > const_real_nullsmall) then
-                         loc_bio_remin(io2l(io_Fe),kk) = loc_bio_remin(io2l(io_Fe),kk) - &
-                              fun_box_scav_Fe(                                                  &
-                              & dum_dtyr,                     &
-                              & loc_bio_remin_dt_scav,        &
-                              & loc_FeFeLL(1),  &
-                              & loc_bio_part_TMP(:,kk)       &
-                              & )
-                      end if
+                   ! NOTHING!
                    end SELECT
                 end if
 
                 ! *** Scavenge H2S from water column ***
                 if (ocn_select(io_H2S) .AND. sed_select(is_POM_S)) then
-                   if (dum_vocn%mk(io2l(io_H2S),kk) > const_real_nullsmall) then
+                   if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns) then
                       call sub_box_scav_H2S(               &
                            & dum_i,dum_j,kk,               &
                            & dum_dtyr,                     &
-                           & loc_bio_remin_dt_scav,        &
+                           & loc_bio_remin_dt_reaction,    &
                            & dum_vocn%mk(io2l(io_H2S),kk), &
                            & loc_bio_part_TMP(:,kk),       &
                            & loc_bio_remin(:,kk)           &
                            & )
+                   end if
+                end if
+
+                ! *** Scavenge Os from water column ***
+                if ((ocn_select(io_Os) .AND. sed_select(is_POM_Os)) .AND. (par_bio_remin_kOstoPOMOS > const_real_nullsmall)) then
+                   if (dum_vocn%mk(io2l(io_Os),kk) > const_real_nullsmall) then
+                      call sub_box_scav_Os(                     &
+                           & dum_dtyr,                          &
+                           & loc_bio_remin_dt_reaction,         &
+                           & dum_vocn%mk(io2l(io_Os),kk),       &
+                           & dum_vocn%mk(io2l(io_Os_187Os),kk), &
+                           & dum_vocn%mk(io2l(io_Os_188Os),kk), &
+                           & dum_vocn%mk(io2l(io_O2),kk),       &
+                           & loc_bio_part_TMP(:,kk),            &
+                           & loc_bio_remin(:,kk)                &
+                           & )
+                   end if
+                end if
+
+                ! *** Reduce FeOOH ***
+                ! NOTE: test for both forms (scavenged and 'free')
+                if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2)) then
+                   if (sed_select(is_FeOOH)) then
+                      if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
+                         call sub_box_react_FeOOH_H2S(        &
+                              & dum_i,dum_j,kk,               &
+                              & dum_dtyr,                     &
+                              & loc_bio_remin_dt_reaction,    &
+                              & dum_vocn%mk(io2l(io_H2S),kk), &
+                              & loc_bio_part_TMP(:,kk),       &
+                              & loc_bio_remin(:,kk)           &
+                              & )
+                      end if
+                   elseif (sed_select(is_POM_FeOOH)) then
+                      if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)>const_rns) then
+                         call sub_box_react_POMFeOOH_H2S(     &
+                              & dum_i,dum_j,kk,               &
+                              & dum_dtyr,                     &
+                              & loc_bio_remin_dt_reaction,    &
+                              & dum_vocn%mk(io2l(io_H2S),kk), &
+                              & loc_bio_part_TMP(:,kk),       &
+                              & loc_bio_remin(:,kk)           &
+                              & )
+                      end if
                    end if
                 end if
 
@@ -4080,19 +3667,26 @@ CONTAINS
     ! *** WRITE GLOBAL ARRAY DATA ***
     ! NOTE: because sub_calc_bio_remin is the first call in the sequence of events (in biogem_main),
     !       data arrays are over-written rather than incremented
-    ! write ocean tracer field and settling flux arrays (global array)
-    dum_vbio_part%mk(:,:) = loc_bio_part(:,:)
-    ! write ocean tracer remineralization field (global array)
-    dum_vbio_remin%mk(:,:) = dum_vbio_remin%mk(:,:) + loc_bio_remin(:,:)
     ! remin diagnostics
-    if (ctrl_bio_remin_redox_save) diag_redox(:,dum_i,dum_j,:) = diag_redox(:,dum_i,dum_j,:) + loc_diag_redox(:,:)
-
+    if (ctrl_bio_remin_redox_save) then
+       diag_redox(:,dum_i,dum_j,:)  = diag_redox(:,dum_i,dum_j,:)  + loc_diag_redox(:,:)
+       diag_precip(:,dum_i,dum_j,:) = diag_precip(:,dum_i,dum_j,:) + loc_diag_precip(:,:)
+       if (ocn_select(io_col9)) then
+          loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          loc_bio_remin(io2l(io_col9),:) = loc_bio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
+       end if
+    end if
+    ! record settling fluxes
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        bio_settle(is,dum_i,dum_j,:) = loc_bio_settle(l,:)
     end do
-
-    ! 
+    ! write ocean tracer field and settling flux arrays (global array)
+    dum_vbio_part%mk(:,:) = loc_bio_part(:,:)
+    ! write ocean tracer remineralization field (global array)
+    dum_vbio_remin%mk(:,:) = dum_vbio_remin%mk(:,:) + loc_bio_remin(:,:)
+    ! deallocate local arrays
     DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
   END SUBROUTINE sub_box_remin_part
@@ -4100,11 +3694,205 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! Calculate FeOOH dissolution (reaction with H2S)
+  ! NOTE: calling of this sub is conditional on both H2S and FeOOH not being zero
+  !       (so divide-by-zero issues should already have be screened for ...)
+  SUBROUTINE sub_box_react_FeOOH_H2S(dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k
+    REAL,INTENT(in)::dum_dtyr
+    REAL,INTENT(in)::dum_dt_scav
+    REAL,INTENT(in)::dum_ocn_H2S
+    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
+    real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::loc_H2S
+    real::loc_part_den_FeOOH
+    real::loc_dFeOOH
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- ! set local solutes
+    loc_H2S = dum_ocn_H2S
+    ! -------------------------------------------------------- ! extract density of FeOOH
+    loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
+    ! -------------------------------------------------------- !
+    ! CALCULATE FeOOH dissolution rate
+    ! -------------------------------------------------------- !
+    ! reaction:
+    !           FeOOH + 1/8H2S --> 1/8SO4 + Fe2
+    ! and where FeOOH comes from:
+    !           Fe2 + 1/4O2  --> Fe3
+    !           Fe3+ + 2*H2O --> FeOOH + 3*H+
+    ! or, overall, ignoring water etc:
+    !           Fe2 + 1/4O2 --> FeOOH
+    ! NOTE: par_bio_remin_kFeOOHtoFe2 == kinetic constant for FeOOH reduction using sulphide in M-1 yr-1
+    ! -------------------------------------------------------- ! calculate reaction rate
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
+    ! cap scavenged POM_FeOOH and dissolved H2S consumption
+    loc_dFeOOH = min(loc_dFeOOH,loc_f*loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
+    ! -------------------------------------------------------- ! implement reaction
+    dum_bio_part(is2l(is_FeOOH)) = dum_bio_part(is2l(is_FeOOH)) - loc_dFeOOH
+    dum_bio_remin(io2l(io_H2S))  = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_Fe2))  = dum_bio_remin(io2l(io_Fe2))  + loc_dFeOOH
+    dum_bio_remin(io2l(io_SO4))  = dum_bio_remin(io2l(io_SO4))  + (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_ALK))  = dum_bio_remin(io2l(io_ALK))  - 2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- ! implement reaction -- isotopes
+    ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
+    ! NOTE: no fractionation (currently)
+    if (ocn_select(io_Fe2_56Fe)) then
+       dum_bio_remin(io2l(io_Fe2_56Fe)) = dum_bio_remin(io2l(io_Fe2_56Fe)) + &
+            & (loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
+       dum_bio_part(is2l(is_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
+    end if
+    if (ocn_select(io_H2S_34S)) then
+       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+    end if
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,dum_k) + &
+         & loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,dum_k) - &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,dum_k) + &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) = diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,dum_k) - &
+         & 2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_react_FeOOH_H2S
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! Calculate FeOOH dissolution (reaction with H2S) for 'scavenged' FeOOH (POM_FeOOH)
+  ! NOTE: calling of this sub is conditional on both H2S and FeOOH not being zero
+  !       (so divide-by-zero issues should already have be screened for ...)
+  ! NOTE: for now, this is simply an edited copy of sub_box_react_FeOOH_H2S
+  !       -> a cleaner solution (not involving duplicating code) should be possible and implemented ... sometime ...
+  SUBROUTINE sub_box_react_POMFeOOH_H2S(dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k
+    REAL,INTENT(in)::dum_dtyr
+    REAL,INTENT(in)::dum_dt_scav
+    REAL,INTENT(in)::dum_ocn_H2S
+    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
+    real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::loc_H2S
+    real::loc_part_den_FeOOH
+    real::loc_dFeOOH
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- ! set local solutes
+    loc_H2S = dum_ocn_H2S
+    ! -------------------------------------------------------- ! extract density of FeOOH
+    loc_part_den_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
+    ! -------------------------------------------------------- !
+    ! CALCULATE FeOOH dissolution rate
+    ! -------------------------------------------------------- !
+    ! reaction:
+    !           FeOOH + 1/8H2S --> 1/8SO4 + Fe2
+    ! and where FeOOH comes from:
+    !           Fe2 + 1/4O2  --> Fe3
+    !           Fe3+ + 2*H2O --> FeOOH + 3*H+
+    ! or, overall, ignoring water etc:
+    !           Fe2 + 1/4O2 --> FeOOH
+    ! NOTE: par_bio_remin_kFeOOHtoFe2 == kinetic constant for FeOOH reduction using sulphide in M-1 yr-1
+    ! -------------------------------------------------------- ! calculate reaction rate
+    loc_dFeOOH = dum_dt_scav*par_bio_remin_kFeOOHtoFe2*loc_part_den_FeOOH*(loc_H2S**(1.0/2.0))
+    ! cap scavenged POM_FeOOH and dissolved H2S consumption
+    loc_dFeOOH = min(loc_dFeOOH,loc_f*loc_part_den_FeOOH,loc_f*(8.0/1.0)*loc_H2S)
+    ! -------------------------------------------------------- ! implement reaction
+    dum_bio_part(is2l(is_POM_FeOOH)) = dum_bio_part(is2l(is_POM_FeOOH)) - loc_dFeOOH
+    dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S))  - (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_Fe2))      = dum_bio_remin(io2l(io_Fe2))  + loc_dFeOOH
+    dum_bio_remin(io2l(io_SO4))      = dum_bio_remin(io2l(io_SO4))  + (1.0/8.0)*loc_dFeOOH
+    dum_bio_remin(io2l(io_ALK))      = dum_bio_remin(io2l(io_ALK))  - 2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- ! implement reaction -- isotopes
+    ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
+    ! NOTE: no fractionation (currently)
+    if (ocn_select(io_Fe2_56Fe)) then
+       dum_bio_remin(io2l(io_Fe2_56Fe)) = dum_bio_remin(io2l(io_Fe2_56Fe)) + &
+            & (loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_POM_FeOOH_56Fe))
+       dum_bio_part(is2l(is_POM_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_POM_FeOOH_56Fe))
+    end if
+    if (ocn_select(io_H2S_34S)) then
+       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+    end if
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_POMFeOOH_dFe2,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dFe2,dum_i,dum_j,dum_k) + &
+         & loc_dFeOOH
+    diag_react(idiag_react_POMFeOOH_dH2S,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dH2S,dum_i,dum_j,dum_k) - &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_POMFeOOH_dSO4,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dSO4,dum_i,dum_j,dum_k) + &
+         & (1.0/8.0)*loc_dFeOOH
+    diag_react(idiag_react_POMFeOOH_dALK,dum_i,dum_j,dum_k) = diag_react(idiag_react_POMFeOOH_dALK,dum_i,dum_j,dum_k) - &
+         & 2.0*(1.0/8.0)*loc_dFeOOH
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_react_POMFeOOH_H2S
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! SCAVENGING
+  ! consider:
+  !           (i)   with no remin, the concentration of particles should be uniform throughout the water column
+  !           (ii)  however, in order to have explicit particle concentrations in the water column and transform to dissolved,
+  !                 concentrations are reduced as the layer thickness increase (hence concerving total mass)
+  !           (iii) this reduced effective layer concentration scales with a longer residence time of the particles in the layer
+  !                 (loc_bio_remin_dt_reaction)
+  !           (iv)  if the reaction involves dtime*concentration, this is the same (as both change with layer thickness ratio)
+  !           (v)   however ... if the particle concentration is to a non unity power (e.g. for Fe),
+  !                 then the concentration needs to be corrected and the time-step rather than the residence time used
+  !
+  ! worked:   (a)   surface ocean production is x0 mol m-3 over time-step dt0 (yr) [converting from mol kg-1]
+  !                 the surface layer thickness is dl0 (m), giving an export flux of x0*dl0/dt0 mol m-2 yr-1
+  !                 for a settling rate of u m yr-1, the particule density is then x0*dl0/dt0/u (mol m-3)
+  !           (b)   local particle density (with no remin) is x = x0 * dl0/dl (scaled by the relative ocean layer thickness)
+  !                 => local flux = x/(dl0/dl)*dl0/dt0 = x*dl/dt0
+  !                 => local density = x*dl/dt0/u where dl/u == local residence time, dt
+  !                                  = x*dt/dt0 (mol kg-1)
+  ! hence ...
+  !                 effecively, what we are saying is that the particle density for reaction is equal to
+  !                 the model-represented layer density, x, corrected by the residence time (dt) divided by the time-step (dt0)
+  !                 because the reaction occurs over time dt0, we have dt0*(dt/dt0) = dt
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! Calculate Fe scavenging
-  ! *** NEW TRACER NOTATION -- NOT USED YET ... ***
+  ! *** NEW TRACER NOTATION ***
   ! NOTE: pass in [TDFe] rather than [Fe] if using new Fe scheme
   ! NOTE: allow remin array for [Fe] to be written to, but correct later (to [TDFe]) outside of subroutine
-  function fun_box_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_bio_part)
+  ! NOTE: revised for a single generic particle and scavenging
+  ! NOTE: particle field to be passed in, in units of mol kg-1
+  function fun_box_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_PART)
     ! -------------------------------------------------------- !
     ! RESULT VARIABLE
     ! -------------------------------------------------------- !
@@ -4115,100 +3903,48 @@ CONTAINS
     REAL,INTENT(in)::dum_dtyr
     REAL,INTENT(in)::dum_dt_scav
     REAL,INTENT(in)::dum_ocn_Fe
-    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
+    real,intent(in)::dum_PART
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
-    real::loc_scav_Fe_k_POC,loc_scav_Fe_k_CaCO3,loc_scav_Fe_k_opal,loc_scav_Fe_k_det
-    real::loc_scav_Fe_k_tot
-    real::loc_scav_dFe_tot
-    real::loc_part_den_POC,loc_part_den_CaCO3,loc_part_den_opal,loc_part_den_det
-    real::loc_part_den_tot
+    real::loc_scav_dFe
+    real::loc_part_den
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    fun_box_scav_Fe = 0.0
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! CALCULATE Fe SCAVENGING
     ! -------------------------------------------------------- !
-    ! NOTE: residence time in each ocean layer must be estimated for the Parekh et al. [2005] model,
-    !       with dum_bio_part passed in units of mol kg-1 for a specific cell
-    !       BUT the mass this represents is actually spread across multiple cells during each time step
-    !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
-    !       => normalize by the fraction of time spent in that cell during the time-step
-    !          = residence time / time-step
-    !            (could also be: cell thickness / (time-step x local velocity))
+    ! NOTE: residence time in each ocean layer must be used in the Parekh et al. [2005] model
     ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
-    fun_box_scav_Fe = 0.0
-    if (sed_select(is_POM_Fe)) then
-       loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is2l(is_POC))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_POC = 0.0
-    end if
-    if (sed_select(is_CaCO3_Fe)) then
-       loc_part_den_CaCO3 = (conv_g_mg*conv_cal_mol_g*dum_bio_part(is2l(is_CaCO3))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_CaCO3 = 0.0
-    end if
-    if (sed_select(is_opal_Fe)) then
-       loc_part_den_opal  = (conv_g_mg*conv_opal_mol_g*dum_bio_part(is2l(is_opal))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_opal  = 0.0
-    end if
-    if (sed_select(is_det_Fe)) then
-       loc_part_den_det   = (conv_g_mg*conv_det_mol_g*dum_bio_part(is2l(is_det))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_det   = 0.0
-    end if
-    loc_part_den_tot = loc_part_den_POC + loc_part_den_CaCO3 + loc_part_den_opal + loc_part_den_det
-    if (loc_part_den_tot > const_real_nullsmall) then
-       if (ctrl_bio_Fe_fixedKscav) then
-          ! -------------------------------------------------- !
-          ! calculate scavenging following Dutkiewicz et al. [2005]
-          ! -------------------------------------------------- !
-          ! -------------------------------------------------- ! net scavenging rate
-          loc_scav_Fe_k_tot = par_scav_Fe_ks
-          ! -------------------------------------------------- ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC = (loc_part_den_POC/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_CaCO3 = (loc_part_den_CaCO3/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_opal = (loc_part_den_opal/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_det = (loc_part_den_det/loc_part_den_tot)*loc_scav_Fe_k_tot
-          ! -------------------------------------------------- ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       else
-          ! -------------------------------------------------- !
-          ! calculate scavenging following Parekh et al. [2005]
-          ! -------------------------------------------------- !
-          ! -------------------------------------------------- ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC   = par_scav_Fe_sf_POC*par_scav_Fe_k0*loc_part_den_POC**par_scav_Fe_exp
-          loc_scav_Fe_k_CaCO3 = par_scav_Fe_sf_CaCO3*par_scav_Fe_k0*loc_part_den_CaCO3**par_scav_Fe_exp
-          loc_scav_Fe_k_opal  = par_scav_Fe_sf_opal*par_scav_Fe_k0*loc_part_den_opal**par_scav_Fe_exp
-          loc_scav_Fe_k_det   = par_scav_Fe_sf_det*par_scav_Fe_k0*loc_part_den_det**par_scav_Fe_exp
-          ! -------------------------------------------------- ! net scavenging rate
-          loc_scav_Fe_k_tot = loc_scav_Fe_k_POC + loc_scav_Fe_k_CaCO3 + loc_scav_Fe_k_opal + loc_scav_Fe_k_det
-          ! -------------------------------------------------- ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       end if
-       ! ----------------------------------------------------- !
-       ! calculate Fe scavenged by particulates
-       ! ----------------------------------------------------- !
-       ! and update local remineralization array to take into account the removal of Fe from solution
-       if (loc_scav_Fe_k_tot > const_real_nullsmall) then
-          if (sed_select(is_POM_Fe)) then
-             dum_bio_part(is2l(is_POM_Fe))   = &
-                  & dum_bio_part(is2l(is_POM_Fe)) + (loc_scav_Fe_k_POC/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_CaCO3_Fe)) then
-             dum_bio_part(is2l(is_CaCO3_Fe)) = &
-                  & dum_bio_part(is2l(is_CaCO3_Fe)) + (loc_scav_Fe_k_CaCO3/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_opal_Fe)) then
-             dum_bio_part(is2l(is_opal_Fe))  = &
-                  & dum_bio_part(is2l(is_opal_Fe)) + (loc_scav_Fe_k_opal/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_det_Fe)) then
-             dum_bio_part(is2l(is_det_Fe))   = &
-                  & dum_bio_part(is2l(is_det_Fe)) + (loc_scav_Fe_k_det/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          ! -------------------------------------------------- ! set output [Fe]
-          fun_box_scav_Fe = loc_scav_dFe_tot
-       end if
+    ! NOTE: the scavenging model of Parekh et al. [2005] follows Honeyman et al. [1988]
+    !       in this, the scavenging rate (day-1) is equal to tau*Rf(Cp)**phi, where Rf = 0.0791 l mg-1 day-1 and phi = 0.58
+    !       becasue Cp is in units of mg l-1, dum_PART must be converted from mol kg-1 == conv_g_mg*conv_POC_mol_g/conv_kg_l
+    !       par_scav_Fe_sf_POC scales for Fe scavening vs. Th and is a tuned parameter ... (value 0.2 in Parekh et al. [2005])
+    if (dum_PART > const_real_nullsmall) then
+       SELECT CASE (trim(opt_bio_Fe_scav))
+       CASE ('Dutkiewicz')
+          ! -------------------------------------------------- ! calculate scavenging following Dutkiewicz et al. [2005]
+                                                               ! NOTE: here we just use the time-step as part conc is not involved
+          loc_scav_dFe = dum_dtyr*par_scav_Fe_k0*dum_ocn_Fe
+       CASE ('Parekh')
+          ! -------------------------------------------------- ! calculate scavenging following Parekh et al. [2005]
+          loc_part_den = (conv_g_mg*conv_POC_mol_g*dum_PART/conv_kg_l) * dum_dt_scav/dum_dtyr
+          loc_scav_dFe = dum_dtyr*par_scav_Fe_sf_POC*par_scav_Fe_k0*(loc_part_den**par_scav_Fe_exp)*dum_ocn_Fe
+       case default
+          ! -------------------------------------------------- ! remove all Fe (limited by reactant depletion rule later)
+          loc_scav_dFe = dum_ocn_Fe
+       end select
+       ! ----------------------------------------------------- ! set output [Fe]
+       ! cap Fe scavenging at maximum of available Fe
+       fun_box_scav_Fe = MIN(loc_scav_dFe,loc_f*dum_ocn_Fe)
        ! ----------------------------------------------------- !
     end if
     ! -------------------------------------------------------- !
@@ -4220,122 +3956,8 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! Calculate Fe scavenging
-  ! *** NEW TRACER NOTATION -- NOT USED YET ... ***
-  ! NOTE: pass in [TDFe] rather than [Fe] if using new Fe scheme
-  ! NOTE: allow remin array for [Fe] to be written to, but correct later (to [TDFe]) outside of subroutine
-  SUBROUTINE sub_box_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_bio_part,dum_bio_remin)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    REAL,INTENT(in)::dum_dtyr
-    REAL,INTENT(in)::dum_dt_scav
-    REAL,INTENT(in)::dum_ocn_Fe
-    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
-    real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    real::loc_scav_Fe_k_POC,loc_scav_Fe_k_CaCO3,loc_scav_Fe_k_opal,loc_scav_Fe_k_det
-    real::loc_scav_Fe_k_tot
-    real::loc_scav_dFe_tot
-    real::loc_part_den_POC,loc_part_den_CaCO3,loc_part_den_opal,loc_part_den_det
-    real::loc_part_den_tot
-    ! -------------------------------------------------------- !
-    ! CALCULATE Fe SCAVENGING
-    ! -------------------------------------------------------- !
-    ! NOTE: residence time in each ocean layer must be estimated for the Parekh et al. [2005] model,
-    !       with dum_bio_part passed in units of mol kg-1 for a specific cell
-    !       BUT the mass this represents is actually spread across multiple cells during each time step
-    !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
-    !       => normalize by the fraction of time spent in that cell during the time-step
-    !          = residence time / time-step
-    !            (could also be: cell thickness / (time-step x local velocity))
-    ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
-    if (sed_select(is_POM_Fe)) then
-       loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is2l(is_POC))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_POC = 0.0
-    end if
-    if (sed_select(is_CaCO3_Fe)) then
-       loc_part_den_CaCO3 = (conv_g_mg*conv_cal_mol_g*dum_bio_part(is2l(is_CaCO3))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_CaCO3 = 0.0
-    end if
-    if (sed_select(is_opal_Fe)) then
-       loc_part_den_opal  = (conv_g_mg*conv_opal_mol_g*dum_bio_part(is2l(is_opal))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_opal  = 0.0
-    end if
-    if (sed_select(is_det_Fe)) then
-       loc_part_den_det   = (conv_g_mg*conv_det_mol_g*dum_bio_part(is2l(is_det))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_det   = 0.0
-    end if
-    loc_part_den_tot = loc_part_den_POC + loc_part_den_CaCO3 + loc_part_den_opal + loc_part_den_det
-    if (loc_part_den_tot > const_real_nullsmall) then
-       if (ctrl_bio_Fe_fixedKscav) then
-          ! -------------------------------------------------- !
-          ! calculate scavenging following Dutkiewicz et al. [2005]
-          ! -------------------------------------------------- !
-          ! -------------------------------------------------- ! net scavenging rate
-          loc_scav_Fe_k_tot = par_scav_Fe_ks
-          ! -------------------------------------------------- ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC = (loc_part_den_POC/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_CaCO3 = (loc_part_den_CaCO3/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_opal = (loc_part_den_opal/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_det = (loc_part_den_det/loc_part_den_tot)*loc_scav_Fe_k_tot
-          ! -------------------------------------------------- ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       else
-          ! -------------------------------------------------- !
-          ! calculate scavenging following Parekh et al. [2005]
-          ! -------------------------------------------------- !
-          ! -------------------------------------------------- ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC   = par_scav_Fe_sf_POC*par_scav_Fe_k0*loc_part_den_POC**par_scav_Fe_exp
-          loc_scav_Fe_k_CaCO3 = par_scav_Fe_sf_CaCO3*par_scav_Fe_k0*loc_part_den_CaCO3**par_scav_Fe_exp
-          loc_scav_Fe_k_opal  = par_scav_Fe_sf_opal*par_scav_Fe_k0*loc_part_den_opal**par_scav_Fe_exp
-          loc_scav_Fe_k_det   = par_scav_Fe_sf_det*par_scav_Fe_k0*loc_part_den_det**par_scav_Fe_exp
-          ! -------------------------------------------------- ! net scavenging rate
-          loc_scav_Fe_k_tot = loc_scav_Fe_k_POC + loc_scav_Fe_k_CaCO3 + loc_scav_Fe_k_opal + loc_scav_Fe_k_det
-          ! -------------------------------------------------- ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       end if
-       ! ----------------------------------------------------- !
-       ! calculate Fe scavenged by particulates
-       ! ----------------------------------------------------- !
-       ! and update local remineralization array to take into account the removal of Fe from solution
-       if (loc_scav_Fe_k_tot > const_real_nullsmall) then
-          if (sed_select(is_POM_Fe)) then
-             dum_bio_part(is2l(is_POM_Fe))   = &
-                  & dum_bio_part(is2l(is_POM_Fe)) + (loc_scav_Fe_k_POC/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_CaCO3_Fe)) then
-             dum_bio_part(is2l(is_CaCO3_Fe)) = &
-                  & dum_bio_part(is2l(is_CaCO3_Fe)) + (loc_scav_Fe_k_CaCO3/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_opal_Fe)) then
-             dum_bio_part(is2l(is_opal_Fe))  = &
-                  & dum_bio_part(is2l(is_opal_Fe)) + (loc_scav_Fe_k_opal/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_det_Fe)) then
-             dum_bio_part(is2l(is_det_Fe))   = &
-                  & dum_bio_part(is2l(is_det_Fe)) + (loc_scav_Fe_k_det/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          ! -------------------------------------------------- ! write removal of [Fe] to remin array
-          dum_bio_remin(io2l(io_Fe)) = dum_bio_remin(io2l(io_Fe)) - loc_scav_dFe_tot
-       end if
-       ! ----------------------------------------------------- !
-    end if
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_scav_Fe
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! Calculate Fe scavenging
   ! *** OLD TRACER NOTATION ***
+  ! NOTE: not upgraded for either is_FeOOH nor 56Fe
   SUBROUTINE sub_calc_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_bio_part,dum_bio_remin)
     ! dummy arguments
     REAL,INTENT(in)::dum_dtyr
@@ -4358,6 +3980,9 @@ CONTAINS
     !       => normalize by the fraction of time spent in that cell during the time-step
     !          = residence time / time-step
     !            (could also be: cell thickness / (time-step x local velocity))
+    !       -> note that ultimately, dum_dtyr/dum_dtyr cancel out leaving the residence time dum_dtyr
+    !          (this could then be simplified, but it is easier(?) to see how things pan out with the effective
+    !           particle concentration adjusted up-front by dum_dt_scav/dum_dtyr)
     ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
     if (sed_select(is_POM_Fe)) then
        loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is_POC)/conv_kg_l) * dum_dt_scav/dum_dtyr
@@ -4420,6 +4045,60 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! Calculate Os scavenging
+  SUBROUTINE sub_box_scav_Os(dum_dtyr,dum_dt_scav, &
+       & dum_ocn_Os,dum_ocn_Os_187Os,dum_ocn_Os_188Os,dum_ocn_O2,dum_bio_part,dum_bio_remin)
+    ! dummy arguments
+    REAL,INTENT(in)::dum_dtyr
+    REAL,INTENT(in)::dum_dt_scav
+    REAL,INTENT(in)::dum_ocn_Os,dum_ocn_Os_187Os,dum_ocn_Os_188Os,dum_ocn_O2
+    real,dimension(n_sed),INTENT(inout)::dum_bio_part
+    real,dimension(n_ocn),INTENT(inout)::dum_bio_remin
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::loc_Os,loc_Os_187Os,loc_Os_188Os
+    real::loc_Os_scavenging,loc_Os_187Os_scavenging,loc_Os_188Os_scavenging
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- ! set local solutes
+    loc_Os = dum_ocn_Os
+    loc_Os_187Os = dum_ocn_Os_187Os
+    loc_Os_188Os = dum_ocn_Os_188Os
+    ! -------------------------------------------------------- !
+    ! CALCULATE Os SCAVENGING
+    ! -------------------------------------------------------- !
+    ! estimate Os scavenging
+    ! NOTE: select if scavenging should be dependent on ambient O2 concentration.
+    !       If yes, Os is only scavenged below an adjustable O2 threshold.
+    if ((ctrl_Os_scav_O2_dep) .and. (dum_ocn_O2 < par_scav_Os_O2_threshold)) then
+       loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*dum_dt_scav*dum_bio_part(is2l(is_POC))
+    elseif (.not. ctrl_Os_scav_O2_dep) then
+       loc_Os_scavenging = par_bio_remin_kOstoPOMOS*loc_Os*dum_dt_scav*dum_bio_part(is2l(is_POC))
+    else
+       loc_Os_scavenging = 0.0
+    end if
+    ! Assume no isotopic fractionation during scavenging
+    loc_Os_187Os_scavenging = loc_Os_187Os*loc_Os_scavenging/loc_Os
+    loc_Os_188Os_scavenging = loc_Os_188Os*loc_Os_scavenging/loc_Os
+    ! implement scavenging
+    dum_bio_remin(io2l(io_Os))          = dum_bio_remin(io2l(io_Os)) - loc_Os_scavenging
+    dum_bio_remin(io2l(io_Os_187Os))    = dum_bio_remin(io2l(io_Os_187Os)) - loc_Os_187Os_scavenging
+    dum_bio_remin(io2l(io_Os_188Os))    = dum_bio_remin(io2l(io_Os_188Os)) - loc_Os_188Os_scavenging
+    dum_bio_part(is2l(is_POM_Os))       = dum_bio_part(is2l(is_POM_Os)) + loc_Os_scavenging
+    dum_bio_part(is2l(is_POM_Os_187Os)) = dum_bio_part(is2l(is_POM_Os_187Os)) + loc_Os_187Os_scavenging
+    dum_bio_part(is2l(is_POM_Os_188Os)) = dum_bio_part(is2l(is_POM_Os_188Os)) + loc_Os_188Os_scavenging
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_scav_Os
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! Calculate H2S scavenging
   SUBROUTINE sub_box_scav_H2S(dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
     ! dummy arguments
@@ -4432,8 +4111,17 @@ CONTAINS
     ! local variables
     real::loc_H2S,loc_part_den_POCl
     real::loc_H2S_scavenging
+    real::loc_dt
 
     ! *** Calculate H2S scavenging ***
+    ! set local residence time in layer
+    ! NOTE: the residence time should have been: dum_dtyr*(dum_dt_scav/dum_dtyr) == dum_dt_scav
+    !       as per the Fe scavenging scheme (I know ... confusing ...)
+    if (ctrl_scav_H2S_dt_old) then
+       loc_dt = dum_dt_scav*(dum_dt_scav/dum_dtyr)
+    else
+       loc_dt = dum_dt_scav
+    end if
     ! set local variables
     loc_H2S = dum_ocn_H2S
     ! density of labile POC
@@ -4448,8 +4136,7 @@ CONTAINS
        ! NOTE: the concentration that dum_bio_part represents is actually spread across multiple cells during each time step
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
-       loc_H2S_scavenging = dum_dt_scav*par_bio_remin_kH2StoSO4*loc_H2S*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
-       loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
+       loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoSO4*loc_H2S*loc_part_den_POCl
        !       print*, 'oxidationanalogue, par_bio_remin_kH2StoSO4 ', par_bio_remin_kH2StoSO4
        !       print*, 'loc_H2S, loc_H2S_scavenging', loc_H2S, loc_H2S_scavenging
     CASE ('kinetic')
@@ -4459,121 +4146,27 @@ CONTAINS
        ! NOTE: the concentration that dum_bio_part represents is actually spread across multiple cells during each time step
        !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
        !       => normalize by the fraction of time spent in that cell during the time-step (== residence time / time-step)
-       loc_H2S_scavenging = dum_dt_scav*par_bio_remin_kH2StoPOMS*loc_H2S*(dum_dt_scav/dum_dtyr)*loc_part_den_POCl
-       loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
+       loc_H2S_scavenging = loc_dt*par_bio_remin_kH2StoPOMS*loc_H2S*loc_part_den_POCl
     CASE ('complete')
        loc_H2S_scavenging = min(loc_part_den_POCl,loc_H2S)
     case default
        !        print*, 'No sulphurization '
        loc_H2S_scavenging = 0.0
     end select
-    ! implement scavenging
-    ! NOTE: is_POC_frac2 should not end up with a value exceeding 1.0
+    ! cap scavenging
+    loc_H2S_scavenging = min(loc_H2S_scavenging,loc_part_den_POCl,loc_H2S)
     if (loc_H2S_scavenging < const_real_nullsmall) loc_H2S_scavenging = 0.0
+    ! bulk tracer conversion
+    ! NOTE: is_POC_frac2 should not end up with a value exceeding 1.0
     dum_bio_remin(io2l(io_H2S))      = dum_bio_remin(io2l(io_H2S)) - loc_H2S_scavenging
     dum_bio_part(is2l(is_POM_S))     = dum_bio_part(is2l(is_POM_S)) + loc_H2S_scavenging
     dum_bio_part(is2l(is_POC_frac2)) = dum_bio_part(is2l(is_POC_frac2)) + loc_H2S_scavenging/dum_bio_part(is2l(is_POC))
     if (dum_bio_part(is2l(is_POC_frac2)) > 1.1) stop
     if (dum_bio_part(is2l(is_POC_frac2)) > 1.0) dum_bio_part(is2l(is_POC_frac2)) = 1.0
-    ! -------------------------------------------------------- ! record diagnostics (mol kg-1) OLD
-    diag_geochem(idiag_geochem_dH2S_POMS,dum_i,dum_j,dum_k) = loc_H2S_scavenging
+    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
+    diag_react(idiag_react_POMS_dH2S,dum_i,dum_j,dum_k) = loc_H2S_scavenging
 
   end SUBROUTINE sub_box_scav_H2S
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CORRECT SPURIOUS NEGATIVE [H2S]
-  SUBROUTINE sub_calc_bio_remin_fix_H2S(loc_ocn)
-    ! dummy arguments
-    real,INTENT(inout),dimension(n_ocn)::loc_ocn
-    ! fix [H2S]
-    if (loc_ocn(io_H2S) < const_real_zero) then
-       loc_ocn(io_SO4) = loc_ocn(io_SO4) + loc_ocn(io_H2S)
-       loc_ocn(io_O2)  = loc_ocn(io_O2) - 2.0*loc_ocn(io_H2S)
-       loc_ocn(io_ALK) = loc_ocn(io_ALK) - 2.0*loc_ocn(io_H2S)
-       loc_ocn(io_H2S) = 0.0
-    end if
-    ! also fix [O2]
-    if (loc_ocn(io_O2) < const_real_zero) then
-       loc_ocn(io_SO4) = loc_ocn(io_SO4) + 0.5*loc_ocn(io_O2)
-       loc_ocn(io_ALK) = loc_ocn(io_ALK) - loc_ocn(io_O2)
-       loc_ocn(io_H2S) = loc_ocn(io_H2S) - 0.5*loc_ocn(io_O2)
-       loc_ocn(io_O2)  = 0.0
-    end if
-  end SUBROUTINE sub_calc_bio_remin_fix_H2S
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CORRECT SPURIOUS NEGATIVE [NH4]
-  SUBROUTINE sub_calc_bio_remin_fix_NH4(loc_ocn)
-    ! dummy arguments
-    real,INTENT(inout),dimension(n_ocn)::loc_ocn
-    ! fix [NH4]
-    if (loc_ocn(io_NH4) < const_real_zero) then
-       loc_ocn(io_NO3) = loc_ocn(io_NO3) + loc_ocn(io_NH4)
-       loc_ocn(io_O2)  = loc_ocn(io_O2) - 2.0*loc_ocn(io_NH4)
-       loc_ocn(io_ALK) = loc_ocn(io_ALK) - 2.0*loc_ocn(io_NH4)
-       loc_ocn(io_NH4) = 0.0
-    end if
-  end SUBROUTINE sub_calc_bio_remin_fix_NH4
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! BRINE REJECTION MECHANISM
-  SUBROUTINE sub_calc_misc_brinerejection(dum_dtyr,dum_i,dum_j,dum_fT,dum_fS)
-    ! dummy arguments
-    real,intent(in)::dum_dtyr                                      !
-    INTEGER,INTENT(in)::dum_i,dum_j                                !
-    real,INTENT(inout)::dum_fT,dum_fS                              !
-    ! local variables
-    integer::l,io                                                  !
-    integer::loc_k1                                                ! local topography
-    real::loc_dV,loc_rM,loc_frac                                   !
-    real,dimension(n_ocn,n_k)::loc_bio_remin                       !
-
-    ! *** BLAH ***
-    ! set local constants
-    loc_k1 = goldstein_k1(dum_i,dum_j)
-    loc_dV = phys_ocnatm(ipoa_seaice_dV,dum_i,dum_j)
-    loc_rM = phys_ocn(ipo_M,dum_i,dum_j,n_k)/phys_ocn(ipo_M,dum_i,dum_j,loc_k1)
-    ! initialize variables
-    dum_fT = 0.0
-    dum_fS = 0.0
-    loc_bio_remin(:,:) = 0.0
-
-    ! *** BLAH ***
-    ! carry out brine transfer from surface to depth
-    if ((loc_dV > const_real_nullsmall) .AND. (dum_j <= par_misc_brinerejection_jmax)) then
-       ! calculate fractional volume transfer of tracers from surface to benthic cell
-       loc_frac = par_misc_brinerejection_frac* &
-            & (const_rho_seaice/phys_ocn(ipo_rho,dum_i,dum_j,n_k))*(loc_dV/phys_ocn(ipo_V,dum_i,dum_j,n_k))
-       ! calculate T,S fluxes
-       dum_fT = 0.0
-       dum_fS = loc_frac*ocn(io_S,dum_i,dum_j,n_k)*phys_ocn(ipo_M,dum_i,dum_j,n_k)/dum_dtyr
-       if (ctrl_misc_brinerejection_bgc) then
-          ! calculate biogeochem tracer concentration changes
-          DO l=3,n_l_ocn
-             io = conv_iselected_io(l)
-             loc_bio_remin(io,n_k)    = -loc_frac*ocn(io,dum_i,dum_j,n_k)
-             loc_bio_remin(io,loc_k1) = -loc_rM*loc_bio_remin(io,n_k)
-          end DO
-       end if
-    end if
-
-    ! *** WRITE DATA ***
-    ! write ocean tracer remineralization field (global array)
-    DO l=3,n_l_ocn
-       io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
-    end do
-!!$    ! record diagnostics
-!!$    diag_geochem(idiag_geochem_ammox_dNH4,dum_i,dum_j,:) = loc_bio_remin(io_NH4,:)
-!!$    diag_geochem(idiag_geochem_ammox_dNO3,dum_i,dum_j,:) = loc_bio_remin(io_NO3,:)
-
-  end SUBROUTINE sub_calc_misc_brinerejection
   ! ****************************************************************************************************************************** !
 
 
@@ -4733,6 +4326,13 @@ CONTAINS
                 CASE (0,1)
                    force_flux_locn(loc_l,i,j,k) = force_flux_ocn_sig_x(dum_io)*force_flux_locn(loc_l,i,j,k)*loc_force_flux_ocn_rtot
                 end SELECT
+                ! Calculate Os isotope flux forcings
+                if (dum_io == io_Os) then
+                   loc_tot  = force_flux_locn(conv_io_lselected(io_Os),i,j,k) &
+                                  & /(1.0+force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)+force_flux_ocn_sig_x(io_Os_188Os))
+                   force_flux_locn(conv_io_lselected(io_Os_187Os),i,j,k) = force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
+                   force_flux_locn(conv_io_lselected(io_Os_188Os),i,j,k) = force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
+                end if
              END DO
           END DO
        END DO
@@ -4910,6 +4510,7 @@ CONTAINS
     END DO
     ! normalize flux forcings (if selected) so that the total flux is equal to the magnitude (at the current time step)
     ! defined in the forcing signal file
+    ! NOTE: add det tracer to normalization
     IF (force_flux_sed_scale(dum_is)) THEN
        if (abs(loc_force_flux_sed_tot) > const_real_nullsmall) then
           loc_force_flux_sed_rtot = 1.0/loc_force_flux_sed_tot
@@ -4919,13 +4520,149 @@ CONTAINS
        DO i=1,n_i
           DO j=1,n_j
              SELECT CASE (sed_type(dum_is))
-             CASE (par_sed_type_bio)
+             CASE (par_sed_type_bio,par_sed_type_abio)
                 force_flux_sed(dum_is,i,j) = force_flux_sed(dum_is,i,j)*force_flux_sed_sig_x(dum_is)*loc_force_flux_sed_rtot
              end SELECT
           END DO
        END DO
     END IF
   END SUBROUTINE sub_update_force_flux_sed
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! MISCELLANEOUS FORCING
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! MISCELLANEOUS GEOCHEMICAL TRANSFORMATIONS
+  SUBROUTINE sub_box_misc_geochem(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    integer::l,io,k
+    integer::loc_l_min,loc_l_max,loc_k
+    real::loc_flux
+    real,dimension(n_ocn,n_k)::loc_bio_remin
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    if (ctrl_force_GOLDSTEInTS .OR. (n_l_ocn < 3)) then
+       loc_l_min = 1
+       if (ctrl_force_GOLDSTEInTSonly) then
+          loc_l_max = 2
+       else
+          loc_l_max = n_l_ocn
+       endif
+    else
+       loc_l_min = 3
+       loc_l_max = n_l_ocn
+       if (ctrl_misc_geoeng_noDIC) loc_l_min = 4
+    endif
+    ! initialize remineralization tracer arrays
+    DO l=loc_l_min,loc_l_max
+       io = conv_iselected_io(l)
+       loc_bio_remin(io,:) = 0.0
+    end do
+    ! -------------------------------------------------------- !
+    ! GEOENGINEERING
+    ! -------------------------------------------------------- !
+    IF ((trim(opt_misc_geoeng) /= 'NONE') .AND. (par_misc_kmin_pipe < n_k)) THEN
+       select case (opt_misc_geoeng)
+       case('pipes')
+          ! -------------------------------------------------- ! initialize
+          ! NOTE: flux in units of m-3 per time step (rather than in kg units)
+          loc_flux = dum_dtyr*par_misc_2D_scale*par_misc_2D(dum_i,dum_j)
+          ! set source k level
+          ! NOTE: cap at deepest ocean level
+          loc_k = par_misc_kmin_pipe
+          if (loc_k < dum_k1) loc_k = dum_k1
+          DO l=loc_l_min,loc_l_max
+             io = conv_iselected_io(l)
+             loc_bio_remin(io,n_k) = loc_bio_remin(io,n_k) + &
+                  & loc_flux*ocn(io,dum_i,dum_j,loc_k)/phys_ocn(ipo_V,dum_i,dum_j,n_k) - &
+                  & loc_flux*ocn(io,dum_i,dum_j,n_k)/phys_ocn(ipo_V,dum_i,dum_j,n_k)
+             DO k=n_k-1,loc_k,-1
+                loc_bio_remin(io,k) = loc_bio_remin(io,k) + &
+                     & loc_flux*ocn(io,dum_i,dum_j,k+1)/phys_ocn(ipo_V,dum_i,dum_j,k) - &
+                     & loc_flux*ocn(io,dum_i,dum_j,k)/phys_ocn(ipo_V,dum_i,dum_j,k)
+             end do
+          end do
+       case default
+          ! -------------------------------------------------- ! nothing doing ...
+       end select
+    end IF
+    ! -------------------------------------------------------- !
+    ! WRITE GLOBAL ARRAY DATA
+    ! -------------------------------------------------------- !
+    ! write ocean tracer remineralization field (global array)
+    DO l=loc_l_min,loc_l_max
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
+    end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_misc_geochem
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! BRINE REJECTION MECHANISM
+  SUBROUTINE sub_calc_misc_brinerejection(dum_dtyr,dum_i,dum_j,dum_fT,dum_fS)
+    ! dummy arguments
+    real,intent(in)::dum_dtyr                                      !
+    INTEGER,INTENT(in)::dum_i,dum_j                                !
+    real,INTENT(inout)::dum_fT,dum_fS                              !
+    ! local variables
+    integer::l,io                                                  !
+    integer::loc_k1                                                ! local topography
+    real::loc_dV,loc_rM,loc_frac                                   !
+    real,dimension(n_ocn,n_k)::loc_bio_remin                       !
+
+    ! *** BLAH ***
+    ! set local constants
+    loc_k1 = goldstein_k1(dum_i,dum_j)
+    loc_dV = phys_ocnatm(ipoa_seaice_dV,dum_i,dum_j)
+    loc_rM = phys_ocn(ipo_M,dum_i,dum_j,n_k)/phys_ocn(ipo_M,dum_i,dum_j,loc_k1)
+    ! initialize variables
+    dum_fT = 0.0
+    dum_fS = 0.0
+    loc_bio_remin(:,:) = 0.0
+
+    ! *** BLAH ***
+    ! carry out brine transfer from surface to depth
+    if ((loc_dV > const_real_nullsmall) .AND. (dum_j <= par_misc_brinerejection_jmax)) then
+       ! calculate fractional volume transfer of tracers from surface to benthic cell
+       loc_frac = par_misc_brinerejection_frac* &
+            & (const_rho_seaice/phys_ocn(ipo_rho,dum_i,dum_j,n_k))*(loc_dV/phys_ocn(ipo_V,dum_i,dum_j,n_k))
+       ! calculate T,S fluxes
+       dum_fT = 0.0
+       dum_fS = loc_frac*ocn(io_S,dum_i,dum_j,n_k)*phys_ocn(ipo_M,dum_i,dum_j,n_k)/dum_dtyr
+       if (ctrl_misc_brinerejection_bgc) then
+          ! calculate biogeochem tracer concentration changes
+          DO l=3,n_l_ocn
+             io = conv_iselected_io(l)
+             loc_bio_remin(io,n_k)    = -loc_frac*ocn(io,dum_i,dum_j,n_k)
+             loc_bio_remin(io,loc_k1) = -loc_rM*loc_bio_remin(io,n_k)
+          end DO
+       end if
+    end if
+
+    ! *** WRITE DATA ***
+    ! write ocean tracer remineralization field (global array)
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
+    end do
+
+  end SUBROUTINE sub_calc_misc_brinerejection
   ! ****************************************************************************************************************************** !
 
 
@@ -4945,12 +4682,10 @@ CONTAINS
     real,dimension(n_sed,n_i,n_j,n_k)::loc_bio_part
     real,dimension(n_ocn,n_i,n_j,n_k)::loc_bio_part_ocn
     real,dimension(n_ocn,n_i,n_j,n_k)::loc_ocn
-    real,dimension(n_ocn,n_i,n_j,n_k)::loc_ocn_tot
     ! set local variables
     loc_bio_part(:,:,:,:)     = 0.0
     loc_bio_part_ocn(:,:,:,:) = 0.0
     loc_ocn(:,:,:,:)          = 0.0
-    loc_ocn_tot(:,:,:,:)      = 0.0
     ! set default result
     fun_calc_ocn_tot(:) = 0.0
     ! convert particulate sediment and dissolved organic matter tracer concentrations to (dissolved) tracers
@@ -4991,11 +4726,10 @@ CONTAINS
     ! determine ocean tracer inventory (mol)
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
-       loc_ocn_tot(io,:,:,:) = loc_ocn(io,:,:,:) + loc_bio_part_ocn(io,:,:,:)
-       fun_calc_ocn_tot(io) = sum(phys_ocn(ipo_M,:,:,:)*loc_ocn_tot(io,:,:,:))
+       fun_calc_ocn_tot(io) = sum(phys_ocn(ipo_M,:,:,:)*(loc_ocn(io,:,:,:) + loc_bio_part_ocn(io,:,:,:)))
     end do
     fun_calc_ocn_tot(:) = fun_audit_combinetracer(fun_calc_ocn_tot(:))
-  END function fun_calc_ocn_tot
+  END FUNCTION fun_calc_ocn_tot
   ! ****************************************************************************************************************************** !
 
 
@@ -5068,10 +4802,11 @@ CONTAINS
     !       2NO3- + 2H+ -> N2 + 5/2O2 + H2O <--> 5O2 + 2N2 + 2H2O -> 4NO3- + 4H+
     ! NOTE: ALK changes associayed with NO3- are taken into account in the NO3- budget
     !       => no additional/explicit ALK budgeting w.r.t either N2 or NH4 is required
-    ! NOTE: for O2 -- account for the deficit from reduced forms 
+    ! NOTE: for O2 -- account for the deficit from reduced forms
     !       => do not attempt to implicitly oxidize reduced forms and calculate the resulting O2 deficit
     ! NOTE: for ALK -- count the charges (+vs and -ve)
     !       (excluding PO4)
+    ! NOTE: Fe3 has 1/4 O2 vs. Fe2
     if (ocn_select(io_CH4)) then
        fun_audit_combinetracer(io_DIC) = fun_audit_combinetracer(io_DIC) + dum_ocn(io_CH4)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - 2.0*dum_ocn(io_CH4)
@@ -5081,48 +4816,73 @@ CONTAINS
        fun_audit_combinetracer(io_DIC_13C) = fun_audit_combinetracer(io_DIC_13C) + dum_ocn(io_CH4_13C)
     end if
     fun_audit_combinetracer(io_CH4_13C) = 0.0
-    if (ocn_select(io_PO4)) then
-       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 2.0*dum_ocn(io_PO4)
-    end if
+    !if (ocn_select(io_PO4)) then
+    !   fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 2.0*dum_ocn(io_PO4)
+    !end if
     if (ocn_select(io_NO3)) then
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) + dum_ocn(io_NO3)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + (5.0/4.0)*dum_ocn(io_NO3)
     end if
+    ! io_N2O
     if (ocn_select(io_N2O)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + 2.0*dum_ocn(io_N2O)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 0.5*dum_ocn(io_N2O)
     end if
     fun_audit_combinetracer(io_N2O) = 0.0
+    ! io_N2
     if (ocn_select(io_N2)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + 2.0*dum_ocn(io_N2)
     end if
     fun_audit_combinetracer(io_N2)  = 0.0
+    ! io_NH4
     if (ocn_select(io_NH4)) then
        fun_audit_combinetracer(io_NO3) = fun_audit_combinetracer(io_NO3) + dum_ocn(io_NH4)
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) - dum_ocn(io_NH4)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - (3.0/4.0)*dum_ocn(io_NH4)
     end if
     fun_audit_combinetracer(io_NH4) = 0.0
-    if (ocn_select(io_SO4)) then
-       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  + 2.0*dum_ocn(io_SO4)
-    end if
+    ! io_H2S
     if (ocn_select(io_H2S)) then
        fun_audit_combinetracer(io_ALK) = fun_audit_combinetracer(io_ALK) - 2.0*dum_ocn(io_H2S)
        fun_audit_combinetracer(io_SO4) = fun_audit_combinetracer(io_SO4) + dum_ocn(io_H2S)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - 2.0*dum_ocn(io_H2S)
     end if
     fun_audit_combinetracer(io_H2S) = 0.0
-    if (ocn_select(io_Fe)) then
+    ! io_Fe2
+    if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe)) then
+       fun_audit_combinetracer(io_Fe)  = fun_audit_combinetracer(io_Fe)  + dum_ocn(io_Fe2)
+       fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2)  - (1.0/4.0)*dum_ocn(io_Fe2)
+    end if
+    fun_audit_combinetracer(io_Fe2) = 0.0
+    ! io_FeL
+    if (ocn_select(io_Fe) .AND. ocn_select(io_FeL)) then
        fun_audit_combinetracer(io_Fe)  = fun_audit_combinetracer(io_Fe)  + dum_ocn(io_FeL)
     end if
-    if (ocn_select(io_L)) then
+    if (ocn_select(io_L) .AND. ocn_select(io_FeL)) then
        fun_audit_combinetracer(io_L)   = fun_audit_combinetracer(io_L)   + dum_ocn(io_FeL)
     end if
     fun_audit_combinetracer(io_FeL) = 0.0
+    ! io_I
     if (ocn_select(io_I)) then
        fun_audit_combinetracer(io_IO3) = fun_audit_combinetracer(io_IO3) + dum_ocn(io_I)
        fun_audit_combinetracer(io_O2)  = fun_audit_combinetracer(io_O2) - (3.0/2.0)*dum_ocn(io_I)
     end if
     fun_audit_combinetracer(io_I) = 0.0
+    ! io_H2S_34S
+    if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
+       fun_audit_combinetracer(io_SO4_34S) = fun_audit_combinetracer(io_SO4_34S) + dum_ocn(io_H2S_34S)
+       fun_audit_combinetracer(io_H2S_34S) = 0.0
+    end if
+    ! io_Fe2_56Fe
+    if (ocn_select(io_Fe2_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
+       fun_audit_combinetracer(io_Fe_56Fe)  = fun_audit_combinetracer(io_Fe_56Fe)  + dum_ocn(io_Fe2_56Fe)
+    end if
+    fun_audit_combinetracer(io_Fe2_56Fe) = 0.0
+    ! io_FeL_56Fe
+    if (ocn_select(io_Fe_56Fe) .AND. ocn_select(io_FeL_56Fe)) then
+       fun_audit_combinetracer(io_Fe_56Fe)  = fun_audit_combinetracer(io_Fe_56Fe)  + dum_ocn(io_FeL_56Fe)
+    end if
+    fun_audit_combinetracer(io_FeL_56Fe) = 0.0
     ! #### INSERT CODE FOR FURTHER SPECIAL CASES ################################################################################# !
     !
     ! ############################################################################################################################ !
@@ -5131,7 +4891,7 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! MISCELLANEOUS ROUTINES
+  ! CONVERSION ROUTINES
   ! ****************************************************************************************************************************** !
 
 
@@ -5241,81 +5001,126 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! Copy of GOLDSTEIn overturning streamfunction calculation
-  SUBROUTINE sub_calc_psi(dum_u,dum_opsi,dum_opsia,dum_opsip,dum_zpsi,dum_opsia_minmax,dum_opsip_minmax)
-    ! dummy arguments
-    REAL,INTENT(in),DIMENSION(3,n_i,n_j,n_k)::dum_u
-    REAL,INTENT(out),DIMENSION(0:n_j,0:n_k)::dum_opsi,dum_opsia,dum_opsip,dum_zpsi
-    REAL,INTENT(out),DIMENSION(2)::dum_opsia_minmax,dum_opsip_minmax
-    ! local variables
-    INTEGER::i,j,k
-    REAL::loc_ominp,loc_omaxp
-    REAL::loc_omina,loc_omaxa
-    REAL,DIMENSION(n_j,n_k)::loc_ou,loc_zu
-    REAL,DIMENSION(0:n_j,0:n_k)::loc_opsi,loc_opsia,loc_opsip,loc_zpsi
-    ! Calculate meridional overturning streamfunction opsi on C grid only
-    loc_opsi(:,:)  = 0.0
-    loc_opsia(:,:) = 0.0
-    loc_opsip(:,:) = 0.0
-    DO j=1,n_j-1
-       DO k=1,n_k-1
-          loc_ou(j,k) = 0.0
-          DO i=1,n_i
-             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
-          END DO
-          loc_opsi(j,k) = loc_opsi(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
-       END DO
-    END DO
-    ! Pacific overturning streamfunction
-    loc_ominp = 0.0
-    loc_omaxp = 0.0
-    DO j=goldstein_jsf+1,n_j-1
-       DO k=1,n_k-1
-          loc_ou(j,k) = 0.0
-          DO i=goldstein_ips(j),goldstein_ipf(j)
-             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
-          ENDDO
-          loc_opsip(j,k) = loc_opsip(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
-          IF(loc_opsip(j,k) < loc_ominp) loc_ominp = loc_opsip(j,k)
-          IF(loc_opsip(j,k) > loc_omaxp) loc_omaxp = loc_opsip(j,k)
-       ENDDO
-    ENDDO
-    dum_opsip_minmax(1) = loc_ominp
-    dum_opsip_minmax(2) = loc_omaxp
-    ! Atlantic overturning streamfunction
-    ! NOTE: Atlantic calculation hacked so that only the deeper 1/2 of the maximum is calculated
-    loc_omina = 0.0
-    loc_omaxa = 0.0
-    DO j=goldstein_jsf+1,n_j-1
-       DO k=1,n_k-1
-          loc_ou(j,k) = 0.0
-          DO i=goldstein_ias(j),goldstein_iaf(j)
-             loc_ou(j,k) = loc_ou(j,k) + goldstein_cv(j)*dum_u(2,i,j,k)*goldstein_dphi
-          ENDDO
-          loc_opsia(j,k) = loc_opsia(j,k-1) - goldstein_dz(k)*loc_ou(j,k)
-          IF((loc_opsia(j,k) < loc_omina) .AND. (k <= n_k/2)) loc_omina = loc_opsia(j,k)
-          IF((loc_opsia(j,k) > loc_omaxa) .AND. (k <= n_k/2)) loc_omaxa = loc_opsia(j,k)
-       ENDDO
-    ENDDO
-    dum_opsia_minmax(1) = loc_omina
-    dum_opsia_minmax(2) = loc_omaxa
+  ! USED!
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! Calculate Fe scavenging
+  ! *** NEW TRACER NOTATION -- NOT USED YET ... ***
+  ! NOTE: pass in [TDFe] rather than [Fe] if using new Fe scheme
+  ! NOTE: allow remin array for [Fe] to be written to, but correct later (to [TDFe]) outside of subroutine
+  SUBROUTINE sub_box_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_bio_part,dum_bio_remin)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    REAL,INTENT(in)::dum_dtyr
+    REAL,INTENT(in)::dum_dt_scav
+    REAL,INTENT(in)::dum_ocn_Fe
+    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
+    real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::loc_scav_Fe_k_POC,loc_scav_Fe_k_CaCO3,loc_scav_Fe_k_opal,loc_scav_Fe_k_det
+    real::loc_scav_Fe_k_tot
+    real::loc_scav_dFe_tot
+    real::loc_part_den_POC,loc_part_den_CaCO3,loc_part_den_opal,loc_part_den_det
+    real::loc_part_den_tot
+    ! -------------------------------------------------------- !
+    ! CALCULATE Fe SCAVENGING
+    ! -------------------------------------------------------- !
+    ! NOTE: residence time in each ocean layer must be estimated for the Parekh et al. [2005] model,
+    !       with dum_bio_part passed in units of mol kg-1 for a specific cell
+    !       BUT the mass this represents is actually spread across multiple cells during each time step
+    !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
+    !       => normalize by the fraction of time spent in that cell during the time-step
+    !          = residence time / time-step
+    !            (could also be: cell thickness / (time-step x local velocity))
+    ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
+    if (sed_select(is_POM_Fe)) then
+       loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is2l(is_POC))/conv_kg_l) * dum_dt_scav/dum_dtyr
+    else
+       loc_part_den_POC = 0.0
+    end if
+    if (sed_select(is_CaCO3_Fe)) then
+       loc_part_den_CaCO3 = (conv_g_mg*conv_cal_mol_g*dum_bio_part(is2l(is_CaCO3))/conv_kg_l) * dum_dt_scav/dum_dtyr
+    else
+       loc_part_den_CaCO3 = 0.0
+    end if
+    if (sed_select(is_opal_Fe)) then
+       loc_part_den_opal  = (conv_g_mg*conv_opal_mol_g*dum_bio_part(is2l(is_opal))/conv_kg_l) * dum_dt_scav/dum_dtyr
+    else
+       loc_part_den_opal  = 0.0
+    end if
+    if (sed_select(is_det_Fe)) then
+       loc_part_den_det   = (conv_g_mg*conv_det_mol_g*dum_bio_part(is2l(is_det))/conv_kg_l) * dum_dt_scav/dum_dtyr
+    else
+       loc_part_den_det   = 0.0
+    end if
     !
-    loc_zpsi(:,:) = 0.0
-    DO i=1,n_i-1
-       DO k=1,n_k-1
-          loc_zu(i,k) = 0
-          DO j=1,n_j
-             loc_zu(i,k) = loc_zu(i,k) + dum_u(1,i,j,k)/goldstein_c(j)*goldstein_ds
-          ENDDO
-          loc_zpsi(i,k) = loc_zpsi(i,k-1) - goldstein_dz(k)*loc_zu(i,k)
-       ENDDO
-    ENDDO
-    ! set results arrays
-    dum_opsi(1:n_j,1:n_k)  = loc_opsi(1:n_j,1:n_k)
-    dum_opsia(1:n_j,1:n_k) = loc_opsia(1:n_j,1:n_k)
-    dum_opsip(1:n_j,1:n_k) = loc_opsip(1:n_j,1:n_k)
-    dum_zpsi(1:n_j,1:n_k)  = loc_zpsi(1:n_j,1:n_k)
-  END SUBROUTINE sub_calc_psi
+    loc_part_den_tot = loc_part_den_POC + loc_part_den_CaCO3 + loc_part_den_opal + loc_part_den_det
+    !
+    if (loc_part_den_tot > const_real_nullsmall) then
+       if (ctrl_bio_Fe_fixedKscav) then
+          ! -------------------------------------------------- !
+          ! calculate scavenging following Dutkiewicz et al. [2005]
+          ! -------------------------------------------------- !
+          ! -------------------------------------------------- ! net scavenging rate
+          loc_scav_Fe_k_tot = par_scav_Fe_ks
+          ! -------------------------------------------------- ! particle-specific scavenging rates
+          loc_scav_Fe_k_POC = (loc_part_den_POC/loc_part_den_tot)*loc_scav_Fe_k_tot
+          loc_scav_Fe_k_CaCO3 = (loc_part_den_CaCO3/loc_part_den_tot)*loc_scav_Fe_k_tot
+          loc_scav_Fe_k_opal = (loc_part_den_opal/loc_part_den_tot)*loc_scav_Fe_k_tot
+          loc_scav_Fe_k_det = (loc_part_den_det/loc_part_den_tot)*loc_scav_Fe_k_tot
+          ! -------------------------------------------------- ! calculate total Fe scavenged
+          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
+       else
+          ! -------------------------------------------------- !
+          ! calculate scavenging following Parekh et al. [2005]
+          ! -------------------------------------------------- !
+          ! -------------------------------------------------- ! particle-specific scavenging rates
+          loc_scav_Fe_k_POC   = par_scav_Fe_sf_POC*par_scav_Fe_k0*loc_part_den_POC**par_scav_Fe_exp
+          loc_scav_Fe_k_CaCO3 = par_scav_Fe_sf_CaCO3*par_scav_Fe_k0*loc_part_den_CaCO3**par_scav_Fe_exp
+          loc_scav_Fe_k_opal  = par_scav_Fe_sf_opal*par_scav_Fe_k0*loc_part_den_opal**par_scav_Fe_exp
+          loc_scav_Fe_k_det   = par_scav_Fe_sf_det*par_scav_Fe_k0*loc_part_den_det**par_scav_Fe_exp
+          ! -------------------------------------------------- ! net scavenging rate
+          loc_scav_Fe_k_tot = loc_scav_Fe_k_POC + loc_scav_Fe_k_CaCO3 + loc_scav_Fe_k_opal + loc_scav_Fe_k_det
+          ! -------------------------------------------------- ! calculate total Fe scavenged
+          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
+       end if
+       ! ----------------------------------------------------- !
+       ! calculate Fe scavenged by particulates
+       ! ----------------------------------------------------- !
+       ! and update local remineralization array to take into account the removal of Fe from solution
+       if (loc_scav_Fe_k_tot > const_real_nullsmall) then
+          if (sed_select(is_POM_Fe)) then
+             dum_bio_part(is2l(is_POM_Fe)) = &
+                  & dum_bio_part(is2l(is_POM_Fe)) + (loc_scav_Fe_k_POC/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
+          end if
+          if (sed_select(is_CaCO3_Fe)) then
+             dum_bio_part(is2l(is_CaCO3_Fe)) = &
+                  & dum_bio_part(is2l(is_CaCO3_Fe)) + (loc_scav_Fe_k_CaCO3/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
+          end if
+          if (sed_select(is_opal_Fe)) then
+             dum_bio_part(is2l(is_opal_Fe))  = &
+                  & dum_bio_part(is2l(is_opal_Fe)) + (loc_scav_Fe_k_opal/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
+          end if
+          if (sed_select(is_det_Fe)) then
+             dum_bio_part(is2l(is_det_Fe))   = &
+                  & dum_bio_part(is2l(is_det_Fe)) + (loc_scav_Fe_k_det/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
+          end if
+          ! -------------------------------------------------- ! write removal of [Fe] to remin array
+          dum_bio_remin(io2l(io_Fe)) = dum_bio_remin(io2l(io_Fe)) - loc_scav_dFe_tot
+       end if
+       ! ----------------------------------------------------- ! 56Fe
+       !!!
+       ! ----------------------------------------------------- !
+    end if
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_scav_Fe
   ! ****************************************************************************************************************************** !
 
 

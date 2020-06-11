@@ -83,7 +83,7 @@ c     ==================================================================
 c     *** BIOGEM model - START
       if (flag_biogem) then
          call initialise_biogem_wrapper
-ccc         call biogem_climate_wrapper
+         call biogem_climate_wrapper
          call biogem_tracercoupling_wrapper
       endif
 c     ==================================================================
@@ -547,9 +547,8 @@ c           => force t-series save
      &              then
                   if (debug_loop.gt.2) PRINT*,'>>> BIOGEM @ ',
      &                 koverall,conv_kocn_kbiogem*kocn_loop
-ccc THIS MOSTLY FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM,
-ccc BUT NEEDS BIOGEM TEST REPLACING (AND *CARE* TAKEN)
-                  if (koverall.eq.(conv_kocn_kbiogem*kocn_loop))
+ccc THIS MOSTLY FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM
+                  if (koverall.eq.(conv_kocn_kbiogem*kocn_loop)) 
      &                 call biogem_climate_sol_wrapper
                   if (flag_ecogem) call diag_biogem_ecogem_wrapper ! extract ECOGEM diagnostics
                   call biogem_forcing_wrapper
@@ -558,9 +557,7 @@ ccc BUT NEEDS BIOGEM TEST REPLACING (AND *CARE* TAKEN)
                   call biogem_climate_wrapper 
                   if (debug_loop.gt.2) PRINT*,'<<<'
                   if (mod(koverall,conv_kocn_korb*kocn_loop).eq.0)
-     &                 then
-                     call diag_biogem_rec_orb_wrapper
-                  endif
+     &                 call diag_biogem_rec_orb_wrapper
                   call diag_biogem_timeslice_wrapper
                   if (flag_ecogem) call diag_ecogem_timeslice_wrapper ! save and write ECOGEM timeslice data after BIOGEM
                   if (flag_gemlite.and.(gem_switch.ne.0)) then
@@ -569,8 +566,8 @@ ccc BUT NEEDS BIOGEM TEST REPLACING (AND *CARE* TAKEN)
                      call diag_biogem_timeseries_wrapper
                   end if
                   call cpl_flux_ocnatm_wrapper
-                  if (flag_sedgem) call cpl_flux_ocnsed_wrapper
-                  if (flag_sedgem) call cpl_comp_ocnsed_wrapper
+                  call cpl_flux_ocnsed_wrapper
+                  call cpl_comp_ocnsed_wrapper
                   if (flag_rokgem) call reinit_flux_rokocn_wrapper
                   if (debug_loop.gt.0) call diag_biogem_wrapper
 c     If GEMlite: test for the end of the 1st (normal) part of cycle

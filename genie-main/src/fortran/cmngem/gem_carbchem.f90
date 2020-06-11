@@ -333,7 +333,7 @@ CONTAINS
     REAL,DIMENSION(n_carb),INTENT(inout)::dum_carb
     REAL,DIMENSION(n_carbalk),INTENT(inout)::dum_carbalk
     ! local variables
-    INTEGER::n
+    INTEGER::n,m
     real::loc_OH,loc_H3SiO4,loc_H4BO4,loc_HSO4,loc_HF,loc_H3PO4,loc_H2PO4,loc_HPO4,loc_PO4,loc_HS,loc_NH3
     REAL::loc_zed
     REAL::loc_ALK_DIC,loc_conc_CO2,loc_conc_CO3,loc_conc_HCO3
@@ -342,6 +342,7 @@ CONTAINS
     real::loc_r
     ! initialize loop variables
     n = 1
+    m = 1
     loc_H = dum_carb(ic_H)
     loc_HF = 0.0
     loc_HS = 0.0
@@ -401,9 +402,15 @@ CONTAINS
             & loc_H_p3/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) &
             & )
        ! calculate carbonate alkalinity
-       loc_ALK_DIC = dum_ALK &
-            & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
-            & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       if (ctrl_carbchem_noH3SiO4) then
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       else
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       end if
        ! estimate the partitioning between the aqueous carbonate species, and then make two independent estimates of [H];
        ! -> one using the 1st carbonate dissociation constant and estimated [CO2] and [HCO3-] concentrations
        ! -> the other using the 2nd carbonate dissociation constant and estimated [HCO3-] and [CO32-] concentrations
@@ -428,51 +435,52 @@ CONTAINS
        loc_H2 = dum_carbconst(icc_k2)*loc_conc_HCO3/loc_conc_CO3
        ! test for -ve [H]
        IF ((loc_H1 < const_real_nullsmall) .OR. (loc_H2 < const_real_nullsmall)) THEN
-          CALL sub_report_error(                                                         &
-               & 'gem_carbchem.f90','sub_calc_carb',                                     &
-               & 'Numerical instability at step; '//fun_conv_num_char_n(4,n)//           &
-               & ' / Data; dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,'//   &
-               & 'pH(SWS), pH (OLD), pH (guess #1), pH (guess #2)',                      &
-               & 'CARBONATE CHEMISTRY COULD NOT BE UPDATED :(',                          &
-               & (/dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,              &
-               & -LOG10(loc_H),-LOG10(loc_H_old),-LOG10(loc_H1),-LOG10(loc_H2)/),.false. &
-               & )
-          Print*,' > WHAT-IT-MEANS (maybe ...): '
-          Print*,'   (1) Check the FIRST TWO lines of the ERROR DATA (ocean DIC and ALK):'
-          Print*,'       -> These should be ... reasonable ... of order a few thousand umol kg-1'
-          Print*,'          (units reported are mol kg-1)'
-          Print*,'       -> NaNs, negative values, obsenely low (<< a few hundred umol kg-1) or,'
-          Print*,'          high (>> tens of thousands) are indicative of array bounds problems.'
-          Print*,'          Array bounds problems are mostly commonly due to'
-          Print*,'          (A) incorrect ocean dimension compared to the compiled executable,'
-          Print*,'          (B) incorrect number of biogeochem tracers in the ocean '
-          Print*,'              compared to compiled executable.'
-          Print*,'          => Carry out a *** make cleanall *** (from ~/genie/genie-main).' 
-          Print*,'   2) If the relative values of DIC and ALK differ by factor of ca. 2'
-          Print*,'       it may not be possible to solve for aqueous carbonate chemsitry.' 
-          Print*,'       => View the netCDF distribution of DIC, ALK (or other tracers);'
-          Print*,'          -> Extreme hotspots or minima may reflect problems associated with'
-          Print*,'             circulation or sea-ice instabilities.'
-          Print*,'             Extreme freshening (or salinity) in topographically restricted'
-          Print*,'             (and/or shallow) seas can also cause problems.'
-          Print*,'   (3) Extreme values of Ca and SO4 (#3, #4) are only vanishingly possible' 
-          Print*,'       except due to incorrect compiled array dimension or extreme salinity.' 
-          Print*,' > NOTE: The circulation model is very robust and will not easily fall over.'
-          Print*,'         BIOGEM is something of a canary in this respect and will report'
-          Print*,'         unrealistic chemistries diagnostic of problems elsewhere.' 
-          Print*,'         *** THIS ERROR MESSAGE THUS DOES NOT NECESSARILY INDICATE ***'
-          Print*,'         *** SOMETHING AMISS WITH THE BIOGEOCHEMSITRY CODE PER SE. ***'
-          Print*,' > Refer to user-manual for info on altering the error behavior.'
-          Print*,' '
-          error_carbchem = .TRUE.
-          if (ctrl_carbchem_fail) then
-             error_stop = .TRUE.
+          if ((.NOT. ctrl_carbchem_pHseed_retry) .OR. (m > par_carbchem_pH_iterationmax)) then
+             CALL sub_report_error(                                                         &
+                  & 'gem_carbchem.f90','sub_calc_carb',                                     &
+                  & 'Numerical instability at step; '//fun_conv_num_char_n(4,n)//           &
+                  & ' / Data; dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,'//   &
+                  & 'pH(SWS), pH (OLD), pH (guess #1), pH (guess #2)',                      &
+                  & 'CARBONATE CHEMISTRY COULD NOT BE UPDATED :(',                          &
+                  & (/dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,              &
+                  & -LOG10(loc_H),-LOG10(loc_H_old),-LOG10(loc_H1),-LOG10(loc_H2)/),.false. &
+                  & )
+             Print*,' > WHAT-IT-MEANS (maybe ...): '
+             Print*,'   (1) Check the FIRST TWO lines of the ERROR DATA (ocean DIC and ALK):'
+             Print*,'       -> These should be ... reasonable ... of order a few thousand umol kg-1'
+             Print*,'          (units reported are mol kg-1)'
+             Print*,'       -> NaNs, negative values, obsenely low (<< a few hundred umol kg-1) or,'
+             Print*,'          high (>> tens of thousands) are indicative of array bounds problems.'
+             Print*,'          Array bounds problems are mostly commonly due to'
+             Print*,'          (A) incorrect ocean dimension compared to the compiled executable,'
+             Print*,'          (B) incorrect number of biogeochem tracers in the ocean '
+             Print*,'              compared to compiled executable.'
+             Print*,'          => Carry out a *** make cleanall *** (from ~/genie/genie-main).' 
+             Print*,'   2) If the relative values of DIC and ALK differ by factor of ca. 2'
+             Print*,'       it may not be possible to solve for aqueous carbonate chemsitry.' 
+             Print*,'       => View the netCDF distribution of DIC, ALK (or other tracers);'
+             Print*,'          -> Extreme hotspots or minima may reflect problems associated with'
+             Print*,'             circulation or sea-ice instabilities.'
+             Print*,'             Extreme freshening (or salinity) in topographically restricted'
+             Print*,'             (and/or shallow) seas can also cause problems.'
+             Print*,'   (3) Extreme values of Ca and SO4 (#3, #4) are only vanishingly possible' 
+             Print*,'       except due to incorrect compiled array dimension or extreme salinity.' 
+             Print*,' > NOTE: The circulation model is very robust and will not easily fall over.'
+             Print*,'         BIOGEM is something of a canary in this respect and will report'
+             Print*,'         unrealistic chemistries diagnostic of problems elsewhere.' 
+             Print*,'         *** THIS ERROR MESSAGE THUS DOES NOT NECESSARILY INDICATE ***'
+             Print*,'         *** SOMETHING AMISS WITH THE BIOGEOCHEMSITRY CODE PER SE. ***'
+             Print*,' > Refer to user-manual for info on altering the error behavior.'
+             Print*,' '
+             error_carbchem = .TRUE.
+             error_stop     = .TRUE.
              exit
           else
              ! re-seed [H+]
              call RANDOM_NUMBER(loc_r)
              loc_H1 = 10**(-4.7 - 2.5*dum_ALK/dum_DIC - (loc_r - 0.5))
              loc_H2 = loc_H1
+             m = m + 1
           end if
        ENDIF
        ! the implicit bit!
@@ -514,19 +522,27 @@ CONTAINS
        end if
        ! test for whether we are likely to be waiting all bloody day for the algorithm to solve sweet FA
        IF (n > par_carbchem_pH_iterationmax) THEN
-          CALL sub_report_error(                                                                            &
-               & 'gem_carbchem.f90','sub_calc_carb',                                                        &
-               & 'Number of steps taken without successfully solving for pH = '//fun_conv_num_char_n(4,n)// &
-               & ' out of: '//fun_conv_num_char_n(4,par_carbchem_pH_iterationmax)//' maximum allowed'//     &
-               & ' / Data; dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,'//                      &
-               & 'pH(SWS), pH (OLD), pH (guess #1), pH (guess #2)',                                         &
-               & 'CARBONATE CHEMISTRY COULD NOT BE UPDATED :(',                                             &
-               & (/dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,                                 &
-               & -LOG10(loc_H),-LOG10(loc_H_old),-LOG10(loc_H1),-LOG10(loc_H2)/),.false.                    &
-               & )
-          error_carbchem = .TRUE.
-          if (ctrl_carbchem_fail) then
-             error_stop = .TRUE.
+          if ((.NOT. ctrl_carbchem_pHseed_retry) .OR. (m > par_carbchem_pH_iterationmax)) then
+             CALL sub_report_error(                                                                            &
+                  & 'gem_carbchem.f90','sub_calc_carb',                                                        &
+                  & 'Number of steps taken without successfully solving for pH = '//fun_conv_num_char_n(4,n)// &
+                  & ' out of: '//fun_conv_num_char_n(4,par_carbchem_pH_iterationmax)//' maximum allowed'//     &
+                  & ' / Data; dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,'//                      &
+                  & 'pH(SWS), pH (OLD), pH (guess #1), pH (guess #2)',                                         &
+                  & 'CARBONATE CHEMISTRY COULD NOT BE UPDATED :(',                                             &
+                  & (/dum_DIC,dum_ALK,dum_Ca,dum_SO4tot,dum_H2Stot,dum_NH4tot,                                 &
+                  & -LOG10(loc_H),-LOG10(loc_H_old),-LOG10(loc_H1),-LOG10(loc_H2)/),.false.                    &
+                  & )
+             Print*,' > WHAT-IT-MEANS (maybe ...): '
+             Print*,'   (1) Check the FIRST TWO lines of the ERROR DATA (ocean DIC and ALK):'
+             Print*,'       -> These should be ... reasonable ... of order a few thousand umol kg-1'
+             Print*,'          (units reported are mol kg-1)'
+             Print*,'       -> Excessively high ALK values can arrise for sulphate-reduction'
+             Print*,'          and may casue pH convergence problems.' 
+             Print*,' > Refer to user-manual for info on aiding pH convergence, or trying to avoid the issue in the first place.'
+             Print*,' '
+             error_carbchem = .TRUE.
+             error_stop     = .TRUE.
              exit
           else
              ! re-seed [H+]
@@ -534,6 +550,7 @@ CONTAINS
              loc_H1 = 10**(-4.7 - 2.5*dum_ALK/dum_DIC - (loc_r - 0.5))
              loc_H2 = loc_H1
              n = 1
+             m = m + 1
           end if
        END IF
 
@@ -626,9 +643,15 @@ CONTAINS
             & loc_H_p3/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) &
             & )
        ! calculate carbonate alkalinity
-       loc_ALK_DIC = dum_ALK &
-            & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
-            & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       if (ctrl_carbchem_noH3SiO4) then
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       else
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       end if
        ! estimate the partitioning between the aqueous carbonate species, and then make two independent estimates of [H]
        loc_zed = ( &
             &   (4.0*loc_ALK_DIC + loc_DIC_RFO*dum_carbconst(icc_k) - loc_ALK_DIC*dum_carbconst(icc_k))**2 + &

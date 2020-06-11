@@ -163,9 +163,9 @@ LEVS=$(grep -o '$(DEFINE)GOLDSTEINNLEVS=..\>' $CONFIGPATH/$MODELID".config" | se
 IGRID=$(grep -o 'go_grid=.' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
 # filter single digit format level ('8' vs. '08')
 ###if [ "$LEVS" == "8\'" ] || [ "$LEVS" == "8\"" ]; then
-if [ "$LEVS" != "32" ] && [ "$LEVS" != "24" ] && [ "$LEVS" != "16" ] && [ "$LEVS" != "08" ]; then
-    let LEVS=8
-fi
+###if [ "$LEVS" != "32" ] && [ "$LEVS" != "24" ] && [ "$LEVS" != "16" ] && [ "$LEVS" != "08" ]; then
+###    let LEVS=8
+###fi
 # define relative biogeochem time-stepping
 if [ $LONS -eq 36 ] && [ $LEVS -eq 16 ]; then
     let N_TIMESTEPS=96
@@ -190,7 +190,7 @@ elif [ $LONS -eq 48 ] && [ $LEVS -eq 16 ]; then
     let dbiostp=2
 else
     let N_TIMESTEPS=96
-    let dbiostp=1
+    let dbiostp=2
 fi
 if [ $IGRID -eq 1 ]; then
     echo "   Making non-equal area grid modifications to time-stepping, igrid: " $IGRID

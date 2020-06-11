@@ -22,8 +22,8 @@ MODULE gem_cmn
   ! WARNING: these values must be duplicated in genie_control.f90
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
   INTEGER,PARAMETER::n_atm =  21
-  INTEGER,PARAMETER::n_ocn = 101
-  INTEGER,PARAMETER::n_sed =  87
+  INTEGER,PARAMETER::n_ocn = 109
+  INTEGER,PARAMETER::n_sed = 107
 
 
   ! ****************************************************************************************************************************** !
@@ -43,25 +43,29 @@ MODULE gem_cmn
   real::par_carbchem_pH_tolerance                                       ! pH solution tolerance
   integer::par_carbchem_pH_iterationmax                                 ! pH solution maximum number of iterations
   NAMELIST /ini_gem_nml/par_carbchem_pH_tolerance,par_carbchem_pH_iterationmax
-  logical::ctrl_carbchem_fail                                           ! Exit upon pH solution failure?
-  NAMELIST /ini_gem_nml/ctrl_carbchem_fail
+  logical::ctrl_carbchem_pHseed_retry                                   ! Attempt pH re-seed if solution fails (else exit)?
+  NAMELIST /ini_gem_nml/ctrl_carbchem_pHseed_retry
   real::par_geochem_Tmin                                                ! minimum T used in empirical geochem calculations
   real::par_geochem_Tmax                                                ! maximum T used in empirical geochem calculations
   NAMELIST /ini_gem_nml/par_geochem_Tmin,par_geochem_Tmax
   real::par_geochem_Smin                                                ! minimum S used in empirical geochem calculations
   real::par_geochem_Smax                                                ! maximum S used in empirical geochem calculations
   NAMELIST /ini_gem_nml/par_geochem_Smin,par_geochem_Smax
-  real::par_carbchem_Tmin                                                ! minimum T used in empirical carbchem calculations
-  real::par_carbchem_Tmax                                                ! maximum T used in empirical carbchem calculations
+  real::par_carbchem_Tmin                                               ! minimum T used in empirical carbchem calculations
+  real::par_carbchem_Tmax                                               ! maximum T used in empirical carbchem calculations
   NAMELIST /ini_gem_nml/par_carbchem_Tmin,par_carbchem_Tmax
-  real::par_carbchem_Smin                                                ! minimum S used in empirical carbchem calculations
-  real::par_carbchem_Smax                                                ! maximum S used in empirical carbchem calculations
+  real::par_carbchem_Smin                                               ! minimum S used in empirical carbchem calculations
+  real::par_carbchem_Smax                                               ! maximum S used in empirical carbchem calculations
   NAMELIST /ini_gem_nml/par_carbchem_Smin,par_carbchem_Smax
+  logical::ctrl_carbchem_noH3SiO4                                       ! Ignore H3SiO4 in the calculation of carbonate ALK 
+  NAMELIST /ini_gem_nml/ctrl_carbchem_noH3SiO4
   ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
   real::par_grid_lon_offset                                             ! assumed lon grid offset (w.r.t. Prime Meridian)
   NAMELIST /ini_gem_nml/par_grid_lon_offset
   integer::ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end               ! 
   NAMELIST /ini_gem_nml/ctrl_debug_init,ctrl_debug_loop,ctrl_debug_end
+  logical::ctrl_debug_reportwarnings                                    ! Report all run-time warnings?
+  NAMELIST /ini_gem_nml/ctrl_debug_reportwarnings
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
   CHARACTER(len=127)::par_gem_indir_name                                ! 
   NAMELIST /ini_gem_nml/par_gem_indir_name
@@ -182,7 +186,15 @@ MODULE gem_cmn
   INTEGER,PARAMETER::io_Sr                                = 98  ! 
   INTEGER,PARAMETER::io_Sr_87Sr                           = 99  ! 
   INTEGER,PARAMETER::io_Sr_88Sr                           = 100  ! 
-  INTEGER,PARAMETER::io_H20                               = 101  ! 
+  INTEGER,PARAMETER::io_FeS                               = 101   ! 
+  INTEGER,PARAMETER::io_FeS_56Fe                          = 102   ! 
+  INTEGER,PARAMETER::io_FeS_34S                           = 103   ! 
+  INTEGER,PARAMETER::io_FeOOH                             = 107   ! 
+  INTEGER,PARAMETER::io_FeOOH_56Fe                        = 108   ! 
+  INTEGER,PARAMETER::io_Os                                = 104   ! 
+  INTEGER,PARAMETER::io_Os_187Os                          = 105   ! 
+  INTEGER,PARAMETER::io_Os_188Os                          = 106   ! 
+  INTEGER,PARAMETER::io_H20                               = 109   ! 
   ! atmospheric tracer indices
   INTEGER,PARAMETER::ia_T                                 = 01    ! temperature
   INTEGER,PARAMETER::ia_q                                 = 02    ! specific humidity
@@ -217,6 +229,7 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_POCd                              = 09    ! 
   INTEGER,PARAMETER::is_POCd_114Cd                        = 43    ! 
   INTEGER,PARAMETER::is_POFe                              = 10    ! 
+  INTEGER,PARAMETER::is_POFe_56Fe                         = 94    ! 
   INTEGER,PARAMETER::is_POI                               = 79    ! 
   INTEGER,PARAMETER::is_POBa                              = 80    ! 
   INTEGER,PARAMETER::is_POBa_138Ba                        = 81    ! 
@@ -224,6 +237,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_POM_230Th                         = 12    ! 
   INTEGER,PARAMETER::is_POM_Fe                            = 13    !  
   INTEGER,PARAMETER::is_POM_Fe_56Fe                       = 75    ! 
+  INTEGER,PARAMETER::is_POM_FeOOH                         = 103    !  
+  INTEGER,PARAMETER::is_POM_FeOOH_56Fe                    = 104    ! 
   INTEGER,PARAMETER::is_POM_Nd                            = 47    ! 
   INTEGER,PARAMETER::is_POM_Nd_144Nd                      = 48    ! 
   INTEGER,PARAMETER::is_POM_MoS2                          = 58    ! 
@@ -233,6 +248,9 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_POM_S_34S                         = 74    !  
   INTEGER,PARAMETER::is_POM_BaSO4                         = 82    ! 
   INTEGER,PARAMETER::is_POM_BaSO4_138Ba                   = 83    !  
+  INTEGER,PARAMETER::is_POM_Os                            = 97    ! 
+  INTEGER,PARAMETER::is_POM_Os_187Os                      = 98    !  
+  INTEGER,PARAMETER::is_POM_Os_188Os                      = 99    !  
   INTEGER,PARAMETER::is_CaCO3                             = 14    ! 
   INTEGER,PARAMETER::is_CaCO3_13C                         = 15    ! 
   INTEGER,PARAMETER::is_CaCO3_14C                         = 16    ! 
@@ -254,6 +272,20 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_SrCO3                             = 84    ! 
   INTEGER,PARAMETER::is_SrCO3_87Sr                        = 85    !
   INTEGER,PARAMETER::is_SrCO3_88Sr                        = 86    !
+  INTEGER,PARAMETER::is_OsCO3                             = 100   ! 
+  INTEGER,PARAMETER::is_OsCO3_187Os                       = 101   !
+  INTEGER,PARAMETER::is_OsCO3_188Os                       = 102   !
+  INTEGER,PARAMETER::is_FeCO3                             = 88    ! 
+  INTEGER,PARAMETER::is_FeCO3_13C                         = 89    !
+  INTEGER,PARAMETER::is_FeCO3_56Fe                        = 90    !
+  INTEGER,PARAMETER::is_FeS2                              = 91    ! 
+  INTEGER,PARAMETER::is_FeS2_34S                          = 92    !
+  INTEGER,PARAMETER::is_FeS2_56Fe                         = 93    !
+  INTEGER,PARAMETER::is_FeOOH                             = 95    ! 
+  INTEGER,PARAMETER::is_FeOOH_56Fe                        = 96    !
+  INTEGER,PARAMETER::is_Fe3Si2O4                          = 105   ! 
+  INTEGER,PARAMETER::is_Fe3Si2O4_56Fe                     = 106   !
+  INTEGER,PARAMETER::is_Fe3Si2O4_30Si                     = 107   !
   INTEGER,PARAMETER::is_det                               = 22    ! 
   INTEGER,PARAMETER::is_detLi                             = 55    ! 
   INTEGER,PARAMETER::is_detLi_7Li                         = 56    !  
@@ -410,18 +442,17 @@ MODULE gem_cmn
   INTEGER,DIMENSION(n_ocn)::io2l
   INTEGER,DIMENSION(n_sed)::is2l
   ! tracer conversion - transformation ratios
-  real,DIMENSION(n_sed,n_ocn)::conv_ocn_sed
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn
-  real,DIMENSION(n_atm,n_ocn)::conv_ocn_atm
   real,DIMENSION(n_ocn,n_atm)::conv_atm_ocn
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_O                           ! tracer conversion array for oxic conditions
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N                           ! tracer conversion array for N-reduction redox conditions
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_Fe                          ! tracer conversion array for FeOOH-reduction
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_S                           ! tracer conversion array for S-reduction redox conditions
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_meth                        ! tracer conversion array for methanogenesis
   real,DIMENSION(n_sed,n_ocn)::conv_DOM_POM
   real,DIMENSION(n_ocn,n_sed)::conv_POM_DOM
   real,DIMENSION(n_sed,n_ocn)::conv_RDOM_POM
   real,DIMENSION(n_ocn,n_sed)::conv_POM_RDOM
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_O                           ! tracer conversion array for oxic conditions
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N                           ! tracer conversion array for N-reduction redox conditions
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_S                           ! tracer conversion array for S-reduction redox conditions
-  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_meth                        ! tracer conversion array for methanogenesis
   ! tracer conversion -- transformation ratios -- compaxt index format
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo
   real,DIMENSION(:,:),ALLOCATABLE::conv_lD_lP
@@ -430,22 +461,22 @@ MODULE gem_cmn
   real,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_O                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_N                           ! 
+  real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_Fe                          ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_S                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_meth                        ! 
   ! tracer conversion - indices for non-zero transformation ratio values
   ! NOTE: the zero index place in the array is used in algorithms identifying null relationships (or something)
-  integer,DIMENSION(0:n_sed,0:n_ocn)::conv_ocn_sed_i
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! 
-  integer,DIMENSION(0:n_atm,0:n_ocn)::conv_ocn_atm_i
   integer,DIMENSION(0:n_ocn,0:n_atm)::conv_atm_ocn_i
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! 
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_O                  ! tracer conversion array for oxic conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_Fe                 ! tracer conversion array for FeOOH-reduction
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_S                  ! tracer conversion array for S-reduction redox conditions
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_meth               ! tracer conversion array for methanogenesis
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_DOM_POM_i
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_POM_DOM_i
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_RDOM_POM_i
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_POM_RDOM_i
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_O                  ! tracer conversion array for oxic conditions
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_S                  ! tracer conversion array for S-reduction redox conditions
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_meth               ! tracer conversion array for methanogenesis
   ! tracer conversion -- transformation ratios -- compaxt index format
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i                ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_lD_lP_i                ! 
@@ -454,6 +485,7 @@ MODULE gem_cmn
   integer,DIMENSION(:,:),ALLOCATABLE::conv_lP_lRD_i               ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_O              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_N              ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_Fe             ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_S              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_meth           ! 
   ! carbonate chemistry
@@ -635,7 +667,7 @@ MODULE gem_cmn
   integer,parameter::n_itype_min  = 11
   integer,parameter::n_itype_max  = 23
   integer,parameter::n_itype_minR = 24
-  integer,parameter::n_itype_maxR = 25
+  integer,parameter::n_itype_maxR = 27
   ! 18O:(18O+17O+16O) [estimated from % natural abundance data]
   REAL,PARAMETER::const_stnd_18O_O          = 0.002004
   ! isotopic standard array
@@ -660,6 +692,8 @@ MODULE gem_cmn
   !       6Li:   7.5%
   !       7Li:  92.5%
   !          => 7R(Li) = 92.5/7.5 = 12.33333
+  !       34S:   34S/32S = 1/22.656 = 0.044138 for IAEA-S-1 [Ding et al., 1999]
+!                (4.25/94.99 = 0.044742 -- wiki ... natural abundance ...)
   !       144Nd: 143Nd/144Nd = 0.512638
   !       114Cd: 114Cd/110Cd = 0.2873/0.1249 = 2.3002
   !       44Ca:  44Ca/40Ca = 0.02086/0.96941 = 0.021518 (wikipedia ...)
@@ -669,12 +703,14 @@ MODULE gem_cmn
   !       138Ba: 
   !       87Sr:  87Sr/86Sr = 0.709175 [modern seawater ratio]
   !       88Sr:  88Sr/86Sr = 8.375209 [NBS987]
+  !       187Os:  187Os/192Os = 0.34062 [Dabek and Hallas 2007]
+  !       188Os:  188Os/192Os = 0.3244 [Dabek and Hallas 2007]
   REAL,PARAMETER,DIMENSION(n_itype_min:n_itype_max)::const_standards = (/ &
        & 0.011202,  & ! TYPE 11; 13C ! OLD: 0.011237 ! NEW: 0.011202
        & 1.176E-12, & ! TYPE 12; 14C ! OLD: 1.117E-12 ! NEW: 1.176E-12
        & 0.002005,  & ! TYPE 13; 18O
        & 0.003660,  & ! TYPE 14; 15N
-       & 0.000000,  & ! TYPE 15; 34S
+       & 0.044138,  & ! TYPE 15; 34S
        & 0.033532,  & ! TYPE 16; 30Si
        & 2.3002,    & ! TYPE 17; 114Cd
        & 12.33333,  & ! TYPE 18; 7Li
@@ -685,7 +721,9 @@ MODULE gem_cmn
        & 0.0 /)       ! TYPE 23; 138Ba
   REAL,PARAMETER,DIMENSION(n_itype_minR:n_itype_maxR)::const_standardsR = (/ &
        & 0.709175,  & ! TYPE 24; 87Sr
-       & 8.375209 /)  ! TYPE 25; 88Sr 
+       & 8.375209,  & ! TYPE 25; 88Sr 
+       & 0.34062,      & ! TYPE 26; 187Os 
+       & 0.3244 /)    ! TYPE 27; 188Os 
 
   ! *** radioactive decay ***
   ! ln(2) is used for the conversion between half-life and e-folding time of decay
@@ -774,6 +812,7 @@ MODULE gem_cmn
   REAL,PARAMETER::const_real_null       = -0.999999E+19                 ! 
   REAL,PARAMETER::const_real_nullhigh   = +0.999999E+19                 ! 
   REAL,PARAMETER::const_real_nullsmall  = +0.999999E-19                 ! 
+  REAL,PARAMETER::const_rns             = +0.999999E-19                 ! 
   REAL,PARAMETER::const_real_zero       = +0.000000E+00                 ! 
   REAL,PARAMETER::const_real_one        = +1.000000E+00                 ! 
   REAL,PARAMETER::const_nulliso         = -999.999                      ! isotope null

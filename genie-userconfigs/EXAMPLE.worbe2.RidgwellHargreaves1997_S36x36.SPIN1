@@ -43,8 +43,14 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 #
 # --- SEDIMENTS ------------------------------------------------
 #
+# Sediment grid
+SEDGEMNLONSOPTS='$(DEFINE)SEDGEMNLONS=36'
+SEDGEMNLATSOPTS='$(DEFINE)SEDGEMNLATS=36'
 # sediment  grid options
 sg_par_sed_Dmax_neritic=175.0
+sg_par_sed_topo_D_name="worbe2_topo.36x36"
+sg_par_sed_reef_mask_name="worbe2_reef_mask.36x36"
+sg_par_sedcore_save_mask_name="worbe2_save_mask.36x36"
 # sediment diagenesis options
 sg_par_sed_diagen_CaCO3opt="ridgwell2001lookup"
 sg_ctrl_sed_bioturb=.false.
