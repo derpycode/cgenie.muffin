@@ -7190,6 +7190,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.03</value>
                         <description>geothermal gradient oC/m</description>
                     </param>
+                    <param name="par_sed_hydrate_exflow">
+			<value datatype="real">-30</value>
+                        <description>water flux of external source in cm/kyr</description>
+                    </param>
+                    <param name="par_sed_hydrate_orgCfrac">
+			<value datatype="real">0.25</value>
+                        <description>OM available for ch4gen and so4red</description>
+                    </param>
                     <param name="par_sed_hydrate_savefreq">
 			<value datatype="integer">10</value>
                         <description>frequency to save data</description>

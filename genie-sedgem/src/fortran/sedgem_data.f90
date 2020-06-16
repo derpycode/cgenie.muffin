@@ -130,6 +130,8 @@ CONTAINS
        print*,'Geothermal gradient oC/m                            : ',par_sed_hydrate_geotherm
        print*,'threshold (volume ratio) for bubble escape to ocean : ',par_sed_bubble_threshold
        print*,'frequency to save data                              : ',par_sed_hydrate_savefreq
+       print*,'water flux of external source in cm/kyr             : ',par_sed_hydrate_exflow
+       print*,'OM available for ch4gen and so4red                  : ',par_sed_hydrate_orgCfrac
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
@@ -1382,7 +1384,6 @@ CONTAINS
     ! POC
     loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:))
     loc_tot2_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fdis(is_POC,:,:))
-    print*,loc_tot1_sedgrid,loc_tot2_sedgrid
     if (abs(loc_tot1_sedgrid) > const_real_nullsmall) then 
        loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
     else

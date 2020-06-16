@@ -122,7 +122,9 @@ MODULE sedgem_lib
   REAL::par_sed_hydrate_threshold                                ! depth threshold above which is not considered as location of hydrate formation
   REAL::par_sed_hydrate_geotherm                                 ! geothermal gradient oC/m
   REAL::par_sed_bubble_threshold                                 ! threshold (volume ratio) for bubble escape to ocean/muds/omen
-  NAMELIST /ini_sedgem_nml/par_sed_hydrate_threshold,par_sed_hydrate_geotherm,par_sed_bubble_threshold
+  REAL::par_sed_hydrate_exflow                                   ! water flux of external source in cm/kyr
+  REAL::par_sed_hydrate_orgCfrac                                 ! OM available for ch4gen and so4red
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_threshold,par_sed_hydrate_geotherm,par_sed_bubble_threshold,par_sed_hydrate_exflow,par_sed_hydrate_orgCfrac
   integer::par_sed_hydrate_savefreq                              ! frequency to save data 
   NAMELIST /ini_sedgem_nml/par_sed_hydrate_savefreq
   ! ------------------- DIAGENESIS SCHEME: ARCHER 1991 --------------------------------------------------------------------------- !
