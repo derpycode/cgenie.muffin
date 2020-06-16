@@ -21,6 +21,7 @@ real,save::ceqb_map(n_i,n_j)
 real,save::heatflow_map(n_i,n_j)
 real,save::depth_map(n_i,n_j)
 real,save::om_map(n_i,n_j)
+real,save::omprs_map(n_i,n_j)
 real,save::ombur_map(n_i,n_j)
 real,save::omfrc_map(n_i,n_j)
 real,save::sedv_map(n_i,n_j)
@@ -34,6 +35,10 @@ real,save::so4flx_map_INIT(n_i,n_j)
 real,save::ch4flx_map_INIT(n_i,n_j)
 real,save::h_diss_map(n_i,n_j)
 real,save::b_diss_map(n_i,n_j)
+real,save::ch4gen_map(n_i,n_j)
+real,save::so4red_map(n_i,n_j)
+real,save::aom_map(n_i,n_j)
+real,save::degas_map(n_i,n_j)
 ! real,save::cflx_source(n_i,n_j)
 
 integer,save::irec_hydrate
@@ -73,12 +78,26 @@ select case(trim(par_sed_hydrate_opt_org))
     case('omen') ! use omen to get om conc. (wt%) 
         if (trim(par_sed_diagen_Corgopt)=='huelse2016') then 
             loc_org_0 = om_map(dum_i,dum_j) ! om_map records the results of OMEN in sedgem_box
+            ! calculating OM conc. from OM flux and burial rate 
+            loc_org_0 = omfrc_map(dum_i,dum_j)*ombur_map(dum_i,dum_j) &! om_map records the results of OMEN in sedgem_box
+                /( &
+                (2650.d0/30d-3)*1d-2*(1d0-0.69d0)*  &! mol m-2 yr-1
+                loc_v_sed*10d0/(2.65d0*(1d0-0.67d0))*1d2*1d-2/1d3 &! m/yr 
+                )  
+            om_map(dum_i,dum_j) = loc_org_0
             ! print*,'omen',loc_org_0,loc_v_sed,fun_calc_sed_mass(new_sed_in(:)),fun_calc_sed_mass(dis_sed_in(:)),dum_dtyr  
             ! print*,'omen',loc_org_0,loc_v_sed,(fun_calc_sed_mass(new_sed_in(:))-fun_calc_sed_mass(dis_sed_in(:)))/dum_dtyr  
             if (irec_hydrate==0 .and. loc_org_0 == 0.) then 
                 return
             endif 
-            ! pause
+            ! if (dum_i==2 .and. dum_j==22)then 
+                ! print *, 'preservation  :', (1.-0.25*margin_map(dum_i,dum_j))*omfrc_map(dum_i,dum_j)*ombur_map(dum_i,dum_j)
+                ! print *, 'decomposition :', 0.25*margin_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j)*ombur_map(dum_i,dum_j)
+                ! print *, 'total rain    :', ombur_map(dum_i,dum_j)
+                ! print *, 'margin factor :',margin_map(dum_i,dum_j)
+                ! print *, 'pause at hydrate_update'
+                ! pause
+            ! endif
         else 
             ! case where OMEN is used just to calculate OM conc. 
             ! this option may not be good 
@@ -113,7 +132,8 @@ select case(trim(par_sed_hydrate_opt_margin)) ! calculation is conducted only on
         ! else 
             ! loc_margin = 1.0
         ! endif
-        if (dum_i==1 .and. dum_j==11) then    
+        ! if (dum_i==1 .and. dum_j==11) then    
+        if (dum_i==2 .and. dum_j==22) then    
             loc_margin = 1.0
             print*,loc_D_hydrate,loc_T_hydrate,loc_DO_hydrate,loc_v_sed,loc_org_0
         else 
@@ -312,6 +332,7 @@ real::dum_interp(5,nz)
 
 ! logical::hydrate_restart = .true.
 logical::hydrate_restart = .false.
+logical::hydrate_restart_OK = .false.
 ! logical::bubble_cut = .true.
 ! logical::bubble_cut = .false.
 character(1000) resdir 
@@ -482,6 +503,12 @@ call system('mkdir -p '//trim(adjustl(outdir))//'res')
 call checkfile(trim(adjustl(outdir))//'/profiles/'//trim(adjustl(outfilename))&
     //'/org.txt',first_call)
 
+if (hydrate_restart) then 
+    call checkfile(trim(adjustl(resdir))//'/profiles/'//trim(adjustl(outfilename))&
+        //'/org.txt',hydrate_restart_OK)
+    hydrate_restart_OK = .not. hydrate_restart_OK
+endif 
+
 if(first_call)irec_hydrate = 0
 
 if (first_call) then 
@@ -491,9 +518,11 @@ if (first_call) then
 endif 
 
 if(loc_display)print*,'first call? A: ',first_call
-
+if(loc_display)print*,'can restart? A: ',hydrate_restart_OK
+! pause
 if (.not.first_call) hydrate_restart = .false.
-if (hydrate_restart) first_call = .false.
+! if (hydrate_restart) first_call = .false.
+if (hydrate_restart .and. hydrate_restart_OK) first_call = .false.
 
 if(.not.first_call)then
     ! reading cm, cs, h, b, z, dz, v, u, org etc. from previous run 
@@ -757,7 +786,7 @@ timeloop:do
     if (time + dt_ref >= time_fin) dt_ref = time_fin - time
     if (.not.flg_esc) dt = dt_ref  ! in yr
     dt_om = 1d100
-    if (spin_aq_done) dt_om = dt
+    ! if (spin_aq_done) dt_om = dt
     dt_aq = dt
     dt_sld = dt
     
@@ -796,6 +825,13 @@ timeloop:do
         zs,nz,org_0,v,org,dec_m0,dec_s0,z,dz,mch4,mch2o,mso4,poro,dt_om,tol,rho_s,rho_f,poro_0,v_sed,nflx,  &! input 
         phi_s,phi_m,orgx,omflx                                                                              &! output
         )
+
+    ! if (dum_i==2 .and. dum_j==22 .and. time==0d0)then 
+        ! print*,dum_i,dum_j 
+        ! print*,loc_margin,abs(sum(omflx(iadv,:)*dz(:)))*loc_margin
+        ! print*,'pause in hydrate_main'
+        ! pause
+    ! endif 
     ! exit timeloop
     ! phi_s = 0d0
     ! phi_m = 0d0
@@ -1030,41 +1066,89 @@ mbinv_map(dum_i,dum_j) = mbinv
 ! ch4flx_map(dum_i,dum_j) = sum(ch4flx(irxn_aom,:)*dz(:)) ! mol m-2 yr-1; negative when lost from sediment 
 ! so4flx_map(dum_i,dum_j) = sum(so4flx(irxn_aom,:)*dz(:))  
 
+omprs_map(dum_i,dum_j) = (rho_s/mch2o)*1d-2*((1d0-poro(nz))*org(nz)*v(nz))
+if (frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j) > 0d0 &
+    .and. abs(frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j)  &
+            -omprs_map(dum_i,dum_j)- abs(sum(omflx(iadv,:)*dz(:)))) &
+        /(frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j))>tol  )then 
+    print*,'om not in balance'
+    print*,dum_i,dum_j 
+    print*,abs(sum(omflx(iadv,:)*dz(:))),frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j)
+    print*,org_0,v_sed
+    pause
+endif 
+
+ch4gen_map(dum_i,dum_j) = sum(ch4flx(irxn_om,:)*dz(:))  
+so4red_map(dum_i,dum_j) = sum(so4flx(irxn_om,:)*dz(:))  
+aom_map(dum_i,dum_j) = sum(so4flx(irxn_aom,:)*dz(:))  
+degas_map(dum_i,dum_j) = (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
+
 select case(trim(par_sed_hydrate_opt_org))
     case('muds') 
         if (ocn_select(io_CH4))then
-            ch4flx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) ! mol m-2 yr-1; negative when lost from sediment  
+            ch4flx_map(dum_i,dum_j) = - degas_map(dum_i,dum_j) ! mol m-2 yr-1; negative when lost from sediment  
             dicflx_map(dum_i,dum_j) = 0d0
             alkflx_map(dum_i,dum_j) = 0d0
             so4flx_map(dum_i,dum_j) = 0d0
         else 
             ! dic and alk fluxes are meaningful only when not tracing methane and complete oxidation of methane by sulfate 
             ch4flx_map(dum_i,dum_j) =    0d0 ! mol m-2 yr-1; negative when lost from sediment  
-            dicflx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
-            alkflx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
-            so4flx_map(dum_i,dum_j) =   (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
+            dicflx_map(dum_i,dum_j) = - degas_map(dum_i,dum_j)
+            alkflx_map(dum_i,dum_j) = - degas_map(dum_i,dum_j)
+            so4flx_map(dum_i,dum_j) =   degas_map(dum_i,dum_j)
         endif 
     case('omen') ! use omen to get om conc. (wt%) 
         if (trim(par_sed_diagen_Corgopt)=='huelse2016') then
             if (ocn_select(io_CH4))then
-                so4flx_map(dum_i,dum_j) = sum(so4flx(irxn_om,:)*dz(:)) + sum(so4flx(irxn_aom,:)*dz(:)) 
+                so4flx_map(dum_i,dum_j) = (&
+                    so4red_map(dum_i,dum_j) &
+                    + aom_map(dum_i,dum_j) &
+                    )
                 ! so4flx_map(dum_i,dum_j) = sum(so4flx(iadv,:)*dz(:)) + sum(so4flx(idif,:)*dz(:))
-                dicflx_map(dum_i,dum_j) = sum(ch4flx(irxn_om,:)*dz(:)) - 2d0*sum(so4flx(irxn_om,:)*dz(:)) - sum(ch4flx(irxn_aom,:)*dz(:))
-                alkflx_map(dum_i,dum_j) = - 1d0*sum(so4flx(irxn_om,:)*dz(:)) - sum(ch4flx(irxn_aom,:)*dz(:))
-                ch4flx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) &
-                    + sum(ch4flx(irxn_om,:)*dz(:)) + sum(ch4flx(irxn_aom,:)*dz(:)) 
-                    ! + sum(ch4flx(iadv,:)*dz(:)) + sum(ch4flx(idif,:)*dz(:))  
+                dicflx_map(dum_i,dum_j) = (&
+                    ch4gen_map(dum_i,dum_j) &
+                    - 2d0*so4red_map(dum_i,dum_j) &
+                    - aom_map(dum_i,dum_j)  &
+                    )
+                alkflx_map(dum_i,dum_j) = (&
+                    - 1d0*so4red_map(dum_i,dum_j) &
+                    - aom_map(dum_i,dum_j)  &
+                    )
+                ch4flx_map(dum_i,dum_j) = (&
+                    - degas_map(dum_i,dum_j) &
+                    + ch4gen_map(dum_i,dum_j) &
+                    + aom_map(dum_i,dum_j) &
+                    )
             else 
-                so4flx_map(dum_i,dum_j) = sum(so4flx(irxn_om,:)*dz(:)) + sum(so4flx(irxn_aom,:)*dz(:)) &
-                    - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) &
-                    + sum(ch4flx(irxn_om,:)*dz(:)) + sum(ch4flx(irxn_aom,:)*dz(:)) 
+                so4flx_map(dum_i,dum_j) = ( &
+                    so4red_map(dum_i,dum_j) &
+                    + aom_map(dum_i,dum_j) &
+                    - (&
+                        - degas_map(dum_i,dum_j) &
+                        + ch4gen_map(dum_i,dum_j) &
+                        + aom_map(dum_i,dum_j) &
+                    )  &
+                    )
                 ! so4flx_map(dum_i,dum_j) = sum(so4flx(iadv,:)*dz(:)) + sum(so4flx(idif,:)*dz(:))
-                dicflx_map(dum_i,dum_j) = sum(ch4flx(irxn_om,:)*dz(:)) - 2d0*sum(so4flx(irxn_om,:)*dz(:)) - sum(ch4flx(irxn_aom,:)*dz(:))  &
-                    - (- (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) &
-                    + sum(ch4flx(irxn_om,:)*dz(:)) + sum(ch4flx(irxn_aom,:)*dz(:)) )
-                alkflx_map(dum_i,dum_j) = - 1d0*sum(so4flx(irxn_om,:)*dz(:)) - sum(ch4flx(irxn_aom,:)*dz(:))  &
-                    - (- (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) &
-                    + sum(ch4flx(irxn_om,:)*dz(:)) + sum(ch4flx(irxn_aom,:)*dz(:))  )
+                dicflx_map(dum_i,dum_j) = ( &
+                    ch4gen_map(dum_i,dum_j) &
+                    - 2d0*so4red_map(dum_i,dum_j) &
+                    - aom_map(dum_i,dum_j)  &
+                    + ( &
+                        - degas_map(dum_i,dum_j) &
+                        + ch4gen_map(dum_i,dum_j) &
+                        + aom_map(dum_i,dum_j) &
+                        ) &
+                    )
+                alkflx_map(dum_i,dum_j) = (&
+                    - 1d0*so4red_map(dum_i,dum_j) &
+                    - aom_map(dum_i,dum_j)  &
+                    + ( &
+                        - degas_map(dum_i,dum_j) &
+                        + ch4gen_map(dum_i,dum_j) &
+                        + aom_map(dum_i,dum_j)  &
+                        )&
+                    )
                 ! ch4flx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) &
                     ! + sum(ch4flx(irxn_om,:)*dz(:)) + sum(ch4flx(irxn_aom,:)*dz(:)) 
                     ! + sum(ch4flx(iadv,:)*dz(:)) + sum(ch4flx(idif,:)*dz(:)) 
@@ -1074,16 +1158,16 @@ select case(trim(par_sed_hydrate_opt_org))
             ! ch4flx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) ! mol m-2 yr-1; negative when lost from sediment 
             ! so4flx_map(dum_i,dum_j) = ch4flx_map(dum_i,dum_j)
             if (ocn_select(io_CH4))then
-                ch4flx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) ! mol m-2 yr-1; negative when lost from sediment  
+                ch4flx_map(dum_i,dum_j) = - degas_map(dum_i,dum_j) ! mol m-2 yr-1; negative when lost from sediment  
                 dicflx_map(dum_i,dum_j) = 0d0
                 alkflx_map(dum_i,dum_j) = 0d0
                 so4flx_map(dum_i,dum_j) = 0d0
             else 
                 ! dic and alk fluxes are meaningful only when not tracing methane and complete oxidation of methane by sulfate 
                 ch4flx_map(dum_i,dum_j) =    0d0 ! mol m-2 yr-1; negative when lost from sediment  
-                dicflx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
-                alkflx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
-                so4flx_map(dum_i,dum_j) =   (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
+                dicflx_map(dum_i,dum_j) = - degas_map(dum_i,dum_j)
+                alkflx_map(dum_i,dum_j) = - degas_map(dum_i,dum_j)
+                so4flx_map(dum_i,dum_j) =   degas_map(dum_i,dum_j)
             endif 
         endif 
 endselect 
@@ -1117,8 +1201,6 @@ call closefiles(                                                        &
     file_anion,file_ch4flx,file_so4flx,file_bnd,                        &
     file_so4flxss,file_ch4flxss,file_hflxss,file_bflxss,file_omflxss    &
     )
-
-! pause
 
 call cpu_time(finish_time)
 write(*,'(f10.3,A)')finish_time-start_time,'[CPU sec]'
@@ -2251,7 +2333,8 @@ implicit none
 
 integer i,j
 character*256 workdir,intchr
-real h_globe,b_globe,aom_globe,ombur_globe,omdec_globe,omprs_globe
+real h_globe,b_globe,ch4flx_globe,ombur_globe,omdec_globe,omprs_globe,so4flx_globe,dicflx_globe,alkflx_globe
+real aom_globe,ch4gen_globe,so4red_globe,degas_globe
 
 ! print*, ' printing data by signal tracking model '
 
@@ -2261,10 +2344,17 @@ workdir = trim(adjustl(workdir))//'/hydrate/res/'
 
 h_globe = 0d0
 b_globe = 0d0
-aom_globe = 0d0
+ch4flx_globe = 0d0
+so4flx_globe = 0d0
+dicflx_globe = 0d0
+alkflx_globe = 0d0
 ombur_globe = 0d0
 omdec_globe = 0d0
 omprs_globe = 0d0
+ch4gen_globe = 0d0
+so4red_globe = 0d0
+aom_globe = 0d0
+degas_globe = 0d0
 
 do j=1,n_j
     do i=1,n_i
@@ -2274,6 +2364,8 @@ do j=1,n_j
             mbinv_map(i,j)    = const_real_null
             so4flx_map(i,j)   = const_real_null
             ch4flx_map(i,j)   = const_real_null
+            dicflx_map(i,j)   = const_real_null
+            alkflx_map(i,j)   = const_real_null
             zs_map(i,j)       = const_real_null
             hsz_map(i,j)      = const_real_null
             ceqh_map(i,j)     = const_real_null
@@ -2283,6 +2375,7 @@ do j=1,n_j
             om_map(i,j)       = const_real_null
             omfrc_map(i,j)    = const_real_null
             ombur_map(i,j)    = const_real_null
+            omprs_map(i,j)    = const_real_null
             btso4_map(i,j)    = const_real_null
             temp_map(i,j)     = const_real_null
             sedv_map(i,j)     = const_real_null
@@ -2293,12 +2386,20 @@ do j=1,n_j
         endif 
         if (mhinv_map(i,j)>0d0) h_globe = h_globe + mhinv_map(i,j)*phys_sed(ips_A,i,j)*12d0/16d0*max(0d0,margin_map(i,j))
         if (mbinv_map(i,j)>0d0) b_globe = b_globe + mbinv_map(i,j)*phys_sed(ips_A,i,j)*12d0/16d0*max(0d0,margin_map(i,j))
-        if (abs(ch4flx_map(i,j))<abs(const_real_null)) aom_globe = aom_globe + ch4flx_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
-        if (ombur_map(i,j)>0d0) ombur_globe = ombur_globe + ombur_map(i,j)*phys_sed(ips_A,i,j)
-        if (ombur_map(i,j)>0d0) omdec_globe = omdec_globe + ombur_map(i,j)*(1.-omfrc_map(i,j))*phys_sed(ips_A,i,j)
+        if (abs(ch4flx_map(i,j))<abs(const_real_null)) ch4flx_globe = ch4flx_globe + ch4flx_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(so4flx_map(i,j))<abs(const_real_null)) so4flx_globe = so4flx_globe + so4flx_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(dicflx_map(i,j))<abs(const_real_null)) dicflx_globe = dicflx_globe + dicflx_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(alkflx_map(i,j))<abs(const_real_null)) alkflx_globe = alkflx_globe + alkflx_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(ch4gen_map(i,j))<abs(const_real_null)) ch4gen_globe = ch4gen_globe + ch4gen_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(so4red_map(i,j))<abs(const_real_null)) so4red_globe = so4red_globe + so4red_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(aom_map(i,j))   <abs(const_real_null)) aom_globe    = aom_globe    + aom_map(i,j)   *phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(degas_map(i,j)) <abs(const_real_null)) degas_globe  = degas_globe  + degas_map(i,j) *phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (omprs_map(i,j)>0d0) omprs_globe = omprs_globe + omprs_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (ombur_map(i,j)>0d0) ombur_globe = ombur_globe &
+            + par_sed_hydrate_orgCfrac*ombur_map(i,j)*omfrc_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
     enddo
 enddo 
-omprs_globe = ombur_globe - omdec_globe
+omdec_globe = ombur_globe - omprs_globe
 
 ! print*, ' data prepared ... now going to record '
 open(unit=100,file=trim(adjustl(workdir))//'mhinv-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
@@ -2405,11 +2506,19 @@ write(100,*) 'Global CH4 hydrate   (Pg C): ',h_globe*1d3/1d15
 write(100,*) 'Global CH4 bubble    (Pg C): ',b_globe*1d3/1d15
 write(100,*) 'Global CH4 total     (Pg C): ',(h_globe+b_globe)*1d3/1d15
 write(100,*) '---------------------------'
-write(100,*) 'Global AOM flux            : ', aom_globe*12d0/1d15, ' (Pg C yr-1) = ',aom_globe/1d12, ' (Tmol yr-1)'
+write(100,*) 'Global CH4 flux            : ', ch4flx_globe*12d0/1d15, ' (Pg C yr-1) = ',ch4flx_globe, ' (mol yr-1)'
+write(100,*) 'Global SO4 flux            : ', so4flx_globe*12d0/1d15, ' (Pg C yr-1) = ',so4flx_globe, ' (mol yr-1)'
+write(100,*) 'Global DIC flux            : ', dicflx_globe*12d0/1d15, ' (Pg C yr-1) = ',dicflx_globe, ' (mol yr-1)'
+write(100,*) 'Global ALK flux            : ', alkflx_globe*12d0/1d15, ' (Pg C yr-1) = ',alkflx_globe, ' (mol yr-1)'
 write(100,*) '---------------------------'
-write(100,*) 'Global OM rain             : ', ombur_globe*12d0/1d15,' (Pg C yr-1) = ',ombur_globe/1d12, ' (Tmol yr-1)'
-write(100,*) 'Global OM degradation      : ', omdec_globe*12d0/1d15,' (Pg C yr-1) = ',omdec_globe/1d12, ' (Tmol yr-1)'
-write(100,*) 'Global OM preservation     : ', omprs_globe*12d0/1d15,' (Pg C yr-1) = ',omprs_globe/1d12, ' (Tmol yr-1)'
+write(100,*) 'Global CH4 genesis         : ', ch4gen_globe*12d0/1d15, ' (Pg C yr-1) = ',ch4gen_globe, ' (mol yr-1)'
+write(100,*) 'Global SO4 reduction       : ', so4red_globe*12d0/1d15, ' (Pg C yr-1) = ',so4red_globe, ' (mol yr-1)'
+write(100,*) 'Global AOM                 : ', aom_globe*12d0/1d15,    ' (Pg C yr-1) = ',aom_globe,    ' (mol yr-1)'
+write(100,*) 'Global CH4 degas           : ', degas_globe*12d0/1d15,  ' (Pg C yr-1) = ',degas_globe,  ' (mol yr-1)'
+write(100,*) '---------------------------'
+write(100,*) 'Global OM rain             : ', ombur_globe*12d0/1d15,' (Pg C yr-1) = ',ombur_globe, ' (mol yr-1)'
+write(100,*) 'Global OM degradation      : ', omdec_globe*12d0/1d15,' (Pg C yr-1) = ',omdec_globe, ' (mol yr-1)'
+write(100,*) 'Global OM preservation     : ', omprs_globe*12d0/1d15,' (Pg C yr-1) = ',omprs_globe, ' (mol yr-1)'
 write(100,*) 'Preservation ratio     (%) : ', omprs_globe/ombur_globe*1d2
 close(100)
 
@@ -2590,12 +2699,14 @@ v_sed = 22d0 ! cm/kyr
 ! u_ext = -50d0  ! cm/kyr
 u_ext = -30d0  ! cm/kyr  ! Hunter et al. (2013)
 ! u_ext = -10d0  ! cm/kyr  ! Hunter et al. (2013)
+u_ext = par_sed_hydrate_exflow
 ! #ifdef noextflow
 ! u_ext = -0d0  ! cm/kyr
 ! #endif
 cm_ext = 0d0 ! mass fraction
 
 frac = 0.25d0
+frac = par_sed_hydrate_orgCfrac
 
 org_0 = 1.1d0 ! wt%, dry fraction 
 org_0 = 1.5d0 ! wt%, dry fraction 
@@ -2656,7 +2767,9 @@ endsubroutine count_lines
 !**************************************************************************************************************************************
 
 !**************************************************************************************************************************************
-subroutine checkfile(fname,ox)
+subroutine checkfile(fname,ox) 
+! returning .true.  if a file does not exist
+! returning .false. if a file does     exist
 implicit none
 character(*),intent(in)::fname
 logical,intent(out)::ox
@@ -2948,17 +3061,17 @@ do iz=1,nz
     else 
         ymx(row) = ymx(row) + (  &
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(0d0-org(iz))/dt  &! time chage rate in CH2O mol / sediment m3
-            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*0d0*v(iz)-(1d0-poro_0)*0d0*v_sed)/dz(iz) &! advecction
+            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*0d0*v(iz)-(1d0-poro(iz-1))*0d0*v(iz-1))/dz(iz) &! advecction
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(dec_m(iz)+dec_s(iz))*0d0  &! decomposition
             )
         amx(row,row) = amx(row,row) + (&
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(1d0-0d0)/dt  &! time chage rate in CH2O mol / sediment m3
-            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*1d0*v(iz)-(1d0-poro_0)*0d0*v_sed)/dz(iz) &! advecction
+            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*1d0*v(iz)-(1d0-poro(iz-1))*0d0*v(iz-1))/dz(iz) &! advecction
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(dec_m(iz)+dec_s(iz))*1d0  &! decomposition 
             )
         amx(row,row-1) = amx(row,row-1) + (&
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(0d0-0d0)/dt  &! time chage rate in CH2O mol / sediment m3
-            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*0d0*v(iz)-(1d0-poro_0)*1d0*v_sed)/dz(iz) &! advecction
+            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*0d0*v(iz)-(1d0-poro(iz-1))*1d0*v(iz-1))/dz(iz) &! advecction
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(dec_m(iz)+dec_s(iz))*0d0  &! decomposition 
             )
     endif 
@@ -3007,7 +3120,7 @@ do iz=1,nz
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(orgx(iz)-org(iz))/dt  &! time chage rate in CH2O mol / sediment m3
             )
         omflx(iadv,iz) = omflx(iadv,iz) + (  &
-            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*orgx(iz)*v(iz)-(1d0-poro_0)*orgx(iz-1)*v_sed)/dz(iz) &! advecction
+            -(rho_s/mch2o)*1d-2*((1d0-poro(iz))*orgx(iz)*v(iz)-(1d0-poro(iz-1))*orgx(iz-1)*v(iz-1))/dz(iz) &! advecction
             )
         omflx(irxn_om,iz) = omflx(irxn_om,iz) + (  &
             -(rho_s/mch2o)*1d-2*(1d0-poro(iz))*(dec_m(iz)+dec_s(iz))*orgx(iz)  &! decomposition
@@ -3016,6 +3129,9 @@ do iz=1,nz
     omflx(ires,iz)=sum(omflx(:,iz))
 enddo 
 
+print*,'net om flx  :',(rho_s/mch2o)*1d-2*((1d0-poro_0)*org_0*v_sed) - (rho_s/mch2o)*1d-2*((1d0-poro(nz))*orgx(nz)*v(nz))
+print*,'om rain flx :',(rho_s/mch2o)*1d-2*((1d0-poro_0)*org_0*v_sed) 
+print*,'om bur flx  :',(rho_s/mch2o)*1d-2*((1d0-poro(nz))*orgx(nz)*v(nz))
 
 endsubroutine omcalc
 !**************************************************************************************************************************************

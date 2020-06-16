@@ -258,8 +258,17 @@ CONTAINS
           ! om_map(dum_i,dum_j) = loc_sed_mean_OM_top
           omfrc_map(dum_i,dum_j) = loc_sed_pres_fracC
           ombur_map(dum_i,dum_j) = sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2  ! converting mol/cm2 to mol/m2/yr
-          loc_sed_pres_fracC = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracC   ! taking 0.25 of remaining for hydrate model 
-          loc_sed_pres_fracP = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracP   ! taking 0.25 of remaining for hydrate model 
+          omprs_map(dum_i,dum_j) = 0.0  
+          ! if (dum_i==2 .and. dum_j==22)then 
+             ! print *, 'preservation  :', (1.-0.25*margin_map(dum_i,dum_j))*loc_sed_pres_fracC &
+                ! *sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2
+             ! print *, 'decomposition :', 0.25*margin_map(dum_i,dum_j)*loc_sed_pres_fracC*sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2
+             ! print*,'pause in sedgem_box'
+             ! pause 
+          ! endif 
+          ! ombur_map(dum_i,dum_j) = 0.25*loc_sed_pres_fracC*sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2  ! converting mol/cm2 to mol/m2/yr
+          loc_sed_pres_fracC = (1.-par_sed_hydrate_orgCfrac*margin_map(dum_i,dum_j))*loc_sed_pres_fracC   ! taking 0.25 of remaining for hydrate model 
+          loc_sed_pres_fracP = (1.-par_sed_hydrate_orgCfrac*margin_map(dum_i,dum_j))*loc_sed_pres_fracP   ! taking 0.25 of remaining for hydrate model 
        endif 
        ! calculate the return rain flux back to ocean
        ! NOTE: diagenetic function calculates all (dissolved) exchange fluxes
@@ -1524,8 +1533,9 @@ CONTAINS
           ! om_map(dum_i,dum_j) = loc_sed_mean_OM_top
           omfrc_map(dum_i,dum_j) = loc_sed_pres_fracC
           ombur_map(dum_i,dum_j) = sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2  ! converting mol/cm2 to mol/m2/yr
-          loc_sed_pres_fracC = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracC   ! taking 0.25 of remaining for hydrate model 
-          loc_sed_pres_fracP = 0.75*margin_map(dum_i,dum_j)*loc_sed_pres_fracP   ! taking 0.25 of remaining for hydrate model 
+          omprs_map(dum_i,dum_j) = 0.0  
+          loc_sed_pres_fracC = (1.-par_sed_hydrate_orgCfrac*margin_map(dum_i,dum_j))*loc_sed_pres_fracC   ! taking 0.25 of remaining for hydrate model 
+          loc_sed_pres_fracP = (1.-par_sed_hydrate_orgCfrac*margin_map(dum_i,dum_j))*loc_sed_pres_fracP   ! taking 0.25 of remaining for hydrate model 
        endif 
        ! calculate the return rain flux back to ocean
        ! NOTE: diagenetic function calculates all (dissolved) exchange fluxes
