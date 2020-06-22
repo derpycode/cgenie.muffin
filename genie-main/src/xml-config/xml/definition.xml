@@ -2102,6 +2102,10 @@
 			<value datatype="boolean">.true.</value>
                         <description></description>
                     </param>
+                    <param name="opt_delf2x_cesm">
+			<value datatype="boolean">.false.</value>
+                        <description>apply CESM state-dependent climate sensitivity</description>
+                    </param>
                 </namelist>
             </file>
         </model>

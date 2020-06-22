@@ -225,6 +225,7 @@ c JDA adding some variables relating to the forcing
       real co2lev,solar,vol,aero
       character header*40
 c     radiative forcing terms
+      real co2_term
       real ch4_term,n2o_term
       real ch4_func
 
@@ -795,6 +796,13 @@ c     calculate coefficients
             tv1 = b01 + rq*(b11 + b21*rq)
             tv2 = b02 + rq*(b12 + b22*rq)
             tv3 = b03 + rq*(b13 + b23*rq)
+c     calculate CO2 contribution
+            if(opt_delf2x_cesm) then
+               co2_term = (4.81937*log(co2(i,j))/log(2.0) - 32.86485)
+     1              *log(co2(i,j)/co20)
+            else
+               co2_term = delf2x*log(co2(i,j)/co20)
+            endif
 c     calculate CH4 and N2O contributions
 c     NOTE units are ppb for CH4 and N2O calculation
             ch4_term = 
@@ -811,16 +819,14 @@ c pbh talt dependence removed for olr (orography only affects surface proceses n
                fxplw(i,j) = tv0 + talt*(tv1 
      1              + talt*(tv2 
      2              + talt*tv3))
-     3              - delf2x*log(co2(i,j)/co20)
-     4              - ch4_term - n2o_term
+     3              - co2_term - ch4_term - n2o_term
      5              + olr_adj*(meantemp-t_eqm)
      6              - olr_adj0
             else
                fxplw(i,j) = tv0 + atemp(i,j)*(tv1 
      1              + atemp(i,j)*(tv2 
      2              + atemp(i,j)*tv3))
-     3              - delf2x*log(co2(i,j)/co20)
-     4              - ch4_term - n2o_term
+     3              - co2_term - ch4_term - n2o_term
      5              + olr_adj*(meantemp-t_eqm)
      6              - olr_adj0
             endif

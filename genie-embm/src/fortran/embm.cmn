@@ -305,6 +305,8 @@ c AR (18/01/08) : run-time seasonality option
 c AR : radiative forcing by CH4 and N2O
       real alphach4,alphan2o
       common /embm_greenhouse/alphach4,alphan2o
+      logical opt_delf2x_cesm
+      common /embm_greenhouse/opt_delf2x_cesm
 
 c orography
       real lapse_rate
