@@ -20,6 +20,7 @@ real,save::ceqh_map(n_i,n_j)
 real,save::ceqb_map(n_i,n_j)
 real,save::heatflow_map(n_i,n_j)
 real,save::depth_map(n_i,n_j)
+real,save::sedthick_map(n_i,n_j)
 real,save::om_map(n_i,n_j)
 real,save::omprs_map(n_i,n_j)
 real,save::ombur_map(n_i,n_j)
@@ -56,7 +57,7 @@ integer,intent(in)::dum_i,dum_j
 real,intent(in)::depth_in,btmocn_in(n_ocn),dtyr_in,new_sed_in(n_sed),dis_sed_in(n_sed)
 
 real loc_D_hydrate,loc_T_hydrate,loc_DO_hydrate,loc_v_sed,dum_dtyr,loc_org_0,loc_geotherm,loc_margin,loc_v_sedv
-real loc_sed_pres_fracC,loc_sed_pres_fracP,loc_exe_ocn(n_ocn),loc_sed_mean_OM_top,loc_sed_mean_OM_bot
+real loc_sed_pres_fracC,loc_sed_pres_fracP,loc_exe_ocn(n_ocn),loc_sed_mean_OM_top,loc_sed_mean_OM_bot,sedthick
 
 loc_D_hydrate = depth_in
 loc_T_hydrate = btmocn_in(io_T)
@@ -127,27 +128,33 @@ endselect
 
 select case(trim(par_sed_hydrate_opt_margin)) ! calculation is conducted only on margins 
     case('depth')  ! margin is assumed to be areas whose depths are shallower than some threshold value 
-        ! if (loc_D_hydrate > par_sed_hydrate_threshold) then 
-            ! loc_margin = 0.0
-        ! else 
-            ! loc_margin = 1.0
-        ! endif
-        ! if (dum_i==1 .and. dum_j==11) then    
-        if (dum_i==2 .and. dum_j==22) then    
-            loc_margin = 1.0
-            print*,loc_D_hydrate,loc_T_hydrate,loc_DO_hydrate,loc_v_sed,loc_org_0
-        else 
+        if (loc_D_hydrate > par_sed_hydrate_threshold) then 
             loc_margin = 0.0
-        endif 
+        else 
+            loc_margin = 1.0
+        endif
+        ! if (dum_i==1 .and. dum_j==11) then    
+        ! if (dum_i==2 .and. dum_j==22) then    
+            ! loc_margin = 1.0
+            ! print*,loc_D_hydrate,loc_T_hydrate,loc_DO_hydrate,loc_v_sed,loc_org_0
+        ! else 
+            ! loc_margin = 0.0
+        ! endif 
     case('archer09')  ! margin is obtained from Archer et al. (2009)
         call get_margin_mask_Archer09(dum_i,dum_j,loc_margin)
 endselect 
+
+call get_sed_thick_Laske97(dum_i,dum_j,sedthick)
+
+if (loc_v_sed < const_real_nullsmall .or. loc_org_0 < const_real_nullsmall) then 
+    loc_margin = 0.0
+endif 
 
 call hydrate_main(                                                          &
     dum_i,dum_j,dum_dtyr,                                                   &
     loc_geotherm,loc_D_hydrate,loc_T_hydrate,btmocn_in(io_S),loc_v_sed,     &
     btmocn_in(io_SO4)*1e3,btmocn_in(io_CH4),loc_org_0,                      &
-    loc_margin                                                              &    
+    sedthick,loc_margin                                                     &    
     )
 
 endsubroutine hydrate_update
@@ -158,7 +165,7 @@ subroutine hydrate_main(                            &
     dum_i,dum_j,dum_dt,                             &
     geotherm_in,wdpth_in,wtemp_in,sal_in,v_sed_in,  &
     so4s_in,cm_0_in,org_0_in,                       &
-    margin_in                                       &
+    sedthick_in,margin_in                           &
     )
 implicit none
 
@@ -178,7 +185,7 @@ implicit none
 !  changing the main program to subroutine to be incorporated in genie (for this macros are removed)
 
 integer,intent(in)::dum_i,dum_j
-real,intent(in)::geotherm_in,wdpth_in,wtemp_in,sal_in,v_sed_in,so4s_in,cm_0_in,org_0_in,dum_dt,margin_in
+real,intent(in)::geotherm_in,wdpth_in,wtemp_in,sal_in,v_sed_in,so4s_in,cm_0_in,org_0_in,dum_dt,margin_in,sedthick_in
 
 integer iz, nz, iz3,it, izso4
 parameter (nz = 30)
@@ -339,6 +346,7 @@ character(1000) resdir
 real:: min_thr = 1d-10
 
 logical:: grid_evol = .false.
+logical dir_e
 
 real::loc_zs,loc_hsz
 
@@ -406,7 +414,8 @@ xis = sal/(1000d0/18d0) ! mole fraction assuming salt is all NaCl
 v_sed = v_sed_in*10d0/(2.65d0*(1d0-0.67d0))*1d2 ! converting g/cm2/yr to cm/kyr where porosity 0.67 and solid density 2.65 is assumed 
 so4s = so4s_in
 cs_0 = so4s*1d-3  ! converting mM to M
-cm_0 = cm_0_in
+! cm_0 = cm_0_in
+cm_0 = max(0.0,cm_0_in) 
 org_0 = org_0_in
 loc_margin = margin_in
 
@@ -494,8 +503,14 @@ if(loc_margin <= 0d0 .or. (.not.bubble_only.and.hszflg == 2)) then
     sedv_map(dum_i,dum_j) = v_sed   ! cm/kyr
     sal_map(dum_i,dum_j) = sal*58.44d0
     margin_map(dum_i,dum_j) = loc_margin
+    sedthick_map(dum_i,dum_j) = sedthick_in
     return
 endif
+
+inquire(file=trim(adjustl(outdir))//'res/.', exist=dir_e)
+if (.not.dir_e) then 
+    irec_hydrate = 0
+endif 
     
 call system('mkdir -p '//trim(adjustl(outdir))//'profiles/'//trim(adjustl(outfilename)))
 call system('mkdir -p '//trim(adjustl(outdir))//'res')
@@ -509,7 +524,7 @@ if (hydrate_restart) then
     hydrate_restart_OK = .not. hydrate_restart_OK
 endif 
 
-if(first_call)irec_hydrate = 0
+! if(first_call)irec_hydrate = 0
 
 if (first_call) then 
     first_call_save = .true.
@@ -786,7 +801,7 @@ timeloop:do
     if (time + dt_ref >= time_fin) dt_ref = time_fin - time
     if (.not.flg_esc) dt = dt_ref  ! in yr
     dt_om = 1d100
-    ! if (spin_aq_done) dt_om = dt
+    if (spin_aq_done) dt_om = dt
     dt_aq = dt
     dt_sld = dt
     
@@ -1073,15 +1088,20 @@ if (frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j) > 0d0 &
         /(frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j))>tol  )then 
     print*,'om not in balance'
     print*,dum_i,dum_j 
-    print*,abs(sum(omflx(iadv,:)*dz(:))),frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j)
+    print*,abs(sum(omflx(iadv,:)*dz(:))),frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j)  &
+        ,(rho_s/mch2o)*1d-2*((1d0-poro(nz))*org(nz)*v(nz)) &
+        ,abs(frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j)  &
+            -omprs_map(dum_i,dum_j)- abs(sum(omflx(iadv,:)*dz(:)))) &
+            /(frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j))
     print*,org_0,v_sed
-    pause
+    ! pause
 endif 
 
 ch4gen_map(dum_i,dum_j) = sum(ch4flx(irxn_om,:)*dz(:))  
 so4red_map(dum_i,dum_j) = sum(so4flx(irxn_om,:)*dz(:))  
 aom_map(dum_i,dum_j) = sum(so4flx(irxn_aom,:)*dz(:))  
 degas_map(dum_i,dum_j) = (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:))
+! degas_map(dum_i,dum_j) = 0d0
 
 select case(trim(par_sed_hydrate_opt_org))
     case('muds') 
@@ -1185,6 +1205,7 @@ temp_map(dum_i,dum_j) = wtemp
 sedv_map(dum_i,dum_j) = v_sed/(1d-2/1d3) ! converting m/yr to cm/kyr 
 sal_map(dum_i,dum_j) = sal*58.44d0
 margin_map(dum_i,dum_j) = loc_margin
+sedthick_map(dum_i,dum_j) = sedthick_in
 
 if (first_call) then 
     mhinv_map_OLD(dum_i,dum_j) = mhinv_map(dum_i,dum_j)
@@ -2262,6 +2283,28 @@ endsubroutine get_margin_mask_Archer09
 !**************************************************************************************************************************************
 
 !**************************************************************************************************************************************
+subroutine get_sed_thick_Laske97(loc_i,loc_j,sed_thick)
+implicit none
+real,intent(out)::sed_thick
+integer,intent(in)::loc_i,loc_j
+
+integer loc_k
+real dum(n_j)
+
+if(n_j==72) open(unit=100,file=trim(par_indir_name)//'/sedthickness_laske97_72x72.dat',status='old',action='read')
+if(n_j==36) open(unit=100,file=trim(par_indir_name)//'/sedthickness_laske97_36x36.dat',status='old',action='read')
+do loc_k=1,loc_j
+    read(100,*)dum(:)
+enddo
+
+sed_thick = dum(loc_i)
+
+close(100)
+
+endsubroutine get_sed_thick_Laske97
+!**************************************************************************************************************************************
+
+!**************************************************************************************************************************************
 subroutine get_bDO_Hunter13(loc_i,loc_j,bDO)
 implicit none
 real,intent(out)::bDO
@@ -2335,12 +2378,20 @@ integer i,j
 character*256 workdir,intchr
 real h_globe,b_globe,ch4flx_globe,ombur_globe,omdec_globe,omprs_globe,so4flx_globe,dicflx_globe,alkflx_globe
 real aom_globe,ch4gen_globe,so4red_globe,degas_globe
+logical dir_e
 
 ! print*, ' printing data by signal tracking model '
 
-write(intchr,*)irec_hydrate
 workdir = trim(par_outdir_name)
 workdir = trim(adjustl(workdir))//'/hydrate/res/'
+
+inquire(file=trim(adjustl(workdir))//'/hydrate/res/.', exist=dir_e)
+if (.not.dir_e) then 
+    irec_hydrate = 0
+    call system('mkdir -p '//trim(adjustl(workdir)))
+endif 
+
+write(intchr,*)irec_hydrate
 
 h_globe = 0d0
 b_globe = 0d0
@@ -2371,6 +2422,7 @@ do j=1,n_j
             ceqh_map(i,j)     = const_real_null
             ceqb_map(i,j)     = const_real_null
             heatflow_map(i,j) = const_real_null
+            sedthick_map(i,j) = const_real_null
             depth_map(i,j)    = const_real_null
             om_map(i,j)       = const_real_null
             omfrc_map(i,j)    = const_real_null
@@ -2462,6 +2514,11 @@ if (irec_hydrate == par_sed_hydrate_savefreq) then
     open(unit=100,file=trim(adjustl(workdir))//'heatflow-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
     do j=1,n_j
         write(100,*) (heatflow_map(i,j),i=1,n_i)
+    enddo 
+    close(100)
+    open(unit=100,file=trim(adjustl(workdir))//'sedthick-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+    do j=1,n_j
+        write(100,*) (sedthick_map(i,j),i=1,n_i)
     enddo 
     close(100)
     open(unit=100,file=trim(adjustl(workdir))//'margin-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
@@ -4524,6 +4581,7 @@ if (any(hx<0d0) .or. any(bx<0d0)) then
 endif 
 
 if (any(hx>1d0) .or. any(bx>1d0)) then
+    print*,'*** Hydrate or bubble vol% exceed 100%'
     flg_esc = .true.
     do iz=1,nz
         if(hx(iz)>1d0)then
@@ -4535,6 +4593,7 @@ if (any(hx>1d0) .or. any(bx>1d0)) then
             rxn_hb(iz)=0d0
         endif
     enddo
+    pause
     return
 endif 
 
