@@ -964,7 +964,8 @@ CONTAINS
     ! ############################################################################################################################ !
 
     ! *** SET DOM FRACTIONS ****************************************************************************************************** !
-    If (ctrl_bio_red_DOMfrac_Tdep) then
+    select case (opt_bio_red_DOMfrac)
+    case ('dunne')
        ! NOTE: from Dunne et al. [2005]
        !       rPOC = 0.419 + 0.0582 * ln(PP/Zeu) - 0.0101 * C :: for 0.04 < rPOC < 0.72
        !       where: temperature (T) is in units of degrees C
@@ -980,16 +981,36 @@ CONTAINS
        loc_PPoverZeu = 1.0E+3*1027.649*bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4/(conv_yr_d*dum_dt)
        loc_rPOC  = 0.419 + 0.0582*log(loc_PPoverZeu) - 0.0101*loc_TC
        ! cap loc_rPOC range
-       If (loc_rPOC < 0.04)  loc_rPOC = 0.04
-       If (loc_rPOC > 0.419) loc_rPOC = 0.419
+       If (loc_rPOC < 0.04) loc_rPOC = 0.04
+       If (loc_rPOC > 0.72) loc_rPOC = 0.72
        ! set DOMfrac
        ! NOTE: for now, ignore RDOM creation via primary production ...
        loc_bio_red_DOMfrac  = 1.0 - loc_rPOC
        loc_bio_red_RDOMfrac = 0.0
-    else
+    case ('simple')
+       ! NOTE: just the T-dependent part of Dunne et al. [2005]
+       !       rPOC = 0.419 - 0.0101 * C :: for 0.04 < rPOC < 0.72
+       loc_rPOC = par_bio_red_DOMfrac_Tdep_const - par_bio_red_DOMfrac_Tdep_gamma*loc_TC
+       ! cap loc_rPOC range
+       ! NOTE: simplified range
+       If (loc_rPOC < 0.0) loc_rPOC = 0.0
+       If (loc_rPOC > 1.0) loc_rPOC = 1.0
+       ! set DOMfrac
+       ! NOTE: for now, ignore RDOM creation via primary production ...
+       loc_bio_red_DOMfrac  = 1.0 - loc_rPOC
+       loc_bio_red_RDOMfrac = 0.0
+    case ('DEFAULT')
        loc_bio_red_DOMfrac  = par_bio_red_DOMfrac
        loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
-    end if
+    case default
+       CALL sub_report_error( &
+            & 'biogem_box','sub_calc_bio_uptake', &
+            & 'Unrecognised <opt_bio_red_DOMfrac> option: '//TRIM(opt_bio_red_DOMfrac)//'. ' // &
+            & 'Valid options: dunne, simple, DEFAULT', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    end select
 
     ! *** ADJUST FOR TOTAL DOM + RDOM ******************************************************************************************** !
     ! check for total DOM fraction exceeding 1.0 and re-scale (proportionally and to sum to 1.0)

@@ -206,8 +206,11 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_RDOMlifetime
   LOGICAL::ctrl_bio_remin_RDOM_photolysis                               ! RDOM degradation by (surface) photolysis only?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_RDOM_photolysis
-  LOGICAL::ctrl_bio_red_DOMfrac_Tdep                                    ! T-dependent DOM production?
-  NAMELIST /ini_biogem_nml/ctrl_bio_red_DOMfrac_Tdep
+  CHARACTER(len=63)::opt_bio_red_DOMfrac                                ! DOM production option
+  NAMELIST /ini_biogem_nml/opt_bio_red_DOMfrac
+  real::par_bio_red_DOMfrac_Tdep_const                                  ! DOM production constant in Dunne et al. [2005]
+  real::par_bio_red_DOMfrac_Tdep_gamma                                  ! DOM production scalar in Dunne et al. [2005]
+  NAMELIST /ini_biogem_nml/par_bio_red_DOMfrac_Tdep_const,par_bio_red_DOMfrac_Tdep_gamma
   LOGICAL::ctrl_bio_remin_DOM_Tdep                                      ! T-dependent DOM remineralization?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_DOM_Tdep
   LOGICAL::ctrl_bio_remin_POC_fixed                              ! fixed-profile POM remineralization

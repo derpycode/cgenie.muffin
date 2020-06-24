@@ -4364,9 +4364,17 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>RDOM degradation by (surface) photolysis only?</description>
                     </param>
-                    <param name="ctrl_bio_red_DOMfrac_Tdep">
-			<value datatype="boolean">.false.</value>
-                        <description>T-dependent DOM production?</description>
+                    <param name="opt_bio_red_DOMfrac">
+			<value datatype="string">DEFAULT</value>
+                        <description>DOM production option</description>
+                    </param>
+                    <param name="par_bio_red_DOMfrac_Tdep_const">
+			<value datatype="real">0.419</value>
+                        <description>DOM production constant in Dunne et al. [2005]</description>
+                    </param>
+                    <param name="par_bio_red_DOMfrac_Tdep_gamma">
+			<value datatype="real">0.0101</value>
+                        <description>DOM production scalar in Dunne et al. [2005]</description>
                     </param>
                     <param name="ctrl_bio_remin_DOM_Tdep">
 			<value datatype="boolean">.false.</value>

@@ -197,7 +197,9 @@ CONTAINS
        print*,'DOM lifetime (yrs)                                  : ',par_bio_remin_DOMlifetime
        print*,'RDOM lifetime (yrs)                                 : ',par_bio_remin_RDOMlifetime
        print*,'RDOM degradation by (surface) photolysis only?      : ',ctrl_bio_remin_RDOM_photolysis
-       print*,'T-dependent DOM production?                         : ',ctrl_bio_red_DOMfrac_Tdep
+       print*,'DOM production option                               : ',opt_bio_red_DOMfrac
+       print*,'DOM production constant in Dunne et al. [2005]      : ',par_bio_red_DOMfrac_Tdep_const
+       print*,'DOM production scalar in Dunne et al. [2005]        : ',par_bio_red_DOMfrac_Tdep_gamma
        print*,'T-dependent DOM remineralization?                   : ',ctrl_bio_remin_DOM_Tdep
        print*,'Apply fixed-profile for POM remineralization?       : ',ctrl_bio_remin_POC_fixed
        print*,'Kinetic-based POM remineralization?                 : ',ctrl_bio_remin_POC_kinetic
