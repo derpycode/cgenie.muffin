@@ -2618,6 +2618,8 @@ CONTAINS
     DO k=n_k,loc_k1,-1
        ! calculate DOM lifetime modifier
        ! NOTE: dum_vocn%mk(1,k) is the local temeprature (K)
+       ! NOTE: T-dependent DOM remin assumes the same Ea1 as for particulate organic matter remin (par_bio_remin_POC_Ea1)
+       !       (but scaling rate constant differs -- par_bio_remin_DOC_K1)
        ! NOTE: check that no more DOM than exists (100% or fraction 1.0), is remineralized
        If (ctrl_bio_remin_DOM_Tdep) then
           loc_bio_remin_DOMratio = dum_dtyr*par_bio_remin_DOC_K1*exp(-par_bio_remin_POC_Ea1/(const_R_SI*dum_vocn%mk(1,k)))
