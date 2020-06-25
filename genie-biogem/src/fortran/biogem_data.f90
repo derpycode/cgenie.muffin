@@ -1608,6 +1608,7 @@ CONTAINS
     int_misc_opn_fxsw_sig   = 0.0
     int_ocnsed_sig(:)       = 0.0
     int_diag_bio_sig(:)     = 0.0
+    int_diag_bioNORM_sig(:) = 0.0
     int_diag_geochem_old_sig(:) = 0.0
     int_diag_precip_sig(:)  = 0.0
     int_diag_iron_sig(:)    = 0.0

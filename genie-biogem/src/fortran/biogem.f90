@@ -3296,7 +3296,7 @@ SUBROUTINE diag_biogem_timeseries( &
   real::loc_ocn_rtot_A,loc_opn_rtot_A,loc_ocnatm_rtot_A          !
   real::loc_ocnsed_tot_A,loc_ocnsed_tot_A_ben                    !
   real::loc_ocnsed_rtot_A,loc_ocnsed_rtot_A_ben                  !
-  real::loc_tot_A                                                !
+  real::loc_tot_A,loc_tot_EP                                     !
   real::loc_sig                                                  !
   REAL,DIMENSION(2)::loc_opsia_minmax,loc_opsip_minmax           !
   real::loc_opsi_scale                                           !
@@ -3688,12 +3688,19 @@ SUBROUTINE diag_biogem_timeseries( &
            ! NOTE: the area used in calculating a mean global biological uptake rates must be total ocean surface area
            !       (i.e., including sea-ice covered area)
            ! NOTE: diag_bio variables have already been converted into yr-1
-           loc_tot_A = sum(phys_ocn(ipo_A,:,:,n_k))
+           loc_tot_A  = sum(phys_ocn(ipo_A,:,:,n_k))
+           loc_tot_EP = SUM(bio_settle(is_POC,:,:,n_k))
            IF (ctrl_data_save_sig_diag .OR. ctrl_data_save_sig_diag_geochem) THEN
               DO ib=1,n_diag_bio
                  int_diag_bio_sig(ib) = int_diag_bio_sig(ib) + &
                       & SUM(phys_ocn(ipo_A,:,:,n_k)*diag_bio(ib,:,:))/loc_tot_A
               END DO
+              if (loc_tot_EP > const_real_nullsmall) then
+                 DO ib=1,n_diag_bio
+                    int_diag_bioNORM_sig(ib) = int_diag_bioNORM_sig(ib) + &
+                         & SUM(bio_settle(is_POC,:,:,n_k)*diag_bio(ib,:,:))/loc_tot_EP
+                 END DO
+              end if
               DO id=1,n_diag_geochem_old
                  int_diag_geochem_old_sig(id) = int_diag_geochem_old_sig(id) + &
                       & SUM(phys_ocn(ipo_M,:,:,:)*diag_geochem_old(id,:,:,:))*loc_ocn_rtot_M

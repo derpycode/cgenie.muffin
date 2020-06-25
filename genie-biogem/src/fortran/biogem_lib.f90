@@ -1235,7 +1235,8 @@ MODULE biogem_lib
   real::int_misc_SLT_sig                                         !
   real::int_misc_det_Fe_tot_sig,int_misc_det_Fe_dis_sig          !
   REAL,DIMENSION(n_sed)::int_ocnsed_sig                          !
-  REAL,DIMENSION(n_diag_bio)::int_diag_bio_sig                   ! biology diagnostics
+  REAL,DIMENSION(n_diag_bio)::int_diag_bio_sig                   ! biology diagnostics (area weighted mean)
+  REAL,DIMENSION(n_diag_bio)::int_diag_bioNORM_sig               ! biology diagnostics (POC export weighted mean)
   REAL,DIMENSION(n_diag_geochem_old)::int_diag_geochem_old_sig   ! geochemistry diagnostics -- OLD
   REAL,DIMENSION(n_diag_precip)::int_diag_precip_sig             ! geochemistry diagnostics -- precipitation
   REAL,DIMENSION(n_diag_iron)::int_diag_iron_sig                 ! geochemistry (Fe) diagnostics
