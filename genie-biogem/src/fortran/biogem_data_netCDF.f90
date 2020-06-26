@@ -1381,53 +1381,51 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Fe diagnostics
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_geochem) then
-       IF (ocn_select(io_Fe)) THEN
-          ! total aeolian Fe flux (mass)
-          loc_unitsname = 'mg Fe m-2 yr-1'
-          loc_ij(:,:) = conv_mol_mmol*par_det_Fe_frac*conv_det_mol_g* &
-               & int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_det,:,:,n_k)/(int_t_timeslice**2)
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_g','Total aeolian iron flux to surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fFetot_g',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! total aeolian Fe flux (moles)
-          loc_unitsname = 'mmol Fe m-2 yr-1'
-          loc_ij(:,:) = conv_Fe_g_mol*loc_ij(:,:)
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_mol','Total aeolian iron flux to surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fFetot_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! solulablized aeolian Fe flux
-          loc_unitsname = 'umol Fe m-2 yr-1'
-          loc_ij(:,:) = conv_mol_umol*conv_mmol_mol*int_phys_ocnatm_timeslice(ipoa_solFe,:,:)*loc_ij(:,:)/int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFe_mol','Dissolved aeolian iron flux to surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fFe_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! particulate Fe loss
-          loc_unitsname = 'umol Fe m-2 yr-1'
-          loc_ij(:,:) = conv_mol_umol* &
-               & int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_POFe,:,:,n_k)/(int_t_timeslice**2)
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fpartFe','Particulate organic matter iron loss from surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fpartFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! total scavenged Fe loss
-          loc_unitsname = 'umol Fe m-2 yr-1'
-          loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
-               & ( &
-               &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k)   + &
-               &   int_bio_settle_timeslice(is_CaCO3_Fe,:,:,n_k) + &
-               &   int_bio_settle_timeslice(is_opal_Fe,:,:,n_k) + &
-               &   int_bio_settle_timeslice(is_det_Fe,:,:,n_k) &
-               & )
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged iron loss from surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fscavFetot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! solubility (%)
-          loc_unitsname = '%'
-          loc_ij(:,:) = 100.0*int_phys_ocnatm_timeslice(ipoa_solFe,:,:)/int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_Fe_sol','Aeolian iron solubility', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_Fe_sol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-       end if
+    If (ctrl_data_save_slice_ocn .AND. (ocn_select(io_Fe) .OR. ocn_select(io_TDFe))) then
+       ! total aeolian Fe flux (mass)
+       loc_unitsname = 'mg Fe m-2 yr-1'
+       loc_ij(:,:) = conv_mol_mmol*par_det_Fe_frac*conv_det_mol_g* &
+            & int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_det,:,:,n_k)/(int_t_timeslice**2)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_g','Total aeolian iron flux to surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fFetot_g',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! total aeolian Fe flux (moles)
+       loc_unitsname = 'mmol Fe m-2 yr-1'
+       loc_ij(:,:) = conv_Fe_g_mol*loc_ij(:,:)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_mol','Total aeolian iron flux to surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fFetot_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! solulablized aeolian Fe flux
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = conv_mol_umol*conv_mmol_mol*int_phys_ocnatm_timeslice(ipoa_solFe,:,:)*loc_ij(:,:)/int_t_timeslice
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFe_mol','Dissolved aeolian iron flux to surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fFe_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! particulate Fe loss
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = conv_mol_umol* &
+            & int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_POFe,:,:,n_k)/(int_t_timeslice**2)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fpartFe','Particulate organic matter iron loss from surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fpartFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! total scavenged Fe loss
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
+            & ( &
+            &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k)   + &
+            &   int_bio_settle_timeslice(is_CaCO3_Fe,:,:,n_k) + &
+            &   int_bio_settle_timeslice(is_opal_Fe,:,:,n_k) + &
+            &   int_bio_settle_timeslice(is_det_Fe,:,:,n_k) &
+            & )
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged iron loss from surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fscavFetot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! solubility (%)
+       loc_unitsname = '%'
+       loc_ij(:,:) = 100.0*int_phys_ocnatm_timeslice(ipoa_solFe,:,:)/int_t_timeslice
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_Fe_sol','Aeolian iron solubility', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_Fe_sol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
     end if
     !-----------------------------------------------------------------------
     !       Fe:C export cellular quotient ratio
