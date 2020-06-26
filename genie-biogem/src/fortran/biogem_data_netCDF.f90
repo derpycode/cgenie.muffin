@@ -1378,7 +1378,7 @@ CONTAINS
     !       Fe diagnostics
     !-----------------------------------------------------------------------
     If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_bio) then
-       IF (ocn_select(io_Fe) .OR. ocn_select(io_Fe)) THEN
+       IF (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) THEN
           ! total aeolian Fe flux (mass)
           loc_unitsname = 'mg Fe m-2 yr-1'
           loc_ij(:,:) = conv_mol_mmol*par_det_Fe_frac*conv_det_mol_g* &
