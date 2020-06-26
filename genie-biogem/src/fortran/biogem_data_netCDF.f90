@@ -555,7 +555,7 @@ CONTAINS
                & loc_lat_moc_e(:), loc_c1, loc_c0)
           loc_zt_moc_e(0) = 0.0
           loc_zt_moc_e(1:n_k) = phys_ocn(ipo_Dmid,1,1,n_k:1:-1)
-          loc_zt_moc_e(n_k+1) = goldstein_dsc
+          loc_zt_moc_e(n_k+1) = phys_ocn(ipo_Dbot,1,1,1)
           call sub_putvar1d ('zt_moc_edges', loc_iou, n_k+2, loc_ntrec, n_k+2, &
                & loc_zt_moc_e(:), loc_c1, loc_c0)
           ! PSI
@@ -652,7 +652,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       pH FIELD
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_diag_geochem) then
+    if (ctrl_data_save_slice_bio .OR. ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'pH units (SWS)'
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ijk(:,:,:) = const_real_zero
@@ -829,7 +829,7 @@ CONTAINS
     !       Fe SPECIATION [complete]
     !----------------------------------------------------------------
     If ( &
-         & (ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_geochem) &
+         & (ctrl_data_save_slice_ocn) &
          & .AND. &
          & (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) &
          & ) then
@@ -856,7 +856,7 @@ CONTAINS
           DO i=1,n_i
              DO j=1,n_j
                 DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)                                                       
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)
                 END DO
              END DO
           END DO
@@ -904,7 +904,7 @@ CONTAINS
           DO i=1,n_i
              DO j=1,n_j
                 DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)                                            
+                   loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)
 
                 END DO
              END DO
@@ -1070,7 +1070,7 @@ CONTAINS
                       DO j=1,n_j
                          DO k=goldstein_k1(i,j),n_k
                             select case (io)
-                            CASE (io_col0:io_col6,io_col9)
+                            CASE (io_col0:io_col6)
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
                                loc_unitsname  = 'mol kg-1'
                             CASE (io_col7)
@@ -1082,12 +1082,16 @@ CONTAINS
                             CASE (io_col8)
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
                                loc_unitsname  = 'yrs'
+                            CASE (io_col9)
+                               loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                               loc_unitsname  = 'mol kg-1'
                             case default
                                ! NOTHING DOING
                             end select
                          END DO
                       END DO
                    END DO
+                   loc_name = 'diag_pre_NULL_'//fun_conv_num_char_n(2,io)
                    select case (io)
                    CASE (io_col0)
                       if (ocn_select(io_DIC))     loc_name = 'diag_pre_'//trim(string_ocn(io_DIC))
@@ -1107,17 +1111,9 @@ CONTAINS
                    CASE (io_col7)
                       if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
                    CASE (io_col8)
-                      if (ocn_select(io_DIC_14C) .AND. ctrl_force_ocn_age) then
-                         loc_name = 'diag_pre_d14C_age'
-                      else
-                         !!! (alternative preformed tracer?)
-                      end if
+                      if (ocn_select(io_DIC_14C)) loc_name = 'diag_pre_d14C_age'
                    CASE (io_col9)
-                      if (ocn_select(io_DIC) .AND. ctrl_bio_remin_redox_save) then
-                         loc_name = 'diag_pre_Csoft'
-                      else
-                         !!! (alternative preformed tracer?)
-                      end if
+                      if (ocn_select(io_DIC))     loc_name = 'diag_reg_Csoft'
                    end select
                    call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
                         & trim(loc_unitsname),const_real_zero,const_real_zero)
@@ -1205,7 +1201,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       pH FIELD
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_diag_geochem) then
+    if (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'pH units (SWS)'
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ij(:,:) = const_real_zero
@@ -1224,7 +1220,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       P:C export cellular quotient ratio
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
        IF (sed_select(is_POP) .AND. sed_select(is_POC)) THEN
           ! P/C
           loc_unitsname = 'n/a'
@@ -1261,7 +1257,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       CaCO3:POC surface ocean export 'rain ratio'
     !-----------------------------------------------------------------------
-    IF (ctrl_data_save_slice_bio) THEN
+    IF (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) THEN
        loc_unitsname = 'n/a'
        IF (sed_select(is_CaCO3) .AND. sed_select(is_POC)) THEN
           loc_ij(:,:) = const_real_null
@@ -1284,7 +1280,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       opal:POC surface ocean export 'rain ratio'
     !-----------------------------------------------------------------------
-    IF (ctrl_data_save_slice_bio) THEN
+    IF (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) THEN
        loc_unitsname = 'n/a'
        IF (sed_select(is_opal) .AND. sed_select(is_POC)) THEN
           loc_ij(:,:) = const_real_null
@@ -1307,7 +1303,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       POC frac2 surface ocean export ratio
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        loc_unitsname = 'n/a'
        loc_ij(:,:) = const_real_null
        DO i=1,n_i
@@ -1326,7 +1322,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Cd particulate surface ocean export trace metal ratios
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_proxy) then
+    If (ctrl_data_save_slice_diag_proxy) then
        IF (ocn_select(io_Cd)) THEN
           loc_unitsname = 'nmol kg-1 (umol kg-1)-1'
           IF (sed_select(is_POCd) .AND. sed_select(is_POC)) THEN
@@ -1443,7 +1439,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Fe:C export cellular quotient ratio
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        IF (sed_select(is_POFe) .AND. sed_select(is_POC)) THEN
           ! C/Fe
           loc_unitsname = 'n/a'
@@ -1480,7 +1476,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Biological productivity controls
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        DO ib=1,n_diag_bio
           select case (ib)
           CASE (idiag_bio_dPO4,idiag_bio_dPO4_1,idiag_bio_dPO4_2)
@@ -1524,7 +1520,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     ! ECOGEM diagnostics
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio .AND. flag_ecogem) then
+    if (ctrl_data_save_slice_diag_bio .AND. flag_ecogem) then
        ! calculate POM equivalnt of DOM
        loc_isij(:,:,:) = 0.0
        DO i=1,n_i
@@ -1565,7 +1561,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     ! nutrient availablity diagnostics
     !-----------------------------------------------------------------------
-    if (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_bio) then
+    if (ctrl_data_save_slice_diag_bio) then
        if ( ocn_select(io_PO4) .AND. ocn_select(io_SiO2) ) then
           loc_unitsname = 'n/a'
           loc_ij(:,:) = const_real_null
@@ -1783,6 +1779,10 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,3,'phys_MLD','mixed layer depth',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('phys_MLD',loc_iou,n_i,n_j,loc_ntrec, &
             & int_phys_ocnatm_timeslice(ipoa_mld,:,:)/int_t_timeslice,loc_mask_surf)
+       loc_unitsname = 'n/a'
+       call sub_adddef_netcdf(loc_iou,3,'phys_MLD_k','mixed layer level',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('phys_MLD_k',loc_iou,n_i,n_j,loc_ntrec, &
+            & int_phys_ocnatm_timeslice(ipoa_mld_k,:,:)/int_t_timeslice,loc_mask_surf)
     end if
     !----------------------------------------------------------------
     !       FULL ATMOSPEHRE 'PHYSICS'
@@ -1840,7 +1840,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       WATER-COLUMN INTEGRATED TRACER INVENTORIES
     !----------------------------------------------------------------
-    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_tracer) .OR. (par_data_save_level == 10)) then
+    If (ctrl_data_save_slice_diag_geochem .OR. (par_data_save_level == 10)) then
        loc_unitsname = 'mol m-2'
        DO l=3,n_l_ocn
           io = conv_iselected_io(l)
@@ -1959,7 +1959,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       OCEAN SURFACE DATA
     !----------------------------------------------------------------
-    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
              loc_ij(:,:) = const_real_zero
@@ -2008,7 +2008,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       OCEAN FLOOR DATA
     !----------------------------------------------------------------
-    If ((ctrl_data_save_slice_ocn .AND. ctrl_data_save_slice_diag_proxy) .OR. ctrl_data_save_slice_sur) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
              loc_ij(:,:) = const_real_zero
@@ -2089,7 +2089,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       PARTICULATE FLUXES
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_bio) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           loc_ij(:,:) = const_real_zero
@@ -2141,6 +2141,7 @@ CONTAINS
     !--------------------------------------------------------- !
     if (ctrl_data_save_slice_cdrmip) CALL sub_save_netcdf_2d_cdrmip()
     !--------------------------------------------------------- !
+    !--------------------------------------------------------- !
   END SUBROUTINE sub_save_netcdf_2d
   ! ****************************************************************************************************************************** !
 
@@ -2166,7 +2167,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       save ocn->sed interface flux data
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_focnsed) then
+    If (ctrl_data_save_slice_focnsed .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           loc_ij(:,:) = const_real_zero
@@ -2653,10 +2654,6 @@ CONTAINS
           call sub_putvar3d_g('ocn_DIC_D14C_age',loc_iou,n_i,n_j,n_k, &
                & loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end if
-       ! color tracer ratios -- as an age tracer
-       IF (ctrl_force_ocn_age) then
-          CALL sub_save_netcdf_ocn_col_extra(dum_t)
-       end IF
     end if
     !----------------------------------------------------------------
     !       SAVE SALINITY-NORMALIZED OCEAN TRACER FIELD
@@ -2920,7 +2917,7 @@ CONTAINS
     end if
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- OLD
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_redox_old) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_geochem_old
@@ -2934,7 +2931,7 @@ CONTAINS
     end If
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- PRECIP
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_precip
@@ -2947,7 +2944,7 @@ CONTAINS
     end If
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- REACTION
-    !---------------------------------------------------------------- 
+    !----------------------------------------------------------------
     If (ctrl_data_save_slice_diag_geochem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_react
@@ -2985,6 +2982,12 @@ CONTAINS
     !--------------------------------------------------------- !
     if (ctrl_data_save_slice_cdrmip) CALL sub_save_netcdf_3d_cdrmip()
     !--------------------------------------------------------- !
+    !----------------------------------------------------------------
+    ! COLOR AGE TRACERS
+    !----------------------------------------------------------------
+    IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) CALL sub_save_netcdf_ocn_col_extra(dum_t)
+    !----------------------------------------------------------------
+    !----------------------------------------------------------------
   END SUBROUTINE sub_save_netcdf_3d
   ! ****************************************************************************************************************************** !
 
@@ -3051,15 +3054,15 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou, loc_ntrec
+    INTEGER::loc_iou,loc_ntrec
     REAL::loc_scale
     real,DIMENSION(0:n_j,0:n_k)::loc_mask,loc_tmp_jk
     real,DIMENSION(1:n_i,0:n_j)::loc_mask_surf,loc_tmp_ij
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    loc_iou = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
+    loc_iou = ncout2d_iou
     loc_scale = goldstein_dsc*goldstein_usc*const_rEarth*1.0E-6
     !-----------------------------------------------------------------------
     !       WRITE MOC
@@ -3181,17 +3184,24 @@ CONTAINS
        DO j=1,n_j
           DO k=1,n_k
              IF (k >= goldstein_k1(i,j)) THEN
-                loc_colbminusr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k) - int_ocn_timeslice(io_colr,i,j,k)
-                IF(int_ocn_timeslice(io_colr,i,j,k) > const_real_nullsmall) THEN
-                   loc_colboverr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
-                   loc_colage(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
-                ENDIF
-                IF((int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k)) > const_real_nullsmall) THEN
-                   loc_colroverrplusb(i,j,k) = &
-                        & int_ocn_timeslice(io_colr,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
-                   loc_colboverrplusb(i,j,k) = &
-                        & int_ocn_timeslice(io_colb,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
-                ENDIF
+                if (ctrl_force_ocn_age) then
+                   IF(int_ocn_timeslice(io_colr,i,j,k) > const_real_nullsmall) THEN
+                      loc_colage(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
+                   ENDIF
+                elseif (ctrl_force_ocn_age1) then
+                   loc_colage(i,j,k) = int_ocn_timeslice(io_colr,i,j,k)/int_t_timeslice
+                else
+                   loc_colbminusr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k) - int_ocn_timeslice(io_colr,i,j,k)
+                   IF(int_ocn_timeslice(io_colr,i,j,k) > const_real_nullsmall) THEN
+                      loc_colboverr(i,j,k) = int_ocn_timeslice(io_colb,i,j,k)/int_ocn_timeslice(io_colr,i,j,k)
+                   ENDIF
+                   IF((int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k)) > const_real_nullsmall) THEN
+                      loc_colroverrplusb(i,j,k) = &
+                           & int_ocn_timeslice(io_colr,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
+                      loc_colboverrplusb(i,j,k) = &
+                           & int_ocn_timeslice(io_colb,i,j,k)/(int_ocn_timeslice(io_colr,i,j,k) + int_ocn_timeslice(io_colb,i,j,k))
+                   ENDIF
+                endif
              ENDIF
           END DO
        END DO
@@ -3206,6 +3216,10 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,4,'misc_col_Dage','color tracers; ventilation age','(yrs)',loc_c0,loc_c0)
        call sub_putvar3d_g('misc_col_Dage',loc_iou,n_i,n_j,n_k,loc_ntrec, &
             & loc_colage(:,:,:)-dum_t,loc_mask)
+    elseif (ctrl_force_ocn_age1) then
+       call sub_adddef_netcdf(loc_iou,4,'misc_col_Dage','color tracer; ventilation age','(yrs)',loc_c0,loc_c0)
+       call sub_putvar3d_g('misc_col_Dage',loc_iou,n_i,n_j,n_k,loc_ntrec, &
+            & loc_colage(:,:,:),loc_mask)
     else
        call sub_adddef_netcdf(loc_iou,4,'misc_bMINUSr','color tracers; [b] minus [r]','mol kg-1',loc_c0,loc_c0)
        call sub_putvar3d_g ('misc_bMINUSr',loc_iou,n_i,n_j,n_k,loc_ntrec, &
