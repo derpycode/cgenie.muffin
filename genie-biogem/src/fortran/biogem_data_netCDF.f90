@@ -1381,7 +1381,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Fe diagnostics
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_ocn .AND. (ocn_select(io_Fe) .OR. ocn_select(io_TDFe))) then
+    If (ctrl_data_save_slice_sur .AND. (ocn_select(io_Fe) .OR. ocn_select(io_TDFe))) then
        ! total aeolian Fe flux (mass)
        ! NOTE: new calculation of loc_ij(:,:)
        loc_unitsname = 'mg Fe m-2 yr-1'
@@ -1391,14 +1391,14 @@ CONTAINS
             & trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('misc_sur_fFetot_g',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        ! total aeolian Fe flux (moles)
-       ! NOTE: based on preceeding stepcalculation of loc_ij(:,:)
+       ! NOTE: based on preceeding step calculation of loc_ij(:,:)
        loc_unitsname = 'mmol Fe m-2 yr-1'
        loc_ij(:,:) = conv_Fe_g_mol*loc_ij(:,:)
        call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_mol','Total aeolian iron flux density to surface', &
             & trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('misc_sur_fFetot_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        ! solulablized aeolian Fe flux
-       ! NOTE: based on preceeding stepcalculation of loc_ij(:,:)
+       ! NOTE: based on preceeding step calculation of loc_ij(:,:)
        loc_unitsname = 'umol Fe m-2 yr-1'
        loc_ij(:,:) = conv_mol_umol*conv_mmol_mol*(int_phys_ocnatm_timeslice(ipoa_solFe,:,:)/int_t_timeslice)*loc_ij(:,:)
        call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFe_mol','Solulablized aeolian iron flux density to surface', &
