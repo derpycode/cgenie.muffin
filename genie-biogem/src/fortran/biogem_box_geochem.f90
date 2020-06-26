@@ -1510,6 +1510,8 @@ CONTAINS
                 print*,' WARNING: AER thermodynamic drive out of bounds; DIC = ',ocn(io_DIC,dum_i,dum_j,k), &
                      &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
              end if
+          CASE default
+             loc_Ft = 1.0
           END SELECT
           ! allow CH4 oxidation with O2 (units: mol CH4 kg-1)
           ! Michaelis-Menten term
@@ -1629,6 +1631,8 @@ CONTAINS
                 print*,' WARNING: AOM thermodynamic drive out of bounds; DIC = ',ocn(io_DIC,dum_i,dum_j,k), &
                      &' ALK = ',ocn(io_ALK,dum_i,dum_j,k),' Ft = ',loc_Ft,'.'
              end if
+          CASE default
+             loc_Ft = 1.0
           END SELECT
           ! allow CH4 oxidation coupled to SO4 reduction (units: mol CH4 kg-1)
           ! Michaelis-Menten term

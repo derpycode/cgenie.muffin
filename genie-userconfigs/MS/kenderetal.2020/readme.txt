@@ -3,10 +3,11 @@
 ################################################################
 
 For:
-xxx
+Palaeocene/Eocene greenhouse gases released after less than 2°C of warming
+Sev Kender, Andy Ridgwell, Kara Bogus, Gunver K. Pedersen, Karen Dybkjær, Tamsin A. Mather, Erica Mariani, James B. Riding, Thomas Wagner, Stephen P. Hesselbo, Melanie J. Leng
 
 ################################################################
-20/01/08 -- README.txt file creation (A.R.)
+20/04/14 -- README.txt file creation (A.R.)
 ################################################################
 
 Provided is the code used to create the tuned model experiments presented in the paper.
@@ -24,24 +25,35 @@ $HOME/cgenie.muffin/genie-main
 
 The model spin-up is conducted in 2 stages:
 
-
 ./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.SPIN1 20000
 
+will run an initial equilibrium of ocean circulation and climate, plus ocean carbon and nutrient cycling.
  
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.SPIN2gl 100000 muffin.CBS.p0055ce.SPIN1 
 
+then ensures that sediment composition and carbonate burial are at steady state and in equilibrium with terrestrial weathering.
+(Note the different base-config.)
 
-
-The commands to run the inversion experiments are listed as follows:
+For the inversion experiments themselves:
 
 -------------------------------------------
-./runmuffin.sh muffin.CB.umQ00p0a MS/crichtonetal.CP.2019 muffin.CB.umQ00p0a.SPIN 10000
-./runmuffin.sh muffin.CB.umQ02p5a MS/crichtonetal.CP.2019 muffin.CB.umQ02p5a.SPIN 10000
-./runmuffin.sh muffin.CB.umQ04p5a MS/crichtonetal.CP.2019 muffin.CB.umQ04p5a.SPIN 10000
-./runmuffin.sh muffin.CB.umQ07p5a MS/crichtonetal.CP.2019 muffin.CB.umQ07p5a.SPIN 10000
-./runmuffin.sh muffin.CB.umQ10p0a MS/crichtonetal.CP.2019 muffin.CB.umQ10p0a.SPIN 10000
-./runmuffin.sh muffin.CB.umQ12p5a MS/crichtonetal.CP.2019 muffin.CB.umQ12p5a.SPIN 10000
-./runmuffin.sh muffin.CB.umQ15p0a MS/crichtonetal.CP.2019 muffin.CB.umQ15p0a.SPIN 10000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_RAW_COMPm17m27.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_RAW_COMPm17m60.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_RAW_COMPm35m27.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_RAW_COMPm35m60.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_SM_COMPm17m27.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_SM_COMPm17m60.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_SM_COMPm35m27.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055e.BASES MS/kenderetal.2020 muffin.CBS.p0055ce.DOC_SM_COMPm35m60.EXPT 50000 muffin.CBS.p0055ce.SPIN2gl
 -------------------------------------------
+
+The first 4 invert the raw (un-smoothed) observed d13C record, while the second set of 4 invert the smoothed record.
+The different d13C souces choices are as follows:
+
+COMPm17m27 == -17 o/oo background d13C emissions; -27 o/oo during PETM onset
+COMPm17m60 == -17 o/oo background d13C emissions; -60 o/oo during PETM onset
+COMPm35m27 == -35 o/oo background d13C emissions; -27 o/oo during PETM onset
+COMPm35m60 == -35 o/oo background d13C emissions; -60 o/oo during PETM onset
 
 ### NOTES ######################################################
 

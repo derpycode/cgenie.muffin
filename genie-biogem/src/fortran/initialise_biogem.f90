@@ -174,7 +174,7 @@ SUBROUTINE initialise_biogem(                       &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(vphys_ocn(1:n_vocn),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-  allocate(matrix_exp(1:n_vocn),stat=alloc_error)		! JDW: allocate matrix experiment storage array in one dimension
+  allocate(matrix_exp(1:n_vocn),stat=alloc_error)              ! JDW: allocate matrix experiment storage array in one dimension
   call check_iostat(alloc_error,__LINE__,__FILE__)
   do n=1,n_vocn
      allocate(vocn(n)%mk(1:n_l_ocn,1:n_k),STAT=alloc_error)
@@ -189,7 +189,7 @@ SUBROUTINE initialise_biogem(                       &
      call check_iostat(alloc_error,__LINE__,__FILE__)
      allocate(vphys_ocn(n)%mk(1:n_phys_ocn,1:n_k),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
-     allocate(matrix_exp(n)%mk(1:6,1:n_k),stat=alloc_error)		! JDW: allocate inner matrix array for *6* colour tracers
+     allocate(matrix_exp(n)%mk(1:6,1:n_k),stat=alloc_error)    ! JDW: allocate inner matrix array for *6* colour tracers
      call check_iostat(alloc_error,__LINE__,__FILE__)
   end do
   ! ---------------------------------------------------------- ! initialize arrays: 3D
@@ -200,7 +200,7 @@ SUBROUTINE initialise_biogem(                       &
   vbio_part(:)  = fun_lib_init_vsed()
   vdbio_part(:) = fun_lib_init_vsed()
   vphys_ocn(:)  = fun_lib_init_vocn_n(n_phys_ocn)
-  matrix_exp(:) = fun_lib_init_vocn()		! JDW: initialize matrix experiment array
+  matrix_exp(:) = fun_lib_init_vocn()                          ! JDW: initialize matrix experiment array
   ! ---------------------------------------------------------- !
   !  INITIALIZE ARRAYS -- VECTORIZED -- 2D
   ! ---------------------------------------------------------- !
@@ -377,7 +377,7 @@ SUBROUTINE initialise_biogem(                       &
   if (ctrl_force_GOLDSTEInTS) call sub_biogem_copy_ocntotsTS(dum_ts,dum_ts1)
 
   ! ############################################################################################################################# !
-!!! *** TESTING ***
+  !!! *** TESTING ***
   vocn(:)=fun_lib_conv_ocnTOvocn(ocn(:,:,:,:))
   ocn = 0.0
   ocn(:,:,:,:)=fun_lib_conv_vocnTOocn(vocn(:))

@@ -889,22 +889,13 @@ contains
  !!
   subroutine ecogem_wrapper
     implicit none
-    
-    ! get biogem timeslice data
-!    call diag_biogem_timesync( &
-!        & genie_tseries,      & ! output
-!        & genie_tslice,       & ! output
-!        & genie_intseries,    & ! output
-!        & genie_intslice,     & ! output
-!        & genie_endseries,    & ! output
-!        & genie_endslice      & ! output
-!        )
         
     call ecogem(            &
          & real(conv_kocn_kbiogem*kocn_loop)*genie_timestep, & ! input
          & genie_clock,     & ! input
          & go_fxsw,         & ! input
          & go_mldta,        & ! input
+         & frac_sic,        & ! input
          & egbg_sfcocn,     & ! input  -- tracer concentrations
          & egbg_sfcpart,    & ! output -- change in particulate concentration field
          & egbg_sfcremin    & ! output -- change in remin concentration field

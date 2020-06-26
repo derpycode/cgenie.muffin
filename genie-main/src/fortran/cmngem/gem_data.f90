@@ -45,7 +45,7 @@ if (ctrl_debug_init > 0) then
     print*,'carbonate dissociation constants set                : ',trim(par_carbconstset_name)
     print*,'pH solution tolerance                               : ',par_carbchem_pH_tolerance
     print*,'pH solution maximum number of iterations            : ',par_carbchem_pH_iterationmax
-    print*,'Exit upon pH solution failure?                      : ',ctrl_carbchem_fail
+    print*,'Attempt pH re-seed if solution fails (else exit)?   : ',ctrl_carbchem_pHseed_retry
     print*,'Ignore H3SiO4 in the calculation of carbonate ALK   : ',ctrl_carbchem_noH3SiO4
     ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
     print*,'--- MISC CONTROLS ---'
