@@ -511,7 +511,7 @@ subroutine biogem(        &
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
-                    ls = is2l(is_POP)
+                    ls = is2l(is_POC)
                     loc_tot_i = conv_ls_lo_i(0,ls)
                     do loc_i=1,loc_tot_i
                        lo = conv_ls_lo_i(loc_i,ls)
