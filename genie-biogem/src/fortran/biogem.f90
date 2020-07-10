@@ -487,6 +487,7 @@ subroutine biogem(        &
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
+                    ! set sed tracer -> POP
                     ls = is2l(is_POP)
                     loc_tot_i = conv_ls_lo_i(0,ls)
                     do loc_i=1,loc_tot_i
@@ -511,6 +512,7 @@ subroutine biogem(        &
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
+                    ! set sed tracer -> POC
                     ls = is2l(is_POC)
                     loc_tot_i = conv_ls_lo_i(0,ls)
                     do loc_i=1,loc_tot_i
@@ -526,6 +528,12 @@ subroutine biogem(        &
                              ! do nothing -- ALK with POP
                           end if
                        end if
+                    end do
+                    ! set sed tracer -> 13POC
+                    ls = is2l(is_POC_13C)
+                    loc_tot_i = conv_ls_lo_i(0,ls)
+                    do loc_i=1,loc_tot_i
+                       lo = conv_ls_lo_i(loc_i,ls)
                        if (lo == io2l(io_DIC_13C)) then
                           loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
                           dum_sfxsumrok1(l2io(lo),i,j) = dum_sfxsumrok1(l2io(lo),i,j) + &
