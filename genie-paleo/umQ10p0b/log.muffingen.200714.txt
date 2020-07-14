@@ -34,18 +34,33 @@
          -> Cell at (10, 23) now land
          -> Cell at (11, 22) now land
          -> Cell at (11, 21) now land
+         -> Cell at (36, 36) now ocean
+         -> Cell at (35, 36) now ocean
+         -> Cell at (34, 36) now ocean
+         -> Cell at (1, 36) now ocean
+         -> Cell at (2, 36) now ocean
+         -> Cell at (3, 36) now ocean
+         -> Cell at (4, 36) now ocean
+         -> Cell at (5, 36) now ocean
+         -> Cell at (6, 36) now ocean
+         -> Cell at (7, 36) now ocean
+         -> Cell at (8, 36) now ocean
+         -> Cell at (9, 36) now ocean
+         -> Cell at (10, 36) now ocean
+         -> Cell at (11, 36) now ocean
        - Out of grid range
        * Mask alteration complete
-       * Revised land area fraction = 0.31713
+       * Revised land area fraction = 0.30633
        - User-editing complete.
 >   8. CREATE FINAL MASK ...
        - .mask_out.FINAL.dat saved
-       * Final land area fraction   = 0.31713
+       * Final land area fraction   = 0.30633
 >   9. RE-GRIDING TOPOGRAPHY ...
        - Topography re-gridded.
 >   10. RE-GRIDING OCEAN BATHYMETRY ...
        - Bathymetry re-gridding complete.
 >  11. FILTERING BATHYMETRY ...
+         -> MAKE DEEPER :: Loop count = 1 @ (1,1,10); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (1,28,2); d = 4; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (1,34,1); s = 3; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (1,35,3); s = 3; l = 0
@@ -55,6 +70,7 @@
          -> MAKE DEEPER :: Loop count = 1 @ (4,34,3); d = 4; l = 0
          -> MAKE DEEPER :: Loop count = 1 @ (6,6,5); d = 3; l = 1
          -> MAKE SHALLOWER :: Loop count = 1 @ (6,35,1); s = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (9,1,7); d = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (9,11,5); s = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (9,32,2); s = 3; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (9,33,1); s = 3; l = 0
@@ -67,11 +83,11 @@
          -> MAKE SHALLOWER :: Loop count = 1 @ (10,34,1); s = 3; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (11,31,1); s = 2; l = 1
          -> MAKE SHALLOWER :: Loop count = 1 @ (11,34,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (12,1,10); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (12,7,4); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (12,15,7); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (12,32,12); d = 3; l = 1
          -> MAKE DEEPER :: Loop count = 1 @ (12,35,8); d = 3; l = 1
-         -> MAKE SHALLOWER :: Loop count = 1 @ (13,1,9); s = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (13,2,11); d = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (13,14,1); s = 3; l = 0
          -> MAKE DEEPER :: Loop count = 1 @ (13,17,11); d = 2; l = 2
@@ -178,6 +194,7 @@
          -> MAKE SHALLOWER :: Loop count = 1 @ (34,30,3); s = 2; l = 1
          -> MAKE SHALLOWER :: Loop count = 1 @ (34,31,1); s = 4; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (34,33,2); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (35,1,10); d = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (35,3,5); s = 2; l = 1
          -> MAKE SHALLOWER :: Loop count = 1 @ (35,32,2); s = 3; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (35,34,2); s = 3; l = 0
@@ -197,6 +214,7 @@
          -> MAKE DEEPER :: Loop count = 2 @ (12,15,6); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 2 @ (12,32,11); d = 3; l = 1
          -> MAKE DEEPER :: Loop count = 2 @ (12,35,7); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (13,2,10); d = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 2 @ (13,8,1); s = 3; l = 0
          -> MAKE SHALLOWER :: Loop count = 2 @ (13,13,1); s = 3; l = 0
          -> MAKE DEEPER :: Loop count = 2 @ (13,17,10); d = 2; l = 2

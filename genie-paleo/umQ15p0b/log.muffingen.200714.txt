@@ -29,13 +29,27 @@
          (1) left button to turn grid cell to ocean
          (2) right button to turn grid cell to land
          (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (34, 36) now ocean
+         -> Cell at (35, 36) now ocean
+         -> Cell at (36, 36) now ocean
+         -> Cell at (1, 36) now ocean
+         -> Cell at (2, 36) now ocean
+         -> Cell at (3, 36) now ocean
+         -> Cell at (4, 36) now ocean
+         -> Cell at (5, 36) now ocean
+         -> Cell at (6, 36) now ocean
+         -> Cell at (7, 36) now ocean
+         -> Cell at (8, 36) now ocean
+         -> Cell at (9, 36) now ocean
+         -> Cell at (10, 36) now ocean
+         -> Cell at (11, 36) now ocean
        - Out of grid range
        * Mask alteration complete
-       * Revised land area fraction = 0.30556
+       * Revised land area fraction = 0.29475
        - User-editing complete.
 >   8. CREATE FINAL MASK ...
        - .mask_out.FINAL.dat saved
-       * Final land area fraction   = 0.30556
+       * Final land area fraction   = 0.29475
 >   9. RE-GRIDING TOPOGRAPHY ...
        - Topography re-gridded.
 >   10. RE-GRIDING OCEAN BATHYMETRY ...
@@ -54,6 +68,7 @@
          -> MAKE SHALLOWER :: Loop count = 1 @ (8,35,1); s = 2; l = 1
          -> MAKE SHALLOWER :: Loop count = 1 @ (9,11,5); s = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (9,33,1); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (10,1,8); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (10,10,9); d = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (10,11,6); s = 3; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (10,13,7); s = 2; l = 1
@@ -68,10 +83,10 @@
          -> MAKE SHALLOWER :: Loop count = 1 @ (11,15,4); s = 3; l = 0
          -> MAKE SHALLOWER :: Loop count = 1 @ (11,31,1); s = 2; l = 1
          -> MAKE DEEPER :: Loop count = 1 @ (11,33,4); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (12,1,9); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (12,7,4); d = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (12,15,7); d = 3; l = 1
          -> MAKE DEEPER :: Loop count = 1 @ (12,35,7); d = 3; l = 1
-         -> MAKE SHALLOWER :: Loop count = 1 @ (13,1,8); s = 2; l = 2
          -> MAKE DEEPER :: Loop count = 1 @ (13,2,12); d = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (13,14,1); s = 3; l = 0
          -> MAKE DEEPER :: Loop count = 1 @ (13,16,4); d = 2; l = 2
