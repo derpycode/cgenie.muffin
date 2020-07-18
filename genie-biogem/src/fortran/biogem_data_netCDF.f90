@@ -1187,11 +1187,14 @@ CONTAINS
     !-----------------------------------------------------------------------
     integer::i,j
     integer::io,is,ib
+    integer::loc_k1
     integer::l,loc_m,loc_tot_m
     INTEGER::loc_iou,loc_ntrec
     real,DIMENSION(n_i,n_j)::loc_ij,loc_mask_surf
     real,DIMENSION(n_sed,n_i,n_j)::loc_isij
     CHARACTER(len=255)::loc_unitsname
+    real::loc_tot,loc_frac,loc_standard
+    real::loc_a,loc_b,loc_c,loc_d
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
@@ -1577,6 +1580,69 @@ CONTAINS
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar2d('misc_sur_SiSTAR',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end if
+    end if
+    !-----------------------------------------------------------------------
+    ! d13C proxies
+    !-----------------------------------------------------------------------
+    If (ctrl_data_save_slice_sur .AND. ctrl_data_save_slice_diag_proxy) then
+       ! d13C of DIC
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'o/oo'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot  = int_ocn_timeslice(io_DIC,i,j,loc_k1)
+                loc_frac = int_ocn_timeslice(io_DIC_13C,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+             end IF
+          end DO
+       end DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_DIC_d13C', &
+            & 'bottom-water DIC d13C',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_DIC_d13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+       ! d13C of HCO3-
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'o/oo'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot  = int_carb_timeslice(ic_conc_HCO3,i,j,loc_k1)
+                loc_frac = int_carbisor_timeslice(ici_HCO3_r13C,i,j,loc_k1)*int_carb_timeslice(ic_conc_HCO3,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+             end IF
+          end DO
+       end DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_HCO3_d13C', &
+            & 'bottom-water HCO3- d13C',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_HCO3_d13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+       ! Schmittner d13C
+       loc_a = 0.45
+       loc_b = 1.0
+       loc_c = -2.2e-3
+       loc_d = -6.6e-5
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'o/oo'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot  = int_ocn_timeslice(io_DIC,i,j,loc_k1)
+                loc_frac = int_ocn_timeslice(io_DIC_13C,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = loc_a + &
+                     & loc_b*fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null) + &
+                     & loc_c*1.0E6*int_carb_timeslice(ic_conc_CO3,i,j,loc_k1) + &
+                     & loc_d*int_phys_ocn_timeslice(ipo_Dbot,i,j,loc_k1)/int_t_timeslice
+             end IF
+          end DO
+       end DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_LA1', &
+            & 'bottom-water Schmittner d13C (LA1)',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_LA1',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
     end if
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
     !
@@ -2057,7 +2123,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       ocean surface carbonate chemistry data
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_sur) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ij(:,:) = const_real_zero
           DO ic=1,n_carb
@@ -2083,6 +2149,38 @@ CONTAINS
              call sub_adddef_netcdf(loc_iou,3,'carb_sur_'//trim(string_carb(ic)), &
                   & 'surface '//trim(string_carb(ic)),trim(loc_unitsname),const_real_zero,const_real_zero)
              call sub_putvar2d('carb_sur_'//trim(string_carb(ic)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          END DO
+       end if
+    end if
+    !----------------------------------------------------------------
+    !       benthic carbonate chemistry data
+    !----------------------------------------------------------------
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
+       IF (opt_select(iopt_select_carbchem)) THEN
+          loc_ij(:,:) = const_real_zero
+          DO ic=1,n_carb
+             DO i=1,n_i
+                DO j=1,n_j
+                   loc_k1 = goldstein_k1(i,j)
+                   IF (n_k >= loc_k1) THEN
+                      SELECT CASE (ic)
+                      CASE (ic_ohm_cal,ic_ohm_arg)
+                         loc_ij(i,j) = int_carb_timeslice(ic,i,j,loc_k1)/int_t_timeslice
+                      case default
+                         loc_ij(i,j) = int_carb_timeslice(ic,i,j,loc_k1)/int_t_timeslice
+                      end SELECT
+                   end IF
+                end DO
+             end DO
+             SELECT CASE (ic)
+             CASE (ic_ohm_cal,ic_ohm_arg)
+                loc_unitsname = ' '
+             case default
+                loc_unitsname = 'mol kg-1'
+             end SELECT
+             call sub_adddef_netcdf(loc_iou,3,'carb_ben_'//trim(string_carb(ic)), &
+                  & 'bottom-water '//trim(string_carb(ic)),trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('carb_ben_'//trim(string_carb(ic)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
           END DO
        end if
     end if
