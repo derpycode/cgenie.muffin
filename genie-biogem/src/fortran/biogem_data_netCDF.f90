@@ -1194,6 +1194,7 @@ CONTAINS
     real,DIMENSION(n_sed,n_i,n_j)::loc_isij
     CHARACTER(len=255)::loc_unitsname
     real::loc_tot,loc_frac,loc_standard
+    real::loc_tot1,loc_frac1,loc_tot2,loc_frac2
     real::loc_a,loc_b,loc_c,loc_d
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
@@ -1582,10 +1583,47 @@ CONTAINS
        end if
     end if
     !-----------------------------------------------------------------------
-    ! d13C proxies
+    ! proxies
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_sur .AND. ctrl_data_save_slice_diag_proxy) then
-       ! d13C of DIC
+    If (ctrl_data_save_slice_diag_proxy) then
+       ! DpH
+       loc_unitsname = 'pH units (SWS)'
+       IF (opt_select(iopt_select_carbchem)) THEN
+          loc_ij(:,:) = const_real_zero
+          DO i=1,n_i
+             DO j=1,n_j
+                loc_k1 = goldstein_k1(i,j)
+                IF (n_k >= loc_k1) THEN
+                   loc_ij(i,j) = (-LOG10(int_carb_timeslice(ic_H,i,j,n_k)/int_t_timeslice)) - &
+                        & (-LOG10(int_carb_timeslice(ic_H,i,j,loc_k1)/int_t_timeslice))
+                END if
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,3,'proxy_DpH','surface-benthic DpH', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('proxy_DpH',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       end if
+       ! Dd13C (DIC)
+       loc_unitsname = 'o/oo'
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot1     = int_ocn_timeslice(io_DIC,i,j,n_k)
+                loc_frac1    = int_ocn_timeslice(io_DIC_13C,i,j,n_k)
+                loc_tot2     = int_ocn_timeslice(io_DIC,i,j,loc_k1)
+                loc_frac2    = int_ocn_timeslice(io_DIC_13C,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = fun_calc_isotope_delta(loc_tot1,loc_frac1,loc_standard,.FALSE.,const_real_null) - &
+                     & fun_calc_isotope_delta(loc_tot2,loc_frac2,loc_standard,.FALSE.,const_real_null)
+             END if
+          END DO
+       END DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_Dd13C','surface-benthic Dd13C', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_DpH',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! benthic d13C of DIC
        loc_ij(:,:) = const_real_zero
        loc_unitsname = 'o/oo'
        DO i=1,n_i
@@ -1602,7 +1640,7 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,3,'proxy_ben_DIC_d13C', &
             & 'bottom-water DIC d13C',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('proxy_ben_DIC_d13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
-       ! d13C of HCO3-
+       ! benthic d13C of HCO3-
        loc_ij(:,:) = const_real_zero
        loc_unitsname = 'o/oo'
        DO i=1,n_i
@@ -1619,7 +1657,7 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,3,'proxy_ben_HCO3_d13C', &
             & 'bottom-water HCO3- d13C',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('proxy_ben_HCO3_d13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
-       ! Schmittner d13C
+       ! benthic Schmittner d13C
        loc_a = 0.45
        loc_b = 1.0
        loc_c = -2.2e-3
