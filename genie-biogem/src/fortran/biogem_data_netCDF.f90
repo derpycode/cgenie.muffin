@@ -1622,7 +1622,7 @@ CONTAINS
        END DO
        call sub_adddef_netcdf(loc_iou,3,'proxy_Dd13C','surface-benthic Dd13C', &
             & trim(loc_unitsname),const_real_zero,const_real_zero)
-       call sub_putvar2d('proxy_DpH',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       call sub_putvar2d('proxy_Dd13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        ! benthic d13C of DIC
        loc_ij(:,:) = const_real_zero
        loc_unitsname = 'o/oo'
