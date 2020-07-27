@@ -29,13 +29,27 @@
          (1) left button to turn grid cell to ocean
          (2) right button to turn grid cell to land
          (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (34, 36) now ocean
+         -> Cell at (35, 36) now ocean
+         -> Cell at (36, 36) now ocean
+         -> Cell at (1, 36) now ocean
+         -> Cell at (2, 36) now ocean
+         -> Cell at (3, 36) now ocean
+         -> Cell at (4, 36) now ocean
+         -> Cell at (5, 36) now ocean
+         -> Cell at (6, 36) now ocean
+         -> Cell at (7, 36) now ocean
+         -> Cell at (8, 36) now ocean
+         -> Cell at (9, 36) now ocean
+         -> Cell at (10, 36) now ocean
+         -> Cell at (11, 36) now ocean
        - Out of grid range
        * Mask alteration complete
-       * Revised land area fraction = 0.29784
+       * Revised land area fraction = 0.28704
        - User-editing complete.
 >   8. CREATE FINAL MASK ...
        - .mask_out.FINAL.dat saved
-       * Final land area fraction   = 0.29784
+       * Final land area fraction   = 0.28704
 >   9. RE-GRIDING TOPOGRAPHY ...
        - Topography re-gridded.
 >   10. RE-GRIDING OCEAN BATHYMETRY ...
@@ -48,6 +62,7 @@
          -> MAKE SHALLOWER :: Loop count = 1 @ (4,4,1); s = 3; l = 0
          -> MAKE DEEPER :: Loop count = 1 @ (4,19,2); d = 4; l = 0
          -> MAKE DEEPER :: Loop count = 1 @ (4,34,3); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (5,1,9); s = 2; l = 2
          -> MAKE SHALLOWER :: Loop count = 1 @ (6,35,1); s = 2; l = 1
          -> MAKE SHALLOWER :: Loop count = 1 @ (7,35,1); s = 2; l = 1
          -> MAKE SHALLOWER :: Loop count = 1 @ (9,11,5); s = 2; l = 2
