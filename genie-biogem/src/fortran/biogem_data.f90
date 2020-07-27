@@ -2941,16 +2941,17 @@ CONTAINS
     ! set BASIC options
     select case (par_data_save_level)
     case (2:99)
+       ctrl_data_save_slice_ocn    = .true.
        ctrl_data_save_slice_ocnatm = .true.
-       ctrl_data_save_slice_ocn = .true.
-       ctrl_data_save_slice_misc = .true.
-       if (flag_sedgem) ctrl_data_save_slice_ocnsed = .true.
-       ctrl_data_save_sig_ocnatm = .true.
-       ctrl_data_save_sig_ocn = .true.
-       ctrl_data_save_sig_ocn_sur = .true.
-       ctrl_data_save_sig_misc = .true.
-       ctrl_data_save_GLOBAL = .true.
-       if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
+       ctrl_data_save_slice_ocnsed = .true.
+       ctrl_data_save_slice_misc   = .true.
+       ctrl_data_save_slice_sur    = .true.
+       ctrl_data_save_sig_ocn      = .true.
+       ctrl_data_save_sig_ocnatm   = .true.
+       ctrl_data_save_sig_ocnsed   = .true.
+       ctrl_data_save_sig_misc     = .true.
+       ctrl_data_save_sig_ocn_sur  = .true.
+       ctrl_data_save_GLOBAL       = .true.
     case default
        ! NOTHING
     end select
