@@ -100,6 +100,7 @@ CONTAINS
        print*,'--- BOUNDARY CONDITIONS ----------------------------'
        print*,'Set dissolution flux = rain flux to close system?   : ',ctrl_force_sed_closedsystem
        print*,'Balance the P cycle (with weathering)?              : ',ctrl_force_sed_closed_P
+       print*,'Balance the C cycle (with weathering)?              : ',ctrl_force_sed_closed_C
        print*,'set reflective boundary condition for POM?          : ',ctrl_force_sed_reflective_POM
        print*,'Allow temperature / salinity forcing of climate?    : ',ctrl_force_GOLDSTEInTS
        print*,'Allow ONLY temperature / salinity forcing?          : ',ctrl_force_GOLDSTEInTSonly
