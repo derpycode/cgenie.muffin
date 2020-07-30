@@ -403,10 +403,16 @@ MODULE biogem_lib
   real::par_d187Os_OsCO3_epsilon                                  ! 187/192Os fractionation between Os and OsCO3
   real::par_d188Os_OsCO3_epsilon                                  ! 188/192Os fractionation between Os and OsCO3
   namelist /ini_biogem_nml/par_d187Os_OsCO3_epsilon,par_d188Os_OsCO3_epsilon
+  real::par_d56Fe_Corg_FeOOH_epsilon                             ! dissimilatory iron reduction fractionation
+  namelist /ini_biogem_nml/par_d56Fe_Corg_FeOOH_epsilon
   real::par_d13C_Corg_CH4_epsilon                                ! methanogenesis fractionation
   namelist /ini_biogem_nml/par_d13C_Corg_CH4_epsilon
   real::par_d34S_Corg_SO4_epsilon                                ! sulphate reduction fractionation (in S isotopes)
   namelist /ini_biogem_nml/par_d34S_Corg_SO4_epsilon
+  real::par_d34S_AOM_alpha                                       ! S fractionation during AOM (in S isotopes)
+  real::par_d34S_AerSox_alpha                                    ! S fractionation during aerobic sulphide oxidation
+  real::par_d34S_ISO_alpha                                       ! S fractionation during iron-mediated sulphide oxidation
+  namelist /ini_biogem_nml/par_d34S_AOM_alpha,par_d34S_AerSox_alpha,par_d34S_ISO_alpha   
   real::par_bio_uptake_dN2_epsilon                               ! N2 fixation 15N fractionation
   real::par_bio_uptake_dNH4_epsilon                              ! NH4 assimilation 15N fractionation
   real::par_bio_uptake_dNO3_epsilon                              ! NO3 uptake 15N fractionation
