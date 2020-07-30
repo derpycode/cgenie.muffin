@@ -778,7 +778,7 @@ CONTAINS
     real,dimension(n_sed,n_k)::loc_bio_part
     real,dimension(1:3)::loc_Fe2spec
     real::loc_H2S,loc_SO4,loc_FeS,loc_FeSp,loc_Fe2
-    real::loc_r56Fe,loc_r34S
+    real::loc_r56Fe,loc_r34S,loc_r34SO4
     real::loc_R_56Fe
     real::loc_FeS2_precipitation
     real::loc_f
@@ -839,8 +839,10 @@ CONTAINS
           loc_bio_part(is_FeS2,k) = loc_FeS2_precipitation
           ! calculate isotopic fractionation -- 56Fe
           ! NOTE: we already know that loc_FeSp is non-zero
+          ! NOTE: loc_Fe2 may differ from ocn(io_Fe2,dum_i,dum_j,k) and hence the isotopic ratio of the Fe reservoir
+          !       needs to be calculated w.r.t. the latter
           if (ocn_select(io_Fe2_56Fe)) then
-             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
              loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
              loc_bio_part(is_FeS2_56Fe,k) = &
                  & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
@@ -848,19 +850,34 @@ CONTAINS
           ! calculate isotopic fractionation -- 34S
           ! NOTE: we already know that loc_H2S is non-zero
           ! NOTE: no 34S fractionation assumed in the formation of pyrite (fractionation takes place between SO4 and H2S)
-          if (ocn_select(io_H2S_34S)) then
-             loc_r34S  = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
-             loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
+          ! NOTE: loc_H2S may differ from ocn(io_H2S,dum_i,dum_j,k) and hence the isotopic ratio of the Fe reservoir
+          !       needs to be calculated w.r.t. the latter
+          if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
+             loc_r34S   = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
+             loc_r34SO4 = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
+             
+             loc_bio_part(is_FeS2_34S,k) = (7.0/8.0*loc_r34S + 1.0/8.0*loc_r34SO4)*loc_bio_part(is_FeS2,k)
           end if
           ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
-          DO l=1,n_l_sed
-             is = conv_iselected_is(l)
-             loc_tot_i = conv_sed_ocn_i(0,is)
-             do loc_i=1,loc_tot_i
-                io = conv_sed_ocn_i(loc_i,is)
-                loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
-             end do
-          end DO
+          loc_bio_uptake(io_Fe2,k) = loc_bio_uptake(io_Fe2,k) + loc_bio_part(is_FeS2,k)
+          loc_bio_uptake(io_Fe2_56Fe,k) = loc_bio_uptake(io_Fe2_56Fe,k) + loc_bio_part(is_FeS2_56Fe,k)
+          
+          loc_bio_uptake(io_H2S,k) = loc_bio_uptake(io_H2S,k) + 7.0/4.0*loc_bio_part(is_FeS2,k)
+          loc_bio_uptake(io_H2S_34S,k) = loc_bio_uptake(io_H2S_34S,k) + (7.0/4.0*loc_r34S*loc_bio_part(is_FeS2,k))
+          
+          loc_bio_uptake(io_SO4,k) = loc_bio_uptake(io_SO4,k) + 1.0/4.0*loc_bio_part(is_FeS2,k)
+          loc_bio_uptake(io_SO4_34S,k) = loc_bio_uptake(io_SO4_34S,k) + (1.0/4.0*loc_r34SO4*loc_bio_part(is_FeS2,k))
+          
+          loc_bio_uptake(io_ALK,k) = loc_bio_uptake(io_ALK,k) - 2.0/4.0*loc_bio_part(is_FeS2,k)
+          
+          !DO l=1,n_l_sed
+          !   is = conv_iselected_is(l)
+          !   loc_tot_i = conv_sed_ocn_i(0,is)
+          !   do loc_i=1,loc_tot_i
+          !      io = conv_sed_ocn_i(loc_i,is)
+          !      loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+          !   end do
+          !end DO
        end if
     end DO
     ! -------------------------------------------------------- !
@@ -1206,8 +1223,8 @@ CONTAINS
           CASE ('OLD')
              ! change units of H2S oxidation constant from mM-2 hr-1 to M-2 yr-1
              ! and convert from O2 consumption units to H2S units (i.e., divide by 2)
-             loc_H2S_oxidation_const = 0.5*const_oxidation_coeff_H2S/conv_hr_yr/(conv_mmol_mol)**2
-             loc_H2S_oxidation = dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2**2
+             loc_H2S_oxidation_const = 0.5*const_oxidation_coeff_H2S/conv_hr_yr/(conv_mmol_mol)**2.0
+             loc_H2S_oxidation = dum_dtyr*loc_H2S_oxidation_const*loc_H2S*loc_O2**2.0
           case ('complete')
              loc_H2S_oxidation = min(loc_H2S,0.5*loc_O2)
           CASE ('OLDDEFAULT')
@@ -1584,7 +1601,7 @@ CONTAINS
     real::loc_T,loc_TC,loc_kT
     real::loc_dG,loc_Ft,loc_Ft_min
     real::loc_MM,loc_AOM
-    real::loc_r13C,loc_r14C
+    real::loc_r13C,loc_r14C,loc_r34S
     real,dimension(n_ocn,n_k)::loc_bio_remin
     real::loc_f
     ! -------------------------------------------------------- !
@@ -1648,6 +1665,7 @@ CONTAINS
           ! calculate isotopic ratios
           loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
           loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
+          loc_r34S = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
           ! perform AOM
           loc_bio_remin(io_CH4,k)     = -loc_AOM
           loc_bio_remin(io_DIC,k)     =  loc_AOM
@@ -1658,6 +1676,9 @@ CONTAINS
           loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AOM
           loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AOM
           loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AOM
+          loc_bio_remin(io_SO4_34S,k) = -loc_r34S*loc_AOM
+          loc_bio_remin(io_H2S_34S,k) =  loc_r34S*loc_AOM
+         
        end if
     end DO
     ! -------------------------------------------------------- !
