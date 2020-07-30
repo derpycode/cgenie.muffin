@@ -2532,17 +2532,17 @@ CONTAINS
     end if
     ! test for Fe isotopes selected
     ! NOTE: value of loc_FeOOH already determined
-    if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe2_56Fe)) then
-       if (loc_FeOOH > const_real_nullsmall) then
-          loc_r56Fe  = dum_ocn(io2l(io_FeOOH_56Fe)) / loc_FeOOH
-       else
-          loc_r56Fe  = 0.0
-       end if
-       loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
-       loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
-       dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:)
-       dum_conv_ls_lo(io2l(io_Fe2_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe2_56Fe),:)
-    end if
+    !if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe2_56Fe)) then
+    !   if (loc_FeOOH > const_real_nullsmall) then
+    !      loc_r56Fe  = dum_ocn(io2l(io_FeOOH_56Fe)) / loc_FeOOH
+    !   else
+    !      loc_r56Fe  = 0.0
+    !   end if
+    !   loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
+    !   loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
+    !   dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:)
+    !   dum_conv_ls_lo(io2l(io_Fe2_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe2_56Fe),:)
+    !end if
     ! ---------------------------------------------------------- !
     ! END
     ! ---------------------------------------------------------- !
@@ -2718,6 +2718,7 @@ CONTAINS
     integer::loc_m,loc_tot_m
     real,dimension(1:n_l_ocn)::loc_vocn                                 !
     real,dimension(1:3)::loc_FeFELL
+    real::loc_R,loc_alpha
     real::loc_T,loc_SiO2                                                !
     real::loc_Si_eq,loc_u
     real::loc_scav_Fe,loc_r56Fe
@@ -3391,10 +3392,12 @@ CONTAINS
                       else
                          loc_r56Fe = 0.0
                       end if
+                      loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
+                      loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
                       loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) = &
-                           & loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
+                           & loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*loc_bio_remin(io2l(io_FeOOH),kk)
                       loc_bio_remin(io2l(io_Fe2_56Fe),kk) = &
-                           & loc_bio_remin(io2l(io_Fe2_56Fe),kk) - loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
+                           & loc_bio_remin(io2l(io_Fe2_56Fe),kk) - loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*loc_bio_remin(io2l(io_FeOOH),kk)
                       !loc_bio_remin(io2l(io_FeOOH_56Fe),kk) = 0.0
                    end if
                    loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = &
