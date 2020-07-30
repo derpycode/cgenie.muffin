@@ -3752,9 +3752,13 @@ CONTAINS
        dum_bio_part(is2l(is_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
     end if
     if (ocn_select(io_H2S_34S)) then
-       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+!       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+!       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+!            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+       dum_bio_remin(io2l(io_H2S_34S)) = dum_bio_remin(io2l(io_H2S_34S)) - &
+            & ((1.0/8.0)*loc_dFeOOH*ocn(io_H2S_34S,dum_i,dum_j,dum_k)/loc_H2S)
        dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
-            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+            & ((1.0/8.0)*loc_dFeOOH*ocn(io_H2S_34S,dum_i,dum_j,dum_k)/loc_H2S)
     end if
     ! -------------------------------------------------------- !
     ! DIAGNOSTICS
@@ -3836,9 +3840,13 @@ CONTAINS
        dum_bio_part(is2l(is_POM_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_POM_FeOOH_56Fe))
     end if
     if (ocn_select(io_H2S_34S)) then
-       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+!       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+!       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+!            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+       dum_bio_remin(io2l(io_H2S_34S)) = dum_bio_remin(io2l(io_H2S_34S)) - &
+            & ((1.0/8.0)*loc_dFeOOH*ocn(io_H2S_34S,dum_i,dum_j,dum_k)/loc_H2S)
        dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
-            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+            & ((1.0/8.0)*loc_dFeOOH*ocn(io_H2S_34S,dum_i,dum_j,dum_k)/loc_H2S)
     end if
     ! -------------------------------------------------------- !
     ! DIAGNOSTICS
