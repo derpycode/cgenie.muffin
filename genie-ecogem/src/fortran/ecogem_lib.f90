@@ -108,6 +108,7 @@ MODULE ecogem_lib
   real :: vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
   real :: vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
   real :: vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
+  real :: vmaxDIC_a_pft_diazotroph,vmaxDIC_b_pft_diazotroph
   namelist/ini_ecogem_nml/vmaxDIC_a,vmaxDIC_b,vmaxDIC_c
   namelist/ini_ecogem_nml/qcarbon_a,alphachl_a,PARfrac,chl2nmax,biosynth,k_w,k_chl
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
@@ -115,6 +116,7 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
   namelist/ini_ecogem_nml/vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
   namelist/ini_ecogem_nml/vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_diazotroph,vmaxDIC_b_pft_diazotroph
   logical::ctrl_restrict_mld    ! restrict MLD
   NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
   logical::ctrl_PARseaicelimit    ! PAR attenutation by sea-ice cover?

@@ -436,7 +436,8 @@ subroutine ecogem(          &
                     io=nut2quota(ii)
                     dbiomassdt(io,:) = dbiomassdt(io,:) + up_inorg(ii ,:) * BioC(:)
                  enddo
-
+                 ! Take into account nitrogen fixation here scaled with dbiomass in phosphorus - Fanny Jun20
+                 dbiomassdt(iNitr,:) = merge(dbiomassdt(iPhos,:)*40.0,dbiomassdt(iNitr,:),pft.eq.'diazotroph')
                  ! CHLOROPHYLL A SYNTHESIS
                  if (chlquota) dbiomassdt(iChlo,:) = chlsynth(:)
                  do io=1,iomax+iChl
@@ -721,7 +722,23 @@ subroutine ecogem(          &
   endif
 
   ! set initial values for protected fraction of POM and CaCO3
-  dum_egbg_sfcpart(is_POC_frac2  ,:,:,n_k) = par_bio_remin_POC_frac2
+  ! Added ballast parameterisation - Fanny, Aug2020
+  if (ctrl_bio_remin_POC_ballast) then
+     if (dum_egbg_sfcpart(is_POC,:,:,n_k) > const_real_nullsmall) then
+        dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = (                                          &
+                  &   par_bio_remin_kc(dum_i,dum_j)*dum_egbg_sfcpart(is_CaCO3,:,:,n_k) + &
+                  &   par_bio_remin_ko(dum_i,dum_j)*dum_egbg_sfcpart(is_opal,:,:,n_k)  + &
+                  &   par_bio_remin_kl(dum_i,dum_j)*dum_egbg_sfcpart(is_det,,:,:,n_k)    &
+                  & )                                                                    &
+                  & /dum_egbg_sfcpart(is_POC,:,:,n_k)
+     else
+        dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = 0.0  
+     endif
+     if (dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) > 1.0) dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = 1.0
+  else
+     dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = par_bio_remin_POC_frac2
+  endif
+
   dum_egbg_sfcpart(is_CaCO3_frac2,:,:,n_k) = par_bio_remin_CaCO3_frac2
 
   ! ---------------------------------------------------------- !
