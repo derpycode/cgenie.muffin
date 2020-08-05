@@ -181,6 +181,12 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_b
   real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix
   NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_ef
+  ! ------------------- EXPORT PROPERTIES ---------------------------------------------------------------------------------------- !
+  LOGICAL::ctrl_bio_remin_POC_ballast_eco                         ! ballasting parameterization?
+  NAMELIST /ini_ecogem_nml/ctrl_bio_remin_POC_ballast_eco
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_kc                      !
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_ko                      !
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_kl
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                     ! continuing run?
   NAMELIST /ini_ecogem_nml/ctrl_continuing

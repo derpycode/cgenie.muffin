@@ -1,4 +1,8 @@
 #Ignore files setting local netcdf libraries
 ./genie-main/makefile.arc
 ./genie-main/user.mak
+*.dep
+*.o
+*.mod
+*.a
 

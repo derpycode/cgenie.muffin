@@ -544,7 +544,7 @@ subroutine ecogem(          &
 				! POC weighted
                  		!loc_weighted_mean_size=loc_weighted_mean_size+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp)))*logesd(jp) ! sum of weights * size
                  		!loc_total_weights=loc_total_weights+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp))) ! sum of weights
-				endIF
+				endif
 			enddo
 
                  	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
@@ -722,24 +722,29 @@ subroutine ecogem(          &
   endif
 
   ! set initial values for protected fraction of POM and CaCO3
-  ! Added ballast parameterisation - Fanny, Aug2020
-  if (ctrl_bio_remin_POC_ballast) then
-     if (dum_egbg_sfcpart(is_POC,:,:,n_k) > const_real_nullsmall) then
-        dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = (                                          &
-                  &   par_bio_remin_kc(dum_i,dum_j)*dum_egbg_sfcpart(is_CaCO3,:,:,n_k) + &
-                  &   par_bio_remin_ko(dum_i,dum_j)*dum_egbg_sfcpart(is_opal,:,:,n_k)  + &
-                  &   par_bio_remin_kl(dum_i,dum_j)*dum_egbg_sfcpart(is_det,,:,:,n_k)    &
-                  & )                                                                    &
-                  & /dum_egbg_sfcpart(is_POC,:,:,n_k)
-     else
-        dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = 0.0  
-     endif
-     if (dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) > 1.0) dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = 1.0
+  ! Added ballast parameterisation - Fanny, Aug20
+  ! NEED TO MAKE CARRYING COEF EXPLICIT (HARD CODING HERE BECAUSE WANT TO FIND A WAY TO DEFINE THEM ONLY ONE) - Fanny Aug20
+  ! Changed frac2 modification to be for imld:n_k rather than n_k
+  if (ctrl_bio_remin_POC_ballast_eco) then 
+     !dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+     !          &  ( par_bio_remin_kc(:,:)*dum_egbg_sfcpart(is_CaCO3,:,:,imld:n_k) + &
+     !          &    par_bio_remin_ko(:,:)*dum_egbg_sfcpart(is_opal,:,:,imld:n_k)  + &
+     !          &    par_bio_remin_kl(:,:)*dum_egbg_sfcpart(is_det,:,:,imld:n_k) )   &
+     !          &  /dum_egbg_sfcpart(is_POC,:,:,imld:n_k) ,                          &
+     !          &  0.0, dum_egbg_sfcpart(is_POC,:,:,imld:n_k) > const_real_nullsmall)
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+               &  ( 0.085*dum_egbg_sfcpart(is_CaCO3,:,:,imld:n_k) + &
+               &    0.025*dum_egbg_sfcpart(is_opal,:,:,imld:n_k)  + &
+               &    0.0*dum_egbg_sfcpart(is_det,:,:,imld:n_k) )   &
+               &  /dum_egbg_sfcpart(is_POC,:,:,imld:n_k) ,                          &
+               &  0.0, dum_egbg_sfcpart(is_POC,:,:,imld:n_k) > const_real_nullsmall)
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+              &  1.0,dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k), dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) > 1.0)
   else
-     dum_egbg_sfcpart(is_POC_frac2,:,:,n_k) = par_bio_remin_POC_frac2
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = par_bio_remin_POC_frac2
   endif
 
-  dum_egbg_sfcpart(is_CaCO3_frac2,:,:,n_k) = par_bio_remin_CaCO3_frac2
+  dum_egbg_sfcpart(is_CaCO3_frac2,:,:,imld:n_k) = par_bio_remin_CaCO3_frac2
 
   ! ---------------------------------------------------------- !
   ! END

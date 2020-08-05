@@ -47,7 +47,8 @@ bg_ctrl_bio_remin_POC_fixed=.true.
 # Set carrying coeff of CaCO3, opal and detrital materials (from Wilson et al., 2012)
 #bg_par_bio_remin_ballast_kc = 0.085
 bg_par_bio_remin_ballast_ko = 0.025
-#
+#Ballast for ecogem
+eg_ctrl_bio_remin_POC_ballast_eco=.true.
 # --- IRON ----------------------------------------------------------
 #
 bg_opt_geochem_Fe='hybrid'

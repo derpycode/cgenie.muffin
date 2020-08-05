@@ -145,7 +145,10 @@ CONTAINS
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b
        print*,'fractionation for intercellular C fixation          : ',par_d13C_DIC_Corg_ef
+       ! ------------------- BALLAST PROPERTIES ------------------------------------------------------------------------------ !
+       print*,'ballasting parameterization?                        : ',ctrl_bio_remin_POC_ballast_eco
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
+
        print*,'--- RUN CONTROL ------------------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing
        ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !

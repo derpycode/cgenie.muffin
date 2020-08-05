@@ -8163,6 +8163,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                       <value datatype="boolean">.FALSE.</value>
                       <description>Force ecogem with a temperature field</description>
                     </param>
+                    <param name="ctrl_bio_remin_POC_ballast_eco">
+			<value datatype="boolean">.false.</value>
+                        <description>Ballasting parameterization?</description>
+                    </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
                         <value datatype="string">Default</value>
