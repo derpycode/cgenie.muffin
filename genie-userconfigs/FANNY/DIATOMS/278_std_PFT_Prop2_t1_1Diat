@@ -39,16 +39,6 @@ bg_par_bio_remin_CaCO3_eL1=1.8905e+003
 # remineralization length #2 for CaCO3
 bg_par_bio_remin_CaCO3_eL2=1000000.0
 #
-# ----------- BALLASTING EFFECT ---------------------------------
-#
-# Turn on ballasting 
-bg_ctrl_bio_remin_POC_ballast=.true.
-bg_ctrl_bio_remin_POC_fixed=.false.
-# Set carrying coeff of CaCO3, opal and detrital materials
-#bg_par_bio_remin_ballast_kc = 0.094
-bg_par_bio_remin_ballast_ko = 0.025
-#bg_par_bio_remin_ballast_kl
-#
 # --- IRON ----------------------------------------------------------
 #
 bg_opt_geochem_Fe='hybrid'
@@ -96,7 +86,8 @@ bg_par_d30Si_opal_epsilon=-1.1
 gm_ctrl_debug_init          =0
 eg_ctrl_debug_eco_init      =.false.
 
-eg_par_ecogem_plankton_file ='3Diat4ZP.eco'
+# PFTs with diatoms, pico and eukaryotes Fanny - Jun20
+eg_par_ecogem_plankton_file ='1Diat4ZP_PiEu.eco'
 
 #################### Nitrogen ############################
 eg_useNO3                   =.false.
@@ -119,13 +110,16 @@ eg_squota                   =.true.
 eg_qminP_a     =   3.33e-3
 eg_qminFe_a    =   1.00e-6
 eg_qmaxFe_a    =   4.00e-6
-# Si properties - Fanny May2020
+# Si properties - Fanny June2020
 eg_vmaxSiO2_a=4.4e-2
 eg_vmaxSiO2_b=0.06
-eg_qminSi_a=0.050000
-eg_qmaxSi_a=0.170000
-eg_affinSiO2_a = 17.60
+eg_qminSi_a=0.033600
+eg_qmaxSi_a=0.176000
+eg_affinSiO2_a = 3.900
 eg_affinSiO2_b = -0.35
+
+# eukaryote photosynthetic rate - Fanny Jun20 (equivalent to 0.56 times diatoms Pmax)
+eg_vmaxDIC_a_pft_eukaryote = 2.2000
 
 eg_ns          =   2
 

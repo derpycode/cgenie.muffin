@@ -87,7 +87,7 @@ gm_ctrl_debug_init          =0
 eg_ctrl_debug_eco_init      =.false.
 
 # PFTs with diatoms, pico and eukaryotes Fanny - Jun20
-eg_par_ecogem_plankton_file ='3D4ZP_PiEu.eco'
+eg_par_ecogem_plankton_file ='3Diat4ZP_PiEu.eco'
 
 #################### Nitrogen ############################
 eg_useNO3                   =.false.
