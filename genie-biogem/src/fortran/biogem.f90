@@ -3619,6 +3619,10 @@ SUBROUTINE diag_biogem_timeseries( &
               int_misc_opsi_max_sig = int_misc_opsi_max_sig + loc_dtyr*maxval(loc_opsi(:,:))
               int_misc_opsia_min_sig = int_misc_opsia_min_sig + loc_dtyr*loc_opsia_minmax(1)
               int_misc_opsia_max_sig = int_misc_opsia_max_sig + loc_dtyr*loc_opsia_minmax(2)
+              DO k=0,n_k
+                 int_misc_moc_maxS_sig(k) = int_misc_moc_maxS_sig(k) + loc_dtyr*minval(loc_opsi(1:int(n_j/2),k))
+                 int_misc_moc_maxN_sig(k) = int_misc_moc_maxN_sig(k) + loc_dtyr*maxval(loc_opsi(int(n_j/2)+1:n_j,k))
+              end DO
               ! calculate current mean surface land (air) temperature SLT (degrees C)
               loc_sig = 0.0
               loc_tot_A = 0.0

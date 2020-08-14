@@ -1600,6 +1600,8 @@ CONTAINS
     int_misc_opsi_max_sig   = 0.0
     int_misc_opsia_min_sig  = 0.0
     int_misc_opsia_max_sig  = 0.0
+    int_misc_moc_maxS_sig(:) = 0.0
+    int_misc_moc_maxN_sig(:) = 0.0
     int_misc_SLT_sig        = 0.0
     int_misc_det_Fe_tot_sig = 0.0
     int_misc_det_Fe_dis_sig = 0.0

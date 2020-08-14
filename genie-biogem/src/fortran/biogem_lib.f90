@@ -1249,6 +1249,9 @@ MODULE biogem_lib
   ! misc
   real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
   real::int_misc_ocn_fxsw_sig,int_misc_opn_fxsw_sig              !
+  ! MOC
+  REAL,DIMENSION(0:n_k)::int_misc_moc_maxS_sig                   ! min Southern MOC at each depth level
+  REAL,DIMENSION(0:n_k)::int_misc_moc_maxN_sig                   ! max Northern MOC at each depth level
   ! 'snap-shot' time-series arrays
   real::snap_misc_ocn_solfor_N_sig                               !
   real::snap_misc_ocn_solfor_S_sig                               !

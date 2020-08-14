@@ -411,16 +411,39 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       !
+       ! OPSI -- OLD
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opsi',string_results_ext)
        select case (fname_topo)
        case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
-          loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv) / '// &
-               & 'Atlantic min overturning (Sv) / Atlantic max overturning (Sv)'
+          loc_string = '% time (yr) / global min (Sv) (!INCLUDES GYRE!) / global max (Sv) (!INCLUDES GYRE!) / '// &
+               & 'Atlantic min (Sv) (IN LOWER 50% OF GRID) / Atlantic max (Sv) (IN LOWER 50% OF GRID)'
        case default
-          loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv)'
+          loc_string = '% time (yr) / global min (Sv) (!INCLUDES GYRE!) / global max (Sv) (!INCLUDES GYRE!)'
        end select
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       ! MOC -- NEW!
+       loc_filename=fun_data_timeseries_filename( &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxS',string_results_ext)
+       loc_string = &
+            & 'time (yr) / Southern max (Sv) @ each k (upper layer boundary in depth) from kmax to 0'
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       loc_filename=fun_data_timeseries_filename( &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxN',string_results_ext)
+       loc_string = &
+            & 'time (yr) / Northern max (Sv) @ each k (upper layer boundary in depth) from kmax to 0'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -1812,7 +1835,7 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       !
+       ! OPSI -- OLD
        loc_filename=fun_data_timeseries_filename( &
             & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opsi',string_results_ext)
        call check_unit(out,__LINE__,__FILE__)
@@ -1832,6 +1855,25 @@ CONTAINS
                & loc_opsi_scale*int_misc_opsi_min_sig/int_t_sig,  &
                & loc_opsi_scale*int_misc_opsi_max_sig/int_t_sig
        end select
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       ! MOC -- NEW!
+       loc_filename=fun_data_timeseries_filename( &
+            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxS',string_results_ext)
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       WRITE(unit=out,fmt='(f12.3,999f9.3)') loc_t,(loc_opsi_scale*int_misc_moc_maxS_sig(k)/int_t_sig,k=n_k,0,-1)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       loc_filename=fun_data_timeseries_filename( &
+            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxN',string_results_ext)
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       WRITE(unit=out,fmt='(f12.3,999f9.3)') loc_t,(loc_opsi_scale*int_misc_moc_maxN_sig(k)/int_t_sig,k=n_k,0,-1)
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
