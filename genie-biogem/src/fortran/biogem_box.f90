@@ -2727,8 +2727,8 @@ CONTAINS
     real::loc_bio_remin_layerratio
     real::loc_bio_remin_sinkingrate_physical                            ! particle sinking rate -- physical
     real::loc_bio_remin_sinkingrate_reaction                            ! particle sinking rate -- for geochemical reactions
-    real::loc_bio_remin_dt_physical                                     ! layer residence time (in years)
     real::loc_bio_remin_dt_reaction                                     ! layer residence time (for calculating scavenging)
+    real::loc_bio_remin_dt_reaction_Fe                                  ! (special case)
     real::loc_bio_remin_POC_frac1,loc_bio_remin_POC_frac2
     real::loc_bio_part_POC_ratio
     real::loc_bio_remin_CaCO3_frac1,loc_bio_remin_CaCO3_frac2
@@ -2810,8 +2810,8 @@ CONTAINS
     ! replace reaction sinking rate if size-dependent sinking is selected
     select case (par_bio_remin_fun)
     case ('KriestOschlies2008_explicit')
-      loc_bio_remin_sinkingrate_reaction = &
-      & par_bio_remin_POC_w0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta
+       loc_bio_remin_sinkingrate_reaction = &
+            & par_bio_remin_POC_w0*((loc_bio_part_OLD(is2l(is_POC_size),n_k))*loc_size0)**par_bio_remin_POC_eta
     end select
     ! -------------------------------------------------------- ! test for possibilty of precip in water column
     ! if so: assume particules could be present at any/every depth in the local water column
@@ -2876,8 +2876,17 @@ CONTAINS
              if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
                 ! calculate surface residence time (yr) of particulates in ocean layer (from layer thickness and sinking speed)
                 loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,k)
-                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) &
-                     & loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
+                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) then
+                   loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
+                   if (par_bio_remin_sinkingrate_reaction_Fe > const_real_nullsmall) then
+                      loc_bio_remin_dt_reaction_Fe = loc_bio_remin_dD/par_bio_remin_sinkingrate_reaction_Fe
+                   else
+                      loc_bio_remin_dt_reaction_Fe = loc_bio_remin_dt_reaction
+                   end if
+                else
+                   loc_bio_remin_dt_reaction    = 0.0
+                   loc_bio_remin_dt_reaction_Fe = 0.0
+                end if
                 ! calculate Fe scavenging
                 SELECT CASE (trim(opt_geochem_Fe))
                 case ('OLD')
@@ -2945,12 +2954,15 @@ CONTAINS
                       ! NOTHING!
                       end SELECT
                    end if
+                ! calculate scavenging (and isotopes)
+                ! NOTE: isotopes not enabled for all of the Fe schemes
+                ! NOTE: Fe scavenging has the possibility of a different reaction time-scale (for model tuning flexibility)
                 SELECT CASE (trim(opt_geochem_Fe))
                 CASE ('ALT','OLD')
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
                          loc_scav_Fe = fun_box_scav_Fe(          &
                               & dum_dtyr,                        &
-                              & loc_bio_remin_dt_reaction,       &
+                              & loc_bio_remin_dt_reaction_Fe,    &
                               & loc_FeFeLL(1),                   &
                               & loc_bio_part_TMP(is2l(is_POC),k) &
                               & )
@@ -2967,7 +2979,7 @@ CONTAINS
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
                          loc_scav_Fe = fun_box_scav_Fe(          &
                               & dum_dtyr,                        &
-                              & loc_bio_remin_dt_reaction,       &
+                              & loc_bio_remin_dt_reaction_Fe,    &
                               & loc_FeFeLL(1),                   &
                               & loc_bio_part_TMP(is2l(is_POC),k) &
                               & )
@@ -3000,7 +3012,7 @@ CONTAINS
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
                          loc_scav_Fe = fun_box_scav_Fe(          &
                               & dum_dtyr,                        &
-                              & loc_bio_remin_dt_reaction,       &
+                              & loc_bio_remin_dt_reaction_Fe,    &
                               & loc_FeFeLL(1),                   &
                               & loc_bio_part_TMP(is2l(is_POC),k) &
                               & )
@@ -3041,10 +3053,17 @@ CONTAINS
                 loc_bio_remin_dD = dum_vphys_ocn%mk(ipo_dD,kk)
                 ! calculate residence time (yr) of particulates in ocean layer (from layer thickness and sinking speed)
                 ! NOTE: sinking rate has units of (m yr-1) (converted from parameter file input units)
-                if (loc_bio_remin_sinkingrate_physical > const_real_nullsmall) &
-                     & loc_bio_remin_dt_physical = loc_bio_remin_dD/loc_bio_remin_sinkingrate_physical
-                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) &
-                     & loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
+                if (loc_bio_remin_sinkingrate_reaction > const_real_nullsmall) then
+                   loc_bio_remin_dt_reaction = loc_bio_remin_dD/loc_bio_remin_sinkingrate_reaction
+                   if (par_bio_remin_sinkingrate_reaction_Fe > const_real_nullsmall) then
+                      loc_bio_remin_dt_reaction_Fe = loc_bio_remin_dD/par_bio_remin_sinkingrate_reaction_Fe
+                   else
+                      loc_bio_remin_dt_reaction_Fe = loc_bio_remin_dt_reaction
+                   end if
+                else
+                   loc_bio_remin_dt_reaction    = 0.0
+                   loc_bio_remin_dt_reaction_Fe = 0.0
+                end if
 
                 ! *** Calculate fractional change in particulate fluxes ***
 
@@ -3486,12 +3505,13 @@ CONTAINS
                    end if
                    ! calculate scavenging (and isotopes)
                    ! NOTE: isotopes not enabled for all of the Fe schemes
+                   ! NOTE: Fe scavenging has the possibility of a different reaction time-scale (for model tuning flexibility)
                    SELECT CASE (trim(opt_geochem_Fe))
                    CASE ('OLD','ALT')
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
                          loc_scav_Fe = fun_box_scav_Fe(           &
                               & dum_dtyr,                         &
-                              & loc_bio_remin_dt_reaction,        &
+                              & loc_bio_remin_dt_reaction_Fe,     &
                               & loc_FeFeLL(1),                    &
                               & loc_bio_part_TMP(is2l(is_POC),kk) &
                               & )
@@ -3508,7 +3528,7 @@ CONTAINS
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
                          loc_scav_Fe = fun_box_scav_Fe(           &
                               & dum_dtyr,                         &
-                              & loc_bio_remin_dt_reaction,        &
+                              & loc_bio_remin_dt_reaction_Fe,     &
                               & loc_FeFeLL(1),                    &
                               & loc_bio_part_TMP(is2l(is_POC),kk) &
                               & )
@@ -3540,7 +3560,7 @@ CONTAINS
                       if (loc_FeFeLL(1) > const_real_nullsmall) then
                          loc_scav_Fe = fun_box_scav_Fe(           &
                               & dum_dtyr,                         &
-                              & loc_bio_remin_dt_reaction,        &
+                              & loc_bio_remin_dt_reaction_Fe,     &
                               & loc_FeFeLL(1),                    &
                               & loc_bio_part_TMP(is2l(is_POC),kk) &
                               & )

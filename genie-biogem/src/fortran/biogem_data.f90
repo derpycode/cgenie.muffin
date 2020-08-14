@@ -228,6 +228,7 @@ CONTAINS
        print*,'Prescribed scavenging sinking rate (m d-1)          : ',par_bio_remin_sinkingrate_scav
        print*,'Explicit physical particle sinking rate (m d-1)     : ',par_bio_remin_sinkingrate_physical
        print*,'Implicit sinking rate for geochem reactions (m d-1) : ',par_bio_remin_sinkingrate_reaction
+       print*,'Implicit sinking rate for Fe reactions (m d-1)      : ',par_bio_remin_sinkingrate_reaction_Fe
        print*,'Organic matter carrying capacity of CaCO3           : ',par_bio_remin_ballast_kc
        print*,'Organic matter carrying capacity of opal            : ',par_bio_remin_ballast_ko
        print*,'Organic matter carrying capacity of lithogenics     : ',par_bio_remin_ballast_kl

@@ -243,8 +243,10 @@ MODULE biogem_lib
   real::par_bio_remin_sinkingrate_scav                           ! sinking rate (for calculating scavenging) (m d-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate,par_bio_remin_sinkingrate_scav
   real::par_bio_remin_sinkingrate_physical                       ! Explicit physical particle sinking rate (m d-1)
+  NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate_physical
   real::par_bio_remin_sinkingrate_reaction                       ! Implicit sinking rate for geochem reactions (m d-1)
-  NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate_physical,par_bio_remin_sinkingrate_reaction
+  real::par_bio_remin_sinkingrate_reaction_Fe                    ! Implicit sinking rate for Fe reactions (m d-1)
+  NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate_reaction,par_bio_remin_sinkingrate_reaction_Fe
   real::par_bio_remin_ballast_kc                                 ! organic matter carrying capacity of CaCO3
   real::par_bio_remin_ballast_ko                                 ! organic matter carrying capacity of opal
   real::par_bio_remin_ballast_kl                                 ! organic matter carrying capacity of detital (lithogenic)
