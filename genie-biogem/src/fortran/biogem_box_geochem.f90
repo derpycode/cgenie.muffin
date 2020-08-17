@@ -857,6 +857,7 @@ CONTAINS
              loc_r34SO4 = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
              
              loc_bio_part(is_FeS2_34S,k) = (7.0/8.0*loc_r34S + 1.0/8.0*loc_r34SO4)*loc_bio_part(is_FeS2,k)
+             !loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
           end if
           ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
           loc_bio_uptake(io_Fe2,k) = loc_bio_uptake(io_Fe2,k) + loc_bio_part(is_FeS2,k)
