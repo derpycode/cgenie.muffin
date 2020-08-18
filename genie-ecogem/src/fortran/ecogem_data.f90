@@ -603,16 +603,17 @@ CONTAINS
     close(302)
 
     ! grazing matrix
-    do jpred=1,npmax
-       if (heterotrophy(jpred).le.0.0) then
-          gkernel(jpred,:) = 0.0
-       endif
-       do jprey=1,npmax-1
-          WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
-       enddo
-       WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
-    enddo
-    close(303)
+!    do jpred=1,npmax
+!       if (heterotrophy(jpred).le.0.0) then
+!          gkernel(jpred,:) = 0.0
+!       endif
+!       do jprey=1,npmax-1
+!          WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
+!       enddo
+!       WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
+!    enddo
+!    close(303)
+
     ! ****************************************************************************************
     ! ****************************************************************************************
 
