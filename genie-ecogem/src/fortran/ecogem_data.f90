@@ -817,6 +817,7 @@ CONTAINS
     int_uptake_timeslice(:,:,:,:,:)   = 0.0
     int_gamma_timeslice(:,:,:,:,:)    = 0.0
     int_nutrient_timeslice(:,:,:,:)   = 0.0
+    int_export_timeslice(:,:,:,:,:)   = 0.0  !Fanny/Maria - Aug19
 
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
     !

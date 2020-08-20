@@ -144,6 +144,8 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(up_flux_iso(iomaxiso,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(export_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
+  call check_iostat(alloc_error,__LINE__,__FILE__)
 
   ! ecogem time-slice arrays
   ALLOCATE(int_plankton_timeslice(iomax+iChl,npmax,n_i,n_j,n_k),STAT=alloc_error)
@@ -153,6 +155,8 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(int_gamma_timeslice(iomax+2,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(int_nutrient_timeslice(iimax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_export_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Time-series storage arrays
   if (n_tser.gt.0) then
