@@ -4368,6 +4368,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>RDOM degradation by (surface) photolysis only?</description>
                     </param>
+                    <param name="opt_bio_red_DOMfrac">
+			<value datatype="string">DEFAULT</value>
+                        <description>DOM production option</description>
+                    </param>
+                    <param name="par_bio_red_DOMfrac_Tdep_const">
+			<value datatype="real">0.419</value>
+                        <description>DOM production constant in Dunne et al. [2005]</description>
+                    </param>
+                    <param name="par_bio_red_DOMfrac_Tdep_gamma">
+			<value datatype="real">0.0101</value>
+                        <description>DOM production scalar in Dunne et al. [2005]</description>
+                    </param>
+                    <param name="ctrl_bio_remin_DOM_Tdep">
+			<value datatype="boolean">.false.</value>
+                        <description>T-dependent DOM remineralization?</description>
+                    </param>
                     <param name="par_bio_remin_CH4rate">
 			<value datatype="real">1.0e-4</value>
                         <description>Specific CH4 oxidation rate (d-1)</description>
@@ -4507,6 +4523,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_POC_Ea2">
 			<value datatype="real">80000.0</value>
                         <description>'Activation energy #2 for POC (J)</description>
+                    </param>
+                    <param name="par_bio_remin_DOC_K1">
+			<value datatype="real">1.0E12</value>
+                        <description>Degradation rate constant #1 for DOC (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_POC_dfrac2">
 			<value datatype="real">0.0</value>
@@ -8167,6 +8187,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                       <value datatype="boolean">.FALSE.</value>
                       <description>Force ecogem with a temperature field</description>
                     </param>
+                    <param name="par_beta_POCtoDOC">
+			<value datatype="real">1.0</value>
+	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
+                    </param>
+                    <param name="ctrl_Tdep_POCtoDOC">
+                      <value datatype="boolean">.FALSE.</value>
+                      <description>Temperature-dependent POC/DOC partitioning?</description>
+                    </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
                         <value datatype="string">Default</value>
@@ -8610,10 +8638,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="beta_mort_c">
 			<value datatype="real">100.0</value>
 	                  <description>Fraction mortality to dissolved - midpoint vol.</description>
-                    </param>
-                    <param name="par_beta_POCtoDOC">
-			<value datatype="real">1.0</value>
-	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
                     </param>
 <!-- initial fractional abundance of particulate export -->
                     <param name="par_bio_remin_POC_frac2">
