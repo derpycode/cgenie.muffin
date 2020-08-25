@@ -26,13 +26,13 @@ All experiments are run from:$HOME/cgenie.muffin/genie-main
 
 located in subdirectory: ensemble.spin
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2019/ensemble.spin [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN 10000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2020/ensemble.spin [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN 10000
 
 ### transient forcing from Pre-industrial to Present ###########
 
 located in subdirectory: ensemble.trans
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2019/ensemble.trans [letter][no1]_[no2]_worjh2_PD_BASES.TRANS 310 [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2020/ensemble.trans [letter][no1]_[no2]_worjh2_PD_BASES.TRANS 310 [letter][no1]_[no2]_worjh2_280ppm_m6_5permil_BASES.SPIN
 
 ### experiment naming convention ###############################
  
@@ -76,7 +76,7 @@ crichtonetal.TDEP.DOMTprodTremin.SPIN   --  as crichtonetal.TDEP.SPIN, but addin
 
 These experiments are run:
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2019 crichtonetal.*.SPIN 10000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2020 crichtonetal.*.SPIN 10000
 
 crichtonetal.*.SPIN is one of the experiment names listed above
 
@@ -90,7 +90,7 @@ crichtonetal.TDEP.DOMTprodTremin.TRANS  --  as per ccrichtonetal.TDEP.DOMTprodTr
 
 These experiments are run:
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2019 crichtonetal.*.TRANS 310 crichtonetal.*.SPIN
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASES MS/crichtonetal.GMD.2020 crichtonetal.*.TRANS 310 crichtonetal.*.SPIN
 
 crichtonetal.*.TRANS is one of the experiment names listed above
 
