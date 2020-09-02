@@ -411,16 +411,39 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       !
+       ! OPSI -- OLD
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opsi',string_results_ext)
        select case (fname_topo)
        case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
-          loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv) / '// &
-               & 'Atlantic min overturning (Sv) / Atlantic max overturning (Sv)'
+          loc_string = '% time (yr) / global min (Sv) (!INCLUDES GYRE!) / global max (Sv) (!INCLUDES GYRE!) / '// &
+               & 'Atlantic min (Sv) (IN LOWER 50% OF GRID) / Atlantic max (Sv) (IN LOWER 50% OF GRID)'
        case default
-          loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv)'
+          loc_string = '% time (yr) / global min (Sv) (!INCLUDES GYRE!) / global max (Sv) (!INCLUDES GYRE!)'
        end select
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       ! MOC -- NEW!
+       loc_filename=fun_data_timeseries_filename( &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxS',string_results_ext)
+       loc_string = &
+            & 'time (yr) / Southern max (Sv) @ each k (upper layer boundary in depth) from kmax to 0'
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       loc_filename=fun_data_timeseries_filename( &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxN',string_results_ext)
+       loc_string = &
+            & 'time (yr) / Northern max (Sv) @ each k (upper layer boundary in depth) from kmax to 0'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -776,7 +799,7 @@ CONTAINS
           CASE (idiag_bio_dPO4,idiag_bio_dPO4_1,idiag_bio_dPO4_2,idiag_bio_N2fixation,idiag_bio_NH4assim)
              loc_string = '% time (yr) / integrated global rate (mol yr-1)'
           case default
-             loc_string = '% time (yr) / global mean'
+             loc_string = '% time (yr) / global mean (area-weighted) / global mean (POC export weighted)'
           end select
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
@@ -1115,7 +1138,7 @@ CONTAINS
     REAL::loc_t
     real::loc_opsi_scale
     real::loc_ocn_tot_M,loc_ocn_tot_M_sur,loc_ocn_tot_A
-    real::loc_sig,loc_sig_sur,loc_sig_opn,loc_sig_ben,loc_rsig
+    real::loc_sig,loc_sigNORM,loc_sig_sur,loc_sig_opn,loc_sig_ben,loc_rsig
     real::loc_tot,loc_tot_sur,loc_tot_opn,loc_tot_ben
     real::loc_frac,loc_frac_sur,loc_frac_opn,loc_frac_ben,loc_standard
     real::loc_d13C,loc_d14C
@@ -1812,7 +1835,7 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       !
+       ! OPSI -- OLD
        loc_filename=fun_data_timeseries_filename( &
             & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opsi',string_results_ext)
        call check_unit(out,__LINE__,__FILE__)
@@ -1832,6 +1855,25 @@ CONTAINS
                & loc_opsi_scale*int_misc_opsi_min_sig/int_t_sig,  &
                & loc_opsi_scale*int_misc_opsi_max_sig/int_t_sig
        end select
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       ! MOC -- NEW!
+       loc_filename=fun_data_timeseries_filename( &
+            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxS',string_results_ext)
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       WRITE(unit=out,fmt='(f12.3,999f9.3)') loc_t,(loc_opsi_scale*int_misc_moc_maxS_sig(k)/int_t_sig,k=n_k,0,-1)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       loc_filename=fun_data_timeseries_filename( &
+            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_moc_maxN',string_results_ext)
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       WRITE(unit=out,fmt='(f12.3,999f9.3)') loc_t,(loc_opsi_scale*int_misc_moc_maxN_sig(k)/int_t_sig,k=n_k,0,-1)
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -2295,7 +2337,8 @@ CONTAINS
     ! diagnostic diagnostics
     IF (ctrl_data_save_sig_diag_bio .AND. ctrl_data_save_sig_fexport) THEN
        DO ib=1,n_diag_bio
-          loc_sig = int_diag_bio_sig(ib)/int_t_sig
+          loc_sig     = int_diag_bio_sig(ib)/int_t_sig
+          loc_sigNORM = int_diag_bioNORM_sig(ib)/int_t_sig
           loc_filename=fun_data_timeseries_filename(loc_t, &
                & par_outdir_name,trim(par_outfile_name)//'_series_diag_bio',trim(string_diag_bio(ib)),string_results_ext)
           call check_unit(out,__LINE__,__FILE__)
@@ -2308,13 +2351,20 @@ CONTAINS
                   & loc_ocn_tot_M_sur*loc_sig
           CASE (idiag_bio_CaCO3toPOC_nsp,idiag_bio_opaltoPOC_sp,idiag_bio_fspPOC)
              ! correct for the number of sub-slices to create an average
-             WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
-                  & loc_t,                        &
-                  & loc_sig/real(int_t_sig_count)
+             WRITE(unit=out,fmt='(f16.3,e15.6,e15.6)',iostat=ios) &
+                  & loc_t,                                        &
+                  & loc_sig/real(int_t_sig_count),                &
+                  & loc_sigNORM/real(int_t_sig_count)
+          CASE (idiag_bio_DOMfrac,idiag_bio_DOMlifetime)
+             WRITE(unit=out,fmt='(f16.3,e15.6,e15.6)',iostat=ios) &
+                  & loc_t,                                        &
+                  & loc_sig,                                      &
+                  & loc_sigNORM
           case default
-             WRITE(unit=out,fmt='(f16.3,e15.6)',iostat=ios) &
-                  & loc_t,                        &
-                  & loc_sig
+             WRITE(unit=out,fmt='(f16.3,e15.6,e15.6)',iostat=ios) &
+                  & loc_t,                                        &
+                  & loc_sig,                                      &
+                  & loc_sigNORM
           end select
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)

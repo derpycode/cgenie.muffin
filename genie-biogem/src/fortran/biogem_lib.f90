@@ -64,7 +64,8 @@ MODULE biogem_lib
   logical::ctrl_force_sed_closedsystem                                  ! Set dissolution flux = rain flux to close system?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closedsystem
   logical::ctrl_force_sed_closed_P                                      ! Balance the P cycle (with weathering)?
-  NAMELIST /ini_biogem_nml/ctrl_force_sed_closed_P
+  logical::ctrl_force_sed_closed_C                                      ! Balance the C cycle (with weathering)?
+  NAMELIST /ini_biogem_nml/ctrl_force_sed_closed_P,ctrl_force_sed_closed_C
   logical::ctrl_force_sed_reflective_POM                                ! Set reflective boundary condition for POM?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_reflective_POM
   logical::ctrl_force_GOLDSTEInTS                                       ! Allow temperature / salinity forcing of climate?
@@ -206,6 +207,13 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_RDOMlifetime
   LOGICAL::ctrl_bio_remin_RDOM_photolysis                               ! RDOM degradation by (surface) photolysis only?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_RDOM_photolysis
+  CHARACTER(len=63)::opt_bio_red_DOMfrac                                ! DOM production option
+  NAMELIST /ini_biogem_nml/opt_bio_red_DOMfrac
+  real::par_bio_red_DOMfrac_Tdep_const                                  ! DOM production constant in Dunne et al. [2005]
+  real::par_bio_red_DOMfrac_Tdep_gamma                                  ! DOM production scalar in Dunne et al. [2005]
+  NAMELIST /ini_biogem_nml/par_bio_red_DOMfrac_Tdep_const,par_bio_red_DOMfrac_Tdep_gamma
+  LOGICAL::ctrl_bio_remin_DOM_Tdep                                      ! T-dependent DOM remineralization?
+  NAMELIST /ini_biogem_nml/ctrl_bio_remin_DOM_Tdep
   LOGICAL::ctrl_bio_remin_POC_fixed                              ! fixed-profile POM remineralization
   LOGICAL::ctrl_bio_remin_CaCO3_fixed                            ! fixed-profile CaCO3 remineralization
   LOGICAL::ctrl_bio_remin_opal_fixed                             ! fixed-profile opal remineralization
@@ -239,6 +247,9 @@ MODULE biogem_lib
   real::par_bio_remin_POC_Ea1,par_bio_remin_POC_Ea2
   NAMELIST /ini_biogem_nml/par_bio_remin_POC_K1,par_bio_remin_POC_K2
   NAMELIST /ini_biogem_nml/par_bio_remin_POC_Ea1,par_bio_remin_POC_Ea2
+  real::par_bio_remin_DOC_K1                                     ! DOC K(1)
+  NAMELIST /ini_biogem_nml/par_bio_remin_DOC_K1
+  NAMELIST /ini_biogem_nml/par_bio_remin_POC_K1,par_bio_remin_POC_K2
   real::par_bio_remin_sinkingrate                                ! prescribed particle sinking rate (m d-1)
   real::par_bio_remin_sinkingrate_scav                           ! sinking rate (for calculating scavenging) (m d-1)
   NAMELIST /ini_biogem_nml/par_bio_remin_sinkingrate,par_bio_remin_sinkingrate_scav
@@ -758,7 +769,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_force                          = 08 ! forcings
   INTEGER,PARAMETER::n_opt_data                           = 30 ! data (I/O)
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
-  INTEGER,PARAMETER::n_diag_bio                           = 21 !
+  INTEGER,PARAMETER::n_diag_bio                           = 22 !
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
   INTEGER,PARAMETER::n_diag_react                         = 09 !
@@ -862,6 +873,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_bio_CaCO3toPOC_nsp            = 19    !
   INTEGER,PARAMETER::idiag_bio_opaltoPOC_sp              = 20    !
   INTEGER,PARAMETER::idiag_bio_fspPOC                    = 21    !
+  INTEGER,PARAMETER::idiag_bio_DOMlifetime               = 22    !
   ! diagnostics - OLD
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNO3        = 01    !
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNH4        = 02    !
@@ -985,7 +997,8 @@ MODULE biogem_lib
        & 'k_SiO2_sp     ', &
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
-       & 'fspPOC        ' /)
+       & 'fspPOC        ', &
+       & 'DOMlifetime   ' /)
   ! diagnostics - geochemistry -- OLD
   CHARACTER(len=14),DIMENSION(n_diag_geochem_old),PARAMETER::string_diag_geochem_old = (/ &
        & 'dNO3_NH4_oxid ', &
@@ -1225,7 +1238,8 @@ MODULE biogem_lib
   real::int_misc_SLT_sig                                         !
   real::int_misc_det_Fe_tot_sig,int_misc_det_Fe_dis_sig          !
   REAL,DIMENSION(n_sed)::int_ocnsed_sig                          !
-  REAL,DIMENSION(n_diag_bio)::int_diag_bio_sig                   ! biology diagnostics
+  REAL,DIMENSION(n_diag_bio)::int_diag_bio_sig                   ! biology diagnostics (area weighted mean)
+  REAL,DIMENSION(n_diag_bio)::int_diag_bioNORM_sig               ! biology diagnostics (POC export weighted mean)
   REAL,DIMENSION(n_diag_geochem_old)::int_diag_geochem_old_sig   ! geochemistry diagnostics -- OLD
   REAL,DIMENSION(n_diag_precip)::int_diag_precip_sig             ! geochemistry diagnostics -- precipitation
   REAL,DIMENSION(n_diag_iron)::int_diag_iron_sig                 ! geochemistry (Fe) diagnostics
@@ -1237,6 +1251,9 @@ MODULE biogem_lib
   ! misc
   real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
   real::int_misc_ocn_fxsw_sig,int_misc_opn_fxsw_sig              !
+  ! MOC
+  REAL,DIMENSION(0:n_k)::int_misc_moc_maxS_sig                   ! min Southern MOC at each depth level
+  REAL,DIMENSION(0:n_k)::int_misc_moc_maxN_sig                   ! max Northern MOC at each depth level
   ! 'snap-shot' time-series arrays
   real::snap_misc_ocn_solfor_N_sig                               !
   real::snap_misc_ocn_solfor_S_sig                               !
