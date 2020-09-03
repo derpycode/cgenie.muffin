@@ -402,6 +402,7 @@ CONTAINS
     real::loc_kCd
     real::loc_TC
     real::loc_bio_red_DOMfrac,loc_bio_red_RDOMfrac,loc_bio_red_DOMtotal !
+    real::loc_PPoverZeu,loc_rPOC
     real::loc_r_POM_DOM,loc_r_POM_RDOM                                  !
     real::loc_bio_red_POC_POFe_sp,loc_bio_red_POC_POFe_nsp
     real::loc_d13C_DIC_Corg_ef
@@ -671,41 +672,6 @@ CONTAINS
        loc_kT = 0.0
     end SELECT
     diag_bio(idiag_bio_kT,dum_i,dum_j) = dum_dt*loc_kT
-
-    ! *** SET DOM FRACTION ******************************************************************************************************* !
-    SELECT CASE (par_bio_prodopt)
-    case (                        &
-         & 'bio_P',               &
-         & 'bio_PFe',             &
-         & 'bio_PFeSi'            &
-         & )
-!!!loc_bio_red_DOMfrac = (1.0 - 0.5/(par_bio_kT0*exp(loc_TC/par_bio_kT_eT)))*par_bio_red_DOMfrac
-       loc_bio_red_DOMfrac = par_bio_red_DOMfrac
-    case default
-       loc_bio_red_DOMfrac = par_bio_red_DOMfrac
-    end SELECT
-
-    ! *** SET RDOM FRACTION ****************************************************************************************************** !
-    SELECT CASE (par_bio_prodopt)
-    case (                        &
-         & 'bio_P',               &
-         & 'bio_PFe',             &
-         & 'bio_PFeSi'            &
-         & )
-!!!loc_bio_red_RDOMfrac = (1.0 - 0.5/(par_bio_kT0*exp(loc_TC/par_bio_kT_eT)))*par_bio_red_RDOMfrac
-       loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
-    case default
-       loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
-    end SELECT
-
-    ! *** ADJUST FOR TOTAL DOM + RDOM ******************************************************************************************** !
-    ! check for total DOM fraction exceeding 1.0 and re-scale (proportionally and to sum to 1.0)
-    loc_bio_red_DOMtotal = loc_bio_red_DOMfrac + loc_bio_red_RDOMfrac
-    if (loc_bio_red_DOMtotal > 1.0) then
-       loc_bio_red_DOMfrac = loc_bio_red_DOMfrac/loc_bio_red_DOMtotal
-       loc_bio_red_RDOMfrac = 1.0 - loc_bio_red_DOMfrac
-       loc_bio_red_DOMtotal = 1.0
-    end if
 
     ! *** CALCULATE PO4 DEPLETION ***
     ! NOTE: production is calculated as the concentration of newly-formed particulate material in the surface ocean layer
@@ -996,6 +962,64 @@ CONTAINS
        end if
     end select
     ! ############################################################################################################################ !
+
+    ! *** SET DOM FRACTIONS ****************************************************************************************************** !
+    select case (opt_bio_red_DOMfrac)
+    case ('dunne')
+       ! NOTE: from Dunne et al. [2005]
+       !       rPOC = 0.419 + 0.0582 * ln(PP/Zeu) - 0.0101 * C :: for 0.04 < rPOC < 0.72
+       !       where: temperature (T) is in units of degrees C
+       !              vertically integrated primary production (PP) is in units of mmol C m-2 d-1
+       !              the depth of the euphotic zone (Zeu) is in m
+       !       Units conversion: mmol C m-2 d-1 / m == mmol C m-3 d-1
+       !                         == 1.0E-3 * 1027.649 mol C kg-1 d-1
+       !       BIOGEM calculates PP as mol kg-1 per time-step
+       ! calculate carbon PP/Zeu from PO4 uptake (loc_dPO4), in required units
+       ! NOTE: ignore differences in C:P of loc_dPO4_1, loc_dPO4_2 uptake fractions
+       ! NOTE: this needs compelte re-turning becasue BIOGEM nutrient uptake does not correspond well to PP
+       !       (and there may also be issues with use of a fixed mixed (surface) layer depth)
+       loc_PPoverZeu = 1.0E+3*1027.649*bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4/(conv_yr_d*dum_dt)
+       loc_rPOC  = 0.419 + 0.0582*log(loc_PPoverZeu) - 0.0101*loc_TC
+       ! cap loc_rPOC range
+       If (loc_rPOC < 0.04) loc_rPOC = 0.04
+       If (loc_rPOC > 0.72) loc_rPOC = 0.72
+       ! set DOMfrac
+       ! NOTE: for now, ignore RDOM creation via primary production ...
+       loc_bio_red_DOMfrac  = 1.0 - loc_rPOC
+       loc_bio_red_RDOMfrac = 0.0
+    case ('simple')
+       ! NOTE: just the T-dependent part of Dunne et al. [2005]
+       !       rPOC = 0.419 - 0.0101 * C :: for 0.04 < rPOC < 0.72
+       loc_rPOC = par_bio_red_DOMfrac_Tdep_const - par_bio_red_DOMfrac_Tdep_gamma*loc_TC
+       ! cap loc_rPOC range
+       ! NOTE: simplified range
+       If (loc_rPOC < 0.0) loc_rPOC = 0.0
+       If (loc_rPOC > 1.0) loc_rPOC = 1.0
+       ! set DOMfrac
+       ! NOTE: for now, ignore RDOM creation via primary production ...
+       loc_bio_red_DOMfrac  = 1.0 - loc_rPOC
+       loc_bio_red_RDOMfrac = 0.0
+    case ('DEFAULT')
+       loc_bio_red_DOMfrac  = par_bio_red_DOMfrac
+       loc_bio_red_RDOMfrac = par_bio_red_RDOMfrac
+    case default
+       CALL sub_report_error( &
+            & 'biogem_box','sub_calc_bio_uptake', &
+            & 'Unrecognised <opt_bio_red_DOMfrac> option: '//TRIM(opt_bio_red_DOMfrac)//'. ' // &
+            & 'Valid options: dunne, simple, DEFAULT', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    end select
+
+    ! *** ADJUST FOR TOTAL DOM + RDOM ******************************************************************************************** !
+    ! check for total DOM fraction exceeding 1.0 and re-scale (proportionally and to sum to 1.0)
+    loc_bio_red_DOMtotal = loc_bio_red_DOMfrac + loc_bio_red_RDOMfrac
+    if (loc_bio_red_DOMtotal > 1.0) then
+       loc_bio_red_DOMfrac = loc_bio_red_DOMfrac/loc_bio_red_DOMtotal
+       loc_bio_red_RDOMfrac = 1.0 - loc_bio_red_DOMfrac
+       loc_bio_red_DOMtotal = 1.0
+    end if
 
     ! *** ADJUST PARTICULATE COMPOSITION 'REDFIELD' RATIOS *********************************************************************** !
     !
@@ -1811,6 +1835,7 @@ CONTAINS
     ! added *2 for nitrogen fixation diagnostic to calculate rate in molN/kg/yr (rather than molN2/kg/yr) - Fanny (July 2010)
     ! ############################################################################################################################ !
     diag_bio(idiag_bio_dPO4,dum_i,dum_j) = loc_dPO4
+    diag_bio(idiag_bio_DOMfrac,dum_i,dum_j) = dum_dt*loc_bio_red_DOMfrac
     SELECT CASE (par_bio_prodopt)
     CASE ( &
          & '2N2T_PO4MM_NO3', &
@@ -1826,7 +1851,6 @@ CONTAINS
          & 'bio_PFe_OCMIP2' &
          & )
        diag_bio(idiag_bio_knut,dum_i,dum_j)    = dum_dt*min(loc_kPO4,loc_kFe)
-       diag_bio(idiag_bio_DOMfrac,dum_i,dum_j) = dum_dt*loc_bio_red_DOMfrac
     case (                        &
          & 'bio_PFeSi',           &
          & 'bio_PFeSi_Ridgwell02' &
@@ -1834,7 +1858,6 @@ CONTAINS
        diag_bio(idiag_bio_knut,dum_i,dum_j)    = dum_dt*min(loc_kPO4,loc_kFe)
        diag_bio(idiag_bio_dPO4_1,dum_i,dum_j)  = loc_dPO4_sp
        diag_bio(idiag_bio_dPO4_2,dum_i,dum_j)  = loc_dPO4_nsp
-       diag_bio(idiag_bio_DOMfrac,dum_i,dum_j) = dum_dt*loc_bio_red_DOMfrac
        ! sp vs. nsp diagnostics
        ! NOTE: simply use the existing array value if unable to calculate a new one ...
        if (loc_dPO4_nsp*bio_part(is_POC,dum_i,dum_j,n_k) > const_real_nullsmall) then
@@ -2563,6 +2586,7 @@ CONTAINS
     integer::loc_m,loc_tot_m                                            !
     real::tmp_bio_remin
     real::loc_bio_remin_DOMratio,loc_bio_remin_RDOMratio                !
+    real::loc_bio_remin_DOMlifetime
     real::loc_intI                                                      ! local integrated insolation
     real,dimension(n_l_ocn,n_k)::loc_vbio_remin                         !
     real,dimension(n_sed,n_k)::loc_bio_part                             !
@@ -2593,12 +2617,18 @@ CONTAINS
     !       by the integrated insolation
     DO k=n_k,loc_k1,-1
        ! calculate DOM lifetime modifier
-       ! NOTE: check that DOM lifetimes are no shorter than the time-step and modify fraction remineralized accordingly
-       if (par_bio_remin_DOMlifetime > dum_dtyr) then
-          loc_bio_remin_DOMratio = dum_dtyr/par_bio_remin_DOMlifetime
+       ! NOTE: dum_vocn%mk(1,k) is the local temeprature (K)
+       ! NOTE: T-dependent DOM remin assumes the same Ea1 as for particulate organic matter remin (par_bio_remin_POC_Ea1)
+       !       (but scaling rate constant differs -- par_bio_remin_DOC_K1)
+       ! NOTE: check that no more DOM than exists (100% or fraction 1.0), is remineralized
+       If (ctrl_bio_remin_DOM_Tdep) then
+          loc_bio_remin_DOMratio = dum_dtyr*par_bio_remin_DOC_K1*exp(-par_bio_remin_POC_Ea1/(const_R_SI*dum_vocn%mk(1,k)))
        else
-          loc_bio_remin_DOMratio = 1.0
+          loc_bio_remin_DOMratio = dum_dtyr/par_bio_remin_DOMlifetime
        end if
+       if (loc_bio_remin_DOMratio > 1.0) loc_bio_remin_DOMratio = 1.0
+       ! store (surface) lifetime
+       if (k == n_k) loc_bio_remin_DOMlifetime = 1.0/(loc_bio_remin_DOMratio/dum_dtyr)
        ! calculate RDOM lifetime modifier
        if (ctrl_bio_remin_RDOM_photolysis) then
           ! restrict photolysis to the surface (n = n_k) layer (otherwise, set a 'high' (effectively infinite) lifetime)
@@ -2690,6 +2720,8 @@ CONTAINS
           loc_vbio_remin(io2l(io_col9),:) = loc_vbio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
        end if
     end if
+    ! write out (surface) lifetime for integration/averaging
+    diag_bio(idiag_bio_DOMlifetime,loc_i,loc_j) = dum_dtyr*loc_bio_remin_DOMlifetime
     ! write ocean tracer remineralization field (global array)
     dum_vbio_remin%mk(:,:) = loc_vbio_remin(:,:)
     ! deallocate local arrays
