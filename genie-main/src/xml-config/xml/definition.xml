@@ -4864,6 +4864,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0</value>
                         <description>188/192Os fractionation between Os and OsCO3</description>
                     </param>
+                    <param name="par_d56Fe_Corg_FeOOH_epsilon">
+			<value datatype="real">-1.3</value>
+                        <description>dissimilatory iron reduction fractionation</description>
+                    </param>
                     <param name="par_d13C_Corg_CH4_epsilon">
 			<value datatype="real">-35.0</value>
                         <description>methanogenesis fractionation</description>
@@ -4871,6 +4875,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_d34S_Corg_SO4_epsilon">
 			<value datatype="real">-40.0</value>
                         <description>sulphate reduction S fractionation</description>
+                    </param>
+                    <param name="par_d34S_AOM_alpha">
+			<value datatype="real">1.0</value>
+                        <description>AOM S fractionation</description>
+                    </param>
+                    <param name="par_d34S_AerSox_alpha">
+			<value datatype="real">1.0</value>
+                        <description>Aerobic S oxidation S fractionation</description>
+                    </param>
+                    <param name="par_d34S_ISO_alpha">
+			<value datatype="real">1.0</value>
+                        <description>iron-mediated S oxidation S fractionation</description>
                     </param>
                     <param name="par_bio_uptake_dN2_epsilon">
 			<value datatype="real">0.0</value>

@@ -2550,12 +2550,12 @@ CONTAINS
        end if
        loc_alpha = 1.0 + par_d34S_Corg_SO4_epsilon/1000.0
        loc_R     = loc_r34S/(1.0 - loc_r34S)
-       dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_SO4_34S),:)
-       dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_H2S_34S),:)
+       dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_SO4),:)!dum_conv_ls_lo(io2l(io_SO4_34S),:)
+       dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_H2S),:)!dum_conv_ls_lo(io2l(io_H2S_34S),:)
     end if
-    !! test for Fe isotopes selected
-    !! NOTE: value of loc_FeOOH already determined
-    !if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
+    ! test for Fe isotopes selected
+    ! NOTE: value of loc_FeOOH already determined
+    !if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe2_56Fe)) then
     !   if (loc_FeOOH > const_real_nullsmall) then
     !      loc_r56Fe  = dum_ocn(io2l(io_FeOOH_56Fe)) / loc_FeOOH
     !   else
@@ -2564,7 +2564,7 @@ CONTAINS
     !   loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
     !   loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
     !   dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:)
-    !   dum_conv_ls_lo(io2l(io_Fe_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe_56Fe),:)
+    !   dum_conv_ls_lo(io2l(io_Fe2_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe2_56Fe),:)
     !end if
     ! ---------------------------------------------------------- !
     ! END
@@ -2750,9 +2750,11 @@ CONTAINS
     integer::loc_m,loc_tot_m
     real,dimension(1:n_l_ocn)::loc_vocn                                 !
     real,dimension(1:3)::loc_FeFELL
+    real::loc_R,loc_alpha
     real::loc_T,loc_SiO2                                                !
     real::loc_Si_eq,loc_u
     real::loc_scav_Fe,loc_r56Fe
+    real::loc_H2S_34S
     real::tmp_bio_remin    !
     real::loc_bio_remin_dD
     real::loc_bio_remin_max_D                                         !
@@ -3423,11 +3425,12 @@ CONTAINS
                       else
                          loc_r56Fe = 0.0
                       end if
-                      loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) = &
-                           & loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
-                      loc_bio_remin(io2l(io_Fe2_56Fe),kk) = &
-                           & loc_bio_remin(io2l(io_Fe2_56Fe),kk) - loc_r56Fe*loc_bio_remin(io2l(io_FeOOH),kk)
-                      !loc_bio_remin(io2l(io_FeOOH_56Fe),kk) = 0.0
+                      loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
+                      loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
+                      loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) = loc_bio_part_TMP(is2l(is_POM_FeOOH_56Fe),kk) + &
+                           & loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*loc_bio_remin(io2l(io_FeOOH),kk)
+                      loc_bio_remin(io2l(io_Fe2_56Fe),kk) = loc_bio_remin(io2l(io_Fe2_56Fe),kk) - &
+                           & loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*loc_bio_remin(io2l(io_FeOOH),kk)
                    end if
                    loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) = &
                         & loc_bio_part_TMP(is2l(is_POM_FeOOH),kk) + loc_bio_remin(io2l(io_FeOOH),kk)
@@ -3622,7 +3625,14 @@ CONTAINS
 
                 ! *** Reduce FeOOH ***
                 ! NOTE: test for both forms (scavenged and 'free')
+                ! NOTE: ensure io_H2S_34S is selected ... or pass a zero (that is not used in the subroutine) for 34S (H2S)
+                !       (otherwise ... io2l(io_H2S) when io_H2S has not bee selected is index 0)
                 if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2)) then
+                   if (ocn_select(io_H2S_34S)) then
+                      loc_H2S_34S = dum_vocn%mk(io2l(io_H2S_34S),kk)
+                   else
+                      loc_H2S_34S = 0.0
+                   end if
                    if (sed_select(is_FeOOH)) then
                       if (dum_vocn%mk(io2l(io_H2S),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
                          call sub_box_react_FeOOH_H2S(        &
@@ -3630,6 +3640,7 @@ CONTAINS
                               & dum_dtyr,                     &
                               & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
+                              & loc_H2S_34S,                  &
                               & loc_bio_part_TMP(:,kk),       &
                               & loc_bio_remin(:,kk)           &
                               & )
@@ -3641,6 +3652,7 @@ CONTAINS
                               & dum_dtyr,                     &
                               & loc_bio_remin_dt_reaction,    &
                               & dum_vocn%mk(io2l(io_H2S),kk), &
+                              & loc_H2S_34S,                  &
                               & loc_bio_part_TMP(:,kk),       &
                               & loc_bio_remin(:,kk)           &
                               & )
@@ -3729,20 +3741,23 @@ CONTAINS
   ! Calculate FeOOH dissolution (reaction with H2S)
   ! NOTE: calling of this sub is conditional on both H2S and FeOOH not being zero
   !       (so divide-by-zero issues should already have be screened for ...)
-  SUBROUTINE sub_box_react_FeOOH_H2S(dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+  SUBROUTINE sub_box_react_FeOOH_H2S( &
+                  & dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_ocn_H2S_34S,dum_bio_part,dum_bio_remin &
+                  & )
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k
     REAL,INTENT(in)::dum_dtyr
     REAL,INTENT(in)::dum_dt_scav
-    REAL,INTENT(in)::dum_ocn_H2S
+    REAL,INTENT(in)::dum_ocn_H2S,dum_ocn_H2S_34S
     real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
     real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
-    real::loc_H2S
+    real::loc_H2S,loc_H2S_34S,loc_r34S,loc_R_34S
+    real::loc_r56Fe,loc_R_56Fe
     real::loc_part_den_FeOOH
     real::loc_dFeOOH
     real::loc_f
@@ -3752,6 +3767,7 @@ CONTAINS
     loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- ! set local solutes
     loc_H2S = dum_ocn_H2S
+    loc_H2S_34S = dum_ocn_H2S_34S
     ! -------------------------------------------------------- ! extract density of FeOOH
     loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
     ! -------------------------------------------------------- !
@@ -3779,14 +3795,20 @@ CONTAINS
     ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
     ! NOTE: no fractionation (currently)
     if (ocn_select(io_Fe2_56Fe)) then
+       loc_r56Fe = dum_bio_part(is2l(is_FeOOH_56Fe))/loc_part_den_FeOOH
+       loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe) 
        dum_bio_remin(io2l(io_Fe2_56Fe)) = dum_bio_remin(io2l(io_Fe2_56Fe)) + &
-            & (loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
-       dum_bio_part(is2l(is_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_FeOOH_56Fe))
+            & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_dFeOOH
+       dum_bio_part(is2l(is_FeOOH_56Fe)) = dum_bio_part(is2l(is_FeOOH_56Fe)) - &
+            & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_dFeOOH
     end if
     if (ocn_select(io_H2S_34S)) then
-       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
-       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
-            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+        loc_r34S = loc_H2S_34S/loc_H2S
+        loc_R_34S = loc_r34S/(1.0 - loc_r34S) 
+        dum_bio_remin(io2l(io_H2S_34S)) = dum_bio_remin(io2l(io_H2S_34S)) - &
+              & par_d34S_ISO_alpha*loc_R_34S/(1.0 + par_d34S_ISO_alpha*loc_R_34S)*(1.0/8.0)*loc_dFeOOH
+        dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+              & par_d34S_ISO_alpha*loc_R_34S/(1.0 + par_d34S_ISO_alpha*loc_R_34S)*(1.0/8.0)*loc_dFeOOH
     end if
     ! -------------------------------------------------------- !
     ! DIAGNOSTICS
@@ -3813,20 +3835,23 @@ CONTAINS
   !       (so divide-by-zero issues should already have be screened for ...)
   ! NOTE: for now, this is simply an edited copy of sub_box_react_FeOOH_H2S
   !       -> a cleaner solution (not involving duplicating code) should be possible and implemented ... sometime ...
-  SUBROUTINE sub_box_react_POMFeOOH_H2S(dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_bio_part,dum_bio_remin)
+  SUBROUTINE sub_box_react_POMFeOOH_H2S( &
+                  & dum_i,dum_j,dum_k,dum_dtyr,dum_dt_scav,dum_ocn_H2S,dum_ocn_H2S_34S,dum_bio_part,dum_bio_remin &
+                  & )
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k
     REAL,INTENT(in)::dum_dtyr
     REAL,INTENT(in)::dum_dt_scav
-    REAL,INTENT(in)::dum_ocn_H2S
+    REAL,INTENT(in)::dum_ocn_H2S,dum_ocn_H2S_34S
     real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
     real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
-    real::loc_H2S
+    real::loc_H2S,loc_H2S_34S,loc_R_34S,loc_r34S
+    real::loc_r56Fe,loc_R_56Fe
     real::loc_part_den_FeOOH
     real::loc_dFeOOH
     real::loc_f
@@ -3835,7 +3860,8 @@ CONTAINS
     ! -------------------------------------------------------- ! maximum fraction consumed in any given geochemical reaction
     loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- ! set local solutes
-    loc_H2S = dum_ocn_H2S
+    loc_H2S     = dum_ocn_H2S
+    loc_H2S_34S = dum_ocn_H2S_34S
     ! -------------------------------------------------------- ! extract density of FeOOH
     loc_part_den_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
     ! -------------------------------------------------------- !
@@ -3863,14 +3889,20 @@ CONTAINS
     ! NOTE: only explicitly test for 2 isotope tracers selected (4 total)
     ! NOTE: no fractionation (currently)
     if (ocn_select(io_Fe2_56Fe)) then
+       loc_r56Fe  = dum_bio_part(is2l(is_POM_FeOOH_56Fe))/loc_part_den_FeOOH
+       loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe) 
        dum_bio_remin(io2l(io_Fe2_56Fe)) = dum_bio_remin(io2l(io_Fe2_56Fe)) + &
-            & (loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_POM_FeOOH_56Fe))
-       dum_bio_part(is2l(is_POM_FeOOH_56Fe)) = (1.0 - loc_dFeOOH/loc_part_den_FeOOH)*dum_bio_part(is2l(is_POM_FeOOH_56Fe))
+            & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_dFeOOH
+       dum_bio_part(is2l(is_POM_FeOOH_56Fe)) = dum_bio_part(is2l(is_POM_FeOOH_56Fe)) - &
+            & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_dFeOOH
     end if
     if (ocn_select(io_H2S_34S)) then
-       dum_bio_remin(io2l(io_H2S_34S)) = (1.0 - (1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
-       dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
-            & ((1.0/8.0)*loc_dFeOOH/loc_H2S)*dum_bio_remin(io2l(io_H2S_34S))
+        loc_r34S  = loc_H2S_34S/loc_H2S
+        loc_R_34S = loc_r34S/(1.0 - loc_r34S) 
+        dum_bio_remin(io2l(io_H2S_34S)) = dum_bio_remin(io2l(io_H2S_34S)) - &
+              & par_d34S_ISO_alpha*loc_R_34S/(1.0 + par_d34S_ISO_alpha*loc_R_34S)*(1.0/8.0)*loc_dFeOOH
+        dum_bio_remin(io2l(io_SO4_34S)) = dum_bio_remin(io2l(io_SO4_34S)) + &
+              & par_d34S_ISO_alpha*loc_R_34S/(1.0 + par_d34S_ISO_alpha*loc_R_34S)*(1.0/8.0)*loc_dFeOOH
     end if
     ! -------------------------------------------------------- !
     ! DIAGNOSTICS
@@ -4360,10 +4392,15 @@ CONTAINS
                 end SELECT
                 ! Calculate Os isotope flux forcings
                 if (dum_io == io_Os) then
-                   loc_tot  = force_flux_locn(conv_io_lselected(io_Os),i,j,k) &
-                                  & /(1.0+force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)+force_flux_ocn_sig_x(io_Os_188Os))
-                   force_flux_locn(conv_io_lselected(io_Os_187Os),i,j,k) = force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
-                   force_flux_locn(conv_io_lselected(io_Os_188Os),i,j,k) = force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
+                   loc_tot = force_flux_locn(conv_io_lselected(io_Os),i,j,k)/( &
+                        & 1.0 + &
+                        & force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os) + &
+                        & force_flux_ocn_sig_x(io_Os_188Os) &
+                        & )
+                   force_flux_locn(conv_io_lselected(io_Os_187Os),i,j,k) = &
+                        & force_flux_ocn_sig_x(io_Os_187Os)*force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
+                   force_flux_locn(conv_io_lselected(io_Os_188Os),i,j,k) = &
+                        & force_flux_ocn_sig_x(io_Os_188Os)*loc_tot
                 end if
              END DO
           END DO
