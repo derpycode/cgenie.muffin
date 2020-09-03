@@ -855,9 +855,7 @@ CONTAINS
           if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
              loc_r34S   = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
              loc_r34SO4 = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
-             
              loc_bio_part(is_FeS2_34S,k) = (7.0/8.0*loc_r34S + 1.0/8.0*loc_r34SO4)*loc_bio_part(is_FeS2,k)
-             !loc_bio_part(is_FeS2_34S,k) = loc_r34S*loc_bio_part(is_FeS2,k)
           end if
           ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
           loc_bio_uptake(io_Fe2,k) = loc_bio_uptake(io_Fe2,k) + loc_bio_part(is_FeS2,k)
@@ -1250,10 +1248,6 @@ CONTAINS
                   & par_d34S_AerSox_alpha*loc_R_34S/(1.0 + par_d34S_AerSox_alpha*loc_R_34S)*loc_H2S_oxidation
              loc_bio_remin(io_H2S_34S,k) = &
                   & -par_d34S_AerSox_alpha*loc_R_34S/(1.0 + par_d34S_AerSox_alpha*loc_R_34S)*loc_H2S_oxidation
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
-             !loc_bio_remin(io_H2S_34S,k) = -loc_r34S*loc_H2S_oxidation
-             !loc_bio_remin(io_SO4_34S,k) = loc_r34S*loc_H2S_oxidation
-             ! ################################################################################################################### !
           end if
        end if
     end DO
@@ -1672,9 +1666,10 @@ CONTAINS
           loc_r13C = ocn(io_CH4_13C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
           loc_r14C = ocn(io_CH4_14C,dum_i,dum_j,k)/ocn(io_CH4,dum_i,dum_j,k)
           ! calculate isotopic fractionation -- 34S
+          ! (and perform teh S-isotopic part of AOM)
           ! NOTE: we already know that loc_SO4 is non-zero
           if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
-             loc_r34S = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
+             loc_r34S  = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
              loc_R_34S = loc_r34S/(1.0 - loc_r34S)
              loc_bio_remin(io_SO4_34S,k) = &
                   & -par_d34S_AOM_alpha*loc_R_34S/(1.0 + par_d34S_AOM_alpha*loc_R_34S)*loc_AOM
@@ -1691,9 +1686,6 @@ CONTAINS
           loc_bio_remin(io_CH4_14C,k) = -loc_r14C*loc_AOM
           loc_bio_remin(io_DIC_13C,k) =  loc_r13C*loc_AOM
           loc_bio_remin(io_DIC_14C,k) =  loc_r14C*loc_AOM
-          !loc_bio_remin(io_SO4_34S,k) = -loc_r34S*loc_AOM
-          !loc_bio_remin(io_H2S_34S,k) =  loc_r34S*loc_AOM
-         
        end if
     end DO
     ! -------------------------------------------------------- !
