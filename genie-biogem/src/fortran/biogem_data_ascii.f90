@@ -384,6 +384,35 @@ CONTAINS
           end SELECT
        END DO
     END IF
+    ! sediment burial flux
+    IF (ctrl_data_save_sig_ocnsed) THEN
+       IF (sed_select(is_CaCO3)) THEN
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','fburial_CaCO3',string_results_ext)
+          loc_string = '% time (yr) / global CaCO3 burial flux (mol yr-1) / global CaCO3 burial flux density (mol m-2 yr-1)'// &
+               & ' // WARNING: Approximated by: Fsed(CaCO3) - Fdis(Ca)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       END if
+       IF (sed_select(is_opal)) THEN
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','fburial_opal',string_results_ext)
+          loc_string = '% time (yr) / global opal burial flux (mol yr-1) / global opal burial flux density (mol m-2 yr-1)'// &
+               & ' // WARNING: Approximated by: Fsed(opal) - Fdis(SiO2)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       END if
+    END IF
     ! miscellaneous
     IF (ctrl_data_save_sig_misc) THEN
        if (flag_gemlite) then
@@ -1802,6 +1831,43 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)
           end SELECT
        END DO
+    END IF
+
+    ! *** <sig_fburial_*> ***
+    ! write sediment burial flux data
+    ! NOTE: write data both as the total flux, and as the equivalent mean flux density
+    ! NOTE: the surface ocean area is used as a proxy for the total ocean floor area
+    IF (ctrl_data_save_sig_ocnsed) THEN
+       IF (sed_select(is_CaCO3)) THEN
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','fburial_CaCO3',string_results_ext)
+          loc_sig = int_focnsed_sig(is_CaCO3)/int_t_sig - int_fsedocn_sig(io_Ca)/int_t_sig
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,2e15.7)',iostat=ios) &
+               & loc_t, &
+               & loc_sig, &
+               & loc_sig/loc_ocn_tot_A
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       END if
+       IF (sed_select(is_opal)) THEN
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','fburial_opal',string_results_ext)
+          loc_sig = int_focnsed_sig(is_opal)/int_t_sig - int_fsedocn_sig(io_SiO2)/int_t_sig
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,2e15.7)',iostat=ios) &
+               & loc_t, &
+               & loc_sig, &
+               & loc_sig/loc_ocn_tot_A
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       END if
     END IF
 
     ! *** <sig_misc_*> ***
