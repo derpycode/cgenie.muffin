@@ -1056,6 +1056,25 @@ CONTAINS
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar3d_g('misc_DINex',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end IF
+       !-----------------------------------------------------------------------
+       !       Si-star
+       !-----------------------------------------------------------------------
+       ! NOTE: units: m kg-1 (not umol kg-1)
+       IF (ocn_select(io_PO4) .AND. ocn_select(io_SiO2)) THEN
+          loc_unitsname = 'mol kg-1'
+          loc_ijk(:,:,:) = const_real_null
+          DO i=1,n_i
+             DO j=1,n_j
+                DO k=goldstein_k1(i,j),n_k
+                   loc_ijk(i,j,k) = int_ocn_timeslice(io_SiO2,i,j,k)/int_t_timeslice - &
+                        & par_bio_red_POP_PON*int_ocn_timeslice(io_PO4,i,j,k)/int_t_timeslice
+                END DO
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,4,'misc_Sistar','Si-star', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar3d_g('misc_Sistar',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       end IF
     end If
     If (ctrl_data_save_slice_ocn) then
        !-----------------------------------------------------------------------
@@ -1595,7 +1614,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     if (ctrl_data_save_slice_diag_bio) then
        if ( ocn_select(io_PO4) .AND. ocn_select(io_SiO2) ) then
-          loc_unitsname = 'n/a'
+          loc_unitsname = 'mol kg-1'
           loc_ij(:,:) = const_real_null
           DO i=1,n_i
              DO j=1,n_j
