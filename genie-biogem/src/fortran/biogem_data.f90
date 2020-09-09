@@ -321,8 +321,12 @@ CONTAINS
        print*,'Planktic foram 13C fractionation scheme ID string   : ',opt_bio_foram_p_13C_delta
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
+       print*,'dissimilatory iron reduction fractionation          : ',par_d56Fe_Corg_FeOOH_epsilon  
        print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
        print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
+       print*,'AOM S-fractionation                                 : ',par_d34S_AOM_alpha
+       print*,'aerobic sulphide oxidation S-fractionation          : ',par_d34S_AerSox_alpha
+       print*,'iron-mediated sulphide oxidation S-fractionation    : ',par_d34S_ISO_alpha
        print*,'N2 fixation 15N fractionation                       : ',par_bio_uptake_dN2_epsilon
        print*,'NH4 assimilation 15N fractionation                  : ',par_bio_uptake_dNH4_epsilon
        print*,'NO3 uptake 15N fractionation                        : ',par_bio_uptake_dNO3_epsilon
