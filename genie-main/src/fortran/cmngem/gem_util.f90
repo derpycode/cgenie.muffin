@@ -2279,6 +2279,7 @@ CONTAINS
     string_atm_tlname(:) = ' '
     atm_mima(:,:)        = 0.0
     conv_ia_lselected(:) = 0
+    ia2l(:)              = 0
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.atm'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -2380,6 +2381,7 @@ CONTAINS
     string_ocn_tlname(:) = ' '
     ocn_mima(:,:)        = 0.0
     conv_io_lselected(:) = 0
+    io2l(:)              = 0
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.ocn'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -2481,6 +2483,7 @@ CONTAINS
     string_sed_tlname(:) = ' '
     sed_mima(:,:)        = 0.0
     conv_is_lselected(:) = 0
+    is2l(:)              = 0
     ! check file format
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.sed'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)

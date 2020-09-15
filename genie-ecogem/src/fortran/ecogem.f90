@@ -98,6 +98,9 @@ subroutine ecogem(          &
   ! carbon re-partitioning between DOM and POM
   REAL                                     ::loc_dorgmatdt_iCarb
   REAL                                     ::loc_dorgmatisodt_iCarb
+  ! T-dependent DOM production
+  REAL,DIMENSION(npmax)                    ::loc_chl
+  real                                     ::loc_rPOC
 
   ! ------------------------------------------------------- !
   ! INITIALIZE LOCAL VARIABLES
@@ -454,6 +457,35 @@ subroutine ecogem(          &
                  ! Apply respiration
                  dbiomassdt(iCarb,:) = dbiomassdt(iCarb,:) - respiration(:) * loc_biomass(iCarb,:)
 
+                 ! ------------------------------------------- !
+                 ! chl-a (and temeprature) DEPENDENT DOM PARTITIONING
+                 ! ------------------------------------------- !
+                 ! NOTE: from Dunne et al. [2005]
+                 !       rPOC = 0.426 + 0.0668 * ln(Chl/Zeu) - 0.0081 * C :: for 0.04 < rPOC < 0.72
+                 !       where: temperature (T) is in units of degrees C
+                 !              vertically integrated chlorophyll (Chl) is in units of mg Chl m-2(???)
+                 !              the depth of the euphotic zone (Zeu) is in m
+                 !       No units conversion required as ECOGEM Chl units are: mg Chl m-3
+                 ! NOTE: code goes here before <beta_mort> etc. arrays are used 
+                 if (ctrl_Tdep_POCtoDOC) then
+                    ! chl inventory from pervious time-step
+                    loc_chl(:) = loc_biomass(iChlo,:)
+                    ! chl inventory based on (end of) current time-step
+                    !!!loc_chl(:) = loc_biomass(iChlo,:) + dbiomassdt(iChlo,:) * dum_dts/real(nsubtime)
+                    If (sum(loc_chl(:)) > const_real_nullsmall) then
+                       loc_rPOC  = 0.426 + 0.0668*log(sum(loc_chl(:))) - 0.0081*(templocal-const_zeroC)
+                       ! cap loc_rPOC range
+                       If (loc_rPOC < 0.04)  loc_rPOC = 0.04
+                       If (loc_rPOC > 0.419) loc_rPOC = 0.419
+                    else
+                       loc_rPOC = 0.5
+                    end if
+                    beta_mort_1(:) = loc_rPOC             ! fraction to POM
+                    beta_graz_1(:) = loc_rPOC             ! fraction to POM
+                    beta_mort(:)   = 1.0 - beta_mort_1(:) ! fraction to DOM
+                    beta_graz(:)   = 1.0 - beta_graz_1(:) ! fraction to DOM
+                 end if
+
                  !**************************ckc ISOTOPES**************************************************
                  if (c13trace) then
                     ! INORGANIC RESOURCE UPTAKE (only for carbon 13)
@@ -494,7 +526,6 @@ subroutine ecogem(          &
                  if (fundamental) dorgmatdt(:,:) = 0.0
 
                  !**********************ckc ISOTOPES**********************************************************************
-
                  if (c13trace) then
                     dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort(:)  ) ! fraction to DOM
                     dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort_1(:)) ! fraction to POM
@@ -725,6 +756,7 @@ subroutine ecogem(          &
 end subroutine ecogem
 ! ******************************************************************************************************************************** !
 
+
 ! ******************************************************************************************************************************** !
 ! biogem DIAGNOSTICS - TIME-SLICE
 SUBROUTINE diag_ecogem_timeslice( &
@@ -796,10 +828,10 @@ SUBROUTINE diag_ecogem_timeslice( &
 
      ! NOTE: do not time increment weight quantities such as <int_bio_remin_timeslice> or <int_bio_settle_timeslice>,
      !       because they represent discrete increments rather than a flux or weightable concentration value
-     int_plankton_timeslice(:,:,:,:,:) = int_plankton_timeslice(:,:,:,:,:) + loc_dtyr *      plankton(:,:,:,:,:)        ! mmol m^-3
-     int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr *   uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
-     int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) + loc_dtyr *    phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
-     int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr *        nutrient(:,:,:,:)        ! mmol m^-3
+     int_plankton_timeslice(:,:,:,:,:) = int_plankton_timeslice(:,:,:,:,:) + loc_dtyr * plankton(:,:,:,:,:)        ! mmol m^-3
+     int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) +   loc_dtyr * uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
+     int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) +    loc_dtyr * phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
+     int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) +   loc_dtyr * nutrient(:,:,:,:)        ! mmol m^-3
   end if
 
   ! write time-slice data and re-set integration
@@ -850,7 +882,6 @@ end SUBROUTINE diag_ecogem_timeslice
 ! ******************************************************************************************************************************** !
 
 
-
 ! ******************************************************************************************************************************** !
 ! RESTART ECOGEM (save data)
 SUBROUTINE ecogem_save_rst(dum_genie_clock)
@@ -893,4 +924,6 @@ SUBROUTINE ecogem_save_rst(dum_genie_clock)
   ! END
   ! ---------------------------------------------------------- !
 END SUBROUTINE ecogem_save_rst
+
 ! ******************************************************************************************************************************** !
+
