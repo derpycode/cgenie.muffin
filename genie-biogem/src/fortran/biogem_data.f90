@@ -958,19 +958,21 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   !
   SUBROUTINE sub_init_redox()
+    ! NOTE: allocate sufficient array places for all potential transformations
+    !       also: a generous potential string length for automatically-generated variable names
     USE biogem_lib
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     integer::n
-    CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::loc_string     !
+    CHARACTER(len=63),DIMENSION(:),ALLOCATABLE::loc_string     !
     integer::lo,ls
     integer::loc_m,loc_tot_m
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     n = 0
-    allocate(loc_string(100),STAT=alloc_error)
+    allocate(loc_string(255),STAT=alloc_error)
     ! -------------------------------------------------------- !
     ! COUNT POTENTIAL REDOX REACTIONS
     ! -------------------------------------------------------- !

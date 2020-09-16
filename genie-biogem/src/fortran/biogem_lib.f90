@@ -1054,7 +1054,8 @@ MODULE biogem_lib
        & 'FCa           ', &
        & 'FCa_44Ca      ' /)
   ! diagnostics - redox
-  CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::string_diag_redox        !
+  ! NOTE: set a generous potential string length for automatically-generated variable names
+  CHARACTER(len=63),DIMENSION(:),ALLOCATABLE::string_diag_redox        !
 
   ! *** array index linked information ***
   ! diagnostics - geochemistry -- precip
