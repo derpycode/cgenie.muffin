@@ -487,20 +487,57 @@ subroutine biogem(        &
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
+                    ! set sed tracer -> POP
                     ls = is2l(is_POP)
                     loc_tot_i = conv_ls_lo_i(0,ls)
                     do loc_i=1,loc_tot_i
                        lo = conv_ls_lo_i(loc_i,ls)
                        if (lo == io2l(io_PO4)) then
                           loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
-                          dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
-                               &  (loc_remin - locij_fsedocn(io_PO4,i,j))
+                          dum_sfxsumrok1(l2io(lo),i,j) = dum_sfxsumrok1(l2io(lo),i,j) + &
+                               &  (loc_remin - locij_fsedocn(l2io(lo),i,j))
                           if (ctrl_bio_red_ALKwithPOC) then
                              ! do nothing -- ALK with POC
                           else
                              dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
-                                  &  conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
+                                  & conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
                           end if
+                       end if
+                    end do
+                 end if
+                 if (ctrl_force_sed_closed_C) then
+                    ! special case of partial closure -- calculate theoretical DIC remin flux required for closure
+                    ! set weathering equal to imbalance in DIC return
+                    DO l=1,n_l_ocn
+                       loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
+                    end DO
+                    call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
+                    ! set sed tracer -> POC
+                    ls = is2l(is_POC)
+                    loc_tot_i = conv_ls_lo_i(0,ls)
+                    do loc_i=1,loc_tot_i
+                       lo = conv_ls_lo_i(loc_i,ls)
+                       if (lo == io2l(io_DIC)) then
+                          loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
+                          dum_sfxsumrok1(l2io(lo),i,j) = dum_sfxsumrok1(l2io(lo),i,j) + &
+                               &  (loc_remin - locij_fsedocn(l2io(lo),i,j))
+                          if (ctrl_bio_red_ALKwithPOC) then
+                             dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
+                                  & conv_sed_ocn(io_ALK,is_POC)*(loc_remin - locij_fsedocn(l2io(lo),i,j))
+                          else
+                             ! do nothing -- ALK with POP
+                          end if
+                       end if
+                    end do
+                    ! set sed tracer -> 13POC
+                    ls = is2l(is_POC_13C)
+                    loc_tot_i = conv_ls_lo_i(0,ls)
+                    do loc_i=1,loc_tot_i
+                       lo = conv_ls_lo_i(loc_i,ls)
+                       if (lo == io2l(io_DIC_13C)) then
+                          loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
+                          dum_sfxsumrok1(l2io(lo),i,j) = dum_sfxsumrok1(l2io(lo),i,j) + &
+                               &  (loc_remin - locij_fsedocn(l2io(lo),i,j))
                        end if
                     end do
                  end if
@@ -3296,7 +3333,7 @@ SUBROUTINE diag_biogem_timeseries( &
   real::loc_ocn_rtot_A,loc_opn_rtot_A,loc_ocnatm_rtot_A          !
   real::loc_ocnsed_tot_A,loc_ocnsed_tot_A_ben                    !
   real::loc_ocnsed_rtot_A,loc_ocnsed_rtot_A_ben                  !
-  real::loc_tot_A                                                !
+  real::loc_tot_A,loc_tot_EP                                     !
   real::loc_sig                                                  !
   REAL,DIMENSION(2)::loc_opsia_minmax,loc_opsip_minmax           !
   real::loc_opsi_scale                                           !
@@ -3688,12 +3725,19 @@ SUBROUTINE diag_biogem_timeseries( &
            ! NOTE: the area used in calculating a mean global biological uptake rates must be total ocean surface area
            !       (i.e., including sea-ice covered area)
            ! NOTE: diag_bio variables have already been converted into yr-1
-           loc_tot_A = sum(phys_ocn(ipo_A,:,:,n_k))
+           loc_tot_A  = sum(phys_ocn(ipo_A,:,:,n_k))
+           loc_tot_EP = SUM(bio_settle(is_POC,:,:,n_k))
            IF (ctrl_data_save_sig_diag .OR. ctrl_data_save_sig_diag_geochem) THEN
               DO ib=1,n_diag_bio
                  int_diag_bio_sig(ib) = int_diag_bio_sig(ib) + &
                       & SUM(phys_ocn(ipo_A,:,:,n_k)*diag_bio(ib,:,:))/loc_tot_A
               END DO
+              if (loc_tot_EP > const_real_nullsmall) then
+                 DO ib=1,n_diag_bio
+                    int_diag_bioNORM_sig(ib) = int_diag_bioNORM_sig(ib) + &
+                         & SUM(bio_settle(is_POC,:,:,n_k)*diag_bio(ib,:,:))/loc_tot_EP
+                 END DO
+              end if
               DO id=1,n_diag_geochem_old
                  int_diag_geochem_old_sig(id) = int_diag_geochem_old_sig(id) + &
                       & SUM(phys_ocn(ipo_M,:,:,:)*diag_geochem_old(id,:,:,:))*loc_ocn_rtot_M

@@ -1187,11 +1187,15 @@ CONTAINS
     !-----------------------------------------------------------------------
     integer::i,j
     integer::io,is,ib
+    integer::loc_k1
     integer::l,loc_m,loc_tot_m
     INTEGER::loc_iou,loc_ntrec
     real,DIMENSION(n_i,n_j)::loc_ij,loc_mask_surf
     real,DIMENSION(n_sed,n_i,n_j)::loc_isij
     CHARACTER(len=255)::loc_unitsname
+    real::loc_tot,loc_frac,loc_standard
+    real::loc_tot1,loc_frac1,loc_tot2,loc_frac2
+    real::loc_a,loc_b,loc_c,loc_d
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
@@ -1377,53 +1381,64 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       Fe diagnostics
     !-----------------------------------------------------------------------
-    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_bio) then
-       IF (ocn_select(io_Fe) .OR. ocn_select(io_Fe)) THEN
-          ! total aeolian Fe flux (mass)
-          loc_unitsname = 'mg Fe m-2 yr-1'
-          loc_ij(:,:) = conv_mol_mmol*par_det_Fe_frac*conv_det_mol_g* &
-               & int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_det,:,:,n_k)/(int_t_timeslice**2)
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_g','Total aeolian iron flux to surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fFetot_g',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! total aeolian Fe flux (moles)
-          loc_unitsname = 'mmol Fe m-2 yr-1'
-          loc_ij(:,:) = conv_Fe_g_mol*loc_ij(:,:)
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_mol','Total aeolian iron flux to surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fFetot_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! solulablized aeolian Fe flux
-          loc_unitsname = 'umol Fe m-2 yr-1'
-          loc_ij(:,:) = conv_mol_umol*conv_mmol_mol*int_phys_ocnatm_timeslice(ipoa_solFe,:,:)*loc_ij(:,:)/int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFe_mol','Dissolved aeolian iron flux to surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fFe_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! particulate Fe loss
-          loc_unitsname = 'umol Fe m-2 yr-1'
-          loc_ij(:,:) = conv_mol_umol* &
-               & int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_POFe,:,:,n_k)/(int_t_timeslice**2)
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fpartFe','Particulate organic matter iron loss from surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fpartFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! total scavenged Fe loss
-          loc_unitsname = 'umol Fe m-2 yr-1'
-          loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
-               & ( &
-               &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k)   + &
-               &   int_bio_settle_timeslice(is_CaCO3_Fe,:,:,n_k) + &
-               &   int_bio_settle_timeslice(is_opal_Fe,:,:,n_k) + &
-               &   int_bio_settle_timeslice(is_det_Fe,:,:,n_k) &
-               & )
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged iron loss from surface', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_fscavFetot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-          ! solubility (%)
-          loc_unitsname = '%'
-          loc_ij(:,:) = 100.0*int_phys_ocnatm_timeslice(ipoa_solFe,:,:)/int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_Fe_sol','Aeolian iron solubility', &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_Fe_sol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
-       end if
+    If (ctrl_data_save_slice_sur .AND. (ocn_select(io_Fe) .OR. ocn_select(io_TDFe))) then
+       ! total aeolian Fe flux (mass)
+       ! NOTE: new calculation of loc_ij(:,:)
+       loc_unitsname = 'mg Fe m-2 yr-1'
+       loc_ij(:,:) = conv_mol_mmol*par_det_Fe_frac*conv_det_mol_g* &
+            & (int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_det,:,:,n_k))/(int_t_timeslice**2)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_g','Total aeolian iron flux density to surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fFetot_g',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! total aeolian Fe flux (moles)
+       ! NOTE: based on preceeding step calculation of loc_ij(:,:)
+       loc_unitsname = 'mmol Fe m-2 yr-1'
+       loc_ij(:,:) = conv_Fe_g_mol*loc_ij(:,:)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFetot_mol','Total aeolian iron flux density to surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fFetot_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! solulablized aeolian Fe flux
+       ! NOTE: based on preceeding step calculation of loc_ij(:,:)
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = conv_mol_umol*conv_mmol_mol*(int_phys_ocnatm_timeslice(ipoa_solFe,:,:)/int_t_timeslice)*loc_ij(:,:)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFe_mol','Solulablized aeolian iron flux density to surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fFe_mol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! solulablized aeolian Fe flux (2)
+       ! NOTE: based on preceeding step calculation of loc_ij(:,:)
+       loc_unitsname = 'mol Fe yr-1'
+       loc_ij(:,:) = conv_umol_mol*(int_phys_ocn_timeslice(ipo_A,:,:,n_k)/int_t_timeslice)*loc_ij(:,:)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fFe','Solulablized aeolian iron flux to surface grid points', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! particulate Fe loss
+       ! NOTE: new calculation of loc_ij(:,:)
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = conv_mol_umol* &
+            & int_phys_ocn_timeslice(ipo_rA,:,:,n_k)*int_bio_settle_timeslice(is_POFe,:,:,n_k)/(int_t_timeslice**2)
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fpartFe','Particulate organic matter iron loss from surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fpartFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! total scavenged Fe loss
+       ! NOTE: new calculation of loc_ij(:,:)
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
+            & ( &
+            &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k)   + &
+            &   int_bio_settle_timeslice(is_CaCO3_Fe,:,:,n_k) + &
+            &   int_bio_settle_timeslice(is_opal_Fe,:,:,n_k) + &
+            &   int_bio_settle_timeslice(is_det_Fe,:,:,n_k) &
+            & )
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged iron loss from surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fscavFetot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! solubility (%)
+       ! NOTE: new calculation of loc_ij(:,:)
+       loc_unitsname = '%'
+       loc_ij(:,:) = 100.0*int_phys_ocnatm_timeslice(ipoa_solFe,:,:)/int_t_timeslice
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_Fe_sol','Aeolian iron solubility', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_Fe_sol',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
     end if
     !-----------------------------------------------------------------------
     !       Fe:C export cellular quotient ratio
@@ -1472,6 +1487,8 @@ CONTAINS
              loc_unitsname = 'mol kg-1 yr-1'
           CASE (idiag_bio_N2fixation,idiag_bio_NH4assim)
              loc_unitsname = 'mol kg-1 yr-1'
+          CASE (idiag_bio_DOMlifetime)
+             loc_unitsname = 'yr'
           case default
              loc_unitsname = 'n/a'
           end select
@@ -1510,6 +1527,34 @@ CONTAINS
     ! ECOGEM diagnostics
     !-----------------------------------------------------------------------
     if (ctrl_data_save_slice_diag_bio .AND. flag_ecogem) then
+       ! save POM
+       DO l=1,n_l_sed
+          loc_ij(:,:) = 0.0
+          is = conv_iselected_is(l)
+          if ( (is == is_POC) .OR. (sed_type(is) == par_sed_type_POM)) then
+             loc_ij(:,:) = int_diag_ecogem_part(is,:,:)/int_t_timeslice
+             call sub_adddef_netcdf(loc_iou,3,'eco_diag_POM_'//trim(string_sed(is)), &
+                  & 'ECOGEM particulate organic matter production - '//trim(string_sed(is)), &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('eco_diag_POM_'//trim(string_sed(is)),loc_iou, &
+                  & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
+          end if
+       end do
+       ! save DOM
+       ! NOTE: only save the io tracers that convert (non zero) to POM (i.e. DOM)
+       DO l=3,n_l_ocn
+          loc_ij(:,:) = 0.0
+          io = conv_iselected_io(l)
+          loc_tot_m = conv_DOM_POM_i(0,io)
+          do loc_m=1,loc_tot_m
+             loc_ij(:,:) = int_diag_ecogem_remin(io,:,:)/int_t_timeslice
+             call sub_adddef_netcdf(loc_iou,3,'eco_diag_DOM_'//trim(string_ocn(io)), &
+                  & 'ECOGEM dissolved matter production - '//trim(string_ocn(io)), &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('eco_diag_DOM_'//trim(string_ocn(io)),loc_iou, &
+                  & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+          end do
+       end DO
        ! calculate POM equivalnt of DOM
        loc_isij(:,:,:) = 0.0
        DO i=1,n_i
@@ -1526,25 +1571,27 @@ CONTAINS
              end If
           end DO
        end DO
-       ! calculate DOM ratio (replace values in same local array)
+       ! calculate DOM ratio (replace values in same local array) and save as netCDF
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
-          DO i=1,n_i
-             DO j=1,n_j
-                If (goldstein_k1(i,j) <= n_k) then
-                   if ((loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j)) > const_real_nullsmall) then
-                      loc_isij(is,i,j) = loc_isij(is,i,j)/(loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j))
-                   else
-                      loc_isij(is,i,j) = 0.0
-                   end if
-                end If
+          if ( (is == is_POC) .OR. (sed_type(is) == par_sed_type_POM)) then
+             DO i=1,n_i
+                DO j=1,n_j
+                   If (goldstein_k1(i,j) <= n_k) then
+                      if ((loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j)) > const_real_nullsmall) then
+                         loc_isij(is,i,j) = loc_isij(is,i,j)/(loc_isij(is,i,j)+int_diag_ecogem_part(is,i,j))
+                      else
+                         loc_isij(is,i,j) = 0.0
+                      end if
+                   end If
+                end DO
              end DO
-          end DO
-          call sub_adddef_netcdf(loc_iou,3,'eco_diag_DOMfract_'//trim(string_sed(is)), &
-               & 'ECOGEM dissolved matter production fraction - '//trim(string_sed(is)), &
-               & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('eco_diag_DOMfract_'//trim(string_sed(is)),loc_iou, &
-               & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
+             call sub_adddef_netcdf(loc_iou,3,'eco_diag_DOMfract_'//trim(string_sed(is)), &
+                  & 'ECOGEM dissolved matter production fraction - '//trim(string_sed(is)), &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('eco_diag_DOMfract_'//trim(string_sed(is)),loc_iou, &
+                  & n_i,n_j,loc_ntrec,loc_isij(is,:,:),loc_mask_surf)
+          end if
        end do
     end if
     !-----------------------------------------------------------------------
@@ -1566,6 +1613,106 @@ CONTAINS
                & trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar2d('misc_sur_SiSTAR',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end if
+    end if
+    !-----------------------------------------------------------------------
+    ! proxies
+    !-----------------------------------------------------------------------
+    If (ctrl_data_save_slice_diag_proxy) then
+       ! DpH
+       loc_unitsname = 'pH units (SWS)'
+       IF (opt_select(iopt_select_carbchem)) THEN
+          loc_ij(:,:) = const_real_zero
+          DO i=1,n_i
+             DO j=1,n_j
+                loc_k1 = goldstein_k1(i,j)
+                IF (n_k >= loc_k1) THEN
+                   loc_ij(i,j) = (-LOG10(int_carb_timeslice(ic_H,i,j,n_k)/int_t_timeslice)) - &
+                        & (-LOG10(int_carb_timeslice(ic_H,i,j,loc_k1)/int_t_timeslice))
+                END if
+             END DO
+          END DO
+          call sub_adddef_netcdf(loc_iou,3,'proxy_DpH','surface-benthic DpH', &
+               & trim(loc_unitsname),const_real_zero,const_real_zero)
+          call sub_putvar2d('proxy_DpH',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       end if
+       ! Dd13C (DIC)
+       loc_unitsname = 'o/oo'
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot1     = int_ocn_timeslice(io_DIC,i,j,n_k)
+                loc_frac1    = int_ocn_timeslice(io_DIC_13C,i,j,n_k)
+                loc_tot2     = int_ocn_timeslice(io_DIC,i,j,loc_k1)
+                loc_frac2    = int_ocn_timeslice(io_DIC_13C,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = fun_calc_isotope_delta(loc_tot1,loc_frac1,loc_standard,.FALSE.,const_real_null) - &
+                     & fun_calc_isotope_delta(loc_tot2,loc_frac2,loc_standard,.FALSE.,const_real_null)
+             END if
+          END DO
+       END DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_Dd13C','surface-benthic Dd13C', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_Dd13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! benthic d13C of DIC
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'o/oo'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot  = int_ocn_timeslice(io_DIC,i,j,loc_k1)
+                loc_frac = int_ocn_timeslice(io_DIC_13C,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+             end IF
+          end DO
+       end DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_DIC_d13C', &
+            & 'bottom-water DIC d13C',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_DIC_d13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+       ! benthic d13C of HCO3-
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'o/oo'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot  = int_carb_timeslice(ic_conc_HCO3,i,j,loc_k1)
+                loc_frac = int_carbisor_timeslice(ici_HCO3_r13C,i,j,loc_k1)*int_carb_timeslice(ic_conc_HCO3,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+             end IF
+          end DO
+       end DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_HCO3_d13C', &
+            & 'bottom-water HCO3- d13C',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_HCO3_d13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+       ! benthic Schmittner d13C
+       loc_a = 0.45
+       loc_b = 1.0
+       loc_c = -2.2e-3
+       loc_d = -6.6e-5
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'o/oo'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_tot  = int_ocn_timeslice(io_DIC,i,j,loc_k1)
+                loc_frac = int_ocn_timeslice(io_DIC_13C,i,j,loc_k1)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ij(i,j) = loc_a + &
+                     & loc_b*fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null) + &
+                     & loc_c*1.0E6*int_carb_timeslice(ic_conc_CO3,i,j,loc_k1) + &
+                     & loc_d*int_phys_ocn_timeslice(ipo_Dbot,i,j,loc_k1)/int_t_timeslice
+             end IF
+          end DO
+       end DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_LA1', &
+            & 'bottom-water Schmittner d13C (LA1)',trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_LA1',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
     end if
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
     !
@@ -2046,7 +2193,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       ocean surface carbonate chemistry data
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_sur) then
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        IF (opt_select(iopt_select_carbchem)) THEN
           loc_ij(:,:) = const_real_zero
           DO ic=1,n_carb
@@ -2072,6 +2219,38 @@ CONTAINS
              call sub_adddef_netcdf(loc_iou,3,'carb_sur_'//trim(string_carb(ic)), &
                   & 'surface '//trim(string_carb(ic)),trim(loc_unitsname),const_real_zero,const_real_zero)
              call sub_putvar2d('carb_sur_'//trim(string_carb(ic)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          END DO
+       end if
+    end if
+    !----------------------------------------------------------------
+    !       benthic carbonate chemistry data
+    !----------------------------------------------------------------
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
+       IF (opt_select(iopt_select_carbchem)) THEN
+          loc_ij(:,:) = const_real_zero
+          DO ic=1,n_carb
+             DO i=1,n_i
+                DO j=1,n_j
+                   loc_k1 = goldstein_k1(i,j)
+                   IF (n_k >= loc_k1) THEN
+                      SELECT CASE (ic)
+                      CASE (ic_ohm_cal,ic_ohm_arg)
+                         loc_ij(i,j) = int_carb_timeslice(ic,i,j,loc_k1)/int_t_timeslice
+                      case default
+                         loc_ij(i,j) = int_carb_timeslice(ic,i,j,loc_k1)/int_t_timeslice
+                      end SELECT
+                   end IF
+                end DO
+             end DO
+             SELECT CASE (ic)
+             CASE (ic_ohm_cal,ic_ohm_arg)
+                loc_unitsname = ' '
+             case default
+                loc_unitsname = 'mol kg-1'
+             end SELECT
+             call sub_adddef_netcdf(loc_iou,3,'carb_ben_'//trim(string_carb(ic)), &
+                  & 'bottom-water '//trim(string_carb(ic)),trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('carb_ben_'//trim(string_carb(ic)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
           END DO
        end if
     end if
