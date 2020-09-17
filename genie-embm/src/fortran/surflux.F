@@ -226,6 +226,8 @@ c JDA adding some variables relating to the forcing
       character header*40
 c     radiative forcing terms
       real co2_term
+c ML  state dependent climate sensitivity
+      real co2_t1, co2_t2, co2_t3, co2_t4, co2_t5
       real ch4_term,n2o_term
       real ch4_func
 
@@ -797,9 +799,14 @@ c     calculate coefficients
             tv2 = b02 + rq*(b12 + b22*rq)
             tv3 = b03 + rq*(b13 + b23*rq)
 c     calculate CO2 contribution
+c MLI (16/09/20) State dependent climate sensitivity
             if(opt_delf2x_cesm) then
-               co2_term = (4.81937*log(co2(i,j))/log(2.0) - 32.86485)
-     1              *log(co2(i,j)/co20)
+               co2_t1 = co2(i,j)*1e6
+               co2_t2 = (7.58434074655/1e10) * (co2_t1**(3.))
+               co2_t3 = (3.25968011260/1e6) * (co2_t1**(2.))
+               co2_t4 = 0.0054526683 * co2_t1 + 4.446262989
+               co2_t5 = co2_t2 - co2_t3 + co2_t4
+               co2_term = co2_t5 * log(co2(i,j)/co20)
             else
                co2_term = delf2x*log(co2(i,j)/co20)
             endif
