@@ -8,6 +8,7 @@ Christopher T. Reinhard, Stephanie L. Olson, Sandra Kirtland Turner, Cecily Päl
 
 ################################################################
 08/02/2019 -- README.txt file creation (C.T.R.)
+2019/08/26 -- revision of README.txt file (A.R.)
 ################################################################
 
 Provided is the code used to create the model experiments presented in the paper.
@@ -61,7 +62,7 @@ where the string X corresponds to the imposed atmospheric pO2 (relative to the p
 and the string Y corresponds to the initial marine SO4 concentration (in umol kg-1)
 
 # --------------------------------------------------------------
-### model experiments -- BEQ and e-fold ensembles ##############
+### model experiments -- BEQ ensembles #########################
 # --------------------------------------------------------------
 
 For the biological energy quantum (BEQ) ensembles, based on the 'Proterozoic' benchmark spinup (Figure 10c):
@@ -69,12 +70,6 @@ For the biological energy quantum (BEQ) ensembles, based on the 'Proterozoic' be
 ./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASESCH4.iso MS/reinhardetal.GMD.2020 200101_GMD_0.001PALO2_280uMSO4_BEQX_SPIN 10000
 
 where the sub-string X (in the string BEQX) denotes the biological energy quantum (in kJ mol-1)
-
-For the e-folding depth ensembles, based on the 'Proterozoic' benchmark spinup (Figure 10d):
-
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASESCH4.iso MS/reinhardetal.GMD.2020 200101_GMD_0.001PALO2_280uMSO4_efoldX_SPIN 10000
-
-where the sub-string X (in the strong efoldX) denotes the multiplier on e-folding depth
 
 ################################################################
 ################################################################
