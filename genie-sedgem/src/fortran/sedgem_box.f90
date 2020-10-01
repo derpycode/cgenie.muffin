@@ -2101,11 +2101,6 @@ CONTAINS
     !       this must be converted to cm3 cm-2
     select case (par_sed_diagen_opalopt)
     case ('ridgwelletal2003explicit')
-       ! ******************************
-       opt_sed(iopt_sed_diagen_AltoasymSi) = .TRUE. ! asymptotic [Si] dependence on %refrac/%opal?
-       opt_sed(iopt_sed_diagen_AltoKSi)    = .TRUE. ! KSi dependence on %refrac/%opal?
-       par_sed_opal_Sitoopalmax            = 15.0   ! %refrac/%opal max limit
-       ! ******************************
        ! CALCULATE SEDIMENT OPAL DIAGENESIS EXPLICITLY
        ! NOTE: model of Ridgwell [2001], Ridgwell et al. [2002]
        ! NOTE: do not calculate dissolution for < 0.1 wt%
@@ -2115,15 +2110,8 @@ CONTAINS
        else
           loc_dis = 0.0
        endif
-       !!!print*,100.0*loc_frac_opal,1.0E6*dum_SiO2,dum_T,conv_yr_s*loc_KSi,loc_opaltorefrac
-       !!!print*,1.0E+06*conv_yr_s*loc_dis
        loc_dis = conv_opal_mol_cm3*loc_dis*conv_yr_s*dum_dtyr
     case ('ridgwelletal2003lookup')
-       ! ******************************
-       opt_sed(iopt_sed_diagen_AltoasymSi) = .TRUE. ! asymptotic [Si] dependence on %refrac/%opal?
-       opt_sed(iopt_sed_diagen_AltoKSi)    = .TRUE. ! KSi dependence on %refrac/%opal?
-       par_sed_opal_Sitoopalmax            = 10.0   ! %refrac/%opal max limit
-       ! ******************************
        ! CALCULATE SEDIMENT OPAL DIAGENESIS VIA A LOOK-UP TABLE [Ridgwell, 2001]
        ! NOTE: loc_dis returned in units of mol cm-2 yr-1
        loc_dis = fun_interp_5D(lookup_sed_dis_opal,loc_frac_opal,dum_SiO2,dum_T,loc_KSi,loc_opaltorefrac, &

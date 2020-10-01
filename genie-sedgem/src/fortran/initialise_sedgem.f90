@@ -124,6 +124,23 @@ SUBROUTINE initialise_sedgem( &
   ! initialize sedcorenv time counters
   sed_time      = 0.0
   sed_time_save = 0.0
+  ! initialize opal diagenesis options
+  select case (par_sed_diagen_opalopt)
+  case ('ridgwelletal2003explicit')
+     opt_sed(iopt_sed_diagen_AltoasymSi) = .TRUE. ! asymptotic [Si] dependence on %refrac/%opal?
+     opt_sed(iopt_sed_diagen_AltoKSi)    = .TRUE. ! KSi dependence on %refrac/%opal?
+     par_sed_opal_Sitoopalmax            = 15.0   ! %refrac/%opal max limit
+  case ('ridgwelletal2003lookup')
+     opt_sed(iopt_sed_diagen_AltoasymSi) = .TRUE. ! asymptotic [Si] dependence on %refrac/%opal?
+     opt_sed(iopt_sed_diagen_AltoKSi)    = .TRUE. ! KSi dependence on %refrac/%opal?
+     par_sed_opal_Sitoopalmax            = 10.0   ! %refrac/%opal max limit
+  case ('archer2002muds')
+     opt_sed(iopt_sed_diagen_AltoasymSi) = .FALSE.
+     opt_sed(iopt_sed_diagen_AltoKSi)    = .FALSE. 
+  case default
+     opt_sed(iopt_sed_diagen_AltoasymSi) = .FALSE.
+     opt_sed(iopt_sed_diagen_AltoKSi)    = .FALSE. 
+  end select
   ! ---------------------------------------------------------- ! INITIALIZE netCDF OUTPUT
   IF (ctrl_misc_debug2) print*, 'INITIALIZE netCDF OUTPUT'
   string_ncout2d   = TRIM(par_outdir_name)//'fields_sedgem_2d.nc'
