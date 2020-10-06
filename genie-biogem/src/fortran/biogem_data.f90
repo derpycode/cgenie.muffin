@@ -454,6 +454,7 @@ CONTAINS
        print*,'Number of timesteps in sub-inteval saving           : ',par_data_save_slice_n
        print*,'Auto save at run end?                               : ',ctrl_data_save_slice_autoend
        print*,'Save cdrmip data (only)?                            : ',ctrl_data_save_slice_cdrmip
+       print*,'Update carbonate chemistry for saving?              : ',ctrl_data_save_slice_carb_update
        ! --- DATA SAVING: TIME-SERIES -------------------------------------------------------------------------------------------- !
        print*,'--- BIOGEM DATA SAVING: TIME-SERIES ----------------'
        print*,'Atmospheric (interface) composition?                : ',ctrl_data_save_sig_ocnatm

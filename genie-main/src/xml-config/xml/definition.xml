@@ -5395,6 +5395,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Save cdrmip data (only)?</description>
                     </param>
+                    <param name="ctrl_data_save_slice_carb_update">
+			<value datatype="boolean">.true.</value>
+                        <description>Update carbonate chemistry for saving?</description>
+                    </param>
 <!-- DATA SAVING: TIME-SERIES -->
                     <param name="ctrl_data_save_sig_ocnatm">
 			<value datatype="boolean">.true.</value>
