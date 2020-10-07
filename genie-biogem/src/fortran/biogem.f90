@@ -2957,7 +2957,7 @@ SUBROUTINE diag_biogem_timeslice( &
         if_save3: if (dum_save) then
 
            ! reconstruct local interface fluxes and update whole-ocean carbonate equilibrium
-           IF (opt_select(iopt_select_carbchem)) THEN
+           IF (opt_select(iopt_select_carbchem) .AND. ctrl_data_save_slice_carb_update) THEN
               DO i=1,n_i
                  DO j=1,n_j
                     loc_k1 = goldstein_k1(i,j)

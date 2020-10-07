@@ -630,6 +630,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_data_save_slice_autoend
   LOGICAL::ctrl_data_save_slice_cdrmip                           ! save cdrmip data (only)?
   NAMELIST /ini_biogem_nml/ctrl_data_save_slice_cdrmip
+  LOGICAL::ctrl_data_save_slice_carb_update                      ! Update carbonate chemistry for saving?
+  NAMELIST /ini_biogem_nml/ctrl_data_save_slice_carb_update
   ! ------------------- DATA SAVING: TIME-SERIES --------------------------------------------------------------------------------- !
   LOGICAL::ctrl_data_save_sig_ocnatm                             ! time-series data save: Atmospheric (interface) composition?
   LOGICAL::ctrl_data_save_sig_ocn                                ! time-series data save: Oceanic composition?
