@@ -8,7 +8,13 @@ ea_36=y
 # --- BIOLOGICAL NEW PRODUCTION -------------------------------------
 #
 # biological scheme ID string
-bg_par_bio_prodopt="NONE"
+bg_par_bio_prodopt="bio_PFe"
+# [PO4] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_PO4=0.10E-06
+# [Fe] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_Fe=0.10E-09
+# biological uptake time-scale
+bg_par_bio_tau=63.3827
 #
 # --- ORGANIC MATTER EXPORT RATIOS ----------------------------------
 #
@@ -68,51 +74,6 @@ bg_par_bio_FetoC_K=103684.0
 #[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- constant
 bg_par_bio_FetoC_C=0.0
 #
-# --- ECOGEM ----------------------------------------------------------
-#
-gm_ctrl_debug_init          =0
-eg_ctrl_debug_eco_init      =.true.
-
-eg_par_ecogem_plankton_file ='NPZD.eco'
-
-#################### Nitrogen ############################
-eg_useNO3                   =.false.
-eg_nquota                   =.false.
-################## Phosphorus ############################
-eg_usePO4                   =.true.
-eg_pquota                   =.true.
-######################## Iron ############################
-eg_useFe                    =.true.
-eg_fquota                   =.true.
-################# Chlorophyll ############################
-eg_chlquota                 =.true.
-
-# Tuned
-eg_qminFe_a    =   1.0e-6
-eg_qmaxFe_a    =   4.0e-6
-
-eg_ns          =   2
-
-eg_beta_mort_a =   0.8 # Maximum fraction to DOM as ESD --> zero
-eg_beta_mort_b =   0.4 # Minimum fraction to DOM as ESD --> infinity 
-eg_beta_mort_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
-eg_beta_graz_a =   0.8 # Maximum fraction to DOM as ESD --> zero
-eg_beta_graz_b =   0.4 # Minimum fraction to DOM as ESD --> infinity
-eg_beta_graz_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
-
-eg_par_bio_red_POC_CaCO3     = 0.0285 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
-eg_par_bio_red_POC_CaCO3_pP  = 0.7440 # exponent for modifier of CaCO3:POC export ratio
-
-eg_nsubtime                 =25
-eg_n_keco                   =1
-
-bg_ctrl_ncrst               =.true.
-eg_ctrl_ncrst               =.false.
-bg_ctrl_continuing          =.true.
-eg_ctrl_continuing          =.false.
-
-bg_ctrl_audit               =.false.
-#
 # --- DATA SAVING -----------------------------------------------------
 #
 bg_par_data_save_level=10
@@ -158,4 +119,3 @@ ea_28=0.8
 bg_par_det_Fe_sol=0.002014275
 bg_par_scav_Fe_sf_POC=0.344104
 bg_par_bio_tau=95.6337
-
