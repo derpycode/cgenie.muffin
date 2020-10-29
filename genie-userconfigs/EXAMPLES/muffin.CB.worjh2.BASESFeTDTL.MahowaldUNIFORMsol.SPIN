@@ -89,7 +89,7 @@ bg_par_infile_slice_name='save_timeslice_NONE.dat'
 #
 # *** FORCINGS ******************************************************
 #
-bg_par_forcing_name="worjh2.RpCO2_Rp13CO2.FeMahowald2006"
+bg_par_forcing_name="worjh2.RpCO2_Rp13CO2.Mahowald.0ka"
 bg_par_atm_force_scale_val_3=278.0E-06
 bg_par_atm_force_scale_val_4=-6.5
 #
