@@ -1,5 +1,5 @@
 # *******************************************************************
-# *** muffin.CB.worjh2.BASESFeTDTL.Albani.SPIN **********************
+# *** muffin.CB.worjh2.BASESFeTDTL.MahowaldFILEsol.SPIN *************
 # *******************************************************************
 #
 # *** CLIMATE *******************************************************
@@ -57,10 +57,10 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 # iron tracer scheme
 # NOTE: the base-config requires TFe and TL tracers
 bg_opt_geochem_Fe='hybrid'
-# exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
-bg_par_det_Fe_sol_exp=0.500
-# aeolian Fe solubility
-bg_par_det_Fe_sol=0.002441
+# Replace internal dust Fe solubility field?
+bg_ctrl_force_det_Fe_sol=.true.
+# Filename for dust Fe solubility field
+bg_par_det_Fe_sol_file='worjh2.det_Fe_sol.Mahowald.dat'
 # modifier of the scavenging rate of dissolved Fe
 bg_par_scav_Fe_sf_POC=0.225
 # no scavenged regeneration
@@ -89,7 +89,7 @@ bg_par_infile_slice_name='save_timeslice_NONE.dat'
 #
 # *** FORCINGS ******************************************************
 #
-bg_par_forcing_name="worjh2.RpCO2_Rp13CO2.Albani.0ka"
+bg_par_forcing_name="worjh2.RpCO2_Rp13CO2.Mahowald.0ka"
 bg_par_atm_force_scale_val_3=278.0E-06
 bg_par_atm_force_scale_val_4=-6.5
 #
@@ -107,4 +107,4 @@ gm_par_carbchem_Tmax = 45.0
 #
 # *******************************************************************
 # *** END ***********************************************************
-# *******************************************************************
+# ******************************************************************* 

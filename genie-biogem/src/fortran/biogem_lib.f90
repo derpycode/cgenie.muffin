@@ -81,8 +81,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_Cd_alpha
   logical::ctrl_force_CaCO3ballastcoeff                                 ! Set spatial ballast coefficient distribution (CaCO3)
   logical::ctrl_force_opalballastcoeff                                  ! Set spatial ballast coefficient distribution (opal)
-  logical::ctrl_force_detballastcoeff                                  ! Set spatial ballast coefficient distribution (det)
+  logical::ctrl_force_detballastcoeff                                   ! Set spatial ballast coefficient distribution (det)
   NAMELIST /ini_biogem_nml/ctrl_force_CaCO3ballastcoeff,ctrl_force_opalballastcoeff,ctrl_force_detballastcoeff
+  logical::ctrl_force_det_Fe_sol                                        ! Set spatial dust Fe solubility?
+  NAMELIST /ini_biogem_nml/ctrl_force_det_Fe_sol
   logical::ctrl_force_scav_fpart_POC                                    ! Replace internal POC flux for isotope scavenging
   logical::ctrl_force_scav_fpart_CaCO3                                  ! Replace internal CaCO3 flux for isotope scavenging
   logical::ctrl_force_scav_fpart_opal                                   ! Replace internal opal flux for isotope scavenging
@@ -102,6 +104,8 @@ MODULE biogem_lib
   CHARACTER(len=127)::par_opalballastcoeff_file                         !
   CHARACTER(len=127)::par_detballastcoeff_file                          !
   NAMELIST /ini_biogem_nml/par_CaCO3ballastcoeff_file,par_opalballastcoeff_file,par_detballastcoeff_file
+  CHARACTER(len=127)::par_det_Fe_sol_file                               !
+  NAMELIST /ini_biogem_nml/par_det_Fe_sol_file
   CHARACTER(len=127)::par_scav_fpart_POC_file                           !
   CHARACTER(len=127)::par_scav_fpart_CaCO3_file                         !
   CHARACTER(len=127)::par_scav_fpart_opal_file                          !
@@ -1433,6 +1437,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_i,n_j)::par_bio_remin_b                       !
   REAL,DIMENSION(n_i,n_j)::par_misc_2D                           !
   REAL,DIMENSION(n_i,n_j)::force_Fgeothermal2D                   !
+  REAL,DIMENSION(n_i,n_j)::par_det_Fe_sol_2D                     !
 
   ! ****************************************************************************************************************************** !
   ! *** GLOBAL VARIABLES AND RUN-TIME SET PARAMETERS ***************************************************************************** !
