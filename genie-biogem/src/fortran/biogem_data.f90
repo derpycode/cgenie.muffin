@@ -112,6 +112,7 @@ CONTAINS
        print*,'Replace uniform CaCO3 scavenging coefficient?       : ',ctrl_force_CaCO3ballastcoeff
        print*,'Replace uniform opal scavenging coefficient?        : ',ctrl_force_opalballastcoeff
        print*,'Replace uniform det scavenging coefficient?         : ',ctrl_force_detballastcoeff
+       print*,'Replace internal dust Fe solubility field?          : ',ctrl_force_det_Fe_sol
        print*,'Replace internal POC flux for 230Th/231Pa scav.     : ',ctrl_force_scav_fpart_POC
        print*,'Replace internal CaCO3 flux for 230Th/231Pa scav.   : ',ctrl_force_scav_fpart_CaCO3
        print*,'Replace internal opal flux for 230Th/231Pa scav.    : ',ctrl_force_scav_fpart_opal
@@ -125,6 +126,7 @@ CONTAINS
        print*,'Filename for CaCO3 ballast coefficient field        : ',trim(par_CaCO3ballastcoeff_file)
        print*,'Filename for opal ballast coefficient field         : ',trim(par_opalballastcoeff_file)
        print*,'Filename for det ballast coefficient field          : ',trim(par_detballastcoeff_file)
+       print*,'Filename for dust Fe solubility field               : ',trim(par_det_Fe_sol_file)
        print*,'Filename for imposed scavenging POC flux            : ',trim(par_scav_fpart_POC_file)
        print*,'Filename for imposed scavenging CaCO3 flux          : ',trim(par_scav_fpart_CaCO3_file)
        print*,'Filename for imposed scavenging opal flux           : ',trim(par_scav_fpart_opal_file)
@@ -605,6 +607,7 @@ CONTAINS
     if (sed_select(is_FeCO3))    ctrl_carbchemupdate_full = .true.
     if (sed_select(is_Fe3Si2O4)) ctrl_carbchemupdate_full = .true.
     if (ocn_select(io_CH4))      ctrl_carbchemupdate_full = .true.
+    ! set uniform solubility parameter
     ! -------------------------------------------------------- !
     ! MISC
     ! -------------------------------------------------------- !
@@ -882,6 +885,18 @@ CONTAINS
        CALL sub_load_data_ij(loc_filename,n_i,n_j,par_bio_remin_kl(:,:))
     else
        par_bio_remin_kl(:,:) = par_bio_remin_ballast_kl
+    end if
+
+    ! *** load prescribed dust Fe solubility field (if requested) ***
+    ! NOTE: populate the 2D solubility field <par_det_Fe_sol_exp> uniformly to the value of the solubilty parameter, par_det_Fe_sol
+    !       if a spatially-explicit field is not requested
+    ! NOTE: convert the solubility field from percent to fractional solubility
+    if (ctrl_force_det_Fe_sol) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_det_Fe_sol_file)
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,par_det_Fe_sol_2D(:,:))
+       par_det_Fe_sol_2D(:,:) = par_det_Fe_sol_2D(:,:)/100.0
+    else
+       par_det_Fe_sol_2D(:,:) = par_det_Fe_sol
     end if
 
     ! *** load prescribed POC scavenging coefficient field (if requested) ***

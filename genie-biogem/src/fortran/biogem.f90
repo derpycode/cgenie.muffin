@@ -215,12 +215,14 @@ subroutine biogem(        &
               ! NOTE: the flux used to derive the solubility, should be in units of  mass per unit area (or volume) (time can be ignored)
               !       on an equal area grid, it does not matter and hence old code was OK
               !       (old code was: phys_ocnatm(ipoa_solFe,i,j) = force_flux_sed(is_det,i,j)**(par_det_Fe_sol_exp - 1.0))
-              if (force_flux_sed(is_det,i,j) > const_real_nullsmall) then
+              ! NOTE: only implement if par_det_Fe_sol_exp not equal to 1.0 (which is for uniform solubility)
+              !       and if a 2D solbility field has not been requested (ctrl_force_det_Fe_sol)
+              if ( (ABS(par_det_Fe_sol_exp - 1.0) > const_real_nullsmall) .AND. .NOT.(ctrl_force_det_Fe_sol) ) then
                  phys_ocnatm(ipoa_solFe,i,j) = (phys_ocn(ipo_rM,i,j,n_k)*force_flux_sed(is_det,i,j))**(par_det_Fe_sol_exp - 1.0)
                  loc_det_tot = loc_det_tot + force_flux_sed(is_det,i,j)
                  loc_det_sol_tot = loc_det_sol_tot + phys_ocnatm(ipoa_solFe,i,j)*force_flux_sed(is_det,i,j)
               else
-                 phys_ocnatm(ipoa_solFe,i,j) = 0.0
+                 loc_det_sol_tot = 0.0
               end if
               ! total global weathering (mol per time step)
               DO l=3,n_l_ocn
@@ -306,12 +308,16 @@ subroutine biogem(        &
      end DO
      ! re-scale Aeolian solubilities
      ! => calculate the scale factor required to match the requested mean global solubility (<par_det_Fe_sol>)
-     if ((loc_det_tot > const_real_nullsmall) .AND. (par_det_Fe_sol > const_real_nullsmall)) then
+     ! NOTE: loc_det_sol_tot being zero indicate uniform solubility or spatially explict solubility is being requested 
+     !       and re-scaling not required
+     ! NOTE: <par_det_Fe_sol_2D> is populated uniformly with the value of the solubilty parameter, par_det_Fe_sol
+     !       if a spatially-explicit field is not requested
+     if ( (loc_det_sol_tot > const_real_nullsmall) .AND. (loc_det_tot > const_real_nullsmall) ) then
         loc_det_Fe_sol_sf = par_det_Fe_sol/(loc_det_sol_tot/loc_det_tot)
+        phys_ocnatm(ipoa_solFe,:,:) = loc_det_Fe_sol_sf*phys_ocnatm(ipoa_solFe,:,:)
      else
-        loc_det_Fe_sol_sf = 0.0
+        phys_ocnatm(ipoa_solFe,:,:) = par_det_Fe_sol_2D(:,:)
      end if
-     phys_ocnatm(ipoa_solFe,:,:) = loc_det_Fe_sol_sf*phys_ocnatm(ipoa_solFe,:,:)
 
      ! ****************************************************************************************************************************
      ! ****************************************************************************************************************************
