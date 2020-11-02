@@ -38,7 +38,7 @@ bg_par_bio_remin_sinkingrate_physical=9.9E9
 bg_par_bio_remin_sinkingrate_reaction=125.0
 # *** common settings ***********************************************
 # DOC lifetime (yrs)
-bg_par_bio_remin_DOMlifetime=0.5
+bg_par_bio_remin_DOMlifetime=1.0
 # initial fractional abundance of POC component #2
 bg_par_bio_remin_POC_frac2=0.0557
 # depth of remineralization or particulate organic matter
