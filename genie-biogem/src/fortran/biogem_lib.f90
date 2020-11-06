@@ -784,7 +784,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
   INTEGER,PARAMETER::n_diag_react                         = 09 !
   INTEGER,PARAMETER::n_diag_iron                          = 07 !
-  INTEGER,PARAMETER::n_diag_misc_2D                       = 07 !
+  INTEGER,PARAMETER::n_diag_misc_2D                       = 09 !
   INTEGER::n_diag_redox                                   =  0 !
 
 
@@ -924,11 +924,13 @@ MODULE biogem_lib
   ! diagnostics - misc - 2D
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2                 = 01    !
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2_13C             = 02    !
-  INTEGER,PARAMETER::idiag_misc_2D_FDIC                  = 03    !
-  INTEGER,PARAMETER::idiag_misc_2D_FDIC_13C              = 04    !
-  INTEGER,PARAMETER::idiag_misc_2D_FALK                  = 05    !
-  INTEGER,PARAMETER::idiag_misc_2D_FCa                   = 06    !
-  INTEGER,PARAMETER::idiag_misc_2D_FCa_44Ca              = 07    !
+  INTEGER,PARAMETER::idiag_misc_2D_FpCO2_14C             = 03    !
+  INTEGER,PARAMETER::idiag_misc_2D_FDIC                  = 04    !
+  INTEGER,PARAMETER::idiag_misc_2D_FDIC_13C              = 05    !
+  INTEGER,PARAMETER::idiag_misc_2D_FDIC_14C              = 06    !
+  INTEGER,PARAMETER::idiag_misc_2D_FALK                  = 07    !
+  INTEGER,PARAMETER::idiag_misc_2D_FCa                   = 08    !
+  INTEGER,PARAMETER::idiag_misc_2D_FCa_44Ca              = 09    !
 
   ! *** array index names ***
   ! ocean 'physics'
@@ -1054,8 +1056,10 @@ MODULE biogem_lib
   CHARACTER(len=14),DIMENSION(n_diag_misc_2D),PARAMETER::string_diag_misc_2D = (/ &
        & 'FpCO2         ', &
        & 'FpCO2_13C     ', &
+       & 'FpCO2_14C     ', &
        & 'FDIC          ', &
        & 'FDIC_13C      ', &
+       & 'FDIC_14C      ', &
        & 'FALK          ', &
        & 'FCa           ', &
        & 'FCa_44Ca      ' /)
