@@ -2185,8 +2185,8 @@ CONTAINS
        IF (loc_force_restore_select .AND. loc_force_flux_select) then
           CALL sub_report_error( &
                & 'biogem_data','sub_init_tracer_forcing_ocn', &
-               & 'You are being greedy ... and have both flux AND restoring atmospheric forcing selected'// &
-               & '(gem_config_atm.par) - Is this really what you intended?', &
+               & 'You are being greedy ... and have both flux AND restoring ocean forcing selected'// &
+               & '(gem_config_ocn.par) - Is this really what you intended?', &
                & 'CONTINUING', &
                & (/const_real_null/),.false. &
                & )
