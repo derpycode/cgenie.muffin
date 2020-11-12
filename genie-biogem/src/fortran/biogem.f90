@@ -1085,15 +1085,15 @@ subroutine biogem(        &
                       & loc_standard,.FALSE.,const_real_null &
                       & )
                  ! calculate the sign of the DIC input
-                 If (loc_delta_target > loc_delta_actual) then
-                    if (loc_delta_source > loc_delta_actual) then
+                 If (loc_delta_actual > loc_delta_target) then
+                    if (loc_delta_source < loc_delta_actual) then
                        loc_force_sign = 1.0
                     else
                        loc_force_sign = -1.0
                        if (ctrl_force_invert_noneg) loc_force_sign = 0.0
                     end If
                  else
-                    if (loc_delta_source > loc_delta_actual) then
+                    if (loc_delta_source < loc_delta_actual) then
                        loc_force_sign = -1.0
                        if (ctrl_force_invert_noneg) loc_force_sign = 0.0
                     else
