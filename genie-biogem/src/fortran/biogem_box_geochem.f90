@@ -773,7 +773,6 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     INTEGER::k,l,io,is
-    integer::loc_i,loc_tot_i
     real,dimension(n_ocn,n_k)::loc_bio_uptake
     real,dimension(n_sed,n_k)::loc_bio_part
     real,dimension(1:3)::loc_Fe2spec
@@ -1291,7 +1290,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
-    integer::l,io,k,id
+    integer::l,io,k!,id
     real::loc_O2,loc_SO4,loc_r34S
     real::loc_SO4_reduction
     real,dimension(n_ocn,n_k)::loc_bio_remin
