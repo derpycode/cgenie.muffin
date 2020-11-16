@@ -1366,7 +1366,7 @@ MODULE biogem_lib
   INTEGER,DIMENSION(n_ocn,2)::force_restore_ocn_sig_i             !
   LOGICAL,DIMENSION(n_ocn)::force_restore_ocn_select              !
   LOGICAL,DIMENSION(n_ocn)::force_restore_ocn_sur                 !
-  INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_restore_ocn_k1          !
+  !!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_restore_ocn_k1          !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm                !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm_I              !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm_II             !
@@ -1392,7 +1392,7 @@ MODULE biogem_lib
   INTEGER,DIMENSION(n_ocn,2)::force_flux_ocn_sig_i               !
   LOGICAL,DIMENSION(n_ocn)::force_flux_ocn_select                !
   LOGICAL,DIMENSION(n_ocn)::force_flux_ocn_scale                 !
-  INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_flux_ocn_k1            !
+  !!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_flux_ocn_k1            !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm                  !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm_I                !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm_II               !

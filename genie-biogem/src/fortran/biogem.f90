@@ -65,17 +65,17 @@ subroutine biogem(        &
   real::loc_det_tot,loc_det_sol_tot,loc_det_Fe_sol_sf            !
   REAL,DIMENSION(n_ocn)::loc_fweather_tot,loc_fseddis_tot        ! local total weathering flux, dissolution flux
   REAL,DIMENSION(n_ocn)::loc_fsedpres_tot,loc_fsedsettle_tot     !
-  real::loc_frac,loc_standard                                    !
+  real::loc_frac,loc_tot,loc_standard                            !
   real::loc_delta_actual,loc_delta_target,loc_delta_source       !
   real::loc_force_flux
   real::loc_force_sign
   real::loc_force_target
   real::loc_force_actual
-  real::loc_force_actual_d13C
-  real::loc_force_actual_totd13C,loc_force_actual_totd14C        ! 
+  real::loc_force_actual_d13C,loc_force_actual_d14C
   real::loc_force_actual_d44Ca
   real::loc_r18O
   real::loc_remin
+  real::loc_M
   real,dimension(1:n_l_ocn)::loc_vocn                            !
   real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                !
   CHARACTER(len=31)::loc_string     !
@@ -300,7 +300,7 @@ subroutine biogem(        &
      ! calc mean DIC d13C
      if (force_restore_ocn_select(io_DIC_13C) .AND. force_flux_ocn_select(io_DIC_13C)) THEN
         loc_standard = const_standards(ocn_type(io_DIC_13C))
-        loc_force_actual_totd13C = &
+        loc_force_actual_d13C = &
              & fun_calc_isotope_delta(                                          &
              & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC,:,:,:))*loc_ocn_rtot_M,     & 
              & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC_13C,:,:,:))*loc_ocn_rtot_M, &
@@ -309,11 +309,44 @@ subroutine biogem(        &
      ! calc mean DIC d14C
      if (force_restore_ocn_select(io_DIC_14C) .AND. force_flux_ocn_select(io_DIC_14C)) THEN
         loc_standard = const_standards(ocn_type(io_DIC_14C))
-        loc_force_actual_totd14C = &
-             & fun_calc_isotope_delta(                                          &
-             & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC,:,:,:))*loc_ocn_rtot_M,     & 
-             & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC_14C,:,:,:))*loc_ocn_rtot_M, &
-             & loc_standard,.FALSE.,const_real_null)
+        SELECT CASE (force_ocn_uniform(io_DIC_14C))
+        case (3)
+           ! whole ocean
+           loc_force_actual_d14C = &
+                & fun_calc_isotope_delta(                                          &
+                & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC,:,:,:))*loc_ocn_rtot_M,     & 
+                & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC_14C,:,:,:))*loc_ocn_rtot_M, &
+                & loc_standard,.FALSE.,const_real_null)
+        case (2)
+           ! mean surface
+           loc_force_actual_d14C = &
+                & fun_calc_isotope_delta(                                              &
+                & SUM(phys_ocn(ipo_M,:,:,n_k)*ocn(io_DIC,:,:,n_k))*loc_ocn_rtot_M,     & 
+                & SUM(phys_ocn(ipo_M,:,:,n_k)*ocn(io_DIC_14C,:,:,n_k))*loc_ocn_rtot_M, &
+                & loc_standard,.FALSE.,const_real_null)
+        case (1)
+           ! mean benthic
+           loc_M    = 0.0
+           loc_frac = 0.0
+           Loc_tot  = 0.0
+           DO i=1,n_i
+              DO j=1,n_j
+                 if (goldstein_k1(i,j) <= n_k) then
+                    loc_M    = loc_M    + phys_ocn(ipo_M,i,j,goldstein_k1(i,j))
+                    loc_tot  = loc_tot  + phys_ocn(ipo_M,i,j,goldstein_k1(i,j))*ocn(io_DIC,i,j,goldstein_k1(i,j))
+                    loc_frac = loc_frac + phys_ocn(ipo_M,i,j,goldstein_k1(i,j))*ocn(io_DIC_14C,i,j,goldstein_k1(i,j))
+                 end if
+              end do
+           end DO
+           loc_force_actual_d14C =        &
+                & fun_calc_isotope_delta( &
+                & loc_tot/loc_M,          & 
+                & loc_frac/loc_M,         &
+                & loc_standard,.FALSE.,const_real_null)
+        case default
+           ! ???
+           loc_force_actual_d14C = 0.0
+        end SELECT
      end IF
      ! calc mean O2 d18O
      IF (ocn_select(io_O2_18O)) THEN
@@ -855,7 +888,7 @@ subroutine biogem(        &
                  io = conv_iselected_io(l)
                  IF (force_restore_ocn_select(io) .AND. (.NOT. force_flux_ocn_select(io))) THEN
                     IF (force_restore_ocn_sig_i(io,1) /= force_restore_ocn_sig_i(io,2)) THEN
-                       DO k=force_restore_ocn_k1(io,i,j),n_k
+                       DO k=goldstein_k1(i,j),n_k
                           ! catch missing restoring data (non-isotope tracer values < 0.0) => force restoring flux to zero
                           ! also catch 'null' isotopic values
                           SELECT CASE (ocn_type(io))
@@ -1072,18 +1105,41 @@ subroutine biogem(        &
                  ! (2) 14C INVERSIONS
                  ! ------------------------------------------- !
                  ! calculate local variables
-                 ! NOTE: just take surface ocean (n_k) values for target and source, 
-                 !       assuming that the forcing and target is homogeneous throughout the ocean
+                 ! NOTE: take an appropriate value for 'k' ...
+                 !       (for whole ocena, take a surface value as representative)
+                 SELECT CASE (force_ocn_uniform(io_DIC_14C))
+                 case (3)
+                    ! whole ocean
+                    k = n_k
+                 case (2)
+                    ! surface ocean
+                    k = n_k
+                 case (1)
+                    ! benthic
+                    k = goldstein_k1(i,j)
+                 case default
+                    ! ???
+                 end SELECT
                  loc_standard = const_standards(ocn_type(io_DIC_14C))
-                 loc_delta_actual = loc_force_actual_totd14C
+                 loc_delta_actual = loc_force_actual_d14C
                  loc_delta_target = fun_calc_isotope_delta( &
-                      & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_14C),i,j,n_k), &
+                      & force_restore_locn(io2l(io_DIC),i,j,k),force_restore_locn(io2l(io_DIC_14C),i,j,k), &
                       & loc_standard,.FALSE.,const_real_null &
                       & )
                  loc_delta_source = fun_calc_isotope_delta( &
-                      & force_flux_locn(io2l(io_DIC),i,j,n_k),force_flux_locn(io2l(io_DIC_14C),i,j,n_k), &
+                      & force_flux_locn(io2l(io_DIC),i,j,k),force_flux_locn(io2l(io_DIC_14C),i,j,k), &
                       & loc_standard,.FALSE.,const_real_null &
                       & )
+
+!par_misc_debug_i = 9
+!par_misc_debug_j = 9
+!           if ((i == par_misc_debug_i) .AND. (j == par_misc_debug_j)) then
+!print*,force_ocn_uniform(io_DIC_14C),k
+!print*,loc_delta_actual,loc_delta_target,loc_delta_source
+!print*,force_restore_locn(io2l(io_DIC),i,j,k),force_restore_locn(io2l(io_DIC_14C),i,j,k)
+!print*,force_flux_locn(io2l(io_DIC),i,j,k),force_flux_locn(io2l(io_DIC_14C),i,j,k)
+!end if
+
                  ! calculate the sign of the DIC input
                  If (loc_delta_actual > loc_delta_target) then
                     if (loc_delta_source < loc_delta_actual) then

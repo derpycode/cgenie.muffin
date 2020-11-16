@@ -2164,15 +2164,7 @@ CONTAINS
        force_ocn_point_j(io)        = loc_force_point_j
        force_ocn_point_k(io)        = loc_force_point_k
        if (force_ocn_uniform(io) > 0) force_flux_ocn_scale(io) = .true.
-       ! set local depth limit for ocean boundary conditions (i.e., as as to achieve a surface-only forcing)
-       ! NOTE: ensure that land-surface information is preserved (i.e, 'k > n_k')
-       ! NOTE: there is currently no restriction of flux forcing to the ocean surface only
-       IF (force_restore_ocn_sur(io)) THEN
-          force_restore_ocn_k1(io,:,:) = MAX(goldstein_k1(:,:),n_k)
-       ELSE
-          force_restore_ocn_k1(io,:,:) = goldstein_k1(:,:)
-       END IF
-       force_flux_ocn_k1(io,:,:) = goldstein_k1(:,:)
+       ! report errors
        if (loc_force_restore_select .AND. (loc_force_restore_tconst < const_real_nullsmall)) then
           CALL sub_report_error( &
                & 'biogem_data','sub_init_tracer_forcing_ocn', &
@@ -2383,7 +2375,6 @@ CONTAINS
           force_restore_ocn_select(io_PO4) = .TRUE.
           force_flux_ocn_select(io_PO4) = .FALSE.
           force_restore_ocn_sur(io_PO4) = .TRUE.
-          force_restore_ocn_k1(io_PO4,:,:) = MAX(goldstein_k1(:,:),n_k)
        END IF
     CASE (               &
          & 'bio_POCflux' &
@@ -3601,6 +3592,14 @@ CONTAINS
              loc_ijk(:,:,:) = 0.0
           elseif (force_ocn_uniform(io) == 2) then
              loc_ijk(:,:,n_k) = 0.0
+          elseif (force_ocn_uniform(io) == 1) then
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,goldstein_k1(i,j)) = 0.0
+                   end if
+                end do
+             end DO
           elseif (force_ocn_uniform(io) == 0) then
              loc_ijk(force_ocn_point_i(io),force_ocn_point_j(io),force_ocn_point_k(io)) = 0.0
           elseif (force_ocn_uniform(io) == -1) then
@@ -3636,9 +3635,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                DO k=force_restore_ocn_k1(io,i,j),n_k
-                   force_restore_locn_I(l,i,j,k) = loc_ijk(i,j,k)
-                end do
+                   DO k=goldstein_k1(i,j),n_k
+                      force_restore_locn_I(l,i,j,k) = loc_ijk(i,j,k)
+                   end do
              end do
           end DO
           ! load forcing data array #II
@@ -3647,6 +3646,14 @@ CONTAINS
              loc_ijk(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:)
           elseif (force_ocn_uniform(io) == 2) then
              loc_ijk(:,:,n_k) = phys_ocn(ipo_mask_ocn,:,:,n_k)
+          elseif (force_ocn_uniform(io) == 1) then
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,goldstein_k1(i,j)) = phys_ocn(ipo_mask_ocn,i,j,goldstein_k1(i,j))
+                   end if
+                end do
+             end DO
           elseif (force_ocn_uniform(io) == 0) then
              loc_ijk(force_ocn_point_i(io),force_ocn_point_j(io),force_ocn_point_k(io)) = 1.0
           elseif (force_ocn_uniform(io) == -1) then
@@ -3704,9 +3711,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                DO k=force_restore_ocn_k1(io,i,j),n_k
-                   force_restore_locn_II(l,i,j,k) = loc_ijk(i,j,k)
-                end do
+                   DO k=goldstein_k1(i,j),n_k
+                      force_restore_locn_II(l,i,j,k) = loc_ijk(i,j,k)
+                   end do
              end do
           end DO
           ! load forcing time series data
@@ -3937,6 +3944,14 @@ CONTAINS
              loc_ijk(:,:,:) = 0.0
           elseif (force_ocn_uniform(io) == 2) then
              loc_ijk(:,:,n_k) = 0.0
+          elseif (force_ocn_uniform(io) == 1) then
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,goldstein_k1(i,j)) = 0.0
+                   end if
+                end do
+             end DO
           elseif (force_ocn_uniform(io) == 0) then
              loc_ijk(force_ocn_point_i(:),force_ocn_point_j(:),force_ocn_point_k(:)) = 0.0
           elseif (force_ocn_uniform(io) == -1) then
@@ -3965,9 +3980,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                DO k=force_flux_ocn_k1(io,i,j),n_k
-                   force_flux_locn_I(l,i,j,k) = loc_ijk(i,j,k)
-                end do
+                   DO k=goldstein_k1(i,j),n_k
+                      force_flux_locn_I(l,i,j,k) = loc_ijk(i,j,k)
+                   end do
              end do
           end DO
           ! load forcing data array #II
@@ -3976,6 +3991,14 @@ CONTAINS
              loc_ijk(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:)
           elseif (force_ocn_uniform(io) == 2) then
              loc_ijk(:,:,n_k) = phys_ocn(ipo_mask_ocn,:,:,n_k)
+          elseif (force_ocn_uniform(io) == 1) then
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,goldstein_k1(i,j)) = phys_ocn(ipo_mask_ocn,i,j,goldstein_k1(i,j))
+                   end if
+                end do
+             end DO
           elseif (force_ocn_uniform(io) == 0) then
              loc_ijk(force_ocn_point_i(io),force_ocn_point_j(io),force_ocn_point_k(io)) = 1.0
           elseif (force_ocn_uniform(io) == -1) then
@@ -4016,9 +4039,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                DO k=force_flux_ocn_k1(io,i,j),n_k
-                   force_flux_locn_II(l,i,j,k) = loc_ijk(i,j,k)
-                end do
+                   DO k=goldstein_k1(i,j),n_k
+                      force_flux_locn_II(l,i,j,k) = loc_ijk(i,j,k)
+                   end do
              end do
           end DO
           ! load forcing time series data

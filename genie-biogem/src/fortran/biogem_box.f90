@@ -4313,7 +4313,7 @@ CONTAINS
     ! NOTE: flux forcings are in units of mol a-1
     DO i=1,n_i
        DO j=1,n_j
-          DO k=force_restore_ocn_k1(dum_io,i,j),n_k
+          DO k=goldstein_k1(i,j),n_k
              loc_force_restore_ocn = &
                   & force_restore_locn_I(loc_l,i,j,k) + &
                   & force_restore_ocn_sig_x(dum_io)*(force_restore_locn_II(loc_l,i,j,k) - force_restore_locn_I(loc_l,i,j,k))
@@ -4359,7 +4359,7 @@ CONTAINS
     loc_force_flux_ocn_tot = 0.0
     DO i=1,n_i
        DO j=1,n_j
-          DO k=force_flux_ocn_k1(dum_io,i,j),n_k
+          DO k=goldstein_k1(i,j),n_k
              loc_force_flux_ocn = &
                   & force_flux_locn_I(loc_l,i,j,k) + &
                   & force_flux_ocn_sig_x(dum_io)*(force_flux_locn_II(loc_l,i,j,k) - force_flux_locn_I(loc_l,i,j,k))
@@ -4385,7 +4385,7 @@ CONTAINS
        end if
        DO i=1,n_i
           DO j=1,n_j
-             DO k=force_flux_ocn_k1(dum_io,i,j),n_k
+             DO k=goldstein_k1(i,j),n_k
                 SELECT CASE (ocn_type(dum_io))
                 CASE (0,1)
                    force_flux_locn(loc_l,i,j,k) = force_flux_ocn_sig_x(dum_io)*force_flux_locn(loc_l,i,j,k)*loc_force_flux_ocn_rtot
