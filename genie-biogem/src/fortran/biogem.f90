@@ -402,34 +402,6 @@ subroutine biogem(        &
               end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
-                   & '*** DECAY RADIOACTIVE TRACERS ***'
-              ! *** DECAY RADIOACTIVE TRACERS ***
-              ! NOTE: decay of isotopes in atmosphere is implemented in ATCHEM
-              ! NOTE: the decay of ocean tracers is implemented as a (-ve.) flux forcing
-              !       because of ensuring mass conservation in the salinity-normalization tracer advection scheme later ...
-              !       and to do this, units of mol kg-1 (tracer concentration) must be converted to mol yr-1 (flux)
-              ! NOTE: particulate tracers can be adjusted directly
-              ! OCEAN TRACERS
-              DO l=3,n_l_ocn
-                 io = conv_iselected_io(l)
-                 IF (abs(const_lambda_ocn(io)).gt.const_real_nullsmall) THEN
-                    DO k=loc_k1,n_k
-                       locijk_focn(io,i,j,k) = locijk_focn(io,i,j,k) - &
-                            & phys_ocn(ipo_M,i,j,k)*(1.0 - loc_fracdecay_ocn(io))*ocn(io,i,j,k)/loc_dtyr
-                    END DO
-                 end IF
-              end do
-              ! SEDIMENT TRACERS
-              DO l=1,n_l_sed
-                 is = conv_iselected_is(l)
-                 IF (abs(const_lambda_sed(is)).gt.const_real_nullsmall) THEN
-                    DO k=loc_k1,n_k
-                       bio_part(is,i,j,k) = loc_fracdecay_sed(is)*bio_part(is,i,j,k)
-                    END DO
-                 end if
-              END DO
-
-              IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** AEROSOL DISSOLUTION INPUT ***'
               ! *** AEROSOL DISSOLUTION INPUT ***
               ! dissolved from Fe from dust
@@ -1106,7 +1078,7 @@ subroutine biogem(        &
                  ! ------------------------------------------- !
                  ! calculate local variables
                  ! NOTE: take an appropriate value for 'k' ...
-                 !       (for whole ocena, take a surface value as representative)
+                 !       (for whole ocean, take a surface value as representative)
                  SELECT CASE (force_ocn_uniform(io_DIC_14C))
                  case (3)
                     ! whole ocean
@@ -1130,16 +1102,6 @@ subroutine biogem(        &
                       & force_flux_locn(io2l(io_DIC),i,j,k),force_flux_locn(io2l(io_DIC_14C),i,j,k), &
                       & loc_standard,.FALSE.,const_real_null &
                       & )
-
-!par_misc_debug_i = 9
-!par_misc_debug_j = 9
-!           if ((i == par_misc_debug_i) .AND. (j == par_misc_debug_j)) then
-!print*,force_ocn_uniform(io_DIC_14C),k
-!print*,loc_delta_actual,loc_delta_target,loc_delta_source
-!print*,force_restore_locn(io2l(io_DIC),i,j,k),force_restore_locn(io2l(io_DIC_14C),i,j,k)
-!print*,force_flux_locn(io2l(io_DIC),i,j,k),force_flux_locn(io2l(io_DIC_14C),i,j,k)
-!end if
-
                  ! calculate the sign of the DIC input
                  If (loc_delta_actual > loc_delta_target) then
                     if (loc_delta_source < loc_delta_actual) then
@@ -1157,6 +1119,7 @@ subroutine biogem(        &
                     end If
                  end If
                  ! calculate fluxes
+                 ! NOTE: value of <locijk_focn> over-writes and previous forcing-derived values 
                  DO k=loc_k1,n_k
                     locijk_focn(io_DIC,i,j,k)     = loc_force_sign*force_flux_locn(io2l(io_DIC),i,j,k)
                     locijk_focn(io_DIC_13C,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_DIC_13C),i,j,k)
@@ -1524,6 +1487,35 @@ subroutine biogem(        &
                  end IF
 
               end IF
+
+              IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
+                   & '*** DECAY RADIOACTIVE TRACERS ***'
+              ! *** DECAY RADIOACTIVE TRACERS ***
+              ! NOTE: decay of isotopes in atmosphere is implemented in ATCHEM
+              ! NOTE: the decay of ocean tracers is implemented as a (-ve.) flux forcing
+              !       because of ensuring mass conservation in the salinity-normalization tracer advection scheme later ...
+              !       and to do this, units of mol kg-1 (tracer concentration) must be converted to mol yr-1 (flux)
+              ! NOTE: particulate tracers can be adjusted directly
+              ! NOTE: code to come after inversion forcings (so 14C decay fluxes are not over-written)
+              ! OCEAN TRACERS
+              DO l=3,n_l_ocn
+                 io = conv_iselected_io(l)
+                 IF (abs(const_lambda_ocn(io)).gt.const_real_nullsmall) THEN
+                    DO k=loc_k1,n_k
+                       locijk_focn(io,i,j,k) = locijk_focn(io,i,j,k) - &
+                            & phys_ocn(ipo_M,i,j,k)*(1.0 - loc_fracdecay_ocn(io))*ocn(io,i,j,k)/loc_dtyr
+                    END DO
+                 end IF
+              end do
+              ! SEDIMENT TRACERS
+              DO l=1,n_l_sed
+                 is = conv_iselected_is(l)
+                 IF (abs(const_lambda_sed(is)).gt.const_real_nullsmall) THEN
+                    DO k=loc_k1,n_k
+                       bio_part(is,i,j,k) = loc_fracdecay_sed(is)*bio_part(is,i,j,k)
+                    END DO
+                 end if
+              END DO
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN-ATMOPSHERE EXCHANGE FLUXES ***'
