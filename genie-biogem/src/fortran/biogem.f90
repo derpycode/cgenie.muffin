@@ -402,6 +402,35 @@ subroutine biogem(        &
               end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
+                   & '*** DECAY RADIOACTIVE TRACERS ***'
+              ! *** DECAY RADIOACTIVE TRACERS ***
+              ! NOTE: decay of isotopes in atmosphere is implemented in ATCHEM
+              ! NOTE: the decay of ocean tracers is implemented as a (-ve.) flux forcing
+              !       because of ensuring mass conservation in the salinity-normalization tracer advection scheme later ...
+              !       and to do this, units of mol kg-1 (tracer concentration) must be converted to mol yr-1 (flux)
+              ! NOTE: particulate tracers can be adjusted directly
+              ! NOTE: code to come after inversion forcings (so 14C decay fluxes are not over-written)
+              ! OCEAN TRACERS
+              DO l=3,n_l_ocn
+                 io = conv_iselected_io(l)
+                 IF (abs(const_lambda_ocn(io)).gt.const_real_nullsmall) THEN
+                    DO k=loc_k1,n_k
+                       locijk_focn(io,i,j,k) = locijk_focn(io,i,j,k) - &
+                            & phys_ocn(ipo_M,i,j,k)*(1.0 - loc_fracdecay_ocn(io))*ocn(io,i,j,k)/loc_dtyr
+                    END DO
+                 end IF
+              end do
+              ! SEDIMENT TRACERS
+              DO l=1,n_l_sed
+                 is = conv_iselected_is(l)
+                 IF (abs(const_lambda_sed(is)).gt.const_real_nullsmall) THEN
+                    DO k=loc_k1,n_k
+                       bio_part(is,i,j,k) = loc_fracdecay_sed(is)*bio_part(is,i,j,k)
+                    END DO
+                 end if
+              END DO
+
+              IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** AEROSOL DISSOLUTION INPUT ***'
               ! *** AEROSOL DISSOLUTION INPUT ***
               ! dissolved from Fe from dust
@@ -972,9 +1001,105 @@ subroutine biogem(        &
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** INVERSIONS ***'
-              IF (force_restore_ocn_select(io_ALK) .AND. force_flux_ocn_select(io_ALK)) THEN
+                 if (force_restore_ocn_select(io_DIC_14C) .AND. force_flux_ocn_select(io_DIC_14C)) THEN
                  ! ------------------------------------------- !
-                 ! (1) ocean ALK adjustment INVERSIONS
+                 ! (1) 14C INVERSIONS
+                 ! ------------------------------------------- !
+                 ! calculate local variables
+                 ! NOTE: take an appropriate value for 'k' ...
+                 !       (for whole ocean, take a surface value as representative)
+                 SELECT CASE (force_ocn_uniform(io_DIC_14C))
+                 case (3)
+                    ! whole ocean
+                    k = n_k
+                 case (2)
+                    ! surface ocean
+                    k = n_k
+                 case (1)
+                    ! benthic
+                    k = goldstein_k1(i,j)
+                 case default
+                    ! ???
+                 end SELECT
+                 loc_standard = const_standards(ocn_type(io_DIC_14C))
+                 loc_delta_actual = loc_force_actual_d14C
+                 loc_delta_target = fun_calc_isotope_delta( &
+                      & force_restore_locn(io2l(io_DIC),i,j,k),force_restore_locn(io2l(io_DIC_14C),i,j,k), &
+                      & loc_standard,.FALSE.,const_real_null &
+                      & )
+                 loc_delta_source = fun_calc_isotope_delta( &
+                      & force_flux_locn(io2l(io_DIC),i,j,k),force_flux_locn(io2l(io_DIC_14C),i,j,k), &
+                      & loc_standard,.FALSE.,const_real_null &
+                      & )
+                 ! calculate the sign of the DIC input
+                 If (loc_delta_actual > loc_delta_target) then
+                    if (loc_delta_source < loc_delta_actual) then
+                       loc_force_sign = 1.0
+                    else
+                       loc_force_sign = -1.0
+                       if (ctrl_force_invert_noneg) loc_force_sign = 0.0
+                    end If
+                 else
+                    if (loc_delta_source < loc_delta_actual) then
+                       loc_force_sign = -1.0
+                       if (ctrl_force_invert_noneg) loc_force_sign = 0.0
+                    else
+                       loc_force_sign = 1.0
+                    end If
+                 end If
+                 ! calculate fluxes
+                 ! NOTE: value of <locijk_focn> over-writes and previous forcing-derived values 
+                 ! NOTE: preserve existing 14C decay flux
+                 DO k=loc_k1,n_k
+                    locijk_focn(io_DIC,i,j,k)     = loc_force_sign*force_flux_locn(io2l(io_DIC),i,j,k)
+                    locijk_focn(io_DIC_13C,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_DIC_13C),i,j,k)
+                    locijk_focn(io_DIC_14C,i,j,k) = locijk_focn(io_DIC_14C,i,j,k) + &
+                         & loc_force_sign*force_flux_locn(io2l(io_DIC_14C),i,j,k)
+                    IF (force_flux_ocn_select(io_ALK)) then
+                       locijk_focn(io_ALK,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
+                    end if
+                    IF (force_flux_ocn_select(io_Ca)) then
+                       locijk_focn(io_Ca,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_Ca),i,j,k)
+                    end if
+                 END DO
+                 ! optional inversion of pCO2 via ALK flux forcing
+                 IF (force_restore_ocn_select(io_ALK) .AND. force_flux_ocn_select(io_ALK)) THEN
+                    loc_force_actual = dum_sfcatm1(ia_pCO2,i,j)
+                    loc_force_target = force_restore_atm(ia_pCO2,i,j)/par_atm_force_scale_val(ia_pCO2)
+                    ! calculate the sign of the ALK input
+                    if (loc_force_actual > loc_force_target) then
+                       loc_force_sign = 1.0
+                    else
+                       if (ctrl_force_invert_noneg) then
+                          loc_force_sign = 0.0
+                       else
+                          loc_force_sign = -1.0
+                       end if
+                    end If
+                    ! NOTE: whole ocean ALK addition
+                    DO k=loc_k1,n_k
+                       locijk_focn(io_ALK,i,j,n_k) = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
+                       IF (force_flux_ocn_select(io_Ca)) then
+                          locijk_focn(io_Ca,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_Ca),i,j,k)
+                       end if
+                    END DO
+                    ! remove any explicit (carbon) pCO2 forcing (plus recorded diagnostic fluxes)
+                    locij_fatm(ia_pCO2,i,j)     = 0.0
+                    locij_fatm(ia_pCO2_13C,i,j) = 0.0
+                    diag_misc_2D(idiag_misc_2D_FpCO2,i,j)     = locij_fatm(ia_pCO2,i,j)
+                    diag_misc_2D(idiag_misc_2D_FpCO2_13C,i,j) = locij_fatm(ia_pCO2_13C,i,j)
+                 end If
+                 ! record diagnostics
+                 diag_misc_2D(idiag_misc_2D_FDIC,i,j)     = sum(locijk_focn(io_DIC,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FDIC_13C,i,j) = sum(locijk_focn(io_DIC_13C,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FDIC_14C,i,j) = sum(locijk_focn(io_DIC_14C,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FALK,i,j)     = sum(locijk_focn(io_ALK,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FCa,i,j)      = sum(locijk_focn(io_Ca,i,j,:))
+                 ! ------------------------------------------- !
+                 ! ------------------------------------------- !
+              elseif (force_restore_ocn_select(io_ALK) .AND. force_flux_ocn_select(io_ALK)) THEN
+                 ! ------------------------------------------- !
+                 ! (2) ocean ALK adjustment INVERSIONS
                  ! ------------------------------------------- !
                  IF ( force_restore_atm_select(ia_pCO2) .AND. &
                       & ( &
@@ -984,11 +1109,10 @@ subroutine biogem(        &
                       & ) &
                       & ) THEN
                     ! (1a) ocean ALK [GEOENGINEEGING of pCO2]
-                    ! NOTE: re-scale the 'target' in case the atm flux forcing has been scaled (same param applied to both)
                     loc_force_actual = dum_sfcatm1(ia_pCO2,i,j)
-                    loc_force_target = force_restore_atm(ia_pCO2,i,j)/par_atm_force_scale_val(ia_pCO2)
+                    loc_force_target = force_restore_atm(ia_pCO2,i,j)
                     ! calculate the sign of the ALK input
-                    if (loc_force_target < loc_force_actual) then
+                    if (loc_force_actual > loc_force_target) then
                        loc_force_sign = 1.0
                     else
                        if (ctrl_force_invert_noneg) then
@@ -1069,73 +1193,6 @@ subroutine biogem(        &
                  diag_misc_2D(idiag_misc_2D_FALK,i,j)     = sum(locijk_focn(io_ALK,i,j,:))
                  diag_misc_2D(idiag_misc_2D_FDIC,i,j)     = sum(locijk_focn(io_DIC,i,j,:))
                  diag_misc_2D(idiag_misc_2D_FDIC_13C,i,j) = sum(locijk_focn(io_DIC_13C,i,j,:))
-                 diag_misc_2D(idiag_misc_2D_FCa,i,j)      = sum(locijk_focn(io_Ca,i,j,:))
-                 ! ------------------------------------------- !
-                 ! ------------------------------------------- !
-              elseif (force_restore_ocn_select(io_DIC_14C) .AND. force_flux_ocn_select(io_DIC_14C)) THEN
-                 ! ------------------------------------------- !
-                 ! (2) 14C INVERSIONS
-                 ! ------------------------------------------- !
-                 ! calculate local variables
-                 ! NOTE: take an appropriate value for 'k' ...
-                 !       (for whole ocean, take a surface value as representative)
-                 SELECT CASE (force_ocn_uniform(io_DIC_14C))
-                 case (3)
-                    ! whole ocean
-                    k = n_k
-                 case (2)
-                    ! surface ocean
-                    k = n_k
-                 case (1)
-                    ! benthic
-                    k = goldstein_k1(i,j)
-                 case default
-                    ! ???
-                 end SELECT
-                 loc_standard = const_standards(ocn_type(io_DIC_14C))
-                 loc_delta_actual = loc_force_actual_d14C
-                 loc_delta_target = fun_calc_isotope_delta( &
-                      & force_restore_locn(io2l(io_DIC),i,j,k),force_restore_locn(io2l(io_DIC_14C),i,j,k), &
-                      & loc_standard,.FALSE.,const_real_null &
-                      & )
-                 loc_delta_source = fun_calc_isotope_delta( &
-                      & force_flux_locn(io2l(io_DIC),i,j,k),force_flux_locn(io2l(io_DIC_14C),i,j,k), &
-                      & loc_standard,.FALSE.,const_real_null &
-                      & )
-                 ! calculate the sign of the DIC input
-                 If (loc_delta_actual > loc_delta_target) then
-                    if (loc_delta_source < loc_delta_actual) then
-                       loc_force_sign = 1.0
-                    else
-                       loc_force_sign = -1.0
-                       if (ctrl_force_invert_noneg) loc_force_sign = 0.0
-                    end If
-                 else
-                    if (loc_delta_source < loc_delta_actual) then
-                       loc_force_sign = -1.0
-                       if (ctrl_force_invert_noneg) loc_force_sign = 0.0
-                    else
-                       loc_force_sign = 1.0
-                    end If
-                 end If
-                 ! calculate fluxes
-                 ! NOTE: value of <locijk_focn> over-writes and previous forcing-derived values 
-                 DO k=loc_k1,n_k
-                    locijk_focn(io_DIC,i,j,k)     = loc_force_sign*force_flux_locn(io2l(io_DIC),i,j,k)
-                    locijk_focn(io_DIC_13C,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_DIC_13C),i,j,k)
-                    locijk_focn(io_DIC_14C,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_DIC_14C),i,j,k)
-                    IF (force_flux_ocn_select(io_ALK)) then
-                       locijk_focn(io_ALK,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
-                    end if
-                    IF (force_flux_ocn_select(io_Ca)) then
-                       locijk_focn(io_Ca,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_Ca),i,j,k)
-                    end if
-                 END DO
-                 ! record diagnostics
-                 diag_misc_2D(idiag_misc_2D_FDIC,i,j)     = sum(locijk_focn(io_DIC,i,j,:))
-                 diag_misc_2D(idiag_misc_2D_FDIC_13C,i,j) = sum(locijk_focn(io_DIC_13C,i,j,:))
-                 diag_misc_2D(idiag_misc_2D_FDIC_14C,i,j) = sum(locijk_focn(io_DIC_14C,i,j,:))
-                 diag_misc_2D(idiag_misc_2D_FALK,i,j)     = sum(locijk_focn(io_ALK,i,j,:))
                  diag_misc_2D(idiag_misc_2D_FCa,i,j)      = sum(locijk_focn(io_Ca,i,j,:))
                  ! ------------------------------------------- !
                  ! ------------------------------------------- !
@@ -1487,35 +1544,6 @@ subroutine biogem(        &
                  end IF
 
               end IF
-
-              IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
-                   & '*** DECAY RADIOACTIVE TRACERS ***'
-              ! *** DECAY RADIOACTIVE TRACERS ***
-              ! NOTE: decay of isotopes in atmosphere is implemented in ATCHEM
-              ! NOTE: the decay of ocean tracers is implemented as a (-ve.) flux forcing
-              !       because of ensuring mass conservation in the salinity-normalization tracer advection scheme later ...
-              !       and to do this, units of mol kg-1 (tracer concentration) must be converted to mol yr-1 (flux)
-              ! NOTE: particulate tracers can be adjusted directly
-              ! NOTE: code to come after inversion forcings (so 14C decay fluxes are not over-written)
-              ! OCEAN TRACERS
-              DO l=3,n_l_ocn
-                 io = conv_iselected_io(l)
-                 IF (abs(const_lambda_ocn(io)).gt.const_real_nullsmall) THEN
-                    DO k=loc_k1,n_k
-                       locijk_focn(io,i,j,k) = locijk_focn(io,i,j,k) - &
-                            & phys_ocn(ipo_M,i,j,k)*(1.0 - loc_fracdecay_ocn(io))*ocn(io,i,j,k)/loc_dtyr
-                    END DO
-                 end IF
-              end do
-              ! SEDIMENT TRACERS
-              DO l=1,n_l_sed
-                 is = conv_iselected_is(l)
-                 IF (abs(const_lambda_sed(is)).gt.const_real_nullsmall) THEN
-                    DO k=loc_k1,n_k
-                       bio_part(is,i,j,k) = loc_fracdecay_sed(is)*bio_part(is,i,j,k)
-                    END DO
-                 end if
-              END DO
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN-ATMOPSHERE EXCHANGE FLUXES ***'
