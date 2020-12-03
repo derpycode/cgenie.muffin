@@ -7158,6 +7158,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>switch to limit bubble formation</description>
                     </param>
+                    <param name="par_sed_hydrate_forcerun">
+			<value datatype="boolean">.false.</value>
+                        <description>contine run even with carbchem error</description>
+                    </param>
                     <param name="par_sed_hydrate_opt_org">
 			<value datatype="string">muds</value>
                         <description>option for how Corg is calculated</description>
@@ -7201,6 +7205,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_hydrate_savefreq">
 			<value datatype="integer">10</value>
                         <description>frequency to save data</description>
+                    </param>
+                    <param name="par_sed_hydrate_istart">
+			<value datatype="integer">0</value>
+                        <description>starting time to implement hydrate-feedback</description>
                     </param>
 <!-- DIAGENESIS SCHEME: ARCHER 1991  -->
                     <param name="par_sed_archer1991_dissc">

@@ -254,6 +254,9 @@ CONTAINS
        loc_sed_diagen_fCorg = (1.0 - loc_sed_pres_fracC)*loc_new_sed(is_POC)
        ! For hydrate coupling 
        if (par_sed_hydrate_on .and. trim(par_sed_hydrate_opt_org) =='omen') then 
+          ! sedv_map(dum_i,dum_j) = (fun_calc_sed_mass(loc_new_sed(:)) - fun_calc_sed_mass(loc_dis_sed(:)))/dum_dtyr  ! g/cm2/yr
+          sedv_map(dum_i,dum_j) = sed_diag(idiag_OMEN_bur,dum_i,dum_j)*1./(1.-0.85)/dum_dtyr  &! cm/yr  
+             *(2.65*(1.-0.67))  ! converting to g cm-2 yr-1 (using the assumed porosity 0.67 and sediment grain density 2.65 g/cm3) 
           om_map(dum_i,dum_j) = loc_sed_mean_OM_bot
           ! om_map(dum_i,dum_j) = loc_sed_mean_OM_top
           omfrc_map(dum_i,dum_j) = loc_sed_pres_fracC
@@ -1392,7 +1395,10 @@ CONTAINS
     real::loc_delta_Corg
     real::loc_alpha                                            ! 
     real::loc_R                                                ! local isotope R, local (isotope specific) r's
-    REAL,DIMENSION(n_sed)::loc_fsed                            ! 
+    REAL,DIMENSION(n_sed)::loc_fsed                            !
+    
+    real::loc_sed_vsed_muds                                    ! burial rate caculated from Muds lookup table; YK added 
+    real::loc_sed_OM_muds                                      ! OM from Muds lookup table; YK added 
 
     ! *** INITIALIZE VARIABLES ****************************************************************************************************
     ! zero local sediment arrays
@@ -1496,6 +1502,39 @@ CONTAINS
              end if
           end if
        end DO
+    case ('buffett2004muds')
+       ! Use lookup tables used by Buffett & Archer (2004 EPSL) for muds 
+       ! use muds to get om conc. (wt%) and sediment flux (g/cm2/yr) from Muds results
+       loc_sed_vsed_muds = 0.
+       loc_sed_OM_muds = 0.
+       call interp_muds(dum_sfcsumocn(io_O2)*1e6,dum_D,loc_sed_vsed_muds,loc_sed_OM_muds)
+       ! NOTE: the units of the Corg flux must be changed from (cm3 cm-2) to (mol cm-2 yr-1) and then to (mmol m-2 d-1)
+       loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
+       ! 1. calculate burial OM flux in mol m-2 yr-1 consistent with OM wt% and burial rate 
+       loc_sed_pres_fracC =  &
+          (2650.d0/30d-3)*1d-2*(1d0-0.69d0)*loc_sed_OM_muds  &! converting OM wt% to mol bulk m-3
+             *loc_sed_vsed_muds*10d0/(2.65d0*(1d0-0.67d0))*1d2*1d-2/1d3  ! converting g cm-2 yr-1 to m yr-1 
+       ! 2. converting the C fraction that is preserved 
+       loc_sed_pres_fracC = loc_sed_pres_fracC/(sed_fsed(is_POC,dum_i,dum_j)/dum_dtyr/conv_cm2_m2)
+       loc_sed_pres_fracC = min(1.,max(0.,loc_sed_pres_fracC))  ! limit to 0-1
+       ! calculate the return rain flux back to ocean
+       ! NOTE: apply estimated fractional preservation
+       ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          if ( &
+               & (sed_dep(is) == is_POC) .OR. &
+               & (sed_type(is) == par_sed_type_POM) .OR. &
+               & (sed_type(sed_dep(is)) == par_sed_type_POM) &
+               & ) then
+             if (sed_type(is) == par_sed_type_scavenged) then
+                loc_dis_sed(is) = 0.0
+             else
+                loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
+                loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
+             end if
+          end if
+       end DO
     case ('dunne2007')
        ! Following Dunne et al. [2007]
        ! NOTE: the units of the Corg flux must be changed from (cm3 cm-2) to (mol cm-2 yr-1) and then to (mmol m-2 d-1)
@@ -1529,6 +1568,10 @@ CONTAINS
             & )
        ! For hydrate coupling 
        if (par_sed_hydrate_on .and. trim(par_sed_hydrate_opt_org) =='omen') then 
+          ! sedv_map(dum_i,dum_j) = (fun_calc_sed_mass(loc_new_sed(:)) - fun_calc_sed_mass(loc_dis_sed(:)))/dum_dtyr  ! g/cm2/yr
+          sedv_map(dum_i,dum_j) = sed_diag(idiag_OMEN_bur,dum_i,dum_j)*1./(1.-0.85)/dum_dtyr  &! cm/yr  
+             *(2.65*(1.-0.67))  ! converting to g cm-2 yr-1 (using the assumed porosity 0.67 and sediment grain density 2.65 g/cm3) 
+          ! assume same burial rate as in OMEN but changed to g/cm2/yr as required in hydrate model
           om_map(dum_i,dum_j) = loc_sed_mean_OM_bot
           ! om_map(dum_i,dum_j) = loc_sed_mean_OM_top
           omfrc_map(dum_i,dum_j) = loc_sed_pres_fracC

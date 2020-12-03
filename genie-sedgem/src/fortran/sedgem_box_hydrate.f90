@@ -37,6 +37,7 @@ real,save::ch4flx_map_INIT(n_i,n_j)
 real,save::h_diss_map(n_i,n_j)
 real,save::b_diss_map(n_i,n_j)
 real,save::ch4gen_map(n_i,n_j)
+real,save::ch4adv_map(n_i,n_j)
 real,save::so4red_map(n_i,n_j)
 real,save::aom_map(n_i,n_j)
 real,save::degas_map(n_i,n_j)
@@ -80,10 +81,11 @@ select case(trim(par_sed_hydrate_opt_org))
         if (trim(par_sed_diagen_Corgopt)=='huelse2016') then 
             loc_org_0 = om_map(dum_i,dum_j) ! om_map records the results of OMEN in sedgem_box
             ! calculating OM conc. from OM flux and burial rate 
+            loc_v_sed = sedv_map(dum_i,dum_j)  ! g cm-2 yr-1
             loc_org_0 = omfrc_map(dum_i,dum_j)*ombur_map(dum_i,dum_j) &! om_map records the results of OMEN in sedgem_box
                 /( &
                 (2650.d0/30d-3)*1d-2*(1d0-0.69d0)*  &! mol m-2 yr-1
-                loc_v_sed*10d0/(2.65d0*(1d0-0.67d0))*1d2*1d-2/1d3 &! m/yr 
+                loc_v_sed/(2.65d0*(1d0-0.67d0))*1d3*1d-2/1d3 &! m/yr 
                 )  
             om_map(dum_i,dum_j) = loc_org_0
             ! print*,'omen',loc_org_0,loc_v_sed,fun_calc_sed_mass(new_sed_in(:)),fun_calc_sed_mass(dis_sed_in(:)),dum_dtyr  
@@ -411,7 +413,7 @@ wdpth = wdpth_in
 wtemp = wtemp_in - const_zeroC
 sal = sal_in/58.44d0  ! g/kg to mol/kg
 xis = sal/(1000d0/18d0) ! mole fraction assuming salt is all NaCl
-v_sed = v_sed_in*10d0/(2.65d0*(1d0-0.67d0))*1d2 ! converting g/cm2/yr to cm/kyr where porosity 0.67 and solid density 2.65 is assumed 
+v_sed = v_sed_in/(2.65d0*(1d0-0.67d0))*1d3 ! converting g/cm2/yr to cm/kyr where porosity 0.67 and solid density 2.65 is assumed 
 so4s = so4s_in
 cs_0 = so4s*1d-3  ! converting mM to M
 ! cm_0 = cm_0_in
@@ -491,13 +493,18 @@ if(loc_margin <= 0d0 .or. (.not.bubble_only.and.hszflg == 2)) then
     so4flx_map(dum_i,dum_j) = 0.
     dicflx_map(dum_i,dum_j) = 0.
     alkflx_map(dum_i,dum_j) = 0.
+    ch4gen_map(dum_i,dum_j) = 0.
+    ch4adv_map(dum_i,dum_j) = 0.
+    so4red_map(dum_i,dum_j) = 0.
+    degas_map(dum_i,dum_j) = 0.
+    aom_map(dum_i,dum_j) = 0.
     zs_map(dum_i,dum_j) = loc_zs
     hsz_map(dum_i,dum_j) = loc_hsz
     ceqh_map(dum_i,dum_j) = ceqh
     ceqb_map(dum_i,dum_j) = ceqb
     heatflow_map(dum_i,dum_j) = geotherm_in*1.5*1000.
     depth_map(dum_i,dum_j) = wdpth
-    om_map(dum_i,dum_j) = org_0
+    om_map(dum_i,dum_j) = org_0 * frac
     btso4_map(dum_i,dum_j) = so4s
     temp_map(dum_i,dum_j) = wtemp
     sedv_map(dum_i,dum_j) = v_sed   ! cm/kyr
@@ -507,16 +514,19 @@ if(loc_margin <= 0d0 .or. (.not.bubble_only.and.hszflg == 2)) then
     return
 endif
 
-inquire(file=trim(adjustl(outdir))//'res/.', exist=dir_e)
-if (.not.dir_e) then 
-    irec_hydrate = 0
-endif 
+! inquire(file=trim(adjustl(outdir))//'res/.', exist=dir_e)
+! if (.not.dir_e) then 
+    ! irec_hydrate = 0
+! endif 
     
 call system('mkdir -p '//trim(adjustl(outdir))//'profiles/'//trim(adjustl(outfilename)))
 call system('mkdir -p '//trim(adjustl(outdir))//'res')
 
 call checkfile(trim(adjustl(outdir))//'/profiles/'//trim(adjustl(outfilename))&
     //'/org.txt',first_call)
+
+
+call checkfile(trim(adjustl(outdir))//'/res/Global_C-0.res',dir_e)
 
 if (hydrate_restart) then 
     call checkfile(trim(adjustl(resdir))//'/profiles/'//trim(adjustl(outfilename))&
@@ -525,6 +535,8 @@ if (hydrate_restart) then
 endif 
 
 ! if(first_call)irec_hydrate = 0
+if(first_call .and. (.not. irec_hydrate> 0)) irec_hydrate = 0
+! if(dir_e .and. (.not. irec_hydrate>=0)) irec_hydrate = 0
 
 if (first_call) then 
     first_call_save = .true.
@@ -1019,9 +1031,11 @@ timeloop:do
         endif 
     endif 
     
-    write(file_ch4flx,*) time,(sum(ch4flx(iflx,:)*dz(:)),iflx=1,nflx)
-    write(file_so4flx,*) time,(sum(so4flx(iflx,:)*dz(:)),iflx=1,nflx)
-    write(file_bnd,*) time,wtemp,so4s
+    if (.not.first_call) then 
+        write(file_ch4flx,*) time,(sum(ch4flx(iflx,:)*dz(:)),iflx=1,nflx)
+        write(file_so4flx,*) time,(sum(so4flx(iflx,:)*dz(:)),iflx=1,nflx)
+        write(file_bnd,*) time,wtemp,so4s
+    endif 
             
     if (time>=time_fin) exit timeloop
     
@@ -1097,6 +1111,7 @@ if (frac*ombur_map(dum_i,dum_j)*omfrc_map(dum_i,dum_j) > 0d0 &
     ! pause
 endif 
 
+ch4adv_map(dum_i,dum_j) = sum(ch4flx(iadv,:)*dz(:))  
 ch4gen_map(dum_i,dum_j) = sum(ch4flx(irxn_om,:)*dz(:))  
 so4red_map(dum_i,dum_j) = sum(so4flx(irxn_om,:)*dz(:))  
 aom_map(dum_i,dum_j) = sum(so4flx(irxn_aom,:)*dz(:))  
@@ -1138,6 +1153,7 @@ select case(trim(par_sed_hydrate_opt_org))
                     - degas_map(dum_i,dum_j) &
                     + ch4gen_map(dum_i,dum_j) &
                     + aom_map(dum_i,dum_j) &
+                    + ch4adv_map(dum_i,dum_j) &!  added 7/7/2020
                     )
             else 
                 so4flx_map(dum_i,dum_j) = ( &
@@ -1147,6 +1163,7 @@ select case(trim(par_sed_hydrate_opt_org))
                         - degas_map(dum_i,dum_j) &
                         + ch4gen_map(dum_i,dum_j) &
                         + aom_map(dum_i,dum_j) &
+                        + ch4adv_map(dum_i,dum_j) &!  added 7/7/2020
                     )  &
                     )
                 ! so4flx_map(dum_i,dum_j) = sum(so4flx(iadv,:)*dz(:)) + sum(so4flx(idif,:)*dz(:))
@@ -1158,6 +1175,7 @@ select case(trim(par_sed_hydrate_opt_org))
                         - degas_map(dum_i,dum_j) &
                         + ch4gen_map(dum_i,dum_j) &
                         + aom_map(dum_i,dum_j) &
+                        + ch4adv_map(dum_i,dum_j) &!  added 7/7/2020
                         ) &
                     )
                 alkflx_map(dum_i,dum_j) = (&
@@ -1167,6 +1185,7 @@ select case(trim(par_sed_hydrate_opt_org))
                         - degas_map(dum_i,dum_j) &
                         + ch4gen_map(dum_i,dum_j) &
                         + aom_map(dum_i,dum_j)  &
+                        + ch4adv_map(dum_i,dum_j) &!  added 7/7/2020
                         )&
                     )
                 ! ch4flx_map(dum_i,dum_j) = - (cb*rho_b/mch4)*sum(bflx(irxn_dec,:)*dz(:)) &
@@ -1199,7 +1218,7 @@ ceqh_map(dum_i,dum_j) = ceqh
 ceqb_map(dum_i,dum_j) = ceqb
 heatflow_map(dum_i,dum_j) = geotherm_in*1.5*1000.
 depth_map(dum_i,dum_j) = wdpth
-om_map(dum_i,dum_j) = org_0/frac
+om_map(dum_i,dum_j) = org_0 ! /frac
 btso4_map(dum_i,dum_j) = so4s
 temp_map(dum_i,dum_j) = wtemp
 sedv_map(dum_i,dum_j) = v_sed/(1d-2/1d3) ! converting m/yr to cm/kyr 
@@ -1454,7 +1473,7 @@ wdpth = wdpth_in
 wtemp = wtemp_in - const_zeroC
 sal = sal_in/58.44d0  ! g/kg to mol/kg
 xis = sal/(1000d0/18d0) ! mole fraction assuming salt is all NaCl
-v_sed = v_sed_in*10d0/(2.65d0*(1d0-0.67d0))*1d2 ! converting g/cm2/yr to cm/kyr where porosity 0.67 and solid density 2.65 is assumed 
+v_sed = v_sed_in/(2.65d0*(1d0-0.67d0))*1d3 ! converting g/cm2/yr to cm/kyr where porosity 0.67 and solid density 2.65 is assumed 
 so4s = so4s_in
 cs_0 = so4s*1d-3  ! converting mM to M
 cm_0 = cm_0_in
@@ -2377,7 +2396,7 @@ implicit none
 integer i,j
 character*256 workdir,intchr
 real h_globe,b_globe,ch4flx_globe,ombur_globe,omdec_globe,omprs_globe,so4flx_globe,dicflx_globe,alkflx_globe
-real aom_globe,ch4gen_globe,so4red_globe,degas_globe
+real aom_globe,ch4gen_globe,so4red_globe,degas_globe,ch4adv_globe
 logical dir_e
 
 ! print*, ' printing data by signal tracking model '
@@ -2385,12 +2404,13 @@ logical dir_e
 workdir = trim(par_outdir_name)
 workdir = trim(adjustl(workdir))//'/hydrate/res/'
 
-inquire(file=trim(adjustl(workdir))//'/hydrate/res/.', exist=dir_e)
-if (.not.dir_e) then 
-    irec_hydrate = 0
-    call system('mkdir -p '//trim(adjustl(workdir)))
-endif 
+! inquire(file=trim(adjustl(workdir))//'/hydrate/res/.', exist=dir_e)
+! if (.not.dir_e) then 
+    ! irec_hydrate = 0
+    ! call system('mkdir -p '//trim(adjustl(workdir)))
+! endif 
 
+call system('mkdir -p '//trim(adjustl(workdir)))
 write(intchr,*)irec_hydrate
 
 h_globe = 0d0
@@ -2403,6 +2423,7 @@ ombur_globe = 0d0
 omdec_globe = 0d0
 omprs_globe = 0d0
 ch4gen_globe = 0d0
+ch4adv_globe = 0d0
 so4red_globe = 0d0
 aom_globe = 0d0
 degas_globe = 0d0
@@ -2417,6 +2438,11 @@ do j=1,n_j
             ch4flx_map(i,j)   = const_real_null
             dicflx_map(i,j)   = const_real_null
             alkflx_map(i,j)   = const_real_null
+            so4red_map(i,j)   = const_real_null
+            ch4adv_map(i,j)   = const_real_null
+            ch4gen_map(i,j)   = const_real_null
+            degas_map(i,j)    = const_real_null
+            aom_map(i,j)      = const_real_null
             zs_map(i,j)       = const_real_null
             hsz_map(i,j)      = const_real_null
             ceqh_map(i,j)     = const_real_null
@@ -2443,6 +2469,7 @@ do j=1,n_j
         if (abs(dicflx_map(i,j))<abs(const_real_null)) dicflx_globe = dicflx_globe + dicflx_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
         if (abs(alkflx_map(i,j))<abs(const_real_null)) alkflx_globe = alkflx_globe + alkflx_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
         if (abs(ch4gen_map(i,j))<abs(const_real_null)) ch4gen_globe = ch4gen_globe + ch4gen_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
+        if (abs(ch4adv_map(i,j))<abs(const_real_null)) ch4adv_globe = ch4adv_globe + ch4adv_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
         if (abs(so4red_map(i,j))<abs(const_real_null)) so4red_globe = so4red_globe + so4red_map(i,j)*phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
         if (abs(aom_map(i,j))   <abs(const_real_null)) aom_globe    = aom_globe    + aom_map(i,j)   *phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
         if (abs(degas_map(i,j)) <abs(const_real_null)) degas_globe  = degas_globe  + degas_map(i,j) *phys_sed(ips_A,i,j)*max(0d0,margin_map(i,j))
@@ -2459,51 +2486,91 @@ do j=1,n_j
     write(100,*) (mhinv_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'mbinv-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (mbinv_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'ch4flx-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (ch4flx_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'so4flx-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (so4flx_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
 enddo 
 close(100)
+
+open(unit=100,file=trim(adjustl(workdir))//'so4red-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+do j=1,n_j
+    write(100,*) (so4red_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
+enddo 
+close(100)
+
+open(unit=100,file=trim(adjustl(workdir))//'ch4gen-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+do j=1,n_j
+    write(100,*) (ch4gen_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
+enddo 
+close(100)
+
+open(unit=100,file=trim(adjustl(workdir))//'ch4adv-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+do j=1,n_j
+    write(100,*) (ch4adv_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
+enddo 
+close(100)
+
+open(unit=100,file=trim(adjustl(workdir))//'degas-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+do j=1,n_j
+    write(100,*) (degas_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
+enddo 
+close(100)
+
+open(unit=100,file=trim(adjustl(workdir))//'aom-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
+do j=1,n_j
+    write(100,*) (aom_map(i,j)*margin_map(i,j)*merge(1d0,-1d0,margin_map(i,j)>=0d0),i=1,n_i)
+enddo 
+close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'zs-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (zs_map(i,j),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'hsz-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (hsz_map(i,j),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'ceqh-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (ceqh_map(i,j),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'ceqb-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (ceqb_map(i,j),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'h_diss-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (h_diss_map(i,j),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'b_diss-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (b_diss_map(i,j),i=1,n_i)
 enddo 
 close(100)
+
 open(unit=100,file=trim(adjustl(workdir))//'tot_diss-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
 do j=1,n_j
     write(100,*) (h_diss_map(i,j) + b_diss_map(i,j),i=1,n_i)
@@ -2511,6 +2578,7 @@ enddo
 close(100)
 
 if (irec_hydrate == par_sed_hydrate_savefreq) then 
+! if (irec_hydrate == 0) then 
     open(unit=100,file=trim(adjustl(workdir))//'heatflow-'//trim(adjustl(intchr))//'.res',action='write',status='unknown')
     do j=1,n_j
         write(100,*) (heatflow_map(i,j),i=1,n_i)
@@ -2572,6 +2640,7 @@ write(100,*) 'Global CH4 genesis         : ', ch4gen_globe*12d0/1d15, ' (Pg C yr
 write(100,*) 'Global SO4 reduction       : ', so4red_globe*12d0/1d15, ' (Pg C yr-1) = ',so4red_globe, ' (mol yr-1)'
 write(100,*) 'Global AOM                 : ', aom_globe*12d0/1d15,    ' (Pg C yr-1) = ',aom_globe,    ' (mol yr-1)'
 write(100,*) 'Global CH4 degas           : ', degas_globe*12d0/1d15,  ' (Pg C yr-1) = ',degas_globe,  ' (mol yr-1)'
+write(100,*) 'Global CH4 adv             : ', ch4adv_globe*12d0/1d15, ' (Pg C yr-1) = ',ch4adv_globe, ' (mol yr-1)'
 write(100,*) '---------------------------'
 write(100,*) 'Global OM rain             : ', ombur_globe*12d0/1d15,' (Pg C yr-1) = ',ombur_globe, ' (mol yr-1)'
 write(100,*) 'Global OM degradation      : ', omdec_globe*12d0/1d15,' (Pg C yr-1) = ',omdec_globe, ' (mol yr-1)'
@@ -4593,7 +4662,7 @@ if (any(hx>1d0) .or. any(bx>1d0)) then
             rxn_hb(iz)=0d0
         endif
     enddo
-    pause
+    ! pause
     return
 endif 
 

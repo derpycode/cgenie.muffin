@@ -111,7 +111,8 @@ MODULE sedgem_lib
   logical::par_sed_hydrate_feedback                              ! switch to enable feedback from hydrate dissociation
   logical::par_sed_hydrate_restart                               ! switch to enable restart from different run 
   logical::par_sed_bubble_limit                                  ! switch to limit bubble formation  
-  NAMELIST /ini_sedgem_nml/par_sed_hydrate_on,par_sed_hydrate_hunter2013,par_sed_hydrate_feedback,par_sed_hydrate_restart,par_sed_bubble_limit
+  logical::par_sed_hydrate_forcerun                              ! proceed simulation even with carbonate chem error  
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_on,par_sed_hydrate_hunter2013,par_sed_hydrate_feedback,par_sed_hydrate_restart,par_sed_bubble_limit,par_sed_hydrate_forcerun
   character(len=63)::par_sed_hydrate_opt_org                     ! option for how Corg is calculated
   character(len=63)::par_sed_hydrate_opt_margin                  ! option for how margin is chosen
   character(len=63)::par_sed_hydrate_opt_geotherm                ! option for how geotherm is chosen
@@ -126,7 +127,8 @@ MODULE sedgem_lib
   REAL::par_sed_hydrate_orgCfrac                                 ! OM available for ch4gen and so4red
   NAMELIST /ini_sedgem_nml/par_sed_hydrate_threshold,par_sed_hydrate_geotherm,par_sed_bubble_threshold,par_sed_hydrate_exflow,par_sed_hydrate_orgCfrac
   integer::par_sed_hydrate_savefreq                              ! frequency to save data 
-  NAMELIST /ini_sedgem_nml/par_sed_hydrate_savefreq
+  integer::par_sed_hydrate_istart                                ! integer to denote the starting time to implement hydrate-feedback 
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_savefreq,par_sed_hydrate_istart
   ! ------------------- DIAGENESIS SCHEME: ARCHER 1991 --------------------------------------------------------------------------- !
   REAL::par_sed_archer1991_dissc                                 ! dissolution rate constant, units of 1/s
   REAL::par_sed_archer1991_disscpct                              ! dissolution rate scaling (%)

@@ -121,6 +121,7 @@ CONTAINS
        print*,'Switch to enable feedback from hydrate dissociation : ',par_sed_hydrate_feedback
        print*,'switch to enable restart from different run         : ',par_sed_hydrate_restart
        print*,'switch to limit bubble formation                    : ',par_sed_bubble_limit
+       print*,'continue run even with carbchem error               : ',par_sed_hydrate_forcerun
        print*,'Option for how Corg is calculated                   : ',par_sed_hydrate_opt_org
        print*,'Option for how margin is chosen                     : ',par_sed_hydrate_opt_margin
        print*,'Option for how geotherm is chosen                   : ',par_sed_hydrate_opt_geotherm
@@ -132,6 +133,7 @@ CONTAINS
        print*,'frequency to save data                              : ',par_sed_hydrate_savefreq
        print*,'water flux of external source in cm/kyr             : ',par_sed_hydrate_exflow
        print*,'OM available for ch4gen and so4red                  : ',par_sed_hydrate_orgCfrac
+       print*,'starting time to implement hydrate-feedback         : ',par_sed_hydrate_istart
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc

@@ -143,6 +143,8 @@ MODULE sedgem_box_benthic
     real DALK1                      ! ALK diffusion coefficient in bioturbated layer (cm2/yr)
     real DALK2                      ! ALK diffusion coefficient in non-bioturbated layer (cm2/yr)
 
+    logical flg_err_YK              ! YK added; flag when solution cannont be obtained in FUN_zbrent
+
     SAVE
 
 
@@ -279,6 +281,8 @@ CONTAINS
 
         ! dum_sfcsumocn mol/kg -> SEDIMENT MODEL needs mol/cm^3, assuming 10^3 kg/m^3 as density of seawater
         dum_swiconc_O2 = dum_sfcsumocn(io_O2)*1e-3
+        ! YK added 
+        dum_swiconc_O2 = max(1e-15,dum_swiconc_O2)
         loc_BW_O2_concentration = dum_sfcsumocn(io_O2)*1e+6		! BW [O2] in muM for calculating P-regeneration
         if(ocn_select(io_NO3))then
             dum_swiconc_NO3 = dum_sfcsumocn(io_NO3)*1e-3
@@ -645,6 +649,12 @@ CONTAINS
                             !                    loc_SO4_swiflux = loc_new_sed(is_POC)*conv_POC_cm3_mol*(-138.0/212.0)
                             call sub_huelseetal2016_zSO4(dum_swiconc_SO4, loc_SO4_swiflux)
                             !                    print*,'OMEN loc_SO4_swiflux = ', loc_SO4_swiflux
+                            ! YK added the followinf if-clause 
+                            if (flg_err_YK) then 
+                                print *, 'error in calculating zso4 with sub_huelseetal2016_zSO4'
+                                print *, dum_swiconc_O2,dum_swiconc_NO3,dum_swiconc_SO4
+                                pause 
+                            endif 
                             if(loc_SO4_swiflux > 0.0)then
 !                                print*,' '
                                 print*,'---------- loc_SO4_swiflux positiv ----------', loc_SO4_swiflux
@@ -1143,6 +1153,8 @@ CONTAINS
         ! Alkalinity
         DALK1=(qdispALK+adispALK*loc_TempC)*dispFactor+Dbio;                ! ALK diffusion coefficient in bioturbated layer (cm2/yr)
         DALK2=(qdispALK+adispALK*loc_TempC)*dispFactor;                     ! ALK diffusion coefficient in non-bioturbated layer (cm2/yr)
+        
+        flg_err_YK = .false. ! YK added error flag which is initially false.
 
     end SUBROUTINE sub_huelseetal2016_initialize
     
@@ -1401,6 +1413,12 @@ CONTAINS
             zL=1e-10
             tol=1e-16
             zox = FUN_zbrent(FUN_zO2, zL, zinf, tol)
+            ! YK added the following if-clause 
+            if (flg_err_YK) then 
+                print *, 'error in calculating zox with FUN_zbrent'
+                print *, zL,zinf
+                pause 
+            endif 
             zno3 = zox
             loc_conczinf = 0.0
         !            stop
@@ -1673,6 +1691,12 @@ CONTAINS
                 zno3 = FUN_zbrent(FUN_zNO3, max(zL,zox), zinf, tol)
                 !        print*,'$$$$ calculated zno3 =', zno3
                 !        zno3 = 7.4319         ! use qualifier d0 fuer double: 7.4319d0
+                ! YK added the following if-clause 
+                if (flg_err_YK) then 
+                    print *, 'error in calculating zno3 with FUN_zbrent'
+                    print *, max(zL,zox),zinf,zox
+                    pause 
+                endif 
                 bctype = 1;
                 conczinf = 0.0
             END IF
@@ -1912,6 +1936,14 @@ CONTAINS
                 tol=1e-16
                 zso4 = FUN_zbrent(FUN_zSO4, max(zno3,zL), zinf, tol)
 !                print*,'CALCULATE zso4 = ', zso4
+                ! YK added the following if-clause 
+                if (flg_err_YK) then 
+                    print *, 'error in calculating zso4 with FUN_zbrent'
+                    print *, max(zno3,zL),zinf,zox,zno3
+                    return
+                    ! print*, 
+                    ! pause 
+                endif 
             END IF
         !    print*,'bctype, zso4 ', bctype, zso4
         END IF !(zno3 == zinf)
@@ -4442,7 +4474,9 @@ CONTAINS
         !was     *'root must be bracketed for FUN_zbrent'
         IF((fa.gt.0..and.fb.gt.0.).or.(fa.lt.0..and.fb.lt.0.))THEN
             print*,'root must be bracketed for FUN_zbrent'
-            STOP
+            ! STOP  ! YK comment out 
+            flg_err_YK = .true.   ! YK added 
+            return               ! YK added 
         ELSE
             c=b
             fc=fb

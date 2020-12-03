@@ -639,26 +639,30 @@ SUBROUTINE sedgem(          &
            IF (irec_hydrate == 0) then 
               ch4flx_map(i,j) = 0.
            ELSEIF (irec_hydrate > 0) then 
-              IF (par_sed_hydrate_feedback .and. margin_map(i,j)>=0.) THEN
-                 if (.not. ocn_select(io_CH4)) then 
-                    dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*dicflx_map(i,j)/conv_yr_s
-                    dum_sfxocn(io_ALK,i,j) = dum_sfxocn(io_ALK,i,j) +  margin_map(i,j)*alkflx_map(i,j)/conv_yr_s
-                    dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) +  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
-                    dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) -  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
-                    ! dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
-                    ! if (ocn_select(io_SO4)) then 
-                       ! dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) -  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
-                    ! endif 
-                    ! if (ocn_select(io_H2S)) then 
-                       ! dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
-                    ! endif 
-                 elseif (ocn_select(io_CH4)) then 
-                    dum_sfxocn(io_CH4,i,j) = dum_sfxocn(io_CH4,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
-                    dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*dicflx_map(i,j)/conv_yr_s
-                    dum_sfxocn(io_ALK,i,j) = dum_sfxocn(io_ALK,i,j) +  margin_map(i,j)*alkflx_map(i,j)/conv_yr_s
-                    dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) +  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
-                    dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) -  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
-                 endif 
+              IF (irec_hydrate <  par_sed_hydrate_istart) then 
+                 ch4flx_map(i,j) = 0.
+              else IF (irec_hydrate >=  par_sed_hydrate_istart) then 
+                 IF (par_sed_hydrate_feedback .and. margin_map(i,j)>=0.) THEN
+                    if (.not. ocn_select(io_CH4)) then 
+                       dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*dicflx_map(i,j)/conv_yr_s
+                       dum_sfxocn(io_ALK,i,j) = dum_sfxocn(io_ALK,i,j) +  margin_map(i,j)*alkflx_map(i,j)/conv_yr_s
+                       dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) +  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                       dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) -  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                       ! dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                       ! if (ocn_select(io_SO4)) then 
+                          ! dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) -  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                       ! endif 
+                       ! if (ocn_select(io_H2S)) then 
+                          ! dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                       ! endif 
+                    elseif (ocn_select(io_CH4)) then 
+                       dum_sfxocn(io_CH4,i,j) = dum_sfxocn(io_CH4,i,j) +  margin_map(i,j)*ch4flx_map(i,j)/conv_yr_s
+                       dum_sfxocn(io_DIC,i,j) = dum_sfxocn(io_DIC,i,j) +  margin_map(i,j)*dicflx_map(i,j)/conv_yr_s
+                       dum_sfxocn(io_ALK,i,j) = dum_sfxocn(io_ALK,i,j) +  margin_map(i,j)*alkflx_map(i,j)/conv_yr_s
+                       dum_sfxocn(io_SO4,i,j) = dum_sfxocn(io_SO4,i,j) +  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                       dum_sfxocn(io_H2S,i,j) = dum_sfxocn(io_H2S,i,j) -  margin_map(i,j)*so4flx_map(i,j)/conv_yr_s
+                    endif 
+                 end IF               
               end IF               
            end IF 
            
@@ -723,10 +727,12 @@ SUBROUTINE sedgem(          &
   ! catch any carbonate chemistry errors arising in sub_update_sed
   if (error_stop) then
      print*, 'error_stop detected'
-     call end_sedgem(     &
-          & dum_dts,      &
-          & dum_sfcsumocn &
-          & )
+     if (.not. par_sed_hydrate_forcerun) then
+        call end_sedgem(     &
+             & dum_dts,      &
+             & dum_sfcsumocn &
+             & )
+     endif 
   end if
 
   ! *** RUN-TIME OUTPUT ***
@@ -762,6 +768,8 @@ SUBROUTINE sedgem(          &
   ! YK added for hydrate recording
   if (par_sed_hydrate_on .and. dum_reinit_sfxsumsed) then 
      irec_hydrate = irec_hydrate + 1
+     ! print*, irec_hydrate, mod(irec_hydrate,par_sed_hydrate_savefreq)==0
+     ! pause     
      if (mod(irec_hydrate,par_sed_hydrate_savefreq)==0) then 
         call sub_save_hydrate()
      endif 
