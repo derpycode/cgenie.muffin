@@ -139,12 +139,10 @@ MODULE ecogem_lib
   real :: beta_graz_a,beta_graz_b,beta_graz_c   ! a/b/c: fraction messy feeding to dissolved
   real :: beta_mort_a,beta_mort_b,beta_mort_c   ! a/b/c: fraction mortality to dissolved
   real :: par_bio_remin_POC_frac2,par_bio_remin_CaCO3_frac2
-  real :: par_beta_POCtoDOC
   namelist/ini_ecogem_nml/respir_a,biosink_a,mort_a
   namelist/ini_ecogem_nml/respir_b,biosink_b,mort_b
   namelist/ini_ecogem_nml/beta_graz_a,beta_graz_b,beta_graz_c,beta_mort_a,beta_mort_b,beta_mort_c
   namelist/ini_ecogem_nml/par_bio_remin_POC_frac2,par_bio_remin_CaCO3_frac2
-  namelist/ini_ecogem_nml/par_beta_POCtoDOC
   ! Mixotrophy parameters
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff
@@ -226,6 +224,11 @@ MODULE ecogem_lib
   namelist /ini_ecogem_nml/ par_cocco_palatability_mod,par_cocco_vmax_mod
   real::par_diatom_palatability_mod , par_diatom_vmax_mod
   namelist /ini_ecogem_nml/ par_diatom_palatability_mod,par_diatom_vmax_mod
+  ! POC:DOC parameters
+  real::par_beta_POCtoDOC
+  namelist/ini_ecogem_nml/par_beta_POCtoDOC
+  logical::ctrl_Tdep_POCtoDOC
+  NAMELIST /ini_ecogem_nml/ctrl_Tdep_POCtoDOC
 
   ! ------------------- TEST" !--------------------------------------------------------------------------------------------------- !
   logical::ctrl_hello_world                                             ! hello world!

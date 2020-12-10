@@ -283,6 +283,7 @@ SUBROUTINE initialise_biogem(                       &
      CALL sub_data_init_lookup_4D_Fe()
   end SELECT
   ! ---------------------------------------------------------- ! set up redox save/reporting
+  IF (ctrl_debug_lvl2) print*, 'initialize redox arrays'
   CALL sub_init_redox()
   ! ---------------------------------------------------------- ! initialize arrays (2)
   IF (ctrl_debug_lvl2) print*, 'initialize data saving arrays'
