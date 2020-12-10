@@ -121,7 +121,7 @@ eg_useDIC_13C               =.true.
 eg_useSiO2                  =.true.
 eg_squota                   =.true.
 
-# Tuned
+# Tuned - Ward et al. (2018)
 eg_qminP_a     =   3.33e-3
 eg_qminFe_a    =   1.00e-6
 eg_qmaxFe_a    =   4.00e-6

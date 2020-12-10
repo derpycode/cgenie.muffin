@@ -294,7 +294,7 @@ CONTAINS
              if (useNO3)  VCN(:) = VCN(:) + up_inorg(iNO3,:)
              if (useNO2)  VCN(:) = VCN(:) + up_inorg(iNO2,:)
              if (useNH4)  VCN(:) = VCN(:) + up_inorg(iNH4,:)
-          ! Representation of nitrogen fixation ! Fanny - June 2020 - Still need to check Moore et al (2002) + parameterise N:P_diazo (=40.0)
+          ! To account for nitrogen fixation ! Fanny - June 2020 - Still need to check Moore et al (2002) + parameterise N:P_diazo (=40.0) - probably should scale with nitrogen fixation rate!!
              VCN(:) = merge(up_inorg(iPO4,:) * 40.0,VCN(:),pft.eq.'diazotroph')
           elseif (pquota) then
              VCN(:) = up_inorg(iPO4,:) * 16.0
