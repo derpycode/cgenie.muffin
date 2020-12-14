@@ -424,6 +424,7 @@ CONTAINS
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
        print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
+       print*,'Ads constant for PO4 adsorption on (POM-)FeOOH      : ',par_bio_Kd_PO4_FeOOH                                     ! 
        ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -1582,7 +1583,8 @@ CONTAINS
     int_diag_airsea_timeslice(:,:,:)    = 0.0
     int_diag_redox_timeslice(:,:,:,:)   = 0.0
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
-    !
+    ! YK added 12/12/2020
+    ! int_focsed_POM_FeOOH_chk = 0.0
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeslice
   ! ****************************************************************************************************************************** !
@@ -1646,6 +1648,14 @@ CONTAINS
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
+    ! YK added 12/12/2020
+    int_focsed_POM_FeOOH_chk = 0.0
+    int_focnads_PO4_POM_FeOOH = 0.0
+    int_focnsed_PO4ads_POM_FeOOH = 0.0
+    int_focsed_FeOOH_chk = 0.0
+    int_focnads_PO4_FeOOH = 0.0
+    int_focnsed_PO4ads_FeOOH = 0.0
+    int_dtyr_YK = 0.0
     !
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeseries

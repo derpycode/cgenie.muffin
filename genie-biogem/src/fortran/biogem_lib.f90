@@ -590,6 +590,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte
   LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
   NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
+  real::par_bio_Kd_PO4_FeOOH                                     ! first order constant for PO4 adsorption on FeOOH (and POM associated FeOOH)
+  NAMELIST /ini_biogem_nml/par_bio_Kd_PO4_FeOOH
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            !
   CHARACTER(len=255)::par_indir_name                             !
@@ -1274,7 +1276,22 @@ MODULE biogem_lib
   ! redox
   real,DIMENSION(:),ALLOCATABLE::int_diag_redox_sig              ! redox diagnostics time-series
   ! ### ADD ADDITIONAL TIME-SERIES ARRAY DEFINITIONS HERE ######################################################################## !
-  !
+  
+  ! YK added in attempt to capture PO4 adsorption on FeOOH 
+  REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_PO4_FeOOH                 ! adsorped PO4 on FeOOH
+  REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_prev_PO4_FeOOH            ! adsorped PO4 on FeOOH @ previous time step
+  REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_FeOOH_dPO4                ! change in PO4 by adsorption on FeOOH (ocn_ads_PO4_FeOOH-ocn_ads_prev_PO4_FeOOH)?
+  ! YK added in attempt to capture PO4 adsorption on POM-associated FeOOH 
+  REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_PO4_POM_FeOOH             ! adsorped PO4 on POM-associated FeOOH
+  REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_prev_PO4_POM_FeOOH        ! adsorped PO4 on POM-associated FeOOH @ previous time step
+  REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_POM_FeOOH_dPO4            ! change in PO4 by adsorption on POM-FeOOH 
+  ! further adding array to capture settling PO4 
+  ! REAL,DIMENSION(n_i,n_j,n_k)::settle_ads_PO4_POM_FeOOH          ! PO4 settling flux with POM-FeOOH 
+  ! REAL,DIMENSION(n_i,n_j,n_k)::settle_ads_PO4_FeOOH              ! PO4 settling flux with FeOOH
+  ! further adding array to capture PO4 burial
+  REAL,DIMENSION(n_i,n_j)::fsed_ads_PO4_POM_FeOOH                ! PO4 flux to sediment on POM-FeOOH 
+  REAL,DIMENSION(n_i,n_j)::fsed_ads_PO4_FeOOH                    ! PO4 flux to sediment on FeOOH
+  
   ! ############################################################################################################################## !
 
   ! *** integrated (time-averaged) time-slice arrays ***
@@ -1315,6 +1332,16 @@ MODULE biogem_lib
   REAL,DIMENSION(n_sed,n_i,n_j)::int_diag_ecogem_part                !
   REAL,DIMENSION(n_ocn,n_i,n_j)::int_diag_ecogem_remin               !
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
+  ! 
+  ! --- YK added 12/10/2020
+  REAL::int_focnsed_PO4ads_FeOOH                                  ! PO4 burial through adsorption onto (POM-)FeOOH (mol/yr)
+  REAL::int_focnads_PO4_FeOOH                                     ! PO4 loss in ocean via adsorption onto (POM-)FeOOH (mol/yr)
+  REAL::int_focnsed_PO4ads_POM_FeOOH                              ! PO4 burial through adsorption onto (POM-)FeOOH (mol/yr)
+  REAL::int_focnads_PO4_POM_FeOOH                                 ! PO4 loss in ocean via adsorption onto (POM-)FeOOH (mol/yr)
+  REAL::int_ocn_PO4                                               ! PO4 in ocean just to check 
+  REAL::int_focsed_POM_FeOOH_chk                                  ! just to check 
+  REAL::int_focsed_FeOOH_chk                                      ! just to check 
+  REAL::int_dtyr_YK                                               ! just to check
   !
   ! ############################################################################################################################## !
 
