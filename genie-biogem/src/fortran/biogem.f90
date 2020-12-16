@@ -72,7 +72,7 @@ subroutine biogem(        &
   real::loc_force_target
   real::loc_force_actual
   real::loc_force_actual_d13C,loc_force_actual_d14C
-  real::loc_force_actual_d44Ca
+  real::loc_force_actual_d44Ca,loc_force_actual_CaCO3
   real::loc_r18O
   real::loc_remin
   real::loc_M
@@ -352,6 +352,10 @@ subroutine biogem(        &
      IF (ocn_select(io_O2_18O)) THEN
         loc_r18O = SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_O2_18O,:,:,:))*loc_ocn_rtot_M / &
              & ( SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_O2,:,:,:))*loc_ocn_rtot_M )
+     end IF
+     ! calc mean wt% CaCO3
+     If (flag_sedgem .AND. sed_select(is_CaCO3)) then
+        loc_force_actual_CaCO3 = SUM(phys_ocn(ipo_A,:,:,n_k)*dum_sfcsed1(is_CaCO3,:,:))/SUM(phys_ocn(ipo_A,:,:,n_k))
      end IF
      ! sedimentary preservation (mol per time step)
      DO l=3,n_l_ocn
@@ -1062,23 +1066,38 @@ subroutine biogem(        &
                        locijk_focn(io_Ca,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_Ca),i,j,k)
                     end if
                  END DO
-                 ! optional inversion of pCO2 via ALK flux forcing
+                 ! optional inversion of pCO2 or wt% CaCO3 via ALK flux forcing
                  IF (force_restore_ocn_select(io_ALK) .AND. force_flux_ocn_select(io_ALK)) THEN
-                    loc_force_actual = dum_sfcatm1(ia_pCO2,i,j)
-                    loc_force_target = force_restore_atm(ia_pCO2,i,j)/par_atm_force_scale_val(ia_pCO2)
-                    ! calculate the sign of the ALK input
-                    if (loc_force_actual > loc_force_target) then
-                       loc_force_sign = 1.0
-                    else
-                       if (ctrl_force_invert_noneg) then
-                          loc_force_sign = 0.0
+                    If (flag_sedgem .AND. (par_force_invert_wtpctcaco3 > const_real_nullsmallneg)) then
+                       loc_force_actual = loc_force_actual_CaCO3
+                       loc_force_target = par_force_invert_wtpctcaco3
+                       ! calculate the sign of the ALK input
+                       if (loc_force_actual < loc_force_target) then
+                          loc_force_sign = 1.0
                        else
-                          loc_force_sign = -1.0
-                       end if
-                    end If
+                          if (ctrl_force_invert_noneg) then
+                             loc_force_sign = 0.0
+                          else
+                             loc_force_sign = -1.0
+                          end if
+                       end If
+                    else
+                       loc_force_actual = dum_sfcatm1(ia_pCO2,i,j)
+                       loc_force_target = force_restore_atm(ia_pCO2,i,j)/par_atm_force_scale_val(ia_pCO2)
+                       ! calculate the sign of the ALK input
+                       if (loc_force_actual > loc_force_target) then
+                          loc_force_sign = 1.0
+                       else
+                          if (ctrl_force_invert_noneg) then
+                             loc_force_sign = 0.0
+                          else
+                             loc_force_sign = -1.0
+                          end if
+                       end If
+                    end if
                     ! NOTE: whole ocean ALK addition
                     DO k=loc_k1,n_k
-                       locijk_focn(io_ALK,i,j,n_k) = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
+                       locijk_focn(io_ALK,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
                        IF (force_flux_ocn_select(io_Ca)) then
                           locijk_focn(io_Ca,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_Ca),i,j,k)
                        end if
@@ -1369,6 +1388,7 @@ subroutine biogem(        &
                     end If
                     ! calculate flux of CO2 to ocean *OR* atmosphere with specified d13C to approach atmospheric d13C target
                     ! NOTE: units of (mol yr-1)
+                    ! NOTE: zero the diagnostics of the 'traditional' flux forcing (which is overwritten here)
                     IF (force_flux_ocn_select(io_DIC_13C)) THEN
                        locijk_focn(io_DIC,i,j,n_k)     = loc_force_sign*force_flux_locn(io2l(io_DIC),i,j,n_k)
                        locijk_focn(io_DIC_13C,i,j,n_k) = loc_frac*locijk_focn(io_DIC,i,j,n_k)
@@ -1380,6 +1400,8 @@ subroutine biogem(        &
                           locijk_focn(io_DOM_C,i,j,n_k)     = 0.0
                           locijk_focn(io_DOM_C_13C,i,j,n_k) = 0.0
                        end if
+                       diag_forcing(ia_pCO2,i,j)     = 0.0
+                       diag_forcing(ia_pCO2_13C,i,j) = 0.0
                     elseIF (force_flux_atm_select(ia_pCO2_13C)) then
                        locij_fatm(ia_pCO2,i,j)     = loc_force_sign*force_flux_atm(ia_pCO2,i,j)
                        locij_fatm(ia_pCO2_13C,i,j) = loc_frac*locij_fatm(ia_pCO2,i,j)
@@ -1392,6 +1414,8 @@ subroutine biogem(        &
                           locijk_focn(io_DOM_C,i,j,n_k)     = 0.0
                           locijk_focn(io_DOM_C_13C,i,j,n_k) = 0.0
                        end if
+                       diag_forcing(ia_pCO2,i,j)     = 0.0
+                       diag_forcing(ia_pCO2_13C,i,j) = 0.0
                     end IF
                  elseIF ( &
                       & (force_restore_ocn_select(io_Ca) .AND. force_restore_ocn_select(io_Ca_44Ca)) &
@@ -1461,7 +1485,7 @@ subroutine biogem(        &
                              loc_force_sign = -1.0
                           end if
                        end If
-                       ! adjust d13C if d13C target is also selected
+                       ! adjust d13C, if d13C target is also selected
                        IF (force_restore_ocn_select(io_DIC) .AND. force_restore_ocn_select(io_DIC_13C)) THEN
                           loc_standard = const_standards(ocn_type(io_DIC_13C))
                           ! replace mean global surface DIC d13C by point value
@@ -1501,16 +1525,19 @@ subroutine biogem(        &
                        end IF
                        ! calculate flux of CO2 to atmosphere with specified d13C to approach atmospheric d13C target
                        ! NOTE: units of (mol yr-1)
-                       locij_fatm(ia_pCO2,i,j)     = loc_force_sign*force_flux_atm(ia_pCO2,i,j)
-                       locij_fatm(ia_pCO2_13C,i,j) = loc_frac*locij_fatm(ia_pCO2,i,j)
-                       diag_misc_2D(idiag_misc_2D_FpCO2,i,j)     = locij_fatm(ia_pCO2,i,j)
-                       diag_misc_2D(idiag_misc_2D_FpCO2_13C,i,j) = locij_fatm(ia_pCO2_13C,i,j)
+                       ! NOTE: zero the diagnostics of the 'traditional' flux forcing (which is overwritten here)
+                       locij_fatm(ia_pCO2,i,j)       = loc_force_sign*force_flux_atm(ia_pCO2,i,j)
+                       locij_fatm(ia_pCO2_13C,i,j)   = loc_frac*locij_fatm(ia_pCO2,i,j)
                        IF (force_flux_atm_select(ia_pcolr) .AND. force_flux_atm_select(ia_pcolr_13C)) THEN
                           locij_fatm(ia_pCO2,i,j)      = locij_fatm(ia_pCO2,i,j) + locij_fatm(ia_pcolr,i,j)
                           locij_fatm(ia_pCO2_13C,i,j)  = locij_fatm(ia_pCO2_13C,i,j) + locij_fatm(ia_pcolr_13C,i,j)
                           locij_fatm(ia_pcolr,i,j)     = 0.0
                           locij_fatm(ia_pcolr_13C,i,j) = 0.0
                        end if
+                       diag_misc_2D(idiag_misc_2D_FpCO2,i,j)     = locij_fatm(ia_pCO2,i,j)
+                       diag_misc_2D(idiag_misc_2D_FpCO2_13C,i,j) = locij_fatm(ia_pCO2_13C,i,j)
+                       diag_forcing(ia_pCO2,i,j)     = 0.0
+                       diag_forcing(ia_pCO2_13C,i,j) = 0.0
                     end if
                  end if
                  ! ------------------------------------------- !

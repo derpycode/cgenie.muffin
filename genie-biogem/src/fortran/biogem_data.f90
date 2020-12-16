@@ -528,6 +528,7 @@ CONTAINS
        print*,'j coordinate of point forcing (0 = DISABLED)        : ',par_force_point_j
        print*,'k coordinate of point forcing (0 = DISABLED)        : ',par_force_point_k
        print*,'Surface ocean saturation state target               : ',par_force_invert_ohmega
+       print*,'Sediment wt% CaCO3 target                           : ',par_force_invert_wtpctcaco3
        print*,'Prevent negative inversion fluxes                   : ',ctrl_force_invert_noneg
        print*,'Calcite saturation as the saturation target?        : ',ctrl_force_ohmega_calcite
        print*,'Allow carbon removal via Corg?                      : ',ctrl_force_invert_Corgburial

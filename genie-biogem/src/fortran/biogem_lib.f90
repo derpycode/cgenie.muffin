@@ -724,8 +724,10 @@ MODULE biogem_lib
   integer::par_force_point_j                                     ! 'j' coordinate of point forcing
   integer::par_force_point_k                                     ! 'k' coordinate of point forcing
   NAMELIST /ini_biogem_nml/par_force_point_i,par_force_point_j,par_force_point_k
-  REAL::par_force_invert_ohmega                                 ! surface ocean saturation state target
+  REAL::par_force_invert_ohmega                                  ! surface ocean saturation state target
   NAMELIST /ini_biogem_nml/par_force_invert_ohmega
+  REAL::par_force_invert_wtpctcaco3                              ! Sediment wt% CaCO3 target
+  NAMELIST /ini_biogem_nml/par_force_invert_wtpctcaco3
   logical::ctrl_force_invert_noneg                              ! prevent negative inversion fluxes (i.e. no removal)
   NAMELIST /ini_biogem_nml/ctrl_force_invert_noneg
   logical::ctrl_force_ohmega_calcite                            ! Calcite saturation as the saturation target?

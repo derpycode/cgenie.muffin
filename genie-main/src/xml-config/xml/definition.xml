@@ -6668,6 +6668,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
                         <description>Surface ocean saturation state target</description>
                     </param>
+                    <param name="par_force_invert_wtpctcaco3">
+			<value datatype="real">-99.9</value>
+                        <description>Sediment wt% CaCO3 target</description>
+                    </param>
                     <param name="ctrl_force_invert_noneg">
 			<value datatype="boolean">.false.</value>
                         <description>Prevent negative inversion fluxes?</description>
