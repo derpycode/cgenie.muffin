@@ -1124,6 +1124,7 @@ CONTAINS
        !
     end If
     ! ### INSERT CODE TO SAVE ADDITIONAL 3-D DATA FIELDS ######################################################################### !
+    ! ---------- YK added 12.xx.2020
     If (ctrl_data_save_slice_ocn &
        ! .AND. (ctrl_data_save_slice_diag_bio .OR. ctrl_data_save_slice_diag_geochem) &
        .and. par_bio_Kd_PO4_FeOOH > 0.0 &
@@ -1131,21 +1132,21 @@ CONTAINS
        if (ocn_select(io_PO4).and.ocn_select(io_Fe2)) then 
           if (sed_select(is_FeOOH)) then 
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname = 'umol kg-1'
+             loc_unitsname = 'mol kg-1'
              loc_ijk(:,:,:) = ocn_ads_PO4_FeOOH(:,:,:)
              call sub_adddef_netcdf(loc_iou,4,'PO4 on FeOOH','PO4 adsorption on FeOOH', &
                   & trim(loc_unitsname),const_real_zero,const_real_zero)
              call sub_putvar3d_g('PO4 on FeOOH',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
              
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname = 'umol kg-1'
+             loc_unitsname = 'mol kg-1'
              loc_ijk(:,:,:) = ocn_ads_prev_PO4_FeOOH(:,:,:)
              call sub_adddef_netcdf(loc_iou,4,'PO4 on FeOOH prev','PO4 adsorption on FeOOH prev', &
                   & trim(loc_unitsname),const_real_zero,const_real_zero)
              call sub_putvar3d_g('PO4 on FeOOH prev',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
              
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname = 'umol kg-1'
+             loc_unitsname = 'mol kg-1'
              loc_ijk(:,:,:) = ocn_ads_FeOOH_dPO4(:,:,:)
              call sub_adddef_netcdf(loc_iou,4,'dPO4 on FeOOH','dPO4 adsorption on FeOOH', &
                   & trim(loc_unitsname),const_real_zero,const_real_zero)
@@ -1160,21 +1161,21 @@ CONTAINS
           endif 
           if (sed_select(is_POM_FeOOH)) then 
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname = 'umol kg-1'
+             loc_unitsname = 'mol kg-1'
              loc_ijk(:,:,:) = ocn_ads_PO4_POM_FeOOH(:,:,:)
              call sub_adddef_netcdf(loc_iou,4,'PO4 on POM-FeOOH','PO4 adsorption on POM assoc-FeOOH', &
                   & trim(loc_unitsname),const_real_zero,const_real_zero)
              call sub_putvar3d_g('PO4 on POM-FeOOH',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
              
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname = 'umol kg-1'
+             loc_unitsname = 'mol kg-1'
              loc_ijk(:,:,:) = ocn_ads_prev_PO4_POM_FeOOH(:,:,:)
              call sub_adddef_netcdf(loc_iou,4,'PO4 on POM-FeOOH prev','PO4 adsorption on POM assoc-FeOOH prev', &
                   & trim(loc_unitsname),const_real_zero,const_real_zero)
              call sub_putvar3d_g('PO4 on POM-FeOOH prev',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
              
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname = 'umol kg-1'
+             loc_unitsname = 'mol kg-1'
              loc_ijk(:,:,:) = ocn_ads_POM_FeOOH_dPO4(:,:,:)
              call sub_adddef_netcdf(loc_iou,4,'dPO4 on POM-FeOOH','dPO4 adsorption on POM assoc-FeOOH', &
                   & trim(loc_unitsname),const_real_zero,const_real_zero)
@@ -1196,6 +1197,7 @@ CONTAINS
          call sub_putvar3d_g('ocn_PO4_chk',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        endif 
     endif 
+    ! ------------ END
     !
     ! ############################################################################################################################ !
     !-----------------------------------------------------------------------

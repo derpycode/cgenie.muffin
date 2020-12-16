@@ -1106,7 +1106,8 @@ CONTAINS
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','focnsed_'//'PO4_ads_FeOOH',string_results_ext &
             & )  
-       loc_string = '% time (yr) / global PO4 (mol) / global PO4 bur (mol) / global PO4 ads (mol)'
+       loc_string = '% time (yr) / global PO4 (mol) / global PO4 bur (mol yr-1) / global PO4 ads (mol yr-1)' &
+            & //'/ global FeOOH bur (mol yr-1)'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -1118,7 +1119,8 @@ CONTAINS
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','focnsed_'//'PO4_ads_POM_FeOOH',string_results_ext &
             & )  
-       loc_string = '% time (yr) / global PO4 (mol) / global PO4 bur (mol) / global PO4 ads (mol)'
+       loc_string = '% time (yr) / global PO4 (mol) / global PO4 bur (mol yr-1) / global PO4 ads (mol yr-1)' &
+            & //'/ global FeOOH bur (mol yr-1)'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -2819,7 +2821,7 @@ CONTAINS
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       WRITE(unit=out,fmt='(f12.3,3e15.7)',iostat=ios) &
+       WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
             & loc_t, &
             & int_ocn_PO4, &
             & int_focnsed_PO4ads_FeOOH/int_dtyr_YK, &

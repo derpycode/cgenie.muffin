@@ -641,7 +641,7 @@ subroutine biogem(        &
      
      
      ! YK added for PO4 adsorption on FeOOH (12/05/2020)
-     ocn_ads_prev_PO4_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6*bio_part(is_FeOOH,:,:,:)*1e6 *1e-6 
+     ocn_ads_prev_PO4_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6*bio_part(is_FeOOH,:,:,:)*1e6 *1e-6  ! coeff is defined for umol/kg
      ocn_ads_prev_PO4_POM_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6* bio_part(is_POM_FeOOH,:,:,:)*1e6 *1e-6
      ! ****************************************************************************************************************************
      
@@ -1643,6 +1643,9 @@ subroutine biogem(        &
               !---- YK added 12.13.2020
               ! *** PO4 adsorption ***
               if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
+                 if (sed_select(is_FeOOH)) then
+                    call sub_calc_ads_PO4_FeOOH(i,j,loc_k1,loc_dtyr)
+                 end if
                  if (sed_select(is_POM_FeOOH)) then
                     call sub_calc_ads_PO4_POM_FeOOH(i,j,loc_k1,loc_dtyr)
                  end if
@@ -1842,7 +1845,7 @@ subroutine biogem(        &
      
      
      ! ------ YK added for PO4 adsorption on FeOOH
-     ocn_ads_PO4_FeOOH = par_bio_Kd_PO4_FeOOH*ocn(io_PO4,:,:,:)*1e6* bio_part(is_FeOOH,:,:,:)*1e6 *1e-6
+     ocn_ads_PO4_FeOOH = par_bio_Kd_PO4_FeOOH*ocn(io_PO4,:,:,:)*1e6* bio_part(is_FeOOH,:,:,:)*1e6 *1e-6 ! coeff is defined for umol/kg
      ocn_ads_PO4_POM_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6*bio_part(is_POM_FeOOH,:,:,:)*1e6 *1e-6
      
      ocn_ads_FeOOH_dPO4 = ocn_ads_PO4_FeOOH - ocn_ads_prev_PO4_FeOOH
