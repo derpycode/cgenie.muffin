@@ -1101,6 +1101,8 @@ CONTAINS
     END IF
     
     ! ---- YK added (12.10.2020) 
+    ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+    ! (so removing this block should not affect anything; going to remove later)
     ! ocean->sediment flux
     IF (ctrl_data_save_sig_focnsed) THEN
        loc_filename=fun_data_timeseries_filename( &
@@ -2808,6 +2810,8 @@ CONTAINS
     END IF
     
     ! ----- YK added 12.10.2020
+    ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+    ! (so removing this block should not affect anything; going to remove later)
     
     ! *** <sig_focnsed_*> ***
     ! write ocean-sediment flux data

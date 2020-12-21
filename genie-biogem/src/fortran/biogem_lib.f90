@@ -1277,11 +1277,13 @@ MODULE biogem_lib
   real,DIMENSION(:),ALLOCATABLE::int_diag_redox_sig              ! redox diagnostics time-series
   ! ### ADD ADDITIONAL TIME-SERIES ARRAY DEFINITIONS HERE ######################################################################## !
   
-  ! YK added in attempt to capture PO4 adsorption on FeOOH 
+  ! ---- YK added in attempt to capture PO4 adsorption on FeOOH 
+  ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+  ! (so removing this block should not affect anything; going to remove later)
   REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_PO4_FeOOH                 ! adsorped PO4 on FeOOH
   REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_prev_PO4_FeOOH            ! adsorped PO4 on FeOOH @ previous time step
   REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_FeOOH_dPO4                ! change in PO4 by adsorption on FeOOH (ocn_ads_PO4_FeOOH-ocn_ads_prev_PO4_FeOOH)?
-  ! YK added in attempt to capture PO4 adsorption on POM-associated FeOOH 
+  ! added in attempt to capture PO4 adsorption on POM-associated FeOOH 
   REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_PO4_POM_FeOOH             ! adsorped PO4 on POM-associated FeOOH
   REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_prev_PO4_POM_FeOOH        ! adsorped PO4 on POM-associated FeOOH @ previous time step
   REAL,DIMENSION(n_i,n_j,n_k)::ocn_ads_POM_FeOOH_dPO4            ! change in PO4 by adsorption on POM-FeOOH 
@@ -1291,6 +1293,7 @@ MODULE biogem_lib
   ! further adding array to capture PO4 burial
   REAL,DIMENSION(n_i,n_j)::fsed_ads_PO4_POM_FeOOH                ! PO4 flux to sediment on POM-FeOOH 
   REAL,DIMENSION(n_i,n_j)::fsed_ads_PO4_FeOOH                    ! PO4 flux to sediment on FeOOH
+  ! ---- End 
   
   ! ############################################################################################################################## !
 
@@ -1334,6 +1337,8 @@ MODULE biogem_lib
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
   ! 
   ! --- YK added 12/10/2020
+  ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+  ! (so removing this block should not affect anything; going to remove later)
   REAL::int_focnsed_PO4ads_FeOOH                                  ! PO4 burial through adsorption onto (POM-)FeOOH (mol/yr)
   REAL::int_focnads_PO4_FeOOH                                     ! PO4 loss in ocean via adsorption onto (POM-)FeOOH (mol/yr)
   REAL::int_focnsed_PO4ads_POM_FeOOH                              ! PO4 burial through adsorption onto (POM-)FeOOH (mol/yr)
@@ -1342,6 +1347,7 @@ MODULE biogem_lib
   REAL::int_focsed_POM_FeOOH_chk                                  ! just to check 
   REAL::int_focsed_FeOOH_chk                                      ! just to check 
   REAL::int_dtyr_YK                                               ! just to check
+  ! --- End 
   !
   ! ############################################################################################################################## !
 

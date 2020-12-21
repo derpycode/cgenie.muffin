@@ -1125,6 +1125,8 @@ CONTAINS
     end If
     ! ### INSERT CODE TO SAVE ADDITIONAL 3-D DATA FIELDS ######################################################################### !
     ! ---------- YK added 12.xx.2020
+    ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+    ! (so removing this block should not affect anything; going to remove later)
     If (ctrl_data_save_slice_ocn &
        ! .AND. (ctrl_data_save_slice_diag_bio .OR. ctrl_data_save_slice_diag_geochem) &
        .and. par_bio_Kd_PO4_FeOOH > 0.0 &

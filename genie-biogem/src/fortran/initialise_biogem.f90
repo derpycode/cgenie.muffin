@@ -386,6 +386,8 @@ SUBROUTINE initialise_biogem(                       &
   
   
   ! ---- YK added (20201204)
+  ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+  ! (so removing this block should not affect anything; going to remove later)
   ocn_ads_PO4_FeOOH(:,:,:)          = 0.0
   ocn_ads_prev_PO4_FeOOH(:,:,:)     = 0.0
   ocn_ads_FeOOH_dPO4(:,:,:)         = 0.0
@@ -399,6 +401,8 @@ SUBROUTINE initialise_biogem(                       &
   ! ---- end
   !
   ! ----- YK added (12/10/2020)
+  ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+  ! (so removing this block should not affect anything; going to remove later)
   int_focnsed_PO4ads_FeOOH      = 0.0        ! PO4 burial through adsorption onto (POM-)FeOOH
   int_focnads_PO4_FeOOH         = 0.0        ! PO4 loss in ocean via adsorption onto (POM-)FeOOH
   int_focnsed_PO4ads_POM_FeOOH  = 0.0        ! PO4 burial through adsorption onto (POM-)FeOOH

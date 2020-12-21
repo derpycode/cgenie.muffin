@@ -899,7 +899,7 @@
                         </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="107">
+                   <paramArray name="sed_select" dimension="1" extent="109">
                         <description>tracer selection</description>
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -1326,6 +1326,14 @@
                             <description></description>
                         </param>
                         <param name="sed_select(107)" index="107">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(108)" index="108">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(109)" index="109">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>

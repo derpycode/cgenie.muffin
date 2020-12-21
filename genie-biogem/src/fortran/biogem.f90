@@ -640,9 +640,12 @@ subroutine biogem(        &
      end do
      
      
-     ! YK added for PO4 adsorption on FeOOH (12/05/2020)
+     ! ---- YK added for PO4 adsorption on FeOOH (12/05/2020) 
+     ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+     ! (so removing this block should not affect anything; going to remove later)
      ocn_ads_prev_PO4_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6*bio_part(is_FeOOH,:,:,:)*1e6 *1e-6  ! coeff is defined for umol/kg
      ocn_ads_prev_PO4_POM_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6* bio_part(is_POM_FeOOH,:,:,:)*1e6 *1e-6
+     ! ---- End 
      ! ****************************************************************************************************************************
      
 
@@ -1758,6 +1761,8 @@ subroutine biogem(        &
               ! print *,'check FeOOM',i,j,bio_settle(is_POM_FeOOH,i,j,loc_k1)
               
               ! ---- YK added (12/10/2020) 
+              ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+              ! (so removing this block should not affect anything; going to remove later)
               if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
                  if (sed_select(is_FeOOH)) then
                     ! fsed_ads_PO4_FeOOH(i,j) = phys_ocn(ipo_rA,i,j,loc_k1)*settle_ads_PO4_FeOOH(i,j,loc_k1)*loc_rdts
@@ -1770,7 +1775,7 @@ subroutine biogem(        &
                        *phys_ocn(ipo_rA,i,j,loc_k1)*loc_rdts  ! converting to mol/m2/s
                     ! print*,'check ads PO4' ,i,j,fsed_ads_PO4_FeOOH(i,j)
                     ! dum_sfxocn1(io_PO4,i,j) = dum_sfxocn1(io_PO4,i,j) - fsed_ads_PO4_FeOOH(i,j)
-                    dum_sfxocn1(io_PO4,i,j) = - fsed_ads_PO4_FeOOH(i,j)
+                    ! dum_sfxocn1(io_PO4,i,j) = - fsed_ads_PO4_FeOOH(i,j)
                  elseif (sed_select(is_POM_FeOOH)) then
                     ! fsed_ads_PO4_POM_FeOOH(i,j) = phys_ocn(ipo_rA,i,j,loc_k1)*settle_ads_PO4_POM_FeOOH(i,j,loc_k1)*loc_rdts
                     fsed_ads_PO4_POM_FeOOH(i,j) = &
@@ -1782,7 +1787,7 @@ subroutine biogem(        &
                        *phys_ocn(ipo_rA,i,j,loc_k1)*loc_rdts  ! converting to mol/m2/s
                     ! print*,'check ads PO4' ,i,j,fsed_ads_PO4_POM_FeOOH(i,j)
                     ! dum_sfxocn1(io_PO4,i,j) = dum_sfxocn1(io_PO4,i,j) - fsed_ads_PO4_POM_FeOOH(i,j)
-                    dum_sfxocn1(io_PO4,i,j) = - fsed_ads_PO4_POM_FeOOH(i,j)
+                    ! dum_sfxocn1(io_PO4,i,j) = - fsed_ads_PO4_POM_FeOOH(i,j)
                  endif 
               endif 
               ! ---- end
@@ -1845,6 +1850,8 @@ subroutine biogem(        &
      
      
      ! ------ YK added for PO4 adsorption on FeOOH
+     ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+     ! (so removing this block should not affect anything; going to remove later)
      ocn_ads_PO4_FeOOH = par_bio_Kd_PO4_FeOOH*ocn(io_PO4,:,:,:)*1e6* bio_part(is_FeOOH,:,:,:)*1e6 *1e-6 ! coeff is defined for umol/kg
      ocn_ads_PO4_POM_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6*bio_part(is_POM_FeOOH,:,:,:)*1e6 *1e-6
      
@@ -1898,7 +1905,9 @@ subroutine biogem(        &
 
   END IF if_go
                        
-  ! --- YK added 12.10.2020
+  ! --- YK added 12.10.2020 
+  ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
+  ! (so removing this block should not affect anything; going to remove later) 
   int_dtyr_YK = int_dtyr_YK + loc_dtyr
   if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
      if (sed_select(is_FeOOH)) then
@@ -1906,8 +1915,8 @@ subroutine biogem(        &
            DO j=1,n_j
               loc_k1 = goldstein_k1(i,j)
               int_focnsed_PO4ads_FeOOH = int_focnsed_PO4ads_FeOOH + &
-                 ! fsed_ads_PO4_FeOOH(i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts  
-                 dum_sfxocn1(io_PO4,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
+                 fsed_ads_PO4_FeOOH(i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts  
+                 ! dum_sfxocn1(io_PO4,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
               int_focsed_FeOOH_chk =  int_focsed_FeOOH_chk + &
                  dum_sfxsed1(is_FeOOH,i,j)*phys_ocn(ipo_A,i,j,loc_k1) *loc_dts !/loc_dtyr
            enddo 
@@ -1919,8 +1928,8 @@ subroutine biogem(        &
            DO j=1,n_j
               loc_k1 = goldstein_k1(i,j)
               int_focnsed_PO4ads_POM_FeOOH = int_focnsed_PO4ads_POM_FeOOH + &
-                 ! fsed_ads_PO4_POM_FeOOH(i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
-                 dum_sfxocn1(io_PO4,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
+                 fsed_ads_PO4_POM_FeOOH(i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
+                 ! dum_sfxocn1(io_PO4,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
               ! int_focsed_POM_FeOOH_chk = int_focsed_POM_FeOOH_chk + &
                  ! dum_sfxsed1(is_POM_FeOOH,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
               int_focsed_POM_FeOOH_chk =  int_focsed_POM_FeOOH_chk + &
