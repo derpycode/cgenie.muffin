@@ -72,6 +72,7 @@ subroutine biogem(        &
   real::loc_force_target
   real::loc_force_actual
   real::loc_force_actual_d13C
+  real::loc_force_actual_totd13C,loc_force_actual_totd14C        ! 
   real::loc_force_actual_d44Ca
   real::loc_r18O
   real::loc_remin
@@ -215,12 +216,14 @@ subroutine biogem(        &
               ! NOTE: the flux used to derive the solubility, should be in units of  mass per unit area (or volume) (time can be ignored)
               !       on an equal area grid, it does not matter and hence old code was OK
               !       (old code was: phys_ocnatm(ipoa_solFe,i,j) = force_flux_sed(is_det,i,j)**(par_det_Fe_sol_exp - 1.0))
-              if (force_flux_sed(is_det,i,j) > const_real_nullsmall) then
+              ! NOTE: only implement if par_det_Fe_sol_exp not equal to 1.0 (which is for uniform solubility)
+              !       and if a 2D solbility field has not been requested (ctrl_force_det_Fe_sol)
+              if ( (ABS(par_det_Fe_sol_exp - 1.0) > const_real_nullsmall) .AND. .NOT.(ctrl_force_det_Fe_sol) ) then
                  phys_ocnatm(ipoa_solFe,i,j) = (phys_ocn(ipo_rM,i,j,n_k)*force_flux_sed(is_det,i,j))**(par_det_Fe_sol_exp - 1.0)
                  loc_det_tot = loc_det_tot + force_flux_sed(is_det,i,j)
                  loc_det_sol_tot = loc_det_sol_tot + phys_ocnatm(ipoa_solFe,i,j)*force_flux_sed(is_det,i,j)
               else
-                 phys_ocnatm(ipoa_solFe,i,j) = 0.0
+                 loc_det_sol_tot = 0.0
               end if
               ! total global weathering (mol per time step)
               DO l=3,n_l_ocn
@@ -294,6 +297,24 @@ subroutine biogem(        &
            end IF
         end DO
      end DO
+     ! calc mean DIC d13C
+     if (force_restore_ocn_select(io_DIC_13C) .AND. force_flux_ocn_select(io_DIC_13C)) THEN
+        loc_standard = const_standards(ocn_type(io_DIC_13C))
+        loc_force_actual_totd13C = &
+             & fun_calc_isotope_delta(                                          &
+             & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC,:,:,:))*loc_ocn_rtot_M,     & 
+             & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC_13C,:,:,:))*loc_ocn_rtot_M, &
+             & loc_standard,.FALSE.,const_real_null)
+     end IF
+     ! calc mean DIC d14C
+     if (force_restore_ocn_select(io_DIC_14C) .AND. force_flux_ocn_select(io_DIC_14C)) THEN
+        loc_standard = const_standards(ocn_type(io_DIC_14C))
+        loc_force_actual_totd14C = &
+             & fun_calc_isotope_delta(                                          &
+             & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC,:,:,:))*loc_ocn_rtot_M,     & 
+             & SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_DIC_14C,:,:,:))*loc_ocn_rtot_M, &
+             & loc_standard,.FALSE.,const_real_null)
+     end IF
      ! calc mean O2 d18O
      IF (ocn_select(io_O2_18O)) THEN
         loc_r18O = SUM(phys_ocn(ipo_M,:,:,:)*ocn(io_O2_18O,:,:,:))*loc_ocn_rtot_M / &
@@ -306,12 +327,16 @@ subroutine biogem(        &
      end DO
      ! re-scale Aeolian solubilities
      ! => calculate the scale factor required to match the requested mean global solubility (<par_det_Fe_sol>)
-     if ((loc_det_tot > const_real_nullsmall) .AND. (par_det_Fe_sol > const_real_nullsmall)) then
+     ! NOTE: loc_det_sol_tot being zero indicate uniform solubility or spatially explict solubility is being requested 
+     !       and re-scaling not required
+     ! NOTE: <par_det_Fe_sol_2D> is populated uniformly with the value of the solubilty parameter, par_det_Fe_sol
+     !       if a spatially-explicit field is not requested
+     if ( (loc_det_sol_tot > const_real_nullsmall) .AND. (loc_det_tot > const_real_nullsmall) ) then
         loc_det_Fe_sol_sf = par_det_Fe_sol/(loc_det_sol_tot/loc_det_tot)
+        phys_ocnatm(ipoa_solFe,:,:) = loc_det_Fe_sol_sf*phys_ocnatm(ipoa_solFe,:,:)
      else
-        loc_det_Fe_sol_sf = 0.0
+        phys_ocnatm(ipoa_solFe,:,:) = par_det_Fe_sol_2D(:,:)
      end if
-     phys_ocnatm(ipoa_solFe,:,:) = loc_det_Fe_sol_sf*phys_ocnatm(ipoa_solFe,:,:)
 
      ! ****************************************************************************************************************************
      ! ****************************************************************************************************************************
@@ -979,7 +1004,7 @@ subroutine biogem(        &
                        locijk_focn(io_Ca,i,j,n_k) = loc_force_sign*force_flux_locn(io2l(io_Ca),i,j,n_k)
                     end if
                  else
-                    ! (1b) ocean ALK [GEOENGINEEGING of SURFACE OCEAN CHEMISTRY]
+                    ! (1c) ocean ALK [GEOENGINEEGING of SURFACE OCEAN CHEMISTRY]
                     ! NOTE: the 'red' tracer is used to set a time history of ocean surface pH
                     !       the 'blue' tracer is used to set a time history of saturation state
                     !       otherwise employ fixed target
@@ -1021,7 +1046,7 @@ subroutine biogem(        &
                           end if
                        end If
                     end IF
-                    !
+                    ! calculate fluxes
                     DO k=loc_k1,n_k
                        locijk_focn(io_ALK,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
                        IF (force_flux_ocn_select(io_DIC)) then
@@ -1035,13 +1060,69 @@ subroutine biogem(        &
                        end if
                     END DO
                  end if
+                 ! record diagnostics
                  diag_misc_2D(idiag_misc_2D_FALK,i,j)     = sum(locijk_focn(io_ALK,i,j,:))
                  diag_misc_2D(idiag_misc_2D_FDIC,i,j)     = sum(locijk_focn(io_DIC,i,j,:))
                  diag_misc_2D(idiag_misc_2D_FDIC_13C,i,j) = sum(locijk_focn(io_DIC_13C,i,j,:))
                  diag_misc_2D(idiag_misc_2D_FCa,i,j)      = sum(locijk_focn(io_Ca,i,j,:))
+                 ! ------------------------------------------- !
+                 ! ------------------------------------------- !
+              elseif (force_restore_ocn_select(io_DIC_14C) .AND. force_flux_ocn_select(io_DIC_14C)) THEN
+                 ! ------------------------------------------- !
+                 ! (2) 14C INVERSIONS
+                 ! ------------------------------------------- !
+                 ! calculate local variables
+                 ! NOTE: just take surface ocean (n_k) values for target and source, 
+                 !       assuming that the forcing and target is homogeneous throughout the ocean
+                 loc_standard = const_standards(ocn_type(io_DIC_14C))
+                 loc_delta_actual = loc_force_actual_totd14C
+                 loc_delta_target = fun_calc_isotope_delta( &
+                      & force_restore_locn(io2l(io_DIC),i,j,n_k),force_restore_locn(io2l(io_DIC_14C),i,j,n_k), &
+                      & loc_standard,.FALSE.,const_real_null &
+                      & )
+                 loc_delta_source = fun_calc_isotope_delta( &
+                      & force_flux_locn(io2l(io_DIC),i,j,n_k),force_flux_locn(io2l(io_DIC_14C),i,j,n_k), &
+                      & loc_standard,.FALSE.,const_real_null &
+                      & )
+                 ! calculate the sign of the DIC input
+                 If (loc_delta_actual > loc_delta_target) then
+                    if (loc_delta_source < loc_delta_actual) then
+                       loc_force_sign = 1.0
+                    else
+                       loc_force_sign = -1.0
+                       if (ctrl_force_invert_noneg) loc_force_sign = 0.0
+                    end If
+                 else
+                    if (loc_delta_source < loc_delta_actual) then
+                       loc_force_sign = -1.0
+                       if (ctrl_force_invert_noneg) loc_force_sign = 0.0
+                    else
+                       loc_force_sign = 1.0
+                    end If
+                 end If
+                 ! calculate fluxes
+                 DO k=loc_k1,n_k
+                    locijk_focn(io_DIC,i,j,k)     = loc_force_sign*force_flux_locn(io2l(io_DIC),i,j,k)
+                    locijk_focn(io_DIC_13C,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_DIC_13C),i,j,k)
+                    locijk_focn(io_DIC_14C,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_DIC_14C),i,j,k)
+                    IF (force_flux_ocn_select(io_ALK)) then
+                       locijk_focn(io_ALK,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
+                    end if
+                    IF (force_flux_ocn_select(io_Ca)) then
+                       locijk_focn(io_Ca,i,j,k) = loc_force_sign*force_flux_locn(io2l(io_Ca),i,j,k)
+                    end if
+                 END DO
+                 ! record diagnostics
+                 diag_misc_2D(idiag_misc_2D_FDIC,i,j)     = sum(locijk_focn(io_DIC,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FDIC_13C,i,j) = sum(locijk_focn(io_DIC_13C,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FDIC_14C,i,j) = sum(locijk_focn(io_DIC_14C,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FALK,i,j)     = sum(locijk_focn(io_ALK,i,j,:))
+                 diag_misc_2D(idiag_misc_2D_FCa,i,j)      = sum(locijk_focn(io_Ca,i,j,:))
+                 ! ------------------------------------------- !
+                 ! ------------------------------------------- !
               else
                  ! ------------------------------------------- !
-                 ! (2) ATMOSPHERIC pCO2 INVERSIONS
+                 ! (3) ATMOSPHERIC pCO2 INVERSIONS
                  ! ------------------------------------------- !
                  IF (force_restore_atm_select(ia_pCO2) .AND. force_flux_atm_select(ia_pCO2)) THEN
                     locij_fatm(ia_pCO2,i,j) = 0.0
@@ -1061,7 +1142,7 @@ subroutine biogem(        &
                             & )
                        !
                        if (ctrl_force_invert_explicit) then
-                          ! (2a) atmosphere pCO2-13C
+                          ! (3a) atmosphere pCO2-13C
                           ! NOTE: done in the same way as the 'double inversion'
                           loc_force_target = force_restore_atm(ia_pCO2,i,j)
                           loc_force_actual = dum_sfcatm1(ia_pCO2,i,j)
@@ -1096,7 +1177,7 @@ subroutine biogem(        &
                           diag_misc_2D(idiag_misc_2D_FpCO2,i,j)     = locij_fatm(ia_pCO2,i,j)
                           diag_misc_2D(idiag_misc_2D_FpCO2_13C,i,j) = locij_fatm(ia_pCO2_13C,i,j)
                        else
-                          ! (2b) atmosphere pCO2-13C
+                          ! (3b) atmosphere pCO2-13C
                           ! NOTE: this code has a similar effect of restoring forcing, except that it allows
                           !       isotopic properties of a target signal to be followed via input/loss of carbon with a prescribed d13C
                           loc_frac = force_flux_atm(ia_pCO2_13C,i,j)/force_flux_atm(ia_pCO2,i,j)
@@ -1124,7 +1205,7 @@ subroutine biogem(        &
                           diag_misc_2D(idiag_misc_2D_FpCO2_13C,i,j) = locij_fatm(ia_pCO2_13C,i,j)
                        end if
                     else
-                       ! (2c) atmospheric pCO2
+                       ! (3c) atmospheric pCO2
                        ! NOTE: this code has a similar effect of restoring forcing, except that it allows
                        !       the isotopic properties of the flux to be prescribed rather than just the final isotopic state
                        ! NOTE: the threshold is set via a prescribed restoring signal
@@ -2957,7 +3038,7 @@ SUBROUTINE diag_biogem_timeslice( &
         if_save3: if (dum_save) then
 
            ! reconstruct local interface fluxes and update whole-ocean carbonate equilibrium
-           IF (opt_select(iopt_select_carbchem)) THEN
+           IF (opt_select(iopt_select_carbchem) .AND. ctrl_data_save_slice_carb_update) THEN
               DO i=1,n_i
                  DO j=1,n_j
                     loc_k1 = goldstein_k1(i,j)

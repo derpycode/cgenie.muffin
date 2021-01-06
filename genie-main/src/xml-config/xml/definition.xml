@@ -4060,6 +4060,10 @@
 			<value datatype="boolean">.false.</value>
                         <description>Replace internal [Cd/P]POM/[Cd/P]SW alpha?</description>
                     </param>
+                    <param name="ctrl_force_det_Fe_sol">
+			<value datatype="boolean">.false.</value>
+                        <description>Replace internal dust Fe solubility field?</description>
+                    </param>
                     <param name="ctrl_force_scav_fpart_POC">
 			<value datatype="boolean">.false.</value>
                         <description>Replace internal POC flux for 230Th and 231Pa isotope scavenging?</description>
@@ -4099,6 +4103,10 @@
                     <param name="par_Cd_alpha_file">
 			<value datatype="string">Cd_alpha.dat</value>
                         <description></description>
+                    </param>
+                    <param name="par_det_Fe_sol_file">
+			<value datatype="string">worjh2.det_Fe_sol.NULL.dat</value>
+                        <description>Filename for dust Fe solubility field</description>
                     </param>
                     <param name="par_scav_fpart_POC_file">
 			<value datatype="string">scav_fpart_POC.dat</value>
@@ -5394,6 +5402,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_data_save_slice_cdrmip">
 			<value datatype="boolean">.false.</value>
                         <description>Save cdrmip data (only)?</description>
+                    </param>
+                    <param name="ctrl_data_save_slice_carb_update">
+			<value datatype="boolean">.true.</value>
+                        <description>Update carbonate chemistry for saving?</description>
                     </param>
 <!-- DATA SAVING: TIME-SERIES -->
                     <param name="ctrl_data_save_sig_ocnatm">

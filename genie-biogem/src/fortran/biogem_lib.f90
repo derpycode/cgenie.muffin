@@ -81,8 +81,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_Cd_alpha
   logical::ctrl_force_CaCO3ballastcoeff                                 ! Set spatial ballast coefficient distribution (CaCO3)
   logical::ctrl_force_opalballastcoeff                                  ! Set spatial ballast coefficient distribution (opal)
-  logical::ctrl_force_detballastcoeff                                  ! Set spatial ballast coefficient distribution (det)
+  logical::ctrl_force_detballastcoeff                                   ! Set spatial ballast coefficient distribution (det)
   NAMELIST /ini_biogem_nml/ctrl_force_CaCO3ballastcoeff,ctrl_force_opalballastcoeff,ctrl_force_detballastcoeff
+  logical::ctrl_force_det_Fe_sol                                        ! Set spatial dust Fe solubility?
+  NAMELIST /ini_biogem_nml/ctrl_force_det_Fe_sol
   logical::ctrl_force_scav_fpart_POC                                    ! Replace internal POC flux for isotope scavenging
   logical::ctrl_force_scav_fpart_CaCO3                                  ! Replace internal CaCO3 flux for isotope scavenging
   logical::ctrl_force_scav_fpart_opal                                   ! Replace internal opal flux for isotope scavenging
@@ -102,6 +104,8 @@ MODULE biogem_lib
   CHARACTER(len=127)::par_opalballastcoeff_file                         !
   CHARACTER(len=127)::par_detballastcoeff_file                          !
   NAMELIST /ini_biogem_nml/par_CaCO3ballastcoeff_file,par_opalballastcoeff_file,par_detballastcoeff_file
+  CHARACTER(len=127)::par_det_Fe_sol_file                               !
+  NAMELIST /ini_biogem_nml/par_det_Fe_sol_file
   CHARACTER(len=127)::par_scav_fpart_POC_file                           !
   CHARACTER(len=127)::par_scav_fpart_CaCO3_file                         !
   CHARACTER(len=127)::par_scav_fpart_opal_file                          !
@@ -630,6 +634,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_data_save_slice_autoend
   LOGICAL::ctrl_data_save_slice_cdrmip                           ! save cdrmip data (only)?
   NAMELIST /ini_biogem_nml/ctrl_data_save_slice_cdrmip
+  LOGICAL::ctrl_data_save_slice_carb_update                      ! Update carbonate chemistry for saving?
+  NAMELIST /ini_biogem_nml/ctrl_data_save_slice_carb_update
   ! ------------------- DATA SAVING: TIME-SERIES --------------------------------------------------------------------------------- !
   LOGICAL::ctrl_data_save_sig_ocnatm                             ! time-series data save: Atmospheric (interface) composition?
   LOGICAL::ctrl_data_save_sig_ocn                                ! time-series data save: Oceanic composition?
@@ -778,7 +784,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
   INTEGER,PARAMETER::n_diag_react                         = 09 !
   INTEGER,PARAMETER::n_diag_iron                          = 07 !
-  INTEGER,PARAMETER::n_diag_misc_2D                       = 07 !
+  INTEGER,PARAMETER::n_diag_misc_2D                       = 09 !
   INTEGER::n_diag_redox                                   =  0 !
 
 
@@ -918,11 +924,13 @@ MODULE biogem_lib
   ! diagnostics - misc - 2D
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2                 = 01    !
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2_13C             = 02    !
-  INTEGER,PARAMETER::idiag_misc_2D_FDIC                  = 03    !
-  INTEGER,PARAMETER::idiag_misc_2D_FDIC_13C              = 04    !
-  INTEGER,PARAMETER::idiag_misc_2D_FALK                  = 05    !
-  INTEGER,PARAMETER::idiag_misc_2D_FCa                   = 06    !
-  INTEGER,PARAMETER::idiag_misc_2D_FCa_44Ca              = 07    !
+  INTEGER,PARAMETER::idiag_misc_2D_FpCO2_14C             = 03    !
+  INTEGER,PARAMETER::idiag_misc_2D_FDIC                  = 04    !
+  INTEGER,PARAMETER::idiag_misc_2D_FDIC_13C              = 05    !
+  INTEGER,PARAMETER::idiag_misc_2D_FDIC_14C              = 06    !
+  INTEGER,PARAMETER::idiag_misc_2D_FALK                  = 07    !
+  INTEGER,PARAMETER::idiag_misc_2D_FCa                   = 08    !
+  INTEGER,PARAMETER::idiag_misc_2D_FCa_44Ca              = 09    !
 
   ! *** array index names ***
   ! ocean 'physics'
@@ -1048,8 +1056,10 @@ MODULE biogem_lib
   CHARACTER(len=14),DIMENSION(n_diag_misc_2D),PARAMETER::string_diag_misc_2D = (/ &
        & 'FpCO2         ', &
        & 'FpCO2_13C     ', &
+       & 'FpCO2_14C     ', &
        & 'FDIC          ', &
        & 'FDIC_13C      ', &
+       & 'FDIC_14C      ', &
        & 'FALK          ', &
        & 'FCa           ', &
        & 'FCa_44Ca      ' /)
@@ -1431,6 +1441,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_i,n_j)::par_bio_remin_b                       !
   REAL,DIMENSION(n_i,n_j)::par_misc_2D                           !
   REAL,DIMENSION(n_i,n_j)::force_Fgeothermal2D                   !
+  REAL,DIMENSION(n_i,n_j)::par_det_Fe_sol_2D                     !
 
   ! ****************************************************************************************************************************** !
   ! *** GLOBAL VARIABLES AND RUN-TIME SET PARAMETERS ***************************************************************************** !

@@ -112,6 +112,7 @@ CONTAINS
        print*,'Replace uniform CaCO3 scavenging coefficient?       : ',ctrl_force_CaCO3ballastcoeff
        print*,'Replace uniform opal scavenging coefficient?        : ',ctrl_force_opalballastcoeff
        print*,'Replace uniform det scavenging coefficient?         : ',ctrl_force_detballastcoeff
+       print*,'Replace internal dust Fe solubility field?          : ',ctrl_force_det_Fe_sol
        print*,'Replace internal POC flux for 230Th/231Pa scav.     : ',ctrl_force_scav_fpart_POC
        print*,'Replace internal CaCO3 flux for 230Th/231Pa scav.   : ',ctrl_force_scav_fpart_CaCO3
        print*,'Replace internal opal flux for 230Th/231Pa scav.    : ',ctrl_force_scav_fpart_opal
@@ -125,6 +126,7 @@ CONTAINS
        print*,'Filename for CaCO3 ballast coefficient field        : ',trim(par_CaCO3ballastcoeff_file)
        print*,'Filename for opal ballast coefficient field         : ',trim(par_opalballastcoeff_file)
        print*,'Filename for det ballast coefficient field          : ',trim(par_detballastcoeff_file)
+       print*,'Filename for dust Fe solubility field               : ',trim(par_det_Fe_sol_file)
        print*,'Filename for imposed scavenging POC flux            : ',trim(par_scav_fpart_POC_file)
        print*,'Filename for imposed scavenging CaCO3 flux          : ',trim(par_scav_fpart_CaCO3_file)
        print*,'Filename for imposed scavenging opal flux           : ',trim(par_scav_fpart_opal_file)
@@ -454,6 +456,7 @@ CONTAINS
        print*,'Number of timesteps in sub-inteval saving           : ',par_data_save_slice_n
        print*,'Auto save at run end?                               : ',ctrl_data_save_slice_autoend
        print*,'Save cdrmip data (only)?                            : ',ctrl_data_save_slice_cdrmip
+       print*,'Update carbonate chemistry for saving?              : ',ctrl_data_save_slice_carb_update
        ! --- DATA SAVING: TIME-SERIES -------------------------------------------------------------------------------------------- !
        print*,'--- BIOGEM DATA SAVING: TIME-SERIES ----------------'
        print*,'Atmospheric (interface) composition?                : ',ctrl_data_save_sig_ocnatm
@@ -604,6 +607,7 @@ CONTAINS
     if (sed_select(is_FeCO3))    ctrl_carbchemupdate_full = .true.
     if (sed_select(is_Fe3Si2O4)) ctrl_carbchemupdate_full = .true.
     if (ocn_select(io_CH4))      ctrl_carbchemupdate_full = .true.
+    ! set uniform solubility parameter
     ! -------------------------------------------------------- !
     ! MISC
     ! -------------------------------------------------------- !
@@ -881,6 +885,18 @@ CONTAINS
        CALL sub_load_data_ij(loc_filename,n_i,n_j,par_bio_remin_kl(:,:))
     else
        par_bio_remin_kl(:,:) = par_bio_remin_ballast_kl
+    end if
+
+    ! *** load prescribed dust Fe solubility field (if requested) ***
+    ! NOTE: populate the 2D solubility field <par_det_Fe_sol_exp> uniformly to the value of the solubilty parameter, par_det_Fe_sol
+    !       if a spatially-explicit field is not requested
+    ! NOTE: convert the solubility field from percent to fractional solubility
+    if (ctrl_force_det_Fe_sol) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_det_Fe_sol_file)
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,par_det_Fe_sol_2D(:,:))
+       par_det_Fe_sol_2D(:,:) = par_det_Fe_sol_2D(:,:)/100.0
+    else
+       par_det_Fe_sol_2D(:,:) = par_det_Fe_sol
     end if
 
     ! *** load prescribed POC scavenging coefficient field (if requested) ***
@@ -2169,8 +2185,8 @@ CONTAINS
        IF (loc_force_restore_select .AND. loc_force_flux_select) then
           CALL sub_report_error( &
                & 'biogem_data','sub_init_tracer_forcing_ocn', &
-               & 'You are being greedy ... and have both flux AND restoring atmospheric forcing selected'// &
-               & '(gem_config_atm.par) - Is this really what you intended?', &
+               & 'You are being greedy ... and have both flux AND restoring ocean forcing selected'// &
+               & '(gem_config_ocn.par) - Is this really what you intended?', &
                & 'CONTINUING', &
                & (/const_real_null/),.false. &
                & )
@@ -2898,6 +2914,8 @@ CONTAINS
   ! DATA SAVE META CONFIG
   SUBROUTINE sub_adj_par_save()
 
+    !
+    ! NOTE: the value of ctrl_data_save_sig_diag_redox_old is set independently
     select case (par_data_save_level)
     case (0:99)
        ctrl_data_save_slice_ocnatm = .false.
@@ -2913,52 +2931,62 @@ CONTAINS
        ctrl_data_save_slice_phys_atm = .false.
        ctrl_data_save_slice_phys_ocn = .false.
        ctrl_data_save_slice_misc = .false.
-       ctrl_data_save_slice_diag = .false.
        ctrl_data_save_slice_diag_bio = .false.
        ctrl_data_save_slice_diag_geochem = .false.
        ctrl_data_save_slice_diag_proxy = .false.
        ctrl_data_save_slice_diag_tracer = .false.
        ctrl_data_save_sig_ocnatm = .false.
        ctrl_data_save_sig_ocn = .false.
-       ctrl_data_save_sig_fexport = .false.
-       ctrl_data_save_sig_fairsea = .false.
        ctrl_data_save_sig_ocnsed = .false.
+       ctrl_data_save_sig_fairsea = .false.
        ctrl_data_save_sig_focnatm = .false.
        ctrl_data_save_sig_focnsed = .false.
        ctrl_data_save_sig_fsedocn = .false.
+       ctrl_data_save_sig_fexport = .false.
        ctrl_data_save_sig_ocn_sur = .false.
        ctrl_data_save_sig_carb_sur = .false.
        ctrl_data_save_sig_misc = .false.
        ctrl_data_save_sig_diag = .false.
+       ctrl_data_save_sig_diag_bio = .false.
+       ctrl_data_save_sig_diag_geochem = .false.
        ctrl_data_save_derived = .false.
        ctrl_data_save_GLOBAL = .false.
     case default
        ! set new *non namelist* defined sub-options (to broadly retain back-compatability)
-       ctrl_data_save_slice_diag_bio = ctrl_data_save_slice_diag
+       ctrl_data_save_slice_diag_bio     = ctrl_data_save_slice_diag
        ctrl_data_save_slice_diag_geochem = ctrl_data_save_slice_diag
-       ctrl_data_save_slice_diag_proxy = ctrl_data_save_slice_diag
-       ctrl_data_save_slice_diag_tracer = ctrl_data_save_slice_diag
-       ctrl_data_save_sig_diag_bio = ctrl_data_save_sig_diag
-       ctrl_data_save_sig_diag_geochem = ctrl_data_save_sig_diag
+       ctrl_data_save_slice_diag_proxy   = ctrl_data_save_slice_diag
+       ctrl_data_save_slice_diag_tracer  = ctrl_data_save_slice_diag
+       ctrl_data_save_sig_diag_bio       = ctrl_data_save_sig_diag
+       ctrl_data_save_sig_diag_geochem   = ctrl_data_save_sig_diag
     end select
 
     ! meta meta options
     if (ctrl_data_save_slice_cdrmip) par_data_save_level = 0
+    
+    ! no longer used! [REMOVE]
+    ctrl_data_save_slice_diag = .false.
 
     ! set BASIC options
     select case (par_data_save_level)
     case (2:99)
        ctrl_data_save_slice_ocn    = .true.
        ctrl_data_save_slice_ocnatm = .true.
-       ctrl_data_save_slice_ocnsed = .true.
        ctrl_data_save_slice_misc   = .true.
        ctrl_data_save_slice_sur    = .true.
        ctrl_data_save_sig_ocn      = .true.
        ctrl_data_save_sig_ocnatm   = .true.
-       ctrl_data_save_sig_ocnsed   = .true.
        ctrl_data_save_sig_misc     = .true.
        ctrl_data_save_sig_ocn_sur  = .true.
        ctrl_data_save_GLOBAL       = .true.
+       If (flag_sedgem) then
+          ctrl_data_save_slice_ocnsed  = .true.
+          ctrl_data_save_slice_focnsed = .true.
+          ctrl_data_save_slice_fsedocn = .true.
+          ctrl_data_save_sig_ocnsed    = .true.
+          ctrl_data_save_sig_focnsed   = .true.
+          ctrl_data_save_sig_fsedocn   = .true.
+       end if
     case default
        ! NOTHING
     end select
@@ -2967,9 +2995,9 @@ CONTAINS
     case (0)
        ! save NOTHING
     case (1)
-       ! MINIMUM (biogeochem ONLY)
-       ctrl_data_save_slice_misc = .false.
-       ctrl_data_save_sig_misc = .false.
+       ! only (full) physics
+       ctrl_data_save_slice_phys_atm = .true.
+       ctrl_data_save_slice_phys_ocn = .true.
     case (2)
        ! BASIC (biogeochem + BASIC physics)
     case (3)
@@ -2977,21 +3005,18 @@ CONTAINS
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
     case (4)
        ! BASIC + geochem diagnostics
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (5)
        ! BASIC + biology + geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
@@ -2999,22 +3024,17 @@ CONTAINS
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_fairsea = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (6)
        ! BASIC + tracer + proxy diagnostics
        ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_sig_carb_sur = .true.
@@ -3023,36 +3043,32 @@ CONTAINS
        ! BASIC + biology + tracer + proxy diagnostics
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
-       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
-       ctrl_data_save_sig_diag = .true.
     case (8)
        ! BASIC + biology + tracer + proxy + geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_data_save_derived = .true.
     case (9)
        ! BASIC + full physics
@@ -3063,29 +3079,25 @@ CONTAINS
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_sur = .true.
+       ctrl_data_save_slice_carbconst = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       ctrl_data_save_slice_ocnsed = .false.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (11)
        ! BASIC + biology + tracer + proxy + redox diagnostics
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
-       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_bio_remin_redox_save=.true.
@@ -3098,15 +3110,11 @@ CONTAINS
        ! BASIC + FULL (inc. redox) geochem diagnostics
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (15)
        ! BASIC + biology + FULL (inc. redox) geochem diagnostics
@@ -3115,18 +3123,14 @@ CONTAINS
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_fairsea = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (16)
        ! BASIC + biology + tracer + proxy diagnostics + FULL (inc. redox) geochem
@@ -3138,16 +3142,14 @@ CONTAINS
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_data_save_derived = .true.
        ctrl_bio_remin_redox_save=.true.
     case (99)
@@ -3162,17 +3164,15 @@ CONTAINS
        ctrl_data_save_slice_phys_atm = .true.
        ctrl_data_save_slice_phys_ocn = .true.
        ctrl_data_save_slice_misc = .true.
-       ctrl_data_save_slice_diag = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
-       if (flag_sedgem) ctrl_data_save_slice_ocnsed = .true.
        ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_ocnatm = .true.
        ctrl_data_save_sig_ocn = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_ocn_sur = .true.
@@ -3182,11 +3182,8 @@ CONTAINS
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
        ctrl_data_save_derived = .true.
-       ctrl_data_save_GLOBAL = .true.
-       if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
+       ctrl_data_save_GLOBAL = .true.
     case default
        ! [leave user-specified settings]
     end select
