@@ -252,7 +252,7 @@ c SG (15/02/2K7) : added ENTS albedo scheme flag
 
 c SG (16/02/2K7) : added orbital parameters for albedo calculation
       integer en_ntimes_max
-      parameter (en_ntimes_max=2000)
+      parameter (en_ntimes_max=16383)
 
       character*200 filenameorbit
       integer t_orbit,norbit,orbitsteps
