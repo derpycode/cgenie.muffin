@@ -536,7 +536,7 @@ CONTAINS
 
     INTEGER                                 :: alloc_stat, i, ios
 
-    n_outputs = 29
+    n_outputs = 32
     ALLOCATE(time_series_names(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
     ALLOCATE(output_descriptions(n_outputs),stat=alloc_stat)
@@ -563,6 +563,9 @@ CONTAINS
          & 'DIC_flux_coast                                    ', &
          & 'Ca_flux_coast                                     ', &
          & 'DIC_13C_flux                                      ', &
+         & 'Os_flux                                           ', &
+         & '187Os_flux                                        ', &
+         & '188Os_flux                                        ', &
          & 'ALK_flux_land                                     ', &
          & 'DIC_flux_land                                     ', &
          & 'Ca_flux_land                                      ', &
@@ -596,6 +599,9 @@ CONTAINS
          & 'DIC weathering flux (Tmol yr-1)                  ', & ! but as they are already spread over land for 2D schemes
          & 'Ca weathering flux (Tmol yr-1)                   ', & ! they are just set to the exact same fluxes as the ones below
          & 'DIC_13C weathering flux (Tmol yr-1)              ', & !
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ', &
                                 !'                            * land *                              '
          & 'ALK weathering flux (Tmol yr-1)                  ', &
          & 'DIC weathering flux (Tmol yr-1)                  ', &
@@ -784,7 +790,7 @@ CONTAINS
     OPEN(in,file=TRIM(par_indir_name)//TRIM(par_weathopt)//'_consts.dat',iostat=ios)
     call check_iostat(ios,__LINE__,__FILE__)
     DO i = 1,par_nliths
-       read(in,*,iostat=ios)(weath_consts(i,j),j=1,4)
+       read(in,*,iostat=ios)(weath_consts(i,j),j=1,7)
        call check_iostat(ios,__LINE__,__FILE__)
     END DO
     CLOSE(in,iostat=ios)
