@@ -33,23 +33,23 @@ All experiments are run for 10,000 years from 'cold' (no restart).
 
 ### model experiments -- 'standard' ############################
 
-./runmuffin.sh muffin.CB.umQ00p0a MS\boscologalazzoetal.2021 0Ma_stnd_280_0.2.SPIN 10000
-./runmuffin.sh muffin.CB.umQ02p5a MS\boscologalazzoetal.2021 2_5Ma_stnd_400_0.3.SPIN 10000
-./runmuffin.sh muffin.CB.umQ04p5a MS\boscologalazzoetal.2021 4_5Ma_stnd_400_0.5.SPIN 10000
-./runmuffin.sh muffin.CB.umQ07p5a MS\boscologalazzoetal.2021 7_5Ma_stnd_800_0.4.SPIN 10000
-./runmuffin.sh muffin.CB.umQ10p0a MS\boscologalazzoetal.2021 10Ma_stnd_800_0.3.SPIN 10000
-./runmuffin.sh muffin.CB.umQ12p5a MS\boscologalazzoetal.2021 12_5Ma_stnd_1120_0.2.SPIN 10000
-./runmuffin.sh muffin.CB.umQ15p0a MS\boscologalazzoetal.2021 15Ma_stnd_1120_0.0.SPIN 10000
+./runmuffin.sh muffin.CB.umQ00p0a MS/boscologalazzoetal.2021 0Ma_stnd_280_0.2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ02p5a MS/boscologalazzoetal.2021 2_5Ma_stnd_400_0.3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ04p5a MS/boscologalazzoetal.2021 4_5Ma_stnd_400_0.5.SPIN 10000
+./runmuffin.sh muffin.CB.umQ07p5a MS/boscologalazzoetal.2021 7_5Ma_stnd_800_0.4.SPIN 10000
+./runmuffin.sh muffin.CB.umQ10p0a MS/boscologalazzoetal.2021 10Ma_stnd_800_0.3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ12p5a MS/boscologalazzoetal.2021 12_5Ma_stnd_1120_0.2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ15p0a MS/boscologalazzoetal.2021 15Ma_stnd_1120_0.0.SPIN 10000
 
 ### model experiments -- T-dependent ###########################
 
-./runmuffin.sh muffin.CB.umQ00p0a MS\boscologalazzoetal.2021 0Ma_Tdep_280_0.2.SPIN 10000
-./runmuffin.sh muffin.CB.umQ02p5a MS\boscologalazzoetal.2021 2_5Ma_Tdep_400_0.3.SPIN 10000
-./runmuffin.sh muffin.CB.umQ04p5a MS\boscologalazzoetal.2021 4_5Ma_Tdep_400_0.5.SPIN 10000
-./runmuffin.sh muffin.CB.umQ07p5a MS\boscologalazzoetal.2021 7_5Ma_Tdep_800_0.4.SPIN 10000
-./runmuffin.sh muffin.CB.umQ10p0a MS\boscologalazzoetal.2021 10Ma_Tdep_800_0.3.SPIN 10000
-./runmuffin.sh muffin.CB.umQ12p5a MS\boscologalazzoetal.2021 12_5Ma_Tdep_1120_0.2.SPIN 10000
-./runmuffin.sh muffin.CB.umQ15p0a MS\boscologalazzoetal.2021 15Ma_Tdep_1120_0.0.SPIN 10000
+./runmuffin.sh muffin.CB.umQ00p0a MS/boscologalazzoetal.2021 0Ma_Tdep_280_0.2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ02p5a MS/boscologalazzoetal.2021 2_5Ma_Tdep_400_0.3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ04p5a MS/boscologalazzoetal.2021 4_5Ma_Tdep_400_0.5.SPIN 10000
+./runmuffin.sh muffin.CB.umQ07p5a MS/boscologalazzoetal.2021 7_5Ma_Tdep_800_0.4.SPIN 10000
+./runmuffin.sh muffin.CB.umQ10p0a MS/boscologalazzoetal.2021 10Ma_Tdep_800_0.3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ12p5a MS/boscologalazzoetal.2021 12_5Ma_Tdep_1120_0.2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ15p0a MS/boscologalazzoetal.2021 15Ma_Tdep_1120_0.0.SPIN 10000
 
 ################################################################
 ################################################################
