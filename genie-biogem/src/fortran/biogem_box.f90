@@ -3724,6 +3724,7 @@ CONTAINS
        end if
     end if
     ! record settling fluxes
+    ! NOTE: units of mol per time-step
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        bio_settle(is,dum_i,dum_j,:) = loc_bio_settle(l,:)
