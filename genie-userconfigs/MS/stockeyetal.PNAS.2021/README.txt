@@ -51,7 +51,7 @@ y --> 0.5, 1, 2, 4, 8, 16
 
 # Ordovician continental configuration - shallow remineralization depth
 y --> 4, 8, 16, 32, 64, 128
-./runmuffin.sh muffin.CB.fm0450dc.BASES MS/stockeyetal.PNAS.2021/fm0450.CO2.O2.shallowremin muffin.CB.fm0450dc.BASES.yCO2.xO2.0.34EFD.config 10000
+./runmuffin.sh muffin.CB.fm0450dc.BASES MS/stockeyetal.PNAS.2021/fm0450.CO2.O2.shallow.remin muffin.CB.fm0450dc.BASES.yCO2.xO2.0.34EFD.config 10000
 
 ################################################################
 ################################################################
