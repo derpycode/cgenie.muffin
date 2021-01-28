@@ -206,6 +206,8 @@ subroutine ecogem(          &
                  call sub_adj_carbconst(        &
                       & loc_ocn(io_Ca  ,i,j,k), &
                       & loc_ocn(io_Mg  ,i,j,k), &
+                      & loc_ocn(io_S,i,j,k), &
+                      & loc_ocn(io_T,i,j,k),&
                       & eco_carbconst(:,i,j,k)  &
                       & )
               end if

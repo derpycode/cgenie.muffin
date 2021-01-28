@@ -140,6 +140,8 @@ SUBROUTINE sedgem(          &
               call sub_adj_carbconst(          &
                    & dum_sfcsumocn(io_Ca,i,j), &
                    & dum_sfcsumocn(io_Mg,i,j), &
+                   & dum_sfcsumocn(io_S,i,j), &
+                   & dum_sfcsumocn(io_T,i,j),&
                    & sed_carbconst(:,i,j)      &
                    & )
            end if

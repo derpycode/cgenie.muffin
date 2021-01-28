@@ -267,7 +267,6 @@ CONTAINS
   END SUBROUTINE sub_calc_carbconst
   ! ****************************************************************************************************************************** !
 
-
   ! ****************************************************************************************************************************** !
   ! ADJUST CARBONATE EQUILIBRIUM CONSTANTS
   ! NOTE: to take into account the deviation from modern of:
@@ -275,9 +274,11 @@ CONTAINS
   SUBROUTINE sub_adj_carbconst( &
        & dum_Ca,                &
        & dum_Mg,                &
+       & dum_sal,               &
+       & dum_temp,              &
        & dum_carbconst)
     ! dummy variables
-    REAL,INTENT(in)::dum_Ca,dum_Mg
+    REAL,INTENT(in)::dum_Ca,dum_Mg,dum_sal,dum_temp
     REAL,DIMENSION(n_carbconst),intent(inout)::dum_carbconst
     ! local variables
     real::loc_alpha
@@ -286,12 +287,39 @@ CONTAINS
     loc_alpha = 3.655E-8
     loc_ratio = 1.0
     if (dum_Ca > const_real_nullsmall) loc_ratio = dum_Mg/dum_Ca
-    ! (1a) adjust Ksp
-    !      NOTE: following Tyrrell and Zeebe [2004]
-    dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) - loc_alpha*(const_conc_MgtoCa - loc_ratio)
-    ! (1b) adjust K1 and K2
-    dum_carbconst(icc_k1) = (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
-    dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
+    select case ((par_adj_carbconst_option))
+    case ('TyrrellZeebe2004')
+      ! (1a) adjust Ksp
+      !      NOTE: following Tyrrell and Zeebe [2004]
+      dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) - loc_alpha*(const_conc_MgtoCa - loc_ratio)
+      ! (1b) adjust K1 and K2
+      dum_carbconst(icc_k1) = (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
+      dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
+    case ('Hain2015')
+      ! (1a) adjust Ksp via a look-up table based on MyAMI (downloaded 10/01/2021)
+      !      NOTE: following Hain et al. [2015,2018]
+      !dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
+      !      & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,loc_sal,loc_temp, &
+      !      & lookup_Ca_max,lookup_Mg_max,lookup__max,lookup_temp_max,     &
+      !      & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+      !      & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+      !      & lookup_i_sal_min,lookup_i_sal_max,                               &
+      !      & lookup_i_temp_min,lookup_i_temp_max                              &
+      !      & )
+      !dum_carbconst(icc_karg) = dum_carbconst(icc_kcal) - loc_alpha*(const_conc_MgtoCa - loc_ratio)
+      ! (1b) adjust K1 and K2
+      !print*, (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
+      dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
+            & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
+            & )
+      !print*, dum_carbconst(icc_k1)
+      dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
+    end SELECT
   end SUBROUTINE sub_adj_carbconst
   ! ****************************************************************************************************************************** !
 

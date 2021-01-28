@@ -102,6 +102,8 @@ subroutine gemlite(    &
               call sub_adj_carbconst(     &
                    & ocn(conv_io_lselected(io_Ca),i,j,n_k),  &
                    & ocn(conv_io_lselected(io_Mg),i,j,n_k),  &
+                   & ocn(conv_io_lselected(io_S),i,j,n_k),  &
+                   & ocn(conv_io_lselected(io_T),i,j,n_k),  &
                    & carbconst(:,i,j) &
                    & )
            end if
