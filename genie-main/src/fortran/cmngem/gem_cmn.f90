@@ -812,16 +812,16 @@ MODULE gem_cmn
   ! *** look-up table constants ***
   ! Carbonate constant K1
   ! NOTE: following Hain [2015]
-  INTEGER,PARAMETER::lookup_i_Ca_min      = 0                   ! 
-  INTEGER,PARAMETER::lookup_i_Ca_max      = 60                  ! 
-  INTEGER,PARAMETER::lookup_i_Mg_min   = 0                      ! 
-  INTEGER,PARAMETER::lookup_i_Mg_max   = 60                     ! 
-  INTEGER,PARAMETER::lookup_i_sal_min   = 0                     ! 
+  INTEGER,PARAMETER::lookup_i_Ca_min      = 1                   ! 
+  INTEGER,PARAMETER::lookup_i_Ca_max      = 10                  ! 
+  INTEGER,PARAMETER::lookup_i_Mg_min   = 1                      ! 
+  INTEGER,PARAMETER::lookup_i_Mg_max   = 10                     ! 
+  INTEGER,PARAMETER::lookup_i_sal_min   = 1                     ! 
   INTEGER,PARAMETER::lookup_i_sal_max   = 21                    ! 
-  INTEGER,PARAMETER::lookup_i_temp_min  = 0                     ! 
+  INTEGER,PARAMETER::lookup_i_temp_min  = 1                     ! 
   INTEGER,PARAMETER::lookup_i_temp_max  = 21                    ! 
   REAL,PARAMETER::lookup_Ca_max      = 0.060                    ! 
-  REAL,PARAMETER::lookup_Mg_max   = 0.060                       ! 
+  REAL,PARAMETER::lookup_Mg_max   = 0.020                       ! 
   REAL,PARAMETER::lookup_sal_max   = 40                         ! 
   REAL,PARAMETER::lookup_temp_max  = 40                         ! 
   ! -------------------- look-up tables ------------------------------------------------------------------------------------------ !
