@@ -14,6 +14,9 @@ SUBROUTINE initialise_gem()
   ! *** load lookup tables ***
   if (par_adj_carbconst_option == 'Hain2015') then
     call sub_load_gem_MyAMI_lookup_K1
+    call sub_load_gem_MyAMI_lookup_K2
+    call sub_load_gem_MyAMI_lookup_Kcal
+    call sub_load_gem_MyAMI_lookup_Karg
   endif
 
   ! *** initialize GeM ***
