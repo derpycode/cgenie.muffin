@@ -296,7 +296,6 @@ CONTAINS
       dum_carbconst(icc_k1) = (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
       dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
     case ('Hain2015')
-      print*, dum_carbconst(icc_k1),dum_carbconst(icc_k2)
       ! (1a) adjust Ksp via a look-up table based on MyAMI (downloaded 10/01/2021)
       !      NOTE: following Hain et al. [2015,2018]
       !dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
@@ -324,14 +323,14 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      !dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
-      !      & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,dum_sal,dum_temp, &
-      !      & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-      !      & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-      !      & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-      !      & lookup_i_sal_min,lookup_i_sal_max,                               &
-      !      & lookup_i_temp_min,lookup_i_temp_max                              &
-      !      & )
+      dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
+            & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
+            & )
     end SELECT
   end SUBROUTINE sub_adj_carbconst
   ! ****************************************************************************************************************************** !
