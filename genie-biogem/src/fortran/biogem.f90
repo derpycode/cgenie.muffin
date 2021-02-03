@@ -640,12 +640,6 @@ subroutine biogem(        &
      end do
      
      
-     ! ---- YK added for PO4 adsorption on FeOOH (12/05/2020) 
-     ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-     ! (so removing this block should not affect anything; going to remove later)
-     ocn_ads_prev_PO4_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6*bio_part(is_FeOOH,:,:,:)*1e6 *1e-6  ! coeff is defined for umol/kg
-     ocn_ads_prev_PO4_POM_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6* bio_part(is_POM_FeOOH,:,:,:)*1e6 *1e-6
-     ! ---- End 
      ! ****************************************************************************************************************************
      
 
@@ -1758,40 +1752,6 @@ subroutine biogem(        &
                     dum_sfxsed1(is,i,j) = phys_ocn(ipo_rA,i,j,loc_k1)*locij_focnsed(is,i,j)*loc_rdts
                  end SELECT
               end do
-              ! print *,'check FeOOM',i,j,bio_settle(is_POM_FeOOH,i,j,loc_k1)
-              
-              ! ---- YK added (12/10/2020) 
-              ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-              ! (so removing this block should not affect anything; going to remove later)
-              if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
-                 if (sed_select(is_FeOOH)) then
-                    ! fsed_ads_PO4_FeOOH(i,j) = phys_ocn(ipo_rA,i,j,loc_k1)*settle_ads_PO4_FeOOH(i,j,loc_k1)*loc_rdts
-                    fsed_ads_PO4_FeOOH(i,j) = &
-                       par_bio_Kd_PO4_FeOOH  &! coefficient 
-                       *bio_settle(is_FeOOH,i,j,loc_k1)*phys_ocn(ipo_rM,i,j,loc_k1)*1e6  &! converting from mol to umol/kg
-                       *ocn(io_PO4,i,j,loc_k1)*1e6   &! converting from mol/kg to umol/kg
-                       *1e-6   &! converting from umol/kg to mol/kg
-                       *phys_ocn(ipo_M,i,j,loc_k1)  &! converting from mol/kg to mol 
-                       *phys_ocn(ipo_rA,i,j,loc_k1)*loc_rdts  ! converting to mol/m2/s
-                    ! print*,'check ads PO4' ,i,j,fsed_ads_PO4_FeOOH(i,j)
-                    ! dum_sfxocn1(io_PO4,i,j) = dum_sfxocn1(io_PO4,i,j) - fsed_ads_PO4_FeOOH(i,j)
-                    ! dum_sfxocn1(io_PO4,i,j) = - fsed_ads_PO4_FeOOH(i,j)
-                 elseif (sed_select(is_POM_FeOOH)) then
-                    ! fsed_ads_PO4_POM_FeOOH(i,j) = phys_ocn(ipo_rA,i,j,loc_k1)*settle_ads_PO4_POM_FeOOH(i,j,loc_k1)*loc_rdts
-                    fsed_ads_PO4_POM_FeOOH(i,j) = &
-                       par_bio_Kd_PO4_FeOOH  &
-                       *bio_settle(is_POM_FeOOH,i,j,loc_k1)*phys_ocn(ipo_rM,i,j,loc_k1)*1e6  &! converting from mol to umol/kg
-                       *ocn(io_PO4,i,j,loc_k1)*1e6   &! converting from mol/kg to umol/kg
-                       *1e-6   &! converting from umol/kg to mol/kg
-                       *phys_ocn(ipo_M,i,j,loc_k1)  &! converting to mol 
-                       *phys_ocn(ipo_rA,i,j,loc_k1)*loc_rdts  ! converting to mol/m2/s
-                    ! print*,'check ads PO4' ,i,j,fsed_ads_PO4_POM_FeOOH(i,j)
-                    ! dum_sfxocn1(io_PO4,i,j) = dum_sfxocn1(io_PO4,i,j) - fsed_ads_PO4_POM_FeOOH(i,j)
-                    ! dum_sfxocn1(io_PO4,i,j) = - fsed_ads_PO4_POM_FeOOH(i,j)
-                 endif 
-              endif 
-              ! ---- end
-              
               ! (4) set age tracers
               if (sed_select(is_CaCO3_age)) then
                  dum_sfxsed1(is_CaCO3_age,i,j) = loc_t*dum_sfxsed1(is_CaCO3,i,j)
@@ -1847,24 +1807,6 @@ subroutine biogem(        &
      ! *** (i,j) GRID PT LOOP END *** !
      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
      
-     
-     
-     ! ------ YK added for PO4 adsorption on FeOOH
-     ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-     ! (so removing this block should not affect anything; going to remove later)
-     ocn_ads_PO4_FeOOH = par_bio_Kd_PO4_FeOOH*ocn(io_PO4,:,:,:)*1e6* bio_part(is_FeOOH,:,:,:)*1e6 *1e-6 ! coeff is defined for umol/kg
-     ocn_ads_PO4_POM_FeOOH = par_bio_Kd_PO4_FeOOH* ocn(io_PO4,:,:,:)*1e6*bio_part(is_POM_FeOOH,:,:,:)*1e6 *1e-6
-     
-     ocn_ads_FeOOH_dPO4 = ocn_ads_PO4_FeOOH - ocn_ads_prev_PO4_FeOOH
-     ocn_ads_POM_FeOOH_dPO4 = ocn_ads_PO4_POM_FeOOH - ocn_ads_prev_PO4_POM_FeOOH
-     
-     ! if change is in excess of available PO4, change is forced to the available values 
-     where (ocn_ads_FeOOH_dPO4> ocn(io_PO4,:,:,:)) ocn_ads_FeOOH_dPO4 = ocn(io_PO4,:,:,:) 
-     where (ocn_ads_POM_FeOOH_dPO4> ocn(io_PO4,:,:,:)) ocn_ads_POM_FeOOH_dPO4 = ocn(io_PO4,:,:,:)
-     ! where such modification is made, adsorbed PO4 is also modified 
-     where (ocn_ads_FeOOH_dPO4 == ocn(io_PO4,:,:,:)) ocn_ads_FeOOH_dPO4 = ocn_ads_prev_PO4_FeOOH + ocn(io_PO4,:,:,:)
-     where (ocn_ads_POM_FeOOH_dPO4 == ocn(io_PO4,:,:,:)) ocn_ads_PO4_POM_FeOOH = ocn_ads_prev_PO4_POM_FeOOH + ocn(io_PO4,:,:,:)
-     ! ----------- end 
         
      ! *** CALCULATE TRACER ANOMOLY ***
      ! NOTE: also, for now, vectorize <ocn>
@@ -1904,45 +1846,6 @@ subroutine biogem(        &
 !!$     end DO
 
   END IF if_go
-                       
-  ! --- YK added 12.10.2020 
-  ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-  ! (so removing this block should not affect anything; going to remove later) 
-  int_dtyr_YK = int_dtyr_YK + loc_dtyr
-  if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
-     if (sed_select(is_FeOOH)) then
-        DO i=1,n_i
-           DO j=1,n_j
-              loc_k1 = goldstein_k1(i,j)
-              int_focnsed_PO4ads_FeOOH = int_focnsed_PO4ads_FeOOH + &
-                 fsed_ads_PO4_FeOOH(i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts  
-                 ! dum_sfxocn1(io_PO4,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
-              int_focsed_FeOOH_chk =  int_focsed_FeOOH_chk + &
-                 dum_sfxsed1(is_FeOOH,i,j)*phys_ocn(ipo_A,i,j,loc_k1) *loc_dts !/loc_dtyr
-           enddo 
-        enddo 
-        int_focnads_PO4_FeOOH = int_focnads_PO4_FeOOH + sum(ocn_ads_FeOOH_dPO4(:,:,:)*phys_ocn(ipo_M,:,:,:))
-     elseif (sed_select(is_POM_FeOOH)) then 
-        ! int_focsed_POM_FeOOH_chk = 0.0
-        DO i=1,n_i
-           DO j=1,n_j
-              loc_k1 = goldstein_k1(i,j)
-              int_focnsed_PO4ads_POM_FeOOH = int_focnsed_PO4ads_POM_FeOOH + &
-                 fsed_ads_PO4_POM_FeOOH(i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
-                 ! dum_sfxocn1(io_PO4,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
-              ! int_focsed_POM_FeOOH_chk = int_focsed_POM_FeOOH_chk + &
-                 ! dum_sfxsed1(is_POM_FeOOH,i,j)*phys_ocn(ipo_A,i,j,loc_k1)*loc_dts
-              int_focsed_POM_FeOOH_chk =  int_focsed_POM_FeOOH_chk + &
-                 dum_sfxsed1(is_POM_FeOOH,i,j)*phys_ocn(ipo_A,i,j,loc_k1) *loc_dts !/loc_dtyr
-           enddo 
-        enddo 
-        int_focnads_PO4_POM_FeOOH = int_focnads_PO4_POM_FeOOH + sum(ocn_ads_POM_FeOOH_dPO4(:,:,:)*phys_ocn(ipo_M,:,:,:))
-     endif        
-     int_ocn_PO4 = sum(ocn(io_PO4,:,:,:)* phys_ocn(ipo_M,:,:,:))        
-  endif 
-  ! print *, int_t_sig,int_t_timeslice,int_t_timeslice_TOT,par_data_save_slice_dt,par_data_save_sig_dt
-  ! print*, int_dtyr_YK,int_ocn_PO4, int_focnsed_PO4ads_POM_FeOOH, int_focnads_PO4_POM_FeOOH, int_focsed_POM_FeOOH_chk
-     ! --- end 
 
   IF (ctrl_debug_lvl1) print*, '*** TEST FOR END-OF-RUN ***'
   ! *** TEST FOR END-OF-RUN ***

@@ -1583,10 +1583,6 @@ CONTAINS
     int_diag_airsea_timeslice(:,:,:)    = 0.0
     int_diag_redox_timeslice(:,:,:,:)   = 0.0
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
-    ! YK added 12/12/2020
-    ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-    ! (so removing this block should not affect anything; going to remove later)
-    ! int_focsed_POM_FeOOH_chk = 0.0
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeslice
   ! ****************************************************************************************************************************** !
@@ -1650,17 +1646,6 @@ CONTAINS
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
-    ! YK added 12/12/2020
-    ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-    ! (so removing this block should not affect anything; going to remove later)
-    int_focsed_POM_FeOOH_chk = 0.0
-    int_focnads_PO4_POM_FeOOH = 0.0
-    int_focnsed_PO4ads_POM_FeOOH = 0.0
-    int_focsed_FeOOH_chk = 0.0
-    int_focnads_PO4_FeOOH = 0.0
-    int_focnsed_PO4ads_FeOOH = 0.0
-    int_dtyr_YK = 0.0
-    !
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeseries
   ! ****************************************************************************************************************************** !

@@ -2779,10 +2779,6 @@ CONTAINS
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_part
     real,dimension(1:n_l_ocn,1:n_k)::loc_bio_remin
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_settle
-    ! YK added (12/10/2020)
-    ! real,dimension(1:n_k)::loc_settle_ads_PO4_FeOOH
-    ! real,dimension(1:n_k)::loc_settle_ads_PO4_POM_FeOOH
-    ! end 
     real,dimension(1:n_l_sed)::loc_bio_part_remin
     real,DIMENSION(n_diag_precip,n_k)::loc_diag_precip
     CHARACTER(len=31)::loc_string     !
@@ -2831,11 +2827,6 @@ CONTAINS
     loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
     !
     loc_bio_settle(:,:) = 0.0
-    
-    ! YK added (12/10/2020)
-    ! loc_settle_ads_PO4_FeOOH        = 0.0
-    ! loc_settle_ads_PO4_POM_FeOOH    = 0.0 
-    ! end 
     !
     loc_vocn(:) = 0.0
     ! -------------------------------------------------------- ! set water column particulate tracer loop limit and sinking rate
@@ -3737,21 +3728,6 @@ CONTAINS
                    loc_bio_settle(l,kk) = loc_bio_settle(l,kk) + dum_vphys_ocn%mk(ipo_M,kk)*loc_bio_part_TMP(l,kk)
                 end SELECT
              end do
-             
-             ! ------ YK added (12/10/2020) 
-             ! if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
-                ! if (sed_select(is_FeOOH)) then
-                   ! loc_settle_ads_PO4_FeOOH(kk) = loc_settle_ads_PO4_FeOOH(kk) &
-                      ! + dum_vphys_ocn%mk(ipo_M,kk)*ocn_ads_PO4_FeOOH(dum_i,dum_j,kk)*1e-6
-                ! elseif (sed_select(is_POM_FeOOH)) then
-                   ! loc_settle_ads_PO4_POM_FeOOH(kk) = loc_settle_ads_PO4_POM_FeOOH(kk) &
-                      ! + dum_vphys_ocn%mk(ipo_M,kk) &
-                      ! *par_bio_Kd_PO4_FeOOH*ocn(io_PO4,dum_i,dum_j,kk)*1e6*loc_bio_part_TMP(is_POM_FeOOH,kk)*1e6*1e-6
-                ! endif 
-             ! endif 
-             ! if (kk==loc_k1) print *,dum_i,dum_j,loc_settle_ads_PO4_POM_FeOOH(kk),ocn(io_PO4,dum_i,dum_j,kk),loc_bio_part_TMP(is_POM_FeOOH,kk)
-             ! ------ end 
-                
           end do
 
        end If
@@ -3780,12 +3756,6 @@ CONTAINS
        is = conv_iselected_is(l)
        bio_settle(is,dum_i,dum_j,:) = loc_bio_settle(l,:)
     end do
-    
-    ! ---- YK added (12/10/2020)
-    ! settle_ads_PO4_FeOOH(dum_i,dum_j,:)     =  loc_settle_ads_PO4_FeOOH(:)
-    ! settle_ads_PO4_POM_FeOOH(dum_i,dum_j,:) =  loc_settle_ads_PO4_POM_FeOOH(:)
-    ! ---- end 
-    
     ! write ocean tracer field and settling flux arrays (global array)
     dum_vbio_part%mk(:,:) = loc_bio_part(:,:)
     ! write ocean tracer remineralization field (global array)
@@ -3981,132 +3951,6 @@ CONTAINS
     ! -------------------------------------------------------- !
   end SUBROUTINE sub_box_react_POMFeOOH_H2S
   ! ****************************************************************************************************************************** !
-
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE SCAVENGING OF PO4 ON FeOOH - [CTR|20200515]
-  ! NOTE: calling of this sub is conditional on both PO4 and 'free' FeOOH not being zero
-  !       (so divide-by-zero issues should already have been screened for ...)
-  SUBROUTINE sub_box_scav_PO4_FeOOH(dum_ocn_PO4,dum_i,dum_j,dum_k,dum_bio_part,dum_bio_remin)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    REAL,INTENT(in)::dum_ocn_PO4
-    integer,INTENT(in)::dum_i,dum_j,dum_k
-    real,dimension(n_sed),INTENT(inout)::dum_bio_part
-    real,dimension(n_ocn),INTENT(inout)::dum_bio_remin
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    real::loc_PO4
-    real::loc_part_den_FeOOH
-    real::loc_Kd
-    real::loc_PO4_scavenging
-    real::loc_PO4ads,loc_PO4ads_prev
-    ! -------------------------------------------------------- !
-    ! INITIALIZE LOCAL VARIABLES
-    ! -------------------------------------------------------- ! set local solutes
-    loc_PO4 = dum_ocn_PO4
-    ! -------------------------------------------------------- ! extract density of 'free' FeOOH
-    loc_part_den_FeOOH = dum_bio_part(is2l(is_FeOOH))
-    ! -------------------------------------------------------- !
-    ! PERFORM SCAVENGING of PO4 on 'free' FeOOH
-    ! -------------------------------------------------------- !
-    
-    if (ocn(io_PO4,dum_i,dum_j,dum_k) /= loc_PO4) then 
-        print *, 'error'
-        print *,dum_i,dum_j,dum_k,ocn(io_PO4,dum_i,dum_j,dum_k),loc_PO4
-        stop
-    endif 
-    
-    loc_PO4ads_prev = ocn_ads_prev_PO4_FeOOH(dum_i,dum_j,dum_k)
-    
-    ! PO4 adsorption on FeOOH 
-    ! PO4(ads) = PO4(aq) + FeOOH
-    ! coefficient is a random number assumed here 
-    loc_Kd = par_bio_Kd_PO4_FeOOH  
-    ! input --dum_ocn_PO4-- is assumed to be aq PO4
-    loc_PO4ads = loc_Kd*loc_PO4*1e6*loc_part_den_FeOOH*1e6
-    loc_PO4_scavenging = loc_PO4ads - loc_PO4ads_prev
-    loc_PO4_scavenging = ocn_ads_FeOOH_dPO4(dum_i,dum_j,dum_k)
-    loc_PO4_scavenging = loc_PO4_scavenging*1e-6
-    if (loc_PO4_scavenging > loc_PO4) loc_PO4_scavenging = loc_PO4
-    ! implement scavenging
-    dum_bio_remin(io2l(io_PO4)) = dum_bio_remin(io2l(io_PO4)) - loc_PO4_scavenging
-    
-    
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_scav_PO4_FeOOH
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE SCAVENGING OF PO4 ON POM-associated FeOOH - [CTR|20200515]
-  ! NOTE: calling of this sub is conditional on both PO4 and POM-associated FeOOH not being zero
-  !       (so divide-by-zero issues should already have been screened for ...)
-  ! NOTE: for now, this is simply an edited copy of sub_box_scav_PO4_FeOOH
-  !       -> a cleaner solution (not involving duplicating code) should be possible and implemented ... sometime ...
-  SUBROUTINE sub_box_scav_PO4_POM_FeOOH(dum_ocn_PO4,dum_i,dum_j,dum_k,dum_bio_part,dum_bio_remin)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    REAL,INTENT(in)::dum_ocn_PO4
-    integer,INTENT(in)::dum_i,dum_j,dum_k
-    real,dimension(n_sed),INTENT(inout)::dum_bio_part
-    real,dimension(n_ocn),INTENT(inout)::dum_bio_remin
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    real::loc_PO4,loc_SiO2
-    real::loc_part_den_POM_FeOOH
-    real::loc_Kd
-    real::loc_PO4_scavenging
-    real::loc_PO4ads,loc_PO4ads_prev
-    ! -------------------------------------------------------- !
-    ! INITIALIZE LOCAL VARIABLES
-    ! -------------------------------------------------------- ! set local solutes
-    loc_PO4 = dum_ocn_PO4
-    ! -------------------------------------------------------- ! extract density of POM-associated FeOOH
-    loc_part_den_POM_FeOOH = dum_bio_part(is2l(is_POM_FeOOH))
-    ! -------------------------------------------------------- !
-    ! PERFORM SCAVENGING of PO4 on POM-associated FeOOH
-    ! -------------------------------------------------------- !
-    
-    
-    if (ocn(io_PO4,dum_i,dum_j,dum_k) /= loc_PO4) then 
-        print *, 'error'
-        print *,dum_i,dum_j,dum_k,ocn(io_PO4,dum_i,dum_j,dum_k),loc_PO4
-        stop
-    endif 
-    
-    loc_PO4ads_prev = dum_bio_part(is2l(is_PO4_POM_FeOOH))
-    
-    ! PO4 adsorption on FeOOH 
-    ! PO4(ads) = PO4(aq) + FeOOH
-    ! coefficient from Bjerrum and Canfield, 2003 
-    loc_Kd = 0.07  !uM-1
-    ! input --dum_ocn_PO4-- is assumed to be aq PO4
-    loc_PO4ads = loc_Kd*loc_PO4*1e6*loc_part_den_POM_FeOOH*1e6 *1e-6 ! mol/kg
-    loc_PO4_scavenging = loc_PO4ads - loc_PO4ads_prev
-    ! loc_PO4_scavenging = ocn_ads_POM_FeOOH_dPO4(dum_i,dum_j,dum_k)
-    loc_PO4_scavenging = loc_PO4_scavenging
-    if (loc_PO4_scavenging > loc_PO4) loc_PO4_scavenging = loc_PO4
-    ! ocn_ads_POM_FeOOH_dPO4(dum_i,dum_j,dum_k) = loc_PO4_scavenging*1e6
-    ! implement scavenging
-    dum_bio_remin(io2l(io_PO4)) = dum_bio_remin(io2l(io_PO4)) - loc_PO4_scavenging
-    dum_bio_remin(is2l(is_PO4_POM_FeOOH)) = dum_bio_remin(is2l(is_PO4_POM_FeOOH)) + loc_PO4_scavenging
-    
-    ! print *,dum_i,dum_j,dum_k,loc_PO4_scavenging*1e6,ocn_ads_POM_FeOOH_dPO4(dum_i,dum_j,dum_k) &
-       ! & ,loc_PO4ads,ocn_ads_PO4_POM_FeOOH(dum_i,dum_j,dum_k)
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_scav_PO4_POM_FeOOH
-  ! ****************************************************************************************************************************** !
-  
   
 
   ! ****************************************************************************************************************************** !

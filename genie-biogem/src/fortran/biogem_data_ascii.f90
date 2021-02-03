@@ -1100,40 +1100,6 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
     END IF
     
-    ! ---- YK added (12.10.2020) 
-    ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-    ! (so removing this block should not affect anything; going to remove later)
-    ! ocean->sediment flux
-    IF (ctrl_data_save_sig_focnsed) THEN
-       loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','focnsed_'//'PO4_ads_FeOOH',string_results_ext &
-            & )  
-       loc_string = '% time (yr) / global PO4 (mol) / global PO4 bur (mol yr-1) / global PO4 ads (mol yr-1)' &
-            & //'/ global FeOOH bur (mol yr-1)'
-       call check_unit(out,__LINE__,__FILE__)
-       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
-       call check_iostat(ios,__LINE__,__FILE__)
-       CLOSE(unit=out,iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-       
-       loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','focnsed_'//'PO4_ads_POM_FeOOH',string_results_ext &
-            & )  
-       loc_string = '% time (yr) / global PO4 (mol) / global PO4 bur (mol yr-1) / global PO4 ads (mol yr-1)' &
-            & //'/ global FeOOH bur (mol yr-1)'
-       call check_unit(out,__LINE__,__FILE__)
-       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
-       call check_iostat(ios,__LINE__,__FILE__)
-       CLOSE(unit=out,iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-       
-    END IF
-    ! ---- end 
-    
   END SUBROUTINE sub_init_data_save_runtime
   ! ****************************************************************************************************************************** !
 
@@ -2808,55 +2774,7 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
     END IF
-    
-    ! ----- YK added 12.10.2020
-    ! (reflecting changes in ocean chemistry to global variables just to check mass balance)
-    ! (so removing this block should not affect anything; going to remove later)
-    
-    ! *** <sig_focnsed_*> ***
-    ! write ocean-sediment flux data
-    ! NOTE: write data both as the total flux, and as the equivalent mean flux density
-    ! NOTE: the surface ocean area is used as a proxy for the ocean bottom area
-    IF (ctrl_data_save_sig_focnsed) THEN
-       
-       loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','focnsed_'//'PO4_ads_FeOOH',string_results_ext &
-            & )  
-       call check_unit(out,__LINE__,__FILE__)
-       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-       WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
-            & loc_t, &
-            & int_ocn_PO4, &
-            & int_focnsed_PO4ads_FeOOH/int_dtyr_YK, &
-            & int_focnads_PO4_FeOOH/int_dtyr_YK, &
-            & int_focsed_FeOOH_chk/int_dtyr_YK
-       call check_iostat(ios,__LINE__,__FILE__)
-       CLOSE(unit=out,iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-       
-       loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','focnsed_'//'PO4_ads_POM_FeOOH',string_results_ext &
-            & )  
-       call check_unit(out,__LINE__,__FILE__)
-       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-       WRITE(unit=out,fmt='(f12.3,4e15.7)',iostat=ios) &
-            & loc_t, &
-            & int_ocn_PO4, &
-            & int_focnsed_PO4ads_POM_FeOOH/int_dtyr_YK, &
-            & int_focnads_PO4_POM_FeOOH/int_dtyr_YK, &
-            & int_focsed_POM_FeOOH_chk/int_dtyr_YK
-       ! print *, int_t_sig,int_t_timeslice,int_t_timeslice_TOT,par_data_save_slice_dt,par_data_save_sig_dt
-       ! print *, int_ocn_PO4, int_focnsed_PO4ads_POM_FeOOH/int_t_sig, &
-              ! int_focnads_PO4_POM_FeOOH/int_t_sig, int_focsed_POM_FeOOH_chk/int_t_sig
-       call check_iostat(ios,__LINE__,__FILE__)
-       CLOSE(unit=out,iostat=ios)
-       call check_iostat(ios,__LINE__,__FILE__)
-    END IF
-    
-    ! ---- end 
-    
+        
   END SUBROUTINE sub_data_save_runtime
   ! ****************************************************************************************************************************** !
 
