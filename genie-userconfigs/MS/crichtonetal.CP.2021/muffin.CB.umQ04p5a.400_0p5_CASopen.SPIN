@@ -44,8 +44,12 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 # --- DATA SAVING ----------------------------------------------
 #
 bg_par_data_save_level=7
-bg_ctrl_debug_lvl0=.true.
-ma_debug_loop=1
+# reduce output
+bg_ctrl_data_save_2d=.true.
+bg_ctrl_data_save_3d=.false.
+# save frequency
+bg_par_infile_slice_name='save_timeslice_EVERY000100.dat'
+bg_par_infile_sig_name='save_timeseries_EVERY000100.dat'
 #
 # --- FORCINGS -------------------------------------------------
 #
