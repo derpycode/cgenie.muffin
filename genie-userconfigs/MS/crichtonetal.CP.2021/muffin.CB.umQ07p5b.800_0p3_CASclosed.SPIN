@@ -51,7 +51,7 @@ ma_debug_loop=1
 #
 # specify forcings
 bg_par_forcing_name="Q_xxxxxx.RpCO2_Rp13CO2.Fsal_SUR"
-bg_par_atm_force_scale_val_4=-5.624
+bg_par_atm_force_scale_val_4=-5.828
 # parameter: bg_par_atm_force_scale_val_3 -- default value modified by factor: 800
 bg_par_atm_force_scale_val_3=0.000800
 # parameter: bg_par_ocn_force_scale_val_2 -- default value modified by factor: 0.3
