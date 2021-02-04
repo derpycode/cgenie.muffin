@@ -63,6 +63,8 @@ MODULE biogem_lib
   ! ------------------- BOUNDARY CONDITIONS -------------------------------------------------------------------------------------- !
   logical::ctrl_force_sed_closedsystem                                  ! Set dissolution flux = rain flux to close system?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closedsystem
+  logical::ctrl_force_sed_closedsystem_SUR                              ! Set dissolution flux = rain flux (at surface)?
+  NAMELIST /ini_biogem_nml/ctrl_force_sed_closedsystem_SUR
   logical::ctrl_force_sed_closed_P                                      ! Balance the P cycle (with weathering)?
   logical::ctrl_force_sed_closed_C                                      ! Balance the C cycle (with weathering)?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closed_P,ctrl_force_sed_closed_C

@@ -4028,6 +4028,10 @@
 			<value datatype="boolean">.true.</value>
                         <description>Set dissolution flux = rain flux to close system?</description>
                     </param>
+                    <param name="ctrl_force_sed_closedsystem_SUR">
+			<value datatype="boolean">.false.</value>
+                        <description>Set dissolution flux = rain flux at surface?</description>
+                    </param>
                     <param name="ctrl_force_sed_closed_P">
 			<value datatype="boolean">.false.</value>
                         <description>Balance the P cycle (with weathering)?</description>
