@@ -48,6 +48,110 @@ CONTAINS
   END SUBROUTINE sub_calc_terrCO2exchange
   ! ****************************************************************************************************************************** !
 
+  ! ****************************************************************************************************************************** !
+  ! EXCHANGE CARBON WITH A DYNAMIC (SLAB) TERRESTRIAL BIOSPHERE | (CTR|01-2021)
+  SUBROUTINE sub_calc_terrbio(i,j,dum_dtyr)
+    IMPLICIT NONE
+    ! dummy arguments
+    INTEGER::i,j
+    real,intent(in)::dum_dtyr
+    real,intent(in)::dum_sfcatm1(n_atm,n_io,n_jo)        ! atmosphere composition interface array
+    ! local variables
+    real::loc_avSLT
+    real::loc_SLT(n_i,n_j)
+    real::loc_SLT0
+    real::loc_maxSLT
+    real::loc_minSLT
+
+    real::loc_CO2
+    real::loc_CO22(n_i,n_j)
+    real::loc_CO20
+    real::loc_maxCO2
+    real::loc_minCO2
+
+    real::loc_Fnpp,loc_Fresp
+    real::loc_Rnpp,loc_Rresp
+
+    ! *** PUT TEMP INTO LOCAL ARRAY
+    ! NOTE: extract temps to local array this way to please intel compilers
+    DO i=1,n_i
+       DO j=1,n_j
+          loc_SLT(i,j) = dum_sfcatm1(ia_T,i,j)
+       END DO
+    END DO
+
+    ! *** CALCULATE CURRENT MEAN SURFACE LAND (AIR) TEMPERATURE (degrees C)
+    ! NOTE: assumes equal-area grid
+    IF ((n_i.EQ.n_io).AND.(n_j.EQ.n_jo)) THEN
+       loc_avSLT = 0.0
+       loc_maxSLT = -100.0
+       loc_minSLT =  100.0
+       DO i=1,n_i
+          DO j=1,n_j
+             m = landmask(i,j) * loc_SLT(i,j)
+             loc_avSLT = loc_avSLT + m
+             IF ((m.GT.loc_maxSLT).AND.(landmask(i,j).EQ.1)) THEN
+                loc_maxSLT = m
+             ENDIF
+             IF ((m.LT.loc_minSLT).AND.(landmas(i,j).EQ.1)) THEN
+                loc_minSLT = m
+             ENDIF
+          END DO
+       END DO
+       loc_avSLT = loc_avSLT/nlandcells
+
+    ! *** CONVERT pCO2 FROM ATM TO PPM
+    DO i=1,n_i
+       DO j=1,n_j
+          loc_CO22(i,j) = 1.0E+06*dum_sfcatm1(ia_PCO2,i,j)
+       END DO
+    END DO
+
+    ! *** CALCULATE MEAN CO2 (ppm)
+    ! NOTE: assumes equal-area grid
+    loc_CO2 = 0.0
+    loc_maxCO2 = 0.0
+    loc_minCO2 = 0.0
+    DO i=1,n_i
+       DO j=1,n_j
+          m = landmask(i,j) * loc_CO22(i,j)
+          loc_CO2 = loc_CO2 + m
+          IF ((m.GT.loc_maxCO2).AND.(landmask(i,j).EQ.1)) THEN
+             loc_maxCO2 = m
+          ENDIF
+          IF ((m.LT.loc_minCO2).AND.(landmask(i,j).EQ.1)) THEN
+             loc_minCO2 = m
+          ENDIF
+       END DO
+    END DO
+    loc_CO2 = loc_CO2/nlandcells      
+    
+    ! *** CALCULATE TERRESTRIAL NPP BASED ON CO2 ***
+    loc_Fnpp  = dum_dtyr*(par_atm_Fnpp0*(1 + par_atm_Bnpp*LOG(loc_CO2/par_atm_terrbio_CO2ref)))
+
+    ! *** CALCULATE SOIL RESPIRATION BASED ON GLOBAL AVERAGE LAND TEMPERATURE ***
+    loc_Fresp = dum_dtyr*(par_atm_resp_G*par_atm_resp_kT)
+
+#    ! *** INITIALIZE LOCAL VARIABLES ***
+#    loc_Fatm  = dum_dtyr*par_atm_FterrCO2exchange/real(n_i*n_j)
+#    loc_Fterr = dum_dtyr*par_atm_FterrCO2exchange/real(n_i*n_j)
+#    loc_Ratm = atm(ia_pCO2_13C,dum_i,dum_j)/atm(ia_pCO2,dum_i,dum_j)
+#    loc_Rterr = atm_slabbiosphere(ia_pCO2_13C,dum_i,dum_j)/atm_slabbiosphere(ia_pCO2,dum_i,dum_j)
+#
+#    ! *** EXCHANGE CO2 ***
+#    ! NOTE: atm_slabbiosphere in units of mol
+#    ! bulk CO2
+#    dum_fatm(ia_pCO2) = dum_fatm(ia_pCO2) + loc_Fatm - loc_Fterr
+#    atm_slabbiosphere(ia_pCO2,dum_i,dum_j) = &
+#         & atm_slabbiosphere(ia_pCO2,dum_i,dum_j) - loc_Fatm + loc_Fterr
+#    ! d13C
+#    dum_fatm(ia_pCO2_13C) = dum_fatm(ia_pCO2_13C) + loc_Rterr*loc_Fatm - loc_Ratm*loc_Fterr
+#    atm_slabbiosphere(ia_pCO2_13C,dum_i,dum_j) = &
+#         & atm_slabbiosphere(ia_pCO2_13C,dum_i,dum_j) - loc_Rterr*loc_Fatm + loc_Ratm*loc_Fterr
+
+  END SUBROUTINE sub_calc_terrbio
+  ! ****************************************************************************************************************************** !
+
   ! *****************************************************************************************************************************!
   ! OXIDIZE CH4 -- DEFAULT (ORIGINAL) SCHEME
   SUBROUTINE sub_calc_oxidize_CH4_default(dum_i,dum_j,dum_dtyr)
