@@ -109,6 +109,8 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
   logical::ctrl_restrict_mld    ! restrict MLD
   NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
+  logical::ctrl_PARseaicelimit    ! PAR attenutation by sea-ice cover?
+  NAMELIST /ini_ecogem_nml/ctrl_PARseaicelimit
   ! Grazing parameters
   real :: ass_eff                   !      maximum assimilation efficiency
   integer :: ns                     !      prey switching exponent
@@ -205,7 +207,11 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/ ctrl_data_save_timeseries
   ! ------------------- MISC ----------------------------------------------------------------------------------------------------- !
   logical::ctrl_limit_neg_biomass
-  NAMELIST /ini_ecogem_nml/ ctrl_limit_neg_biomass
+  NAMELIST /ini_ecogem_nml/ctrl_limit_neg_biomass
+  real::par_beta_POCtoDOC
+  namelist/ini_ecogem_nml/par_beta_POCtoDOC
+  logical::ctrl_Tdep_POCtoDOC
+  NAMELIST /ini_ecogem_nml/ctrl_Tdep_POCtoDOC
   ! ------------------- TEST" !--------------------------------------------------------------------------------------------------- !
   logical::ctrl_hello_world                                             ! hello world!
   NAMELIST /ini_ecogem_nml/ctrl_hello_world

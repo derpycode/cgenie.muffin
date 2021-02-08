@@ -48,25 +48,6 @@ CONTAINS
     conv_atm_ocn(io_H2S_34S,ia_pH2S_34S) = 1.0
     conv_atm_ocn(io_CFC11,ia_pCFC11)     = 1.0
     conv_atm_ocn(io_CFC12,ia_pCFC12)     = 1.0
-    ! convert dissolved species -> gaseous
-    conv_ocn_atm(:,:) = 0.0
-    conv_ocn_atm(ia_pCO2,io_DIC)         = 1.0/conv_atm_ocn(io_DIC,ia_pCO2)
-    conv_ocn_atm(ia_pCO2_13C,io_DIC_13C) = 1.0/conv_atm_ocn(io_DIC_13C,ia_pCO2_13C)
-    conv_ocn_atm(ia_pCO2_14C,io_DIC_14C) = 1.0/conv_atm_ocn(io_DIC_14C,ia_pCO2_14C)
-    conv_ocn_atm(ia_pO2,io_O2)           = 1.0/conv_atm_ocn(io_O2,ia_pO2)
-    conv_ocn_atm(ia_pO2_18O,io_O2_18O)   = 1.0/conv_atm_ocn(io_O2_18O,ia_pO2_18O)
-    conv_ocn_atm(ia_pN2,io_N2)           = 1.0/conv_atm_ocn(io_N2,ia_pN2)
-    conv_ocn_atm(ia_pN2_15N,io_N2_15N)   = 1.0/conv_atm_ocn(io_N2_15N,ia_pN2_15N)
-    conv_ocn_atm(ia_pCH4,io_CH4)         = 1.0/conv_atm_ocn(io_CH4,ia_pCH4)
-    conv_ocn_atm(ia_pCH4_13C,io_CH4_13C) = 1.0/conv_atm_ocn(io_CH4_13C,ia_pCH4_13C)
-    conv_ocn_atm(ia_pCH4_14C,io_CH4_14C) = 1.0/conv_atm_ocn(io_CH4_14C,ia_pCH4_14C)
-    conv_ocn_atm(ia_pSF6,io_SF6)         = 1.0/conv_atm_ocn(io_SF6,ia_pSF6)
-    conv_ocn_atm(ia_pN2O,io_N2O)         = 1.0/conv_atm_ocn(io_N2O,ia_pN2O)
-    conv_ocn_atm(ia_pN2O_15N,io_N2O_15N) = 1.0/conv_atm_ocn(io_N2O_15N,ia_pN2O_15N)
-    conv_ocn_atm(ia_pH2S,io_H2S)         = 1.0/conv_atm_ocn(io_H2S,ia_pH2S)
-    conv_ocn_atm(ia_pH2S_34S,io_H2S_34S) = 1.0/conv_atm_ocn(io_H2S_34S,ia_pH2S_34S)
-    conv_ocn_atm(ia_pCFC11,io_CFC11)     = 1.0/conv_atm_ocn(io_CFC11,ia_pCFC11)
-    conv_ocn_atm(ia_pCFC12,io_CFC12)     = 1.0/conv_atm_ocn(io_CFC12,ia_pCFC12)
     ! ############################################################################################################################ !
     ! OCEAN-SEDIMENT
     ! (compositional) relational operator for converting between dissolved and particulate forms
@@ -76,165 +57,124 @@ CONTAINS
     ! ### INSERT DEFINITIONS FOR ADDITIONAL OCN/SED RELATIONSHIPS HERE ########################################################### !
     ! convert solid species -> dissolved
     conv_sed_ocn(:,:) = 0.0
-    conv_sed_ocn(io_DIC,is_POC)              = 1.0
-    conv_sed_ocn(io_DIC_13C,is_POC_13C)      = 1.0
-    conv_sed_ocn(io_DIC_14C,is_POC_14C)      = 1.0
-    conv_sed_ocn(io_PO4,is_POP)              = 1.0
-    conv_sed_ocn(io_NO3,is_PON)              = 1.0
-    conv_sed_ocn(io_NO3_15N,is_PON_15N)      = 1.0
-    conv_sed_ocn(io_ALK,is_PON)              = -1.0
-    conv_sed_ocn(io_Fe,is_POFe)              = 1.0
-    conv_sed_ocn(io_TDFe,is_POFe)             = 1.0
-    conv_sed_ocn(io_O2,is_POC)               = -1.0
-    conv_sed_ocn(io_O2,is_PON)               = -1.0
-    conv_sed_ocn(io_O2,is_POP)               = -1.0
-    conv_sed_ocn(io_Cd,is_POCd)              = 1.0
-    conv_sed_ocn(io_Cd_114Cd,is_POCd_114Cd)  = 1.0
-    conv_sed_ocn(io_I,is_POI)                = 1.0
-    conv_sed_ocn(io_DIC,is_CaCO3)            = 1.0
-    conv_sed_ocn(io_DIC_13C,is_CaCO3_13C)    = 1.0
-    conv_sed_ocn(io_DIC_14C,is_CaCO3_14C)    = 1.0
-    conv_sed_ocn(io_ALK,is_CaCO3)            = 2.0
-    conv_sed_ocn(io_Ca,is_CaCO3)             = 1.0
-    conv_sed_ocn(io_Ca_44Ca,is_CaCO3_44Ca)   = 1.0
-    conv_sed_ocn(io_Cd,is_CdCO3)             = 1.0
-    conv_sed_ocn(io_Cd_114Cd,is_CdCO3_114Cd) = 1.0
-    conv_sed_ocn(io_Li,is_LiCO3)             = 1.0
-    conv_sed_ocn(io_Li_7Li,is_LiCO3_7Li)     = 1.0
-    conv_sed_ocn(io_Li,is_detLi)             = 1.0
-    conv_sed_ocn(io_Li_7Li,is_detLi_7Li)     = 1.0
-    conv_sed_ocn(io_SiO2,is_opal)            = 1.0
-    conv_sed_ocn(io_SiO2_30Si,is_opal_30Si)  = 1.0
-    conv_sed_ocn(io_Fe,is_POM_Fe)            = 1.0
-    conv_sed_ocn(io_Fe,is_CaCO3_Fe)          = 1.0
-    conv_sed_ocn(io_Fe,is_opal_Fe)           = 1.0
-    conv_sed_ocn(io_Fe,is_det_Fe)            = 1.0
-    conv_sed_ocn(io_TDFe,is_POM_Fe)            = 1.0
-    conv_sed_ocn(io_TDFe,is_CaCO3_Fe)          = 1.0
-    conv_sed_ocn(io_TDFe,is_opal_Fe)           = 1.0
-    conv_sed_ocn(io_TDFe,is_det_Fe)            = 1.0
-    conv_sed_ocn(io_231Pa,is_POM_231Pa)      = 1.0
-    conv_sed_ocn(io_231Pa,is_CaCO3_231Pa)    = 1.0
-    conv_sed_ocn(io_231Pa,is_opal_231Pa)     = 1.0
-    conv_sed_ocn(io_231Pa,is_det_231Pa)      = 1.0
-    conv_sed_ocn(io_230Th,is_POM_230Th)      = 1.0
-    conv_sed_ocn(io_230Th,is_CaCO3_230Th)    = 1.0
-    conv_sed_ocn(io_230Th,is_opal_230Th)     = 1.0
-    conv_sed_ocn(io_230Th,is_det_230Th)      = 1.0
-    conv_sed_ocn(io_Nd,is_POM_Nd)            = 1.0
-    conv_sed_ocn(io_Nd,is_CaCO3_Nd)          = 1.0
-    conv_sed_ocn(io_Nd,is_opal_Nd)           = 1.0
-    conv_sed_ocn(io_Nd,is_det_Nd)            = 1.0
-    conv_sed_ocn(io_Nd_144Nd,is_POM_Nd_144Nd)   = 1.0
-    conv_sed_ocn(io_Nd_144Nd,is_CaCO3_Nd_144Nd) = 1.0
-    conv_sed_ocn(io_Nd_144Nd,is_opal_Nd_144Nd)  = 1.0
-    conv_sed_ocn(io_Nd_144Nd,is_det_Nd_144Nd)   = 1.0
-    conv_sed_ocn(io_H2S,is_POM_S)               = 1.0
-    conv_sed_ocn(io_H2S_34S,is_POM_S_34S)       = 1.0
-    conv_sed_ocn(io_Mo,is_POM_MoS2)             = 1.0
-    conv_sed_ocn(io_H2S,is_POM_MoS2)            = 2.0
-    conv_sed_ocn(io_Mo,is_CaCO3_MoS2)           = 1.0
-    conv_sed_ocn(io_H2S,is_CaCO3_MoS2)          = 2.0
-    conv_sed_ocn(io_Mo,is_opal_MoS2)            = 1.0
-    conv_sed_ocn(io_H2S,is_opal_MoS2)           = 2.0
-    conv_sed_ocn(io_Mo,is_det_MoS2)             = 1.0
-    conv_sed_ocn(io_H2S,is_det_MoS2)            = 2.0
-    conv_sed_ocn(io_Mo_98Mo,is_POM_MoS2_98Mo)   = 1.0
-    conv_sed_ocn(io_H2S_34S,is_POM_MoS2_34S)    = 2.0
-    conv_sed_ocn(io_Mo_98Mo,is_CaCO3_MoS2_98Mo) = 1.0
-    conv_sed_ocn(io_H2S_34S,is_CaCO3_MoS2_34S)  = 2.0
-    conv_sed_ocn(io_Mo_98Mo,is_opal_MoS2_98Mo)  = 1.0
-    conv_sed_ocn(io_H2S_34S,is_opal_MoS2_34S)   = 2.0
-    conv_sed_ocn(io_Mo_98Mo,is_det_MoS2_98Mo)   = 1.0
-    conv_sed_ocn(io_H2S_34S,is_det_MoS2_34S)    = 2.0
-    conv_sed_ocn(io_Ba,is_POBa)                 = 1.0
-    conv_sed_ocn(io_Ba_138Ba,is_POBa_138Ba)     = 1.0
-    conv_sed_ocn(io_Ba,is_POM_BaSO4)               = 1.0
-    conv_sed_ocn(io_Ba_138Ba,is_POM_BaSO4_138Ba)   = 1.0
-    conv_sed_ocn(io_Sr,is_SrCO3)                = 1.0
-    conv_sed_ocn(io_Sr_87Sr,is_SrCO3_87Sr)      = 1.0
-    conv_sed_ocn(io_Sr_88Sr,is_SrCO3_88Sr)      = 1.0
-    ! convert dissolved species -> solid
-    conv_ocn_sed(:,:) = 0.0
-    conv_ocn_sed(is_POC,io_DIC)              = 1.0/conv_sed_ocn(io_DIC,is_POC)
-    conv_ocn_sed(is_POC_13C,io_DIC_13C)      = 1.0/conv_sed_ocn(io_DIC_13C,is_POC_13C)
-    conv_ocn_sed(is_POC_14C,io_DIC_14C)      = 1.0/conv_sed_ocn(io_DIC_14C,is_POC_14C)
-    conv_ocn_sed(is_POP,io_PO4)              = 1.0/conv_sed_ocn(io_PO4,is_POP)
-    conv_ocn_sed(is_PON,io_NO3)              = 1.0/conv_sed_ocn(io_NO3,is_PON)
-    conv_ocn_sed(is_PON_15N,io_NO3_15N)      = 1.0/conv_sed_ocn(io_NO3_15N,is_PON_15N)
-    conv_ocn_sed(is_PON,io_ALK)              = 1.0/conv_sed_ocn(io_ALK,is_PON)
-    conv_ocn_sed(is_POFe,io_Fe)              = 1.0/conv_sed_ocn(io_Fe,is_POFe)
-    conv_ocn_sed(is_POFe,io_TDFe)              = 1.0/conv_sed_ocn(io_TDFe,is_POFe)
-    conv_ocn_sed(is_POC,io_O2)               = 1.0/conv_sed_ocn(io_O2,is_POC)
-    conv_ocn_sed(is_POP,io_O2)               = 1.0/conv_sed_ocn(io_O2,is_POP)
-    conv_ocn_sed(is_PON,io_O2)               = 1.0/conv_sed_ocn(io_O2,is_PON)
-    conv_ocn_sed(is_POCd,io_Cd)              = 1.0/conv_sed_ocn(io_Cd,is_POCd)
-    conv_ocn_sed(is_POCd_114Cd,io_Cd_114Cd)  = 1.0/conv_sed_ocn(io_Cd_114Cd,is_POCd_114Cd)
-    conv_ocn_sed(is_POI,io_IO3)                = 1.0
-    conv_ocn_sed(is_POI,io_O2)                = -(3.0/2.0)
-    conv_ocn_sed(is_CaCO3,io_DIC)            = 1.0/conv_sed_ocn(io_DIC,is_CaCO3)
-    conv_ocn_sed(is_CaCO3_13C,io_DIC_13C)    = 1.0/conv_sed_ocn(io_DIC_13C,is_CaCO3_13C)
-    conv_ocn_sed(is_CaCO3_14C,io_DIC_14C)    = 1.0/conv_sed_ocn(io_DIC_14C,is_CaCO3_14C)
-    conv_ocn_sed(is_CaCO3,io_ALK)            = 1.0/conv_sed_ocn(io_ALK,is_CaCO3)
-    conv_ocn_sed(is_CaCO3,io_Ca)             = 1.0/conv_sed_ocn(io_Ca,is_CaCO3)
-    conv_ocn_sed(is_CaCO3_44Ca,io_Ca_44Ca)   = 1.0/conv_sed_ocn(io_Ca_44Ca,is_CaCO3_44Ca)
-    conv_ocn_sed(is_CdCO3,io_Cd)             = 1.0/conv_sed_ocn(io_Cd,is_CdCO3)
-    conv_ocn_sed(is_CdCO3_114Cd,io_Cd_114Cd) = 1.0/conv_sed_ocn(io_Cd_114Cd,is_CdCO3_114Cd)
-    conv_ocn_sed(is_LiCO3,io_Li)             = 1.0/conv_sed_ocn(io_Li,is_LiCO3)
-    conv_ocn_sed(is_LiCO3_7Li,io_Li_7Li)     = 1.0/conv_sed_ocn(io_Li_7Li,is_LiCO3_7Li)
-    conv_ocn_sed(is_detLi,io_Li)             = 1.0/conv_sed_ocn(io_Li,is_detLi)
-    conv_ocn_sed(is_detLi_7Li,io_Li_7Li)     = 1.0/conv_sed_ocn(io_Li_7Li,is_detLi_7Li)
-    conv_ocn_sed(is_opal,io_SiO2)            = 1.0/conv_sed_ocn(io_SiO2,is_opal)
-    conv_ocn_sed(is_opal_30Si,io_SiO2_30Si)  = 1.0/conv_sed_ocn(io_SiO2_30Si,is_opal_30Si)
-    conv_ocn_sed(is_POM_Fe,io_Fe)            = 1.0/conv_sed_ocn(io_Fe,is_POM_Fe)
-    conv_ocn_sed(is_CaCO3_Fe,io_Fe)          = 1.0/conv_sed_ocn(io_Fe,is_CaCO3_Fe)
-    conv_ocn_sed(is_opal_Fe,io_Fe)           = 1.0/conv_sed_ocn(io_Fe,is_opal_Fe)
-    conv_ocn_sed(is_det_Fe,io_Fe)            = 1.0/conv_sed_ocn(io_Fe,is_det_Fe)
-    conv_ocn_sed(is_POM_Fe,io_TDFe)            = 1.0/conv_sed_ocn(io_TDFe,is_POM_Fe)
-    conv_ocn_sed(is_CaCO3_Fe,io_TDFe)          = 1.0/conv_sed_ocn(io_TDFe,is_CaCO3_Fe)
-    conv_ocn_sed(is_opal_Fe,io_TDFe)           = 1.0/conv_sed_ocn(io_TDFe,is_opal_Fe)
-    conv_ocn_sed(is_det_Fe,io_TDFe)            = 1.0/conv_sed_ocn(io_TDFe,is_det_Fe)
-    conv_ocn_sed(is_POM_231Pa,io_231Pa)      = 1.0/conv_sed_ocn(io_231Pa,is_POM_231Pa)
-    conv_ocn_sed(is_CaCO3_231Pa,io_231Pa)    = 1.0/conv_sed_ocn(io_231Pa,is_CaCO3_231Pa)
-    conv_ocn_sed(is_opal_231Pa,io_231Pa)     = 1.0/conv_sed_ocn(io_231Pa,is_opal_231Pa)
-    conv_ocn_sed(is_det_231Pa,io_231Pa)      = 1.0/conv_sed_ocn(io_231Pa,is_det_231Pa)
-    conv_ocn_sed(is_POM_230Th,io_230Th)      = 1.0/conv_sed_ocn(io_230Th,is_POM_230Th)
-    conv_ocn_sed(is_CaCO3_230Th,io_230Th)    = 1.0/conv_sed_ocn(io_230Th,is_CaCO3_230Th)
-    conv_ocn_sed(is_opal_230Th,io_230Th)     = 1.0/conv_sed_ocn(io_230Th,is_opal_230Th)
-    conv_ocn_sed(is_det_230Th,io_230Th)      = 1.0/conv_sed_ocn(io_230Th,is_det_230Th)
-    conv_ocn_sed(is_POM_Nd,io_Nd)            = 1.0/conv_sed_ocn(io_Nd,is_POM_Nd)
-    conv_ocn_sed(is_CaCO3_Nd,io_Nd)          = 1.0/conv_sed_ocn(io_Nd,is_CaCO3_Nd)
-    conv_ocn_sed(is_opal_Nd,io_Nd)           = 1.0/conv_sed_ocn(io_Nd,is_opal_Nd)
-    conv_ocn_sed(is_det_Nd,io_Nd)            = 1.0/conv_sed_ocn(io_Nd,is_det_Nd)
-    conv_ocn_sed(is_POM_Nd_144Nd,io_Nd_144Nd)   = 1.0/conv_sed_ocn(io_Nd_144Nd,is_POM_Nd_144Nd)
-    conv_ocn_sed(is_CaCO3_Nd_144Nd,io_Nd_144Nd) = 1.0/conv_sed_ocn(io_Nd_144Nd,is_CaCO3_Nd_144Nd)
-    conv_ocn_sed(is_opal_Nd_144Nd,io_Nd_144Nd)  = 1.0/conv_sed_ocn(io_Nd_144Nd,is_opal_Nd_144Nd)
-    conv_ocn_sed(is_det_Nd_144Nd,io_Nd_144Nd)   = 1.0/conv_sed_ocn(io_Nd_144Nd,is_det_Nd_144Nd)
-    conv_ocn_sed(is_POM_S,io_H2S)               = 1.0/conv_sed_ocn(io_H2S,is_POM_S)
-    conv_ocn_sed(is_POM_S_34S,io_H2S_34S)       = 1.0/conv_sed_ocn(io_H2S_34S,is_POM_S_34S)
-    conv_ocn_sed(is_POM_MoS2,io_Mo) = 1.0/conv_sed_ocn(io_Mo,is_POM_MoS2)
-    conv_ocn_sed(is_POM_MoS2,io_H2S) = 1.0/conv_sed_ocn(io_H2S,is_POM_MoS2)
-    conv_ocn_sed(is_CaCO3_MoS2,io_Mo) = 1.0/conv_sed_ocn(io_Mo,is_CaCO3_MoS2)
-    conv_ocn_sed(is_CaCO3_MoS2,io_H2S) = 1.0/conv_sed_ocn(io_H2S,is_CaCO3_MoS2)
-    conv_ocn_sed(is_opal_MoS2,io_Mo) = 1.0/conv_sed_ocn(io_Mo,is_opal_MoS2)
-    conv_ocn_sed(is_opal_MoS2,io_H2S) = 1.0/conv_sed_ocn(io_H2S,is_opal_MoS2)
-    conv_ocn_sed(is_det_MoS2,io_Mo) = 1.0/conv_sed_ocn(io_Mo,is_det_MoS2)
-    conv_ocn_sed(is_det_MoS2,io_H2S) = 1.0/conv_sed_ocn(io_H2S,is_det_MoS2)
-    conv_ocn_sed(is_POM_MoS2_98Mo,io_Mo_98Mo) = 1.0/conv_sed_ocn(io_Mo_98Mo,is_POM_MoS2_98Mo)
-    conv_ocn_sed(is_POM_MoS2_34S,io_H2S_34S) = 1.0/conv_sed_ocn(io_H2S_34S,is_POM_MoS2_34S)
-    conv_ocn_sed(is_CaCO3_MoS2_98Mo,io_Mo_98Mo) = 1.0/conv_sed_ocn(io_Mo_98Mo,is_CaCO3_MoS2_98Mo)
-    conv_ocn_sed(is_CaCO3_MoS2_34S,io_H2S_34S) = 1.0/conv_sed_ocn(io_H2S_34S,is_CaCO3_MoS2_34S)
-    conv_ocn_sed(is_opal_MoS2_98Mo,io_Mo_98Mo) = 1.0/conv_sed_ocn(io_Mo_98Mo,is_opal_MoS2_98Mo)
-    conv_ocn_sed(is_opal_MoS2_34S,io_H2S_34S) = 1.0/conv_sed_ocn(io_H2S_34S,is_opal_MoS2_34S)
-    conv_ocn_sed(is_det_MoS2_98Mo,io_Mo_98Mo) = 1.0/conv_sed_ocn(io_Mo_98Mo,is_det_MoS2_98Mo)
-    conv_ocn_sed(is_det_MoS2_34S,io_H2S_34S) = 1.0/conv_sed_ocn(io_H2S_34S,is_det_MoS2_34S)
-    conv_ocn_sed(is_POBa,io_Ba)                 = 1.0/conv_sed_ocn(io_Ba,is_POBa)
-    conv_ocn_sed(is_POBa_138Ba,io_Ba_138Ba)     = 1.0/conv_sed_ocn(io_Ba_138Ba,is_POBa_138Ba)
-    conv_ocn_sed(is_POM_BaSO4,io_Ba)               = 1.0/conv_sed_ocn(io_Ba,is_POM_BaSO4)
-    conv_ocn_sed(is_POM_BaSO4_138Ba,io_Ba_138Ba)   = 1.0/conv_sed_ocn(io_Ba_138Ba,is_POM_BaSO4_138Ba)
-    conv_ocn_sed(is_SrCO3,io_Sr)                = 1.0/conv_sed_ocn(io_Sr,is_SrCO3)
-    conv_ocn_sed(is_SrCO3_87Sr,io_Sr_87Sr)      = 1.0/conv_sed_ocn(io_Sr_87Sr,is_SrCO3_87Sr)
-    conv_ocn_sed(is_SrCO3_88Sr,io_Sr_88Sr)      = 1.0/conv_sed_ocn(io_Sr_88Sr,is_SrCO3_88Sr)
+    conv_sed_ocn(io_DIC,is_POC)                  = 1.0
+    conv_sed_ocn(io_DIC_13C,is_POC_13C)          = 1.0
+    conv_sed_ocn(io_DIC_14C,is_POC_14C)          = 1.0
+    conv_sed_ocn(io_PO4,is_POP)                  = 1.0
+    conv_sed_ocn(io_NO3,is_PON)                  = 1.0
+    conv_sed_ocn(io_NO3_15N,is_PON_15N)          = 1.0
+    conv_sed_ocn(io_ALK,is_PON)                  = -1.0
+    conv_sed_ocn(io_Fe,is_POFe)                  = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_POFe_56Fe)        = 1.0
+    conv_sed_ocn(io_TDFe,is_POFe)                = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_POFe_56Fe)      = 1.0
+    conv_sed_ocn(io_O2,is_POC)                   = -1.0
+    conv_sed_ocn(io_O2,is_PON)                   = -1.0
+    conv_sed_ocn(io_O2,is_POP)                   = -1.0
+    conv_sed_ocn(io_Cd,is_POCd)                  = 1.0
+    conv_sed_ocn(io_Cd_114Cd,is_POCd_114Cd)      = 1.0
+    conv_sed_ocn(io_I,is_POI)                    = 1.0
+    conv_sed_ocn(io_DIC,is_CaCO3)                = 1.0
+    conv_sed_ocn(io_DIC_13C,is_CaCO3_13C)        = 1.0
+    conv_sed_ocn(io_DIC_14C,is_CaCO3_14C)        = 1.0
+    conv_sed_ocn(io_ALK,is_CaCO3)                = 2.0
+    conv_sed_ocn(io_Ca,is_CaCO3)                 = 1.0
+    conv_sed_ocn(io_Ca_44Ca,is_CaCO3_44Ca)       = 1.0
+    conv_sed_ocn(io_Cd,is_CdCO3)                 = 1.0
+    conv_sed_ocn(io_Cd_114Cd,is_CdCO3_114Cd)     = 1.0
+    conv_sed_ocn(io_Li,is_LiCO3)                 = 1.0
+    conv_sed_ocn(io_Li_7Li,is_LiCO3_7Li)         = 1.0
+    conv_sed_ocn(io_Li,is_detLi)                 = 1.0
+    conv_sed_ocn(io_Li_7Li,is_detLi_7Li)         = 1.0
+    conv_sed_ocn(io_SiO2,is_opal)                = 1.0
+    conv_sed_ocn(io_SiO2_30Si,is_opal_30Si)      = 1.0
+    conv_sed_ocn(io_Fe,is_POM_Fe)                = 1.0
+    conv_sed_ocn(io_Fe,is_CaCO3_Fe)              = 1.0
+    conv_sed_ocn(io_Fe,is_opal_Fe)               = 1.0
+    conv_sed_ocn(io_Fe,is_det_Fe)                = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_POM_Fe_56Fe)      = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_CaCO3_Fe_56Fe)    = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_opal_Fe_56Fe)     = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_det_Fe_56Fe)      = 1.0
+    conv_sed_ocn(io_TDFe,is_POM_Fe)              = 1.0
+    conv_sed_ocn(io_TDFe,is_CaCO3_Fe)            = 1.0
+    conv_sed_ocn(io_TDFe,is_opal_Fe)             = 1.0
+    conv_sed_ocn(io_TDFe,is_det_Fe)              = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_POM_Fe_56Fe)    = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_CaCO3_Fe_56Fe)  = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_opal_Fe_56Fe)   = 1.0
+    conv_sed_ocn(io_TDFe_56Fe,is_det_Fe_56Fe)    = 1.0
+    conv_sed_ocn(io_231Pa,is_POM_231Pa)          = 1.0
+    conv_sed_ocn(io_231Pa,is_CaCO3_231Pa)        = 1.0
+    conv_sed_ocn(io_231Pa,is_opal_231Pa)         = 1.0
+    conv_sed_ocn(io_231Pa,is_det_231Pa)          = 1.0
+    conv_sed_ocn(io_230Th,is_POM_230Th)          = 1.0
+    conv_sed_ocn(io_230Th,is_CaCO3_230Th)        = 1.0
+    conv_sed_ocn(io_230Th,is_opal_230Th)         = 1.0
+    conv_sed_ocn(io_230Th,is_det_230Th)          = 1.0
+    conv_sed_ocn(io_Nd,is_POM_Nd)                = 1.0
+    conv_sed_ocn(io_Nd,is_CaCO3_Nd)              = 1.0
+    conv_sed_ocn(io_Nd,is_opal_Nd)               = 1.0
+    conv_sed_ocn(io_Nd,is_det_Nd)                = 1.0
+    conv_sed_ocn(io_Nd_144Nd,is_POM_Nd_144Nd)    = 1.0
+    conv_sed_ocn(io_Nd_144Nd,is_CaCO3_Nd_144Nd)  = 1.0
+    conv_sed_ocn(io_Nd_144Nd,is_opal_Nd_144Nd)   = 1.0
+    conv_sed_ocn(io_Nd_144Nd,is_det_Nd_144Nd)    = 1.0
+    conv_sed_ocn(io_H2S,is_POM_S)                = 1.0
+    conv_sed_ocn(io_H2S_34S,is_POM_S_34S)        = 1.0
+    conv_sed_ocn(io_Mo,is_POM_MoS2)              = 1.0
+    conv_sed_ocn(io_H2S,is_POM_MoS2)             = 2.0
+    conv_sed_ocn(io_Mo,is_CaCO3_MoS2)            = 1.0
+    conv_sed_ocn(io_H2S,is_CaCO3_MoS2)           = 2.0
+    conv_sed_ocn(io_Mo,is_opal_MoS2)             = 1.0
+    conv_sed_ocn(io_H2S,is_opal_MoS2)            = 2.0
+    conv_sed_ocn(io_Mo,is_det_MoS2)              = 1.0
+    conv_sed_ocn(io_H2S,is_det_MoS2)             = 2.0
+    conv_sed_ocn(io_Mo_98Mo,is_POM_MoS2_98Mo)    = 1.0
+    conv_sed_ocn(io_H2S_34S,is_POM_MoS2_34S)     = 2.0
+    conv_sed_ocn(io_Mo_98Mo,is_CaCO3_MoS2_98Mo)  = 1.0
+    conv_sed_ocn(io_H2S_34S,is_CaCO3_MoS2_34S)   = 2.0
+    conv_sed_ocn(io_Mo_98Mo,is_opal_MoS2_98Mo)   = 1.0
+    conv_sed_ocn(io_H2S_34S,is_opal_MoS2_34S)    = 2.0
+    conv_sed_ocn(io_Mo_98Mo,is_det_MoS2_98Mo)    = 1.0
+    conv_sed_ocn(io_H2S_34S,is_det_MoS2_34S)     = 2.0
+    conv_sed_ocn(io_Ba,is_POBa)                  = 1.0
+    conv_sed_ocn(io_Ba_138Ba,is_POBa_138Ba)      = 1.0
+    conv_sed_ocn(io_Ba,is_POM_BaSO4)             = 1.0
+    conv_sed_ocn(io_Ba_138Ba,is_POM_BaSO4_138Ba) = 1.0
+    conv_sed_ocn(io_Sr,is_SrCO3)                 = 1.0
+    conv_sed_ocn(io_Sr_87Sr,is_SrCO3_87Sr)       = 1.0
+    conv_sed_ocn(io_Sr_88Sr,is_SrCO3_88Sr)       = 1.0
+    conv_sed_ocn(io_Os,is_OsCO3)                 = 1.0
+    conv_sed_ocn(io_Os_187Os,is_OsCO3_187Os)     = 1.0
+    conv_sed_ocn(io_Os_188Os,is_OsCO3_188Os)     = 1.0
+    conv_sed_ocn(io_DIC,is_FeCO3)                = 1.0
+    conv_sed_ocn(io_Fe2,is_FeCO3)                = 1.0
+    conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)        = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_FeCO3_56Fe)      = 1.0
+    conv_sed_ocn(io_Fe2,is_Fe3Si2O4)             = 3.0
+    conv_sed_ocn(io_SiO2,is_Fe3Si2O4)            = 2.0
+    conv_sed_ocn(io_Fe2_56Fe,is_Fe3Si2O4_56Fe)   = 3.0
+    conv_sed_ocn(io_SiO2_30Si,is_Fe3Si2O4_30Si)  = 2.0
+    conv_sed_ocn(io_H2S,is_FeS2)                 = 7.0/4.0
+    conv_sed_ocn(io_SO4,is_FeS2)                 = 1.0/4.0
+    conv_sed_ocn(io_FeS,is_FeS2)                 = 0.0
+    conv_sed_ocn(io_Fe2,is_FeS2)                 = 1.0
+    conv_sed_ocn(io_ALK,is_FeS2)                 = -2.0/4.0
+    conv_sed_ocn(io_H2S_34S,is_FeS2_34S)         = 7.0/4.0
+    conv_sed_ocn(io_FeS_34S,is_FeS2_34S)         = 0.0
+    conv_sed_ocn(io_SO4_34S,is_FeS2_34S)         = 1.0/4.0
+    conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)       = 0.0
+    conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)       = 1.0
+    conv_sed_ocn(io_Fe,is_FeOOH)                 = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)       = 1.0
+    conv_sed_ocn(io_O2,is_FeOOH)                 = 0.0
+    conv_sed_ocn(io_Fe,is_POM_FeOOH)             = 1.0
+    conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0 
+    conv_sed_ocn(io_O2,is_POM_FeOOH)             = 0.0
+    conv_sed_ocn(io_Os,is_POM_Os)                = 1.0
+    conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)    = 1.0
+    conv_sed_ocn(io_Os_188Os,is_POM_Os_188Os)    = 1.0
     ! ############################################################################################################################ !
     ! DISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between DOM and POM
@@ -251,6 +191,7 @@ CONTAINS
     conv_POM_DOM(io_DOM_Cd,is_POCd)             = 1.0
     conv_POM_DOM(io_DOM_Cd_114Cd,is_POCd_114Cd) = 1.0
     conv_POM_DOM(io_DOM_Fe,is_POFe)             = 1.0
+    conv_POM_DOM(io_DOM_Fe_56Fe,is_POFe_56Fe)   = 1.0
     conv_POM_DOM(io_DOM_I,is_POI)               = 1.0
     ! convert DOM -> POM
     conv_DOM_POM(:,:) = 0.0
@@ -263,36 +204,15 @@ CONTAINS
     conv_DOM_POM(is_POCd,io_DOM_Cd)             = 1.0/conv_POM_DOM(io_DOM_Cd,is_POCd)
     conv_DOM_POM(is_POCd_114Cd,io_DOM_Cd_114Cd) = 1.0/conv_POM_DOM(io_DOM_Cd_114Cd,is_POCd_114Cd)
     conv_DOM_POM(is_POFe,io_DOM_Fe)             = 1.0/conv_POM_DOM(io_DOM_Fe,is_POFe)
+    conv_DOM_POM(is_POFe_56Fe,io_DOM_Fe_56Fe)   = 1.0/conv_POM_DOM(io_DOM_Fe_56Fe,is_POFe_56Fe)
     conv_DOM_POM(is_POI,io_DOM_I)               = 1.0/conv_POM_DOM(io_DOM_I,is_POI)
     ! ############################################################################################################################ !
     ! RDISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between RDOM and POM
     ! convert POM -> RDOM
-    ! NOTE: populate unused elements with zero
-    ! ### INSERT DEFINITIONS FOR ADDITIONAL DOM/POM RELATIONSHIPS HERE ########################################################### !
-    conv_POM_RDOM(:,:) = 0.0
-    conv_POM_RDOM(io_RDOM_C,is_POC)               = 1.0
-    conv_POM_RDOM(io_RDOM_C_13C,is_POC_13C)       = 1.0
-    conv_POM_RDOM(io_RDOM_C_14C,is_POC_14C)       = 1.0
-    conv_POM_RDOM(io_RDOM_N,is_PON)               = 1.0
-    conv_POM_RDOM(io_RDOM_N_15N,is_PON_15N)       = 1.0
-    conv_POM_RDOM(io_RDOM_P,is_POP)               = 1.0
-    conv_POM_RDOM(io_RDOM_Cd,is_POCd)             = 1.0
-    conv_POM_RDOM(io_RDOM_Cd_114Cd,is_POCd_114Cd) = 1.0
-    conv_POM_RDOM(io_RDOM_Fe,is_POFe)             = 1.0
-    conv_POM_RDOM(io_RDOM_I,is_POI)               = 1.0
+    conv_POM_RDOM(:,:) = conv_POM_DOM(:,:)
     ! convert RDOM -> POM
-    conv_RDOM_POM(:,:) = 0.0
-    conv_RDOM_POM(is_POC,io_RDOM_C)               = 1.0/conv_POM_RDOM(io_RDOM_C,is_POC)
-    conv_RDOM_POM(is_POC_13C,io_RDOM_C_13C)       = 1.0/conv_POM_RDOM(io_RDOM_C_13C,is_POC_13C)
-    conv_RDOM_POM(is_POC_14C,io_RDOM_C_14C)       = 1.0/conv_POM_RDOM(io_RDOM_C_14C,is_POC_14C)
-    conv_RDOM_POM(is_PON,io_RDOM_N)               = 1.0/conv_POM_RDOM(io_RDOM_N,is_PON)
-    conv_RDOM_POM(is_PON_15N,io_RDOM_N_15N)       = 1.0/conv_POM_RDOM(io_RDOM_N_15N,is_PON_15N)
-    conv_RDOM_POM(is_POP,io_RDOM_P)               = 1.0/conv_POM_RDOM(io_RDOM_P,is_POP)
-    conv_RDOM_POM(is_POCd,io_RDOM_Cd)             = 1.0/conv_POM_RDOM(io_RDOM_Cd,is_POCd)
-    conv_RDOM_POM(is_POCd_114Cd,io_RDOM_Cd_114Cd) = 1.0/conv_POM_RDOM(io_RDOM_Cd_114Cd,is_POCd_114Cd)
-    conv_RDOM_POM(is_POFe,io_RDOM_Fe)             = 1.0/conv_POM_RDOM(io_RDOM_Fe,is_POFe)
-    conv_RDOM_POM(is_POI,io_RDOM_I)               = 1.0/conv_POM_RDOM(io_RDOM_I,is_POI)
+    conv_RDOM_POM(:,:) = conv_DOM_POM(:,:)
   END SUBROUTINE sub_def_tracerrelationships
   ! ****************************************************************************************************************************** !
 
@@ -1092,15 +1012,15 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CONVERT: D14C -> RADIOCARBON AGE
-  FUNCTION fun_convert_D14Ctoage(dum_D14C)
+  FUNCTION fun_convert_D14Ctoage(dum_D14Cocn,dum_D14Catm)
     IMPLICIT NONE
     ! result variable
     REAL::fun_convert_D14Ctoage
     ! dummy arguments
-    REAL,INTENT(in)::dum_D14C
+    REAL,INTENT(in)::dum_D14Cocn,dum_D14Catm
     ! return function value
-    IF ((1.0 + dum_D14C/1000.0) > const_real_nullsmall) THEN
-       fun_convert_D14Ctoage = -1.*log(1.0 + dum_D14C/1000.0)/const_lambda_14C_libby
+    IF ( (dum_D14Cocn+1000.0)/(dum_D14Catm+1000.0) > const_real_nullsmall ) THEN
+       fun_convert_D14Ctoage = -1.*log( (dum_D14Cocn+1000.0)/(dum_D14Catm+1000.0) )/const_lambda_14C_libby
     else
        fun_convert_D14Ctoage = 0.0
     endif
@@ -1988,26 +1908,27 @@ CONTAINS
     INTEGER::ia,io,is
     integer::loc_tot_i
     ! zero arrays
-    conv_ocn_sed_i(:,:) = 0
-    conv_sed_ocn_i(:,:) = 0
-    conv_ocn_atm_i(:,:) = 0
-    conv_atm_ocn_i(:,:) = 0
-    conv_DOM_POM_i(:,:) = 0
-    conv_POM_DOM_i(:,:) = 0
+    conv_atm_ocn_i(:,:)      = 0
+    conv_sed_ocn_i(:,:)      = 0
     conv_sed_ocn_i_O(:,:)    = 0
     conv_sed_ocn_i_N(:,:)    = 0
+    conv_sed_ocn_i_Fe(:,:)   = 0
     conv_sed_ocn_i_S(:,:)    = 0
     conv_sed_ocn_i_meth(:,:) = 0
-    ! identify the indices of all non-zero transformation values in the conversion array for ocn -> sed
-    do io=1,n_ocn
+    conv_DOM_POM_i(:,:)      = 0
+    conv_POM_DOM_i(:,:)      = 0
+    conv_RDOM_POM_i(:,:)     = 0
+    conv_POM_RDOM_i(:,:)     = 0
+    ! identify the indices of all non-zero transformation values in the conversion array for atm -> ocn
+    do ia=1,n_atm
        loc_tot_i = 0
-       do is=1,n_sed
-          if (abs(conv_ocn_sed(is,io)) > const_real_nullsmall) then
+       do io=1,n_ocn
+          if (abs(conv_atm_ocn(io,ia)) > const_real_nullsmall) then
              loc_tot_i = loc_tot_i + 1
-             conv_ocn_sed_i(loc_tot_i,io) = is
+             conv_atm_ocn_i(loc_tot_i,ia) = io
           end if
        end do
-       conv_ocn_sed_i(0,io) = loc_tot_i
+       conv_atm_ocn_i(0,ia) = loc_tot_i
     end do
     ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
     do is=1,n_sed
@@ -2020,27 +1941,65 @@ CONTAINS
        end do
        conv_sed_ocn_i(0,is) = loc_tot_i
     end do
-    ! identify the indices of all non-zero transformation values in the conversion array for ocn -> atm
-    do io=1,n_ocn
-       loc_tot_i = 0
-       do ia=1,n_atm
-          if (abs(conv_ocn_atm(ia,io)) > const_real_nullsmall) then
-             loc_tot_i = loc_tot_i + 1
-             conv_ocn_atm_i(loc_tot_i,io) = ia
-          end if
-       end do
-       conv_ocn_atm_i(0,io) = loc_tot_i
-    end do
-    ! identify the indices of all non-zero transformation values in the conversion array for atm -> ocn
-    do ia=1,n_atm
+    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
+    ! NOTE: oxic conditions
+    do is=1,n_sed
        loc_tot_i = 0
        do io=1,n_ocn
-          if (abs(conv_atm_ocn(io,ia)) > const_real_nullsmall) then
+          if (abs(conv_sed_ocn_O(io,is)) > const_real_nullsmall) then
              loc_tot_i = loc_tot_i + 1
-             conv_atm_ocn_i(loc_tot_i,ia) = io
+             conv_sed_ocn_O(loc_tot_i,is) = io
           end if
        end do
-       conv_atm_ocn_i(0,ia) = loc_tot_i
+       conv_sed_ocn_i_O(0,is) = loc_tot_i
+    end do
+    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
+    ! NOTE: N-reduction redox conditions
+    do is=1,n_sed
+       loc_tot_i = 0
+       do io=1,n_ocn
+          if (abs(conv_sed_ocn_N(io,is)) > const_real_nullsmall) then
+             loc_tot_i = loc_tot_i + 1
+             conv_sed_ocn_N(loc_tot_i,is) = io
+          end if
+       end do
+       conv_sed_ocn_i_N(0,is) = loc_tot_i
+    end do
+    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
+    ! NOTE: FeOOH-reduction redox conditions
+    do is=1,n_sed
+       loc_tot_i = 0
+       do io=1,n_ocn
+          if (abs(conv_sed_ocn_Fe(io,is)) > const_real_nullsmall) then
+             loc_tot_i = loc_tot_i + 1
+             conv_sed_ocn_Fe(loc_tot_i,is) = io
+          end if
+       end do
+       conv_sed_ocn_i_Fe(0,is) = loc_tot_i
+    end do
+    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
+    ! NOTE: S-reduction redox conditions
+    do is=1,n_sed
+       loc_tot_i = 0
+       do io=1,n_ocn
+          if (abs(conv_sed_ocn_S(io,is)) > const_real_nullsmall) then
+             loc_tot_i = loc_tot_i + 1
+             conv_sed_ocn_i_S(loc_tot_i,is) = io
+          end if
+       end do
+       conv_sed_ocn_i_S(0,is) = loc_tot_i
+    end do
+    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
+    ! NOTE: methanogenesis
+    do is=1,n_sed
+       loc_tot_i = 0
+       do io=1,n_ocn
+          if (abs(conv_sed_ocn_meth(io,is)) > const_real_nullsmall) then
+             loc_tot_i = loc_tot_i + 1
+             conv_sed_ocn_i_meth(loc_tot_i,is) = io
+          end if
+       end do
+       conv_sed_ocn_i_meth(0,is) = loc_tot_i
     end do
     ! identify the indices of all non-zero transformation values in the conversion array for DOM -> POM
     do io=1,n_ocn
@@ -2085,54 +2044,6 @@ CONTAINS
           end if
        end do
        conv_POM_RDOM_i(0,is) = loc_tot_i
-    end do
-    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
-    ! NOTE: oxic conditions
-    do is=1,n_sed
-       loc_tot_i = 0
-       do io=1,n_ocn
-          if (abs(conv_sed_ocn_O(io,is)) > const_real_nullsmall) then
-             loc_tot_i = loc_tot_i + 1
-             conv_sed_ocn_O(loc_tot_i,is) = io
-          end if
-       end do
-       conv_sed_ocn_i_O(0,is) = loc_tot_i
-    end do
-    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
-    ! NOTE: N-reduction redox conditions
-    do is=1,n_sed
-       loc_tot_i = 0
-       do io=1,n_ocn
-          if (abs(conv_sed_ocn_N(io,is)) > const_real_nullsmall) then
-             loc_tot_i = loc_tot_i + 1
-             conv_sed_ocn_N(loc_tot_i,is) = io
-          end if
-       end do
-       conv_sed_ocn_i_N(0,is) = loc_tot_i
-    end do
-    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
-    ! NOTE: S-reduction redox conditions
-    do is=1,n_sed
-       loc_tot_i = 0
-       do io=1,n_ocn
-          if (abs(conv_sed_ocn_S(io,is)) > const_real_nullsmall) then
-             loc_tot_i = loc_tot_i + 1
-             conv_sed_ocn_i_S(loc_tot_i,is) = io
-          end if
-       end do
-       conv_sed_ocn_i_S(0,is) = loc_tot_i
-    end do
-    ! identify the indices of all non-zero transformation values in the conversion array for sed -> ocn
-    ! NOTE: methanogenesis
-    do is=1,n_sed
-       loc_tot_i = 0
-       do io=1,n_ocn
-          if (abs(conv_sed_ocn_meth(io,is)) > const_real_nullsmall) then
-             loc_tot_i = loc_tot_i + 1
-             conv_sed_ocn_i_meth(loc_tot_i,is) = io
-          end if
-       end do
-       conv_sed_ocn_i_meth(0,is) = loc_tot_i
     end do
   END SUBROUTINE sub_calc_tracerrelationships_i
   ! ****************************************************************************************************************************** !
@@ -2368,6 +2279,7 @@ CONTAINS
     string_atm_tlname(:) = ' '
     atm_mima(:,:)        = 0.0
     conv_ia_lselected(:) = 0
+    ia2l(:)              = 0
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.atm'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -2469,6 +2381,7 @@ CONTAINS
     string_ocn_tlname(:) = ' '
     ocn_mima(:,:)        = 0.0
     conv_io_lselected(:) = 0
+    io2l(:)              = 0
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.ocn'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -2570,6 +2483,7 @@ CONTAINS
     string_sed_tlname(:) = ' '
     sed_mima(:,:)        = 0.0
     conv_is_lselected(:) = 0
+    is2l(:)              = 0
     ! check file format
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.sed'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)

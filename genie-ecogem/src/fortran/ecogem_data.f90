@@ -121,6 +121,7 @@ CONTAINS
        write(*,68),'  - light attenuation by water              (k_w) :   ',        k_w
        write(*,68),'  - light attenuation by chlorophyll a    (k_chl) :   ',      k_chl
        write(*,66),'  - restrict MLD for mean light calculation?      :   ',      ctrl_restrict_mld
+       write(*,66),'  - PAR attenutation by sea-ice cover?            :   ',      ctrl_PARseaicelimit
        write(*,*), '- Grazing parameters --------------------------------'
        write(*,68),'  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
        write(*,68),'  - hill number for grazing assimilation   (hill) :   ',       hill
@@ -133,6 +134,7 @@ CONTAINS
        write(*,69),'  - basal mortality                        (mort) : a=',     mort_a,', b=',     mort_b
        write(*,70),'  - fraction messy feed. to dissolved (beta_graz) : a=',beta_graz_a,', b=',beta_graz_b,', c=',beta_graz_c
        write(*,70),'  - fraction mortality to dissolved   (beta_mort) : a=',beta_mort_a,', b=',beta_mort_b,', c=',beta_mort_c
+       write(*,70),'  - adjusted partitioning of C into POM vs. DOM   :   ',par_beta_POCtoDOC
        write(*,*), '- Other stuff -----------------------------'
        write(*,71),'  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
        write(*,68),'  - maximum temperature                (temp_max) :   ',temp_max
@@ -526,6 +528,7 @@ CONTAINS
     gkernelT(:,:) =transpose(gkernel(:,:))
 
     ! detrital partitioning
+    ! NOTE: fraction partitioned into DOM (a seperate and explicit array is created for 1-minus this -- the fraction into POM)
     beta_graz(:) =beta_graz_a - (beta_graz_a-beta_graz_b) / (1.0+beta_mort_c/diameter(:))
     beta_mort(:) =beta_mort_a - (beta_mort_a-beta_mort_b) / (1.0+beta_mort_c/diameter(:))
 

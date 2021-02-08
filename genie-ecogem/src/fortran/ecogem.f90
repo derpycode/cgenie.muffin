@@ -6,6 +6,7 @@ subroutine ecogem(          &
      & dum_genie_clock,     &
      & dum_egbg_fxsw,       & ! input
      & dum_mld,             & ! input
+     & dum_frac_sic,        & ! input
      & dum_egbg_sfcocn,     & ! input  -- tracer concentrations
      & dum_egbg_sfcpart,    & ! output -- change in particulate concentration field
      & dum_egbg_sfcdiss     & ! output -- change in remin concentration field
@@ -26,6 +27,7 @@ subroutine ecogem(          &
   integer(kind=8),intent(in)                             :: dum_genie_clock     ! genie clock (ms since start) NOTE: 8-byte integer
   real   ,intent(in) ,dimension(n_i,n_j)                 :: dum_egbg_fxsw       !
   real   ,intent(in) ,dimension(n_i,n_j)                 :: dum_mld             ! mixed layer depth
+  real   ,intent(in) ,dimension(n_i,n_j)                 :: dum_frac_sic        ! sea-ice fraction
   real   ,intent(in) ,dimension(n_ocn ,n_i,n_j,n_k)      :: dum_egbg_sfcocn     ! ecology-interface ocean tracer composition; ocn grid
   real   ,intent(out),dimension(n_sed ,n_i,n_j,n_k)      :: dum_egbg_sfcpart    ! ocean -> ecology flux; ocn grid
   real   ,intent(out),dimension(n_ocn ,n_i,n_j,n_k)      :: dum_egbg_sfcdiss    ! ecology -> ocean flux; ocn grid
@@ -98,7 +100,12 @@ subroutine ecogem(          &
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
   REAL                                     ::loc_rdts,loc_rdtyr            ! time reciprocals
-
+  ! carbon re-partitioning between DOM and POM
+  REAL                                     ::loc_dorgmatdt_iCarb
+  REAL                                     ::loc_dorgmatisodt_iCarb
+  ! T-dependent DOM production
+  REAL,DIMENSION(npmax)                    ::loc_chl
+  real                                     ::loc_rPOC
 
   ! ------------------------------------------------------- !
   ! INITIALIZE LOCAL VARIABLES
@@ -119,8 +126,12 @@ subroutine ecogem(          &
   ! sea surface temp (in degrees C)
   kbase        = n_k-n_keco+1
   isocean(:,:) = wet_mask_ij ! use SST~=abs.zero as ocean flag
-  ! surface incident PAR
-  PAR = PARfrac * dum_egbg_fxsw(:,:)
+  ! calculate PAR fraction of total shortwave solar radiation
+  PAR(:,:) = PARfrac * dum_egbg_fxsw(:,:)
+  ! optional attenutation by sea-ice cover
+  if (ctrl_PARseaicelimit) then
+     PAR(:,:) = (1.0 - dum_frac_sic) * PAR(:,:)
+  end if
   ! fluxes passed back to biogem
   nutrient_flux(:,:,:,:) = 0.0
   orgmat_flux(:,:,:,:,:) = 0.0
@@ -457,6 +468,35 @@ subroutine ecogem(          &
                  ! Apply respiration
                  dbiomassdt(iCarb,:) = dbiomassdt(iCarb,:) - respiration(:) * loc_biomass(iCarb,:)
 
+                 ! ------------------------------------------- !
+                 ! chl-a (and temeprature) DEPENDENT DOM PARTITIONING
+                 ! ------------------------------------------- !
+                 ! NOTE: from Dunne et al. [2005]
+                 !       rPOC = 0.426 + 0.0668 * ln(Chl/Zeu) - 0.0081 * C :: for 0.04 < rPOC < 0.72
+                 !       where: temperature (T) is in units of degrees C
+                 !              vertically integrated chlorophyll (Chl) is in units of mg Chl m-2(???)
+                 !              the depth of the euphotic zone (Zeu) is in m
+                 !       No units conversion required as ECOGEM Chl units are: mg Chl m-3
+                 ! NOTE: code goes here before <beta_mort> etc. arrays are used 
+                 if (ctrl_Tdep_POCtoDOC) then
+                    ! chl inventory from pervious time-step
+                    loc_chl(:) = loc_biomass(iChlo,:)
+                    ! chl inventory based on (end of) current time-step
+                    !!!loc_chl(:) = loc_biomass(iChlo,:) + dbiomassdt(iChlo,:) * dum_dts/real(nsubtime)
+                    If (sum(loc_chl(:)) > const_real_nullsmall) then
+                       loc_rPOC  = 0.426 + 0.0668*log(sum(loc_chl(:))) - 0.0081*(templocal-const_zeroC)
+                       ! cap loc_rPOC range
+                       If (loc_rPOC < 0.04)  loc_rPOC = 0.04
+                       If (loc_rPOC > 0.419) loc_rPOC = 0.419
+                    else
+                       loc_rPOC = 0.5
+                    end if
+                    beta_mort_1(:) = loc_rPOC             ! fraction to POM
+                    beta_graz_1(:) = loc_rPOC             ! fraction to POM
+                    beta_mort(:)   = 1.0 - beta_mort_1(:) ! fraction to DOM
+                    beta_graz(:)   = 1.0 - beta_graz_1(:) ! fraction to DOM
+                 end if
+
                  !**************************ckc ISOTOPES**************************************************
                  if (c13trace) then
                     ! INORGANIC RESOURCE UPTAKE (only for carbon 13)
@@ -502,6 +542,33 @@ subroutine ecogem(          &
                  ! no organic matter production in fundamental niche experiment
                  if (fundamental) dorgmatdt(:,:) = 0.0
 
+                 !**********************ckc ISOTOPES**********************************************************************
+                 if (c13trace) then
+                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort(:)  ) ! fraction to DOM
+                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort_1(:)) ! fraction to POM
+                    ! unassimilated grazing
+                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1)*ratioGraz(iCarb,1) ! fraction to DOM
+                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2)*ratioGraz(iCarb,2) ! fraction to POM
+                    if (fundamental) dorgmatisodt(:,:) = 0.0
+                 end if
+                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+                 ! ------------------------------------------- !
+                 ! ADJUST CARBON (REDFIELD) EXPORT PARTITIONING
+                 ! ------------------------------------------- !
+                 ! the idea here is to leave the distribution of nutrients etc. between DOM and POM alone, 
+                 ! and re-partition carbon (e.g. more to the DOM phase), hence reducing C/P of exported POM
+                 ! NOTE: for dorgmatdt array index 2 -- 1 == DOM, 2 == POM
+                 ! NOTE: tracers:: iCarb, iNitr, iPhos, iIron, and in isotope array dorgmatisodt:: iCarb13C
+                 loc_dorgmatdt_iCarb = dorgmatdt(iCarb,1) + dorgmatdt(iCarb,2)
+                 dorgmatdt(iCarb,2)  = par_beta_POCtoDOC*dorgmatdt(iCarb,2)
+                 dorgmatdt(iCarb,1)  = loc_dorgmatdt_iCarb - dorgmatdt(iCarb,2)
+                 loc_dorgmatisodt_iCarb   = dorgmatisodt(iCarb13C,1) + dorgmatisodt(iCarb13C,2)
+                 dorgmatisodt(iCarb13C,2) = par_beta_POCtoDOC*dorgmatisodt(iCarb13C,2)
+                 dorgmatisodt(iCarb13C,1) = loc_dorgmatisodt_iCarb - dorgmatisodt(iCarb13C,2)
+                 ! ------------------------------------------- !
+
                  ! ******* JDW size-dependent remineralisation *******
 		 ! calculate weighted mean size for size-dependent remineralisation scheme
 		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
@@ -526,19 +593,6 @@ subroutine ecogem(          &
                  	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
                  endif
                  ! ***************************************************
-
-                 !**********************ckc ISOTOPES**********************************************************************
-
-                 if (c13trace) then
-                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort(:)  ) ! fraction to DOM
-                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2) + sum(loc_bioiso(iCarb13C,:) * mortality(:) * beta_mort_1(:)) ! fraction to POM
-                    ! unassimilated grazing
-                    dorgmatisodt(iCarb13C,1) = dorgmatisodt(iCarb13C,1)*ratioGraz(iCarb,1) ! fraction to DOM
-                    dorgmatisodt(iCarb13C,2) = dorgmatisodt(iCarb13C,2)*ratioGraz(iCarb,2) ! fraction to POM
-                    if (fundamental) dorgmatisodt(:,:) = 0.0
-                 end if
-                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-                 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
                  ! collect fluxes for output
                  do io=1,iomax
@@ -700,7 +754,7 @@ subroutine ecogem(          &
   ! CaCO3 production
   gamma = (omega-1.0)**par_bio_red_POC_CaCO3_pP
   gamma = MERGE(gamma,0.0,omega.gt.1.0)
-  dum_egbg_sfcpart(is_CaCO3,:,:,:) = dum_egbg_sfcpart(is_POC,:,:,:)       * par_bio_red_POC_CaCO3 * gamma
+  dum_egbg_sfcpart(is_CaCO3,:,:,:) = dum_egbg_sfcpart(is_POC,:,:,:)       * par_bio_red_POC_CaCO3 * gamma / par_beta_POCtoDOC
   dum_egbg_sfcdiss(io_DIC  ,:,:,:) = dum_egbg_sfcdiss(io_DIC,:,:,:) - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
   dum_egbg_sfcdiss(io_ALK  ,:,:,:) = dum_egbg_sfcdiss(io_ALK,:,:,:) - 2.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
   dum_egbg_sfcdiss(io_Ca  ,:,:,:)  = dum_egbg_sfcdiss(io_Ca,:,:,:)  - 1.0 * dum_egbg_sfcpart(is_CaCO3,:,:,:)
@@ -720,6 +774,7 @@ subroutine ecogem(          &
   ! ---------------------------------------------------------- !
 end subroutine ecogem
 ! ******************************************************************************************************************************** !
+
 
 ! ******************************************************************************************************************************** !
 ! biogem DIAGNOSTICS - TIME-SLICE
@@ -848,7 +903,6 @@ end SUBROUTINE diag_ecogem_timeslice
 ! ******************************************************************************************************************************** !
 
 
-
 ! ******************************************************************************************************************************** !
 ! RESTART ECOGEM (save data)
 SUBROUTINE ecogem_save_rst(dum_genie_clock)
@@ -891,4 +945,6 @@ SUBROUTINE ecogem_save_rst(dum_genie_clock)
   ! END
   ! ---------------------------------------------------------- !
 END SUBROUTINE ecogem_save_rst
+
 ! ******************************************************************************************************************************** !
+

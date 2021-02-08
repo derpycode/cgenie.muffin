@@ -28,37 +28,35 @@ All experiments are run for 10,000 years.
 
 The mid-point of the time-slice is given in Q10_yypy notation in the filenames:
 
-Q10_00p0 == 0 Ma    == Holocene
-Q10_02p5 == 2.5 Ma  == Piacenzian (Pliocene/Pleistocene)
-Q10_04p5 == 4.5 Ma  == Zanclean (Pliocene)
-Q10_07p5 == 7.5 Ma  == Tortonian/Messinian (Miocene)
-Q10_10p0 == 10 Ma   == Tortonian (Miocene)
-Q10_12p5 == 12.5 Ma == Serravalian (Miocene)
-Q10_15p0 == 15.0 Ma == Langhian (Miocene)
+umQ00p0a == 0 Ma    == Holocene
+umQ02p5a == 2.5 Ma  == Piacenzian (Pliocene/Pleistocene)
+umQ04p5a == 4.5 Ma  == Zanclean (Pliocene)
+umQ07p5a == 7.5 Ma  == Tortonian/Messinian (Miocene)
+umQ10p0a == 10 Ma   == Tortonian (Miocene)
+umQ12p5a == 12.5 Ma == Serravalian (Miocene)
+umQ15p0a == 15.0 Ma == Langhian (Miocene)
 
 The commands to run the tuned experiments are listed as follows:
 
 -------------------------------------------
-./runmuffin.sh muffin.CB.Q10_00p0 MS/crichtonetal.CP.2019 muffin.CB.Q10_00p0.SPIN 10000
-./runmuffin.sh muffin.CB.Q10_02p5 MS/crichtonetal.CP.2019 muffin.CB.Q10_02p5.SPIN 10000
-./runmuffin.sh muffin.CB.Q10_04p5 MS/crichtonetal.CP.2019 muffin.CB.Q10_04p5.SPIN 10000
-./runmuffin.sh muffin.CB.Q10_07p5 MS/crichtonetal.CP.2019 muffin.CB.Q10_07p5.SPIN 10000
-./runmuffin.sh muffin.CB.Q10_10p0 MS/crichtonetal.CP.2019 muffin.CB.Q10_10p0.SPIN 10000
-./runmuffin.sh muffin.CB.Q10_12p5 MS/crichtonetal.CP.2019 muffin.CB.Q10_12p5.SPIN 10000
-./runmuffin.sh muffin.CB.Q10_15p0 MS/crichtonetal.CP.2019 muffin.CB.Q10_15p0.SPIN 10000
+./runmuffin.sh muffin.CB.umQ00p0a MS/crichtonetal.CP.2019 muffin.CB.umQ00p0a.SPIN 10000
+./runmuffin.sh muffin.CB.umQ02p5a MS/crichtonetal.CP.2019 muffin.CB.umQ02p5a.SPIN 10000
+./runmuffin.sh muffin.CB.umQ04p5a MS/crichtonetal.CP.2019 muffin.CB.umQ04p5a.SPIN 10000
+./runmuffin.sh muffin.CB.umQ07p5a MS/crichtonetal.CP.2019 muffin.CB.umQ07p5a.SPIN 10000
+./runmuffin.sh muffin.CB.umQ10p0a MS/crichtonetal.CP.2019 muffin.CB.umQ10p0a.SPIN 10000
+./runmuffin.sh muffin.CB.umQ12p5a MS/crichtonetal.CP.2019 muffin.CB.umQ12p5a.SPIN 10000
+./runmuffin.sh muffin.CB.umQ15p0a MS/crichtonetal.CP.2019 muffin.CB.umQ15p0a.SPIN 10000
 -------------------------------------------
 
 ### NOTES ######################################################
 
 In the user-configs run for the paper, a more frequent, but reduced data saving was used.
 This is becasue the nature of the model-data was 2D -- either surface or benthic fields.
-Also, frequent time-slice saving was necessary in order to automatically identify the presence of oscillations in ocena circulation.
+Also, frequent time-slice saving was necessary in order to automatically identify the presence of oscillations in ocean circulation.
 
-The '# --- DATA SAVING ---' section thus looks like:
+The '# --- DATA SAVING ---' section used in the experiments in the paper is actually:
 
 bg_par_data_save_level=7
-bg_ctrl_debug_lvl0=.true.
-ma_debug_loop=1
 # reduce output
 bg_ctrl_data_save_2d=.true.
 bg_ctrl_data_save_3d=.false.
@@ -66,11 +64,9 @@ bg_ctrl_data_save_3d=.false.
 bg_par_infile_slice_name='save_timeslice_EVERY000100.dat'
 bg_par_infile_sig_name='save_timeseries_EVERY000100.dat'
 
-A more 'normal output' under'# --- DATA SAVING ---', which could be substituted, would be simple be:
+However, a more 'normal' output, under '# --- DATA SAVING ---', is given in the user-config files provided here:
 
 bg_par_data_save_level=15
-bg_ctrl_debug_lvl0=.true.
-ma_debug_loop=1
 
 The salinity forcing, to contorl the AMOC strength, 
 is applied by means of a 2D forcing that is generic across all the reconstructions:

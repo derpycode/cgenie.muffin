@@ -406,6 +406,7 @@ CONTAINS
        ! load sedcore stack top information (this is the stack top state at the time of restart (run beginning)
        ! and hence allows the layers in the sedcore restart that equate to actively used layers implicitly included in the
        ! current stack or sedcore store, to be omitted) (did anypony get all that?)
+       ! (i.e. DO NOT double count restart layers)
        call sub_getvar1d_I(loc_ncid,'grid_nrst',loc_nv_sedcore_rst,loc_m_in(:))
        loc_nv_sed_stack_top_rst(:) = loc_m_in(:)
        ! -------------------------------------------------------- ! load and apply sediment tracers that are selected
@@ -499,11 +500,17 @@ CONTAINS
     ! -------------------------------------------------------- !
     IF (ctrl_misc_debug4) print*,'*** CONSTRUCT SEDCORE ARRAY FOR WRITING ***'
     ! -------------------------------------------------------- ! set number of layers required
+    ! NOTE: loc_n_sedcore_store_tot == maximum number of layers used in the sedcore store
+    !       loc_n_sed_stack_tot     == maximum number of layers used in the (i,j) sed stack (for sedcore locations)
     ! NOTE: 1 (additional) layer is required for the sedtop
     ! NOTE: include sedcore restart, BUT, remove maximum # discarded layers
+    !       (loc_n_sedcore_tot_rst minus minval of the to-be-discarded number of sed restart layers,
+    !        gives the maximum number of sedcore restart layers NOT to be discarded)
+    ! NOTE: loc_nv_sed_stack_top_rst == sed restart layers that will already have been counted in a sedcore array 
+    !       loc_n_sedcore_tot_rst    == dimension of sedcore restart array
     IF (ctrl_continuing) then
        loc_n_sedcore_tot = loc_n_sedcore_store_tot + loc_n_sed_stack_tot + 1 + &
-            & loc_n_sedcore_tot_rst - maxval(loc_nv_sed_stack_top_rst(:))
+            & loc_n_sedcore_tot_rst - minval(loc_nv_sed_stack_top_rst(:))
     else
        loc_n_sedcore_tot = loc_n_sedcore_store_tot + loc_n_sed_stack_tot + 1
     end if
@@ -766,6 +773,9 @@ CONTAINS
        end do
        ! ----------------------------------------------------- ! (i) calculate D14C and radiocarbon age
        ! NOTE: this will be saved regardless of whether 14C is a included tracer in the model or not ...
+       ! NOTE: rather than trying to obtain and pass atmospheric D14C, 
+       !       a dummy pre-industrila value of 0.0 is passed instead to fun_convert_D14Ctoage
+       !       (a recent code change/correction added atmospheric D14C to the calculation of radiocarbon age)
        loc_sedcore_age_14C(m,:) = const_real_zero
        if (sed_select(is_CaCO3_14C)) then
           DO o = 1,loc_n_sedcore_tot
@@ -775,7 +785,7 @@ CONTAINS
                      &   loc_vsedcore(m)%lay(is2l(is_CaCO3_14C),o) &
                      & )
                 loc_sedcore_age_14C(m,o) = &
-                     & fun_convert_D14Ctoage(loc_CaCO3_D14C)
+                     & fun_convert_D14Ctoage(loc_CaCO3_D14C,0.0)
              end if
           end DO
        end if
