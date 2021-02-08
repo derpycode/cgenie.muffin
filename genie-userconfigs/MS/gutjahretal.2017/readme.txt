@@ -8,6 +8,7 @@ Marcus Gutjahr, Andy Ridgwell, Philip F. Sexton, Eleni Anagnostou, Paul N. Pears
 
 ################################################################
 17/06/26 -- README.txt file creation (A.R.)
+20/12/14 -- corrected base-config name
 ################################################################
 
 Provided is the code used to create the model experiments presented in the paper.
@@ -52,19 +53,19 @@ NB. named as per Extended Data Figure 10 (Table a) and in the order that they ap
 These are run on from the end of the (2nd stage) spinup as follows:
 
 -------------------------------------------
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_HI 500000 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm 500000 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_LO 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_HI 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_LO 500000 SPIN2gl
 -------------------------------------------
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.FEsm_HI 500000 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.FEsm 500000 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.FEsm_LO 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.FEsm_HI 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.FEsm 500000 SPIN2gl
+./runmuffin.sh ccgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.FEsm_LO 500000 SPIN2gl
 -------------------------------------------
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07rw 500000 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.FErw 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07rw 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.FErw 500000 SPIN2gl
 -------------------------------------------
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_noW 500000 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.FEsm_noW 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_noW 500000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.FEsm_noW 500000 SPIN2gl
 -------------------------------------------
 
 ### model experiments -- main (Corg burial) ####################
@@ -77,15 +78,15 @@ The first segment is hence the same as per EXP.R07sm_HI, EXP.R07sm, EXP.R07sm_LO
 
 To create the first segment:
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_HI_Corg1 72600 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_Corg1 72600 SPIN2gl
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_LO_Corg1 72600 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_HI_Corg1 72600 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_Corg1 72600 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_LO_Corg1 72600 SPIN2gl
 
 and the 2nd segment:
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_HI_Corg2 227400 EXP.R07sm_HI_Corg1
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_Corg2 227400 EXP.R07sm_Corg1
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 EXP.R07sm_LO_Corg2 227400 EXP.R07sm_LO_Corg1
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_HI_Corg2 227400 EXP.R07sm_HI_Corg1
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_Corg2 227400 EXP.R07sm_Corg1
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 EXP.R07sm_LO_Corg2 227400 EXP.R07sm_LO_Corg1
 
 The 2 segments of each HI/mean/LO configuration are stitched together to create a continue 300,000 year long experiment and then processed.
 
@@ -106,7 +107,7 @@ SENS.020000yr   |    20,000
 
 These are run on from the end of the (2nd stage) spinup as follows:
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0055c.BASES MS/gutjahretal.2017 SENS.??????yr 200000 SPIN2gl
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASESr MS/gutjahretal.2017 SENS.??????yr 200000 SPIN2gl
 
 where SENS.??????yr is one of the experiment IDs listed above.
 
