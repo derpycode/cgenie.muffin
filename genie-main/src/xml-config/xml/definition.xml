@@ -6941,6 +6941,38 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
                         <description>CO2 exchange flux with terrestrial biosphere (mol yr-1) [120 PgC yr-1 == 1.0E16 mol yr-1</description>
                     </param>
+                    <param name="par_atm_slabON">
+			<value datatype="boolean">.false.</value>
+                        <description>box model for terrestrial biosphere</description>
+                    </param>
+                    <param name="par_atm_slabsave">
+			<value datatype="boolean">.false.</value>
+                        <description>crude saving of box terrestrial biosphere</description>
+                    </param>
+                    <param name="par_atm_slab_Fnpp0">
+			<value datatype="real">72.0</value>
+                        <description>NPP const (PgC yr-1)</description>
+                    </param>
+                    <param name="par_atm_slab_B">
+			<value datatype="real">0.71</value>
+                        <description>NPP pCO2 dependence</description>
+                    </param>
+                    <param name="par_atm_slab_tau">
+			<value datatype="real">8.3</value>
+                        <description>turnover year for vegitation</description>
+                    </param>
+                    <param name="par_atm_slab_gamma">
+			<value datatype="real">0.049</value>
+                        <description>decay const (yr-1) for SOM</description>
+                    </param>
+                    <param name="par_atm_slab_Q10">
+			<value datatype="real">2.1</value>
+                        <description>temperature dependence in Q10</description>
+                    </param>
+                    <param name="par_atm_slab_savedtyr">
+			<value datatype="real">10.0</value>
+                        <description>time interval for SOM data storage</description>
+                    </param>
                     <param name="ctrl_continuing">
 			<value datatype="boolean">.false.</value>
                         <description>continuing atchem?</description>

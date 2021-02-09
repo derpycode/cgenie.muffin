@@ -114,6 +114,12 @@ SUBROUTINE atchem(    &
      END DO block_jloop
   END DO block_iloop
   
+  ! ---- YK added 02.08.2021 -----
+  IF (par_atm_slabON .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pCO2_13C)) THEN
+        CALL sub_calc_terrbio(loc_dtyr,dum_sfcatm(ia_T,:,:),locij_fatm(:,:,:))
+  END IF 
+  ! ----- End addition -----
+  
   ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
   ! *** (i,j) GRID PT LOOP END *** !
   ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !

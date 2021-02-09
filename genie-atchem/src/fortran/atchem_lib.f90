@@ -51,6 +51,16 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/par_atm_slabbiosphere_C,par_atm_slabbiosphere_C_d13C
   real::par_atm_FterrCO2exchange          ! 
   NAMELIST /ini_atchem_nml/par_atm_FterrCO2exchange
+  logical::par_atm_slabON                                      ! box model for terrestrial biosphere
+  logical::par_atm_slabsave                                    ! crude saving of box terrestrial biosphere
+  NAMELIST /ini_atchem_nml/par_atm_slabON,par_atm_slabsave
+  real::par_atm_slab_Fnpp0                                      ! NPP const (PgC yr-1)
+  real::par_atm_slab_B                                          ! NPP pCO2 dependence 
+  real::par_atm_slab_tau                                        ! turnover year for vegitation
+  real::par_atm_slab_gamma                                      ! decay const (yr-1) for SOM
+  real::par_atm_slab_Q10                                        ! temperature dependence in Q10
+  real::par_atm_slab_savedtyr                                   ! time interval for SOM data storage
+  NAMELIST /ini_atchem_nml/par_atm_slab_Fnpp0,par_atm_slab_B,par_atm_slab_tau,par_atm_slab_gamma,par_atm_slab_Q10,par_atm_slab_savedtyr
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                     ! continuing run?
   NAMELIST /ini_atchem_nml/ctrl_continuing
@@ -138,6 +148,9 @@ MODULE atchem_lib
   ! *** Miscellanenous ***
   !
   real,dimension(n_atm,n_i,n_j)::atm_slabbiosphere             ! 
+  real,dimension(n_i,n_j)::slab_frac_vegi                      ! YK added 02.08.2021
+  real::slab_time_cnt                                          ! YK added 02.08.2021
+  real::slab_time_cnt2                                         ! YK added 02.08.2021
   ! netCDF and netCDF restart parameters
   CHARACTER(len=31)::string_rstid                              ! 
   CHARACTER(len=7) ::string_ncrunid                            ! 

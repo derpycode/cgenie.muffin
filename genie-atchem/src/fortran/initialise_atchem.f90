@@ -45,6 +45,27 @@ SUBROUTINE initialise_atchem( &
               
   ! *** initialize MISC ***
   call sub_init_slabbiosphere()
+  
+  ! ---- YK added 02.08.2021 -----
+  slab_frac_vegi(:,:) = 0.0 
+  slab_time_cnt = 0.0
+  slab_time_cnt2 = 0.0
+  if (par_atm_slabsave) then 
+     call system ('mkdir -p '//trim(adjustl(par_outdir_name))//'/tem/')
+     open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terFLX.res',action='write',status='replace')
+     write(100,*) 'time / NPP (mol yr-1) / resp (mol yr-1) / Net CO2 flux (mol yr-1)'
+     close(100)
+     open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terFLXg.res',action='write',status='replace')
+     write(100,*) 'time / NPP (PgC yr-1) / resp (PgC yr-1) / Net CO2 flux (PgC yr-1)'
+     close(100)
+     open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terPOOl.res',action='write',status='replace')
+     write(100,*) 'time / Vegie (mol) / Litter (mol) / Total terrestrial OM (mol)'
+     close(100)
+     open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terPOOlg.res',action='write',status='replace')
+     write(100,*) 'time / Vegie (PgC) / Litter (PgC) / Total terrestrial OM (PgC)'
+     close(100)
+  endif 
+  ! ----- End addition -----
 
   print*,' <<< Initialisation complete'
   print*,'======================================================='

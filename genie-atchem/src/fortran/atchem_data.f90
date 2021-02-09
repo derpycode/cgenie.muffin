@@ -68,6 +68,14 @@ CONTAINS
        print*,': ',par_atm_slabbiosphere_C
        print*,': ',par_atm_slabbiosphere_C_d13C
        print*,': ',par_atm_FterrCO2exchange
+       print*,'box model for terrestrial biosphere                 : ',par_atm_slabON
+       print*,'crude saving of box terrestrial biosphere           : ',par_atm_slabsave
+       print*,'NPP const (PgC yr-1)                                : ',par_atm_slab_Fnpp0
+       print*,'NPP pCO2 dependence                                 : ',par_atm_slab_B
+       print*,'turnover year for vegitation                        : ',par_atm_slab_tau
+       print*,'decay const (yr-1) for SOM                          : ',par_atm_slab_gamma
+       print*,'temperature dependence in Q10                       : ',par_atm_slab_Q10
+       print*,'time interval for SOM data storage                  : ',par_atm_slab_savedtyr
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
        print*,'--- RUN CONTROL ------------------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing
