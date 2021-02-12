@@ -53,14 +53,18 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/par_atm_FterrCO2exchange
   logical::par_atm_slabON                                      ! box model for terrestrial biosphere
   logical::par_atm_slabsave                                    ! crude saving of box terrestrial biosphere
-  NAMELIST /ini_atchem_nml/par_atm_slabON,par_atm_slabsave
+  logical::par_atm_slab_restart                                ! restart from a previous run 
+  NAMELIST /ini_atchem_nml/par_atm_slabON,par_atm_slabsave,par_atm_slab_restart
   real::par_atm_slab_Fnpp0                                      ! NPP const (PgC yr-1)
   real::par_atm_slab_B                                          ! NPP pCO2 dependence 
+  real::par_atm_slab_pCO2ref                                    ! NPP reference pCO2 (ppm)
   real::par_atm_slab_tau                                        ! turnover year for vegitation
   real::par_atm_slab_gamma                                      ! decay const (yr-1) for SOM
   real::par_atm_slab_Q10                                        ! temperature dependence in Q10
+  NAMELIST /ini_atchem_nml/par_atm_slab_Fnpp0,par_atm_slab_B,par_atm_slab_tau,par_atm_slab_gamma,par_atm_slab_Q10,par_atm_slab_pCO2ref
   real::par_atm_slab_savedtyr                                   ! time interval for SOM data storage
-  NAMELIST /ini_atchem_nml/par_atm_slab_Fnpp0,par_atm_slab_B,par_atm_slab_tau,par_atm_slab_gamma,par_atm_slab_Q10,par_atm_slab_savedtyr
+  real::par_atm_slab_ss_dtyr                                   ! time duration assuming steady state
+  NAMELIST /ini_atchem_nml/par_atm_slab_savedtyr,par_atm_slab_ss_dtyr 
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                     ! continuing run?
   NAMELIST /ini_atchem_nml/ctrl_continuing
@@ -151,6 +155,7 @@ MODULE atchem_lib
   real,dimension(n_i,n_j)::slab_frac_vegi                      ! YK added 02.08.2021
   real::slab_time_cnt                                          ! YK added 02.08.2021
   real::slab_time_cnt2                                         ! YK added 02.08.2021
+  integer::utest                                               ! YK added 02.12.2021
   ! netCDF and netCDF restart parameters
   CHARACTER(len=31)::string_rstid                              ! 
   CHARACTER(len=7) ::string_ncrunid                            ! 

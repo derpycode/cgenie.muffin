@@ -6949,6 +6949,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>crude saving of box terrestrial biosphere</description>
                     </param>
+                    <param name="par_atm_slab_restart">
+			<value datatype="boolean">.false.</value>
+                        <description>restart from a previous run</description>
+                    </param>
                     <param name="par_atm_slab_Fnpp0">
 			<value datatype="real">72.0</value>
                         <description>NPP const (PgC yr-1)</description>
@@ -6956,6 +6960,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_atm_slab_B">
 			<value datatype="real">0.71</value>
                         <description>NPP pCO2 dependence</description>
+                    </param>
+                    <param name="par_atm_slab_pCO2ref">
+			<value datatype="real">365</value>
+                        <description>NPP pCO2 reference (ppm)</description>
                     </param>
                     <param name="par_atm_slab_tau">
 			<value datatype="real">8.3</value>
@@ -6966,12 +6974,16 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>decay const (yr-1) for SOM</description>
                     </param>
                     <param name="par_atm_slab_Q10">
-			<value datatype="real">2.1</value>
+			<value datatype="real">2.7</value>
                         <description>temperature dependence in Q10</description>
                     </param>
                     <param name="par_atm_slab_savedtyr">
 			<value datatype="real">10.0</value>
-                        <description>time interval for SOM data storage</description>
+                        <description>time interval for SOM data storage (yr)</description>
+                    </param>
+                    <param name="par_atm_slab_ss_dtyr">
+			<value datatype="real">100.0</value>
+                        <description>time duration assuming steady state (yr)</description>
                     </param>
                     <param name="ctrl_continuing">
 			<value datatype="boolean">.false.</value>

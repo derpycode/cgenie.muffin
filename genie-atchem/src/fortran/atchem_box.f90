@@ -91,6 +91,8 @@ CONTAINS
     real::loc_Ratm,loc_Rterr                                   ! local isotopic variables
     
     real::slab_save_dtyr
+    real::slab_ss_dtyr
+    real::loc_time
     
     real::landmask(n_i,n_j)                                    ! 
     
@@ -100,7 +102,7 @@ CONTAINS
     landmask = 1.0 
     ! resp and production paramter values 
     ! production
-    loc_CO2ref = 365. ! ppm (Arora & Matthews 2008)
+    loc_CO2ref = par_atm_slab_pCO2ref !365. ! ppm (Arora & Matthews 2008)
     loc_Fnpp0 = par_atm_slab_Fnpp0* 1e15 / 12. ! 72.0 * 1e15 / 12. ! Pg C yr-1 converted to mol yr-1
     loc_B = par_atm_slab_B ! 0.71
     ! resp
@@ -110,6 +112,8 @@ CONTAINS
     loc_Tref = 15.  ! degree C
     ! time step for saving 
     slab_save_dtyr = max(dum_dtyr,par_atm_slab_savedtyr)
+    ! time when assuming steady state
+    slab_ss_dtyr = par_atm_slab_ss_dtyr
     
     ! *** PUT TEMP INTO LOCAL ARRAY
     ! NOTE: extract temps to local array this way to please intel compilers
@@ -130,7 +134,7 @@ CONTAINS
     ! print *,loc_CO2,loc_avSLT
     
     ! initially reaching steady state
-    if ((slab_time_cnt <= slab_save_dtyr) .and. (slab_time_cnt2 <=slab_save_dtyr) ) then 
+    if ((.not.par_atm_slab_restart) .and. (slab_time_cnt <= slab_ss_dtyr) .and. (slab_time_cnt2 <=slab_ss_dtyr) ) then 
     ! if (1.0 == 2.0) then 
     ! *** CALCULATE TERRESTRIAL NPP BASED ON CO2 ***
        loc_Fnpp  = dum_dtyr*(loc_Fnpp0*(1. + loc_B*LOG(loc_CO2/loc_CO2ref)))
@@ -181,20 +185,23 @@ CONTAINS
     if (par_atm_slabsave) then 
        slab_time_cnt = slab_time_cnt + dum_dtyr
        if (slab_time_cnt > slab_save_dtyr) then 
+           loc_time = slab_time_cnt2 + 0.5*slab_time_cnt 
            slab_time_cnt2 = slab_time_cnt2 + slab_time_cnt
-           open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terFLX.res',action='write',status='old',position='append')
-           write(100,*) slab_time_cnt2, loc_Fnpp/dum_dtyr, loc_Fresp/dum_dtyr, (loc_Fresp - loc_Fnpp)/dum_dtyr
-           close(100)
-           open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terFLXg.res',action='write',status='old',position='append')
-           write(100,*) slab_time_cnt2, loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
-           close(100)
-           open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terPOOl.res',action='write',status='old',position='append')
-           write(100,*) slab_time_cnt2, loc_vegi_new, loc_litter_new, loc_litter_new + loc_vegi_new
-           close(100)
-           open(unit=100,file=trim(adjustl(par_outdir_name))//'/tem/terPOOlg.res',action='write',status='old',position='append')
-           write(100,*) slab_time_cnt2, loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
-           close(100)
-           slab_time_cnt = slab_time_cnt - slab_save_dtyr
+           ! print *,'!!! saving vertual box biosphere in atmchem !!!',slab_time_cnt2
+           open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLX.res',action='write',status='old',position='append')
+           write(utest,*) slab_time_cnt2, loc_Fnpp/dum_dtyr, loc_Fresp/dum_dtyr, (loc_Fresp - loc_Fnpp)/dum_dtyr
+           close(utest)
+           open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLXg.res',action='write',status='old',position='append')
+           write(utest,*) slab_time_cnt2, loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
+           close(utest)
+           open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOl.res',action='write',status='old',position='append')
+           write(utest,*) slab_time_cnt2, loc_vegi_new, loc_litter_new, loc_litter_new + loc_vegi_new
+           close(utest)
+           open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOlg.res',action='write',status='old',position='append')
+           write(utest,*) slab_time_cnt2, loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
+           close(utest)
+           ! slab_time_cnt = slab_time_cnt - slab_save_dtyr
+           slab_time_cnt = 0.
        endif 
     endif 
 
