@@ -570,16 +570,16 @@ CONTAINS
          & 'DIC_flux_land                                     ', &
          & 'Ca_flux_land                                      ', &
          & 'DIC_13C_flux_land                                 ', &
-         & 'Os_flux                                           ', &
-         & '187Os_flux                                        ', &
-         & '188Os_flux                                        ', &
+         & 'Os_flux_land                                      ', &
+         & '187Os_flux_land                                   ', &
+         & '188Os_flux_land                                   ', &
          & 'ALK_flux_ocean                                    ', &
          & 'DIC_flux_ocean                                    ', &
          & 'Ca_flux_ocean                                     ', &
          & 'DIC_13C_flux_ocean                                ', &
-         & 'Os_flux                                           ', &
-         & '187Os_flux                                        ', &
-         & '188Os_flux                                        ' /)
+         & 'Os_flux_ocean                                     ', &
+         & '187Os_flux_ocean                                  ', &
+         & '188Os_flux_ocean                                  ' /)
 
     output_descriptions = (/                                                       &
                                 !'---------------------------- inputs -----------------------------'

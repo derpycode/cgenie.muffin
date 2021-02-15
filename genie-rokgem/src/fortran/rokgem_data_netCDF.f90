@@ -191,6 +191,18 @@ CONTAINS
     call sub_adddef_netcdf(loc_iou,3,'DIC_14C_land','DIC_14C weathering flux - land',trim(loc_unitsname),const_real_zero, &
          & const_real_zero)
     call sub_putvar2d('DIC_14C_land',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+    ! Osmium
+    loc_unitsname = 'mol Os / yr'
+    loc_ij(:,:) = dum_force_flux_weather_o_land(io_Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_land','Os weathering flux - land',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_land',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+    ! Osmium 187Os/188Os
+    loc_unitsname = '187Os/188Os'
+    loc_ij(:,:) = dum_force_flux_weather_o_land(io_Os_187Os,:,:)/dum_force_flux_weather_o_land(io_Os_188Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_187Os_188Os_land',' weathering flux 187Os/188Os - land',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_187Os_188Os_land',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
 
     ! weathering flux to ocean - ocean
     ! Alkalinity
@@ -207,7 +219,7 @@ CONTAINS
     ! Ca
     loc_unitsname = 'mol Ca / yr'
     loc_ij(:,:) = dum_force_flux_weather_o_ocean(io_Ca,:,:)
-    call sub_adddef_netcdf(loc_iou,3,'Ca_ocean','Ca weathering flux -ocean',trim(loc_unitsname),const_real_zero,const_real_zero)
+    call sub_adddef_netcdf(loc_iou,3,'Ca_ocean','Ca weathering flux - ocean',trim(loc_unitsname),const_real_zero,const_real_zero)
     call sub_putvar2d('Ca_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
     ! Alkalinity
     loc_unitsname = 'mol DIC_13C / yr'
@@ -221,6 +233,18 @@ CONTAINS
     call sub_adddef_netcdf(loc_iou,3,'DIC_14C_ocean','DIC_14C weathering flux - ocean',trim(loc_unitsname),const_real_zero, &
          & const_real_zero)
     call sub_putvar2d('DIC_14C_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
+    ! Osmium
+    loc_unitsname = 'mol Os / yr'
+    loc_ij(:,:) = dum_force_flux_weather_o_ocean(io_Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_ocean','Os weathering flux - ocean',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
+    ! Osmium 187Os/188Os
+    loc_unitsname = '187Os/188Os'
+    loc_ij(:,:) = dum_force_flux_weather_o_ocean(io_Os_187Os,:,:)/dum_force_flux_weather_o_ocean(io_Os_188Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_187Os_188Os_ocean',' weathering flux 187Os/188Os - ocean',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_187Os_188Os_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
 
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
     !
