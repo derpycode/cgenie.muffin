@@ -536,7 +536,7 @@ CONTAINS
 
     INTEGER                                 :: alloc_stat, i, ios
 
-    n_outputs = 32
+    n_outputs = 38
     ALLOCATE(time_series_names(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
     ALLOCATE(output_descriptions(n_outputs),stat=alloc_stat)
@@ -570,10 +570,16 @@ CONTAINS
          & 'DIC_flux_land                                     ', &
          & 'Ca_flux_land                                      ', &
          & 'DIC_13C_flux_land                                 ', &
+         & 'Os_flux                                           ', &
+         & '187Os_flux                                        ', &
+         & '188Os_flux                                        ', &
          & 'ALK_flux_ocean                                    ', &
          & 'DIC_flux_ocean                                    ', &
          & 'Ca_flux_ocean                                     ', &
-         & 'DIC_13C_flux_ocean                                ' /)
+         & 'DIC_13C_flux_ocean                                ', &
+         & 'Os_flux                                           ', &
+         & '187Os_flux                                        ', &
+         & '188Os_flux                                        ' /)
 
     output_descriptions = (/                                                       &
                                 !'---------------------------- inputs -----------------------------'
@@ -607,11 +613,17 @@ CONTAINS
          & 'DIC weathering flux (Tmol yr-1)                  ', &
          & 'Ca weathering flux (Tmol yr-1)                   ', &
          & 'DIC_13C weathering flux (Tmol yr-1)              ', &
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ', &
                                 ! '                            * ocean *                            '
          & 'ALK weathering flux (Tmol yr-1)                  ', &
          & 'DIC weathering flux (Tmol yr-1)                  ', &
          & 'Ca weathering flux (Tmol yr-1)                   ', &
-         & 'DIC_13C weathering flux (Tmol yr-1)              ' /)
+         & 'DIC_13C weathering flux (Tmol yr-1)              ', &
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ' /)
 
     ALLOCATE(outputs(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
