@@ -79,6 +79,8 @@ CONTAINS
        print*,'temperature dependence in Q10                       : ',par_atm_slab_Q10
        print*,'time interval for SOM data storage                  : ',par_atm_slab_savedtyr
        print*,'time duration assuming steady state                 : ',par_atm_slab_ss_dtyr
+       print*,'tau (yr) as function of vegi amount (slope)         : ',par_atm_slab_dtaudvegi
+       print*,'tau (yr) as function of vegi amount (intercept)     : ',par_atm_slab_tau0
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
        print*,'--- RUN CONTROL ------------------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing

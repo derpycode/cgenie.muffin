@@ -9,6 +9,7 @@ MODULE atchem_box
 
 
   USE atchem_lib
+  USE genie_global,only:tstar_atm,landice_slicemask_lic,frac_sic ! YK added 
   IMPLICIT NONE
   SAVE
 
@@ -132,6 +133,16 @@ CONTAINS
     loc_Rterr = sum(atm_slabbiosphere(ia_pCO2_13C,:,:))/sum(atm_slabbiosphere(ia_pCO2,:,:))
     
     ! print *,loc_CO2,loc_avSLT
+    ! print *, size(tstar_atm),sum(tstar_atm)
+    ! print *, sum(landice_slicemask_lic)
+    ! print *, sum(frac_sic ),real(size(tstar_atm*(1.-frac_sic ))),sum(1.-frac_sic )
+    
+    ! ice-free surface temperature?
+    loc_avSLT = sum(tstar_atm*(1.-frac_sic ))/sum(1.-frac_sic )
+    
+    ! ice-free land surface temperature?
+    ! loc_avSLT = sum(tstar_atm*(1.- landice_slicemask_lic ))/sum(1.- landice_slicemask_lic )
+    
     
     ! initially reaching steady state
     if ((.not.par_atm_slab_restart) .and. (slab_time_cnt <= slab_ss_dtyr) .and. (slab_time_cnt2 <=slab_ss_dtyr) ) then 
@@ -139,6 +150,17 @@ CONTAINS
     ! *** CALCULATE TERRESTRIAL NPP BASED ON CO2 ***
        loc_Fnpp  = dum_dtyr*(loc_Fnpp0*(1. + loc_B*LOG(loc_CO2/loc_CO2ref)))
        loc_vegi_new = loc_Fnpp/(loc_decay*dum_dtyr)
+       
+       ! when using V vs lambda relationship
+       if ( (par_atm_slab_dtaudvegi /= 0.0) .and.  (par_atm_slab_tau0 /= 0.0)) then 
+          ! loc_decay = (loc_vegi*12./1e15)*0.023 + 6.64 ! yr
+          ! loc_decay = 1./loc_decay                     ! yr-1
+          ! loc_vegi_new = 6.64/(1./loc_Fnpp - 12./1e15*0.023)
+          loc_vegi_new = par_atm_slab_tau0/(1./(loc_Fnpp/dum_dtyr) - 12./1e15*par_atm_slab_dtaudvegi)
+          loc_decay = (loc_vegi_new*12./1e15)*par_atm_slab_dtaudvegi + par_atm_slab_tau0 ! yr
+          loc_decay = 1./loc_decay                     ! yr-1
+       endif 
+       
        loc_litter_new = loc_vegi_new *loc_decay*dum_dtyr &
             & /(dum_dtyr*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1))
        loc_Fresp = dum_dtyr*loc_litter_new*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1)
@@ -152,6 +174,13 @@ CONTAINS
        
        ! *** CALCULATE SOIL RESPIRATION BASED ON GLOBAL AVERAGE LAND TEMPERATURE ***
        loc_Fresp = dum_dtyr*loc_litter*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1)
+       
+       ! when using V vs lambda relationship
+       if ( (par_atm_slab_dtaudvegi /= 0.0) .and.  (par_atm_slab_tau0 /= 0.0)) then 
+          ! loc_decay = (loc_vegi*12./1e15)*0.023 + 6.64 ! yr
+          loc_decay = (loc_vegi*12./1e15)*par_atm_slab_dtaudvegi + par_atm_slab_tau0 ! yr
+          loc_decay = 1./loc_decay                     ! yr-1
+       endif 
 
        loc_vegi_new = loc_vegi + (loc_Fnpp - loc_vegi*loc_decay*dum_dtyr)
        loc_litter_new = loc_litter + (loc_vegi*loc_decay*dum_dtyr - loc_Fresp)
@@ -189,16 +218,20 @@ CONTAINS
            slab_time_cnt2 = slab_time_cnt2 + slab_time_cnt
            ! print *,'!!! saving vertual box biosphere in atmchem !!!',slab_time_cnt2
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLX.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_Fnpp/dum_dtyr, loc_Fresp/dum_dtyr, (loc_Fresp - loc_Fnpp)/dum_dtyr
+           write(utest,*) slab_time_cnt2, loc_avSLT,loc_CO2, & 
+              & loc_Fnpp/dum_dtyr, loc_Fresp/dum_dtyr, (loc_Fresp - loc_Fnpp)/dum_dtyr
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLXg.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
+           write(utest,*) slab_time_cnt2, loc_avSLT, loc_CO2, &
+              & loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOl.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_vegi_new, loc_litter_new, loc_litter_new + loc_vegi_new
+           write(utest,*) slab_time_cnt2, loc_avSLT, loc_CO2, &
+              & loc_vegi_new, loc_litter_new, loc_litter_new + loc_vegi_new
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOlg.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
+           write(utest,*) slab_time_cnt2, loc_avSLT, loc_CO2, &
+              & loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
            close(utest)
            ! slab_time_cnt = slab_time_cnt - slab_save_dtyr
            slab_time_cnt = 0.

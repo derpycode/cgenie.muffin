@@ -6970,7 +6970,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>turnover year for vegitation</description>
                     </param>
                     <param name="par_atm_slab_gamma">
-			<value datatype="real">0.049</value>
+			<value datatype="real">0.044</value>
                         <description>decay const (yr-1) for SOM</description>
                     </param>
                     <param name="par_atm_slab_Q10">
@@ -6984,6 +6984,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_atm_slab_ss_dtyr">
 			<value datatype="real">100.0</value>
                         <description>time duration assuming steady state (yr)</description>
+                    </param>
+                    <param name="par_atm_slab_tau0">
+			<value datatype="real">6.64</value>
+                        <description>tau (yr) at 0 vegi amount</description>
+                    </param>
+                    <param name="par_atm_slab_dtaudvegi">
+			<value datatype="real">0.0023</value>
+                        <description>tau dependence on vegi amount (yr/PgC)</description>
                     </param>
                     <param name="ctrl_continuing">
 			<value datatype="boolean">.false.</value>

@@ -62,8 +62,11 @@ MODULE atchem_lib
   real::par_atm_slab_gamma                                      ! decay const (yr-1) for SOM
   real::par_atm_slab_Q10                                        ! temperature dependence in Q10
   NAMELIST /ini_atchem_nml/par_atm_slab_Fnpp0,par_atm_slab_B,par_atm_slab_tau,par_atm_slab_gamma,par_atm_slab_Q10,par_atm_slab_pCO2ref
+  real::par_atm_slab_tau0                                       ! tau (yr) as function of vegi amount (intercept)
+  real::par_atm_slab_dtaudvegi                                  ! tau (yr) as function of vegi amount (slope)
+  NAMELIST /ini_atchem_nml/par_atm_slab_dtaudvegi,par_atm_slab_tau0
   real::par_atm_slab_savedtyr                                   ! time interval for SOM data storage
-  real::par_atm_slab_ss_dtyr                                   ! time duration assuming steady state
+  real::par_atm_slab_ss_dtyr                                    ! time duration assuming steady state
   NAMELIST /ini_atchem_nml/par_atm_slab_savedtyr,par_atm_slab_ss_dtyr 
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                     ! continuing run?

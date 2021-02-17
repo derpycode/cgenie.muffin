@@ -18,7 +18,7 @@ SUBROUTINE initialise_atchem( &
   real,dimension(n_atm,n_i,n_j),intent(inout)::dum_sfcatm    ! atmosphere-surface tracer composition; atm grid
   
   ! ---- YK added 02.10.2021 -----
-  real,dimension(4)::dum_slab                                ! slab data read from restart 
+  real,dimension(6)::dum_slab                                ! slab data read from restart 
   integer::io                                                ! checking the file 
   ! ----- End addition -----
 
@@ -63,16 +63,16 @@ SUBROUTINE initialise_atchem( &
      utest = 100
      call check_unit(utest)
      open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLX.res',action='write',status='replace')
-     write(utest,*) 'time / NPP (mol yr-1) / resp (mol yr-1) / Net CO2 flux (mol yr-1)'
+     write(utest,*) 'time / T (oC)/ pCO2 (atm) / NPP (mol yr-1) / resp (mol yr-1) / Net CO2 flux (mol yr-1)'
      close(utest)
      open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLXg.res',action='write',status='replace')
-     write(utest,*) 'time / NPP (PgC yr-1) / resp (PgC yr-1) / Net CO2 flux (PgC yr-1)'
+     write(utest,*) 'time / T (oC)/ pCO2 (atm) / NPP (PgC yr-1) / resp (PgC yr-1) / Net CO2 flux (PgC yr-1)'
      close(utest)
      open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOl.res',action='write',status='replace')
-     write(utest,*) 'time / Vegie (mol) / Litter (mol) / Total terrestrial OM (mol)'
+     write(utest,*) 'time / T (oC)/ pCO2 (atm) / Vegie (mol) / Litter (mol) / Total terrestrial OM (mol)'
      close(utest)
      open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOlg.res',action='write',status='replace')
-     write(utest,*) 'time / Vegie (PgC) / Litter (PgC) / Total terrestrial OM (PgC)'
+     write(utest,*) 'time / T (oC)/ pCO2 (atm) / Vegie (PgC) / Litter (PgC) / Total terrestrial OM (PgC)'
      close(utest)
   endif 
   if (par_atm_slab_restart) then 
@@ -82,12 +82,12 @@ SUBROUTINE initialise_atchem( &
      open(unit=utest,file=trim(adjustl(par_rstdir_name))//'/tem/terPOOl.res',action='read',status='old')
      read (utest,'()')
      do
-        read(utest, *,iostat=io) dum_slab(1:4)
+        read(utest, *,iostat=io) dum_slab(1:6)
         IF (io < 0) exit
      enddo 
      close(utest)
-     atm_slabbiosphere(ia_pCO2,:,:) = dum_slab(4)/real(n_i*n_j)
-     slab_frac_vegi(:,:) = dum_slab(2)/dum_slab(4)
+     atm_slabbiosphere(ia_pCO2,:,:) = dum_slab(6)/real(n_i*n_j)
+     slab_frac_vegi(:,:) = dum_slab(4)/dum_slab(6)
   endif 
   ! ----- End addition -----
 
