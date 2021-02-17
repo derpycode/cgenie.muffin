@@ -23,6 +23,7 @@ real,dimension(n_i,n_j),save::time_sed
 real,dimension(n_i,n_j),save::ccdis_sed
 real,dimension(n_i,n_j),save::ccsfave_sed
 real,dimension(n_i,n_j),save::errf_sed
+real,dimension(n_i,n_j),save::init_botT
 integer,dimension(n_i,n_j),save::izml_sed
 integer,save::irec_sed 
 
@@ -343,6 +344,12 @@ real:: biot_off(nspcc) ! factor with which bioturbation depth is multiplied wrt 
 integer:: itr_stst  ! iteration for steady state
 logical::arg_flg(nspcc)
 real:: frc_flx  ! flx fraction of caco3 when assuming two different classes of caco3 
+! logical::ktempdep_on = .true.
+logical::ktempdep_on = .false.
+logical::fracTdep_on = .false.
+real:: eapp_k = 50d0 ! kJ mol-1
+real:: loc_cnst_gas = 8.31d-3 ! kJ mol-1 K-1
+real:: loc_init_botT
 
 call cpu_time(loc_start)
 
@@ -353,6 +360,8 @@ endif
 ! print*,'now in main sb'
 signal_tracking=.true.
 ox_degall = par_sed_kanzaki2019_oxonly                    !  default true 
+ktempdep_on = par_sed_kanzaki2019_dT                        ! default false
+fracTdep_on = par_sed_kanzaki2019_fracDT                        ! default false
 loc_reading = ctrl_continuing ! if continuing, read from previous run
 loc_reading = .false. ! always start from steady state
 
@@ -465,6 +474,9 @@ if (first_call) then
         ,dum_DIC,dum_ALK,dum_Ca,dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot
     close(file_tmp)
 endif 
+! recording initial temperature 
+if (first_call) init_botT(dum_i,dum_j) = temp
+loc_init_botT = init_botT(dum_i,dum_j)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!  MAKING GRID !!!!!!!!!!!!!!!!! 
 beta = 1.00000000005d0  ! a parameter to make a grid; closer to 1, grid space is more concentrated around the sediment-water interface (SWI)
@@ -570,7 +582,7 @@ call make_transmx(  &
 call coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-    ,dis_off  &
+    ,dis_off,loc_init_botT,eapp_k,ktempdep_on,loc_cnst_gas  &
     )
 
 ! print *, kcc(1,1),kcc(nz,1), kcc(1,2),kcc(nz,2)
@@ -857,6 +869,10 @@ do
         ! ccflx(1) = ccflxi*1.0d0
         ! ccflx(1) = ccflxi*max(0d0,1d0-par_sed_kanzaki2019_arg)
         ccflx(1) = ccflxi*max(0d0,1d0-frc_flx)
+        if (fracTdep_on) then 
+            ccflx(1) =  ccflx(1) - (temp - loc_init_botT)/15d0 ! decrease with temperature 
+            ccflx(1) = max(min( ccflx(1),1d0), 0d0) ! constraining between 0 and 1
+        endif 
         ccflx(2) = ccflxi-ccflx(1)
     endif 
     
@@ -866,7 +882,7 @@ do
     call coefs(  &
         dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
         ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-        ,dis_off  &
+        ,dis_off,loc_init_botT,eapp_k,ktempdep_on,loc_cnst_gas  &
         )
     !! /////////////////////
 ! #ifdef sense
@@ -1685,6 +1701,7 @@ zox_sed(dum_i,dum_j) = zox
 ccdis_sed(dum_i,dum_j) = sum(ccdis)
 izml_sed(dum_i,dum_j)= izml
 errf_sed(dum_i,dum_j)= err_f
+errf_sed(dum_i,dum_j)= sum(abs(frt - 1d0)*dz)/sum(dz) ! depth average of deviation of void/expansion of solid
 
 ! assume 5cm for which average conc. of cc is calculated after Ridgwell and Hargreaves 2007
 zx_sample = 5d0  
@@ -2381,7 +2398,7 @@ endsubroutine make_transmx
 subroutine coefs(  &
     dif_dic,dif_alk,dif_o2,kom,kcc,co3sat & ! output 
     ,temp,sal,dep,nz,nspcc,poro,cai,komi,kcci  & !  input 
-    ,dis_off  &
+    ,dis_off,loc_init_botT,eapp_k,ktempdep_on,loc_cnst_gas  &
     )
 integer,intent(in)::nz,nspcc
 real,intent(in)::temp,sal,dep,poro(nz),cai,komi,kcci
@@ -2389,7 +2406,8 @@ real,intent(out)::dif_dic(nz),dif_alk(nz),dif_o2(nz),kom(nz),kcc(nz,nspcc),co3sa
 real dif_dic0,dif_alk0,dif_o20,ff(nz),keq1,keq2,keqcc
 real calceq1,calceq2,calceqcc
 ! real,intent(in)::dis_off_val
-real,intent(in)::dis_off(nspcc)
+real,intent(in)::dis_off(nspcc),loc_init_botT,loc_cnst_gas,eapp_k
+logical,intent(in)::ktempdep_on
 integer::isp
 
 ff = poro*poro       ! representing tortuosity factor 
@@ -2428,6 +2446,10 @@ do isp = 1,nspcc
         ! kcc(:,isp) = kcci/abs(dis_off(isp))
     ! endif 
     kcc(:,isp) = kcci*dis_off(isp)
+    if (ktempdep_on) then 
+        kcc(:,isp) = kcc(:,isp) &
+            & *exp(- eapp_k/loc_cnst_gas*( 1d0/(temp+const_zeroC) - 1d0/(loc_init_botT +const_zeroC) ))
+    endif 
 enddo 
 
 endsubroutine coefs

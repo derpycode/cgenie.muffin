@@ -122,7 +122,9 @@ MODULE sedgem_lib
   REAL::par_sed_kanzaki2019_biotd2                               ! bioturbation depth factor for CaCO3 fracrion 2 
   NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_biotd1,par_sed_kanzaki2019_biotd2
   logical::par_sed_kanzaki2019_oxonly                            ! om degradation scheme, oxonly (or not)?
-  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_oxonly
+  logical::par_sed_kanzaki2019_dT                                ! change of k with temperature ?
+  logical::par_sed_kanzaki2019_fracDT                            ! change of rain fraction with temperature ?
+  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_oxonly,par_sed_kanzaki2019_dT,par_sed_kanzaki2019_fracDT
   ! ------------------- DIAGENESIS SCHEME: opal ---------------------------------------------------------------------------------- !
   REAL::par_sed_opal_KSi0                                        ! base opal KSi value (yr-1)
   NAMELIST /ini_sedgem_nml/par_sed_opal_KSi0

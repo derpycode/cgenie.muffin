@@ -126,6 +126,8 @@ CONTAINS
        print*,'bioturbation depth factor for CaCO3 fracrion 1      : ',par_sed_kanzaki2019_biotd1
        print*,'bioturbation depth factor for CaCO3 fracrion 2      : ',par_sed_kanzaki2019_biotd2
        print*,'om degradation scheme, oxonly?                      : ',par_sed_kanzaki2019_oxonly
+       print*,'change of k with temperature ?                      : ',par_sed_kanzaki2019_dT
+       print*,'change of rainfraction with temperature ?           : ',par_sed_kanzaki2019_fracDT
        ! --- DIAGENESIS SCHEME: opal --------------------------------------------------------------------------------------------- !
        print*,'base opal KSi value (yr-1)                          : ',par_sed_opal_KSi0
        ! --- CaCO3 PRODUCTION ---------------------------------------------------------------------------------------------------- !
