@@ -78,8 +78,6 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 bg_opt_bio_remin_oxidize_H2StoSO4="OLD"
 # sulfide oxidation rate constant [only used if rate law is linear]
 #bg_par_bio_remin_kH2StoSO4=1.0E07
-# aerobic CH4 oxidation scheme
-bg_par_bio_remin_CH4ox="CH4ox_MM"
 # rate constant for aerobic methanotrophy
 bg_par_bio_remin_AER_kAER=0.40
 # O2 half-saturation constant for aerobic methanotrophy

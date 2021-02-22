@@ -279,6 +279,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/par_albedo1d_name,par_albedo2d_name
       NAMELIST /ini_embm_nml/par_orbit_osce,par_orbit_oscsob
       NAMELIST /ini_embm_nml/par_orbit_oscgam,par_orbit_osctau0
+      NAMELIST /ini_embm_nml/opt_delf2x_cesm
 
 c ------------------------------------------------------------ c
 c INITIALIZE VARIABLES
