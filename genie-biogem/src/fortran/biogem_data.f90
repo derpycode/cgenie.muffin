@@ -99,6 +99,7 @@ CONTAINS
        ! --- BOUNDARY CONDITIONS ------------------------------------------------------------------------------------------------- !
        print*,'--- BOUNDARY CONDITIONS ----------------------------'
        print*,'Set dissolution flux = rain flux to close system?   : ',ctrl_force_sed_closedsystem
+       print*,'Set dissolution flux = rain flux at surface?        : ',ctrl_force_sed_closedsystem_SUR
        print*,'Balance the P cycle (with weathering)?              : ',ctrl_force_sed_closed_P
        print*,'Balance the C cycle (with weathering)?              : ',ctrl_force_sed_closed_C
        print*,'set reflective boundary condition for POM?          : ',ctrl_force_sed_reflective_POM
