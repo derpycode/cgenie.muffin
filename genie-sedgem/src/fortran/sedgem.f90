@@ -25,8 +25,9 @@ SUBROUTINE sedgem(          &
   integer::loc_i,loc_tot_i                                     ! array index conversion variables
   real::loc_dtyr                                               ! local time step (in years)
   real::loc_dts                                                ! local time step (in seconds)
-  real::loc_tot_A,loc_tot_A_reef,loc_tot_A_muds                                             ! local total area
-  logical::loc_flag_save                        ! local flag
+  real::loc_tot_A,loc_tot_A_reef,loc_tot_A_muds                ! local total area
+  real::loc_tot_A_hydr                                         ! local total area
+  logical::loc_flag_save                                       ! local flag
   REAL,DIMENSION(n_sed)::loc_fracdecay_sed                     ! local reduction factor for decaying sediment tracers
   real,DIMENSION(n_ocn)::loc_fhydrothermal                     ! local dissolved tracer array for hydrothermal input
   real,DIMENSION(n_ocn)::loc_flowTalteration                   ! local dissolved tracer array for low T alteration sink
@@ -35,7 +36,7 @@ SUBROUTINE sedgem(          &
   real::loc_r7Li,loc_r44Ca                                     ! 
   real::loc_87Sr,loc_88Sr
   real::loc_187Os,loc_188Os
-  real::loc_alpha,loc_R,loc_delta                              ! 
+  real::loc_alpha,loc_R,loc_delta,loc_dalpha                              ! 
   real::loc_fsed                                               ! 
   real,DIMENSION(n_sed,n_i,n_j)::loc_sfxsumsed_OLD                      ! sediment rain flux interface array (COPY)
   real,DIMENSION(n_sed,n_i,n_j)::loc_sed_fsed_OLD                      ! 
@@ -91,6 +92,12 @@ SUBROUTINE sedgem(          &
   IF (ctrl_misc_debug4) print*,'*** UPDATE MASKS ***'
   DO i=1,n_i
      DO j=1,n_j
+        ! convert hydrothermal mask to binary
+        IF (sed_mask_hydr(i,j) > const_real_nullsmall) then
+           phys_sed(ips_mask_sed_hydr,i,j) = 1.0
+        else
+           phys_sed(ips_mask_sed_hydr,i,j) = 0.0
+        endif
         ! catch a zero salinity as an indication that there is no valid corresponding ocean grid point
         ! => permanently amend sediment mask
         IF (sed_mask(i,j) .AND. (dum_sfcsumocn(io_S,i,j) < const_real_nullsmall)) then
@@ -109,6 +116,7 @@ SUBROUTINE sedgem(          &
   loc_tot_A      = sum(loc_phys_sed_mask_deepsea(:,:)*phys_sed(ips_A,:,:))
   loc_tot_A_reef = sum(phys_sed(ips_mask_sed_reef,:,:)*phys_sed(ips_A,:,:))
   loc_tot_A_muds = sum(phys_sed(ips_mask_sed_muds,:,:)*phys_sed(ips_A,:,:))
+  loc_tot_A_hydr = sum(phys_sed(ips_mask_sed_hydr,:,:)*phys_sed(ips_A,:,:))
 
   ! *** CONVERT UNITS ***
   ! convert from global (mol yr-1) units of par_sed_CaCO3burialTOT to (mol cm-2 yr-1) of par_sed_CaCO3burial
@@ -250,12 +258,16 @@ SUBROUTINE sedgem(          &
                  else
                     loc_r7Li = 0.0
                  end if
-                 ! determine whether to use fixed or temperature-dependent MACC 7Li fractionation -- Li and West [2014]
+                 ! determine whether to use fixed or temperature-dependent 7Li fractionation -- Li and West [2014]
+                 ! from Li and West [2014] -- y=1.83*(1E6/((x+273.15)^2)) over x between 0 and 30C, gives ca. -0.15 o/oo K-1
+                 ! NOTE: dum_sfcsumocn(io_T,i,j) in units of K, par_sed_T0C in units of C
                  if (ctrl_sed_clay_7Li_epsilon_fixed) then
                     loc_alpha = 1.0 + par_sed_clay_7Li_epsilon/1000.0
                  else
-                    loc_alpha = 1.83*1.0E6/dum_sfcsumocn(io_T,i,j)**2.0 - 0.72
-                    loc_alpha = exp(loc_alpha/1000.0)
+                    loc_dalpha = par_sed_clay_7Li_epsilon_DT * (dum_sfcsumocn(io_T,i,j) - (const_zeroC + par_sed_T0C))
+                    loc_alpha  = 1.0 + (par_sed_clay_7Li_epsilon + loc_dalpha)/1000.0
+                    !!!loc_alpha = 1.83*1.0E6/dum_sfcsumocn(io_T,i,j)**2.0 - 0.72
+                    !!!loc_alpha = exp(loc_alpha/1000.0)
                  end if
                  loc_R = loc_r7Li/(1.0 - loc_r7Li)
                  loc_fsed = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_fsed
@@ -487,13 +499,25 @@ SUBROUTINE sedgem(          &
      end if
   end IF
   ! re-scale global total and apread over *valid* grid points
+  ! NOTE: adjust units from mol yr-1 (for the total global flux) to mol m-2 s-1
   DO i=1,n_i
      DO j=1,n_j
         if (loc_phys_sed_mask_deepsea(i,j) > const_real_nullsmall) then
-           DO l=1,n_l_ocn
-              io = conv_iselected_io(l)
-              dum_sfxocn(io,i,j) = dum_sfxocn(io,i,j) + loc_fhydrothermal(io)/loc_tot_A/conv_yr_s
-           end DO
+           if (ctrl_sed_Fhydr2D) then
+              ! distribute total hydrothermal flux weighted by a mask
+              ! NOTE: normalize to sum of mask elements
+              DO l=1,n_l_ocn
+                 io = conv_iselected_io(l)
+                 dum_sfxocn(io,i,j) = dum_sfxocn(io,i,j) + &
+                      & (sed_mask_hydr(i,j)/sum(sed_mask_hydr(:,:)))*loc_fhydrothermal(io)/loc_tot_A_hydr/conv_yr_s
+              end DO
+           else
+              ! distribute hydrotherma flux evenly over all sediment grid points
+              DO l=1,n_l_ocn
+                 io = conv_iselected_io(l)
+                 dum_sfxocn(io,i,j) = dum_sfxocn(io,i,j) + loc_fhydrothermal(io)/loc_tot_A/conv_yr_s
+              end DO
+           endif
         end if
      end DO
   end DO
@@ -540,7 +564,15 @@ SUBROUTINE sedgem(          &
                  else
                     loc_r7Li = 0.0
                  end if
-                 loc_alpha = 1.0 + par_sed_lowTalt_7Li_epsilon/1000.0
+                 ! determine whether to use fixed or temperature-dependent 7Li fractionation -- Li and West [2014]
+                 ! NOTE: dum_sfcsumocn(io_T,i,j) in units of K, par_sed_T0C in units of C
+                 ! from Li and West [2014] -- y=1.83*(1E6/((x+273.15)^2)) over x between 90 and 110C, gives ca. -0.07 o/oo K-1
+                 if (ctrl_sed_lowTalt_7Li_epsilon_fixed) then
+                    loc_alpha = 1.0 + par_sed_lowTalt_7Li_epsilon/1000.0
+                 else
+                    loc_dalpha = par_sed_lowTalt_7Li_epsilon_DT * (dum_sfcsumocn(io_T,i,j) - (const_zeroC + par_sed_T0C))
+                    loc_alpha  = 1.0 + (par_sed_lowTalt_7Li_epsilon + loc_dalpha)/1000.0
+                 end if
                  loc_R = loc_r7Li/(1.0 - loc_r7Li)
                  loc_flowTalteration(io_Li_7Li) = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_flowTalteration(io_Li)
               end if

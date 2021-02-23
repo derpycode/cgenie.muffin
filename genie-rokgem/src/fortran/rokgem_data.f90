@@ -185,7 +185,8 @@ CONTAINS
        print*,'enhanced weathering scale factor                    : ',par_weather_fCaCO3_enh_n
        print*,'enhanced weathering scale factor                    : ',par_weather_fCaSiO3_enh_n
        print*,'enhanced weathering total inventory                 : ',par_weather_fCaCO3_enh_nt
-       print*,'enhanced weathering total inventory                 : ',par_weather_fCaSiO3_enh_nt
+       print*,'enhanced weathering total inventory                 : ',par_weather_fCaSiO3_enh_nt    
+       print*,'Li weathering scheme                                : ',trim(opt_weather_CaSiO3_fracLi)
        ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
        print*,'--- 2D WEATHERING PARAMETERS ---'
        print*,'name of lithological data set (part 1)              : ',par_lith_data

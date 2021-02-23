@@ -477,6 +477,7 @@ CONTAINS
     REAL                            :: loc_weather_ratio_CaSiO3b
     REAL                            :: loc_weather_ratio_CaSiO3g
     REAL                            :: loc_weather_ratio_CaCO3
+    REAL                            :: loc_weather_ratio_CaSiO3_WD
     REAL                            :: n, m
 
     REAL                            :: loc_force_flux_weather_a(n_atm)            ! total fluxes (atmosphere variables) 
@@ -760,14 +761,17 @@ CONTAINS
        n = exp(par_k_Tg*(loc_avSLT - loc_SLT0))
        IF (n < 0.0) n = 0.0
        loc_weather_ratio_CaSiO3g = n 
-       n = 0.0       
+       n = (loc_weather_ratio_CaSiO3b+loc_weather_ratio_CaSiO3g)/2.0   
     case default
        n = 1.0
     end select
-    loc_weather_ratio_CaSiO3 = n    
+    loc_weather_ratio_CaSiO3    = n
+    loc_weather_ratio_CaSiO3_WD = loc_weather_ratio_CaSiO3
     ! -------------------------------------------------------- ! (2) additional weathering rate modifiers
     ! NOTE: make sure that weathering modifiers stay positive
     ! NOTE: these modifiers are cumulative (in a product sense)
+    ! NOTE: do not update loc_weather_ratio_CaSiO3_WD ... impact of rainfall (R) and productivity (P) modifiers
+    !       on W/D need to be sorted out 'properly'
     IF (opt_weather_R_Si) THEN
        IF (opt_weather_R_explicit) THEN
           n = (loc_R/loc_R0)**par_beta
@@ -798,7 +802,7 @@ CONTAINS
     ! the difference being that enhanced weathering is applied as a scalar to existing modifier rather than an absolute limit
     if (par_weather_fCaSiO3_enh_nt > const_real_nullsmall) then
        ! SIMPLER: the enhancement of weathering is uniform until the 'reservoir' of easily weatherable material is depleted
-       loc_weather_ratio_CaSiO3 = par_weather_fCaSiO3_enh_n*loc_weather_ratio_CaSiO3
+       loc_weather_ratio_CaSiO3   = par_weather_fCaSiO3_enh_n*loc_weather_ratio_CaSiO3
        par_weather_fCaSiO3_enh_nt = par_weather_fCaSiO3_enh_nt - conv_s_yr*dum_dts*loc_weather_ratio_CaSiO3
     end if
     ! -------------------------------------------------------- ! set actual weathering flux
@@ -826,7 +830,6 @@ CONTAINS
     loc_force_flux_weather_o(io_Mg) = &
          & par_weather_CaSiO3b_fracMg*weather_fCaSiO3b + par_weather_CaSiO3g_fracMg*weather_fCaSiO3g
     loc_force_flux_weather_o(io_ALK) = 2.0*weather_fCaSiO3 + 2.0*weather_fCaCO3
-
     ! bulk carbon
     IF (opt_short_circuit_atm.eqv..true.) THEN
        IF (opt_outgas_eq_Si.eqv..true.) THEN
@@ -846,7 +849,6 @@ CONTAINS
        ENDIF
        loc_force_flux_weather_o(io_DIC) = 2.0*weather_fCaSiO3 + 2.0*weather_fCaCO3
     ENDIF
-
     ! d13C
     ! NOTE: does not matter how the standard is derived -- it is al the same standard! (13C)
     loc_standard = const_standards(atm_type(ia_pCO2_13C))
@@ -892,11 +894,26 @@ CONTAINS
 
     ! ######################################################################################################################### !
     ! LITHIUM CODE
-    ! bulk silicate Li weathering flux
-    loc_force_flux_weather_o(io_Li) = loc_force_flux_weather_o(io_Li) + &
-         & par_weather_CaSiO3_fracLi*weather_fCaSiO3
+    ! fixed vs. W/D empirical relationship -- see: Pogge von Strandmann [2020] (Elements)
+    ! NOTE: previously: weather_fCaSiO3 = loc_weather_ratio_CaSiO3*par_weather_CaSiO3
+    !       (and may have been further modified)
+    !       loc_weather_ratio_CaSiO3_WD == loc_weather_ratio_CaSiO3 before further modifications are carried out
+    select case (opt_weather_CaSiO3_fracLi)
+    case ("Pogge")
+       ! bulk silicate Li weathering flux
+       ! NOTE: yield increases with loc_weather_ratio_CaSiO3_WD
+       loc_force_flux_weather_o(io_Li) = loc_force_flux_weather_o(io_Li) + &
+            & par_weather_CaSiO3_fracLi*weather_fCaSiO3*exp(0.4883*log(loc_weather_ratio_CaSiO3_WD))
+       ! calculate net Li isotopic weathering signature
+       ! NOTE: epsilon decreases with loc_weather_ratio_CaSiO3_WD
+       ! NOTE: 0.6 o/oo == crustal mean (as a minimum possible value of weathered d7Li)
+       loc_standard = const_standards(ocn_type(io_Li_7Li))
+       loc_epsilon  = par_weather_CaSiO3_Li_d7Li - 5.4079*log(loc_weather_ratio_CaSiO3_WD)
+       loc_epsilon  = max(0.6,loc_epsilon)
+    case ("OLD")
 !!$    ! adjust dissolved load for clay formation
-!!$    loc_R_flux = 1.0/(1.0 + exp(par_weather_Li_Rscale*(1.0 - loc_weather_ratio_CaSiO3 + par_weather_Li_Roffset/par_weather_Li_Rscale)))
+!!$    loc_R_flux = 1.0/ &
+!!$         & (1.0 + exp(par_weather_Li_Rscale*(1.0 - loc_weather_ratio_CaSiO3 + par_weather_Li_Roffset/par_weather_Li_Rscale)))
 !!$    loc_force_flux_weather_o(io_Li) = loc_R_flux*loc_force_flux_weather_o(io_Li)
 !!$    ! calculate clay fractionation
 !!$    IF (loc_weather_ratio_CaSiO3 > const_real_nullsmall) then
@@ -904,14 +921,18 @@ CONTAINS
 !!$    else
 !!$       loc_epsilon = par_weather_CaSiO3_Li_d7Li
 !!$    end IF
-    ! calculate net Li isotopic weathering signature
-    loc_standard = const_standards(ocn_type(io_Li_7Li))
-    loc_epsilon = par_weather_CaSiO3_Li_d7Li
-    loc_force_flux_weather_o(io_Li_7Li) = loc_force_flux_weather_o(io_Li_7Li) + &
-         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*loc_force_flux_weather_o(io_Li)
+    case default
+       ! bulk silicate Li weathering flux
+       loc_force_flux_weather_o(io_Li) = loc_force_flux_weather_o(io_Li) + &
+            & par_weather_CaSiO3_fracLi*weather_fCaSiO3
+       ! calculate net Li isotopic weathering signature
+       loc_standard = const_standards(ocn_type(io_Li_7Li))
+       loc_epsilon  = par_weather_CaSiO3_Li_d7Li
+       loc_force_flux_weather_o(io_Li_7Li) = loc_force_flux_weather_o(io_Li_7Li) + &
+            & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*loc_force_flux_weather_o(io_Li)
+    end select
     ! bulk carbonate flux
-    ! 
-    ! *** DISCOUNT LI CONTENT OF CARBONATES ***
+    ! NOTE: *** DISCOUNT LI CONTENT OF CARBONATES ***
     ! 
     ! ######################################################################################################################### !
 
