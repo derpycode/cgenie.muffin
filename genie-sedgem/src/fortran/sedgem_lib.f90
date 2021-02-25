@@ -280,10 +280,6 @@ MODULE sedgem_lib
   ! grid dimensions
   INTEGER,PARAMETER::n_i = ilon1_sed                           ! max i dimension copied from genie_control
   INTEGER,PARAMETER::n_j = ilat1_sed                           ! max j dimension copied from genie_control
-!!$  ! misc arrays dimensions
-!!$  INTEGER,PARAMETER::n_sed_tot      = 100                      ! # sedimentary stack sub-layers
-!!$  INTEGER,PARAMETER::n_sed_tot_init = 099                      ! # initial sedimentary stack sub-layers filled
-!!$  INTEGER,PARAMETER::n_sed_tot_drop = 001                      ! # sedimentary stack sub-layers to drop off bottom
   ! grid properties array dimensions 
   INTEGER,PARAMETER::n_phys_sed     = 14                       ! # grid properties descriptors
   ! options array dimensions

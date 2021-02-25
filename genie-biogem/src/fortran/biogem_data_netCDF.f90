@@ -915,20 +915,21 @@ CONTAINS
          call sub_putvar3d_g('ocn_Sr_d88Sr',loc_iou, &
               & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
     end If
-    !!----------------------
-    !!-----------------------------------------------------------------------
-    !!       misc 'physics'
-    !!-----------------------------------------------------------------------
-    !! NOTE: save selected ocean 'physics' as an alternative to having to select to save ALL of the ocean physical properties
-    !loc_ijk(:,:,:) = int_phys_ocn_timeslice(ipo_rho,:,:,:)/int_t_timeslice
-    !call sub_adddef_netcdf(loc_iou,4,'misc_rho','ocean density','kg m-3',const_real_zero,const_real_zero)
-    !call sub_putvar3d_g('misc_rho',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
-    !loc_ijk(:,:,:) = int_phys_ocn_timeslice(ipo_A,:,:,:)/int_t_timeslice
-    !call sub_adddef_netcdf(loc_iou,4,'grid_A','ocean cell surface area','m2',const_real_zero,const_real_zero)
-    !call sub_putvar3d_g('grid_A',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
-    !loc_ijk(:,:,:) = int_phys_ocn_timeslice(ipo_dD,:,:,:)/int_t_timeslice
-    !call sub_adddef_netcdf(loc_iou,4,'grid_dD','ocean cell thickness','m2',const_real_zero,const_real_zero)
-    !call sub_putvar3d_g('grid_dD',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    !-----------------------------------------------------------------------
+    !       misc 'physics'
+    !-----------------------------------------------------------------------
+    If (ctrl_data_save_slice_misc) then
+       ! NOTE: save selected ocean 'physics' as an alternative to having to select to save ALL of the ocean physical properties
+       loc_ijk(:,:,:) = int_phys_ocn_timeslice(ipo_rho,:,:,:)/int_t_timeslice
+       call sub_adddef_netcdf(loc_iou,4,'misc_rho','ocean density','kg m-3',const_real_zero,const_real_zero)
+       call sub_putvar3d_g('misc_rho',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       loc_ijk(:,:,:) = int_phys_ocn_timeslice(ipo_A,:,:,:)/int_t_timeslice
+       call sub_adddef_netcdf(loc_iou,4,'grid_A','ocean cell surface area','m2',const_real_zero,const_real_zero)
+       call sub_putvar3d_g('grid_A',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       loc_ijk(:,:,:) = int_phys_ocn_timeslice(ipo_dD,:,:,:)/int_t_timeslice
+       call sub_adddef_netcdf(loc_iou,4,'grid_dD','ocean cell thickness','m2',const_real_zero,const_real_zero)
+       call sub_putvar3d_g('grid_dD',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
     !-----------------------------------------------------------------------
     !       ocean carbonate system isotopic properties
     !-----------------------------------------------------------------------

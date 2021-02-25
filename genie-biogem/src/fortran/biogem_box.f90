@@ -1565,13 +1565,15 @@ CONTAINS
     ! ADJUST INORGANIC UPTAKE
     ! -------------------------------------------------------- !
     ! I cycle
-    ! NOTE: IO3- is transformed to I- within the cell (default species exchange with POI is I- not IO3-)
-    !       as default, the reverse of remineralization is applied in order to calculate dissolved update,
-    !       meaning that only the I- speices would be removed (rather than IO3- removed and O2 released)
-    !       ... note ideal to have to have 'exceptions' like tnhis :(
+    ! NOTE: IO3- is transformed to I- within the cell (default species exchange with POI is I- not IO3-).
+    !       But as default, the reverse of remineralization is applied in order to calculate dissolved update,
+    !       meaning that only the I- speices would be removed (rather than IO3- removed and O2 released).
+    !       This fix ensures that IO3- is taken up, but 3/2 O2 is then released to balance the O2 cycle
+    !       becasue I- is going to be released when POI is remineralized.
+    !       ... not ideal to have to have 'exceptions' like this :(
     if (ocn_select(io_IO3)) then
        loc_bio_uptake(io_IO3,loc_k_mld:n_k) = loc_bio_uptake(io_IO3,loc_k_mld:n_k) + loc_bio_uptake(io_I,loc_k_mld:n_k)
-       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k) - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
+       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
        loc_bio_uptake(io_I,loc_k_mld:n_k)   = 0.0
     end if
     ! N cycle
@@ -3722,6 +3724,7 @@ CONTAINS
        end if
     end if
     ! record settling fluxes
+    ! NOTE: units of mol per time-step
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        bio_settle(is,dum_i,dum_j,:) = loc_bio_settle(l,:)

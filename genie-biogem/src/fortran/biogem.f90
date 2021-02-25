@@ -461,7 +461,9 @@ subroutine biogem(        &
               ! *** SEDIMENT DISSOLUTION INPUT ***
               ! modify remineralization array according to dissolution input from sediments
               ! NOTE: <dum_sfxocn1> in units of (mol m-2 s-1) - needs to be converted to (mol per time step)
-              ! NOTE: <dum_sfxsumrok1> in units of (mol) (per time-step)
+              !       <dum_sfxsumrok1> in units of (mol) (per time-step)
+              !       <bio_settle> in units of (mol) (per time-step)
+              !       <bio_remin> in units of (mol kg-1) (per time-step)
               ! NOTE: if the model is configured as a 'closed' system, test for whether SEDGEM is coupled
               !       if so  => set a weathering flux equal to the preservation flux
               !       if not => set dissolution flux by scaling weathering flux to match preservation flux
@@ -486,9 +488,15 @@ subroutine biogem(        &
                     ! set dissolution flux equal to rain flux
                     ! NOTE: force return of S from POM-S in a closed system, despite it being a 'scavenged' type
                     ! NOTE: par_sed_type_det should not be treated like det re. remin(?)
-                    !       (for now, allow is to be reflected back from the sediment-water interface)
+                    !       (for now, allow it to be reflected back from the sediment-water interface)
+                    ! NOTE: if option ctrl_force_sed_closedsystem_SUR,
+                    !       'reflect' at surface and assuming surface geochem conditions
                     DO l=1,n_l_ocn
-                       loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
+                       if (ctrl_force_sed_closedsystem_SUR) then
+                          loc_vocn(l) = ocn(l2io(l),i,j,n_k)
+                       else
+                          loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
+                       end if
                     end DO
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
                     DO ls=1,n_l_sed
@@ -496,29 +504,40 @@ subroutine biogem(        &
                        do loc_i=1,loc_tot_i
                           lo = conv_ls_lo_i(loc_i,ls)
                           if (lo > 0) then
-                             if ( (sed_type(l2is(ls)) == par_sed_type_scavenged) .OR. &
-                                  & ( sed_type(sed_dep(l2is(ls))) == par_sed_type_scavenged) ) then
-                                if ((l2is(ls) == is_POM_S) .OR. (sed_dep(l2is(ls)) == is_POM_S)) then
-                                   loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
-                                else
-                                   loc_remin = par_scav_fremin*loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
-                                end if
-                             else if ( &
-                                  & (sed_dep(l2is(ls)) == is_det) &
-                                  !& (sed_dep(l2is(ls)) == is_det) .OR. &
-                                  !& (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
-                                  !& (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
-                                  & ) then
-                                loc_remin = 0.0
-                             else
+                             if (ctrl_force_sed_closedsystem_SUR) then
                                 loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
-                             end if
-                             locij_fsedocn(l2io(lo),i,j) = locij_fsedocn(l2io(lo),i,j) + loc_remin
-                             ! remin diagnostics
-                             if (ctrl_bio_remin_redox_save) then
-                                loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                                id = fun_find_str_i(trim(loc_string),string_diag_redox)
-                                diag_redox(id,i,j,loc_k1) = diag_redox(id,i,j,loc_k1) + phys_ocn(ipo_rM,i,j,loc_k1)*loc_remin
+                                locijk_focn(l2io(lo),i,j,n_k) = locijk_focn(l2io(lo),i,j,n_k) + loc_remin/loc_dtyr
+                                ! remin diagnostics
+                                if (ctrl_bio_remin_redox_save) then
+                                   loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+                                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                                   diag_redox(id,i,j,n_k) = diag_redox(id,i,j,n_k) + phys_ocn(ipo_rM,i,j,n_k)*loc_remin
+                                end if
+                             else
+                                if ( (sed_type(l2is(ls)) == par_sed_type_scavenged) .OR. &
+                                     & ( sed_type(sed_dep(l2is(ls))) == par_sed_type_scavenged) ) then
+                                   if ((l2is(ls) == is_POM_S) .OR. (sed_dep(l2is(ls)) == is_POM_S)) then
+                                      loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
+                                   else
+                                      loc_remin = par_scav_fremin*loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
+                                   end if
+                                else if ( &
+                                     & (sed_dep(l2is(ls)) == is_det) &
+                                     !& (sed_dep(l2is(ls)) == is_det) .OR. &
+                                     !& (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
+                                     !& (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
+                                     & ) then
+                                   loc_remin = 0.0
+                                else
+                                   loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
+                                end if
+                                locij_fsedocn(l2io(lo),i,j) = locij_fsedocn(l2io(lo),i,j) + loc_remin
+                                ! remin diagnostics
+                                if (ctrl_bio_remin_redox_save) then
+                                   loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+                                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                                   diag_redox(id,i,j,loc_k1) = diag_redox(id,i,j,loc_k1) + phys_ocn(ipo_rM,i,j,loc_k1)*loc_remin
+                                end if
                              end if
                           end if
                        end do
@@ -605,7 +624,7 @@ subroutine biogem(        &
                     end do
                  end if
               end if ! [(ctrl_force_sed_closedsystem)]
-              ! convert fluxes to remin
+              ! convert fluxes to remin (mol kg-1) (per time-step)
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
                  bio_remin(io,i,j,loc_k1) = bio_remin(io,i,j,loc_k1) + &
