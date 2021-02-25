@@ -8131,6 +8131,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">""</value>
                         <description>Li weathering scheme ('OLD','Pogge') -- '' is the fixed fractionation default</description>
                     </param>
+                    <param name="ctrl_weather_CaSiO3_7Li_epsilon_fixed">
+                        <value datatype="boolean">.true.</value>
+                          <description>Fixed (non T-dep) clay fractionation?</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_7Li_epsilon_DT">
+                        <value datatype="real">-0.15</value>
+                          <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
+                    </param>
                       <!-- *** 2D WEATHERING PARAMETERS ********************************* -->
                     <param name="par_lith_data">
 			<value datatype="string">GEM_CO2</value>

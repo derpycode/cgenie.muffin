@@ -928,9 +928,14 @@ CONTAINS
        ! calculate net Li isotopic weathering signature
        loc_standard = const_standards(ocn_type(io_Li_7Li))
        loc_epsilon  = par_weather_CaSiO3_Li_d7Li
-       loc_force_flux_weather_o(io_Li_7Li) = loc_force_flux_weather_o(io_Li_7Li) + &
-            & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*loc_force_flux_weather_o(io_Li)
     end select
+    ! optional additional T-dep clay 7Li fractionation
+    if (.NOT. ctrl_weather_CaSiO3_7Li_epsilon_fixed) then
+       loc_epsilon = loc_epsilon + par_weather_CaSiO3_7Li_epsilon_DT * (loc_avSLT - loc_SLT0)
+    end if
+    ! calculate isotopic weathering flux
+    loc_force_flux_weather_o(io_Li_7Li) = loc_force_flux_weather_o(io_Li_7Li) + &
+         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*loc_force_flux_weather_o(io_Li)
     ! bulk carbonate flux
     ! NOTE: *** DISCOUNT LI CONTENT OF CARBONATES ***
     ! 

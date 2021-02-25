@@ -2915,8 +2915,9 @@ CONTAINS
   ! DATA SAVE META CONFIG
   SUBROUTINE sub_adj_par_save()
 
-    !
-    ! NOTE: the value of ctrl_data_save_sig_diag_redox_old is set independently
+    ! initialize save options to false
+    ! NOTE: the value of ctrl_data_save_sig_diag_redox_old is set independently (and not set to false here)
+    ! NOTE: the value of ctrl_bio_remin_redox_save is set independently (and not set to false here)
     select case (par_data_save_level)
     case (0:99)
        ctrl_data_save_slice_ocnatm = .false.

@@ -187,6 +187,8 @@ CONTAINS
        print*,'enhanced weathering total inventory                 : ',par_weather_fCaCO3_enh_nt
        print*,'enhanced weathering total inventory                 : ',par_weather_fCaSiO3_enh_nt    
        print*,'Li weathering scheme                                : ',trim(opt_weather_CaSiO3_fracLi)
+       print*,'Fixed (non T-dep) clay fractionation?               : ',ctrl_weather_CaSiO3_7Li_epsilon_fixed
+       print*,'T-dependent D7Li sensitivity (o/oo K-1)             : ',par_weather_CaSiO3_7Li_epsilon_DT
        ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
        print*,'--- 2D WEATHERING PARAMETERS ---'
        print*,'name of lithological data set (part 1)              : ',par_lith_data

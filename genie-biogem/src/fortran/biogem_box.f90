@@ -1948,7 +1948,7 @@ CONTAINS
                            & const_lamda_14C_libby*log( (loc_d14Catm+1000.0)/(loc_d14Cocn+1000.0) ) - loc_ocn(io)
                    end if
                 CASE (io_col9)
-                   if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,n_k)     = 0.0 - loc_ocn(io)
+                   if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)
                 end select
              end if
           end do

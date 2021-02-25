@@ -36,7 +36,8 @@ SUBROUTINE sedgem(          &
   real::loc_r7Li,loc_r44Ca                                     ! 
   real::loc_87Sr,loc_88Sr
   real::loc_187Os,loc_188Os
-  real::loc_alpha,loc_R,loc_delta,loc_dalpha                              ! 
+  real::loc_alpha,loc_R,loc_delta
+  real::loc_depsilon                              ! 
   real::loc_fsed                                               ! 
   real,DIMENSION(n_sed,n_i,n_j)::loc_sfxsumsed_OLD                      ! sediment rain flux interface array (COPY)
   real,DIMENSION(n_sed,n_i,n_j)::loc_sed_fsed_OLD                      ! 
@@ -264,8 +265,8 @@ SUBROUTINE sedgem(          &
                  if (ctrl_sed_clay_7Li_epsilon_fixed) then
                     loc_alpha = 1.0 + par_sed_clay_7Li_epsilon/1000.0
                  else
-                    loc_dalpha = par_sed_clay_7Li_epsilon_DT * (dum_sfcsumocn(io_T,i,j) - (const_zeroC + par_sed_T0C))
-                    loc_alpha  = 1.0 + (par_sed_clay_7Li_epsilon + loc_dalpha)/1000.0
+                    loc_depsilon = par_sed_clay_7Li_epsilon_DT * (dum_sfcsumocn(io_T,i,j) - (const_zeroC + par_sed_T0C))
+                    loc_alpha    = 1.0 + (par_sed_clay_7Li_epsilon + loc_depsilon)/1000.0
                     !!!loc_alpha = 1.83*1.0E6/dum_sfcsumocn(io_T,i,j)**2.0 - 0.72
                     !!!loc_alpha = exp(loc_alpha/1000.0)
                  end if
@@ -570,8 +571,8 @@ SUBROUTINE sedgem(          &
                  if (ctrl_sed_lowTalt_7Li_epsilon_fixed) then
                     loc_alpha = 1.0 + par_sed_lowTalt_7Li_epsilon/1000.0
                  else
-                    loc_dalpha = par_sed_lowTalt_7Li_epsilon_DT * (dum_sfcsumocn(io_T,i,j) - (const_zeroC + par_sed_T0C))
-                    loc_alpha  = 1.0 + (par_sed_lowTalt_7Li_epsilon + loc_dalpha)/1000.0
+                    loc_depsilon = par_sed_lowTalt_7Li_epsilon_DT * (dum_sfcsumocn(io_T,i,j) - (const_zeroC + par_sed_T0C))
+                    loc_alpha    = 1.0 + (par_sed_lowTalt_7Li_epsilon + loc_depsilon)/1000.0
                  end if
                  loc_R = loc_r7Li/(1.0 - loc_r7Li)
                  loc_flowTalteration(io_Li_7Li) = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_flowTalteration(io_Li)

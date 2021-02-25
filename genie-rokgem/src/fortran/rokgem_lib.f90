@@ -206,6 +206,10 @@ MODULE rokgem_lib
   NAMELIST /ini_rokgem_nml/par_weather_fCaCO3_enh_nt,par_weather_fCaSiO3_enh_nt
   CHARACTER(len=63)::opt_weather_CaSiO3_fracLi                                           ! Li weathering scheme
   NAMELIST /ini_rokgem_nml/opt_weather_CaSiO3_fracLi
+  LOGICAL::ctrl_weather_CaSiO3_7Li_epsilon_fixed                                         ! Fixed (non T-dep) clay fractionation?
+  NAMELIST /ini_rokgem_nml/ctrl_weather_CaSiO3_7Li_epsilon_fixed
+  REAL::par_weather_CaSiO3_7Li_epsilon_DT                                                ! T-dependent D7Li sensitivity (o/oo K-1)
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_7Li_epsilon_DT
   ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_lith_data 
   CHARACTER(len=63)::par_lith_data2 
