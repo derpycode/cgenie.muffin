@@ -1081,8 +1081,16 @@ CONTAINS
                                loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                                loc_unitsname  = 'o/oo'
                             CASE (io_col8)
-                               loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
-                               loc_unitsname  = 'yrs'
+                               if (ocn_select(io_DIC_14C)) then
+                                  loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                                  loc_unitsname  = 'yrs'
+                               else
+                                  loc_tot        = int_ocn_timeslice(io_col9,i,j,k)/int_t_timeslice
+                                  loc_frac       = int_ocn_timeslice(io_col8,i,j,k)/int_t_timeslice
+                                  loc_standard   = const_standards(ocn_type(io_DIC_13C))
+                                  loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                                  loc_unitsname  = 'o/oo'
+                               end if
                             CASE (io_col9)
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
                                loc_unitsname  = 'mol kg-1'
@@ -1112,7 +1120,11 @@ CONTAINS
                    CASE (io_col7)
                       if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
                    CASE (io_col8)
-                      if (ocn_select(io_DIC_14C)) loc_name = 'diag_pre_d14C_age'
+                      if (ocn_select(io_DIC_14C)) then
+                         loc_name = 'diag_pre_d14C_age'
+                      else
+                         loc_name = 'diag_reg_Csoft_d13C'
+                      end if
                    CASE (io_col9)
                       if (ocn_select(io_DIC))     loc_name = 'diag_reg_Csoft'
                    end select

@@ -1913,6 +1913,8 @@ CONTAINS
     !       d14C = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
     !       where: loc_tot = io_DIC; loc_frac = io_DIC_14C; loc_standard = const_standards(ocn_type(io_DIC_14C))
     !       D14C = fun_convert_delta14CtoD14C(loc_d13C,loc_d14C)
+    ! NOTE: io_col9 is Csoft
+    ! NOTE: if radiocarbon is not selected, then io_col8 is used as 13C of Csoft
     if (ctrl_bio_preformed) then
           do io=io_col0,io_col9
              if (ocn_select(io)) then
@@ -1946,9 +1948,11 @@ CONTAINS
                       loc_d14Cocn = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                       bio_remin(io,dum_i,dum_j,n_k) = &
                            & const_lamda_14C_libby*log( (loc_d14Catm+1000.0)/(loc_d14Cocn+1000.0) ) - loc_ocn(io)
+                   else
+                      if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)                  
                    end if
                 CASE (io_col9)
-                   if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,n_k)     = 0.0 - loc_ocn(io)
+                   if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)
                 end select
              end if
           end do
@@ -2720,6 +2724,11 @@ CONTAINS
           loc_string = 'reminD_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
           id = fun_find_str_i(trim(loc_string),string_diag_redox)
           loc_vbio_remin(io2l(io_col9),:) = loc_vbio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
+       end if
+       if (ocn_select(io_col8) .AND. (.NOT. ctrl_bio_preformed_CsoftPOConly) .AND. (.NOT. ocn_select(io_DIC_14C)))then
+          loc_string = 'reminD_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
+          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          loc_vbio_remin(io2l(io_col8),:) = loc_vbio_remin(io2l(io_col8),:) + loc_diag_redox(id,:)
        end if
     end if
     ! write out (surface) lifetime for integration/averaging
@@ -3721,6 +3730,11 @@ CONTAINS
           loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
           id = fun_find_str_i(trim(loc_string),string_diag_redox)
           loc_bio_remin(io2l(io_col9),:) = loc_bio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
+       end if
+       if (ocn_select(io_col8) .AND. (.NOT. ocn_select(io_DIC_14C)))then
+          loc_string = 'reminP_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
+          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          loc_bio_remin(io2l(io_col8),:) = loc_bio_remin(io2l(io_col8),:) + loc_diag_redox(id,:)
        end if
     end if
     ! record settling fluxes

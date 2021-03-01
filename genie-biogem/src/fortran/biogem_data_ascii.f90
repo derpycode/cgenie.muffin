@@ -1030,6 +1030,12 @@ CONTAINS
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d14C',string_results_ext &
                            & )
                       loc_string = '% time (yr) / global total preformed 14C (mol) / global mean (o/oo)'
+                   else
+                      loc_save = .true.
+                      loc_filename=fun_data_timeseries_filename( &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft_d13C',string_results_ext &
+                           & )
+                      loc_string = '% time (yr) / global total regenerated Csoft 13C (mol) / global mean (o/oo)'
                    end if
                  CASE (io_col9)
                     if (ocn_select(io_DIC)) then
@@ -2674,14 +2680,19 @@ CONTAINS
                       loc_filename=fun_data_timeseries_filename( &
                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d14C',string_results_ext &
                            & )
+                   else
+                      loc_save = .true.
+                      loc_filename=fun_data_timeseries_filename( &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft_d13C',string_results_ext &
+                           & )
                    end if
-                 CASE (io_col9)
-                    if (ocn_select(io_DIC)) then
-                       loc_save = .true.
-                       loc_filename=fun_data_timeseries_filename( &
-                            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft',string_results_ext &
-                            & )
-                    end if
+                CASE (io_col9)
+                   if (ocn_select(io_DIC)) then
+                      loc_save = .true.
+                      loc_filename=fun_data_timeseries_filename( &
+                           & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft',string_results_ext &
+                           & )
+                   end if
                 end select
                 !
                 if (loc_save) then
@@ -2709,6 +2720,21 @@ CONTAINS
                            & loc_frac, &
                            & loc_sig
                       call check_iostat(ios,__LINE__,__FILE__)
+                   CASE (io_col8)
+                      if (ocn_select(io_col9) .AND. (.NOT. ocn_select(io_DIC_14C))) then
+                         loc_tot  = int_ocn_sig(io_col9)/int_t_sig
+                         loc_frac = int_ocn_sig(io_col8)/int_t_sig
+                         loc_standard = const_standards(ocn_type(io_DIC_13C))
+                         loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
+                         call check_unit(out,__LINE__,__FILE__)
+                         OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                         call check_iostat(ios,__LINE__,__FILE__)
+                         WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+                              & loc_t, &
+                              & loc_frac, &
+                              & loc_sig
+                         call check_iostat(ios,__LINE__,__FILE__)
+                      end if
                    case default
                       ! NOTHING DOING
                    end select
