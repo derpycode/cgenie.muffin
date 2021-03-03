@@ -174,7 +174,6 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fLi,par_sed_hydroip_fLi_d7Li
   real::par_sed_lowTalt_fLi_alpha                                ! Li low temperature alteration sink (mol yr-1) (Li/Ca normalized)
   real::par_sed_lowTalt_7Li_epsilon                              ! Li low temperature alteration sink 7Li epsilon (o/oo)           
-  NAMELIST /ini_sedgem_nml/ctrl_sed_clay_7Li_epsilon_fixed
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fLi_alpha,par_sed_lowTalt_7Li_epsilon
   LOGICAL::ctrl_sed_lowTalt_7Li_epsilon_fixed                    ! fixed (non T-dependent) temperature alteration 7Li epsilon?           
   NAMELIST /ini_sedgem_nml/ctrl_sed_lowTalt_7Li_epsilon_fixed
