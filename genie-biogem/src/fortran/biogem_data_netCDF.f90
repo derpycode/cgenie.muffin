@@ -389,31 +389,31 @@ CONTAINS
     select case (dum_TM_flag)
     case(1) ! write TM data
 
-      ! coo is unlimited dimension that we have to append to
-      ! find the current length of coo:
-      status=nf90_inq_dimid(ncid, 'coo', dimid)
-      if(status /= nf90_NoErr) print*,trim(nf90_strerror(status)//',coo')
+       ! coo is unlimited dimension that we have to append to
+       ! find the current length of coo:
+       status=nf90_inq_dimid(ncid, 'coo', dimid)
+       if(status /= nf90_NoErr) print*,trim(nf90_strerror(status)//',coo')
 
-      status=nf90_inquire_dimension(ncid, dimid, name, nc_record_count)
-      if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
+       status=nf90_inquire_dimension(ncid, dimid, name, nc_record_count)
+       if(status /= nf90_NoErr) print*,trim(nf90_strerror(status))
 
-      nc_record_count=nc_record_count+1 ! start count for appending data
+       nc_record_count=nc_record_count+1 ! start count for appending data
 
-      call sub_putvars ('coo_val', ncid, nc_record_count, dum_val,1.0,0.0)
+       call sub_putvars ('coo_val', ncid, nc_record_count, dum_val,1.0,0.0)
 
-      call sub_putvarIs ('coo_col', ncid, nc_record_count, dum_col,1.0,0.0)
+       call sub_putvarIs ('coo_col', ncid, nc_record_count, dum_col,1.0,0.0)
 
-      call sub_putvarIs ('coo_row', ncid, nc_record_count, dum_row,1.0,0.0)
+       call sub_putvarIs ('coo_row', ncid, nc_record_count, dum_row,1.0,0.0)
 
-      call sub_putvarIs ('coo_avg_n', ncid, nc_record_count, dum_avg_n,1.0,0.0)
+       call sub_putvarIs ('coo_avg_n', ncid, nc_record_count, dum_avg_n,1.0,0.0)
 
     case(0) ! write index data
 
-      call sub_putvarIs ('index_i', ncid, dum_start, dum_i,1.0,0.0)
+       call sub_putvarIs ('index_i', ncid, dum_start, dum_i,1.0,0.0)
 
-      call sub_putvarIs ('index_j', ncid, dum_start, dum_j,1.0,0.0)
+       call sub_putvarIs ('index_j', ncid, dum_start, dum_j,1.0,0.0)
 
-      call sub_putvarIs ('index_k', ncid, dum_start, dum_k,1.0,0.0)
+       call sub_putvarIs ('index_k', ncid, dum_start, dum_k,1.0,0.0)
     end select
 
     ! close file
@@ -639,15 +639,19 @@ CONTAINS
     !-----------------------------------------------------------------------
     integer::i,j,k,io,id
     INTEGER::loc_iou,loc_ntrec
+    real,DIMENSION(n_i,n_j)::loc_ij
     real,DIMENSION(n_i,n_j,n_k)::loc_ijk,loc_mask
     CHARACTER(len=255)::loc_name
     CHARACTER(len=255)::loc_unitsname
     real::loc_tot,loc_frac,loc_standard
+    logical::loc_save
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
     loc_iou   = ncout3d_iou
     loc_ntrec = ncout3d_ntrec
+    loc_ij(:,:)     = 0.0
+    loc_ijk(:,:,:)  = 0.0
     loc_mask(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:)
     !-----------------------------------------------------------------------
     !       pH FIELD
@@ -851,22 +855,21 @@ CONTAINS
          & .AND. &
          & (ocn_select(io_Os) .AND. ocn_select(io_Os_187Os)) &
          & ) then
-         loc_unitsname = ''
-         loc_ijk(:,:,:) = const_real_null
-          DO i=1,n_i
-             DO j=1,n_j
-                DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)
-                END DO
+       loc_unitsname = ''
+       loc_ijk(:,:,:) = const_real_null
+       DO i=1,n_i
+          DO j=1,n_j
+             DO k=goldstein_k1(i,j),n_k
+                loc_ijk(i,j,k) = int_ocn_timeslice(io_Os_187Os,i,j,k)/int_ocn_timeslice(io_Os_188Os,i,j,k)
              END DO
           END DO
-         call sub_adddef_netcdf(loc_iou,4,'misc_Os_187Osr188Os', &
-              & 'water-column Os isotope ratio', &
-              & trim(loc_unitsname),const_real_zero,const_real_zero)
-         call sub_putvar3d_g('misc_Os_187Osr188Os',loc_iou, &
-              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       END DO
+       call sub_adddef_netcdf(loc_iou,4,'misc_Os_187Osr188Os', &
+            & 'water-column Os isotope ratio', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar3d_g('misc_Os_187Osr188Os',loc_iou, &
+            & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
     end If
-    !!----------------------
     !----------------------------------------------------------------
     !       Sr 87/86 isotope ratios
     !----------------------------------------------------------------
@@ -875,22 +878,21 @@ CONTAINS
          & .AND. &
          & (ocn_select(io_Sr) .AND. ocn_select(io_Sr_87Sr)) &
          & ) then
-         loc_unitsname = ''
-         loc_ijk(:,:,:) = const_real_null
-          DO i=1,n_i
-             DO j=1,n_j
-                DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = int_ocn_timeslice(io_Sr_87Sr,i,j,k)/(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k))
-                END DO
+       loc_unitsname = ''
+       loc_ijk(:,:,:) = const_real_null
+       DO i=1,n_i
+          DO j=1,n_j
+             DO k=goldstein_k1(i,j),n_k
+                loc_ijk(i,j,k) = int_ocn_timeslice(io_Sr_87Sr,i,j,k)/(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k))
              END DO
           END DO
-         call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_87Srr86Sr', &
-              & 'water-column Sr isotope ratio', &
-              & trim(loc_unitsname),const_real_zero,const_real_zero)
-         call sub_putvar3d_g('ocn_Sr_87Srr86Sr',loc_iou, &
-              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       END DO
+       call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_87Srr86Sr', &
+            & 'water-column Sr isotope ratio', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar3d_g('ocn_Sr_87Srr86Sr',loc_iou, &
+            & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
     end If
-    !!----------------------
     !----------------------------------------------------------------
     !       Sr d88Sr isotope ratios
     !----------------------------------------------------------------
@@ -899,21 +901,21 @@ CONTAINS
          & .AND. &
          & (ocn_select(io_Sr) .AND. ocn_select(io_Sr_88Sr)) &
          & ) then
-         loc_unitsname = ''
-         loc_ijk(:,:,:) = const_real_null
-          DO i=1,n_i
-             DO j=1,n_j
-                DO k=goldstein_k1(i,j),n_k
-                   loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)
+       loc_unitsname = ''
+       loc_ijk(:,:,:) = const_real_null
+       DO i=1,n_i
+          DO j=1,n_j
+             DO k=goldstein_k1(i,j),n_k
+                loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)
 
-                END DO
              END DO
           END DO
-         call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_d88Sr', &
-              & 'water-column Sr isotope ratio', &
-              & trim(loc_unitsname),const_real_zero,const_real_zero)
-         call sub_putvar3d_g('ocn_Sr_d88Sr',loc_iou, &
-              & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       END DO
+       call sub_adddef_netcdf(loc_iou,4,'ocn_Sr_d88Sr', &
+            & 'water-column Sr isotope ratio', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar3d_g('ocn_Sr_d88Sr',loc_iou, &
+            & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
     end If
     !-----------------------------------------------------------------------
     !       misc 'physics'
@@ -1062,77 +1064,327 @@ CONTAINS
        !-----------------------------------------------------------------------
        ! Preformed nutrients and things
        !-----------------------------------------------------------------------
+       ! NOTE: save (loc_save == .true.) unless Csoft and not ctrl_bio_remin_redox_save
        if (ctrl_bio_preformed) then
-             do io=io_col0,io_col9
-                if (ocn_select(io)) then
-                   loc_ijk(:,:,:) = const_real_null
-                   loc_unitsname = '???'
-                   DO i=1,n_i
-                      DO j=1,n_j
-                         DO k=goldstein_k1(i,j),n_k
-                            select case (io)
-                            CASE (io_col0:io_col6)
+          do io=io_col0,io_col9
+             if (ocn_select(io)) then
+                loc_ijk(:,:,:) = const_real_null
+                loc_unitsname = '???'
+                loc_save = .true.
+                DO i=1,n_i
+                   DO j=1,n_j
+                      DO k=goldstein_k1(i,j),n_k
+                         select case (io)
+                         CASE (io_col0:io_col6)
+                            loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                            loc_unitsname  = 'mol kg-1'
+                         CASE (io_col7)
+                            loc_tot        = int_ocn_timeslice(io_col0,i,j,k)/int_t_timeslice
+                            loc_frac       = int_ocn_timeslice(io_col7,i,j,k)/int_t_timeslice
+                            loc_standard   = const_standards(ocn_type(io_DIC_13C))
+                            loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                            loc_unitsname  = 'o/oo'
+                         CASE (io_col8)
+                            if (ocn_select(io_DIC_14C)) then
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
-                               loc_unitsname  = 'mol kg-1'
-                            CASE (io_col7)
-                               loc_tot        = int_ocn_timeslice(io_col0,i,j,k)/int_t_timeslice
-                               loc_frac       = int_ocn_timeslice(io_col7,i,j,k)/int_t_timeslice
+                               loc_unitsname  = 'yrs'
+                            else
+                               loc_tot        = int_ocn_timeslice(io_col9,i,j,k)/int_t_timeslice
+                               loc_frac       = int_ocn_timeslice(io_col8,i,j,k)/int_t_timeslice
                                loc_standard   = const_standards(ocn_type(io_DIC_13C))
                                loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                                loc_unitsname  = 'o/oo'
-                            CASE (io_col8)
-                               if (ocn_select(io_DIC_14C)) then
-                                  loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
-                                  loc_unitsname  = 'yrs'
-                               else
-                                  loc_tot        = int_ocn_timeslice(io_col9,i,j,k)/int_t_timeslice
-                                  loc_frac       = int_ocn_timeslice(io_col8,i,j,k)/int_t_timeslice
-                                  loc_standard   = const_standards(ocn_type(io_DIC_13C))
-                                  loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
-                                  loc_unitsname  = 'o/oo'
-                               end if
-                            CASE (io_col9)
-                               loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
-                               loc_unitsname  = 'mol kg-1'
-                            case default
-                               ! NOTHING DOING
-                            end select
-                         END DO
+                            end if
+                         CASE (io_col9)
+                            loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
+                            loc_unitsname  = 'mol kg-1'
+                         case default
+                            ! NOTHING DOING
+                         end select
                       END DO
                    END DO
-                   loc_name = 'diag_pre_NULL_'//fun_conv_num_char_n(2,io)
-                   select case (io)
-                   CASE (io_col0)
-                      if (ocn_select(io_DIC))     loc_name = 'diag_pre_'//trim(string_ocn(io_DIC))
-                   CASE (io_col1)
-                      if (ocn_select(io_ALK))     loc_name = 'diag_pre_'//trim(string_ocn(io_ALK))
-                   CASE (io_col2)
-                      if (ocn_select(io_O2))      loc_name = 'diag_pre_'//trim(string_ocn(io_O2))
-                   CASE (io_col3)
-                      if (ocn_select(io_PO4))     loc_name = 'diag_pre_'//trim(string_ocn(io_PO4))
-                   CASE (io_col4)
-                      if (ocn_select(io_NO3))     loc_name = 'diag_pre_'//trim(string_ocn(io_NO3))
-                   CASE (io_col5)
-                      if (ocn_select(io_Fe))      loc_name = 'diag_pre_'//trim(string_ocn(io_Fe))
-                      if (ocn_select(io_TDFe))    loc_name = 'diag_pre_'//trim(string_ocn(io_TDFe))
-                   CASE (io_col6)
-                      if (ocn_select(io_SiO2))    loc_name = 'diag_pre_'//trim(string_ocn(io_SiO2))
-                   CASE (io_col7)
-                      if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
-                   CASE (io_col8)
-                      if (ocn_select(io_DIC_14C)) then
-                         loc_name = 'diag_pre_d14C_age'
-                      else
-                         loc_name = 'diag_reg_Csoft_d13C'
-                      end if
-                   CASE (io_col9)
-                      if (ocn_select(io_DIC))     loc_name = 'diag_reg_Csoft'
-                   end select
+                END DO
+                loc_name = 'diag_pre_NULL_'//fun_conv_num_char_n(2,io)
+                select case (io)
+                CASE (io_col0)
+                   if (ocn_select(io_DIC))     loc_name = 'diag_pre_'//trim(string_ocn(io_DIC))
+                CASE (io_col1)
+                   if (ocn_select(io_ALK))     loc_name = 'diag_pre_'//trim(string_ocn(io_ALK))
+                CASE (io_col2)
+                   if (ocn_select(io_O2))      loc_name = 'diag_pre_'//trim(string_ocn(io_O2))
+                CASE (io_col3)
+                   if (ocn_select(io_PO4))     loc_name = 'diag_pre_'//trim(string_ocn(io_PO4))
+                CASE (io_col4)
+                   if (ocn_select(io_NO3))     loc_name = 'diag_pre_'//trim(string_ocn(io_NO3))
+                CASE (io_col5)
+                   if (ocn_select(io_Fe))      loc_name = 'diag_pre_'//trim(string_ocn(io_Fe))
+                   if (ocn_select(io_TDFe))    loc_name = 'diag_pre_'//trim(string_ocn(io_TDFe))
+                CASE (io_col6)
+                   if (ocn_select(io_SiO2))    loc_name = 'diag_pre_'//trim(string_ocn(io_SiO2))
+                CASE (io_col7)
+                   if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
+                CASE (io_col8)
+                   if (ocn_select(io_DIC_14C)) then
+                      loc_name = 'diag_pre_d14C_age'
+                   else
+                      loc_name = 'diag_reg_Csoft_d13C'
+                      if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
+                   end if
+                CASE (io_col9)
+                   if (ocn_select(io_DIC))     loc_name = 'diag_reg_Csoft'
+                   if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
+                end select
+                ! write to netCDF
+                if (.NOT. ctrl_bio_remin_redox_save) then
                    call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
                         & trim(loc_unitsname),const_real_zero,const_real_zero)
                    call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
                 end if
-             end do
+             end if
+          end do
+       end if
+       !-----------------------------------------------------------------------
+       ! Related preformed metrics! :o)
+       ! (1)  O2(sat)
+       ! (2)  AOU (from O2(sat) and O2)
+       ! (3)  AOU-regenP (regen-P from AOU)
+       ! (4)  AOU-regenP-regenC (regenC from regenP from AOU)
+       ! (5)  AOU-regenP-regenC d13C (AOU-regenP-regenC d13C in proportion to AOU-regenP-regenC/DIC)
+       ! (6)  OU (from O2(pre) and actual O2)
+       ! (7)  regenP (from PO4(pre) and actual PO4)
+       ! (8)  regenP-regenC (regenC from regenP)
+       ! (9)  regenP-regenC d13C (regenP-regenC d13C in proportion to regenP-regenC/DIC)
+       ! (10) Csoft (Csoft (real regenC))
+       ! (11) Csoft d13C (Csoft d13C in proportion to Csoft/DIC)
+       ! (**) Ccarb (DIC minus DIC(pre) minus Csoft) *** TO-DO ***
+       ! (**) Ccarb d13C (DIC d13C minus d13C(pre) minus Csoft d13C in respective proportions ...) *** TO-DO ***
+       !-----------------------------------------------------------------------
+       ! NOTE: all is deliberately and tediously re-done behind ctrl_bio_preformed and then behind seperate 'ifs' 
+       !       to make the code clearer and mroe transparent(?)
+       if (ctrl_bio_preformed) then
+          ! (1) O2(sat)
+          if (ocn_select(io_O2)) then
+             loc_ijk(:,:,:) = const_real_null
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_O2sat'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      ! calculate solubility constant 
+                      ! NOTE: that each time-step, only the surface values are calculated
+                      loc_ijk(i,j,k) = fun_calc_solconst(ia_pO2, &
+                           & int_ocn_timeslice(io_T,i,j,k)/int_t_timeslice, &
+                           & int_ocn_timeslice(io_S,i,j,k)/int_t_timeslice, &
+                           & int_phys_ocn_timeslice(ipo_rho,i,j,k)/int_t_timeslice &
+                           & )
+                      ! calculate O2(sat) (scale to pO2)
+                      loc_ijk(i,j,k) = (int_sfcatm1_timeslice(ia_pO2,i,j)/int_t_timeslice)*loc_ijk(i,j,k)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (2) AOU (from O2(sat) and O2)
+          ! NOTE: utilize the fact that loc_ijk already contains the value of O2(sat)
+          ! NOTE: loop rather than manipulate the full arrays directly to preserve the null values for non ocean points
+          !       (doing null minus null might be messy, and we don't like messy here)
+          if (ocn_select(io_O2)) then
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_AOU'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = loc_ijk(i,j,k) - int_ocn_timeslice(io_O2,i,j,k)/int_t_timeslice
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (3) AOU-regenP (regen P from AOU)
+          ! NOTE: cascade the values of loc_ijk ... containing AOU ... onwards! 
+          ! NOTE: default: par_bio_red_POP_PO2=-138.0 -- invert sign as AOU is positive
+          ! NOTE: int_t_timeslice already taken account of in loc_ijk
+          if (ocn_select(io_O2)) then
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_AOU_P'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = loc_ijk(i,j,k)/(-1.0*par_bio_red_POP_PO2)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (4) AOU-regenC (regen C from regen P from AOU)
+          ! NOTE: cascade the values of loc_ijk ... containing regen P ... from AOU ... onwards!
+          ! NOTE: default: par_bio_red_POP_POC=106.0
+          ! NOTE: int_t_timeslice already taken account of in loc_ijk
+          if (ocn_select(io_O2)) then
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_AOU_P_C'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = par_bio_red_POP_POC*loc_ijk(i,j,k)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (5) AOU-regen13C (regen 13C regen C from from regen P from AOU)
+          ! NOTE: cascade the values of loc_ijk ... containing regen C from regen P from AOU ... onwards! 
+          !       To the moon!
+          ! NOTE: take surface export POC d13C, then 'dilute' isotopic signature in the proportion of regen C over DIC
+          !       => need to calculate d13C from POC and POC_13C
+          ! NOTE: int_t_timeslice already taken account of in loc_ijk
+          ! NOTE: no need to change units of int_bio_settle_timeslice
+          if (ocn_select(io_O2) .AND. ocn_select(io_DIC_13C)) then
+             loc_unitsname  = 'o/oo'
+             loc_name       = 'diag_reg_AOU_P_C_d13C'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_tot  = int_bio_settle_timeslice(is_POC,i,j,n_k)
+                      loc_frac = int_bio_settle_timeslice(is_POC_13C,i,j,n_k)
+                      loc_standard = const_standards(sed_type(is_POC_13C))
+                      loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      loc_ijk(i,j,k) = loc_ij(i,j)*loc_ijk(i,j,k)/(int_ocn_timeslice(io_DIC,i,j,k)/int_t_timeslice)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (6) real OU (preformed O2 minus actual O2)
+          if (ocn_select(io_O2) .AND. ocn_select(io_col2)) then
+             loc_ijk(:,:,:) = const_real_null
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_OU'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = (int_ocn_timeslice(io_col2,i,j,k) - int_ocn_timeslice(io_O2,i,j,k))/int_t_timeslice
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (7) real regen P (actual PO4 minus preformed P)
+          if (ocn_select(io_PO4) .AND. ocn_select(io_col3)) then
+             loc_ijk(:,:,:) = const_real_null
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_P'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = (int_ocn_timeslice(io_PO4,i,j,k) - int_ocn_timeslice(io_col3,i,j,k))/int_t_timeslice
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (8) regenP-regenC (regen C from regen P)
+          ! NOTE: cascade the values of loc_ijk ... containing regen P ... onwards!
+          ! NOTE: int_t_timeslice already taken account of in loc_ijk
+          if (ocn_select(io_PO4) .AND. ocn_select(io_col3)) then
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_P_C'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = par_bio_red_POP_POC*loc_ijk(i,j,k)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (9) regenP-regenC regen d13C (regen 13C from regen C from regen P)
+          ! NOTE: cascade the values of loc_ijk ... containing regen C from regen P ... onwards!
+          ! NOTE: loc_ij already contains the values of POC d13C!
+          ! NOTE: int_t_timeslice already taken account of in loc_ijk
+          if (ocn_select(io_PO4) .AND. ocn_select(io_col3) .AND. ocn_select(io_DIC_13C)) then
+             loc_unitsname  = 'o/oo'
+             loc_name       = 'diag_reg_P_C_d13C'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = loc_ij(i,j)*loc_ijk(i,j,k)/(int_ocn_timeslice(io_DIC,i,j,k)/int_t_timeslice)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (11) Csoft regenC for completeness
+          if (ocn_select(io_col9) .AND. ctrl_bio_remin_redox_save) then
+             loc_unitsname  = 'mol kg-1'
+             loc_name       = 'diag_reg_C'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = int_ocn_timeslice(io_col9,i,j,k)/int_t_timeslice
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (11) regen d13C (diag_reg_Csoft_d13C in proportion to Csoft/DIC)
+          ! NOTE: need to calculate regen d13C from regen C and regen 13C
+          ! NOTE: remember D14C needs to be NOT selected
+          ! NOTE: int_t_timeslices cancel out
+          ! NOTE: no need to change units of regen C and regen 13C
+          if ( &
+               & ocn_select(io_DIC_13C) .AND. (.NOT. ocn_select(io_DIC_14C)) .AND. ctrl_bio_remin_redox_save .AND. &
+               & ocn_select(io_col8) .AND. ocn_select(io_col9) &
+               & ) then
+             loc_ijk(:,:,:) = const_real_null
+             loc_unitsname  = 'o/oo'
+             loc_name       = 'diag_reg_d13C'
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_tot  = int_ocn_timeslice(io_col9,i,j,k)
+                      loc_frac = int_ocn_timeslice(io_col8,i,j,k)
+                      loc_standard = const_standards(ocn_type(io_DIC_13C))
+                      loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      loc_ijk(i,j,k) = loc_ijk(i,j,k) *int_ocn_timeslice(io_col9,i,j,k)/int_ocn_timeslice(io_DIC,i,j,k)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
+                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
        end if
        !
     end If
@@ -1159,6 +1411,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     loc_iou         = ncout3d_iou
     loc_ntrec       = ncout3d_ntrec
+    loc_ijk(:,:,:)  = 0.0
     loc_mask(:,:,:) = phys_ocn(ipo_mask_ocn,:,:,:)
     !-----------------------------------------------------------------------
     ! pH
@@ -1214,6 +1467,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     loc_iou   = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
+    loc_ij(:,:)        = 0.0
     loc_mask_surf(:,:) = phys_ocnatm(ipoa_mask_ocn,:,:)
     !-----------------------------------------------------------------------
     !       pH FIELD
@@ -1748,8 +2002,9 @@ CONTAINS
     !-----------------------------------------------------------------------
     ! INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    loc_iou                = ncout2d_iou
-    loc_ntrec              = ncout2d_ntrec
+    loc_iou   = ncout2d_iou
+    loc_ntrec = ncout2d_ntrec
+    loc_ij(:,:)            = 0.0
     loc_mask_surf(:,:)     = phys_ocnatm(ipoa_mask_ocn,:,:)
     loc_mask_surf_ALL(:,:) = 1.0
     !-----------------------------------------------------------------------
@@ -1793,6 +2048,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     loc_iou   = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
+    loc_ij(:,:)            = 0.0
     loc_mask_surf(:,:)     = phys_ocnatm(ipoa_mask_ocn,:,:)
     loc_mask_surf_ALL(:,:) = 1.0
     !-----------------------------------------------------------------------
@@ -2111,47 +2367,47 @@ CONTAINS
     If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
-             loc_ij(:,:) = const_real_zero
-             DO i=1,n_i
-                DO j=1,n_j
-                   loc_k1 = goldstein_k1(i,j)
-                   IF (n_k >= loc_k1) THEN
-                      SELECT CASE (ocn_type(io))
-                      CASE (0)
-                         if (io == io_T) then
-                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice - const_zeroC
-                         else
-                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice
-                         end if
-                      CASE (1)
+          loc_ij(:,:) = const_real_zero
+          DO i=1,n_i
+             DO j=1,n_j
+                loc_k1 = goldstein_k1(i,j)
+                IF (n_k >= loc_k1) THEN
+                   SELECT CASE (ocn_type(io))
+                   CASE (0)
+                      if (io == io_T) then
+                         loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice - const_zeroC
+                      else
                          loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice
-                      case (n_itype_min:n_itype_max)
-                         loc_tot  = int_ocn_timeslice(ocn_dep(io),i,j,n_k)
-                         loc_frac = int_ocn_timeslice(io,i,j,n_k)
-                         loc_standard = const_standards(ocn_type(io))
-                         loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
-                      end SELECT
-                   end IF
-                end DO
+                      end if
+                   CASE (1)
+                      loc_ij(i,j) = int_ocn_timeslice(io,i,j,n_k)/int_t_timeslice
+                   case (n_itype_min:n_itype_max)
+                      loc_tot  = int_ocn_timeslice(ocn_dep(io),i,j,n_k)
+                      loc_frac = int_ocn_timeslice(io,i,j,n_k)
+                      loc_standard = const_standards(ocn_type(io))
+                      loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                   end SELECT
+                end IF
              end DO
-             SELECT CASE (ocn_type(io))
-             CASE (0)
-                If (io == io_T) then
-                   loc_unitsname = 'degrees C'
-                else
-                   loc_unitsname = 'o/oo'
-                end If
-             CASE (1)
-                loc_unitsname = 'mol kg-1'
-             case (n_itype_min:n_itype_max)
+          end DO
+          SELECT CASE (ocn_type(io))
+          CASE (0)
+             If (io == io_T) then
+                loc_unitsname = 'degrees C'
+             else
                 loc_unitsname = 'o/oo'
-             end SELECT
-             SELECT CASE (ocn_type(io))
-             CASE (0,1,n_itype_min:n_itype_max)
-                call sub_adddef_netcdf(loc_iou, 3, 'ocn_sur_'//trim(string_ocn(io)), &
-                     & 'surface-water '//trim(string_ocn(io)), trim(loc_unitsname),const_real_zero,const_real_zero)
-                call sub_putvar2d('ocn_sur_'//trim(string_ocn(io)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
-             end SELECT
+             end If
+          CASE (1)
+             loc_unitsname = 'mol kg-1'
+          case (n_itype_min:n_itype_max)
+             loc_unitsname = 'o/oo'
+          end SELECT
+          SELECT CASE (ocn_type(io))
+          CASE (0,1,n_itype_min:n_itype_max)
+             call sub_adddef_netcdf(loc_iou, 3, 'ocn_sur_'//trim(string_ocn(io)), &
+                  & 'surface-water '//trim(string_ocn(io)), trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('ocn_sur_'//trim(string_ocn(io)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
        END DO
     end if
     !----------------------------------------------------------------
@@ -2160,47 +2416,47 @@ CONTAINS
     If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_diag_proxy) then
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
-             loc_ij(:,:) = const_real_zero
-             DO i=1,n_i
-                DO j=1,n_j
-                   loc_k1 = goldstein_k1(i,j)
-                   IF (n_k >= loc_k1) THEN
-                      SELECT CASE (ocn_type(io))
-                      CASE (0)
-                         if (io == io_T) then
-                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice - const_zeroC
-                         else
-                            loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice
-                         end if
-                      CASE (1)
+          loc_ij(:,:) = const_real_zero
+          DO i=1,n_i
+             DO j=1,n_j
+                loc_k1 = goldstein_k1(i,j)
+                IF (n_k >= loc_k1) THEN
+                   SELECT CASE (ocn_type(io))
+                   CASE (0)
+                      if (io == io_T) then
+                         loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice - const_zeroC
+                      else
                          loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice
-                      case (n_itype_min:n_itype_max)
-                         loc_tot  = int_ocn_timeslice(ocn_dep(io),i,j,loc_k1)
-                         loc_frac = int_ocn_timeslice(io,i,j,loc_k1)
-                         loc_standard = const_standards(ocn_type(io))
-                         loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
-                      end SELECT
-                   end IF
-                end DO
+                      end if
+                   CASE (1)
+                      loc_ij(i,j) = int_ocn_timeslice(io,i,j,loc_k1)/int_t_timeslice
+                   case (n_itype_min:n_itype_max)
+                      loc_tot  = int_ocn_timeslice(ocn_dep(io),i,j,loc_k1)
+                      loc_frac = int_ocn_timeslice(io,i,j,loc_k1)
+                      loc_standard = const_standards(ocn_type(io))
+                      loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                   end SELECT
+                end IF
              end DO
-             SELECT CASE (ocn_type(io))
-             CASE (0)
-                If (io == io_T) then
-                   loc_unitsname = 'degrees C'
-                else
-                   loc_unitsname = 'o/oo'
-                end If
-             CASE (1)
-                loc_unitsname = 'mol kg-1'
-             case (n_itype_min:n_itype_max)
+          end DO
+          SELECT CASE (ocn_type(io))
+          CASE (0)
+             If (io == io_T) then
+                loc_unitsname = 'degrees C'
+             else
                 loc_unitsname = 'o/oo'
-             end SELECT
-             SELECT CASE (ocn_type(io))
-             CASE (0,1,n_itype_min:n_itype_max)
-                call sub_adddef_netcdf(loc_iou, 3, 'ocn_ben_'//trim(string_ocn(io)), &
-                     & 'bottom-water '//trim(string_ocn(io)), trim(loc_unitsname),const_real_zero,const_real_zero)
-                call sub_putvar2d('ocn_ben_'//trim(string_ocn(io)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
-             end SELECT
+             end If
+          CASE (1)
+             loc_unitsname = 'mol kg-1'
+          case (n_itype_min:n_itype_max)
+             loc_unitsname = 'o/oo'
+          end SELECT
+          SELECT CASE (ocn_type(io))
+          CASE (0,1,n_itype_min:n_itype_max)
+             call sub_adddef_netcdf(loc_iou, 3, 'ocn_ben_'//trim(string_ocn(io)), &
+                  & 'bottom-water '//trim(string_ocn(io)), trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_putvar2d('ocn_ben_'//trim(string_ocn(io)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
        END DO
     end if
     !----------------------------------------------------------------
@@ -2344,6 +2600,7 @@ CONTAINS
     !-----------------------------------------------------------------------
     loc_iou   = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
+    loc_ij(:,:)       = 0.0
     loc_sed_mask(:,:) = phys_ocn(ipo_mask_ocn,:,:,n_k)
     !----------------------------------------------------------------
     !       save ocn->sed interface flux data
@@ -2674,8 +2931,9 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       initialize local variables
     !-----------------------------------------------------------------------
-    loc_iou = ncout2d_iou
+    loc_iou   = ncout2d_iou
     loc_ntrec = ncout2d_ntrec
+    loc_ij(:,:) = 0.0
     !----------------------------------------------------------------
     !                  <fseaair_*>
     !       save flux density data
@@ -2747,7 +3005,9 @@ CONTAINS
     !----------------------------------------------------------------
     loc_iou = ncout3d_iou
     loc_ntrec = ncout3d_ntrec
-    loc_mask = phys_ocn(ipo_mask_ocn,:,:,:)
+    loc_ij(:,:)     = 0.0
+    loc_ijk(:,:,:)  = 0.0
+    loc_mask        = phys_ocn(ipo_mask_ocn,:,:,:)
     !----------------------------------------------------------------
     !       SAVE OCEAN TRACER FIELD
     !----------------------------------------------------------------
@@ -2801,7 +3061,7 @@ CONTAINS
                 end do
              end do
           end do
-         loc_unitsname = 'o/oo'
+          loc_unitsname = 'o/oo'
           call sub_adddef_netcdf(loc_iou,4,'ocn_DIC_D14C', &
                & ' oceanic D14C (big delta)',trim(loc_unitsname),const_real_zero,const_real_zero)
           call sub_putvar3d_g('ocn_DIC_D14C',loc_iou,n_i,n_j,n_k, &
@@ -3126,7 +3386,7 @@ CONTAINS
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- REACTION
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_diag_geochem) then
+    If (ctrl_data_save_slice_diag_geochem .AND. ctrl_bio_remin_redox_save) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_react
           loc_ijk(:,:,:) = int_diag_react_timeslice(id,:,:,:)/int_t_timeslice
@@ -3139,7 +3399,7 @@ CONTAINS
     !----------------------------------------------------------------
     ! GEOCHEMICAL DIAGNOSTICS -- REDOX
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_diag_geochem) then
+    If (ctrl_data_save_slice_diag_geochem .AND. ctrl_bio_remin_redox_save) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO id=1,n_diag_redox
           loc_ijk(:,:,:) = int_diag_redox_timeslice(id,:,:,:)/int_t_timeslice
