@@ -2831,6 +2831,8 @@ CONTAINS
                & loc_ocn_tot_M*loc_sig,                   &
                & loc_sig
           call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
        end if
        ! (2)
        if (ocn_select(io_col9) .AND. ocn_select(io_col3)) then
@@ -2845,6 +2847,8 @@ CONTAINS
                & loc_t,                                   &
                & loc_ocn_tot_M*loc_sig,                   &
                & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
        end if
        ! (3)
@@ -2861,6 +2865,8 @@ CONTAINS
                & loc_ocn_tot_M*loc_sig,                   &
                & loc_sig
           call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
        end if
        ! (4)
        if (ocn_select(io_col8) .AND. ocn_select(io_col7) .AND. (.NOT. ocn_select(io_DIC_14C))) then
@@ -2875,6 +2881,8 @@ CONTAINS
                & loc_t,                                   &
                & loc_ocn_tot_M*loc_sig,                   &
                & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
        end if
     end if
