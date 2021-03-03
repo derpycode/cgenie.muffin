@@ -17,6 +17,8 @@ SUBROUTINE initialise_gem()
     call sub_load_gem_MyAMI_lookup_K2
     call sub_load_gem_MyAMI_lookup_Kcal
     call sub_load_gem_MyAMI_lookup_Karg
+    call sub_load_gem_MyAMI_lookup_Kw
+    call sub_load_gem_MyAMI_lookup_K0
   endif
 
   ! *** initialize GeM ***
