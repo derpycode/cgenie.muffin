@@ -7471,7 +7471,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Make hydrothermal input 2D?</description>
                     </param>
-                    <param name="ctrl_sed_Fhydr2D">
+                    <param name="par_sed_Fhydr2D_name">
                         <value datatype="string">hello_world</value>
                         <description>2D hydrothermal input filename</description>
                     </param>
