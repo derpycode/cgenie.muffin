@@ -70,6 +70,8 @@ SUBROUTINE end_sedgem( &
   call check_iostat(dealloc_error,__LINE__,__FILE__)
   DEALLOCATE(sed_mask_muds,STAT=dealloc_error)
   call check_iostat(dealloc_error,__LINE__,__FILE__)
+  DEALLOCATE(sed_mask_hydr,STAT=dealloc_error)
+  call check_iostat(dealloc_error,__LINE__,__FILE__)
   DEALLOCATE(sed,STAT=dealloc_error)
   call check_iostat(dealloc_error,__LINE__,__FILE__)
   DEALLOCATE(sed_top,STAT=dealloc_error)
