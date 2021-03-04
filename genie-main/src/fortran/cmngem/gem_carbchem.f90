@@ -315,14 +315,14 @@ CONTAINS
       !      & lookup_i_temp_min,lookup_i_temp_max                              &
       !      & )
       ! (1b) adjust K1 and K2
-      dum_carbconst(icc_k) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,dum_sal,dum_temp, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
-            & )
+      !dum_carbconst(icc_k) = fun_interp_4D(                                                  &
+      !      & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+      !      & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+      !      & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+      !      & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+      !      & lookup_i_sal_min,lookup_i_sal_max,                               &
+      !      & lookup_i_temp_min,lookup_i_temp_max                              &
+      !      & )
       dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
