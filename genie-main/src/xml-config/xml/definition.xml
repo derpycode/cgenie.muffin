@@ -4156,6 +4156,14 @@
 			<value datatype="string">NONE.dat</value>
                         <description>Filename for 2D geothermal heat input field</description>
                     </param>
+                    <param name="ctrl_force_Vgrid">
+			<value datatype="boolean">.false.</value>
+                        <description>Use virtual grid (for remin)?</description>
+                    </param>
+                    <param name="par_force_Vgrid_file">
+			<value datatype="string">NONE.dat</value>
+                        <description>Filename for virtual grid</description>
+                    </param>
 <!-- BIOLOGICAL NEW PRODUCTION  -->
                     <param name="par_bio_prodopt">
 			<value datatype="string">1N1T_PO4MM</value>

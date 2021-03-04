@@ -625,7 +625,7 @@ CONTAINS
                 loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
                 loc_bio_part(is_FeOOH_56Fe,k) = &
                      & par_d56Fe_FeOOH_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeOOH_alpha*loc_R_56Fe)*loc_bio_part(is_FeOOH,k)
-            end if
+             end if
           end if
        end if
        ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
@@ -844,7 +844,7 @@ CONTAINS
              loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
              loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
              loc_bio_part(is_FeS2_56Fe,k) = &
-                 & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
+                  & (par_d56Fe_FeS2_alpha*loc_R_56Fe/(1.0 + par_d56Fe_FeS2_alpha*loc_R_56Fe))*loc_bio_part(is_FeS2,k)
           end if
           ! calculate isotopic fractionation -- 34S
           ! NOTE: we already know that loc_H2S is non-zero
@@ -859,15 +859,15 @@ CONTAINS
           ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
           loc_bio_uptake(io_Fe2,k) = loc_bio_uptake(io_Fe2,k) + loc_bio_part(is_FeS2,k)
           loc_bio_uptake(io_Fe2_56Fe,k) = loc_bio_uptake(io_Fe2_56Fe,k) + loc_bio_part(is_FeS2_56Fe,k)
-          
+
           loc_bio_uptake(io_H2S,k) = loc_bio_uptake(io_H2S,k) + 7.0/4.0*loc_bio_part(is_FeS2,k)
           loc_bio_uptake(io_H2S_34S,k) = loc_bio_uptake(io_H2S_34S,k) + (7.0/4.0*loc_r34S*loc_bio_part(is_FeS2,k))
-          
+
           loc_bio_uptake(io_SO4,k) = loc_bio_uptake(io_SO4,k) + 1.0/4.0*loc_bio_part(is_FeS2,k)
           loc_bio_uptake(io_SO4_34S,k) = loc_bio_uptake(io_SO4_34S,k) + (1.0/4.0*loc_r34SO4*loc_bio_part(is_FeS2,k))
-          
+
           loc_bio_uptake(io_ALK,k) = loc_bio_uptake(io_ALK,k) - 2.0/4.0*loc_bio_part(is_FeS2,k)
-          
+
           !DO l=1,n_l_sed
           !   is = conv_iselected_is(l)
           !   loc_tot_i = conv_sed_ocn_i(0,is)
@@ -1132,7 +1132,7 @@ CONTAINS
           if (sed_select(is_Fe3Si2O4_30Si)) then
              loc_r30Si = ocn(io_SiO2_30Si,dum_i,dum_j,k)/ocn(io_SiO2,dum_i,dum_j,k)
              loc_bio_part(is_Fe3Si2O4_30Si,k) = loc_r30Si*loc_bio_part(is_Fe3Si2O4,k)
-          end if          
+          end if
        end if
        ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
        DO l=1,n_l_sed

@@ -587,6 +587,37 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! LOAD IN ij (2D) INTEGER DATA
+  SUBROUTINE sub_load_data_ij_INT(dum_filename,dum_i,dum_j,dum_data)
+    ! common blocks
+    IMPLICIT NONE
+    ! dummy variables
+    CHARACTER(len=*),INTENT(in)::dum_filename
+    integer,intent(in)::dum_i,dum_j
+    integer,INTENT(inout),DIMENSION(dum_i,dum_j)::dum_data
+    ! local variables
+    INTEGER::i,j
+    integer::ios
+    ! read data
+    OPEN(unit=in,status='old',file=TRIM(dum_filename),action='read',IOSTAT=ios)
+    If (ios /= 0) then
+       CALL sub_report_error( &
+            & 'gem_util','sub_load_data_ij', &
+            & 'File <'//trim(dum_filename)//'> does not exist', &
+            & 'STOPPING', &
+            & (/const_real_zero/),.true. &
+            & )
+    else
+       DO j=dum_j,1,-1
+          READ(unit=in,fmt=*) (dum_data(i,j),i=1,dum_i)
+       ENDDO
+    end if
+    CLOSE(in)
+  END SUBROUTINE sub_load_data_ij_INT
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! LOAD IN i (1D) DATA
   subroutine sub_load_data_i(dum_filename,dum_i,dum_data)
     ! common blocks

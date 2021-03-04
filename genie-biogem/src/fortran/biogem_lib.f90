@@ -127,6 +127,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_Fgeothermal2D
   CHARACTER(len=127)::par_force_Fgeothermal2D_file                          ! Filename for 2D geothermal heat input field
   NAMELIST /ini_biogem_nml/par_force_Fgeothermal2D_file
+  logical::ctrl_force_Vgrid                                      ! Use virtual grid (for remin)?
+  NAMELIST /ini_biogem_nml/ctrl_force_Vgrid
+  CHARACTER(len=127)::par_force_Vgrid_file                       ! Filename for virtual grid
+  NAMELIST /ini_biogem_nml/par_force_Vgrid_file
   ! ------------------- BIOLOGICAL NEW PRODUCTION -------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_bio_prodopt                             ! biological scheme ID string (e.g., 1N1T_PO4MM, 1N1T_PO4MM_Cd)
   NAMELIST /ini_biogem_nml/par_bio_prodopt
@@ -1370,7 +1374,7 @@ MODULE biogem_lib
   INTEGER,DIMENSION(n_ocn,2)::force_restore_ocn_sig_i             !
   LOGICAL,DIMENSION(n_ocn)::force_restore_ocn_select              !
   LOGICAL,DIMENSION(n_ocn)::force_restore_ocn_sur                 !
-  !!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_restore_ocn_k1          !
+!!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_restore_ocn_k1          !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm                !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm_I              !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm_II             !
@@ -1396,7 +1400,7 @@ MODULE biogem_lib
   INTEGER,DIMENSION(n_ocn,2)::force_flux_ocn_sig_i               !
   LOGICAL,DIMENSION(n_ocn)::force_flux_ocn_select                !
   LOGICAL,DIMENSION(n_ocn)::force_flux_ocn_scale                 !
-  !!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_flux_ocn_k1            !
+!!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_flux_ocn_k1            !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm                  !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm_I                !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm_II               !
@@ -1446,6 +1450,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_i,n_j)::par_misc_2D                           !
   REAL,DIMENSION(n_i,n_j)::force_Fgeothermal2D                   !
   REAL,DIMENSION(n_i,n_j)::par_det_Fe_sol_2D                     !
+  integer,DIMENSION(n_i,n_j)::force_Vgrid                        !
 
   ! ****************************************************************************************************************************** !
   ! *** GLOBAL VARIABLES AND RUN-TIME SET PARAMETERS ***************************************************************************** !

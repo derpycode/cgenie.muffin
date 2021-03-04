@@ -139,6 +139,8 @@ CONTAINS
        print*,'Geothermal heat flux (W m-2)                        : ',par_Fgeothermal
        print*,'Use 2D geothermal heat input field?                 : ',ctrl_force_Fgeothermal2D
        print*,'Filename for 2D geothermal heat input field         : ',trim(par_force_Fgeothermal2D_file)
+       print*,'Use virtual grid (for remin)?                       : ',ctrl_force_Vgrid
+       print*,'Filename for virtual grid                           : ',trim(par_force_Vgrid_file)
        ! --- BIOLOGICAL NEW PRODUCTION ------------------------------------------------------------------------------------------- !
        print*,'--- BIOLOGICAL NEW PRODUCTION ----------------------'
        print*,'Biological scheme ID string                         : ',par_bio_prodopt
@@ -953,6 +955,28 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   !
+  SUBROUTINE sub_init_force_Vgrid()
+    USE biogem_lib
+    USE genie_util, ONLY:check_unit,check_iostat
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    CHARACTER(len=255)::loc_filename                           ! filename string
+    ! -------------------------------------------------------- !
+    ! LOAD 2D FIELD
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! load geothermal 2D field
+    loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    CALL sub_load_data_ij_INT(loc_filename,n_i,n_j,force_Vgrid(:,:))
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  END SUBROUTINE sub_init_force_Vgrid
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  !
   SUBROUTINE sub_init_misc2D()
     USE biogem_lib
     USE genie_util, ONLY:check_unit,check_iostat
@@ -1373,7 +1397,7 @@ CONTAINS
           ! [DEFAULT, oxic remin relationship]
        endif
        ! N isotopes (from denitrification)
-       !!!
+!!!
        ! ALK
        ! [N transformations are explicit and hence ALK is associated with neither P nor C (excepting nitrate reduction)]
     else
@@ -1820,8 +1844,8 @@ CONTAINS
           phys_ocnatm(ipoa_A,i,j)    = 2.0*const_pi*(const_rEarth**2)*(1.0/n_i)*(goldstein_sv(j) - goldstein_sv(j-1))
           phys_ocnatm(ipoa_rA,i,j)   = 1.0/ phys_ocnatm(ipoa_A,i,j)
           IF (n_k >= goldstein_k1(i,j)) THEN
-             phys_ocnatm(ipoa_seaice,i,j) = 0.0
-             phys_ocnatm(ipoa_wspeed,i,j)      = 0.0
+             phys_ocnatm(ipoa_seaice,i,j)   = 0.0
+             phys_ocnatm(ipoa_wspeed,i,j)   = 0.0
              phys_ocnatm(ipoa_mask_ocn,i,j) = 1.0
           END IF
        END DO
@@ -2460,33 +2484,33 @@ CONTAINS
     end if
     ! check color tracers
     if ( ctrl_force_ocn_age .AND. (.NOT.(ocn_select(io_colr) .AND. ocn_select(io_colb))) ) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Parameter: ctrl_force_ocn_age is selected (true), but the necessary red and blue ocean tracers are not.'// &
-               & 'The automatic age tracer option is hence deselected.', &
-               & 'CONTINUING', &
-               & (/const_real_null/),.FALSE. &
-               & )
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'Parameter: ctrl_force_ocn_age is selected (true), but the necessary red and blue ocean tracers are not.'// &
+            & 'The automatic age tracer option is hence deselected.', &
+            & 'CONTINUING', &
+            & (/const_real_null/),.FALSE. &
+            & )
        ctrl_force_ocn_age = .false.
     end if
     if ( ctrl_force_ocn_age1 .AND. (.NOT. ocn_select(io_colr)) ) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'Parameter: ctrl_force_ocn_age1 is selected (true), but the necessary red ocean tracer is not.'// &
-               & 'The automatic age tracer option is hence deselected.', &
-               & 'CONTINUING', &
-               & (/const_real_null/),.FALSE. &
-               & )
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'Parameter: ctrl_force_ocn_age1 is selected (true), but the necessary red ocean tracer is not.'// &
+            & 'The automatic age tracer option is hence deselected.', &
+            & 'CONTINUING', &
+            & (/const_real_null/),.FALSE. &
+            & )
        ctrl_force_ocn_age1 = .false.
     end if
     if ( ctrl_force_ocn_age .AND. ctrl_force_ocn_age1 ) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'You cannot select BOTH ctrl_force_ocn_age AND ctrl_force_ocn_age1.'// &
-               & 'The dual-tracer age tracer option (ctrl_force_ocn_age) will hence be deselected.', &
-               & 'CONTINUING', &
-               & (/const_real_null/),.FALSE. &
-               & )
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'You cannot select BOTH ctrl_force_ocn_age AND ctrl_force_ocn_age1.'// &
+            & 'The dual-tracer age tracer option (ctrl_force_ocn_age) will hence be deselected.', &
+            & 'CONTINUING', &
+            & (/const_real_null/),.FALSE. &
+            & )
        ctrl_force_ocn_age = .false.
     end if
 
@@ -2851,52 +2875,52 @@ CONTAINS
        end IF
     end IF
 
-! *** transport matrix paramater consistency checks ***
+    ! *** transport matrix paramater consistency checks ***
     if(ctrl_data_diagnose_TM)THEN
-         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then
-                 call sub_report_error( &
-		         & 'biogem_data','sub_check_par', &
-			 & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
-			 & '[par_data_TM_start] HAS BEEN CHANGED TO ALLOW MATRIX DIAGNOSIS TO FINISH', &
-			 & (/const_real_null/),.false. &
-			 & )
-                 par_data_TM_start=par_misc_t_runtime-n_k
-         end if
-         if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).lt.0.0)then
-                 call sub_report_error( &
-		         & 'biogem_data','sub_check_par', &
-			 & 'The run is too short to diagnose a full transport matrix', &
-			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
-			 & (/const_real_null/),.false. &
-			 & )
-                 ctrl_data_diagnose_TM=.false.
-         end if
-         if(ctrl_bio_preformed)then
-                 call sub_report_error( &
-		         & 'biogem_data','sub_check_par', &
-			 & 'Diagnosing transport matrix will overwrite preformed tracers', &
-			 & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
-			 & (/const_real_null/),.false. &
-			 & )
-                 ctrl_data_diagnose_TM=.false.
-         end if
-         if(conv_kocn_kbiogem.gt.1.0)then
-                 call sub_report_error( &
-		         & 'biogem_data','sub_check_par', &
-			 & 'Biogem timestep ratio should not be greater than 1 for a transport matrix', &
-			 & 'STOPPING', &
-			 & (/const_real_null/),.true. &
-			 & )
-         end if
-        if(abs((conv_kocn_ksedgem/par_data_save_slice_n)-par_data_TM_avg_n) > const_rns) then ! n.b. conv_ksedgem = n_timesteps!!
-                 call sub_report_error( &
-		         & 'biogem_data','sub_check_par', &
-			 & 'The intra-annual saving intervals you have chosen do not correspond to the transport matrix averaging', &
-			 & '[par_data_save_slice_n] HAS BEEN SET TO MATCH MATRIX AVERAGING INTERVAL', &
-			 & (/const_real_null/),.false. &
-			 & )
-                par_data_save_slice_n=int(conv_kocn_ksedgem/par_data_TM_avg_n)
-         end if
+       if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
+               & '[par_data_TM_start] HAS BEEN CHANGED TO ALLOW MATRIX DIAGNOSIS TO FINISH', &
+               & (/const_real_null/),.false. &
+               & )
+          par_data_TM_start=par_misc_t_runtime-n_k
+       end if
+       if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).lt.0.0)then
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'The run is too short to diagnose a full transport matrix', &
+               & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_data_diagnose_TM=.false.
+       end if
+       if(ctrl_bio_preformed)then
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'Diagnosing transport matrix will overwrite preformed tracers', &
+               & '[ctrl_data_diagnose_TM] HAS BEEN DE-SELECTED; CONTINUING', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_data_diagnose_TM=.false.
+       end if
+       if(conv_kocn_kbiogem.gt.1.0)then
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'Biogem timestep ratio should not be greater than 1 for a transport matrix', &
+               & 'STOPPING', &
+               & (/const_real_null/),.true. &
+               & )
+       end if
+       if(abs((conv_kocn_ksedgem/par_data_save_slice_n)-par_data_TM_avg_n) > const_rns) then ! n.b. conv_ksedgem = n_timesteps!!
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'The intra-annual saving intervals you have chosen do not correspond to the transport matrix averaging', &
+               & '[par_data_save_slice_n] HAS BEEN SET TO MATCH MATRIX AVERAGING INTERVAL', &
+               & (/const_real_null/),.false. &
+               & )
+          par_data_save_slice_n=int(conv_kocn_ksedgem/par_data_TM_avg_n)
+       end if
     end if
 
   END SUBROUTINE sub_check_par_biogem
@@ -2956,7 +2980,7 @@ CONTAINS
 
     ! meta meta options
     if (ctrl_data_save_slice_cdrmip) par_data_save_level = 0
-    
+
     ! no longer used! [REMOVE]
     ctrl_data_save_slice_diag = .false.
 
@@ -3637,9 +3661,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                   DO k=goldstein_k1(i,j),n_k
-                      force_restore_locn_I(l,i,j,k) = loc_ijk(i,j,k)
-                   end do
+                DO k=goldstein_k1(i,j),n_k
+                   force_restore_locn_I(l,i,j,k) = loc_ijk(i,j,k)
+                end do
              end do
           end DO
           ! load forcing data array #II
@@ -3713,9 +3737,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                   DO k=goldstein_k1(i,j),n_k
-                      force_restore_locn_II(l,i,j,k) = loc_ijk(i,j,k)
-                   end do
+                DO k=goldstein_k1(i,j),n_k
+                   force_restore_locn_II(l,i,j,k) = loc_ijk(i,j,k)
+                end do
              end do
           end DO
           ! load forcing time series data
@@ -3982,9 +4006,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                   DO k=goldstein_k1(i,j),n_k
-                      force_flux_locn_I(l,i,j,k) = loc_ijk(i,j,k)
-                   end do
+                DO k=goldstein_k1(i,j),n_k
+                   force_flux_locn_I(l,i,j,k) = loc_ijk(i,j,k)
+                end do
              end do
           end DO
           ! load forcing data array #II
@@ -4041,9 +4065,9 @@ CONTAINS
           end if
           DO i=1,n_i
              DO j=1,n_j
-                   DO k=goldstein_k1(i,j),n_k
-                      force_flux_locn_II(l,i,j,k) = loc_ijk(i,j,k)
-                   end do
+                DO k=goldstein_k1(i,j),n_k
+                   force_flux_locn_II(l,i,j,k) = loc_ijk(i,j,k)
+                end do
              end do
           end DO
           ! load forcing time series data

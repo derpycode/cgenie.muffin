@@ -272,13 +272,13 @@ subroutine biogem(        &
                     loc_standard = const_standards(ocn_type(io_DIC_13C))
                     loc_force_actual_d13C = loc_force_actual_d13C + loc_k_icefree*&
                          & fun_calc_isotope_delta &
-                              & (ocn(io_DIC,i,j,n_k),ocn(io_DIC_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
+                         & (ocn(io_DIC,i,j,n_k),ocn(io_DIC_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
                          & loc_k_tot_icefree
                  elseif (force_restore_ocn_select(io_DOM_C_13C)) then
                     loc_standard = const_standards(ocn_type(io_DOM_C_13C))
                     loc_force_actual_d13C = loc_force_actual_d13C + loc_k_icefree*&
                          & fun_calc_isotope_delta &
-                              & (ocn(io_DOM_C,i,j,n_k),ocn(io_DOM_C_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
+                         & (ocn(io_DOM_C,i,j,n_k),ocn(io_DOM_C_13C,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
                          & loc_k_tot_icefree
                  end if
               end IF
@@ -291,7 +291,7 @@ subroutine biogem(        &
                  loc_standard = const_standards(ocn_type(io_Ca_44Ca))
                  loc_force_actual_d44Ca = loc_force_actual_d44Ca + loc_k_icefree*&
                       & fun_calc_isotope_delta &
-                           & (ocn(io_Ca,i,j,n_k),ocn(io_Ca_44Ca,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
+                      & (ocn(io_Ca,i,j,n_k),ocn(io_Ca_44Ca,i,j,n_k),loc_standard,.FALSE.,const_real_null)/&
                       & loc_k_tot_icefree
               end IF
            end IF
@@ -472,6 +472,12 @@ subroutine biogem(        &
               ! NOTE: scale returned scavenged Fe according to value of par_scav_fremin
               ! NOTE: allow for (optional) return of Fe incorporated into organic matter (is_POFe)
               ! NOTE: make special case for 'scavenged' (POM-bound) S -- return to water column in a non-SEDGEM closed system
+              ! replace loc_k1 with virtual grid layer (if virtual grid world selected)
+              ! NOTE: RESTORE this setting at the end of the IF
+              ! NOTE: don't allow deeper remin than the 'real' ocean (k1)
+              if (ctrl_force_Vgrid) then
+                 loc_k1 = max(loc_k1,force_Vgrid(i,j))
+              end if
               if (ctrl_force_sed_closedsystem) then
                  If (flag_sedgem) then
                     ! set weathering flux equal to sediment preservation flux (globally averaged)
@@ -523,9 +529,9 @@ subroutine biogem(        &
                                    end if
                                 else if ( &
                                      & (sed_dep(l2is(ls)) == is_det) &
-                                     !& (sed_dep(l2is(ls)) == is_det) .OR. &
-                                     !& (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
-                                     !& (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
+                                !& (sed_dep(l2is(ls)) == is_det) .OR. &
+                                !& (sed_type(l2is(ls)) == par_sed_type_det) .OR. &
+                                !& (sed_type(sed_dep(l2is(ls))) == par_sed_type_det) &
                                      & ) then
                                    loc_remin = 0.0
                                 else
@@ -630,6 +636,11 @@ subroutine biogem(        &
                  bio_remin(io,i,j,loc_k1) = bio_remin(io,i,j,loc_k1) + &
                       & phys_ocn(ipo_rM,i,j,loc_k1)*locij_fsedocn(io,i,j)
               end do
+              
+              ! RESTORE loc_k1 setting!!!
+              if (ctrl_force_Vgrid) then
+                 loc_k1 = goldstein_k1(i,j)
+              end if
 
               ! *** ALT (OLD) CODE ************************************************************************************************
 
@@ -1024,7 +1035,7 @@ subroutine biogem(        &
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** INVERSIONS ***'
-                 if (force_restore_ocn_select(io_DIC_14C) .AND. force_flux_ocn_select(io_DIC_14C)) THEN
+              if (force_restore_ocn_select(io_DIC_14C) .AND. force_flux_ocn_select(io_DIC_14C)) THEN
                  ! ------------------------------------------- !
                  ! (1) 14C INVERSIONS
                  ! ------------------------------------------- !
@@ -1755,9 +1766,9 @@ subroutine biogem(        &
               end if
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
-                if (ctrl_bio_FeS2precip_explicit) then
-                   call sub_calc_form_FeS(i,j,loc_k1)
-                end if   
+                 if (ctrl_bio_FeS2precip_explicit) then
+                    call sub_calc_form_FeS(i,j,loc_k1)
+                 end if
               end if
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
@@ -1846,6 +1857,12 @@ subroutine biogem(        &
               !       in the ocn->sed flux coupling, assumed units of (mol m-2 s-1) are converted to (mol m-2) and summed
               !       => convert here to pretend s-1 units (which is cancelled out in the call to cpl_flux_ocnsed)
               !       also add dummy conversion conv_m2_cm2 -- this is undone in sedgem (conv_cm2_m2*dum_sfxsumsed(:,i,j))
+              ! replace loc_k1 with virtual grid layer (if virtual grid world selected)
+              ! NOTE: RESTORE this setting at the end of the loop
+              ! NOTE: don't allow deeper remin than the 'real' ocean (k1)
+              if (ctrl_force_Vgrid) then
+                 loc_k1 = max(loc_k1,force_Vgrid(i,j))
+              end if
               DO l=1,n_l_sed
                  is = conv_iselected_is(l)
                  locij_focnsed(is,i,j) = bio_settle(is,i,j,loc_k1)
@@ -1856,6 +1873,10 @@ subroutine biogem(        &
                     dum_sfxsed1(is,i,j) = phys_ocn(ipo_rA,i,j,loc_k1)*locij_focnsed(is,i,j)*loc_rdts
                  end SELECT
               end do
+              ! RESTORE loc_k1 setting!!!
+              if (ctrl_force_Vgrid) then
+                 loc_k1 = goldstein_k1(i,j)
+              end if
               ! (4) set age tracers
               if (sed_select(is_CaCO3_age)) then
                  dum_sfxsed1(is_CaCO3_age,i,j) = loc_t*dum_sfxsed1(is_CaCO3,i,j)
@@ -2090,69 +2111,69 @@ subroutine biogem_tracercoupling( &
   ! ---------------------------------------------------------- !
   if(ctrl_data_diagnose_TM) then
 
-  if(matrix_go.eq.1)then
+     if(matrix_go.eq.1)then
 
-    ! if matrix_k == 0 then we have finished diagnosing the matrix
-    ! instead of recording results, write index and let run finish
-    IF(matrix_k.lt.1)THEN
-      ! write out an indexing file
-      nc_record_count=1
-      do n=1,n_vocn,1
-        loc_k1 = loc_vts(n)%k1
-        do k=n_k,loc_k1,-1
-          call sub_save_netcdf_TM(0,nc_record_count,0.0,0,0,0,loc_vts(n)%i,loc_vts(n)%j,k)
-          nc_record_count=nc_record_count+1
-        end do
-      end do
-      print*, '>>> Transport matrix diagnosed'
-      print*, '>>> Transport matrix index written to file'
-      ctrl_data_diagnose_TM=.false. ! stop matrix being diagnosed
+        ! if matrix_k == 0 then we have finished diagnosing the matrix
+        ! instead of recording results, write index and let run finish
+        IF(matrix_k.lt.1)THEN
+           ! write out an indexing file
+           nc_record_count=1
+           do n=1,n_vocn,1
+              loc_k1 = loc_vts(n)%k1
+              do k=n_k,loc_k1,-1
+                 call sub_save_netcdf_TM(0,nc_record_count,0.0,0,0,0,loc_vts(n)%i,loc_vts(n)%j,k)
+                 nc_record_count=nc_record_count+1
+              end do
+           end do
+           print*, '>>> Transport matrix diagnosed'
+           print*, '>>> Transport matrix index written to file'
+           ctrl_data_diagnose_TM=.false. ! stop matrix being diagnosed
 
-    else
+        else
 
-    ! integrate dye experiment results array
-    do l=1,6,1
-      do n=1,n_vocn,1
-        loc_k1=loc_vts(n)%k1
-        do k=n_k,loc_k1,-1
-          select case(l)
-          case(1)
-            matrix_exp(n)%mk(io2l(io_col0),k)=matrix_exp(n)%mk(io2l(io_col0),k)+loc_vts(n)%mk(io2l(io_col0),k)
-          case(2)
-            matrix_exp(n)%mk(io2l(io_col1),k)=matrix_exp(n)%mk(io2l(io_col1),k)+loc_vts(n)%mk(io2l(io_col1),k)
-          case(3)
-            matrix_exp(n)%mk(io2l(io_col2),k)=matrix_exp(n)%mk(io2l(io_col2),k)+loc_vts(n)%mk(io2l(io_col2),k)
-          case(4)
-            matrix_exp(n)%mk(io2l(io_col3),k)=matrix_exp(n)%mk(io2l(io_col3),k)+loc_vts(n)%mk(io2l(io_col3),k)
-          case(5)
-            matrix_exp(n)%mk(io2l(io_col4),k)=matrix_exp(n)%mk(io2l(io_col4),k)+loc_vts(n)%mk(io2l(io_col4),k)
-          case(6)
-            matrix_exp(n)%mk(io2l(io_col5),k)=matrix_exp(n)%mk(io2l(io_col5),k)+loc_vts(n)%mk(io2l(io_col5),k)
-          end select
-        end do
-      end do
-    end do
+           ! integrate dye experiment results array
+           do l=1,6,1
+              do n=1,n_vocn,1
+                 loc_k1=loc_vts(n)%k1
+                 do k=n_k,loc_k1,-1
+                    select case(l)
+                    case(1)
+                       matrix_exp(n)%mk(io2l(io_col0),k)=matrix_exp(n)%mk(io2l(io_col0),k)+loc_vts(n)%mk(io2l(io_col0),k)
+                    case(2)
+                       matrix_exp(n)%mk(io2l(io_col1),k)=matrix_exp(n)%mk(io2l(io_col1),k)+loc_vts(n)%mk(io2l(io_col1),k)
+                    case(3)
+                       matrix_exp(n)%mk(io2l(io_col2),k)=matrix_exp(n)%mk(io2l(io_col2),k)+loc_vts(n)%mk(io2l(io_col2),k)
+                    case(4)
+                       matrix_exp(n)%mk(io2l(io_col3),k)=matrix_exp(n)%mk(io2l(io_col3),k)+loc_vts(n)%mk(io2l(io_col3),k)
+                    case(5)
+                       matrix_exp(n)%mk(io2l(io_col4),k)=matrix_exp(n)%mk(io2l(io_col4),k)+loc_vts(n)%mk(io2l(io_col4),k)
+                    case(6)
+                       matrix_exp(n)%mk(io2l(io_col5),k)=matrix_exp(n)%mk(io2l(io_col5),k)+loc_vts(n)%mk(io2l(io_col5),k)
+                    end select
+                 end do
+              end do
+           end do
 
-    matrix_avg_count=matrix_avg_count+1 ! keep track of number of steps integrated
-    matrix_vocn_n=matrix_vocn_n+1  ! one full initialise/recover cycle complete so advance counter
+           matrix_avg_count=matrix_avg_count+1 ! keep track of number of steps integrated
+           matrix_vocn_n=matrix_vocn_n+1  ! one full initialise/recover cycle complete so advance counter
 
-    ! if at set point, average results, write to file, advance some control counters, n.b. conv_kocn_ksedgem = n_timsteps!!
-    if(mod(real(matrix_vocn_n),(conv_kocn_ksedgem/par_data_TM_avg_n)) < const_rns)then
+           ! if at set point, average results, write to file, advance some control counters, n.b. conv_kocn_ksedgem = n_timsteps!!
+           if(mod(real(matrix_vocn_n),(conv_kocn_ksedgem/par_data_TM_avg_n)) < const_rns)then
 
-      call matrix_recover_exp(matrix_k)
+              call matrix_recover_exp(matrix_k)
 
-      if(abs(matrix_season - par_data_TM_avg_n) < const_rns)then !
-        matrix_season=1 ! need to reset season
-      else
-        matrix_season=matrix_season+1 ! otherwise advance season
-      end if
+              if(abs(matrix_season - par_data_TM_avg_n) < const_rns)then !
+                 matrix_season=1 ! need to reset season
+              else
+                 matrix_season=matrix_season+1 ! otherwise advance season
+              end if
 
-      matrix_avg_count=0 ! since we have zeroed the matrix array, set the averaging count to 0
-    end if ! end of experiment recovering call (mod(real...))
+              matrix_avg_count=0 ! since we have zeroed the matrix array, set the averaging count to 0
+           end if ! end of experiment recovering call (mod(real...))
 
-  end if ! end of store/write call (matrix_go)
+        end if ! end of store/write call (matrix_go)
 
-  end if ! write index, matrix_k.lt.1
+     end if ! write index, matrix_k.lt.1
 
   end if ! ctrl_data_diagnose_TM
 
@@ -2261,23 +2282,23 @@ subroutine biogem_tracercoupling( &
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
                  vdocn(n)%mk(l,loc_k1mld:n_k) = vdocn(n)%mk(l,loc_k1mld:n_k) + &
-                    & loc_dilution*dum_egbg_sfcremin(io,loc_i,loc_j,n_k)
+                      & loc_dilution*dum_egbg_sfcremin(io,loc_i,loc_j,n_k)
               end do
               DO l=1,n_l_sed
                  is = conv_iselected_is(l)
                  vdbio_part(n)%mk(l,loc_k1mld:n_k) = vdbio_part(n)%mk(l,loc_k1mld:n_k) + &
-                    & loc_dilution*dum_egbg_sfcpart(is,loc_i,loc_j,n_k)
+                      & loc_dilution*dum_egbg_sfcpart(is,loc_i,loc_j,n_k)
               end do
            else
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
                  vdocn(n)%mk(l,loc_k1:n_k) = vdocn(n)%mk(l,loc_k1:n_k) + &
-                    & dum_egbg_sfcremin(io,loc_i,loc_j,loc_k1:n_k)
+                      & dum_egbg_sfcremin(io,loc_i,loc_j,loc_k1:n_k)
               end do
               DO l=1,n_l_sed
                  is = conv_iselected_is(l)
                  vdbio_part(n)%mk(l,loc_k1:n_k) = vdbio_part(n)%mk(l,loc_k1:n_k) + &
-                    & dum_egbg_sfcpart(is,loc_i,loc_j,loc_k1:n_k)
+                      & dum_egbg_sfcpart(is,loc_i,loc_j,loc_k1:n_k)
               end do
            end if
         end If
@@ -2301,53 +2322,53 @@ subroutine biogem_tracercoupling( &
         vphys_ocn(n)%mk(ipo_M,loc_k1:n_k) = loc_rSratio*vphys_ocn(n)%mk(ipo_M,loc_k1:n_k)
         vphys_ocn(n)%mk(ipo_rM,loc_k1:n_k) = loc_Sratio*vphys_ocn(n)%mk(ipo_rM,loc_k1:n_k)
      end do
-  ! ---------------------------------------------------------- !
-  ! MUFFIN MATRIX II
-  ! ---------------------------------------------------------- !
-  ! initialise colour tracer in ts (going to goldstein)
-  ! n.b. matrix_count & matrix_k are set in biogem_lib
+     ! ---------------------------------------------------------- !
+     ! MUFFIN MATRIX II
+     ! ---------------------------------------------------------- !
+     ! initialise colour tracer in ts (going to goldstein)
+     ! n.b. matrix_count & matrix_k are set in biogem_lib
 
-  if(ctrl_data_diagnose_TM)THEN
-    if(loc_yr.ge.par_data_TM_start)then
+     if(ctrl_data_diagnose_TM)THEN
+        if(loc_yr.ge.par_data_TM_start)then
 
-      if(matrix_vocn_n.eq.0)then ! catch issue when matrix_vocn_n=0 initally
-        print*,'>>> Initialising transport matrix at depth level:',matrix_k
-      end if
+           if(matrix_vocn_n.eq.0)then ! catch issue when matrix_vocn_n=0 initally
+              print*,'>>> Initialising transport matrix at depth level:',matrix_k
+           end if
 
-      if(mod(matrix_vocn_n,conv_kocn_ksedgem).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed, n.b. conv_kocn_ksedgem = n_timesteps!!
-        matrix_k=matrix_k-1 ! decrement matrix_k for next time
-        if(matrix_k.gt.0) print*,'>>> Initialising transport matrix at depth level:',matrix_k
-      end if
+           if(mod(matrix_vocn_n,conv_kocn_ksedgem).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed, n.b. conv_kocn_ksedgem = n_timesteps!!
+              matrix_k=matrix_k-1 ! decrement matrix_k for next time
+              if(matrix_k.gt.0) print*,'>>> Initialising transport matrix at depth level:',matrix_k
+           end if
 
-      ! initialising grid_boxes with 1 mol kg-1 of colour tracer
-      do n=1,n_vocn
-        loc_k1=loc_vocn(n)%k1
-        ! check k level for matrix is not in sediment
-        if (matrix_k.ge.loc_k1) then
-          matrix_tracer=mod(2*loc_vts(n)%j-1+mod(loc_vts(n)%i-1,6),6)+1 ! get tracer number for i j
-          select case (matrix_tracer)
-          CASE(1)
-            loc_vts(n)%mk(io2l(io_col0),matrix_k)=1.0
-          CASE(2)
-            loc_vts(n)%mk(io2l(io_col1),matrix_k)=1.0
-          CASE(3)
-            loc_vts(n)%mk(io2l(io_col2),matrix_k)=1.0
-          CASE(4)
-            loc_vts(n)%mk(io2l(io_col3),matrix_k)=1.0
-          CASE(5)
-            loc_vts(n)%mk(io2l(io_col4),matrix_k)=1.0
-          CASE(6)
-            loc_vts(n)%mk(io2l(io_col5),matrix_k)=1.0
-          end select
-        end if
-      end do
+           ! initialising grid_boxes with 1 mol kg-1 of colour tracer
+           do n=1,n_vocn
+              loc_k1=loc_vocn(n)%k1
+              ! check k level for matrix is not in sediment
+              if (matrix_k.ge.loc_k1) then
+                 matrix_tracer=mod(2*loc_vts(n)%j-1+mod(loc_vts(n)%i-1,6),6)+1 ! get tracer number for i j
+                 select case (matrix_tracer)
+                 CASE(1)
+                    loc_vts(n)%mk(io2l(io_col0),matrix_k)=1.0
+                 CASE(2)
+                    loc_vts(n)%mk(io2l(io_col1),matrix_k)=1.0
+                 CASE(3)
+                    loc_vts(n)%mk(io2l(io_col2),matrix_k)=1.0
+                 CASE(4)
+                    loc_vts(n)%mk(io2l(io_col3),matrix_k)=1.0
+                 CASE(5)
+                    loc_vts(n)%mk(io2l(io_col4),matrix_k)=1.0
+                 CASE(6)
+                    loc_vts(n)%mk(io2l(io_col5),matrix_k)=1.0
+                 end select
+              end if
+           end do
 
-      if(matrix_go.eq.0)then
-        matrix_go=1 ! flag for starting out of sync matrix loops
-      end if
+           if(matrix_go.eq.0)then
+              matrix_go=1 ! flag for starting out of sync matrix loops
+           end if
 
-    end if ! par_data_TM_start
-  end if ! ctrl_data_diagnose_TM
+        end if ! par_data_TM_start
+     end if ! ctrl_data_diagnose_TM
 
      ! ---------------------------------------------------- !
      ! (4) SET DUMMARY VARIABLE VALUES FOR RETURN
@@ -4079,106 +4100,106 @@ end SUBROUTINE diag_biogem_timeseries
 
 ! ******************************************************************************************************************************** !
 subroutine matrix_recover_exp(&
-& dum_matrix_k)
+     & dum_matrix_k)
 
-! +++ Divide By Cucumber Error. Please Reinstall Universe And Reboot +++ 12/03/15
+  ! +++ Divide By Cucumber Error. Please Reinstall Universe And Reboot +++ 12/03/15
 
-use biogem_lib
-use biogem_data_netCDF
+  use biogem_lib
+  use biogem_data_netCDF
 
-implicit none
+  implicit none
 
-Integer,Intent(in)::dum_matrix_k ! depth level of dye experiment
+  Integer,Intent(in)::dum_matrix_k ! depth level of dye experiment
 
-integer::col_count,row_count,n,n2,k,k2 ! loop counters
-integer:: m_j,m_i,m_i_plus_one,m_i_minus_one,m_j_plus_one,m_j_minus_one ! grid_indices
-integer::matrix_tracer ! index for selecting colour tracer
-integer::loc_k1,col_name!,gridboxes,tracer_n
-real::loc_val
+  integer::col_count,row_count,n,n2,k,k2 ! loop counters
+  integer:: m_j,m_i,m_i_plus_one,m_i_minus_one,m_j_plus_one,m_j_minus_one ! grid_indices
+  integer::matrix_tracer ! index for selecting colour tracer
+  integer::loc_k1,col_name!,gridboxes,tracer_n
+  real::loc_val
 
-print*,">>> Recovering Matrix Information at k level:",dum_matrix_k,'@ averaging interval n:',matrix_season
+  print*,">>> Recovering Matrix Information at k level:",dum_matrix_k,'@ averaging interval n:',matrix_season
 
 
-! loop over boxes in vts
-col_count=1  ! outer loop for matrix column	index
-row_count=1  ! inner loop for matrix row index
-do n=1,n_vocn,1
-  loc_k1 = matrix_exp(n)%k1
-   do k=n_k,loc_k1,-1
-     if(k.eq.dum_matrix_k)then ! start looping over whole array for row indices and record results...
+  ! loop over boxes in vts
+  col_count=1  ! outer loop for matrix column	index
+  row_count=1  ! inner loop for matrix row index
+  do n=1,n_vocn,1
+     loc_k1 = matrix_exp(n)%k1
+     do k=n_k,loc_k1,-1
+        if(k.eq.dum_matrix_k)then ! start looping over whole array for row indices and record results...
 
-       ! find out which tracer was initialised
-       matrix_tracer=mod(2*matrix_exp(n)%j-1+mod(matrix_exp(n)%i-1,6),6)+1 ! get tracer number for i j
-       select CASE (matrix_tracer)
-        case(1)
-            col_name=io_col0
-        case(2)
-            col_name=io_col1
-        case(3)
-            col_name=io_col2
-        case(4)
-            col_name=io_col3
-        case(5)
-            col_name=io_col4
-        case(6)
-            col_name=io_col5
-       end select
+           ! find out which tracer was initialised
+           matrix_tracer=mod(2*matrix_exp(n)%j-1+mod(matrix_exp(n)%i-1,6),6)+1 ! get tracer number for i j
+           select CASE (matrix_tracer)
+           case(1)
+              col_name=io_col0
+           case(2)
+              col_name=io_col1
+           case(3)
+              col_name=io_col2
+           case(4)
+              col_name=io_col3
+           case(5)
+              col_name=io_col4
+           case(6)
+              col_name=io_col5
+           end select
 
-       ! calculate i+1, i-1, j+1, j-1
-       m_i=matrix_exp(n)%i
-       m_j=matrix_exp(n)%j
-       m_i_plus_one=matrix_exp(n)%i+1
-       m_i_minus_one=matrix_exp(n)%i-1
-       m_j_plus_one=matrix_exp(n)%j+1
-       m_j_minus_one=matrix_exp(n)%j-1
+           ! calculate i+1, i-1, j+1, j-1
+           m_i=matrix_exp(n)%i
+           m_j=matrix_exp(n)%j
+           m_i_plus_one=matrix_exp(n)%i+1
+           m_i_minus_one=matrix_exp(n)%i-1
+           m_j_plus_one=matrix_exp(n)%j+1
+           m_j_minus_one=matrix_exp(n)%j-1
 
-       ! account for longitude wraparound and off-grid
-       if (m_i_plus_one.gt.36)then
-         m_i_plus_one=1
-       elseif(m_i_minus_one.lt.1)then
-         m_i_minus_one=36
-       end if
-
-       ! loop over whole grid recording tracer where equals above i j's
-       do n2=1,n_vocn,1
-         loc_k1 = matrix_exp(n2)%k1
-         do k2=n_k,loc_k1,-1
-
-           ! catch grid-box in potential neighbouring boxes
-           if(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j)then
-             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-           elseif(matrix_exp(n2)%i.eq.m_i_plus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
-             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-           elseif(matrix_exp(n2)%i.eq.m_i_minus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
-             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-           elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j_plus_one)THEN
-             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-           elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j .eq.m_j_minus_one)THEN
-             loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
-             matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
-           else
-             loc_val=0.0
+           ! account for longitude wraparound and off-grid
+           if (m_i_plus_one.gt.36)then
+              m_i_plus_one=1
+           elseif(m_i_minus_one.lt.1)then
+              m_i_minus_one=36
            end if
 
-           ! record tracer if not zero
-           if(abs(loc_val).gt.const_real_nullsmall)THEN
-             call sub_save_netcdf_TM(1,1,loc_val,col_count,row_count,matrix_season,0,0,0)
-           end if
+           ! loop over whole grid recording tracer where equals above i j's
+           do n2=1,n_vocn,1
+              loc_k1 = matrix_exp(n2)%k1
+              do k2=n_k,loc_k1,-1
 
-           row_count=row_count+1
+                 ! catch grid-box in potential neighbouring boxes
+                 if(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j)then
+                    loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+                    matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+                 elseif(matrix_exp(n2)%i.eq.m_i_plus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
+                    loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+                    matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+                 elseif(matrix_exp(n2)%i.eq.m_i_minus_one .AND. matrix_exp(n2)%j.eq.m_j)THEN
+                    loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+                    matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+                 elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j.eq.m_j_plus_one)THEN
+                    loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+                    matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+                 elseif(matrix_exp(n2)%i.eq.m_i .AND. matrix_exp(n2)%j .eq.m_j_minus_one)THEN
+                    loc_val=matrix_exp(n2)%mk(io2l(col_name),k2)/(matrix_avg_count)
+                    matrix_exp(n2)%mk(io2l(col_name),k2)=0.0
+                 else
+                    loc_val=0.0
+                 end if
 
-         end do
-       end do
-       row_count=1
+                 ! record tracer if not zero
+                 if(abs(loc_val).gt.const_real_nullsmall)THEN
+                    call sub_save_netcdf_TM(1,1,loc_val,col_count,row_count,matrix_season,0,0,0)
+                 end if
 
-     end if
-     col_count=col_count+1
-    end do
+                 row_count=row_count+1
+
+              end do
+           end do
+           row_count=1
+
+        end if
+        col_count=col_count+1
+     end do
   end do
 
-  end subroutine matrix_recover_exp
-  ! ****************************************************************************************************************************** !
+end subroutine matrix_recover_exp
+! ****************************************************************************************************************************** !
