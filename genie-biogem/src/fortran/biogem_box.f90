@@ -515,13 +515,14 @@ CONTAINS
           loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_FeL,dum_i,dum_j,n_k)
           if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k) + ocn(io_FeL_56Fe,dum_i,dum_j,n_k)
        CASE ('FeFe2TL')
-          !! combine Fe2 and Fe3 tracers for total 'bioavailable' iron
-          !loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_Fe2,dum_i,dum_j,n_k)
-          !if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k) + ocn(io_Fe2_56Fe,dum_i,dum_j,n_k)
-          ! leave as just Fe (3) representing total 'bioavailable' iron
-          ! (otherwise there are redox complicatons of varying proportions of Fe3 vs. Fe2 being taken up, and later, remin-ed)
-          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k)
-          if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k)
+          ! combine Fe2 and Fe3 (which implicitly includes ligand-bound iron) tracers for total 'bioavailable' iron
+          ! deal with working out what proportions of what are taken up, later ... (we are going to take up all the Fe2 first)
+          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_Fe2,dum_i,dum_j,n_k)
+          if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k) + ocn(io_Fe2_56Fe,dum_i,dum_j,n_k)
+!!$          ! leave as just Fe (3) representing total 'bioavailable' iron
+!!$          ! (otherwise there are redox complicatons of varying proportions of Fe3 vs. Fe2 being taken up, and later, remin-ed)
+!!$          loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k)
+!!$          if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k)
        CASE ('hybrid')
           ! NOTE: no need to sum separate tracers, as io_TDFe *is* total dissolved and assumed bioavailable Fe pool
           loc_FeT = ocn(io_TDFe,dum_i,dum_j,n_k)
@@ -1302,6 +1303,7 @@ CONTAINS
     if (sed_select(is_POFe_56Fe)) then
        ! NOTE: no need to specify Fe scheme, as the values of loc_FeT and loc_FeT_56Fe have already been populated according to
        !       the specific configuration of explicit (tracer) dissolved Fe pools
+       ! NOTE: no biological uptake fractionation assumed (currently)
        if (loc_FeT>const_rns) then
           loc_r56Fe = loc_FeT_56Fe/loc_FeT
        else
@@ -1562,7 +1564,7 @@ CONTAINS
        end do
     end DO
     ! -------------------------------------------------------- !
-    ! ADJUST INORGANIC UPTAKE
+    ! ADJUST ELEMENTAL UPTAKE
     ! -------------------------------------------------------- !
     ! I cycle
     ! NOTE: IO3- is transformed to I- within the cell (default species exchange with POI is I- not IO3-).
@@ -1575,6 +1577,30 @@ CONTAINS
        loc_bio_uptake(io_IO3,loc_k_mld:n_k) = loc_bio_uptake(io_IO3,loc_k_mld:n_k) + loc_bio_uptake(io_I,loc_k_mld:n_k)
        loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
        loc_bio_uptake(io_I,loc_k_mld:n_k)   = 0.0
+    end if
+    ! Fe cycle
+    ! NOTE: when Fe3+ and Fe2+ are selected, we are preferentially taking up Fe2+,
+    !       then reducing Fe3+ to make up any deficit
+    !       release 1/4 mol O2 per mol Fe3+ -> Fe2+ conversion (negative uptake)
+    ! NOTE: isotopes are also going to have to be corrected as the isotopic composition of the assimilated iron
+    !       is assumed to be that of Fe2+ (the preferentially consumed fraction)
+    ! NOTE: no biological uptake fractionation assumed (currently)
+    ! NOTE: also check for (and truncate) more iron than available total, requested ...
+    if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+       If (loc_bio_uptake(io_Fe2,n_k) > ocn(io_Fe2,dum_i,dum_j,n_k)) then
+          if (loc_bio_uptake(io_Fe2,n_k) > loc_FeT) then
+             loc_bio_uptake(io_Fe2,n_k) = loc_FeT
+          end if
+          ! correct bulk iron source balance 
+          loc_bio_uptake(io_Fe,n_k) = loc_bio_uptake(io_Fe2,n_k) - ocn(io_Fe2,dum_i,dum_j,n_k)
+          loc_bio_uptake(io_O2,n_k) = -(1.0/4.0)*(loc_bio_uptake(io_Fe2,n_k) - ocn(io_Fe2,dum_i,dum_j,n_k))
+          ! correct isotope source balance
+          ! (all Fe2+ 56Fe, plus a proportion of Fe3+ 56Fe equal to the proportion of Fe3+ removed out of total)
+          If (ocn_select(io_Fe_56Fe) .AND. (ocn_select(io_Fe2_56Fe))) then
+             loc_bio_uptake(io_Fe2_56Fe,n_k) = ocn(io_Fe2_56Fe,dum_i,dum_j,n_k) + &
+                  & ocn(io_Fe_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe,n_k)/ocn(io_Fe,dum_i,dum_j,n_k))
+          end if
+       end if
     end if
     ! N cycle
     ! non-standard productivity schemes

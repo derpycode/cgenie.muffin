@@ -1204,6 +1204,14 @@ CONTAINS
        conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 0.0
        conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 1.0
     end if
+    ! ALT relationships if Fe2+ and Fe3+ are resolved
+    ! NOTE: Fe3+ -> Fe2+ is going to have to be performed during bio uptake to preserve O2 mass balance
+    if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+       conv_sed_ocn(io_Fe,is_POFe)  = 0.0
+       conv_sed_ocn(io_Fe2,is_POFe) = 1.0
+       conv_sed_ocn(io_Fe_56Fe,is_POFe_56Fe)  = 0.0
+       conv_sed_ocn(io_Fe2_56Fe,is_POFe_56Fe) = 1.0
+    end if
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !

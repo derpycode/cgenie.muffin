@@ -68,6 +68,8 @@ CONTAINS
     conv_sed_ocn(io_Fe_56Fe,is_POFe_56Fe)        = 1.0
     conv_sed_ocn(io_TDFe,is_POFe)                = 1.0
     conv_sed_ocn(io_TDFe_56Fe,is_POFe_56Fe)      = 1.0
+    conv_sed_ocn(io_Fe2,is_POFe)                 = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_POFe_56Fe)       = 1.0
     conv_sed_ocn(io_O2,is_POC)                   = -1.0
     conv_sed_ocn(io_O2,is_PON)                   = -1.0
     conv_sed_ocn(io_O2,is_POP)                   = -1.0
