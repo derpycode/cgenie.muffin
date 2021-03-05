@@ -199,7 +199,7 @@ end if
              & )
      ENDIF
     ! *** read in look-up data ***
-    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_Kcal.dat'
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_KspC.dat'
     !call check_unit(in,__LINE__,__FILE__)
     OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
     !call check_iostat(ios,__LINE__,__FILE__)
@@ -247,7 +247,7 @@ end if
              & )
      ENDIF
     ! *** read in look-up data ***
-    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_Karg.dat'
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_KspA.dat'
     !call check_unit(in,__LINE__,__FILE__)
     OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
     !call check_iostat(ios,__LINE__,__FILE__)
@@ -325,7 +325,7 @@ end if
     INTEGER::a,b,d,e
     CHARACTER(len=255)::loc_filename
     INTEGER::ios ! for file checks
-    ! allocate size of look-up tables and load data -- CaCO3
+    ! allocate size of look-up tables and load data
     ! NOTE: check for problems allocating array space
     ALLOCATE(lookup_gem_MyAMI_k( &
          & lookup_i_Ca_min:lookup_i_Ca_max, &
