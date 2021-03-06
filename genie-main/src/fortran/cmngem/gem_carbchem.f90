@@ -299,48 +299,48 @@ CONTAINS
       ! (1a) adjust Ksp via a look-up table based on MyAMI (downloaded 10/01/2021)
       !      NOTE: following Hain et al. [2015,2018]
       dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,dum_temp,dum_sal, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_temp_max,lookup_sal_max,     &
+            & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
             & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,dum_temp,dum_sal, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_temp_max,lookup_sal_max,     &
+            & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
             & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       ! (1b) adjust K1 and K2
       !print*, dum_carbconst(icc_k1), dum_carbconst(icc_k2)
       dum_carbconst(icc_k) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,dum_temp,dum_sal, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_temp_max,lookup_sal_max,     &
+            & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
             & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,dum_temp,dum_sal, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_temp_max,lookup_sal_max,     &
+            & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
             & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      !print*, dum_carbconst(icc_k), dum_Ca, dum_Mg, dum_sal, dum_temp
+      print*, dum_carbconst(icc_k),dum_carbconst(icc_k1), dum_Ca, dum_Mg, dum_sal, dum_temp
       !dum_carbconst(icc_k1) = dum_carbconst(icc_k1)*dum_carbconst(icc_k)
       dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,dum_temp,dum_sal, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_temp_max,lookup_sal_max,     &
+            & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
             & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
      ! print*, dum_carbconst(icc_k1)
      ! print*, dum_carbconst(icc_k)
@@ -348,12 +348,12 @@ CONTAINS
      !    & dum_carbconst(icc_k1)/dum_carbconst(icc_k2)
      ! print*, dum_carbconst(icc_k)
       dum_carbconst(icc_kW) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kW,dum_Ca,dum_Mg,dum_temp,dum_sal, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_temp_max,lookup_sal_max,     &
+            & lookup_gem_MyAMI_kW,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
             & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
     end SELECT
   end SUBROUTINE sub_adj_carbconst
