@@ -810,18 +810,18 @@ MODULE gem_cmn
   !  Bunsen Solubility Coefficient coefficients
   real,dimension(6,n_atm)::par_bunsen_coef    
   ! *** look-up table dimenstions for carbonate constants ***
-  INTEGER,PARAMETER::lookup_i_Ca_min      = 1                   ! 
-  INTEGER,PARAMETER::lookup_i_Ca_max      = 60                  ! 
-  INTEGER,PARAMETER::lookup_i_Mg_min   = 1                      ! 
-  INTEGER,PARAMETER::lookup_i_Mg_max   = 60                     ! 
-  INTEGER,PARAMETER::lookup_i_sal_min   = 1                     ! 
-  INTEGER,PARAMETER::lookup_i_sal_max   = 21                    ! 
-  INTEGER,PARAMETER::lookup_i_temp_min  = 1                     ! 
-  INTEGER,PARAMETER::lookup_i_temp_max  = 21                    ! 
+  INTEGER,PARAMETER::lookup_i_Ca_min      = 0                   ! 0-59 mmol
+  INTEGER,PARAMETER::lookup_i_Ca_max      = 60                  ! 0-59 mmol
+  INTEGER,PARAMETER::lookup_i_Mg_min   = 0                      ! 0-59 mmol
+  INTEGER,PARAMETER::lookup_i_Mg_max   = 60                     ! 0-59 mmol
+  INTEGER,PARAMETER::lookup_i_sal_min   = 30                     ! 30-40 PSU
+  INTEGER,PARAMETER::lookup_i_sal_max   = 40                    ! 30-40 PSU
+  INTEGER,PARAMETER::lookup_i_temp_min  = 263                     ! -10-40degC
+  INTEGER,PARAMETER::lookup_i_temp_max  = 313                    ! -10-40degC
   REAL,PARAMETER::lookup_Ca_max      = 0.060                    ! 
-  REAL,PARAMETER::lookup_Mg_max   = 0.020                       ! 
+  REAL,PARAMETER::lookup_Mg_max   = 0.060                       ! 
   REAL,PARAMETER::lookup_sal_max   = 40                         ! 
-  REAL,PARAMETER::lookup_temp_max  = 40                         ! 
+  REAL,PARAMETER::lookup_temp_max  = 313.15                         ! 
   ! -------------------- look-up tables ------------------------------------------------------------------------------------------ !
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kcal  ! carbonate constant kspCal look-up table (Hain et al. 2015)
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_karg  ! carbonate constant kspArg look-up table (Hain et al. 2015)

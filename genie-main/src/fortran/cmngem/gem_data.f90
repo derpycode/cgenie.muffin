@@ -113,6 +113,7 @@ end if
           DO d = lookup_i_sal_min,lookup_i_sal_max,1
              DO e = lookup_i_temp_min,lookup_i_temp_max,1
                 READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_k1(a,b,d,e)
+                !print*, a,b,d,e,lookup_gem_MyAMI_k1(a,b,d,e)
                 !call check_iostat(ios,__LINE__,__FILE__)
              END DO
           END DO
