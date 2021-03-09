@@ -384,6 +384,7 @@ CONTAINS
     real::loc_dPO4_sp,loc_dPO4_nsp
     real::loc_ohm,loc_co3                                               !
     real::loc_frac_N2fix
+    real::loc_frac_Fe2
     real::loc_ficefree,loc_intI,loc_kI,loc_kT
     real,dimension(n_ocn,n_k)::loc_bio_uptake                           !
     real,dimension(n_sed,n_k)::loc_bio_part_DOM                         !
@@ -516,7 +517,7 @@ CONTAINS
           if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k) + ocn(io_FeL_56Fe,dum_i,dum_j,n_k)
        CASE ('FeFe2TL')
           ! combine Fe2 and Fe3 (which implicitly includes ligand-bound iron) tracers for total 'bioavailable' iron
-          ! deal with working out what proportions of what are taken up, later ... (we are going to take up all the Fe2 first)
+          ! deal with working out what proportions of what are taken up, later ...
           loc_FeT = ocn(io_Fe,dum_i,dum_j,n_k) + ocn(io_Fe2,dum_i,dum_j,n_k)
           if (sed_select(is_POFe_56Fe)) loc_FeT_56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,n_k) + ocn(io_Fe2_56Fe,dum_i,dum_j,n_k)
 !!$          ! leave as just Fe (3) representing total 'bioavailable' iron
@@ -1579,28 +1580,40 @@ CONTAINS
        loc_bio_uptake(io_I,loc_k_mld:n_k)   = 0.0
     end if
     ! Fe cycle
-    ! NOTE: when Fe3+ and Fe2+ are selected, we are preferentially taking up Fe2+,
-    !       then reducing Fe3+ to make up any deficit
+    ! NOTE: when Fe3+ and Fe2+ are selected, we are taking them up in proportion to minimize numerical issues
+    !       (e.g. of removing all Fe2+ in a single time-step)
     !       release 1/4 mol O2 per mol Fe3+ -> Fe2+ conversion (negative uptake)
-    ! NOTE: isotopes are also going to have to be corrected as the isotopic composition of the assimilated iron
-    !       is assumed to be that of Fe2+ (the preferentially consumed fraction)
-    ! NOTE: no biological uptake fractionation assumed (currently)
-    ! NOTE: also check for (and truncate) more iron than available total, requested ...
+    ! NOTE: by default, iron uptake is assumed as Fe2+
     if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
-       If (loc_bio_uptake(io_Fe2,n_k) > ocn(io_Fe2,dum_i,dum_j,n_k)) then
-          if (loc_bio_uptake(io_Fe2,n_k) > loc_FeT) then
-             loc_bio_uptake(io_Fe2,n_k) = loc_FeT
-          end if
-          ! correct bulk iron source balance 
-          loc_bio_uptake(io_Fe,n_k) = loc_bio_uptake(io_Fe2,n_k) - ocn(io_Fe2,dum_i,dum_j,n_k)
-          loc_bio_uptake(io_O2,n_k) = -(1.0/4.0)*(loc_bio_uptake(io_Fe2,n_k) - ocn(io_Fe2,dum_i,dum_j,n_k))
+       If (loc_FeT > const_rns) then
+          ! relative availablity of Fe2+ 
+          loc_frac_Fe2 = ocn(io_Fe2,dum_i,dum_j,n_k)/loc_FeT
+          ! correct bulk iron source balance
+          ! NOTE: can directly replace Fe and Fe2 in loc_bio_uptake, but only adjust existing O2 value
+          loc_bio_uptake(io_Fe,n_k)  = (1.0 - loc_frac_Fe2)*loc_bio_uptake(io_Fe2,n_k)
+          loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k) - (1.0/4.0)*loc_bio_uptake(io_Fe,n_k)
+          loc_bio_uptake(io_Fe2,n_k) = loc_frac_Fe2*loc_bio_uptake(io_Fe2,n_k)
           ! correct isotope source balance
-          ! (all Fe2+ 56Fe, plus a proportion of Fe3+ 56Fe equal to the proportion of Fe3+ removed out of total)
+          ! (all Fe2+ 56Fe, plus a proportion of Fe3+ 56Fe equal to the proportion of Fe3+ removed out of total Fe3+)
           If (ocn_select(io_Fe_56Fe) .AND. (ocn_select(io_Fe2_56Fe))) then
-             loc_bio_uptake(io_Fe2_56Fe,n_k) = ocn(io_Fe2_56Fe,dum_i,dum_j,n_k) + &
-                  & ocn(io_Fe_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe,n_k)/ocn(io_Fe,dum_i,dum_j,n_k))
+             if (ocn(io_Fe_56Fe,dum_i,dum_j,n_k) > const_rns) then
+                loc_bio_uptake(io_Fe_56Fe,n_k) = &
+                     & ocn(io_Fe_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe,n_k)/ocn(io_Fe_56Fe,dum_i,dum_j,n_k))
+             else
+                loc_bio_uptake(io_Fe_56Fe,n_k) = 0.0
+             end if
+             if (ocn(io_Fe2_56Fe,dum_i,dum_j,n_k) > const_rns) then
+                loc_bio_uptake(io_Fe2_56Fe,n_k) = &
+                     & ocn(io_Fe2_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe2,n_k)/ocn(io_Fe2_56Fe,dum_i,dum_j,n_k))
+             else
+                loc_bio_uptake(io_Fe2_56Fe,n_k) = 0.0
+             end if
           end if
+       else
+          loc_frac_Fe2 = 1.0
        end if
+    else
+       loc_frac_Fe2 = 0.0
     end if
     ! N cycle
     ! non-standard productivity schemes
@@ -1870,6 +1883,7 @@ CONTAINS
          & '2N2T_PN_Tdep',   &
          & '3N2T_PNFe_Tdep'  &
          & )
+       diag_bio(idiag_bio_frac_Fe2,dum_i,dum_j)   = dum_dt*loc_frac_Fe2
        diag_bio(idiag_bio_dPO4_1,dum_i,dum_j)     = loc_dPO4_1
        diag_bio(idiag_bio_dPO4_2,dum_i,dum_j)     = loc_dPO4_2
        diag_bio(idiag_bio_N2fixation,dum_i,dum_j) = loc_bio_uptake(io_N2,n_k)*2
@@ -1878,14 +1892,16 @@ CONTAINS
          & 'bio_PFe',       &
          & 'bio_PFe_OCMIP2' &
          & )
-       diag_bio(idiag_bio_knut,dum_i,dum_j)    = dum_dt*min(loc_kPO4,loc_kFe)
+       diag_bio(idiag_bio_knut,dum_i,dum_j)     = dum_dt*min(loc_kPO4,loc_kFe)
+       diag_bio(idiag_bio_frac_Fe2,dum_i,dum_j) = dum_dt*loc_frac_Fe2
     case (                        &
          & 'bio_PFeSi',           &
          & 'bio_PFeSi_Ridgwell02' &
          & )
-       diag_bio(idiag_bio_knut,dum_i,dum_j)    = dum_dt*min(loc_kPO4,loc_kFe)
-       diag_bio(idiag_bio_dPO4_1,dum_i,dum_j)  = loc_dPO4_sp
-       diag_bio(idiag_bio_dPO4_2,dum_i,dum_j)  = loc_dPO4_nsp
+       diag_bio(idiag_bio_knut,dum_i,dum_j)     = dum_dt*min(loc_kPO4,loc_kFe)
+       diag_bio(idiag_bio_frac_Fe2,dum_i,dum_j) = dum_dt*loc_frac_Fe2
+       diag_bio(idiag_bio_dPO4_1,dum_i,dum_j)   = loc_dPO4_sp
+       diag_bio(idiag_bio_dPO4_2,dum_i,dum_j)   = loc_dPO4_nsp
        ! sp vs. nsp diagnostics
        ! NOTE: simply use the existing array value if unable to calculate a new one ...
        if (loc_dPO4_nsp*bio_part(is_POC,dum_i,dum_j,n_k) > const_real_nullsmall) then

@@ -1204,14 +1204,6 @@ CONTAINS
        conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 0.0
        conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 1.0
     end if
-    ! ALT relationships if Fe2+ and Fe3+ are resolved
-    ! NOTE: Fe3+ -> Fe2+ is going to have to be performed during bio uptake to preserve O2 mass balance
-    if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
-       conv_sed_ocn(io_Fe,is_POFe)  = 0.0
-       conv_sed_ocn(io_Fe2,is_POFe) = 1.0
-       conv_sed_ocn(io_Fe_56Fe,is_POFe_56Fe)  = 0.0
-       conv_sed_ocn(io_Fe2_56Fe,is_POFe_56Fe) = 1.0
-    end if
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !
@@ -1250,7 +1242,7 @@ CONTAINS
           conv_sed_ocn(io_ALK,is_POP) = 0.0
        end if
     end if
-    ! O2 (of P, N, C)
+    ! O2 (of P, N, C, Fe)
     ! update O2 demand associated with organic matter (taken as the carbon component)
     ! reduce O2 demand associated with C (and H) oxidation => treat N and P explicitly
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
@@ -1282,6 +1274,15 @@ CONTAINS
        conv_sed_ocn(io_O2,is_POP) = 0.0
        conv_sed_ocn(io_O2,is_PON) = 0.0
        conv_sed_ocn(io_O2,is_POC) = 0.0
+    end if
+    ! Fe -- assume Fe2+ is intercellular for of Fe
+    ! NOTE: for other Fe schemes, there is no oxidation/reduction
+    if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+       conv_sed_ocn(io_Fe,is_POFe)  = 0.0
+       conv_sed_ocn(io_Fe2,is_POFe) = 1.0
+       conv_sed_ocn(io_Fe_56Fe,is_POFe_56Fe)  = 0.0
+       conv_sed_ocn(io_Fe2_56Fe,is_POFe_56Fe) = 1.0
+       conv_sed_ocn(io_O2,is_POFe) = 0.0
     end if
     ! -------------------------------------------------------- !
     ! UPDATE ALT REDOX SED->OCN RELATIONSHIPS
@@ -1321,6 +1322,16 @@ CONTAINS
        ! O2 (of P, N, C)
        if (ocn_select(io_NH4)) then
           conv_sed_ocn_O(io_O2,is_PON) = (3.0/4.0)
+       end if
+       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       !       BUT, it is going to be implicitly assumed to be oxidized during remin under oxic conditions
+       if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+          conv_sed_ocn_O(io_Fe,is_POFe)  = 1.0
+          conv_sed_ocn_O(io_Fe2,is_POFe) = 0.0
+          conv_sed_ocn_O(io_Fe_56Fe,is_POFe_56Fe)  = 1.0
+          conv_sed_ocn_O(io_Fe2_56Fe,is_POFe_56Fe) = 0.0
+          conv_sed_ocn_O(io_O2,is_POFe) = -1.0/4.0
        end if
     end if
     ! -------------------------------------------------------- ! Modify for N-reducing conditions
@@ -1408,6 +1419,16 @@ CONTAINS
 !!!
        ! ALK
        ! [N transformations are explicit and hence ALK is associated with neither P nor C (excepting nitrate reduction)]
+       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       !       BUT, it is going to be implicitly assumed to be oxidized during remin under denitrifying conditions
+       if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+          conv_sed_ocn_N(io_Fe,is_POFe)  = 1.0
+          conv_sed_ocn_N(io_Fe2,is_POFe) = 0.0
+          conv_sed_ocn_N(io_Fe_56Fe,is_POFe_56Fe)  = 1.0
+          conv_sed_ocn_N(io_Fe2_56Fe,is_POFe_56Fe) = 0.0
+          conv_sed_ocn_N(io_O2,is_POFe) = -1.0/4.0
+       end if
     else
        conv_sed_ocn_N(:,:) = 0.0
     end if
@@ -1447,6 +1468,15 @@ CONTAINS
        !conv_sed_ocn_Fe(io_Fe_56Fe,is_POP)    = conv_sed_ocn_Fe(io_Fe,is_POP)
        !conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POC) = conv_sed_ocn_Fe(io_FeOOH,is_POC)
        !conv_sed_ocn_Fe(io_Fe_56Fe,is_POC)    = conv_sed_ocn_Fe(io_Fe,is_POC)
+       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+          conv_sed_ocn_Fe(io_Fe,is_POFe)  = 0.0
+          conv_sed_ocn_Fe(io_Fe2,is_POFe) = 1.0
+          conv_sed_ocn_Fe(io_Fe_56Fe,is_POFe_56Fe)  = 0.0
+          conv_sed_ocn_Fe(io_Fe2_56Fe,is_POFe_56Fe) = 1.0
+          conv_sed_ocn_Fe(io_O2,is_POFe) = 0.0
+       end if
     else
        conv_sed_ocn_Fe(:,:) = 0.0
     end if
@@ -1494,6 +1524,15 @@ CONTAINS
           conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP) + conv_sed_ocn_S(io_ALK,is_POP)
           conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC)
        end if
+       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+          conv_sed_ocn_S(io_Fe,is_POFe)  = 0.0
+          conv_sed_ocn_S(io_Fe2,is_POFe) = 1.0
+          conv_sed_ocn_S(io_Fe_56Fe,is_POFe_56Fe)  = 0.0
+          conv_sed_ocn_S(io_Fe2_56Fe,is_POFe_56Fe) = 1.0
+          conv_sed_ocn_S(io_O2,is_POFe) = 0.0
+       end if
     else
        conv_sed_ocn_S(:,:) = 0.0
     end if
@@ -1533,6 +1572,15 @@ CONTAINS
        ! C isotopes
        conv_sed_ocn_meth(io_CH4_13C,is_POC_13C) = loc_alpha*conv_sed_ocn_meth(io_CH4,is_POC)
        conv_sed_ocn_meth(io_DIC_13C,is_POC_13C) = 1.0 - conv_sed_ocn_meth(io_CH4_13C,is_POC_13C)
+       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+          conv_sed_ocn_meth(io_Fe,is_POFe)  = 0.0
+          conv_sed_ocn_meth(io_Fe2,is_POFe) = 1.0
+          conv_sed_ocn_meth(io_Fe_56Fe,is_POFe_56Fe)  = 0.0
+          conv_sed_ocn_meth(io_Fe2_56Fe,is_POFe_56Fe) = 1.0
+          conv_sed_ocn_meth(io_O2,is_POFe) = 0.0
+       end if
     else
        conv_sed_ocn_meth(:,:) = 0.0
     end if
@@ -3125,7 +3173,6 @@ CONTAINS
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
-       ctrl_bio_remin_redox_save=.true.
     case (12)
        ! BASIC + tracer + full physics
        ctrl_data_save_slice_phys_atm = .true.

@@ -491,8 +491,30 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! aeolian Fe diagnostics
+       ! Fe diagnostics
        IF (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) THEN
+          ! total Fe inventory
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_Fe_tot',string_results_ext)
+          IF (ctrl_data_save_sig_ocn_sur) THEN
+             loc_string = '% time (yr) / ' //&
+                  & 'global total ' // 'Fe' //' (mol) / ' //&
+                  & 'global mean ' // 'Fe' //' (mol kg-1) / ' //&
+                  & 'surface (ice-free) ' // 'Fe' //' (mol kg-1) / ' //&
+                  & 'benthic ' // 'Fe' //' (mol kg-1) / ' //&
+                  & 'surface ' // 'Fe' //' (mol kg-1)'
+          else
+             loc_string = '% time (yr) / global total '// 'Fe' //' (mol) / global mean ' // &
+                  &  'Fe' //' (mol kg-1)'
+          end if
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          ! aeolian diagnostics
           loc_filename=fun_data_timeseries_filename( &
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_det_Fe_tot',string_results_ext)
           loc_string = '% time (yr) / total aeolian Fe input (mol yr-1)'
@@ -1981,8 +2003,60 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! aeolian Fe diagnostics
+       ! Fe diagnostics
        IF (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) THEN
+          ! total Fe inventory
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_Fe_tot',string_results_ext)
+          If (ocn_select(io_TDFe)) then
+             loc_sig = int_ocn_sig(io_TDFe)/int_t_sig
+             IF (ctrl_data_save_sig_ocn_sur) THEN
+                loc_sig_opn = int_ocn_opn_sig(io_TDFe)/int_t_sig
+                loc_sig_ben = int_ocn_ben_sig(io_TDFe)/int_t_sig
+                loc_sig_sur = int_ocn_sur_sig(io_TDFe)/int_t_sig
+             end if
+          elseif (ocn_select(io_Fe2) .AND. ocn_select(io_Fe)) then
+             loc_sig = (int_ocn_sig(io_Fe2) + int_ocn_sig(io_Fe))/int_t_sig
+             IF (ctrl_data_save_sig_ocn_sur) THEN
+                loc_sig_opn = (int_ocn_opn_sig(io_Fe2) + int_ocn_opn_sig(io_Fe))/int_t_sig
+                loc_sig_ben = (int_ocn_ben_sig(io_Fe2) + int_ocn_ben_sig(io_Fe))/int_t_sig
+                loc_sig_sur = (int_ocn_sur_sig(io_Fe2) + int_ocn_sur_sig(io_Fe))/int_t_sig
+             end if
+          elseif (ocn_select(io_Fe) .AND. ocn_select(io_FeL)) then
+             loc_sig = (int_ocn_sig(io_Fe) + int_ocn_sig(io_FeL))/int_t_sig
+             IF (ctrl_data_save_sig_ocn_sur) THEN
+                loc_sig_opn = (int_ocn_opn_sig(io_Fe) + int_ocn_opn_sig(io_FeL))/int_t_sig
+                loc_sig_ben = (int_ocn_ben_sig(io_Fe) + int_ocn_ben_sig(io_FeL))/int_t_sig
+                loc_sig_sur = (int_ocn_sur_sig(io_Fe) + int_ocn_sur_sig(io_FeL))/int_t_sig
+             end if
+          end if
+          IF (ctrl_data_save_sig_ocn_sur) THEN
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f12.3,e20.12,4e14.6)',iostat=ios) &
+                  & loc_t,                                          &
+                  & loc_ocn_tot_M*loc_sig,                          &
+                  & loc_sig,                                        &
+                  & loc_sig_opn,                                    &
+                  & loc_sig_ben,                                    &
+                  & loc_sig_sur
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          else
+             call check_unit(out,__LINE__,__FILE__)
+             OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+             WRITE(unit=out,fmt='(f12.3,e20.12,e14.6)',iostat=ios) &
+                  & loc_t,                                   &
+                  & loc_ocn_tot_M*loc_sig,                   &
+                  & loc_sig
+             call check_iostat(ios,__LINE__,__FILE__)
+             CLOSE(unit=out,iostat=ios)
+             call check_iostat(ios,__LINE__,__FILE__)
+          end IF
+          ! aeolian Fe diagnostics
           loc_filename=fun_data_timeseries_filename( &
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_det_Fe_tot',string_results_ext)
           call check_unit(out,__LINE__,__FILE__)

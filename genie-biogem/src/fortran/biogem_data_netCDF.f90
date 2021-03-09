@@ -3155,7 +3155,7 @@ CONTAINS
     !----------------------------------------------------------------
     !       REMINERALIZATION FIELD
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_bio .AND. ctrl_data_save_derived) then
+    If (ctrl_data_save_slice_bio .AND. ctrl_data_save_slice_diag_geochem) then
        DO l=3,n_l_ocn
           io = conv_iselected_io(l)
           is = maxval(maxloc(abs(conv_DOM_POM(:,io))))-1

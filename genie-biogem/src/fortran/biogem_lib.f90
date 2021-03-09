@@ -787,7 +787,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_force                          = 08 ! forcings
   INTEGER,PARAMETER::n_opt_data                           = 30 ! data (I/O)
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
-  INTEGER,PARAMETER::n_diag_bio                           = 22 !
+  INTEGER,PARAMETER::n_diag_bio                           = 23 !
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
   INTEGER,PARAMETER::n_diag_react                         = 09 !
@@ -892,6 +892,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_bio_opaltoPOC_sp              = 20    !
   INTEGER,PARAMETER::idiag_bio_fspPOC                    = 21    !
   INTEGER,PARAMETER::idiag_bio_DOMlifetime               = 22    !
+  INTEGER,PARAMETER::idiag_bio_frac_Fe2                  = 23    !
   ! diagnostics - OLD
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNO3        = 01    !
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNH4        = 02    !
@@ -917,7 +918,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_iron_L                        = 03    !
   INTEGER,PARAMETER::idiag_iron_TDFe                     = 04    !
   INTEGER,PARAMETER::idiag_iron_TL                       = 05    !
-  INTEGER,PARAMETER::idiag_iron_Fe3                      = 06    !
+  INTEGER,PARAMETER::idiag_iron_Fe2                      = 06    !
   INTEGER,PARAMETER::idiag_iron_geo                      = 07    !
   ! diagnostics - geochemistry -- solid-solute reactions
   INTEGER,PARAMETER::idiag_react_POMS_dH2S               = 01    !
@@ -1018,7 +1019,8 @@ MODULE biogem_lib
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
        & 'fspPOC        ', &
-       & 'DOMlifetime   ' /)
+       & 'DOMlifetime   ', &
+       & 'frac_Fe2      ' /)
   ! diagnostics - geochemistry -- OLD
   CHARACTER(len=14),DIMENSION(n_diag_geochem_old),PARAMETER::string_diag_geochem_old = (/ &
        & 'dNO3_NH4_oxid ', &
@@ -1047,7 +1049,7 @@ MODULE biogem_lib
        & 'iron_L            ', &
        & 'iron_TDFe         ', &
        & 'iron_TL           ', &
-       & 'iron_Fe3          ', &
+       & 'iron_Fe2          ', &
        & 'iron_geo          ' /)
   ! diagnostics - geochemistry -- solid-solute reactions
   CHARACTER(len=20),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &

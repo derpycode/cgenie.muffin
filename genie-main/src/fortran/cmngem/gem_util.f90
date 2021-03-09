@@ -73,6 +73,7 @@ CONTAINS
     conv_sed_ocn(io_O2,is_POC)                   = -1.0
     conv_sed_ocn(io_O2,is_PON)                   = -1.0
     conv_sed_ocn(io_O2,is_POP)                   = -1.0
+    conv_sed_ocn(io_O2,is_POFe)                  = 0.0 ! assume by default, no exchange of O2 with Fe uptake/release
     conv_sed_ocn(io_Cd,is_POCd)                  = 1.0
     conv_sed_ocn(io_Cd_114Cd,is_POCd_114Cd)      = 1.0
     conv_sed_ocn(io_I,is_POI)                    = 1.0
