@@ -1079,16 +1079,18 @@ CONTAINS
                             loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
                             loc_unitsname  = 'mol kg-1'
                          CASE (io_col7)
-                            loc_tot        = int_ocn_timeslice(io_col0,i,j,k)/int_t_timeslice
-                            loc_frac       = int_ocn_timeslice(io_col7,i,j,k)/int_t_timeslice
-                            loc_standard   = const_standards(ocn_type(io_DIC_13C))
-                            loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
-                            loc_unitsname  = 'o/oo'
+                            if (ocn_select(io_col0)) then
+                               loc_tot        = int_ocn_timeslice(io_col0,i,j,k)/int_t_timeslice
+                               loc_frac       = int_ocn_timeslice(io_col7,i,j,k)/int_t_timeslice
+                               loc_standard   = const_standards(ocn_type(io_DIC_13C))
+                               loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                               loc_unitsname  = 'o/oo'
+                            end if
                          CASE (io_col8)
                             if (ocn_select(io_DIC_14C)) then
                                loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
                                loc_unitsname  = 'yrs'
-                            else
+                            elseif (ocn_select(io_col9)) then
                                loc_tot        = int_ocn_timeslice(io_col9,i,j,k)/int_t_timeslice
                                loc_frac       = int_ocn_timeslice(io_col8,i,j,k)/int_t_timeslice
                                loc_standard   = const_standards(ocn_type(io_DIC_13C))
@@ -1123,19 +1125,21 @@ CONTAINS
                    if (ocn_select(io_SiO2))    loc_name = 'diag_pre_'//trim(string_ocn(io_SiO2))
                 CASE (io_col7)
                    if (ocn_select(io_DIC_13C)) loc_name = 'diag_pre_'//trim(string_ocn(io_DIC_13C))
+                   if (.NOT. ocn_select(io_col0)) loc_save = .false.
                 CASE (io_col8)
                    if (ocn_select(io_DIC_14C)) then
                       loc_name = 'diag_pre_d14C_age'
                    else
                       loc_name = 'diag_reg_Csoft_d13C'
                       if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
+                      if (.NOT. ocn_select(io_col9)) loc_save = .false.
                    end if
                 CASE (io_col9)
-                   if (ocn_select(io_DIC))     loc_name = 'diag_reg_Csoft'
+                   if (ocn_select(io_DIC)) loc_name = 'diag_reg_Csoft'
                    if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
                 end select
                 ! write to netCDF
-                if (.NOT. ctrl_bio_remin_redox_save) then
+                if (loc_save) then
                    call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
                         & trim(loc_unitsname),const_real_zero,const_real_zero)
                    call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)

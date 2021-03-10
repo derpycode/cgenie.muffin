@@ -1043,7 +1043,8 @@ CONTAINS
                    loc_filename=fun_data_timeseries_filename( &
                         & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d13C',string_results_ext &
                         & )
-                   loc_string = '% time (yr) / global total preformed 13C (mol) / global mean (o/oo)'
+                   loc_string = '% time (yr) / global total preformed 13C (mol) / d13C (o/oo)'
+                   if (.NOT. ocn_select(io_col0)) loc_save = .false.
                 end if
              CASE (io_col8)
                 if (ocn_select(io_DIC_14C)) then
@@ -1051,13 +1052,13 @@ CONTAINS
                    loc_filename=fun_data_timeseries_filename( &
                         & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_d14C',string_results_ext &
                         & )
-                   loc_string = '% time (yr) / global total preformed 14C (mol) / global mean (o/oo)'
+                   loc_string = '% time (yr) / global total preformed 14C (mol) / d14C (o/oo)'
                 else
                    loc_save = .true.
                    loc_filename=fun_data_timeseries_filename( &
                         & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft_d13C',string_results_ext &
                         & )
-                   loc_string = '% time (yr) / global total regenerated Csoft 13C (mol) / global mean (o/oo)'
+                   loc_string = '% time (yr) / global total regenerated Csoft 13C (mol) / d13C (o/oo)'
                    if ((.NOT. ctrl_bio_remin_redox_save) .OR. (.NOT. ocn_select(io_col9))) loc_save = .false.
                 end if
              CASE (io_col9)
@@ -1131,11 +1132,12 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end if
        ! (4)
-       if (ocn_select(io_col8) .AND. ocn_select(io_col7) .AND. (.NOT. ocn_select(io_DIC_14C))) then
+       if (ocn_select(io_col9) .AND. ocn_select(io_col0) .AND. ocn_select(io_col8) .AND. ocn_select(io_col7) .AND. &
+            & (.NOT. ocn_select(io_DIC_14C))) then
           loc_filename=fun_data_timeseries_filename( &
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13Csoftpre13C',string_results_ext &
                & )
-          loc_string = '% time (yr) / global total Csoft 13C + pre 13C (mol) / global mean (mol kg-1)'
+          loc_string = '% time (yr) / global total Csoft 13C + pre 13C (mol) / d13C (o/oo)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2849,18 +2851,20 @@ CONTAINS
                         & loc_sig
                    call check_iostat(ios,__LINE__,__FILE__)
                 CASE (io_col7)
-                   loc_tot  = int_ocn_sig(io_col0)/int_t_sig
-                   loc_frac = int_ocn_sig(io_col7)/int_t_sig
-                   loc_standard = const_standards(ocn_type(io_DIC_13C))
-                   loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
-                   call check_unit(out,__LINE__,__FILE__)
-                   OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-                   call check_iostat(ios,__LINE__,__FILE__)
-                   WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
-                        & loc_t, &
-                        & loc_frac, &
-                        & loc_sig
-                   call check_iostat(ios,__LINE__,__FILE__)
+                   if (ocn_select(io_col0)) then 
+                      loc_tot  = int_ocn_sig(io_col0)/int_t_sig
+                      loc_frac = int_ocn_sig(io_col7)/int_t_sig
+                      loc_standard = const_standards(ocn_type(io_DIC_13C))
+                      loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
+                      call check_unit(out,__LINE__,__FILE__)
+                      OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                      call check_iostat(ios,__LINE__,__FILE__)
+                      WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+                           & loc_t, &
+                           & loc_ocn_tot_M*loc_frac, &
+                           & loc_sig
+                      call check_iostat(ios,__LINE__,__FILE__)
+                   end if
                 CASE (io_col8)
                    if (ocn_select(io_col9) .AND. (.NOT. ocn_select(io_DIC_14C))) then
                       loc_tot  = int_ocn_sig(io_col9)/int_t_sig
@@ -2872,7 +2876,7 @@ CONTAINS
                       call check_iostat(ios,__LINE__,__FILE__)
                       WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
                            & loc_t, &
-                           & loc_frac, &
+                           & loc_ocn_tot_M*loc_frac, &
                            & loc_sig
                       call check_iostat(ios,__LINE__,__FILE__)
                    end if
@@ -2926,11 +2930,12 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end if
        ! (3)
+       ! NOTE: remember that par_bio_red_POP_PO2 is NEGATIVE ...
        if (ocn_select(io_col9) .AND. ocn_select(io_col2)) then
           loc_filename=fun_data_timeseries_filename( &
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_O2softpreO2',string_results_ext &
                & )
-          loc_sig = (int_ocn_sig(io_col2) - par_bio_red_POP_PO2*int_ocn_sig(io_col9)/par_bio_red_POP_POC)/int_t_sig
+          loc_sig = (int_ocn_sig(io_col2) + par_bio_red_POP_PO2*int_ocn_sig(io_col9)/par_bio_red_POP_POC)/int_t_sig
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2943,17 +2948,21 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end if
        ! (4)
-       if (ocn_select(io_col8) .AND. ocn_select(io_col7) .AND. (.NOT. ocn_select(io_DIC_14C))) then
+       if (ocn_select(io_col9) .AND. ocn_select(io_col0) .AND. ocn_select(io_col8) .AND. ocn_select(io_col7) .AND. &
+            & (.NOT. ocn_select(io_DIC_14C))) then
           loc_filename=fun_data_timeseries_filename( &
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13Csoftpre13C',string_results_ext &
                & )
-          loc_sig = (int_ocn_sig(io_col8) + int_ocn_sig(io_col7))/int_t_sig
+          loc_tot  = (int_ocn_sig(io_col9) + int_ocn_sig(io_col0))/int_t_sig
+          loc_frac = (int_ocn_sig(io_col8) + int_ocn_sig(io_col7))/int_t_sig
+          loc_standard = const_standards(ocn_type(io_DIC_13C))
+          loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)        
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
-          WRITE(unit=out,fmt='(f12.3,2e15.7)',iostat=ios) &
+          WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
                & loc_t,                                   &
-               & loc_ocn_tot_M*loc_sig,                   &
+               & loc_ocn_tot_M*loc_frac,                  &
                & loc_sig
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)

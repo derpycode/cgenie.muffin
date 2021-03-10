@@ -1991,10 +1991,10 @@ CONTAINS
                    bio_remin(io,dum_i,dum_j,n_k) = &
                         & const_lamda_14C_libby*log( (loc_d14Catm+1000.0)/(loc_d14Cocn+1000.0) ) - loc_ocn(io)
                 else
-                   if (ocn_select(io_DIC_13C)) bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)                  
+                   bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)                  
                 end if
              CASE (io_col9)
-                if (ocn_select(io_DIC)) bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)
+                bio_remin(io,dum_i,dum_j,n_k) = 0.0 - loc_ocn(io)
              end select
           end if
        end do
@@ -2641,9 +2641,10 @@ CONTAINS
     integer::loc_i,loc_j,loc_k1
     real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                       !
     CHARACTER(len=31)::loc_string     !
-
-    real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
-    allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
+    real,DIMENSION(n_diag_redox,n_k)::loc_diag_redox
+!!$    ! define and allocate local arrays
+!!$    real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
+!!$    allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
 
     ! *** INITIALIZE VARIABLES ***
     ! set local grid point (i,j) information
@@ -2777,8 +2778,8 @@ CONTAINS
     diag_bio(idiag_bio_DOMlifetime,loc_i,loc_j) = dum_dtyr*loc_bio_remin_DOMlifetime
     ! write ocean tracer remineralization field (global array)
     dum_vbio_remin%mk(:,:) = loc_vbio_remin(:,:)
-    ! deallocate local arrays
-    DEALLOCATE(loc_diag_redox,STAT=alloc_error)
+!!$    ! deallocate local arrays
+!!$    DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
   end SUBROUTINE sub_box_remin_DOM
   ! ****************************************************************************************************************************** !
@@ -2835,9 +2836,10 @@ CONTAINS
     real,dimension(1:n_l_sed)::loc_bio_part_remin
     real,DIMENSION(n_diag_precip,n_k)::loc_diag_precip
     CHARACTER(len=31)::loc_string     !
-    ! define and allocate local arrays
-    real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
-    allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
+    real,DIMENSION(n_diag_redox,n_k)::loc_diag_redox
+!!$    ! define and allocate local arrays
+!!$    real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
+!!$    allocate(loc_diag_redox(n_diag_redox,n_k),STAT=alloc_error)
 
     ! *** INITIALIZE VARIABLES ***
     !
@@ -3794,8 +3796,8 @@ CONTAINS
     dum_vbio_part%mk(:,:) = loc_bio_part(:,:)
     ! write ocean tracer remineralization field (global array)
     dum_vbio_remin%mk(:,:) = dum_vbio_remin%mk(:,:) + loc_bio_remin(:,:)
-    ! deallocate local arrays
-    DEALLOCATE(loc_diag_redox,STAT=alloc_error)
+!!$    ! deallocate local arrays
+!!$    DEALLOCATE(loc_diag_redox,STAT=alloc_error)
 
   END SUBROUTINE sub_box_remin_part
   ! ****************************************************************************************************************************** !

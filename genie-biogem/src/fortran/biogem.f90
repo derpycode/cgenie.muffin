@@ -557,6 +557,12 @@ subroutine biogem(        &
                           locij_fsedocn(io_col9,i,j) = locij_fsedocn(io_col9,i,j) + &
                                & phys_ocn(ipo_M,i,j,loc_k1)*diag_redox(id,i,j,loc_k1)
                        end if
+                       if (ocn_select(io_col8) .AND. (.NOT. ocn_select(io_DIC_14C)))then
+                          loc_string = 'reminP_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
+                          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                          locij_fsedocn(io_col8,i,j) = locij_fsedocn(io_col8,i,j) + &
+                               & phys_ocn(ipo_M,i,j,loc_k1)*diag_redox(id,i,j,loc_k1)
+                       end if
                     end if
                  end If ! [(flag_sedgem)]
                  ! prevent return of dissolved Fe?
