@@ -1380,7 +1380,7 @@ CONTAINS
                       loc_frac = int_ocn_timeslice(io_col8,i,j,k)
                       loc_standard = const_standards(ocn_type(io_DIC_13C))
                       loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
-                      loc_ijk(i,j,k) = loc_ijk(i,j,k) *int_ocn_timeslice(io_col9,i,j,k)/int_ocn_timeslice(io_DIC,i,j,k)
+                      loc_ijk(i,j,k) = loc_ijk(i,j,k)*int_ocn_timeslice(io_col9,i,j,k)/int_ocn_timeslice(io_DIC,i,j,k)
                    END DO
                 END DO
              END DO

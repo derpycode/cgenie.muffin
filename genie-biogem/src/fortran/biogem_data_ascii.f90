@@ -1088,6 +1088,7 @@ CONTAINS
     ! (2) Csoft*(P/C) + pre PO4 (should be equal to PO4) (io_col9 + io_col3)
     ! (3) -Csoft*(P/C)*(O2/P) + pre O2 (should be equal to O2) (io_col9 + io_col2)
     ! (4) Csoft 13C + pre 13C (should be equal to DIC 13C in the absence of CaCO3 DIC 13C release)
+    ! (5) Csoft d13C -- contribution of d13C(DIC) that is from Csoft (rather than the d13C of remin Corg itself) 
     IF (ctrl_data_save_sig_diag .AND. ctrl_bio_preformed .AND. ctrl_bio_remin_redox_save) THEN
        ! (1)
        if (ocn_select(io_col9) .AND. ocn_select(io_col0)) then
@@ -1138,6 +1139,22 @@ CONTAINS
                & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13Csoftpre13C',string_results_ext &
                & )
           loc_string = '% time (yr) / global total Csoft 13C + pre 13C (mol) / d13C (o/oo)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       ! (5)
+       ! NOTE: calculate the d13C contribution of Csoft to DIC
+       if (ocn_select(io_col9) .AND. ocn_select(io_col8) .AND. &
+            & (.NOT. ocn_select(io_DIC_14C))) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13Csoft',string_results_ext &
+               & )
+          loc_string = '% time (yr) / global total Csoft 13C (mol) / Dd13C (contribution to DIC d13C) (o/oo)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2894,6 +2911,7 @@ CONTAINS
     ! (2) Csoft*(P/C) + pre PO4 (should be equal to PO4) (io_col9 + io_col3)
     ! (3) -Csoft*(P/C)*(O2/P) + pre O2 (should be equal to O2) (io_col9 + io_col2)
     ! (4) Csoft d13C + pre d13C (should be equal to DIC d13C in the absence of CaCO3 DIC 13C release)
+    ! (5) Csoft d13C -- contribution of d13C(DIC) that is from Csoft (rather than the d13C of remin Corg itself) 
     IF (ctrl_data_save_sig_diag .AND. ctrl_bio_preformed .AND. ctrl_bio_remin_redox_save) THEN
        ! (1)
        if (ocn_select(io_col9) .AND. ocn_select(io_col0)) then
@@ -2957,6 +2975,29 @@ CONTAINS
           loc_frac = (int_ocn_sig(io_col8) + int_ocn_sig(io_col7))/int_t_sig
           loc_standard = const_standards(ocn_type(io_DIC_13C))
           loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)        
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+               & loc_t,                                   &
+               & loc_ocn_tot_M*loc_frac,                  &
+               & loc_sig
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       ! (5)
+       ! NOTE: calculate the d13C contribution of Csoft to DIC
+       if (ocn_select(io_col9) .AND. ocn_select(io_col8) .AND. &
+            & (.NOT. ocn_select(io_DIC_14C))) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13Csoft',string_results_ext &
+               & )
+          loc_tot  = int_ocn_sig(io_col9)/int_t_sig
+          loc_frac = int_ocn_sig(io_col8)/int_t_sig
+          loc_standard = const_standards(ocn_type(io_DIC_13C))
+          loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
+          loc_sig = loc_sig*int_ocn_sig(io_col9)/int_ocn_sig(io_DIC)
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
