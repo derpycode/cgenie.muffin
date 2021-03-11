@@ -70,6 +70,9 @@ CONTAINS
        print*,'# sedimentary stack sub-layers                      : ',n_sed_tot
        print*,'# initial sedimentary stack sub-layers filled       : ',n_sed_tot_init
        print*,'# sedimentary stack sub-layers to drop off bottom   : ',n_sed_tot_drop
+       ! --- DETRITAL CONFIGURATION ---------------------------------------------------------------------------------------------- !
+       print*,'Flux of refractory material (g cm-2 kyr-1)          : ',par_sed_fdet
+       print*,'No pelagic (dust) detrital contribution?            : ',ctrl_sed_det_NOdust
        ! --- DIAGENESIS SCHEME: SELECTION ---------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: SELECTION -------------------'
        print*,'CaCO3 diagenesis scheme                             : ',par_sed_diagen_CaCO3opt
@@ -82,7 +85,6 @@ CONTAINS
        print*,'maximum layer depth for bioturbation                : ',par_n_sed_mix
        print*,'Max surface bioturbation mixing rate (cm2 yr-1)     : ',par_sed_mix_k_sur_max
        print*,'Min surface bioturbation mixing rate (cm2 yr-1)     : ',par_sed_mix_k_sur_min
-       print*,'Flux of refractory material (g cm-2 kyr-1)          : ',par_sed_fdet
        print*,'Prevent CaCO3 erosion (Fdis > Fsed)?                : ',ctrl_sed_noerosion
        print*,'CaCO3 interface dissolution?                        : ',ctrl_sed_interface
        print*,'CaCO3 red tracer tag fraction                       : ',par_sed_CaCO3_fred
@@ -108,6 +110,10 @@ CONTAINS
        print*,'refractory Corg deg. rate order compared to labile  : ',par_sed_huelse2017_k2_order
        print*,'anoxic refractory Corg deg. rate constant (1/yr)    : ',par_sed_huelse2017_k2_anoxic
        print*,'Include explicit P-cycle in OMEN-SED?               : ',par_sed_huelse2017_P_cycle
+       print*,'Remove implicit Alk associated with buried sulf-OM? : ',par_sed_huelse2017_remove_impl_sulALK
+       print*,'Simulate ocean Porg loss with buried sulf-OM?       : ',par_sed_huelse2017_sim_P_loss
+       print*,'Simulate ocean Porg loss related to Corg burial?    : ',par_sed_huelse2017_sim_P_loss_pres_fracC
+       print*,'Simulate increased P-regeneration under anoxia?     : ',par_sed_huelse2017_sim_P_regeneration
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
@@ -162,6 +168,7 @@ CONTAINS
        print*,'Li low-T alteration sink 7Li epsilon (o/oo)         : ',par_sed_lowTalt_7Li_epsilon
        print*,'Li clay formation sink (mol yr-1) (Li/Ca norm)      : ',par_sed_clay_fLi_alpha
        print*,'Li clay formation sink 7Li epsilon (o/oo)           : ',par_sed_clay_7Li_epsilon
+       print*,'fixed (non T-dependent) MACC 7Li epsilon?           : ',ctrl_sed_clay_7Li_epsilon_fixed
        print*,'hydrothermal Ca flux (mol yr-1)                     : ',par_sed_hydroip_fCa
        print*,'hydrothermal Ca flux d44Ca (o/oo)                   : ',par_sed_hydroip_fCa_d44Ca
        print*,'hydrothermal Mg flux (mol yr-1)                     : ',par_sed_hydroip_fMg
@@ -216,6 +223,7 @@ CONTAINS
        print*,'Report errors?                                      : ',ctrl_misc_report_err
        print*,'i sediment coordinate for debug reporting           : ',par_misc_debug_i
        print*,'j sediment coordinate for debug reporting           : ',par_misc_debug_j
+       print*,'Report level #1 debug?                              : ',ctrl_debug_lvl1
        ! --- DATA SAVING: MISC --------------------------------------------------------------------------------------------------- !
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst
@@ -2123,6 +2131,9 @@ CONTAINS
 
              ! *** (j) calculate D14C and radiocarbon age
              !         NOTE: this will be saved regardless of whether 14C is a included tracer in the model or not ...
+             ! NOTE: rather than trying to obtain and pass atmospheric D14C, 
+             !       a dummy pre-industrila value of 0.0 is passed instead to fun_convert_D14Ctoage
+             !       (a recent code change/correction added atmospheric D14C to the calculation of radiocarbon age)
              loc_sed_save_CaCO3_D14C(i,j,:) = const_real_zero
              loc_sed_save_age_14C(i,j,:) = const_real_zero
              if (sed_select(is_CaCO3_14C)) then
@@ -2131,7 +2142,7 @@ CONTAINS
                       loc_sed_save_CaCO3_D14C(i,j,o) = &
                            & fun_convert_delta14CtoD14C(loc_sed_save(is_CaCO3_13C,i,j,o),loc_sed_save(is_CaCO3_14C,i,j,o))
                       loc_sed_save_age_14C(i,j,o) = &
-                           & fun_convert_D14Ctoage(loc_sed_save_CaCO3_D14C(i,j,o))
+                           & fun_convert_D14Ctoage(loc_sed_save_CaCO3_D14C(i,j,o),0.0)
                    end if
                 end DO
              end if

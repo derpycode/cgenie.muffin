@@ -226,6 +226,7 @@ c     namelist for reading initialisation data
       NAMELIST /ini_gold_nml/ctrl_diagend,ctrl_diagmld
       NAMELIST /ini_gold_nml/saln0
       NAMELIST /ini_gold_nml/rst_reset_T
+      NAMELIST /ini_gold_nml/par_dsc,par_dk
 
 c ------------------------------------------------------------ c
 c INITIALIZE VARIABLES
@@ -363,7 +364,8 @@ c dimensional scale values
 
       usc = 0.05
       rsc = 6.37e6
-      dsc = 5e3
+c      dsc = 5e3
+      dsc = par_dsc
       fsc = 2*7.2921e-5
       gsc = 9.81
       rh0sc = 1e3
@@ -507,8 +509,10 @@ c initialize
 
 c set up grid
 c For variable (exponential) dz use ez0 > 0, else use ez0 < 0
+c NOTE: set scale depth using adjusted value of kmax
+c       (Additional ocean layers (deeper than go_par_dsc) == par_dk)
       ez0 = 0.1
-      z1 = ez0*((1.0 + 1/ez0)**(1.0/kmax) - 1.0)
+      z1 = ez0*((1.0 + 1/ez0)**(1.0/(kmax-par_dk)) - 1.0)
       if (debug_init) print*,'z1',z1
       tv4 = ez0*((z1/ez0+1)**0.5-1)
       tv2 = 0

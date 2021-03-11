@@ -95,7 +95,8 @@ crma      real rc(0:maxj),rcv(0:maxj),rdphi,rds,cv2(0:maxj),rc2(0:maxj)
 crma     1 ,rtv(maxi,maxj),rtv3(maxi,maxj),rdz(maxk),rdza(maxk)
 crma      common /ocn_recips/rc,rcv,rdphi,rds,cv2,rc2,rtv,rtv3,rdz,rdza
 crma      real rc(0:maxj),rcv(1:maxj-1),rdphi,rds(maxj),rdsv(0:maxj-1)
-      real rc(0:maxj),rcv(1:maxj-1),rdphi,rds(maxj),rdsv(1:maxj-1)
+      real rc(0:maxj),rcv(1:maxj),rdphi,rds(maxj),rdsv(1:maxj-1)
+cajr  real rc(0:maxj),rcv(1:maxj-1),rdphi,rds(maxj),rdsv(1:maxj-1)
      & ,cv2(1:maxj-1)
      1 ,rc2(0:maxj),rtv(maxi,maxj),rtv3(maxi,maxj),rdz(maxk),rdza(maxk)
       common /recips/rc,rcv,rdphi,rds,rdsv,cv2,rc2,rtv,rtv3,rdz,rdza
@@ -308,9 +309,13 @@ c AR (18/01/08) : run-time seasonality option
 c AR (13/06/08) : diagend CALL option
 c AR (14/11/02) : option to reset ocean T
 c AR (17/11/30) : option to diagnose (only) MLD
+c AR (19/01/29) : added ocean depth (max)
+c AR (20/03/09) : added number of additional deep ocean levels
 
       logical dosc,diso,ctrl_diagend,debug_init,debug_end,debug_loop,
      1 rst_reset_T,ctrl_diagmld
       common /goldstein_ctrl/dosc,diso,ctrl_diagend,
      : debug_init,debug_end,debug_loop,
      : rst_reset_T,ctrl_diagmld
+      real par_dsc,par_dk
+      common /goldstein_ctrl/par_dsc,par_dk

@@ -214,16 +214,20 @@ CONTAINS
              end if
           end if
        end DO
-       ! set fractional flux of POC available for CaCO3 diagenesis
+       ! set flux fraction of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = loc_dis_sed(is_POC)
     case ('dunne2007')
        ! Following Dunne et al. [2007]
-       ! NOTE: the units of the Corg flux must be changed from (cm3 cm-2) to (mol cm-2 yr-1) and then to (mmol m-2 d-1)
+       ! NOTE: the units of the Corg flux must be changed from (cm3 cm-2) to (mol C cm-2 yr-1) and then to (mmol C m-2 d-1)
+       !       (convert cm3 -> mol then mol -> mmol)*(convert cm-2 -> m-2)/(convert timestep (yrs) -> d)
+       ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
+       ! NOTE: apply par_sed_diagen_fracC2Ppres_ox to determine whether P is preferentially remineralized or not
+       !       (a value of zero will ensure that 100% of P is returned)
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           if ( &
@@ -234,12 +238,17 @@ CONTAINS
              if (sed_type(is) == par_sed_type_scavenged) then
                 loc_dis_sed(is) = 0.0
              else
-                loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
-                loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
+                select case (is)
+                case (is_POP)
+                   loc_sed_dis_frac = 1.0 - par_sed_diagen_fracC2Ppres_ox*loc_sed_pres_fracC
+                case default
+                   loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
+                end select
+                loc_dis_sed(is)  = loc_sed_dis_frac*loc_new_sed(is)
              end if
           end if
        end DO
-       ! set fractional flux of POC available for CaCO3 diagenesis
+       ! set flux fraction of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = loc_dis_sed(is_POC)
     case ('huelse2016')
        ! Huelse et al. [2016]
@@ -249,7 +258,7 @@ CONTAINS
             & loc_new_sed(:),sed_fsed(is_POC_frac2,dum_i,dum_j),dum_sfcsumocn(:), &
             & loc_sed_pres_fracC,loc_sed_pres_fracP,loc_exe_ocn(:),loc_sed_mean_OM_top, loc_sed_mean_OM_bot &
             & )
-       ! set fractional flux of POC available for CaCO3 diagenesis
+       ! set flux fraction of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = (1.0 - loc_sed_pres_fracC)*loc_new_sed(is_POC)
        ! calculate the return rain flux back to ocean
        ! NOTE: diagenetic function calculates all (dissolved) exchange fluxes
@@ -966,7 +975,7 @@ CONTAINS
     ! NOTE: use (i.e. set non-zero) ONLY ONE of par_bio_red_CaCO3_LiCO3 and par_bio_red_CaCO3_LiCO3_alpha
     !       (they represent 2 and mutuially exclusive ways of doing it)
     if (ocn_select(io_Li) .AND. ocn_select(io_Ca) .AND. sed_select(is_LiCO3)) then
-       sed_fsed(is_LiCO3,dum_i,dum_j) = sed_fsed(is_LiCO3,dum_i,dum_j)* &
+       sed_fsed(is_LiCO3,dum_i,dum_j) = sed_fsed(is_CaCO3,dum_i,dum_j)* &
             & (par_bio_red_CaCO3_LiCO3 + par_bio_red_CaCO3_LiCO3_alpha*dum_sfcsumocn(io_Li)/dum_sfcsumocn(io_Ca))
     end if
     ! calculate 7/6Li fractionation between Li and LiCO3
@@ -1453,12 +1462,16 @@ CONTAINS
        end DO
     case ('dunne2007')
        ! Following Dunne et al. [2007]
-       ! NOTE: the units of the Corg flux must be changed from (cm3 cm-2) to (mol cm-2 yr-1) and then to (mmol m-2 d-1)
+       ! NOTE: the units of the Corg flux must be changed from (cm3 cm-2) to (mol C cm-2 yr-1) and then to (mmol C m-2 d-1)
+       !       (convert cm3 -> mol then mol -> mmol)*(convert cm-2 -> m-2)/(convert timestep (yrs) -> d)
+       ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
+       ! NOTE: apply par_sed_diagen_fracC2Ppres_ox to determine whether P is preferentially remineralized or not
+       !       (a value of zero will ensure that 100% of P is returned)
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           if ( &
@@ -1469,8 +1482,13 @@ CONTAINS
              if (sed_type(is) == par_sed_type_scavenged) then
                 loc_dis_sed(is) = 0.0
              else
-                loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
-                loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
+                select case (is)
+                case (is_POP)
+                   loc_sed_dis_frac = 1.0 - par_sed_diagen_fracC2Ppres_ox*loc_sed_pres_fracC
+                case default
+                   loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
+                end select
+                loc_dis_sed(is)  = loc_sed_dis_frac*loc_new_sed(is)
              end if
           end if
        end DO

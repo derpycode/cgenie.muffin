@@ -225,6 +225,9 @@ c JDA adding some variables relating to the forcing
       real co2lev,solar,vol,aero
       character header*40
 c     radiative forcing terms
+      real co2_term
+c ML  state dependent climate sensitivity
+      real co2_t1, co2_t2, co2_t3, co2_t4, co2_t5
       real ch4_term,n2o_term
       real ch4_func
 
@@ -795,6 +798,18 @@ c     calculate coefficients
             tv1 = b01 + rq*(b11 + b21*rq)
             tv2 = b02 + rq*(b12 + b22*rq)
             tv3 = b03 + rq*(b13 + b23*rq)
+c     calculate CO2 contribution
+c MLI (16/09/20) State dependent climate sensitivity
+            if(opt_delf2x_cesm) then
+               co2_t1 = co2(i,j)*1e6
+               co2_t2 = (7.58434074655/1e10) * (co2_t1**(3.))
+               co2_t3 = (3.25968011260/1e6) * (co2_t1**(2.))
+               co2_t4 = 0.0054526683 * co2_t1 + 4.446262989
+               co2_t5 = co2_t2 - co2_t3 + co2_t4
+               co2_term = co2_t5 * log(co2(i,j)/co20)
+            else
+               co2_term = delf2x*log(co2(i,j)/co20)
+            endif
 c     calculate CH4 and N2O contributions
 c     NOTE units are ppb for CH4 and N2O calculation
             ch4_term = 
@@ -811,16 +826,14 @@ c pbh talt dependence removed for olr (orography only affects surface proceses n
                fxplw(i,j) = tv0 + talt*(tv1 
      1              + talt*(tv2 
      2              + talt*tv3))
-     3              - delf2x*log(co2(i,j)/co20)
-     4              - ch4_term - n2o_term
+     3              - co2_term - ch4_term - n2o_term
      5              + olr_adj*(meantemp-t_eqm)
      6              - olr_adj0
             else
                fxplw(i,j) = tv0 + atemp(i,j)*(tv1 
      1              + atemp(i,j)*(tv2 
      2              + atemp(i,j)*tv3))
-     3              - delf2x*log(co2(i,j)/co20)
-     4              - ch4_term - n2o_term
+     3              - co2_term - ch4_term - n2o_term
      5              + olr_adj*(meantemp-t_eqm)
      6              - olr_adj0
             endif
@@ -867,7 +880,7 @@ c-----------------------------------------------------------------------
 c AY (18/12/03) : standard c-GOLDSTEIN sea-ice routine
 c                 would be nice to include dummy routine as well
                if(sica(i,j).gt.0.0)then
-c              * Sea-ice present *                 
+c              * Sea-ice present *       
 
 c let albedo over sea ice vary as a function of tair (Holland et al. 1993)
 
@@ -1634,6 +1647,10 @@ ccc            if (flag_ents) then
                eb_uv(2,i,j)  = usc*uatm(2,i,j)
                eb_usurf(i,j) = usurf(i,j)
 c     eb_relh(i,j) = real(relh(i,j))
+cccc SHELF SOLAR RADIATION HACK
+ccc               if(k1(i,j).ne.kmax) then
+ccc                  go_fxsw(i,j) = 0.0
+ccc               endif
 ccc            endif
          enddo
       enddo

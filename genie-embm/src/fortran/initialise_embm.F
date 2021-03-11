@@ -124,7 +124,7 @@ c                 files
       character xv_wstress*127, yv_wstress*127
       integer   len_xu, len_yu, len_xv, len_yv
 
-      character u_wspeed*20, v_wspeed*20
+      character u_wspeed*127, v_wspeed*127
       integer   len_uws, len_vws
 
 c AY (09/01/04) : local variables reinstated
@@ -279,6 +279,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/par_albedo1d_name,par_albedo2d_name
       NAMELIST /ini_embm_nml/par_orbit_osce,par_orbit_oscsob
       NAMELIST /ini_embm_nml/par_orbit_oscgam,par_orbit_osctau0
+      NAMELIST /ini_embm_nml/opt_delf2x_cesm
 
 c ------------------------------------------------------------ c
 c INITIALIZE VARIABLES
@@ -1047,7 +1048,7 @@ c disastrous).
 c           uatm(2,i,j) = uatm(2,i,j)*0.0
          enddo
          if (par_wind_polar_avg.ne.1.and.par_wind_polar_avg.ne.2) then 
-         uatm(2,i,jmax) = 0.
+            uatm(2,i,jmax) = 0.
          endif
       enddo
       else
@@ -1059,6 +1060,7 @@ c           uatm(2,i,j) = uatm(2,i,j)*0.0
             enddo
          enddo
       endif
+c [endif of: if (.not.flag_wind) then]
 
 c parameters for extra heat diffusion where pptn high
 
@@ -1124,7 +1126,7 @@ c T diffusion by input params and make sure q diff is no bigger
 c only if constant lat grid (i.e. allowing compatibility with 36x36 version)
 
 crma      if(ldeg)then
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
          diffa(2,1,j) = min(diffa(2,1,j),diffa(1,1,j))
       endif
          if (debug_init.and.(j.gt.1))write(6,'(i4,4e15.5)')j,
@@ -1335,7 +1337,7 @@ c in north Atlantic (north of 24 deg N) NB INCLUDES DRY POINTS
 
       endif
 
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
 
       area_pac1a = 0.
       area_atl1a = 0.
@@ -1459,7 +1461,7 @@ crma If 36x36s ...
 
 ccc If 64x32 or 64x32l ...
 
-      if(igrid.eq.1.or.igrid.eq.2)then
+      if((igrid.eq.1).or.(igrid.eq.2))then
 
       do j=j1as,(j1bs-1)
          do i=ips(j),ipf(j)
@@ -1709,18 +1711,27 @@ c pbh read in time varying orbital forcing
 c AR (14/10/08) -- input format changed to 5 column format (time first)
 c AR (14/10/08) -- also re-order time(!)
       if(orbit_radfor.eq."y".or.orbit_radfor.eq."Y") then
-        open(unit=729,file=indir_name(1:lenin)// 
-     $ trim(filenameorbit),iostat=ios)
-        do i=1,norbit
-           read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
-        enddo
-        close(729)
-        do i=1,norbit
-           orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
-           orbitobl_vect(norbit-i+1) = orbitall_vect(i,3)
-           orbitpre_vect(norbit-i+1) = orbitall_vect(i,4)
-           orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
-        enddo
+        inquire(file=indir_name(1:lenin)//trim(filenameorbit),
+     $ exist=ioex)
+        if (ioex) then
+          open(unit=729,file=indir_name(1:lenin)//trim(filenameorbit),
+     $ iostat=ios)
+          do i=1,norbit
+             read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
+          enddo
+          close(729)
+          do i=1,norbit
+            orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
+            orbitobl_vect(norbit-i+1) = orbitall_vect(i,3)
+            orbitpre_vect(norbit-i+1) = orbitall_vect(i,4)
+            orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
+          enddo
+        else
+          print*,''
+          print*,' *** Missing file: '//
+     $ indir_name(1:lenin)//trim(filenameorbit)
+          stop
+        endif
       endif
 c end pbh
 

@@ -40,16 +40,28 @@ CONTAINS
 if (ctrl_debug_init > 0) then
     ! --- TRACER SELECTION  ------------------------------------------------------------------------------------------------------ !
     ! NOTE: reported at end of initialise_gem when tracer name information is available
-    ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
-    print*,'--- MISC CONTROLS ---'
-    print*,'assumed longitudinal offset of the grid             : ',par_grid_lon_offset
+    ! --- GEOCHEM CONTROLS ------------------------------------------------------------------------------------------------------- !
+    print*,'--- GEOCHEM CONTROLS ---'
     print*,'carbonate dissociation constants set                : ',trim(par_carbconstset_name)
     print*,'pH solution tolerance                               : ',par_carbchem_pH_tolerance
     print*,'pH solution maximum number of iterations            : ',par_carbchem_pH_iterationmax
-    print*,'Exit upon pH solution failure?                      : ',ctrl_carbchem_fail
+    print*,'Attempt pH re-seed if solution fails (else exit)?   : ',ctrl_carbchem_pHseed_retry
+    print*,'Ignore H3SiO4 in the calculation of carbonate ALK   : ',ctrl_carbchem_noH3SiO4
+    ! --- MISC CONTROLS  --------------------------------------------------------------------------------------------------------- !
+    print*,'--- MISC CONTROLS ---'
+    print*,'minimum T used in empirical geochem calculations    : ',par_geochem_Tmin 
+    print*,'maximum T used in empirical geochem calculations    : ',par_geochem_Tmax
+    print*,'minimum S used in empirical geochem calculations    : ',par_geochem_Smin 
+    print*,'maximum S used in empirical geochem calculations    : ',par_geochem_Smax 
+    print*,'minimum T used in empirical carbchem calculations   : ',par_carbchem_Tmin 
+    print*,'maximum T used in empirical carbchem calculations   : ',par_carbchem_Tmax
+    print*,'minimum S used in empirical carbchem calculations   : ',par_carbchem_Smin 
+    print*,'maximum S used in empirical carbchem calculations   : ',par_carbchem_Smax 
+    print*,'assumed longitudinal offset of the grid             : ',par_grid_lon_offset
     print*,'Debug (initialization) level                        : ',ctrl_debug_init
     print*,'Debug (loop) level                                  : ',ctrl_debug_loop
     print*,'Debug (end) level                                   : ',ctrl_debug_end
+    print*,'Report all run-time warnings?                       : ',ctrl_debug_reportwarnings
     ! --- I/O: DIRECTORY DEFINITIONS --------------------------------------------------------------------------------------------- !
     print*,'--- I/O: DIRECTORY DEFINITIONS ---'
     print*,'Input dir. name                                     : ',trim(par_gem_indir_name)
@@ -89,7 +101,9 @@ end if
          &   1956.9, 127.20, 3.9979, 0.050878, & ! pH2S
          &      0.0,   0.00, 0.0000, 0.000000, & ! pH2S_34S
          &   4039.8, 264.70, 8.2552, 0.103590, & ! pCFC11
-         &   3713.2, 243.40, 7.5879, 0.095215  & ! pCFC12
+         &   3713.2, 243.40, 7.5879, 0.095215, & ! pCFC12
+         &      0.0,   0.00, 0.0000, 0.000000, & ! 
+         &      0.0,   0.00, 0.0000, 0.000000  & ! 
          & /), &
          & (/ &
          &   4,n_atm &
@@ -126,7 +140,9 @@ end if
          &    -41.0563, 66.40050, 15.1060, -0.060583,  0.037975, -0.0060234, & ! pH2S
          &      0.0000,   0.0000,  0.0000,  0.000000,  0.000000,  0.0000000, & ! pH2S_34S
          &   -136.2685, 206.1150, 57.2805, -0.148598,  0.095114, -0.0163396, & ! pCFC11
-         &   -124.4395, 185.4299, 51.6383, -0.149779,  0.094668, -0.0160043  & ! pCFC12
+         &   -124.4395, 185.4299, 51.6383, -0.149779,  0.094668, -0.0160043, & ! pCFC12
+         &      0.0000,   0.0000,  0.0000,  0.000000,  0.000000,  0.0000000, & ! 
+         &      0.0000,   0.0000,  0.0000,  0.000000,  0.000000,  0.0000000  & ! 
          & /), &
          & (/ &
          &   6,n_atm &

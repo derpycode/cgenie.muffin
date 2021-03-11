@@ -1,0 +1,80 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.65
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * A blank template grid will be generated: 
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+         (Nothing to load.)
+>   4. READING MASK & TOPO GRIDS ...
+         (Nothing to load.)
+>   5. RE-GRIDING MASK ...
+       - Blank mask created (nothing to re-grid).
+>   6. FILTERING MASK ...
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = -3.3307e-15
+>   7. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button, or clickoutside the grid, to finish
+       - Out of grid range
+       * Mask alteration complete
+       * Revised land area fraction = -3.3307e-15
+       - User-editing complete.
+       * Final land area fraction   = -3.3307e-15
+>   8. RE-GRIDING TOPOGRAPHY ...
+         (Nothing to re-grid -- set uniform ocean depth.)
+>   9. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  11. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button, or clickoutside the grid, to finish
+       - Out of grid range
+       * Mask alteration complete
+       - User-editing complete.
+>  12. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  13. IDENTIFY ISLANDS ...
+>  14. UPDATING ISLANDS & PATHS ...
+       * updated find: N pole island (currently uncounted)
+       * updated find: S pole island (currently uncounted)
+       * total # true islands = 1
+       * Borders alteration procedure :
+         (1) left button to increase border #
+         (2) right button to decrease border # (0 == no border)
+         (3) middle button, or clickoutside the grid, to finish
+         [exit (middle button) if unsure WTF]
+       - Out of grid range
+       * Mask alteration complete
+>  15. GENERATING .paths FILE ...
+       * Creating raw path #1 ...
+       * Creating raw path #2 ...
+       * Building path #2 ...
+       - .paths file saved
+>  16. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  17. CREATING WIND PRODUCTS ...
+       * Northern gateway (> 40N) found.
+       * Southern gateway (< -40S) found.
+       - Generated zonal wind products.
+>  18. LOADING ALBEDO DATA ...
+         (Nothing to load.)
+>  19. CREATING ALBEDO DATA ...
+       - Created generic zonal mean albedo profile.
+       - .albd.dat file saved
+>  21. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

@@ -52,12 +52,14 @@ c ajr namelist replacements
       osctau0=par_orbit_osctau0
       zw=par_orbit_oscgam
 
-c skt calculate oscgam from AJR par_orbit_oscgam                                                                            
+c skt calculate oscgam (mean longitude) from par_orbit_oscgam                                                                            
       if (zw.eq.99999) then
       oscgam=1.352631
       else
       zw1=180.+zw
-      if (zw1.gt.360.0) zw1=zw-360.0
+      if (zw1.gt.360.0) then
+      zw1=zw1-360.0
+      end if
       zv=pi/180.*(360.-zw1)
       zm=zv
       do i=1,10

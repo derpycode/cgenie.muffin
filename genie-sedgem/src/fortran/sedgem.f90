@@ -34,6 +34,7 @@ SUBROUTINE sedgem(          &
   real::loc_tot,loc_standard                                   ! 
   real::loc_r7Li,loc_r44Ca                                     ! 
   real::loc_87Sr,loc_88Sr
+  real::loc_187Os,loc_188Os
   real::loc_alpha,loc_R,loc_delta                              ! 
   real::loc_fsed                                               ! 
   real,DIMENSION(n_sed,n_i,n_j)::loc_sfxsumsed_OLD                      ! sediment rain flux interface array (COPY)
@@ -120,6 +121,9 @@ SUBROUTINE sedgem(          &
   if ((par_sed_SrCO3recrystTOT*loc_tot_A_reef) > const_real_nullsmall) then
      par_sed_SrCO3recryst = conv_cm2_m2*par_sed_SrCO3recrystTOT/loc_tot_A_reef
   end if
+  if (par_sed_Os_dep < const_real_nullsmall) then
+     par_sed_Os_dep = par_sed_Os_depTOT/loc_tot_A
+  end if
 
   ! *** UPDATE CARBONATE CHEMSITRY ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE CARBONATE CHEMSITRY ***'
@@ -190,6 +194,10 @@ SUBROUTINE sedgem(          &
            !       ... but allow prescribed (uniform) sed det flux PLUS spatial burial flux
            ! NOTE: if an opal flux is provided but opal is not selected as a tracer, add to the detrital field
            if (sed_select(is_det)) then
+              if (ctrl_sed_det_NOdust) then
+                 ! zero det flux, which at this point is assumed to be all pelagic (dust)
+                 dum_sfxsumsed(is_det,i,j) = 0.0
+              endif
               if (ctrl_sed_Fdet) then
                  dum_sfxsumsed(is_det,i,j) =  &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*par_sed_fdet + &
@@ -242,7 +250,13 @@ SUBROUTINE sedgem(          &
                  else
                     loc_r7Li = 0.0
                  end if
-                 loc_alpha = 1.0 + par_sed_clay_7Li_epsilon/1000.0
+                 ! determine whether to use fixed or temperature-dependent MACC 7Li fractionation -- Li and West [2014]
+                 if (ctrl_sed_clay_7Li_epsilon_fixed) then
+                    loc_alpha = 1.0 + par_sed_clay_7Li_epsilon/1000.0
+                 else
+                    loc_alpha = 1.83*1.0E6/dum_sfcsumocn(io_T,i,j)**2.0 - 0.72
+                    loc_alpha = exp(loc_alpha/1000.0)
+                 end if
                  loc_R = loc_r7Li/(1.0 - loc_r7Li)
                  loc_fsed = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_fsed
                  dum_sfxsumsed(is_detLi_7Li,i,j) = dum_sfxsumsed(is_detLi_7Li,i,j) + loc_fsed
@@ -453,6 +467,25 @@ SUBROUTINE sedgem(          &
      loc_fhydrothermal(io_Sr_87Sr) = loc_87Sr
      loc_fhydrothermal(io_Sr_88Sr) = loc_88Sr
   end IF
+  ! Os
+  If (ocn_select(io_Os)) then
+     loc_fhydrothermal(io_Os) = par_sed_hydroip_fOs
+     if (ocn_select(io_Os_187Os).AND. ocn_select(io_Os_188Os)) then
+        loc_fhydrothermal(io_Os_187Os) = par_sed_hydroip_fOs_187Os_188Os
+        loc_fhydrothermal(io_Os_188Os) = par_sed_hydroip_fOs_188Os_192Os
+     ! initialization -- populate array with bulk flux and isotopic delta values
+     loc_fhydrothermal(io_Os_187Os) = 1000.0*(par_sed_hydroip_fOs_187Os_188Os*par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+     loc_fhydrothermal(io_Os_188Os) = 1000.0*(par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+     ! calculate Os ISOTOPES -- 187Os
+     ! NOTE: do not update <loc_fhydrothermal> yet as it is needed for the d188Os calculation ...
+     loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_fhydrothermal(:),1)
+     ! calculate Os ISOTOPES -- 192Os
+     loc_188Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_fhydrothermal(:),2)
+     ! update flux array
+     loc_fhydrothermal(io_Os_187Os) = loc_187Os
+     loc_fhydrothermal(io_Os_188Os) = loc_188Os
+     end if
+  end IF
   ! re-scale global total and apread over *valid* grid points
   DO i=1,n_i
      DO j=1,n_j
@@ -469,6 +502,31 @@ SUBROUTINE sedgem(          &
   DO i=1,n_i
      DO j=1,n_j
         if (loc_phys_sed_mask_deepsea(i,j) > const_real_nullsmall) then
+          ! Os
+          ! NOTE: deposition rates are given in mol m-2 s-1
+           IF ((ocn_select(io_Os)) .AND. (dum_sfcsumocn(io_Os,i,j) > const_real_nullsmall)) then
+             ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018), else suboxic deposition rate
+             if ((ctrl_sed_Os_O2) .AND. (dum_sfcsumocn(io_O2,i,j) > par_sed_Os_O2_threshold)) then
+                loc_fsed = par_sed_Os_dep_oxic*dum_sfcsumocn(io_Os,i,j)
+             elseif (ctrl_sed_Os_O2) then
+                loc_fsed = par_sed_Os_dep_suboxic*dum_sfcsumocn(io_Os,i,j)
+             else
+                loc_fsed = par_sed_Os_dep*dum_sfcsumocn(io_Os,i,j)
+             endif
+             if (loc_fsed <= const_real_nullsmall) then
+                loc_fsed = 0.0
+             end if
+             dum_sfxocn(io_Os,i,j) = dum_sfxocn(io_Os,i,j) - loc_fsed
+             ! Assume no isotopic fractionation during deposition. Hence, bury the same relative amounts of all isotopes
+             if ((ocn_select(io_Os_187Os)) .AND. (dum_sfcsumocn(io_Os_187Os,i,j) > const_real_nullsmall)) then
+                dum_sfxocn(io_Os_187Os,i,j) = dum_sfxocn(io_Os_187Os,i,j) &
+                            & - dum_sfcsumocn(io_Os_187Os,i,j)*(loc_fsed)/(dum_sfcsumocn(io_Os,i,j))
+             end if
+             if ((ocn_select(io_Os_188Os)) .AND. (dum_sfcsumocn(io_Os_188Os,i,j) > const_real_nullsmall)) then
+                dum_sfxocn(io_Os_188Os,i,j) = dum_sfxocn(io_Os_188Os,i,j) &
+                            & - dum_sfcsumocn(io_Os_188Os,i,j)*(loc_fsed)/(dum_sfcsumocn(io_Os,i,j))
+             end if
+           end IF
            ! NOTE: the value of par_sed_lowTalt_fLi_alpha is calculated on the basis of a sink of x mol yr-1
            !          where Atot is the total sediment area and [Li] assumed to be 26 umol Li
            !       => e.g. 1.0E10 (mol yr-1) = [Li] * x / Atot / (365.25*24*3600)

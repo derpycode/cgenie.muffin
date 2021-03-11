@@ -39,6 +39,8 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/par_pCH4_oxidation_tau0
   real::par_pCH4_oxidation_N                                   ! Exponent for CH4 lifetime (dimensionless)
   NAMELIST /ini_atchem_nml/par_pCH4_oxidation_N
+  real::par_atm_pO2_fixed                                      ! Atmospheric pO2 for fixed fixed scheme
+  NAMELIST /ini_atchem_nml/par_atm_pO2_fixed
   ! ------------------- EMISSIONS-TO-ATMOSPHERE ---------------------------------------------------------------------------------- !
   real::par_atm_wetlands_FCH4                                  ! Wetlands CH4 flux (mol yr-1) 
   real::par_atm_wetlands_FCH4_d13C                             ! Wetlands CH4 d13C (o/oo) 
@@ -65,6 +67,9 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/ctrl_ncrst
   CHARACTER(len=127)::par_ncrst_name                           ! 
   NAMELIST /ini_atchem_nml/par_ncrst_name
+  ! ------------------- DEBUGGING OPTIONS ---------------------------------------------------------------------------------------- !
+  LOGICAL::ctrl_debug_lvl1                                       ! report 'level #1' debug?
+  NAMELIST /ini_atchem_nml/ctrl_debug_lvl1 
   ! ############################################################################################################################## !
 
 

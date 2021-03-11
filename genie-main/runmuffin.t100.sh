@@ -120,6 +120,10 @@ else
     echo " CANNOT be found :("
     exit 1
 fi
+if [ $(expr length "$3") -gt 127 ] ; then
+    echo "Usage: '$3' 3rd parameter must be less than 128 characters in length"
+    exit 65
+fi
 if [ -n "$5" ]; then
     if test -e $RESTARTPATH
     then
@@ -131,6 +135,10 @@ if [ -n "$5" ]; then
         echo $RESTARTPATH
         echo " CANNOT be found :("
         exit 1
+    fi
+    if [ $(expr length "$5") -gt 127 ] ; then
+        echo "Usage: '$5' 5th parameter must be less than 128 characters in length"
+        exit 65
     fi
 else
     echo "   #5 NO restart specified"
@@ -148,43 +156,74 @@ echo EXPID=$RUNID >> $CONFIGPATH/$CONFIGNAME
 #
 # (4) SET MODEL TIME-STEPPING
 # ---------------------------
-# extract ocean (lon,lat,lev) dimensions
+# extract ocean (lon,lat) dimension
 LONS=$(grep -o '$(DEFINE)GOLDSTEINNLONS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
 LATS=$(grep -o '$(DEFINE)GOLDSTEINNLATS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
+# extract ocean depth dimentsion
+# NOTE: test for empty as a single digit ... then try 2
+# NOTE: if the first digit is a zero ... remove it ...
 LEVS=$(grep -o '$(DEFINE)GOLDSTEINNLEVS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
-# filter single digit format level ('8' vs. '08')
-###if [ "$LEVS" == "8\'" ] || [ "$LEVS" == "8\"" ]; then
-if [ "$LEVS" != "32" ] && [ "$LEVS" != "24" ] && [ "$LEVS" != "16" ] && [ "$LEVS" != "08" ]; then
-    let LEVS=8
+if [ -z "$LEVS" ]; then
+    LEVS=$(grep -o '$(DEFINE)GOLDSTEINNLEVS=.\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
+else
+    if [[ ${LEVS:0:1} == "0" ]]; then LEVS=${LEVS:1:2}; fi
 fi
+# report
+echo "   Requested model resolution: "$LONS"x"$LATS"x"$LEVS
 # define relative biogeochem time-stepping
 if [ $LONS -eq 36 ] && [ $LEVS -eq 16 ]; then
     let N_TIMESTEPS=100
     let dbiostp=2
 elif [ $LONS -eq 36 ] && [ $LEVS -eq 8 ]; then
     let N_TIMESTEPS=100
-    let dbiostp=5
+    let dbiostp=4
 elif [ $LONS -eq 18 ] && [ $LEVS -eq 16 ]; then
     let N_TIMESTEPS=50
-    let dbiostp=2
+    let dbiostp=1
 elif [ $LONS -eq 18 ] && [ $LEVS -eq 8 ]; then
     let N_TIMESTEPS=50
-    let dbiostp=5
+    let dbiostp=2
+elif [ $LONS -eq 12 ] && [ $LEVS -eq 8 ]; then
+    let N_TIMESTEPS=50
+    let dbiostp=2
+elif [ $LONS -eq 36 ] && [ $LEVS -eq 32 ]; then
+    let N_TIMESTEPS=100
+    let dbiostp=1
+elif [ $LONS -eq 48 ] && [ $LEVS -eq 16 ]; then
+    let N_TIMESTEPS=100
+    let dbiostp=2
 else
     let N_TIMESTEPS=100
     let dbiostp=1
 fi
+# non equal area grid options
+# NOTE: first test for option not being included in the config file
+IGRID=$(grep -o 'go_grid=.' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
+if [ -n "$IGRID" ]; then
+    if [ $IGRID -eq 1 ]; then
+        echo "   Making non-equal area grid modifications to time-stepping, igrid: " $IGRID
+        N_TIMESTEPS="$(echo "4*$N_TIMESTEPS" | bc -l)"
+        dbiostp="$(echo "4*$dbiostp" | bc -l)"
+        let datmstp=5
+    else
+        let datmstp=5
+    fi
+else
+    let datmstp=5
+fi
+# report final time-stepping settings
 echo "   Setting time-stepping [GOLDSTEIN, BIOGEM:GOLDSTEIN]: " $N_TIMESTEPS $dbiostp
 # define primary model time step
-# c-goldstein; ma_genie_timestep = 365.25*24.0/(5*96) * 3600.0 (GOLDSTEIN year length)
-# ma_genie_timestep=65745.0
-dstp="$(echo "3600.0*24.0*365.25/5.0/$N_TIMESTEPS" | bc -l)"
+# c-goldstein; e.g. ma_genie_timestep = 365.25*24.0/(5*96) * 3600.0 (GOLDSTEIN year length)
+#                => ma_genie_timestep=65745.0
+dstp="$(echo "3600.0*24.0*365.25/$datmstp/$N_TIMESTEPS" | bc -l)"
+echo "   Setting primary model time step: " $dstp
 # write primary model time step
 echo ma_genie_timestep=$dstp >> $CONFIGPATH/$CONFIGNAME
 # write relative time-stepping
-echo ma_ksic_loop=5 >> $CONFIGPATH/$CONFIGNAME
-echo ma_kocn_loop=5 >> $CONFIGPATH/$CONFIGNAME
-echo ma_klnd_loop=5 >> $CONFIGPATH/$CONFIGNAME
+echo ma_ksic_loop=$datmstp >> $CONFIGPATH/$CONFIGNAME
+echo ma_kocn_loop=$datmstp >> $CONFIGPATH/$CONFIGNAME
+echo ma_klnd_loop=$datmstp >> $CONFIGPATH/$CONFIGNAME
 echo ma_conv_kocn_kecogem=$dbiostp >> $CONFIGPATH/$CONFIGNAME
 echo ma_conv_kocn_katchem=$dbiostp >> $CONFIGPATH/$CONFIGNAME
 echo ma_conv_kocn_kbiogem=$dbiostp >> $CONFIGPATH/$CONFIGNAME
@@ -196,7 +235,7 @@ echo bg_par_misc_t_runtime=$RUNLENGTH >> $CONFIGPATH/$CONFIGNAME
 # set SEDGEM sediment age
 echo sg_par_misc_t_runtime=$RUNLENGTH >> $CONFIGPATH/$CONFIGNAME
 # set overall GENIE run length
-let stp=$RUNLENGTH*5*$N_TIMESTEPS
+let stp=$RUNLENGTH*$datmstp*$N_TIMESTEPS
 echo ma_koverall_total=$stp >> $CONFIGPATH/$CONFIGNAME
 echo ma_dt_write=$stp >> $CONFIGPATH/$CONFIGNAME
 # set 'health check' frequency [NOTE: a '+1' in effect disables this feature]
@@ -204,25 +243,25 @@ let stp=$RUNLENGTH*$N_TIMESTEPS
 echo ea_3=$stp >> $CONFIGPATH/$CONFIGNAME
 echo go_3=$stp >> $CONFIGPATH/$CONFIGNAME
 echo gs_3=$stp >> $CONFIGPATH/$CONFIGNAME
-echo ents_3=$stp >> $CONFIGPATH/$CONFIGNAME
+echo el_3=$stp >> $CONFIGPATH/$CONFIGNAME
 # set climate model component restart frequency
 let stp=$RUNLENGTH*$N_TIMESTEPS
 echo ea_4=$stp >> $CONFIGPATH/$CONFIGNAME
 echo go_4=$stp >> $CONFIGPATH/$CONFIGNAME
 echo gs_4=$stp >> $CONFIGPATH/$CONFIGNAME
-echo ents_4=$stp >> $CONFIGPATH/$CONFIGNAME
+echo el_4=$stp >> $CONFIGPATH/$CONFIGNAME
 # set 'time series' frequency [NOTE: a '+1' in effect disables this feature]
 let stp=$RUNLENGTH*$N_TIMESTEPS+1
 echo ea_5=$stp >> $CONFIGPATH/$CONFIGNAME
 echo go_5=$stp >> $CONFIGPATH/$CONFIGNAME
 echo gs_5=$stp >> $CONFIGPATH/$CONFIGNAME
-echo ents_5=$stp >> $CONFIGPATH/$CONFIGNAME
+echo el_5=$stp >> $CONFIGPATH/$CONFIGNAME
 # set 'an average' frequency [NOTE: a '+1' in effect disables this feature]
 let stp=$RUNLENGTH*$N_TIMESTEPS+1
 echo ea_6=$stp >> $CONFIGPATH/$CONFIGNAME
 echo go_6=$stp >> $CONFIGPATH/$CONFIGNAME
 echo gs_6=$stp >> $CONFIGPATH/$CONFIGNAME
-echo ents_6=$stp >> $CONFIGPATH/$CONFIGNAME
+echo el_6=$stp >> $CONFIGPATH/$CONFIGNAME
 # SET CLIMATE COMPONENTS TIME-STEPS PER YEAR
 echo ea_9=$N_TIMESTEPS >> $CONFIGPATH/$CONFIGNAME
 echo go_9=$N_TIMESTEPS >> $CONFIGPATH/$CONFIGNAME
@@ -243,8 +282,8 @@ echo gs_15=y >> $CONFIGPATH/$CONFIGNAME
 echo ea_29=rst >> $CONFIGPATH/$CONFIGNAME
 echo go_17=rst >> $CONFIGPATH/$CONFIGNAME
 echo gs_12=rst >> $CONFIGPATH/$CONFIGNAME
-echo ents_17="rst" >> $CONFIGPATH/$CONFIGNAME
-echo ents_24="rst.sland" >> $CONFIGPATH/$CONFIGNAME
+echo el_17="rst" >> $CONFIGPATH/$CONFIGNAME
+echo el_24="rst.sland" >> $CONFIGPATH/$CONFIGNAME
 #
 # (6) CONFIGURE USE OF RESTART
 # -----------------------------
@@ -293,7 +332,7 @@ else
   echo ea_7=n >> $CONFIGPATH/$CONFIGNAME
   echo go_7=n >> $CONFIGPATH/$CONFIGNAME
   echo gs_7=n >> $CONFIGPATH/$CONFIGNAME
-  echo ents_7=n >> $CONFIGPATH/$CONFIGNAME
+  echo el_7=n >> $CONFIGPATH/$CONFIGNAME
   echo ac_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo bg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo sg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
@@ -313,8 +352,8 @@ echo bg_ctrl_force_oldformat=.false. >> $CONFIGPATH/$CONFIGNAME
 # (8) INCORPORATE RUN CONFIGURATION
 # ---------------------------------
 echo "   Make safe goin format"
-dos2unix $GOIN
-#tr ‘\r’ ‘\n’ < $GOIN
+#dos2unix $GOIN
+#tr â€˜\râ€™ â€˜\nâ€™ < $GOIN
 cat $GOIN >> $CONFIGPATH/$CONFIGNAME
 #
 # (9) GO!
@@ -325,7 +364,7 @@ echo ">> Here we go ..."
 echo ""
 cd $BINARYPATH
 # test for change of base-config
-if test -e 'current_config.dat'
+if test -e 'current_config.dat' 
 then
     current_config=$(<'current_config.dat')
     if [ "$current_config" != "$MODELID" ]; then
@@ -339,6 +378,8 @@ else
     echo ">> WARNING: No record of last base-config (file: current_config.dat): CONTINUING ..."
     echo ""
     sleep 4
+    make cleanall
+    echo "$MODELID" > 'current_config.dat'
 fi
 ./genie_example.job -O -f $CONFIGPATH/$CONFIGNAME
 # Clean up and archive

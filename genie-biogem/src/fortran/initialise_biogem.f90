@@ -3,6 +3,7 @@
 ! SETUP BioGeM
 ! ******************************************************************************************************************************** !
 SUBROUTINE initialise_biogem(                       &
+     & dum_dts,                                     &
      & dum_saln0,dum_rhoair,dum_cd,dum_ds,dum_dphi, &
      & dum_usc,dum_dsc,dum_fsc,dum_rh0sc,           &
      & dum_rhosc,dum_cpsc,dum_solconst,dum_scf,     &
@@ -26,15 +27,16 @@ SUBROUTINE initialise_biogem(                       &
   ! ---------------------------------------------------------- !
   ! DUMMY ARGUMENTS
   ! ---------------------------------------------------------- !
+  REAL,INTENT(IN)::dum_dts                                       ! biogem time-step length (seconds)
   REAL,INTENT(in)::dum_saln0,dum_rhoair,dum_cd,dum_ds,dum_dphi   !
-  real,INTENT(in)::dum_usc,dum_dsc,dum_fsc,dum_rh0sc             ! 
+  real,INTENT(in)::dum_usc,dum_dsc,dum_fsc,dum_rh0sc             !
   real,INTENT(in)::dum_rhosc,dum_cpsc,dum_solconst,dum_scf       !
   INTEGER,INTENT(in),DIMENSION(n_j)::dum_ips,dum_ipf             !
-  INTEGER,INTENT(in),DIMENSION(n_j)::dum_ias,dum_iaf             ! 
+  INTEGER,INTENT(in),DIMENSION(n_j)::dum_ias,dum_iaf             !
   INTEGER,INTENT(in)::dum_jsf                                    !
   integer,DIMENSION(n_i,n_j),INTENT(in)::dum_k1                  !
-  REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 ! 
-  REAL,DIMENSION(0:n_j),INTENT(in)::dum_c,dum_cv,dum_s,dum_sv    ! 
+  REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 !
+  REAL,DIMENSION(0:n_j),INTENT(in)::dum_c,dum_cv,dum_s,dum_sv    !
   REAL,DIMENSION(intrac_ocn,n_i,n_j,n_k),INTENT(inout)::dum_ts   ! NOTE: number of tracers in GOLDSTEIN used in dimension #1
   REAL,DIMENSION(intrac_ocn,n_i,n_j,n_k),INTENT(inout)::dum_ts1  ! NOTE: number of tracers in GOLDSTEIN used in dimension #1
   real,intent(inout),dimension(n_atm,n_i,n_j)::dum_sfcatm1       ! atmosphere-surface tracer composition; occ grid
@@ -46,15 +48,16 @@ SUBROUTINE initialise_biogem(                       &
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
-  integer::loc_iou 
-  integer::i,j,n
+  integer::loc_iou
+  integer::i,j,k,n
+  integer::n_wet_grid,loc_k1
   ! ---------------------------------------------------------- !
   ! START
   ! ---------------------------------------------------------- !
   print*,'======================================================='
   print*,' >>> Initialising BIOGEM ocean biogeochem. module ...'
   ! ---------------------------------------------------------- ! load GOIN
-  call sub_load_goin_biogem()
+  call sub_load_goin_biogem(dum_dts/conv_yr_s)
   ! ---------------------------------------------------------- ! set time
   ! NOTE: modify 'par_misc_t_start' according to the run-time accumulated in any requested restart,
   !       so that the time that BioGeM starts with is the same as the requested start time
@@ -171,6 +174,8 @@ SUBROUTINE initialise_biogem(                       &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(vphys_ocn(1:n_vocn),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+  allocate(matrix_exp(1:n_vocn),stat=alloc_error)              ! JDW: allocate matrix experiment storage array in one dimension
+  call check_iostat(alloc_error,__LINE__,__FILE__)
   do n=1,n_vocn
      allocate(vocn(n)%mk(1:n_l_ocn,1:n_k),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -184,6 +189,8 @@ SUBROUTINE initialise_biogem(                       &
      call check_iostat(alloc_error,__LINE__,__FILE__)
      allocate(vphys_ocn(n)%mk(1:n_phys_ocn,1:n_k),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
+     allocate(matrix_exp(n)%mk(1:6,1:n_k),stat=alloc_error)    ! JDW: allocate inner matrix array for *6* colour tracers
+     call check_iostat(alloc_error,__LINE__,__FILE__)
   end do
   ! ---------------------------------------------------------- ! initialize arrays: 3D
   ! NOTE: explicit grid allocated arrays are initialized through the call to sub_init_force
@@ -193,6 +200,7 @@ SUBROUTINE initialise_biogem(                       &
   vbio_part(:)  = fun_lib_init_vsed()
   vdbio_part(:) = fun_lib_init_vsed()
   vphys_ocn(:)  = fun_lib_init_vocn_n(n_phys_ocn)
+  matrix_exp(:) = fun_lib_init_vocn()                          ! JDW: initialize matrix experiment array
   ! ---------------------------------------------------------- !
   !  INITIALIZE ARRAYS -- VECTORIZED -- 2D
   ! ---------------------------------------------------------- !
@@ -229,7 +237,7 @@ SUBROUTINE initialise_biogem(                       &
   CALL sub_data_init_phys_ocn()
   CALL sub_data_init_phys_ocnatm()
   !<<< ALT VECTOR FORM
-  ! ---------------------------------------------------------- ! 
+  ! ---------------------------------------------------------- !
   ! load default values for ocean, atmosphere, and sediment tracers and and initialize tracer arrays and options
   IF (ctrl_debug_lvl2) print*, 'load default values for ocean, atmosphere, and sediment tracers'
   CALL sub_init_tracer_ocn_comp()
@@ -248,7 +256,7 @@ SUBROUTINE initialise_biogem(                       &
   end IF
   ! initialize geoghermal heat input
   if (ctrl_force_Fgeothermal2D) then
-     call sub_init_force_Fgeothermal()    
+     call sub_init_force_Fgeothermal()
   end if
   ! calculate all the tracer relationship indices
   IF (ctrl_debug_lvl2) print*, 'calculate all the primary tracer relationship indices'
@@ -275,6 +283,7 @@ SUBROUTINE initialise_biogem(                       &
      CALL sub_data_init_lookup_4D_Fe()
   end SELECT
   ! ---------------------------------------------------------- ! set up redox save/reporting
+  IF (ctrl_debug_lvl2) print*, 'initialize redox arrays'
   CALL sub_init_redox()
   ! ---------------------------------------------------------- ! initialize arrays (2)
   IF (ctrl_debug_lvl2) print*, 'initialize data saving arrays'
@@ -320,7 +329,7 @@ SUBROUTINE initialise_biogem(                       &
   ! initialise 2d and 3d netcdf files
   IF (ctrl_continuing.AND.opt_append_data) THEN
      OPEN(unit=in,status='old',file=TRIM(par_rstdir_name)//'netcdf_record_numbers',form='formatted',action='read')
-     READ(unit=in,fmt='(i6)') ncout2d_ntrec,ncout3d_ntrec                           
+     READ(unit=in,fmt='(i6)') ncout2d_ntrec,ncout3d_ntrec
      close(unit=in)
   ELSE
      call sub_init_netcdf(trim(string_ncout2d),loc_iou,2)
@@ -335,6 +344,20 @@ SUBROUTINE initialise_biogem(                       &
         ncout3dsig_ntrec = 0
      end if
   ENDIF
+
+  ! JDW: initialise matrix netcdf output
+  if(ctrl_data_diagnose_TM)THEN
+    ! find number of wet grid-points
+    n_wet_grid=0
+    do n=1,n_vocn,1
+      loc_k1 = vocn(n)%k1
+        do k=n_k,loc_k1,-1
+          n_wet_grid=n_wet_grid+1
+        end do
+    end do
+    ! initialise matrix netcdf file
+    call sub_init_netcdf_TM(n_wet_grid)
+  end if
 
   ! *** load restart information ***
   IF (ctrl_continuing) then
@@ -355,7 +378,7 @@ SUBROUTINE initialise_biogem(                       &
   if (ctrl_force_GOLDSTEInTS) call sub_biogem_copy_ocntotsTS(dum_ts,dum_ts1)
 
   ! ############################################################################################################################# !
-!!! *** TESTING ***
+  !!! *** TESTING ***
   vocn(:)=fun_lib_conv_ocnTOvocn(ocn(:,:,:,:))
   ocn = 0.0
   ocn(:,:,:,:)=fun_lib_conv_vocnTOocn(vocn(:))

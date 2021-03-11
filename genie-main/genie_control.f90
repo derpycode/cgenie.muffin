@@ -143,9 +143,9 @@ MODULE genie_control
 
       ! total defined tracer numbers
       ! WARNING: parameter information duplicated in gem_cmn.f90
-      integer, parameter :: intrac_atm_max =  19
-      integer, parameter :: intrac_ocn_max = 101
-      integer, parameter :: intrac_sed_max =  87
+      integer, parameter :: intrac_atm_max =  21
+      integer, parameter :: intrac_ocn_max = 109
+      integer, parameter :: intrac_sed_max = 107
       parameter(intrac_sed=intrac_sed_max)
 
       ! others
@@ -179,7 +179,7 @@ integer :: debug_init,debug_end,debug_loop
       character(len=BUFSIZ) :: fname_restart_main
       character(len=BUFSIZ) :: fname_fluxrestart
 
-      character(len=6) :: fname_topo
+      character(len=8) :: fname_topo
 
       integer(kind=8) :: dt_write
       

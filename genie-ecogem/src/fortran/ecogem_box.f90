@@ -322,6 +322,7 @@ CONTAINS
           ! Output variables
           chlsynth(:) =  chlsynth(:) * isautotrophic
           PP(:)       = (PCPhot(:) - costbiosynth(:)) * isautotrophic
+          if (fundamental) PP(:) = PCPhot(:) * isautotrophic ! ignore cost of biosynthesis in fund. niche experiment
           totPP       =  sum(PCPhot(:) * Cbiomass(:) * isautotrophic) ! does not include cost of biosynthesis
           !-----------------------------------------------------------------
        else ! else if it is extremely dark
@@ -542,7 +543,7 @@ CONTAINS
   END SUBROUTINE check_egbg_compatible
   ! ****************************************************************************************************************************** !
   ! convert a word to lower case
-  elemental subroutine lower_case(word)
+  subroutine lower_case(word)
     character (len=*) , intent(in out) :: word
     integer                            :: i,ic,nlen
     nlen = len(word)
