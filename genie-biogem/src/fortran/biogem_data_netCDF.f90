@@ -1155,20 +1155,22 @@ CONTAINS
        end if
        !-----------------------------------------------------------------------
        ! Related preformed metrics! :o)
-       ! (1)  O2(sat)
-       ! (2)  AOU (from O2(sat) and O2)
-       ! (3)  AOU-regenP (regen-P from AOU) (assuming Redfield)
-       ! (4)  AOU-regenP-regenC (regenC from regenP from AOU) (assuming Redfield)
-       ! (5)  AOU-regenP-regenC d13C (AOU-regenP-regenC d13C in proportion to AOU-regenP-regenC/DIC) (assuming POC d13C)
-       ! (6)  OU (from O2(pre) and actual O2)
-       ! (7)  regenP (from PO4(pre) and actual PO4)
-       ! (8)  regenP-regenC (regenC from regenP) (assuming Redfield)
-       ! (9)  regenP-regenC d13C (regenP-regenC d13C in proportion to regenP-regenC/DIC) (assuming POC d13C)
-       ! (10) regenC (Csoft (real regenC))
-       ! (11) regenC d13C (regenC d13C in proportion to regenC/DIC) (assuming POC d13C)
-       ! (12) regend13C (Csoft d13C in proportion to Csoft/DIC)
-       ! (13) DIC (from PreC + regenC)
-       ! (14) DIC d13C (from PreC d13C + regenC d13C)
+       ! (1)  diag_reg_O2sat -- O2(sat)
+       ! (2)  diag_reg_AOU -- AOU (from O2(sat) and O2)
+       ! (3)  diag_reg_AOU_P -- AOU-regenP (regen-P from AOU) (assuming Redfield)
+       ! (4)  diag_reg_AOU_P_C -- AOU-regenP-regenC (regenC from regenP from AOU) (assuming Redfield)
+       ! (5)  diag_reg_AOU_P_C_d13C -- AOU-regenP-regenC d13C (AOU-regenP-regenC d13C in proportion to AOU-regenP-regenC/DIC)
+       !      (assuming POC d13C)
+       ! (6)  diag_reg_OU -- OU (from O2(pre) and actual O2)
+       ! (7)  diag_reg_P -- regenP (from PO4(pre) and actual PO4)
+       ! (8)  diag_reg_P_C -- regenP-regenC (regenC from regenP) (assuming Redfield)
+       ! (9)  diag_reg_P_C_d13C -- regenP-regenC d13C (regenP-regenC d13C in proportion to regenP-regenC/DIC)
+       !      (assuming POC d13C)
+       ! (10) diag_reg_C -- regenC (Csoft (real regenC))
+       ! (11) diag_reg_C_d13C -- regenC d13C (regenC d13C in proportion to regenC/DIC) (assuming POC d13C)
+       ! (12) diag_reg_d13C -- regend13C (Csoft d13C in proportion to Csoft/DIC)
+       ! (13) diag_reg_DIC -- DIC (from PreC + regenC)
+       ! (14) diag_reg_DIC_d13C -- DIC d13C (from PreC d13C + regenC d13C)
        ! (**) Ccarb (DIC minus DIC(pre) minus Csoft) *** TO-DO ***
        ! (**) Ccarb d13C (DIC d13C minus d13C(pre) minus Csoft d13C in respective proportions ...) *** TO-DO ***
        !-----------------------------------------------------------------------
@@ -1186,7 +1188,7 @@ CONTAINS
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
                       ! calculate solubility constant 
-                      ! NOTE: that each time-step, only the surface values are calculated
+                      ! NOTE: that each time-step, only the surface values are calculated (hence need for full 3D uopdate here)
                       loc_ijk(i,j,k) = fun_calc_solconst(ia_pO2, &
                            & int_ocn_timeslice(io_T,i,j,k)/int_t_timeslice, &
                            & int_ocn_timeslice(io_S,i,j,k)/int_t_timeslice, &
@@ -1431,7 +1433,7 @@ CONTAINS
           end if
           ! (13) DIC (from PreC + regenC)
           if (ocn_select(io_col0) .AND. ocn_select(io_col9) .AND. ctrl_bio_remin_redox_save) then
-             loc_name       = 'diag_DIC'
+             loc_name       = 'diag_reg_DIC'
              loc_unitsname  = 'mol kg-1'
              loc_min        = -1.0
              loc_max        = +1.0
@@ -1453,7 +1455,7 @@ CONTAINS
                & ocn_select(io_col0) .AND. ocn_select(io_col9) .AND. ocn_select(io_col7) .AND. ocn_select(io_col8) &
                & ) then
              loc_ijk(:,:,:) = const_real_null
-             loc_name       = 'diag_DIC_d13C'
+             loc_name       = 'diag_reg_DIC_d13C'
              loc_unitsname  = 'o/oo'
              loc_min        = -1000.0
              loc_max        = +1000.0
