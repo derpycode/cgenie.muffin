@@ -4836,20 +4836,24 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">FIXED</value>
                         <description>CaCO3 44Ca fractionation scheme ID string [alt: 'Fantle']</description>
                     </param>
+                    <param name="par_d13C_DIC_Corg_epsilon">
+                       <value datatype="real">-25.0</value>
+                       <description>FIXED fractionation D13C</description>
+                    </param>
                     <param name="par_d13C_DIC_Corg_b">
                        <value datatype="real">171.0</value>
                        <description>b value for Popp et al. fractionation</description>
                     </param>
                     <param name="par_d13C_DIC_Corg_ef">
-                       <value datatype="real">25.</value>
+                       <value datatype="real">25.0</value>
                        <description>Fractionation for intercellular C fixation (Ridgwell, 2001, PhD. Thesis)</description>
                     </param>
 		    <param name="par_d13C_DIC_Corg_ef_sp">
-		       <value datatype="real">25.</value>
+		       <value datatype="real">25.0</value>
 		       <description>Fractionation for intercellular C fixation of siliceous phytoplankton (Ridgwell, 2001, PhD. Thesis)</description>
 		    </param>
 		    <param name="par_d13C_DIC_Corg_ef_nsp">
-		       <value datatype="real">20.</value>
+		       <value datatype="real">20.0</value>
 		       <description>Fractionation for intercellular C fixation of non-siliceous phytoplankton (Ridgwell, 2001, PhD. Thesis)</description>
 		    </param>
 		    <param name="par_d30Si_opal_epsilon">

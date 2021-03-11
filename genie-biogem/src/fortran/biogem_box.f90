@@ -391,6 +391,7 @@ CONTAINS
     real,dimension(n_sed,n_k)::loc_bio_part_RDOM                        !
     real::loc_delta_Corg,loc_delta_CaCO3
     real::loc_alpha,loc_delta,loc_standard
+    real::loc_r13C,loc_r14C
     real::loc_r15N,loc_r30Si,loc_r114Cd,loc_r7Li,loc_r44Ca
     real::loc_86Sr,loc_87Sr,loc_88Sr
     real::loc_192Os,loc_188Os,loc_187Os
@@ -1277,6 +1278,12 @@ CONTAINS
           bio_part_red(is_POC,is_POC_13C,dum_i,dum_j) = &
                & fun_Corg_Rfrac_Poppetal(carb(ic_conc_CO2,dum_i,dum_j,n_k), &
                & carbisor(ici_CO2_r13C,dum_i,dum_j,n_k),loc_d13C_DIC_Corg_ef,par_d13C_DIC_Corg_b,.false.)
+       CASE ('FIXED')
+          loc_r13C = ocn(io_DIC_13C,dum_i,dum_j,n_k)/ocn(io_DIC,dum_i,dum_j,n_k)
+          ! apply fixed fractionation
+          loc_alpha = 1.0 + par_d13C_DIC_Corg_epsilon/1000.0
+          loc_R = loc_r13C/(1.0 - loc_r13C)
+          bio_part_red(is_POC,is_POC_13C,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
        case default
           bio_part_red(is_POC,is_POC_13C,dum_i,dum_j) = &
                & fun_Corg_Rfrac(ocn(io_T,dum_i,dum_j,n_k),carb(ic_conc_CO2,dum_i,dum_j,n_k), &
@@ -1292,6 +1299,12 @@ CONTAINS
           bio_part_red(is_POC,is_POC_14C,dum_i,dum_j) = &
                & fun_Corg_Rfrac_Poppetal(carb(ic_conc_CO2,dum_i,dum_j,n_k), &
                & carbisor(ici_CO2_r14C,dum_i,dum_j,n_k),loc_d13C_DIC_Corg_ef,par_d13C_DIC_Corg_b,.true.)
+       CASE ('FIXED')
+          loc_r14C = ocn(io_DIC_14C,dum_i,dum_j,n_k)/ocn(io_DIC,dum_i,dum_j,n_k)
+          ! apply fixed fractionation
+          loc_alpha = 1.0 + 2.0*par_d13C_DIC_Corg_epsilon/1000.0
+          loc_R = loc_r14C/(1.0 - loc_r14C)
+          bio_part_red(is_POC,is_POC_14C,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)          
        case default
           bio_part_red(is_POC,is_POC_14C,dum_i,dum_j) = &
                & fun_Corg_Rfrac(ocn(io_T,dum_i,dum_j,n_k),carb(ic_conc_CO2,dum_i,dum_j,n_k), &

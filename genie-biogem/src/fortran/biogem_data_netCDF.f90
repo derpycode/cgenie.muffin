@@ -1157,16 +1157,18 @@ CONTAINS
        ! Related preformed metrics! :o)
        ! (1)  O2(sat)
        ! (2)  AOU (from O2(sat) and O2)
-       ! (3)  AOU-regenP (regen-P from AOU)
-       ! (4)  AOU-regenP-regenC (regenC from regenP from AOU)
-       ! (5)  AOU-regenP-regenC d13C (AOU-regenP-regenC d13C in proportion to AOU-regenP-regenC/DIC)
+       ! (3)  AOU-regenP (regen-P from AOU) (assuming Redfield)
+       ! (4)  AOU-regenP-regenC (regenC from regenP from AOU) (assuming Redfield)
+       ! (5)  AOU-regenP-regenC d13C (AOU-regenP-regenC d13C in proportion to AOU-regenP-regenC/DIC) (assuming POC d13C)
        ! (6)  OU (from O2(pre) and actual O2)
        ! (7)  regenP (from PO4(pre) and actual PO4)
-       ! (8)  regenP-regenC (regenC from regenP)
-       ! (9)  regenP-regenC d13C (regenP-regenC d13C in proportion to regenP-regenC/DIC)
+       ! (8)  regenP-regenC (regenC from regenP) (assuming Redfield)
+       ! (9)  regenP-regenC d13C (regenP-regenC d13C in proportion to regenP-regenC/DIC) (assuming POC d13C)
        ! (10) regenC (Csoft (real regenC))
-       ! (11) regenC d13C (regenC d13C in proportion to regenC/DIC)
+       ! (11) regenC d13C (regenC d13C in proportion to regenC/DIC) (assuming POC d13C)
        ! (12) regend13C (Csoft d13C in proportion to Csoft/DIC)
+       ! (13) DIC (from PreC + regenC)
+       ! (14) DIC d13C (from PreC d13C + regenC d13C)
        ! (**) Ccarb (DIC minus DIC(pre) minus Csoft) *** TO-DO ***
        ! (**) Ccarb d13C (DIC d13C minus d13C(pre) minus Csoft d13C in respective proportions ...) *** TO-DO ***
        !-----------------------------------------------------------------------
@@ -1420,6 +1422,48 @@ CONTAINS
                       loc_standard = const_standards(ocn_type(io_DIC_13C))
                       loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                       loc_ijk(i,j,k) = loc_ijk(i,j,k)*int_ocn_timeslice(io_col9,i,j,k)/int_ocn_timeslice(io_DIC,i,j,k)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (13) DIC (from PreC + regenC)
+          if (ocn_select(io_col0) .AND. ocn_select(io_col9) .AND. ctrl_bio_remin_redox_save) then
+             loc_name       = 'diag_DIC'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = (int_ocn_timeslice(io_col0,i,j,k) + int_ocn_timeslice(io_col9,i,j,k))/int_t_timeslice
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (14) DIC d13C (from PreC d13C + regenC d13C)
+          ! NOTE: int_t_timeslices cancel out
+          if ( &
+               & ocn_select(io_DIC_13C) .AND. (.NOT. ocn_select(io_DIC_14C)) .AND. ctrl_bio_remin_redox_save .AND. &
+               & ocn_select(io_col0) .AND. ocn_select(io_col9) .AND. ocn_select(io_col7) .AND. ocn_select(io_col8) &
+               & ) then
+             loc_ijk(:,:,:) = const_real_null
+             loc_name       = 'diag_DIC_d13C'
+             loc_unitsname  = 'o/oo'
+             loc_min        = -1000.0
+             loc_max        = +1000.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_tot  = (int_ocn_timeslice(io_col0,i,j,k) + int_ocn_timeslice(io_col9,i,j,k))
+                      loc_frac = (int_ocn_timeslice(io_col7,i,j,k) + int_ocn_timeslice(io_col8,i,j,k))
+                      loc_standard = const_standards(ocn_type(io_DIC_13C))
+                      loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                    END DO
                 END DO
              END DO
