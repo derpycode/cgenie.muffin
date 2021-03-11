@@ -644,6 +644,7 @@ CONTAINS
     CHARACTER(len=255)::loc_name
     CHARACTER(len=255)::loc_unitsname
     real::loc_tot,loc_frac,loc_standard
+    real::loc_min,loc_max
     logical::loc_save
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
@@ -1071,6 +1072,8 @@ CONTAINS
                 loc_ijk(:,:,:) = const_real_null
                 loc_unitsname = '???'
                 loc_save = .true.
+                loc_min = const_real_zero
+                loc_max = const_real_zero
                 DO i=1,n_i
                    DO j=1,n_j
                       DO k=goldstein_k1(i,j),n_k
@@ -1085,6 +1088,8 @@ CONTAINS
                                loc_standard   = const_standards(ocn_type(io_DIC_13C))
                                loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                                loc_unitsname  = 'o/oo'
+                               loc_min        = -1000.0
+                               loc_max        = +1000.0
                             end if
                          CASE (io_col8)
                             if (ocn_select(io_DIC_14C)) then
@@ -1096,6 +1101,8 @@ CONTAINS
                                loc_standard   = const_standards(ocn_type(io_DIC_13C))
                                loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
                                loc_unitsname  = 'o/oo'
+                               loc_min        = -1000.0
+                               loc_max        = +1000.0
                             end if
                          CASE (io_col9)
                             loc_ijk(i,j,k) = int_ocn_timeslice(io,i,j,k)/int_t_timeslice
@@ -1130,18 +1137,17 @@ CONTAINS
                    if (ocn_select(io_DIC_14C)) then
                       loc_name = 'diag_pre_d14C_age'
                    else
-                      loc_name = 'diag_reg_Csoft_d13C'
+                      loc_name = 'diag_pre_Csoft_d13C'
                       if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
                       if (.NOT. ocn_select(io_col9)) loc_save = .false.
                    end if
                 CASE (io_col9)
-                   if (ocn_select(io_DIC)) loc_name = 'diag_reg_Csoft'
+                   if (ocn_select(io_DIC)) loc_name = 'diag_pre_Csoft'
                    if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
                 end select
                 ! write to netCDF
                 if (loc_save) then
-                   call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                        & trim(loc_unitsname),const_real_zero,const_real_zero)
+                   call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer',trim(loc_unitsname),loc_min,loc_max)
                    call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
                 end if
              end if
@@ -1158,8 +1164,9 @@ CONTAINS
        ! (7)  regenP (from PO4(pre) and actual PO4)
        ! (8)  regenP-regenC (regenC from regenP)
        ! (9)  regenP-regenC d13C (regenP-regenC d13C in proportion to regenP-regenC/DIC)
-       ! (10) Csoft (Csoft (real regenC))
-       ! (11) Csoft d13C (Csoft d13C in proportion to Csoft/DIC)
+       ! (10) regenC (Csoft (real regenC))
+       ! (11) regenC d13C (regenC d13C in proportion to regenC/DIC)
+       ! (12) regend13C (Csoft d13C in proportion to Csoft/DIC)
        ! (**) Ccarb (DIC minus DIC(pre) minus Csoft) *** TO-DO ***
        ! (**) Ccarb d13C (DIC d13C minus d13C(pre) minus Csoft d13C in respective proportions ...) *** TO-DO ***
        !-----------------------------------------------------------------------
@@ -1169,8 +1176,10 @@ CONTAINS
           ! (1) O2(sat)
           if (ocn_select(io_O2)) then
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_O2sat'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1187,8 +1196,7 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (2) AOU (from O2(sat) and O2)
@@ -1196,8 +1204,10 @@ CONTAINS
           ! NOTE: loop rather than manipulate the full arrays directly to preserve the null values for non ocean points
           !       (doing null minus null might be messy, and we don't like messy here)
           if (ocn_select(io_O2)) then
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_AOU'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1206,8 +1216,7 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (3) AOU-regenP (regen P from AOU)
@@ -1215,8 +1224,10 @@ CONTAINS
           ! NOTE: default: par_bio_red_POP_PO2=-138.0 -- invert sign as AOU is positive
           ! NOTE: int_t_timeslice already taken account of in loc_ijk
           if (ocn_select(io_O2)) then
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_AOU_P'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1225,8 +1236,7 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (4) AOU-regenC (regen C from regen P from AOU)
@@ -1234,8 +1244,10 @@ CONTAINS
           ! NOTE: default: par_bio_red_POP_POC=106.0
           ! NOTE: int_t_timeslice already taken account of in loc_ijk
           if (ocn_select(io_O2)) then
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_AOU_P_C'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1244,8 +1256,7 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (5) AOU-regen13C (regen 13C regen C from from regen P from AOU)
@@ -1256,8 +1267,10 @@ CONTAINS
           ! NOTE: int_t_timeslice already taken account of in loc_ijk
           ! NOTE: no need to change units of int_bio_settle_timeslice
           if (ocn_select(io_O2) .AND. ocn_select(io_DIC_13C)) then
-             loc_unitsname  = 'o/oo'
              loc_name       = 'diag_reg_AOU_P_C_d13C'
+             loc_unitsname  = 'o/oo'
+             loc_min        = -1000.0
+             loc_max        = +1000.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1270,15 +1283,16 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (6) real OU (preformed O2 minus actual O2)
           if (ocn_select(io_O2) .AND. ocn_select(io_col2)) then
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_OU'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1287,15 +1301,16 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (7) real regen P (actual PO4 minus preformed P)
           if (ocn_select(io_PO4) .AND. ocn_select(io_col3)) then
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_P'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1304,16 +1319,17 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (8) regenP-regenC (regen C from regen P)
           ! NOTE: cascade the values of loc_ijk ... containing regen P ... onwards!
           ! NOTE: int_t_timeslice already taken account of in loc_ijk
           if (ocn_select(io_PO4) .AND. ocn_select(io_col3)) then
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_P_C'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1322,8 +1338,7 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (9) regenP-regenC regen d13C (regen 13C from regen C from regen P)
@@ -1331,8 +1346,10 @@ CONTAINS
           ! NOTE: loc_ij already contains the values of POC d13C!
           ! NOTE: int_t_timeslice already taken account of in loc_ijk
           if (ocn_select(io_PO4) .AND. ocn_select(io_col3) .AND. ocn_select(io_DIC_13C)) then
-             loc_unitsname  = 'o/oo'
              loc_name       = 'diag_reg_P_C_d13C'
+             loc_unitsname  = 'o/oo'
+             loc_min        = -1000.0
+             loc_max        = +1000.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1341,14 +1358,15 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
-          ! (11) Csoft regenC for completeness
+          ! (10) Csoft regenC for completeness
           if (ocn_select(io_col9) .AND. ctrl_bio_remin_redox_save) then
-             loc_unitsname  = 'mol kg-1'
              loc_name       = 'diag_reg_C'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1357,11 +1375,30 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
-          ! (11) regen d13C (diag_reg_Csoft_d13C in proportion to Csoft/DIC)
+          ! (11) regenC regen d13C (regen 13C from regen C)
+          ! NOTE: cascade the values of loc_ijk ... containing regen C ... onwards!
+          ! NOTE: loc_ij already contains the values of POC d13C!
+          ! NOTE: int_t_timeslice already taken account of in loc_ijk
+          if (ocn_select(io_PO4) .AND. ocn_select(io_col3) .AND. ocn_select(io_DIC_13C)) then
+             loc_name       = 'diag_reg_C_d13C'
+             loc_unitsname  = 'o/oo'
+             loc_min        = -1000.0
+             loc_max        = +1000.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = loc_ij(i,j)*loc_ijk(i,j,k)/(int_ocn_timeslice(io_DIC,i,j,k)/int_t_timeslice)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (12) regen d13C (diag_reg_Csoft_d13C in proportion to Csoft/DIC)
           ! NOTE: need to calculate regen d13C from regen C and regen 13C
           ! NOTE: remember D14C needs to be NOT selected
           ! NOTE: int_t_timeslices cancel out
@@ -1371,8 +1408,10 @@ CONTAINS
                & ocn_select(io_col8) .AND. ocn_select(io_col9) &
                & ) then
              loc_ijk(:,:,:) = const_real_null
-             loc_unitsname  = 'o/oo'
              loc_name       = 'diag_reg_d13C'
+             loc_unitsname  = 'o/oo'
+             loc_min        = -1000.0
+             loc_max        = +1000.0
              DO i=1,n_i
                 DO j=1,n_j
                    DO k=goldstein_k1(i,j),n_k
@@ -1385,8 +1424,7 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Preformed tracer', &
-                  & trim(loc_unitsname),const_real_zero,const_real_zero)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
        end if

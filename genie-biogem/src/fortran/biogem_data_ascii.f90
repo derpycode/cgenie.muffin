@@ -1056,18 +1056,18 @@ CONTAINS
                 else
                    loc_save = .true.
                    loc_filename=fun_data_timeseries_filename( &
-                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft_d13C',string_results_ext &
+                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Csoft_d13C',string_results_ext &
                         & )
-                   loc_string = '% time (yr) / global total regenerated Csoft 13C (mol) / d13C (o/oo)'
+                   loc_string = '% time (yr) / global total (regenerated, not actually preformed) Csoft 13C (mol) / d13C (o/oo)'
                    if ((.NOT. ctrl_bio_remin_redox_save) .OR. (.NOT. ocn_select(io_col9))) loc_save = .false.
                 end if
              CASE (io_col9)
                 if (ocn_select(io_DIC)) then
                    loc_save = .true.
                    loc_filename=fun_data_timeseries_filename( &
-                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft',string_results_ext &
+                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Csoft',string_results_ext &
                         & )
-                   loc_string = '% time (yr) / global total regenerated Csoft (mol) / global mean (mol kg-1)'
+                   loc_string = '% time (yr) / global total (regenerated, not actually preformed) Csoft (mol) / global mean (mol kg-1)'
                    if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
                 end if
              end select
@@ -1093,7 +1093,7 @@ CONTAINS
        ! (1)
        if (ocn_select(io_col9) .AND. ocn_select(io_col0)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_CsoftpreDIC',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_CsoftPLUSpreDIC',string_results_ext &
                & )
           loc_string = '% time (yr) / global total Csoft + pre DIC (mol) / global mean (mol kg-1)'
           call check_unit(out,__LINE__,__FILE__)
@@ -1107,7 +1107,7 @@ CONTAINS
        ! (2)
        if (ocn_select(io_col9) .AND. ocn_select(io_col3)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_PsoftprePO4',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_PCsoftPLUSprePO4',string_results_ext &
                & )
           loc_string = '% time (yr) / global total Csoft*(P/C) + pre PO4 (mol) / global mean (mol kg-1)'
           call check_unit(out,__LINE__,__FILE__)
@@ -1121,7 +1121,7 @@ CONTAINS
        ! (3)
        if (ocn_select(io_col9) .AND. ocn_select(io_col2)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_O2softpreO2',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_O2PCsoftPLUSpreO2',string_results_ext &
                & )
           loc_string = '% time (yr) / global total -Csoft*(P/C)*(O2/P) + pre O2 (mol) / global mean (mol kg-1)'
           call check_unit(out,__LINE__,__FILE__)
@@ -1136,9 +1136,9 @@ CONTAINS
        if (ocn_select(io_col9) .AND. ocn_select(io_col0) .AND. ocn_select(io_col8) .AND. ocn_select(io_col7) .AND. &
             & (.NOT. ocn_select(io_DIC_14C))) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13Csoftpre13C',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13CsoftPLUSpre13C',string_results_ext &
                & )
-          loc_string = '% time (yr) / global total Csoft 13C + pre 13C (mol) / d13C (o/oo)'
+          loc_string = '% time (yr) / global total Csoft Dd13C + pre Dd13C (mol) / d13C (o/oo)'
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
@@ -2841,7 +2841,7 @@ CONTAINS
                 else
                    loc_save = .true.
                    loc_filename=fun_data_timeseries_filename( &
-                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft_d13C',string_results_ext &
+                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Csoft_d13C',string_results_ext &
                         & )
                    if ((.NOT. ctrl_bio_remin_redox_save) .OR. (.NOT. ocn_select(io_col9))) loc_save = .false.
                 end if
@@ -2849,7 +2849,7 @@ CONTAINS
                 if (ocn_select(io_DIC)) then
                    loc_save = .true.
                    loc_filename=fun_data_timeseries_filename( &
-                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','reg_Csoft',string_results_ext &
+                        & loc_t,par_outdir_name,trim(par_outfile_name)//'_series_diag','preformed_Csoft',string_results_ext &
                         & )
                    if (.NOT. ctrl_bio_remin_redox_save) loc_save = .false.
                 end if
@@ -2916,7 +2916,7 @@ CONTAINS
        ! (1)
        if (ocn_select(io_col9) .AND. ocn_select(io_col0)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_CsoftpreDIC',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_CsoftPLUSpreDIC',string_results_ext &
                & )
           loc_sig = (int_ocn_sig(io_col9) + int_ocn_sig(io_col0))/int_t_sig
           call check_unit(out,__LINE__,__FILE__)
@@ -2933,7 +2933,7 @@ CONTAINS
        ! (2)
        if (ocn_select(io_col9) .AND. ocn_select(io_col3)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_PsoftprePO4',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_PCsoftPLUSprePO4',string_results_ext &
                & )
           loc_sig = (int_ocn_sig(io_col9)/par_bio_red_POP_POC + int_ocn_sig(io_col3))/int_t_sig
           call check_unit(out,__LINE__,__FILE__)
@@ -2951,7 +2951,7 @@ CONTAINS
        ! NOTE: remember that par_bio_red_POP_PO2 is NEGATIVE ...
        if (ocn_select(io_col9) .AND. ocn_select(io_col2)) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_O2softpreO2',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_O2PCsoftPLUSpreO2',string_results_ext &
                & )
           loc_sig = (int_ocn_sig(io_col2) + par_bio_red_POP_PO2*int_ocn_sig(io_col9)/par_bio_red_POP_POC)/int_t_sig
           call check_unit(out,__LINE__,__FILE__)
@@ -2969,7 +2969,7 @@ CONTAINS
        if (ocn_select(io_col9) .AND. ocn_select(io_col0) .AND. ocn_select(io_col8) .AND. ocn_select(io_col7) .AND. &
             & (.NOT. ocn_select(io_DIC_14C))) then
           loc_filename=fun_data_timeseries_filename( &
-               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13Csoftpre13C',string_results_ext &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','diag_reg_13CsoftPLUSpre13C',string_results_ext &
                & )
           loc_tot  = (int_ocn_sig(io_col9) + int_ocn_sig(io_col0))/int_t_sig
           loc_frac = (int_ocn_sig(io_col8) + int_ocn_sig(io_col7))/int_t_sig
