@@ -3295,16 +3295,15 @@ SUBROUTINE diag_biogem_timeslice( &
            if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
               SELECT CASE (trim(opt_geochem_Fe))
               case ('OLD','ALT')
-                 diag_iron(idiag_iron_Fe,:,:,:)   = ocn(io_Fe,:,:,:)
-                 diag_iron(idiag_iron_FeL,:,:,:)  = ocn(io_FeL,:,:,:)
+                 diag_iron(idiag_iron_Fe3,:,:,:)  = ocn(io_Fe,:,:,:)
+                 diag_iron(idiag_iron_Fe3L,:,:,:) = ocn(io_FeL,:,:,:)
                  diag_iron(idiag_iron_L,:,:,:)    = ocn(io_L,:,:,:)
                  diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_Fe,:,:,:) + ocn(io_FeL,:,:,:)
                  diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_L,:,:,:)  + ocn(io_FeL,:,:,:)
-                 diag_iron(idiag_iron_Fe2,:,:,:)  = ocn(io_Fe2,:,:,:)
-                 diag_iron(idiag_iron_geo,:,:,:)  = 0.0
+                 diag_iron(idiag_iron_Fe2,:,:,:)  = 0.0
+                 diag_iron(idiag_iron_TFe3,:,:,:) = 0.0
+                 diag_iron(idiag_iron_geo,:,:,:)  = ocn(io_Fe,:,:,:) + ocn(io_FeL,:,:,:)
               CASE ('FeFe2TL')
-                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_Fe,:,:,:)
-                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
                  DO i=1,n_i
                     DO j=1,n_j
                        loc_k1 = goldstein_k1(i,j)
@@ -3313,18 +3312,19 @@ SUBROUTINE diag_biogem_timeslice( &
                              loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
                                   & ocn(io_Fe,i,j,k),ocn(io_TL,i,j,k),par_K_FeL &
                                   & )
-                             diag_iron(idiag_iron_Fe,i,j,k)  = loc_FeFeLL(1)
-                             diag_iron(idiag_iron_FeL,i,j,k) = loc_FeFeLL(2)
-                             diag_iron(idiag_iron_L,i,j,k)   = loc_FeFeLL(3)
+                             diag_iron(idiag_iron_Fe3,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_Fe3L,i,j,k) = loc_FeFeLL(2)
+                             diag_iron(idiag_iron_L,i,j,k)    = loc_FeFeLL(3)
                           end DO
                        end IF
                     end DO
                  end DO
-                 diag_iron(idiag_iron_Fe2,:,:,:) = ocn(io_Fe2,:,:,:)
-                 diag_iron(idiag_iron_geo,:,:,:) = 0.0
-              CASE ('hybrid')
-                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_Fe,:,:,:) + ocn(io_Fe2,:,:,:)
                  diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
+                 diag_iron(idiag_iron_Fe2,:,:,:)  = ocn(io_Fe2,:,:,:)
+                 diag_iron(idiag_iron_TFe3,:,:,:) = ocn(io_Fe,:,:,:)
+                 diag_iron(idiag_iron_geo,:,:,:)  = 0.0
+              CASE ('hybrid')
                  DO i=1,n_i
                     DO j=1,n_j
                        loc_k1 = goldstein_k1(i,j)
@@ -3333,18 +3333,19 @@ SUBROUTINE diag_biogem_timeslice( &
                              loc_FeFeLL(:) = fun_box_calc_geochem_Fe( &
                                   & ocn(io_TDFe,i,j,k),ocn(io_TL,i,j,k),par_K_FeL &
                                   & )
-                             diag_iron(idiag_iron_Fe,i,j,k)  = loc_FeFeLL(1)
-                             diag_iron(idiag_iron_FeL,i,j,k) = loc_FeFeLL(2)
-                             diag_iron(idiag_iron_L,i,j,k)   = loc_FeFeLL(3)
+                             diag_iron(idiag_iron_Fe3,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_Fe3L,i,j,k) = loc_FeFeLL(2)
+                             diag_iron(idiag_iron_L,i,j,k)    = loc_FeFeLL(3)
                           end DO
                        end IF
                     end DO
                  end DO
-                 diag_iron(idiag_iron_Fe2,:,:,:) = 0.0
-                 diag_iron(idiag_iron_geo,:,:,:) = 0.0
-              CASE ('lookup_4D')
                  diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
                  diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
+                 diag_iron(idiag_iron_Fe2,:,:,:)  = 0.0
+                 diag_iron(idiag_iron_TFe3,:,:,:) = ocn(io_TDFe,:,:,:)
+                 diag_iron(idiag_iron_geo,:,:,:)  = 0.0
+              CASE ('lookup_4D')
                  DO i=1,n_i
                     DO j=1,n_j
                        loc_k1 = goldstein_k1(i,j)
@@ -3354,7 +3355,7 @@ SUBROUTINE diag_biogem_timeslice( &
                                   & (/ ocn(io_T,i,j,k), carb(ic_H,i,j,k),   &
                                   & ocn(io_TDFe,i,j,k), ocn(io_TL,i,j,k) /) &
                                   & )
-                             diag_iron(idiag_iron_Fe,i,j,k)  = loc_FeFeLL(1)
+                             diag_iron(idiag_iron_Fe3,i,j,k) = loc_FeFeLL(1)
                              loc_FeFeLL(1) = fun_box_calc_lookup_Fe_4D_geo( &
                                   & (/ ocn(io_T,i,j,k), carb(ic_H,i,j,k),   &
                                   & ocn(io_TDFe,i,j,k), ocn(io_TL,i,j,k) /) &
@@ -3364,14 +3365,22 @@ SUBROUTINE diag_biogem_timeslice( &
                        end IF
                     end DO
                  end DO
-              CASE default
-                 diag_iron(idiag_iron_Fe,:,:,:)   = 0.0
+                 diag_iron(idiag_iron_Fe3L,i,j,k) = 0.0
+                 diag_iron(idiag_iron_L,i,j,k)    = 0.0
+                 diag_iron(idiag_iron_TDFe,:,:,:) = ocn(io_TDFe,:,:,:)
+                 diag_iron(idiag_iron_TL,:,:,:)   = ocn(io_TL,:,:,:)
                  diag_iron(idiag_iron_Fe2,:,:,:)  = 0.0
-                 diag_iron(idiag_iron_FeL,:,:,:)  = 0.0
+                 diag_iron(idiag_iron_TFe3,:,:,:) = ocn(io_TDFe,:,:,:)
                  diag_iron(idiag_iron_geo,:,:,:)  = 0.0
+              CASE default
+                 diag_iron(idiag_iron_Fe3,:,:,:)  = 0.0
+                 diag_iron(idiag_iron_Fe3L,:,:,:) = 0.0
                  diag_iron(idiag_iron_L,:,:,:)    = 0.0
                  diag_iron(idiag_iron_TDFe,:,:,:) = 0.0
                  diag_iron(idiag_iron_TL,:,:,:)   = 0.0
+                 diag_iron(idiag_iron_Fe2,:,:,:)  = 0.0
+                 diag_iron(idiag_iron_TFe3,:,:,:) = 0.0
+                 diag_iron(idiag_iron_geo,:,:,:)  = 0.0
               end SELECT
            end IF
 

@@ -793,7 +793,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
   INTEGER,PARAMETER::n_diag_react                         = 09 !
-  INTEGER,PARAMETER::n_diag_iron                          = 07 !
+  INTEGER,PARAMETER::n_diag_iron                          = 08 !
   INTEGER,PARAMETER::n_diag_misc_2D                       = 09 !
   INTEGER::n_diag_redox                                   =  0 !
 
@@ -915,13 +915,14 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_precip_FeOOH_dFe              = 06    !
   INTEGER,PARAMETER::idiag_precip_Fe3SiO4_dFe            = 07    !
   ! diagnostics - geochemistry -- iron speciation
-  INTEGER,PARAMETER::idiag_iron_Fe                       = 01    !
-  INTEGER,PARAMETER::idiag_iron_FeL                      = 02    !
+  INTEGER,PARAMETER::idiag_iron_Fe3                      = 01    !
+  INTEGER,PARAMETER::idiag_iron_Fe3L                     = 02    !
   INTEGER,PARAMETER::idiag_iron_L                        = 03    !
   INTEGER,PARAMETER::idiag_iron_TDFe                     = 04    !
   INTEGER,PARAMETER::idiag_iron_TL                       = 05    !
   INTEGER,PARAMETER::idiag_iron_Fe2                      = 06    !
-  INTEGER,PARAMETER::idiag_iron_geo                      = 07    !
+  INTEGER,PARAMETER::idiag_iron_TFe3                     = 07    !
+  INTEGER,PARAMETER::idiag_iron_geo                      = 08    !
   ! diagnostics - geochemistry -- solid-solute reactions
   INTEGER,PARAMETER::idiag_react_POMS_dH2S               = 01    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dFe2              = 02    !
@@ -1046,12 +1047,13 @@ MODULE biogem_lib
        & 'precip_Fe3SiO4_dFe'/)
   ! diagnostics - geochemistry -- Fe speciation
   CHARACTER(len=18),DIMENSION(n_diag_iron),PARAMETER::string_diag_iron = (/ &
-       & 'iron_Fe           ', &
-       & 'iron_FeL          ', &
+       & 'iron_Fe3          ', &
+       & 'iron_Fe3L         ', &
        & 'iron_L            ', &
        & 'iron_TDFe         ', &
        & 'iron_TL           ', &
        & 'iron_Fe2          ', &
+       & 'iron_TFe3         ', &
        & 'iron_geo          ' /)
   ! diagnostics - geochemistry -- solid-solute reactions
   CHARACTER(len=20),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &
