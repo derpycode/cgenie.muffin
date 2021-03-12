@@ -99,8 +99,8 @@
  FeS             101 101  01  'dissolved Iron(II) sulfide'              'mol kg-1'   -9.99E+2    9.99E-1
  FeS_56Fe        102 101  22  'd56Fe of FeS'                            'o/oo'       -9.99E+2    9.99E+2
  FeS_34S         103 101  15  'd34S of FeS'                             'o/oo'       -9.99E+2    9.99E+2
- FeOOH           107 107  01  'dissolved Iron(II) sulfide'              'mol kg-1'   -9.99E+2    9.99E-1
- FeOOH_56Fe      108 107  22  'd56Fe of FeS'                            'o/oo'       -9.99E+2    9.99E+2
+ FeOOH           107 107  01  'dissolved FeOOH'                         'mol kg-1'   -9.99E+2    9.99E-1
+ FeOOH_56Fe      108 107  22  'd56Fe of FeOOH'                          'o/oo'       -9.99E+2    9.99E+2
  I                92  92  01  'iodide'                                  'mol kg-1'   -9.99E+2    9.99E-1
  IO3              93  93  01  'iodate'                                  'mol kg-1'   -9.99E+2    9.99E-1
  Ba               96  96  01  'dissolved barium (Ba)'                   'mol kg-1'   -9.99E+2    9.99E-1

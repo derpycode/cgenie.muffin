@@ -3070,6 +3070,7 @@ CONTAINS
                               & loc_r56Fe*loc_scav_Fe
                       end if
                    end if
+                   print*,k,trim(opt_geochem_Fe),loc_FeFeLL(1),loc_scav_Fe,loc_bio_part_TMP(is2l(is_POM_Fe),k) 
                 CASE ('FeFe2TL')
                    if (loc_FeFeLL(1) > const_real_nullsmall) then
                       loc_scav_Fe = fun_box_scav_Fe(          &
