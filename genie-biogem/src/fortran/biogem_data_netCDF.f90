@@ -839,7 +839,12 @@ CONTAINS
          & (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) &
          & ) then
        DO id=1,n_diag_iron
-          loc_unitsname = 'mol kg-1'
+          select case (id)
+          CASE (idiag_iron_TFe3pct)
+             loc_unitsname = 'percent (%)'
+          case default
+             loc_unitsname = 'mol kg-1'
+          end SELECT
           loc_ijk(:,:,:) = int_diag_iron_timeslice(id,:,:,:)/int_t_timeslice
           call sub_adddef_netcdf(loc_iou,4,'diag_'//trim(string_diag_iron(id)), &
                & 'water-column Fe speciation - '//trim(string_diag_iron(id)), &
@@ -847,6 +852,48 @@ CONTAINS
           call sub_putvar3d_g('diag_'//trim(string_diag_iron(id)),loc_iou, &
                & n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end DO
+    end If
+    !----------------------------------------------------------------
+    !       Fe speciation [isotopes]
+    !----------------------------------------------------------------
+    If ( &
+         & (ctrl_data_save_slice_ocn) &
+         & .AND. &
+         & (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) &
+         & ) then
+       loc_ijk(:,:,:) = const_real_null
+       loc_standard   = const_standards(ocn_type(io_Fe_56Fe))
+       DO i=1,n_i
+          DO j=1,n_j
+             DO k=goldstein_k1(i,j),n_k
+                if (ocn_select(io_Fe_56Fe) .AND. ocn_select(io_FeL_56Fe)) then
+                   loc_tot  = (int_ocn_timeslice(io_Fe,i,j,k) + int_ocn_timeslice(io_FeL,i,j,k))/int_t_timeslice
+                   loc_frac = (int_ocn_timeslice(io_Fe_56Fe,i,j,k) + int_ocn_timeslice(io_FeL_56Fe,i,j,k))/int_t_timeslice
+                   loc_save = .true.
+                elseif (ocn_select(io_Fe_56Fe) .AND. ocn_select(io_Fe2_56Fe)) then
+                   loc_tot  = (int_ocn_timeslice(io_Fe,i,j,k) + int_ocn_timeslice(io_Fe2,i,j,k))/int_t_timeslice
+                   loc_frac = (int_ocn_timeslice(io_Fe_56Fe,i,j,k) + int_ocn_timeslice(io_Fe2_56Fe,i,j,k))/int_t_timeslice
+                   loc_save = .true.
+                elseif (ocn_select(io_TDFe_56Fe)) then
+                   loc_tot  = int_ocn_timeslice(io_TDFe,i,j,k)/int_t_timeslice
+                   loc_frac = int_ocn_timeslice(io_TDFe_56Fe,i,j,k)/int_t_timeslice
+                   loc_save = .true.
+                else
+                   loc_save = .false.
+                end if
+                if (loc_save) loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+             END DO
+          END DO
+       END DO
+       if (loc_save) then
+          loc_unitsname  = 'o/oo'
+          loc_min        = -1000.0
+          loc_max        = +1000.0
+          loc_name = 'diag_iron_TDFe_d56Fe'
+          call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'water-column Fe speciation - d56Fe (total dissolved iron)', &
+               & trim(loc_unitsname),loc_min,loc_max)
+          call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+       end if
     end If
     !----------------------------------------------------------------
     !       Os isotope ratios
