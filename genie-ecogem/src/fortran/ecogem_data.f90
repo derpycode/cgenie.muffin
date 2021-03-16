@@ -385,7 +385,7 @@ CONTAINS
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
-	        heterotrophy(jp)    = 1.0
+	  heterotrophy(jp)    = 1.0
           palatability(jp)    = 1.0
        elseif (pft(jp).eq.'mixotroph') then
           NO3up(jp)           = 0.0
@@ -393,7 +393,7 @@ CONTAINS
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = trophic_tradeoff
-	        heterotrophy(jp)    = trophic_tradeoff
+	  heterotrophy(jp)    = trophic_tradeoff
           palatability(jp)    = 1.0
        elseif (pft(jp).eq.'foram') then
           NO3up(jp)           = 0.0
@@ -401,7 +401,7 @@ CONTAINS
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
-	        heterotrophy(jp)    = trophic_tradeoff  * 0.9
+	  heterotrophy(jp)    = trophic_tradeoff  * 0.9
           palatability(jp)    = 0.8
        else
           print*," "

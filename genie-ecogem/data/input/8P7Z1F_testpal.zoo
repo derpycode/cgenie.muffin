@@ -1,0 +1,48 @@
+
+ 01                 02  03	04	05	06 	07	08	09
+ \/                 \/  \/	\/	\/	\/ 	\/	\/	\/
+
+-START-OF-DATA-
+ Phytoplankton	    f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Phytoplankton      f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Phytoplankton      f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Phytoplankton      f	f	10.0	2.0	2.0	1.0	1.0	1.0
+ Phytoplankton      f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Phytoplankton      f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Phytoplankton      f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Phytoplankton      f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Zooplankton        f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Zooplankton        f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Zooplankton        f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Zooplankton        f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Zooplankton        f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Zooplankton        f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Zooplankton        f	f	10.0	2.0	2.0 	1.0	1.0	1.0
+ Foram              t   f       10.0    2.0     1.0 	0.7	0.8	0.9
+-END-OF-DATA-
+
+ /\                 /\ /\	/\	/\	/\	/\	/\	/\
+ 01                 02 03	04	05	06	07	08	09
+
+DATA FORMAT AND ORDER
+---------------------
+COLUMN #01: functional type (dummy argument same as .eco file)
+COLUMN #02: herbivory (graze on phytoplankton only - if heterotrophy > 0.0)
+COLUMN #03: carnivory (graze on zooplankton only - if heterotrophy > 0.0)
+COLUMN #04: pp_opt_a  (optimal predator:prey ratio)
+COLUMN #05: pp_sig_a  (width of grazing kernel)
+COLUMN #06: ns (prey-switching - 2.0 = active, 1.0 = passive)
+COLUMN #07: mortality protection
+COLUMN #08: palatability
+COLUMN #09: growth-cost factor (e.g., a 10% cost is equivalent to a 0.9 growth-cost factor)
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+                                 Zooplankton
+                                 Mixotroph
