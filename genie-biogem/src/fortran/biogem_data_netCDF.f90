@@ -1171,8 +1171,8 @@ CONTAINS
        ! (12) diag_reg_d13C -- regend13C (Csoft d13C in proportion to Csoft/DIC)
        ! (13) diag_reg_DIC -- DIC (from PreC + regenC)
        ! (14) diag_reg_DIC_d13C -- DIC d13C (from PreC d13C + regenC d13C)
-       ! (**) Ccarb (DIC minus DIC(pre) minus Csoft) *** TO-DO ***
-       ! (**) Ccarb d13C (DIC d13C minus d13C(pre) minus Csoft d13C in respective proportions ...) *** TO-DO ***
+       ! (15) Ccarb (DIC minus (DIC(pre) plus Csoft))
+       ! (16) Ccarb d13C (DIC d13C minus (d13C(pre) plus Csoft d13C)) in respective proportions ...
        !-----------------------------------------------------------------------
        ! NOTE: all is deliberately and tediously re-done behind ctrl_bio_preformed and then behind seperate 'ifs' 
        !       to make the code clearer and mroe transparent(?)
@@ -1473,6 +1473,53 @@ CONTAINS
              call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
+          ! (15) Ccarb (DIC minus (DIC(pre) plus Csoft))
+          if (ocn_select(io_col0) .AND. ocn_select(io_col9) .AND. ctrl_bio_remin_redox_save) then
+             loc_name       = 'diag_reg_CaCO3'
+             loc_unitsname  = 'mol kg-1'
+             loc_min        = -1.0
+             loc_max        = +1.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_ijk(i,j,k) = int_ocn_timeslice(io_DIC,i,j,k)/int_t_timeslice - &
+                           & (int_ocn_timeslice(io_col0,i,j,k) + int_ocn_timeslice(io_col9,i,j,k))/int_t_timeslice
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! (16) Ccarb d13C (DIC d13C minus d13C(pre) minus Csoft d13C in respective proportions ...
+          ! NOTE: int_t_timeslices cancel out
+          if ( &
+               & ocn_select(io_DIC_13C) .AND. (.NOT. ocn_select(io_DIC_14C)) .AND. ctrl_bio_remin_redox_save .AND. &
+               & ocn_select(io_col0) .AND. ocn_select(io_col9) .AND. ocn_select(io_col7) .AND. ocn_select(io_col8) &
+               & ) then
+             loc_ijk(:,:,:) = const_real_null
+             loc_name       = 'diag_reg_CaCO3_d13C'
+             loc_unitsname  = 'o/oo'
+             loc_min        = -1000.0
+             loc_max        = +1000.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   DO k=goldstein_k1(i,j),n_k
+                      loc_tot  = int_ocn_timeslice(io_DIC,i,j,k) - &
+                           & (int_ocn_timeslice(io_col0,i,j,k) + int_ocn_timeslice(io_col9,i,j,k))
+                      loc_frac = int_ocn_timeslice(io_DIC_13C,i,j,k) - &
+                           & (int_ocn_timeslice(io_col7,i,j,k) + int_ocn_timeslice(io_col8,i,j,k))
+                      loc_standard = const_standards(ocn_type(io_DIC_13C))
+                      loc_ijk(i,j,k) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      loc_ijk(i,j,k) = loc_ijk(i,j,k)*loc_tot/int_ocn_timeslice(io_DIC,i,j,k)
+                   END DO
+                END DO
+             END DO
+             ! write to netCDF
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+          end if
+          ! [end of preformed tracer ctrl_bio_preformed IF]
        end if
        !
     end If

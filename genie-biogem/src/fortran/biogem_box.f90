@@ -1608,6 +1608,7 @@ CONTAINS
           loc_bio_uptake(io_Fe2,n_k) = loc_frac_Fe2*loc_bio_uptake(io_Fe2,n_k)
           ! correct isotope source balance
           ! (all Fe2+ 56Fe, plus a proportion of Fe3+ 56Fe equal to the proportion of Fe3+ removed out of total Fe3+)
+          ! => replace the 56Fe value in POM
           If (ocn_select(io_Fe_56Fe) .AND. (ocn_select(io_Fe2_56Fe))) then
              if (ocn(io_Fe_56Fe,dum_i,dum_j,n_k) > const_rns) then
                 loc_bio_uptake(io_Fe_56Fe,n_k) = &
@@ -1621,6 +1622,8 @@ CONTAINS
              else
                 loc_bio_uptake(io_Fe2_56Fe,n_k) = 0.0
              end if
+             ! replace the 56Fe value in POM
+             bio_part(is_POFe_56Fe,dum_i,dum_j,n_k) = loc_bio_uptake(io_Fe_56Fe,n_k) + loc_bio_uptake(io_Fe2_56Fe,n_k)
           end if
        else
           loc_frac_Fe2 = 1.0

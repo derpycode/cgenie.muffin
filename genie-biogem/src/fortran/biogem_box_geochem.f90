@@ -495,9 +495,9 @@ CONTAINS
           loc_bio_remin(io_Fe,k)  = loc_Fe2_oxidation(k)
           loc_bio_remin(io_O2,k)  = -1.0/4.0*loc_Fe2_oxidation(k)
           ! isotopic fractionation
-          ! NOTE: we already know that loc_Fe2 is non-zero
+          ! NOTE: we already know that Fe2 is non-zero
           if (ocn_select(io_Fe2_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
-             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/loc_Fe2
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
              loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
              loc_bio_remin(io_Fe2_56Fe,k)  &
                   & = -par_d56Fe_Fe2ox_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe2ox_alpha*loc_R_56Fe)*loc_Fe2_oxidation(k)
@@ -542,9 +542,9 @@ CONTAINS
           loc_bio_remin(io_SO4,k) = loc_H2S_oxidation(k)
           loc_bio_remin(io_ALK,k) = -2.0*loc_H2S_oxidation(k)
           ! calculate isotopic fractionation -- 56Fe
-          ! NOTE: we already know that loc_Fe2 is non-zero
+          ! NOTE: we already know that Fe is non-zero
           if (ocn_select(io_Fe2_56Fe) .AND. ocn_select(io_Fe_56Fe)) then
-             loc_r56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,k)/loc_Fe
+             loc_r56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k)
              loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
              loc_bio_remin(io_Fe_56Fe,k)  = &
                   & -par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction(k)
@@ -552,9 +552,9 @@ CONTAINS
                   & par_d56Fe_Fered_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fered_alpha*loc_R_56Fe)*loc_Fe_reduction(k)
           end if
           ! calculate isotopic fractionation -- 34S
-          ! NOTE: we already know that loc_H2S is non-zero
+          ! NOTE: we already know that H2S is non-zero
           if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
-             loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/loc_H2S
+             loc_r34S = ocn(io_H2S_34S,dum_i,dum_j,k)/ocn(io_H2S,dum_i,dum_j,k)
              loc_R_34S = loc_r34S/(1.0 - loc_r34S) 
              loc_bio_remin(io_H2S_34S,k) = &
                   & -par_d34S_Fered_alpha*loc_R_34S/(1.0 + par_d34S_Fered_alpha*loc_R_34S)*loc_H2S_oxidation(k)
