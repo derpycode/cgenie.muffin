@@ -165,6 +165,8 @@ MODULE ecogem_lib
   ! explicit grazing parameters
   logical::ctrl_grazing_explicit
   namelist /ini_ecogem_nml/ctrl_grazing_explicit
+  logical::gkernel_cap
+  namelist /ini_ecogem_nml/gkernel_cap
   character(len=127)::par_ecogem_grazing_file
   namelist /ini_ecogem_nml/par_ecogem_grazing_file
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
@@ -282,6 +284,7 @@ MODULE ecogem_lib
   real             ,ALLOCATABLE,DIMENSION(:)    ::pp_opt_a_array,pp_sig_a_array,ns_array   ! grazing parameters as arrays
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::prey_refuge                              ! PFT dependent traits - Added by Grigoratou, Dec18
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::mort_protect                             ! PFT dependent traits - Added by Grigoratou, Dec18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::growthcost_factor                        ! PFT dependent traits - Added by Grigoratou, Dec18
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::palatability                             ! Lower value for defence strategy
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::NO3up,Nfix,calcify,silicify              ! PFT dependent traits
   REAL             ,ALLOCATABLE,DIMENSION(:,:)  ::qmin,qmax,vmax,affinity,kexc             ! Nutrient quota parameters

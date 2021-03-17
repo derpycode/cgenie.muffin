@@ -139,15 +139,17 @@ CONTAINS
        write(*,71),'  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
        write(*,68),'  - maximum temperature                (temp_max) :   ',temp_max
        if(ctrl_grazing_explicit)then
-         write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a=','plankton specific values set in:',par_ecogem_grazing_file, ', b=', pp_opt_b
-         write(*,69),'  - width of grazing kernel              (pp_sig) : a=','plankton specific values set in:',par_ecogem_grazing_file, ', b=',  pp_sig_b
-         write(*,67),'  - prey switching exponent (integer)        (ns) :   ','plankton specific values set in:',par_ecogem_grazing_file
-         write(*,67),'  - herbivory                                     :   ','plankton specific values set in:',par_ecogem_grazing_file
-         write(*,67),'  - carnivory                                     :   ','plankton specific values set in:',par_ecogem_grazing_file
+         write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a= plankton specific values set in:',par_ecogem_grazing_file, ', b=', pp_opt_b
+         write(*,69),'  - width of grazing kernel              (pp_sig) : a= plankton specific values set in:',par_ecogem_grazing_file, ', b=',  pp_sig_b
+         write(*,67),'  - prey switching exponent (integer)        (ns) :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,67),'  - herbivory                                     :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,67),'  - carnivory                                     :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,69),'  - palatability                                  :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,69),'  - growth cost factor                            :    plankton specific values set in:',par_ecogem_grazing_file
        else
          write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a=',   pp_opt_a,', b=',   pp_opt_b
          write(*,69),'  - width of grazing kernel              (pp_sig) : a=',   pp_sig_a,', b=',   pp_sig_b
-        write(*,67),'  - prey switching exponent (integer)        (ns) :   ',    ns
+         write(*,67),'  - prey switching exponent (integer)        (ns) :   ',   ns
       endif
 
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
@@ -330,7 +332,6 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-          palatability(jp)    = 1.0
        elseif (pft(jp).eq.'synechococcus') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -338,7 +339,6 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-          palatability(jp)    = 1.0
        elseif (pft(jp).eq.'picoeukaryote') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -346,7 +346,6 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-          palatability(jp)    = 1.0
        elseif (pft(jp).eq.'diatom') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -354,7 +353,6 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-          palatability(jp)    = 1.0
        elseif (pft(jp).eq.'coccolithophore') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -362,7 +360,6 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-          palatability(jp)    = 1.0
        elseif (pft(jp).eq.'diazotroph') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -370,7 +367,6 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-          palatability(jp)    = 1.0
        elseif (pft(jp).eq.'phytoplankton') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -378,31 +374,27 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-          palatability(jp)    = 1.0
        elseif (pft(jp).eq.'zooplankton') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
-	  heterotrophy(jp)    = 1.0
-          palatability(jp)    = 1.0
+          heterotrophy(jp)    = 1.0
        elseif (pft(jp).eq.'mixotroph') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = trophic_tradeoff
-	  heterotrophy(jp)    = trophic_tradeoff
-          palatability(jp)    = 1.0
+          heterotrophy(jp)    = trophic_tradeoff
        elseif (pft(jp).eq.'foram') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
-	  heterotrophy(jp)    = trophic_tradeoff  * 0.9
-          palatability(jp)    = 0.8
+          heterotrophy(jp)    = 1.0
        else
           print*," "
           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -429,6 +421,21 @@ CONTAINS
     respir(:)     = 0.0
     biosink(:)    = 0.0
     mort(:)       = 0.0
+
+    !-----------------------------------------------------------------------------------------
+    ! populate array like in wardetal.2018
+    if(ctrl_grazing_explicit.eqv..false.)then
+       pp_opt_a_array(:)=pp_opt_a
+       pp_sig_a_array(:)=pp_sig_a
+       ns_array(:)=ns
+       mort_protect(:)=1.0
+       herbivory(:)=.false.
+       carnivory(:)=.false.
+       palatability(:)=1.0
+       growthcost_factor(:)=1.0
+    endif
+    ! set growth costs (could do the same for autotrophy in coccolithophores) - Fanny Mar21
+    heterotrophy(:) = heterotrophy(:)*growthcost_factor(:)
 
     !-----------------------------------------------------------------------------------------
     ! maximum photosynthetic rate
@@ -485,16 +492,6 @@ CONTAINS
        kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
     endif
     !-----------------------------------------------------------------------------------------
-    ! populate array hack
-    if(ctrl_grazing_explicit.eqv..false.)then
-       pp_opt_a_array(:)=pp_opt_a
-       pp_sig_a_array(:)=pp_sig_a
-       ns_array(:)=ns
-       mort_protect(:)=1.0
-       herbivory(:)=.false.
-       carnivory(:)=.false.
-    endif
-
     ! other parameters
     qcarbon(:)  =     qcarbon_a * volume(:) ** qcarbon_b
     alphachl(:) =    alphachl_a * volume(:) ** alphachl_b
@@ -524,7 +521,7 @@ CONTAINS
         end do
     end select
     end do
-    gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0
+    if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
     gkernelT(:,:) =transpose(gkernel(:,:))
 
     ! detrital partitioning
@@ -737,6 +734,8 @@ CONTAINS
     real              ::loc_pp_sig_a
     real              ::loc_ns
     real              ::loc_mort_protect
+    real              ::loc_palatability
+    real              ::loc_growthcost_factor
 
     ! if setting plankton specific parameters
    ! check file format and determine number of lines of data
@@ -773,20 +772,24 @@ CONTAINS
       END DO
       !read in population specifications
       DO n = 1,loc_n_elements
-         READ(unit=in,FMT=*)         &
-              & loc_plnktn_pft,      & ! COLUMN #01: plankton PFT (not used here)
-              & loc_herbivory,      & ! COLUMN #02: herbivory
-              & loc_carnivory,     & ! COLUMN #03: carnivory
-              & loc_pp_opt_a,     & ! COLUMN #04: pp_opt_a
-              & loc_pp_sig_a,     & ! COLUMN #05: pp_sig_a
-              & loc_ns,           &! COLUMN #06: ns (prey switching)
-              & loc_mort_protect ! COLUMN #07: mortality_protection
-         herbivory(n) = loc_herbivory
-         carnivory(n) = loc_carnivory
-         pp_opt_a_array(n) = loc_pp_opt_a
-         pp_sig_a_array(n) = loc_pp_sig_a
-         ns_array(n) = loc_ns
-         mort_protect(n)=loc_mort_protect
+         READ(unit=in,FMT=*)            &
+              & loc_plnktn_pft,         & ! COLUMN #01: plankton PFT (not used here)
+              & loc_herbivory,          & ! COLUMN #02: herbivory
+              & loc_carnivory,          & ! COLUMN #03: carnivory
+              & loc_pp_opt_a,           & ! COLUMN #04: pp_opt_a
+              & loc_pp_sig_a,           & ! COLUMN #05: pp_sig_a
+              & loc_ns,                 & ! COLUMN #06: ns (prey switching)
+              & loc_mort_protect,       & ! COLUMN #07: mortality_protection
+	      & loc_palatability,       & ! COLUMN #08: palatability - in development - Fanny Mar21
+              & loc_growthcost_factor     ! COLUMN #09: growth-cost factor - in development - Fanny Mar21
+         herbivory(n)         = loc_herbivory
+         carnivory(n)         = loc_carnivory
+         pp_opt_a_array(n)    = loc_pp_opt_a
+         pp_sig_a_array(n)    = loc_pp_sig_a
+         ns_array(n)          = loc_ns
+         mort_protect(n)      = loc_mort_protect
+         palatability(n)      = loc_palatability
+         growthcost_factor(n) = loc_growthcost_factor
 
       END DO
       !close file pipe

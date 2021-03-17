@@ -8626,6 +8626,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
 	                  <description>Width of grazing kernel - exponent</description>
                     </param>
+                    <param name="gkernel_cap">
+			<value datatype="boolean">.true.</value>
+	                  <description>Set small values of gkernel to zero (like in wardetal.2018) - Fanny Mar21</description>
+                    </param>
+
                     <param name="ctrl_grazing_explicit">
 			<value datatype="boolean">.false.</value>
 	                  <description>Select plankton specific grazing parameters JDW_FMM_2020</description>
