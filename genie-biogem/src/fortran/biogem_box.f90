@@ -1601,24 +1601,24 @@ CONTAINS
        If (loc_FeT > const_rns) then
           ! relative availablity of Fe2+ 
           loc_frac_Fe2 = ocn(io_Fe2,dum_i,dum_j,n_k)/loc_FeT
+          if (loc_frac_Fe2 < const_rns) loc_frac_Fe2 = 0.0
+          if (loc_frac_Fe2 > 1.0)       loc_frac_Fe2 = 1.0
           ! correct bulk iron source balance
           ! NOTE: can directly replace Fe and Fe2 in loc_bio_uptake, but only adjust existing O2 value
           loc_bio_uptake(io_Fe,n_k)  = (1.0 - loc_frac_Fe2)*loc_bio_uptake(io_Fe2,n_k)
           loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k) - (1.0/4.0)*loc_bio_uptake(io_Fe,n_k)
           loc_bio_uptake(io_Fe2,n_k) = loc_frac_Fe2*loc_bio_uptake(io_Fe2,n_k)
           ! correct isotope source balance
-          ! (all Fe2+ 56Fe, plus a proportion of Fe3+ 56Fe equal to the proportion of Fe3+ removed out of total Fe3+)
-          ! => replace the 56Fe value in POM
           If (ocn_select(io_Fe_56Fe) .AND. (ocn_select(io_Fe2_56Fe))) then
-             if (ocn(io_Fe_56Fe,dum_i,dum_j,n_k) > const_rns) then
-                loc_bio_uptake(io_Fe_56Fe,n_k) = &
-                     & ocn(io_Fe_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe,n_k)/ocn(io_Fe_56Fe,dum_i,dum_j,n_k))
+             if (ocn(io_Fe,dum_i,dum_j,n_k) > const_rns) then
+                loc_bio_uptake(io_Fe_56Fe,n_k) =  &
+                     & ocn(io_Fe_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe,n_k)/ocn(io_Fe,dum_i,dum_j,n_k))
              else
                 loc_bio_uptake(io_Fe_56Fe,n_k) = 0.0
              end if
-             if (ocn(io_Fe2_56Fe,dum_i,dum_j,n_k) > const_rns) then
+             if (ocn(io_Fe2,dum_i,dum_j,n_k) > const_rns) then
                 loc_bio_uptake(io_Fe2_56Fe,n_k) = &
-                     & ocn(io_Fe2_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe2,n_k)/ocn(io_Fe2_56Fe,dum_i,dum_j,n_k))
+                     & ocn(io_Fe2_56Fe,dum_i,dum_j,n_k)*(loc_bio_uptake(io_Fe2,n_k)/ocn(io_Fe2,dum_i,dum_j,n_k))
              else
                 loc_bio_uptake(io_Fe2_56Fe,n_k) = 0.0
              end if
