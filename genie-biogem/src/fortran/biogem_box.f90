@@ -2656,7 +2656,7 @@ CONTAINS
     real,dimension(n_sed,n_k)::loc_bio_part                             !
     integer::loc_i,loc_j,loc_k1
     real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                       !
-    CHARACTER(len=31)::loc_string     !
+!!$    CHARACTER(len=31)::loc_string     !
     real,DIMENSION(n_diag_redox,n_k)::loc_diag_redox
 !!$    ! define and allocate local arrays
 !!$    real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
@@ -2765,8 +2765,9 @@ CONTAINS
                 tmp_bio_remin = loc_conv_ls_lo(lo,ls)*loc_bio_part(l2is(ls),k)
                 loc_vbio_remin(lo,k) = loc_vbio_remin(lo,k) + tmp_bio_remin
                 if (ctrl_bio_remin_redox_save) then
-                   loc_string = 'reminD_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$                   loc_string = 'reminD_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+!!$                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                   id = conv_lslo2idD(ls,lo)
                    loc_diag_redox(id,k) = tmp_bio_remin
                 end if
              end if
@@ -2780,13 +2781,15 @@ CONTAINS
     if (ctrl_bio_remin_redox_save) then
        diag_redox(:,loc_i,loc_j,:) = diag_redox(:,loc_i,loc_j,:) + loc_diag_redox(:,:)
        if (ocn_select(io_col9) .AND. (.NOT. ctrl_bio_preformed_CsoftPOConly)) then
-          loc_string = 'reminD_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
-          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$          loc_string = 'reminD_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+!!$          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          id = conv_lslo2idD(is2l(is_POC),io2l(io_DIC))
           loc_vbio_remin(io2l(io_col9),:) = loc_vbio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
        end if
        if (ocn_select(io_col8) .AND. (.NOT. ctrl_bio_preformed_CsoftPOConly) .AND. (.NOT. ocn_select(io_DIC_14C)))then
-          loc_string = 'reminD_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
-          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$          loc_string = 'reminD_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
+!!$          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          id = conv_lslo2idD(is2l(is_POC_13C),io2l(io_DIC_13C))
           loc_vbio_remin(io2l(io_col8),:) = loc_vbio_remin(io2l(io_col8),:) + loc_diag_redox(id,:)
        end if
     end if
@@ -2851,7 +2854,7 @@ CONTAINS
     real,dimension(1:n_l_sed,1:n_k)::loc_bio_settle
     real,dimension(1:n_l_sed)::loc_bio_part_remin
     real,DIMENSION(n_diag_precip,n_k)::loc_diag_precip
-    CHARACTER(len=31)::loc_string     !
+!!$    CHARACTER(len=31)::loc_string     !
     real,DIMENSION(n_diag_redox,n_k)::loc_diag_redox
 !!$    ! define and allocate local arrays
 !!$    real,DIMENSION(:,:),ALLOCATABLE::loc_diag_redox
@@ -3485,8 +3488,9 @@ CONTAINS
                          tmp_bio_remin = loc_conv_ls_lo(lo,ls)*loc_bio_part_remin(ls)
                          loc_bio_remin(lo,kk) = loc_bio_remin(lo,kk) + tmp_bio_remin
                          if (ctrl_bio_remin_redox_save) then
-                            loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                            id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$                            loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+!!$                            id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                            id = conv_lslo2idP(ls,lo)
                             loc_diag_redox(id,kk) = loc_diag_redox(id,kk) + tmp_bio_remin
                          end if
                       end if
@@ -3792,13 +3796,15 @@ CONTAINS
        diag_redox(:,dum_i,dum_j,:)  = diag_redox(:,dum_i,dum_j,:)  + loc_diag_redox(:,:)
        diag_precip(:,dum_i,dum_j,:) = diag_precip(:,dum_i,dum_j,:) + loc_diag_precip(:,:)
        if (ocn_select(io_col9)) then
-          loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
-          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$          loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+!!$          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          id = conv_lslo2idP(is2l(is_POC),io2l(io_DIC))
           loc_bio_remin(io2l(io_col9),:) = loc_bio_remin(io2l(io_col9),:) + loc_diag_redox(id,:)
        end if
        if (ocn_select(io_col8) .AND. (.NOT. ocn_select(io_DIC_14C)))then
-          loc_string = 'reminP_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
-          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$          loc_string = 'reminP_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
+!!$          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+          id = conv_lslo2idP(is2l(is_POC_13C),io2l(io_DIC_13C))
           loc_bio_remin(io2l(io_col8),:) = loc_bio_remin(io2l(io_col8),:) + loc_diag_redox(id,:)
        end if
     end if

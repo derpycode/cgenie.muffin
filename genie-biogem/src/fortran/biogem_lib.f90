@@ -1202,6 +1202,10 @@ MODULE biogem_lib
 !!$  REAL,DIMENSION(n_ocn,n_i,n_j,n_k)::docn                        ! ***********
 !!$  REAL,DIMENSION(n_sed,n_i,n_j,n_k)::dbio_part                   ! ***********
 !!$! ***********
+  
+  ! *** INDEXING ***
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lslo2idP              !
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lslo2idD              !
 
   ! *** GOLDSTEIN interface with BioGeM ***
   real,dimension(n_ocn)::tstoocn_offset                          ! tracer units offset (GOLDSTEIN <-> BIOGEM conversion)
@@ -2150,7 +2154,44 @@ CONTAINS
   ! MISC
   ! ****************************************************************************************************************************** !
 
+  
+  ! ****************************************************************************************************************************** !
+  ! FIND INDEX OF STRING ... IN REDOX ARRAY
+  ! NOTE: non generic version of fun_find_str_i
+  FUNCTION fun_find_str_i_redox(dum_str)
+    ! common blocks
+    IMPLICIT NONE
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    INTEGER::fun_find_str_i_redox
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    CHARACTER(len=*),INTENT(in)::dum_str
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::n,loc_i
+    ! -------------------------------------------------------- !
+    ! FIND i
+    ! -------------------------------------------------------- !
+    loc_i = 0
+    do n=1,n_diag_redox
+       if (dum_str == string_diag_redox(n)) then
+          loc_i = n
+          exit
+       end if
+    end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+    fun_find_str_i_redox = loc_i
+    ! -------------------------------------------------------- !
+  END FUNCTION fun_find_str_i_redox
+  ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   !
   subroutine sub_wasteCPUcycles1(dum_ocn,dum_string,dum_n)

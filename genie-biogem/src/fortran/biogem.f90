@@ -78,7 +78,7 @@ subroutine biogem(        &
   real::loc_M
   real,dimension(1:n_l_ocn)::loc_vocn                            !
   real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                !
-  CHARACTER(len=31)::loc_string     !
+!!$  CHARACTER(len=31)::loc_string     !
 !!!integer::nthreads,thread_id
 
   loc_debug_ij = .FALSE.
@@ -515,8 +515,9 @@ subroutine biogem(        &
                                 locijk_focn(l2io(lo),i,j,n_k) = locijk_focn(l2io(lo),i,j,n_k) + loc_remin/loc_dtyr
                                 ! remin diagnostics
                                 if (ctrl_bio_remin_redox_save) then
-                                   loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$                                   loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+!!$                                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                                   id = conv_lslo2idP(ls,lo)
                                    diag_redox(id,i,j,n_k) = diag_redox(id,i,j,n_k) + phys_ocn(ipo_rM,i,j,n_k)*loc_remin
                                 end if
                              else
@@ -540,8 +541,9 @@ subroutine biogem(        &
                                 locij_fsedocn(l2io(lo),i,j) = locij_fsedocn(l2io(lo),i,j) + loc_remin
                                 ! remin diagnostics
                                 if (ctrl_bio_remin_redox_save) then
-                                   loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
-                                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$                                   loc_string = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+!!$                                   id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                                   id = conv_lslo2idP(ls,lo)
                                    diag_redox(id,i,j,loc_k1) = diag_redox(id,i,j,loc_k1) + phys_ocn(ipo_rM,i,j,loc_k1)*loc_remin
                                 end if
                              end if
@@ -552,14 +554,16 @@ subroutine biogem(        &
                     ! NOTE: un-do scaling by 1/mass of ocean box
                     if (ctrl_bio_remin_redox_save) then 
                        if (ocn_select(io_col9)) then
-                          loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
-                          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$                          loc_string = 'reminP_'//trim(string_sed(is_POC))//'_d'//trim(string_ocn(io_DIC))
+!!$                          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                          id = conv_lslo2idP(is2l(is_POC),io2l(io_DIC))
                           locij_fsedocn(io_col9,i,j) = locij_fsedocn(io_col9,i,j) + &
                                & phys_ocn(ipo_M,i,j,loc_k1)*diag_redox(id,i,j,loc_k1)
                        end if
                        if (ocn_select(io_col8) .AND. (.NOT. ocn_select(io_DIC_14C)))then
-                          loc_string = 'reminP_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
-                          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+!!$                          loc_string = 'reminP_'//trim(string_sed(is_POC_13C))//'_d'//trim(string_ocn(io_DIC_13C))
+!!$                          id = fun_find_str_i(trim(loc_string),string_diag_redox)
+                          id = conv_lslo2idP(is2l(is_POC_13C),io2l(io_DIC_13C))
                           locij_fsedocn(io_col8,i,j) = locij_fsedocn(io_col8,i,j) + &
                                & phys_ocn(ipo_M,i,j,loc_k1)*diag_redox(id,i,j,loc_k1)
                        end if

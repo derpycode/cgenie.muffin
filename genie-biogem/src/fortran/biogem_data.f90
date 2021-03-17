@@ -1016,6 +1016,10 @@ CONTAINS
     ! -------------------------------------------------------- !
     n = 0
     allocate(loc_string(255),STAT=alloc_error)
+    allocate(conv_lslo2idP(n_l_sed,n_l_ocn),STAT=alloc_error)
+    allocate(conv_lslo2idD(n_l_sed,n_l_ocn),STAT=alloc_error)
+    conv_lslo2idP(:,:) = 0
+    conv_lslo2idD(:,:) = 0
     ! -------------------------------------------------------- !
     ! COUNT POTENTIAL REDOX REACTIONS
     ! -------------------------------------------------------- !
@@ -1111,6 +1115,7 @@ CONTAINS
     ! -------------------------------------------------------- ! (2) solid -> dissolved
     !                                                                NOTE: repeat loop to add dissolved redox transformations
     !                                                                      (as if a 2nd set of particulates)
+    !                                                                NOTE: also generate index array in addition to string
     if (ctrl_bio_remin_redox_save) then
        DO ls=1,n_l_sed
           loc_tot_m = conv_ls_lo_i(0,ls)
@@ -1119,6 +1124,7 @@ CONTAINS
              if (lo > 0) then
                 n = n+1
                 loc_string(n) = 'reminP_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+                conv_lslo2idP(ls,lo) = n
              end if
           end do
        end DO
@@ -1129,6 +1135,7 @@ CONTAINS
              if (lo > 0) then
                 n = n+1
                 loc_string(n) = 'reminD_'//trim(string_sed(l2is(ls)))//'_d'//trim(string_ocn(l2io(lo)))
+                conv_lslo2idD(ls,lo) = n
              end if
           end do
        end DO
