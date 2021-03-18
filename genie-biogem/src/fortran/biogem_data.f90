@@ -2314,6 +2314,7 @@ CONTAINS
          & '1N1T_PO4MM_Tdep',     &
          & '2N1T_PO4MM_SiO2',     &
          & '2N2T_PN_Tdep',        &
+         & '2N1T_PFe_Tdep',       &
          & '3N2T_PNFe_Tdep',      &
          & 'bio_PFe',             &
          & 'bio_PFeSi',           &
@@ -2344,6 +2345,7 @@ CONTAINS
     end select
     SELECT CASE (par_bio_prodopt)
     case (                    &
+         & '2N1T_PFe_Tdep',   &
          & '3N2T_PNFe_Tdep'   &
          & )
        if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
