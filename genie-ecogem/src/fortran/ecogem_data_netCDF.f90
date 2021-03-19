@@ -166,13 +166,11 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       define local variables
     !-----------------------------------------------------------------------
-    integer::loc_err,loc_id
     character(255) :: loc_title,loc_timunit
     real           :: loc_c0,loc_c1
     integer        :: loc_it(6),loc_id_time
     integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
     integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
-    integer        :: loc_id_misc
     !-----------------------------------------------------------------------
     !       initialize local variables 
     !-----------------------------------------------------------------------
@@ -264,13 +262,9 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       define local variables
     !-----------------------------------------------------------------------
-    integer::loc_err,loc_id
     character(255) :: loc_title,loc_timunit
     real           :: loc_c0,loc_c1
-    integer        :: loc_it(6),loc_id_time,loc_id_site
-    integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
-    integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
-    integer        :: loc_id_misc
+    integer        :: loc_it(6),loc_id_time
     !-----------------------------------------------------------------------
     !       initialize local variables 
     !-----------------------------------------------------------------------
@@ -322,7 +316,7 @@ CONTAINS
     real::loc_c0,loc_c1
     logical::loc_defined
     character(255)::loc_name
-    integer::i, j, k, loc_i, loc_iou, loc_ntrec
+    integer::loc_i, loc_iou, loc_ntrec
     real,dimension(1:n_i)::loc_lon
     real,dimension(1:n_j)::loc_lat
     real,dimension(0:n_i)::loc_lon_e
@@ -425,7 +419,7 @@ CONTAINS
     real::loc_c0,loc_c1
     logical::loc_defined
     character(255)::loc_name
-    integer::i, j, loc_i, loc_iou, loc_ntrec
+    integer::loc_i, loc_iou, loc_ntrec
 
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
@@ -480,9 +474,8 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
-    real,DIMENSION(n_i,n_j)::loc_ij,loc2_ij,loc_mask
-    CHARACTER(len=255)::loc_unitsname
+    INTEGER::loc_iou,loc_ntrec,io,jp,ii
+    real,DIMENSION(n_i,n_j)::loc_ij,loc_mask
     CHARACTER(len=255)::shrtstrng,longstrng,diamtr
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,n_i,n_j)
@@ -791,9 +784,8 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
+    INTEGER::loc_iou,loc_ntrec,io,jp,ii
     real,DIMENSION(48)::loc_ij
-    CHARACTER(len=255)::loc_unitsname
     CHARACTER(len=255)::shrtstrng,longstrng,diamtr
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,48)

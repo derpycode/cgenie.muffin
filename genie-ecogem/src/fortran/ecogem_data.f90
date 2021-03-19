@@ -805,7 +805,7 @@ CONTAINS
     INTEGER::n
     INTEGER           :: loc_n_elements,loc_n_start
     CHARACTER(len=16) :: loc_tser_name
-    REAL              :: loc_tser_lat,loc_tser_lon,tmp
+    REAL              :: loc_tser_lat,loc_tser_lon
     CHARACTER(len=255)::loc_filename
     real,dimension(1:n_i)::loc_lon
     real,dimension(1:n_j)::loc_lat
@@ -922,7 +922,7 @@ CONTAINS
   ! READ IN TEMPERATURE FORCING FILE - JDW
   subroutine sub_init_load_forceT()
   ! local variables
-  integer::i,j,loc_n_elements,loc_n_start,ios
+  integer::ios
   character(LEN=127)::loc_filename
 
   loc_filename = TRIM(par_indir_name)//TRIM(par_ecogem_force_T_file)

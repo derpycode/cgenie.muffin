@@ -35,7 +35,7 @@ subroutine ecogem(          &
   ! ------------------------------------------------------------ !
   ! DEFINE LOCAL VARIABLES
   ! ------------------------------------------------------------ !
-  INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,tstep ! counting indices
+  INTEGER                                  ::i,j,k,ii,io,jp,kbase,nsub,tstep ! counting indices
   INTEGER                                  ::jpred,jprey,i_tser ! counting indices
 
   REAL,DIMENSION(n_ocn,n_i,n_j,n_k)        ::loc_ocn
@@ -72,9 +72,6 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax+iChl,npmax)              ::ratiobGraz, biobGraz !ckc for isotopes (jdw: added iChl)
   REAL,DIMENSION(iomax+iChl,komax)              ::ratioGraz, orgbGraz  !ckc for isotope grazing calculations  (jdw: added iChl)
   REAL,DIMENSION(n_i,n_j,n_k)              ::POC_Rfrac, CaCO3_Rfrac  !ckc local Corg d13C dependent on local water iso
-  REAL                                     ::Corg_frac
-  REAL                                     ::PDBstnd !ckc VPDB d13C standard
-  REAL,DIMENSION(n_i,n_j,n_k)              ::frac_ratio !for iCarb multiplier
   REAL                                     ::loc_delta_CaCO3, loc_alpha, loc_R !CaCO3 13C calculation
 
   REAL,DIMENSION(iomax+iChl,npmax)         ::dbiomassdt
@@ -94,7 +91,7 @@ subroutine ecogem(          &
   REAL,DIMENSION(npmax)                    ::BioCiso
 
 
-  real		   		     ::loc_total_weights ! JDW total weights
+  real                                     ::loc_total_weights ! JDW total weights
   real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size
 
 
@@ -115,7 +112,7 @@ subroutine ecogem(          &
 
   ! JDW Overwrite surface temperature with input
   if(ctrl_force_T)then
-	loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface layer?
+      loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface layer?
   end if
 
   ! zero output arrays
@@ -283,15 +280,15 @@ subroutine ecogem(          &
                  !print*,templocal,temp_max,MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
                  templocal = MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
 
-		IF(ctrl_limit_neg_biomass)THEN
+                 IF(ctrl_limit_neg_biomass)THEN
                         !IF(ANY(plankton(:,:,i,j,k).lt.0.0)) print*,'\/',i,j
-                 	loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
-                 	loc_biomass(:,:) = merge(plankton(:,:,i,j,k),1.0e-4,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
-                 	BioC(:) = loc_biomass(iCarb,:)
+                        loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
+                        loc_biomass(:,:) = merge(plankton(:,:,i,j,k),1.0e-4,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
+                        BioC(:) = loc_biomass(iCarb,:)
                  else
-                 	loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
-                 	loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
-                 	BioC(:) = loc_biomass(iCarb,:)
+                        loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
+                        loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
+                        BioC(:) = loc_biomass(iCarb,:)
                  endif
 
                  if (c13trace) then
@@ -574,23 +571,23 @@ subroutine ecogem(          &
 		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
                  if (sed_select(is_POC_size)) then
 
-                 	loc_weighted_mean_size=0.0
-                 	loc_total_weights=0.0
+                        loc_weighted_mean_size=0.0
+                        loc_total_weights=0.0
 
-                 	do jp=1,npmax
-				if(autotrophy(jp).gt.0.0)then
+                        do jp=1,npmax
+                                if(autotrophy(jp).gt.0.0)then
 
 				! Biomass weighted
-				loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(jp) ! sum of weights * size
-				loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
+                                loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(jp) ! sum of weights * size
+                                loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
 
 				! POC weighted
                  		!loc_weighted_mean_size=loc_weighted_mean_size+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp)))*logesd(jp) ! sum of weights * size
                  		!loc_total_weights=loc_total_weights+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp))) ! sum of weights
-				endIF
-			enddo
+                                endIF
+                        enddo
 
-                 	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
+                        dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
                  endif
                  ! ***************************************************
 
@@ -819,12 +816,10 @@ SUBROUTINE diag_ecogem_timeslice( &
   real   ,intent(out),dimension(n_ocn ,n_i,n_j,n_k)::dum_egbg_sfcdiss    ! ecology -> ocean flux; ocn grid
 
   ! local variables
-  integer :: i,j,k,l,io,ia,is
-  integer :: loc_k1                                                !
+  integer :: k
   real    :: loc_t,loc_dts,loc_dtyr                                   !
   real    :: loc_yr_save                                              !
   logical :: write_timeslice
-  integer :: dum_ntrec
 
   ! to convert per day rates into per second
   real,parameter :: pday = 86400.0
@@ -916,7 +911,6 @@ SUBROUTINE ecogem_save_rst(dum_genie_clock)
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
-  integer::l
   integer::loc_iou
   real::loc_yr                                                 !
   CHARACTER(len=255)::loc_filename

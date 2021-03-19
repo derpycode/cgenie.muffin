@@ -28,7 +28,6 @@ SUBROUTINE initialise_ecogem(    &
   integer,DIMENSION(n_i,n_j),INTENT(in)::dum_k1                  !
   REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 !
   REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv    !
-  integer :: stat
   CHARACTER(len=64)::site_string
   ! ---------------------------------------------------------- !
   ! local variables
@@ -335,9 +334,9 @@ SUBROUTINE initialise_ecogem(    &
 
   ! JDW: allocate and load temperature forcing dataset
   if(ctrl_force_T)then
-  	allocate(T_input(n_i,n_j),STAT=alloc_error)
-	T_input(:,:)=0.0
-	call sub_init_load_forceT()
+        allocate(T_input(n_i,n_j),STAT=alloc_error)
+        T_input(:,:)=0.0
+        call sub_init_load_forceT()
   end if
 
   ! ---------------------------------------------------------- ! INITIALIZE netCDF OUTPUT
