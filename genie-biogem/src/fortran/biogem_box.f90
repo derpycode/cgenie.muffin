@@ -922,8 +922,7 @@ CONTAINS
        ! calculate PO4 depletion; loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
        ! (similar to 2N2T_TPN with Fe limitation)
        ! NOTE: as it stands: if there is no fixed nitrogen of any sort, there will be no N2 fixation either(!)
-       if (loc_PO4 > const_real_nullsmall .and. loc_N > const_real_nullsmall   &
-            & .and. loc_FeT > const_real_nullsmall) then
+       if (loc_PO4 > const_real_nullsmall .and. loc_FeT > const_real_nullsmall) then
           loc_dPO4 =                            &
                & dum_dt*                          &
                & loc_ficefree*                    &
