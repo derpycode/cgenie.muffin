@@ -828,7 +828,8 @@ MODULE gem_cmn
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k1   ! carbonate constant k1 look-up table (Hain et al. 2015)     
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k2   ! carbonate constant k2 look-up table (Hain et al. 2015)     
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kW   ! carbonate constant kW look-up table (Hain et al. 2015)    
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k   ! carbonate constant k look-up table (Hain et al. 2015)                  ! 
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k   ! carbonate constant k look-up table (Hain et al. 2015)   
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kSO4   ! equilibrium constant kSO4 look-up table (Hain et al. 2015)               ! 
 
   ! *** miscellaneous - dummy values ***
   REAL,PARAMETER::const_real_null       = -0.999999E+19                 ! 

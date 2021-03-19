@@ -279,13 +279,22 @@ CONTAINS
        & dum_carbconst)
     ! dummy variables
     REAL,INTENT(in)::dum_Ca,dum_Mg,dum_sal,dum_temp
+    real::loc_conv_molaritytoconc,loc_conv_freetoSWS,loc_conv_freetototal,loc_conv_totaltoSWS
+    real::loc_Ftot,loc_SO4tot
     REAL,DIMENSION(n_carbconst),intent(inout)::dum_carbconst
     ! local variables
     real::loc_alpha
     real::loc_ratio
+    real::loc_k0,loc_kSO4
     ! initialize local variables
     loc_alpha = 3.655E-8
     loc_ratio = 1.0
+    loc_SO4tot = fun_calc_SO4tot(dum_sal)
+    loc_Ftot   = fun_calc_Ftot(dum_sal)
+    loc_conv_molaritytoconc = LOG(1 - 0.001005*dum_sal)
+!    loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
+!    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
+!    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
     if (dum_Ca > const_real_nullsmall) loc_ratio = dum_Mg/dum_Ca
     select case ((par_adj_carbconst_option))
     case ('TyrrellZeebe2004')
@@ -298,6 +307,19 @@ CONTAINS
     case ('Hain2015')
       ! (1a) adjust Ksp via a look-up table based on MyAMI (downloaded 10/01/2021)
       !      NOTE: following Hain et al. [2015,2018]
+      ! Ks in the look-up tables are on the total pH scale,so convert to SWS scale for cGENIE
+      !print*, dum_carbconst(icc_k)
+      loc_kSO4 = fun_interp_4D(                                                  &
+            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
+            & )
+    loc_conv_freetototal = -log(1.0 + loc_SO4tot/loc_kSO4)
+    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/loc_kSO4 + loc_Ftot/dum_carbconst(icc_kHF))
+    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
       dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -306,6 +328,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
+      dum_carbconst(icc_kcal) = exp(log(dum_carbconst(icc_kcal)) + loc_conv_totaltoSWS)
       dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -314,7 +337,16 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
+      dum_carbconst(icc_karg) = exp(log(dum_carbconst(icc_karg)) + loc_conv_totaltoSWS)
       ! (1b) adjust K1 and K2, K and Kw
+      loc_k0 = fun_interp_4D(                                                  &
+            & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,dum_sal,dum_temp, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
+            & )
       !print*, dum_carbconst(icc_k1)
       dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,dum_sal,dum_temp, &
@@ -324,7 +356,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-     ! print*, dum_carbconst(icc_k1)
+      dum_carbconst(icc_k1) = exp(log(dum_carbconst(icc_k1)) + loc_conv_totaltoSWS)
       dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -333,8 +365,11 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
+      dum_carbconst(icc_k2) = exp(log(dum_carbconst(icc_k2)) + loc_conv_totaltoSWS)
+      !print*, dum_carbconst(icc_k1)
       dum_carbconst(icc_k) = &
          & dum_carbconst(icc_k1)/dum_carbconst(icc_k2)
+     ! print*, dum_carbconst(icc_k)
       dum_carbconst(icc_kW) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kW,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -343,6 +378,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
+      dum_carbconst(icc_kW) = exp(log(dum_carbconst(icc_kW)) + loc_conv_totaltoSWS)
     end SELECT
   end SUBROUTINE sub_adj_carbconst
   ! ****************************************************************************************************************************** !
