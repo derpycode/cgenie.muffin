@@ -127,6 +127,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_Fgeothermal2D
   CHARACTER(len=127)::par_force_Fgeothermal2D_file                          ! Filename for 2D geothermal heat input field
   NAMELIST /ini_biogem_nml/par_force_Fgeothermal2D_file
+  logical::ctrl_force_Vgrid                                      ! Use virtual grid (for remin)?
+  NAMELIST /ini_biogem_nml/ctrl_force_Vgrid
+  CHARACTER(len=127)::par_force_Vgrid_file                       ! Filename for virtual grid
+  NAMELIST /ini_biogem_nml/par_force_Vgrid_file
   ! ------------------- BIOLOGICAL NEW PRODUCTION -------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_bio_prodopt                             ! biological scheme ID string (e.g., 1N1T_PO4MM, 1N1T_PO4MM_Cd)
   NAMELIST /ini_biogem_nml/par_bio_prodopt
@@ -396,6 +400,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/opt_d13C_DIC_Corg
   CHARACTER(len=63)::opt_d44Ca_Ca_CaCO3                          ! CaCO3 44Ca fractionation scheme ID string
   NAMELIST /ini_biogem_nml/opt_d44Ca_Ca_CaCO3
+  real::par_d13C_DIC_Corg_epsilon                                ! FIXED fractionation D13C
+  NAMELIST /ini_biogem_nml/par_d13C_DIC_Corg_epsilon
   real::par_d13C_DIC_Corg_b                                      ! b value for Popp et al. fractionation
   NAMELIST /ini_biogem_nml/par_d13C_DIC_Corg_b
   real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix
@@ -728,8 +734,10 @@ MODULE biogem_lib
   integer::par_force_point_j                                     ! 'j' coordinate of point forcing
   integer::par_force_point_k                                     ! 'k' coordinate of point forcing
   NAMELIST /ini_biogem_nml/par_force_point_i,par_force_point_j,par_force_point_k
-  REAL::par_force_invert_ohmega                                 ! surface ocean saturation state target
+  REAL::par_force_invert_ohmega                                  ! surface ocean saturation state target
   NAMELIST /ini_biogem_nml/par_force_invert_ohmega
+  REAL::par_force_invert_wtpctcaco3                              ! Sediment wt% CaCO3 target
+  NAMELIST /ini_biogem_nml/par_force_invert_wtpctcaco3
   logical::ctrl_force_invert_noneg                              ! prevent negative inversion fluxes (i.e. no removal)
   NAMELIST /ini_biogem_nml/ctrl_force_invert_noneg
   logical::ctrl_force_ohmega_calcite                            ! Calcite saturation as the saturation target?
@@ -783,11 +791,11 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_force                          = 08 ! forcings
   INTEGER,PARAMETER::n_opt_data                           = 30 ! data (I/O)
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
-  INTEGER,PARAMETER::n_diag_bio                           = 22 !
+  INTEGER,PARAMETER::n_diag_bio                           = 23 !
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
   INTEGER,PARAMETER::n_diag_precip                        = 07 !
-  INTEGER,PARAMETER::n_diag_react                         = 11 !! YK modified 12.28.2020
-  INTEGER,PARAMETER::n_diag_iron                          = 07 !
+  INTEGER,PARAMETER::n_diag_react                         = 11 !! YK modified 12.28.2020 (overwriting _DEV_tracers where n_diag_react = 09; 03.19.2021)
+  INTEGER,PARAMETER::n_diag_iron                          = 09 ! As in _DEV_tracers (03.19.2021)
   INTEGER,PARAMETER::n_diag_misc_2D                       = 09 !
   INTEGER::n_diag_redox                                   =  0 !
 
@@ -888,6 +896,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_bio_opaltoPOC_sp              = 20    !
   INTEGER,PARAMETER::idiag_bio_fspPOC                    = 21    !
   INTEGER,PARAMETER::idiag_bio_DOMlifetime               = 22    !
+  INTEGER,PARAMETER::idiag_bio_frac_Fe2                  = 23    !
   ! diagnostics - OLD
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNO3        = 01    !
   INTEGER,PARAMETER::idiag_geochem_old_ammox_dNH4        = 02    !
@@ -908,13 +917,15 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_precip_FeOOH_dFe              = 06    !
   INTEGER,PARAMETER::idiag_precip_Fe3SiO4_dFe            = 07    !
   ! diagnostics - geochemistry -- iron speciation
-  INTEGER,PARAMETER::idiag_iron_Fe                       = 01    !
-  INTEGER,PARAMETER::idiag_iron_FeL                      = 02    !
+  INTEGER,PARAMETER::idiag_iron_Fe3                      = 01    !
+  INTEGER,PARAMETER::idiag_iron_Fe3L                     = 02    !
   INTEGER,PARAMETER::idiag_iron_L                        = 03    !
   INTEGER,PARAMETER::idiag_iron_TDFe                     = 04    !
   INTEGER,PARAMETER::idiag_iron_TL                       = 05    !
-  INTEGER,PARAMETER::idiag_iron_Fe3                      = 06    !
-  INTEGER,PARAMETER::idiag_iron_geo                      = 07    !
+  INTEGER,PARAMETER::idiag_iron_Fe2                      = 06    !
+  INTEGER,PARAMETER::idiag_iron_TFe3                     = 07    !
+  INTEGER,PARAMETER::idiag_iron_TFe3pct                  = 08    !
+  INTEGER,PARAMETER::idiag_iron_geo                      = 09    !
   ! diagnostics - geochemistry -- solid-solute reactions
   INTEGER,PARAMETER::idiag_react_POMS_dH2S               = 01    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dFe2              = 02    !
@@ -1016,7 +1027,8 @@ MODULE biogem_lib
        & 'CaCO3toPOC_nsp', &
        & 'opaltoPOC_sp  ', &
        & 'fspPOC        ', &
-       & 'DOMlifetime   ' /)
+       & 'DOMlifetime   ', &
+       & 'frac_Fe2      ' /)
   ! diagnostics - geochemistry -- OLD
   CHARACTER(len=14),DIMENSION(n_diag_geochem_old),PARAMETER::string_diag_geochem_old = (/ &
        & 'dNO3_NH4_oxid ', &
@@ -1040,12 +1052,14 @@ MODULE biogem_lib
        & 'precip_Fe3SiO4_dFe'/)
   ! diagnostics - geochemistry -- Fe speciation
   CHARACTER(len=18),DIMENSION(n_diag_iron),PARAMETER::string_diag_iron = (/ &
-       & 'iron_Fe           ', &
-       & 'iron_FeL          ', &
+       & 'iron_Fe3          ', &
+       & 'iron_Fe3L         ', &
        & 'iron_L            ', &
        & 'iron_TDFe         ', &
        & 'iron_TL           ', &
-       & 'iron_Fe3          ', &
+       & 'iron_Fe2          ', &
+       & 'iron_TFe3         ', &
+       & 'iron_TFe3pct      ', &
        & 'iron_geo          ' /)
   ! diagnostics - geochemistry -- solid-solute reactions
   CHARACTER(len=20),DIMENSION(n_diag_react),PARAMETER::string_diag_react = (/ &
@@ -1196,6 +1210,10 @@ MODULE biogem_lib
 !!$  REAL,DIMENSION(n_ocn,n_i,n_j,n_k)::docn                        ! ***********
 !!$  REAL,DIMENSION(n_sed,n_i,n_j,n_k)::dbio_part                   ! ***********
 !!$! ***********
+  
+  ! *** INDEXING ***
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lslo2idP              !
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_lslo2idD              !
 
   ! *** GOLDSTEIN interface with BioGeM ***
   real,dimension(n_ocn)::tstoocn_offset                          ! tracer units offset (GOLDSTEIN <-> BIOGEM conversion)
@@ -1376,7 +1394,7 @@ MODULE biogem_lib
   INTEGER,DIMENSION(n_ocn,2)::force_restore_ocn_sig_i             !
   LOGICAL,DIMENSION(n_ocn)::force_restore_ocn_select              !
   LOGICAL,DIMENSION(n_ocn)::force_restore_ocn_sur                 !
-  INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_restore_ocn_k1          !
+!!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_restore_ocn_k1          !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm                !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm_I              !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_restore_atm_II             !
@@ -1402,7 +1420,7 @@ MODULE biogem_lib
   INTEGER,DIMENSION(n_ocn,2)::force_flux_ocn_sig_i               !
   LOGICAL,DIMENSION(n_ocn)::force_flux_ocn_select                !
   LOGICAL,DIMENSION(n_ocn)::force_flux_ocn_scale                 !
-  INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_flux_ocn_k1            !
+!!!INTEGER,DIMENSION(n_ocn,n_i,n_j)::force_flux_ocn_k1            !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm                  !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm_I                !
   REAL,DIMENSION(n_atm,n_i,n_j)::force_flux_atm_II               !
@@ -1452,6 +1470,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_i,n_j)::par_misc_2D                           !
   REAL,DIMENSION(n_i,n_j)::force_Fgeothermal2D                   !
   REAL,DIMENSION(n_i,n_j)::par_det_Fe_sol_2D                     !
+  integer,DIMENSION(n_i,n_j)::force_Vgrid                        !
 
   ! ****************************************************************************************************************************** !
   ! *** GLOBAL VARIABLES AND RUN-TIME SET PARAMETERS ***************************************************************************** !
@@ -2143,7 +2162,44 @@ CONTAINS
   ! MISC
   ! ****************************************************************************************************************************** !
 
+  
+  ! ****************************************************************************************************************************** !
+  ! FIND INDEX OF STRING ... IN REDOX ARRAY
+  ! NOTE: non generic version of fun_find_str_i
+  FUNCTION fun_find_str_i_redox(dum_str)
+    ! common blocks
+    IMPLICIT NONE
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    INTEGER::fun_find_str_i_redox
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    CHARACTER(len=*),INTENT(in)::dum_str
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::n,loc_i
+    ! -------------------------------------------------------- !
+    ! FIND i
+    ! -------------------------------------------------------- !
+    loc_i = 0
+    do n=1,n_diag_redox
+       if (dum_str == string_diag_redox(n)) then
+          loc_i = n
+          exit
+       end if
+    end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+    fun_find_str_i_redox = loc_i
+    ! -------------------------------------------------------- !
+  END FUNCTION fun_find_str_i_redox
+  ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   !
   subroutine sub_wasteCPUcycles1(dum_ocn,dum_string,dum_n)

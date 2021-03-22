@@ -811,15 +811,17 @@ MODULE gem_cmn
   real,dimension(6,n_atm)::par_bunsen_coef                              ! 
 
   ! *** miscellaneous - dummy values ***
-  REAL,PARAMETER::const_real_null       = -0.999999E+19                 ! 
-  REAL,PARAMETER::const_real_nullhigh   = +0.999999E+19                 ! 
-  REAL,PARAMETER::const_real_nullsmall  = +0.999999E-19                 ! 
-  REAL,PARAMETER::const_rns             = +0.999999E-19                 ! 
-  REAL,PARAMETER::const_real_zero       = +0.000000E+00                 ! 
-  REAL,PARAMETER::const_real_one        = +1.000000E+00                 ! 
-  REAL,PARAMETER::const_nulliso         = -999.999                      ! isotope null
-  integer,PARAMETER::const_integer_zero = 0                             ! 
-  integer,PARAMETER::const_integer_one  = 1                             ! 
+  REAL,PARAMETER::const_real_null          = -0.999999E+19                 ! 
+  REAL,PARAMETER::const_real_nullhigh      = +0.999999E+19                 ! 
+  REAL,PARAMETER::const_real_nullsmall     = +0.999999E-19                 ! 
+  REAL,PARAMETER::const_real_nullsmallneg  = -0.999999E-19                 ! 
+  REAL,PARAMETER::const_rns                = +0.999999E-19                 ! 
+  REAL,PARAMETER::const_rnsn               = -0.999999E-19                 ! 
+  REAL,PARAMETER::const_real_zero          = +0.000000E+00                 ! 
+  REAL,PARAMETER::const_real_one           = +1.000000E+00                 ! 
+  REAL,PARAMETER::const_nulliso            = -999.999                      ! isotope null
+  integer,PARAMETER::const_integer_zero    = 0                             ! 
+  integer,PARAMETER::const_integer_one     = 1                             ! 
 
 
   ! ****************************************************************************************************************************** !
