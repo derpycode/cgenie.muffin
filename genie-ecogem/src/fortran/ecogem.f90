@@ -208,6 +208,7 @@ subroutine ecogem(          &
                       & loc_ocn(io_Mg  ,i,j,k), &
                       & loc_ocn(io_S,i,j,k), &
                       & loc_ocn(io_T,i,j,k),&
+                      & layermid              , &
                       & eco_carbconst(:,i,j,k)  &
                       & )
               end if

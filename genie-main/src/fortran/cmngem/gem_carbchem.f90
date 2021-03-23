@@ -276,11 +276,14 @@ CONTAINS
        & dum_Mg,                &
        & dum_sal,               &
        & dum_temp,              &
+       & dum_D,              &
        & dum_carbconst)
     ! dummy variables
-    REAL,INTENT(in)::dum_Ca,dum_Mg,dum_sal,dum_temp
+    REAL,INTENT(in)::dum_Ca,dum_Mg,dum_sal,dum_temp,dum_D
     real::loc_conv_molaritytoconc,loc_conv_freetoSWS,loc_conv_freetototal,loc_conv_totaltoSWS
     real::loc_Ftot,loc_SO4tot
+    REAL::loc_P ! pressure (bar)
+    real::loc_rRtimesT, loc_TC
     REAL,DIMENSION(n_carbconst),intent(inout)::dum_carbconst
     ! local variables
     real::loc_alpha
@@ -291,10 +294,13 @@ CONTAINS
     loc_ratio = 1.0
     loc_SO4tot = fun_calc_SO4tot(dum_sal)
     loc_Ftot   = fun_calc_Ftot(dum_sal)
+    loc_P        = dum_D/10.0
+    loc_TC       = dum_temp - const_zeroC
+    loc_rRtimesT = 1.0/(const_R*dum_temp)
     loc_conv_molaritytoconc = LOG(1 - 0.001005*dum_sal)
-!    loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
-!    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
-!    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
+    loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
+    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
+    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
     if (dum_Ca > const_real_nullsmall) loc_ratio = dum_Mg/dum_Ca
     select case ((par_adj_carbconst_option))
     case ('TyrrellZeebe2004')
@@ -317,9 +323,9 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-    loc_conv_freetototal = -log(1.0 + loc_SO4tot/loc_kSO4)
-    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/loc_kSO4 + loc_Ftot/dum_carbconst(icc_kHF))
-    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
+!    loc_conv_freetototal = -log(1.0 + loc_SO4tot/loc_kSO4)
+!    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/loc_kSO4 + loc_Ftot/dum_carbconst(icc_kHF))
+!    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
       dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -328,7 +334,10 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_kcal) = exp(log(dum_carbconst(icc_kcal)) + loc_conv_totaltoSWS)
+      dum_carbconst(icc_kcal) = exp(log(dum_carbconst(icc_kcal)) + &
+            & loc_conv_totaltoSWS + &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & )
       dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -337,7 +346,10 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_karg) = exp(log(dum_carbconst(icc_karg)) + loc_conv_totaltoSWS)
+      dum_carbconst(icc_karg) = exp(log(dum_carbconst(icc_karg)) + &
+            & loc_conv_totaltoSWS + &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & )
       ! (1b) adjust K1 and K2, K and Kw
       loc_k0 = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,dum_sal,dum_temp, &
@@ -356,7 +368,10 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_k1) = exp(log(dum_carbconst(icc_k1)) + loc_conv_totaltoSWS)
+      dum_carbconst(icc_k1) = exp(log(dum_carbconst(icc_k1))+ &
+            & loc_conv_totaltoSWS + &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & )
       dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -365,11 +380,14 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_k2) = exp(log(dum_carbconst(icc_k2)) + loc_conv_totaltoSWS)
+      dum_carbconst(icc_k2) = exp(log(dum_carbconst(icc_k2)) + &
+            & loc_conv_totaltoSWS + &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & )
       !print*, dum_carbconst(icc_k1)
       dum_carbconst(icc_k) = &
          & dum_carbconst(icc_k1)/dum_carbconst(icc_k2)
-     ! print*, dum_carbconst(icc_k)
+      !print*, dum_carbconst(icc_k)
       dum_carbconst(icc_kW) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kW,dum_Ca,dum_Mg,dum_sal,dum_temp, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -378,7 +396,10 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_kW) = exp(log(dum_carbconst(icc_kW)) + loc_conv_totaltoSWS)
+      dum_carbconst(icc_kW) = exp(log(dum_carbconst(icc_kW)) + &
+            & loc_conv_totaltoSWS + &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & )
     end SELECT
   end SUBROUTINE sub_adj_carbconst
   ! ****************************************************************************************************************************** !

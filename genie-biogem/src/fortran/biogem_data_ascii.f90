@@ -2982,6 +2982,7 @@ CONTAINS
                         & loc_ocn(io_Mg,i,j,k),  &
                         & ocn(io_S,i,j,k), &
                         & ocn(io_T,i,j,k),&
+                        & loc_phys_ocn(ipo_Dmid,i,j,k), &
                         & loc_carbconst(:,i,j,k) &
                         & )
                 end if

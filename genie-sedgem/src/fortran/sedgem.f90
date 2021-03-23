@@ -142,6 +142,7 @@ SUBROUTINE sedgem(          &
                    & dum_sfcsumocn(io_Mg,i,j), &
                    & dum_sfcsumocn(io_S,i,j), &
                    & dum_sfcsumocn(io_T,i,j),&
+                   & phys_sed(ips_D,i,j),     &
                    & sed_carbconst(:,i,j)      &
                    & )
            end if
