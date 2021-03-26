@@ -43,8 +43,8 @@ MODULE gem_cmn
   real::par_carbchem_pH_tolerance                                       ! pH solution tolerance
   integer::par_carbchem_pH_iterationmax                                 ! pH solution maximum number of iterations
   NAMELIST /ini_gem_nml/par_carbchem_pH_tolerance,par_carbchem_pH_iterationmax
-  logical::ctrl_carbchem_fail                                           ! Exit upon pH solution failure?
-  NAMELIST /ini_gem_nml/ctrl_carbchem_fail
+  logical::ctrl_carbchem_pHseed_retry                                   ! Attempt pH re-seed if solution fails (else exit)?
+  NAMELIST /ini_gem_nml/ctrl_carbchem_pHseed_retry
   real::par_geochem_Tmin                                                ! minimum T used in empirical geochem calculations
   real::par_geochem_Tmax                                                ! maximum T used in empirical geochem calculations
   NAMELIST /ini_gem_nml/par_geochem_Tmin,par_geochem_Tmax

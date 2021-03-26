@@ -99,7 +99,9 @@ CONTAINS
        ! --- BOUNDARY CONDITIONS ------------------------------------------------------------------------------------------------- !
        print*,'--- BOUNDARY CONDITIONS ----------------------------'
        print*,'Set dissolution flux = rain flux to close system?   : ',ctrl_force_sed_closedsystem
+       print*,'Set dissolution flux = rain flux at surface?        : ',ctrl_force_sed_closedsystem_SUR
        print*,'Balance the P cycle (with weathering)?              : ',ctrl_force_sed_closed_P
+       print*,'Balance the C cycle (with weathering)?              : ',ctrl_force_sed_closed_C
        print*,'set reflective boundary condition for POM?          : ',ctrl_force_sed_reflective_POM
        print*,'Allow temperature / salinity forcing of climate?    : ',ctrl_force_GOLDSTEInTS
        print*,'Allow ONLY temperature / salinity forcing?          : ',ctrl_force_GOLDSTEInTSonly
@@ -111,6 +113,7 @@ CONTAINS
        print*,'Replace uniform CaCO3 scavenging coefficient?       : ',ctrl_force_CaCO3ballastcoeff
        print*,'Replace uniform opal scavenging coefficient?        : ',ctrl_force_opalballastcoeff
        print*,'Replace uniform det scavenging coefficient?         : ',ctrl_force_detballastcoeff
+       print*,'Replace internal dust Fe solubility field?          : ',ctrl_force_det_Fe_sol
        print*,'Replace internal POC flux for 230Th/231Pa scav.     : ',ctrl_force_scav_fpart_POC
        print*,'Replace internal CaCO3 flux for 230Th/231Pa scav.   : ',ctrl_force_scav_fpart_CaCO3
        print*,'Replace internal opal flux for 230Th/231Pa scav.    : ',ctrl_force_scav_fpart_opal
@@ -124,6 +127,7 @@ CONTAINS
        print*,'Filename for CaCO3 ballast coefficient field        : ',trim(par_CaCO3ballastcoeff_file)
        print*,'Filename for opal ballast coefficient field         : ',trim(par_opalballastcoeff_file)
        print*,'Filename for det ballast coefficient field          : ',trim(par_detballastcoeff_file)
+       print*,'Filename for dust Fe solubility field               : ',trim(par_det_Fe_sol_file)
        print*,'Filename for imposed scavenging POC flux            : ',trim(par_scav_fpart_POC_file)
        print*,'Filename for imposed scavenging CaCO3 flux          : ',trim(par_scav_fpart_CaCO3_file)
        print*,'Filename for imposed scavenging opal flux           : ',trim(par_scav_fpart_opal_file)
@@ -197,6 +201,10 @@ CONTAINS
        print*,'DOM lifetime (yrs)                                  : ',par_bio_remin_DOMlifetime
        print*,'RDOM lifetime (yrs)                                 : ',par_bio_remin_RDOMlifetime
        print*,'RDOM degradation by (surface) photolysis only?      : ',ctrl_bio_remin_RDOM_photolysis
+       print*,'DOM production option                               : ',opt_bio_red_DOMfrac
+       print*,'DOM production constant in Dunne et al. [2005]      : ',par_bio_red_DOMfrac_Tdep_const
+       print*,'DOM production scalar in Dunne et al. [2005]        : ',par_bio_red_DOMfrac_Tdep_gamma
+       print*,'T-dependent DOM remineralization?                   : ',ctrl_bio_remin_DOM_Tdep
        print*,'Apply fixed-profile for POM remineralization?       : ',ctrl_bio_remin_POC_fixed
        print*,'Kinetic-based POM remineralization?                 : ',ctrl_bio_remin_POC_kinetic
        print*,'Remineralization functional form                    : ',par_bio_remin_fun
@@ -210,8 +218,13 @@ CONTAINS
        print*,'Degradation rate constant #2 for POC                : ',par_bio_remin_POC_K2
        print*,'Activation energy #1 for POC                        : ',par_bio_remin_POC_Ea1
        print*,'Activation energy #2 for POC                        : ',par_bio_remin_POC_Ea2
+       print*,'Degradation rate constant #1 for DOC                : ',par_bio_remin_DOC_K1
        print*,'Range of fractional abundance of POC component #2   : ',par_bio_remin_POC_dfrac2
        print*,'Fractional abundance of POC #2 half sat             : ',par_bio_remin_POC_c0frac2
+       print*,'Size-dependent sinking: reference remin. length     : ',par_bio_remin_POC_eL0
+       print*,'Size-dependent sinking: power-law exponent          : ',par_bio_remin_POC_eta
+       print*,'Size-dependent sinking: smallest size ecogem class  : ',par_bio_remin_POC_size0
+       print*,'Size-dependent sinking: reference sinking rate      : ',par_bio_remin_POC_w0
        print*,'Apply fixed-profile for CaCO3 remineralization?     : ',ctrl_bio_remin_CaCO3_fixed
        print*,'Initial fractional abundance of CaCO3 component #2  : ',par_bio_remin_CaCO3_frac2
        print*,'Remineralization length #1 for CaCO3                : ',par_bio_remin_CaCO3_eL1
@@ -295,7 +308,7 @@ CONTAINS
        print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
-       print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD 
+       print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'CaCO3 44Ca fractionation scheme ID string           : ',trim(opt_d44Ca_Ca_CaCO3)
@@ -310,8 +323,12 @@ CONTAINS
        print*,'Planktic foram 13C fractionation scheme ID string   : ',opt_bio_foram_p_13C_delta
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
+       print*,'dissimilatory iron reduction fractionation          : ',par_d56Fe_Corg_FeOOH_epsilon  
        print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
        print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
+       print*,'AOM S-fractionation                                 : ',par_d34S_AOM_alpha
+       print*,'aerobic sulphide oxidation S-fractionation          : ',par_d34S_AerSox_alpha
+       print*,'iron-mediated sulphide oxidation S-fractionation    : ',par_d34S_ISO_alpha
        print*,'N2 fixation 15N fractionation                       : ',par_bio_uptake_dN2_epsilon
        print*,'NH4 assimilation 15N fractionation                  : ',par_bio_uptake_dNH4_epsilon
        print*,'NO3 uptake 15N fractionation                        : ',par_bio_uptake_dNO3_epsilon
@@ -388,7 +405,7 @@ CONTAINS
        print*,'Rate law power for Fe3Si2O4 precipitation           : ',par_bio_Fe3Si2O4precip_exp
        print*,'Ohmega constant for Fe3Si2O4 precipitation          : ',par_bio_Fe3Si2O4precip_abioticohm_cte
        print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_FeCO3_alpha
-       print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi     
+       print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte
        print*,'Fe fractionation factor for FeS2 precipitation      : ',par_d56Fe_FeS2_alpha
@@ -398,11 +415,11 @@ CONTAINS
        print*,'Scale factor for FeS formation                      : ',par_bio_FeS_sf
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
        print*,'pyrite precip stiochiometry                         : ',ctrl_bio_FeS2precip_explicit
-       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte       
+       print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
        print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
-       print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha 
-       print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha 
-       print*,'let FeOOH precipitate explictely?                   : ',ctrl_bio_FeOOHprecip_explicit 
+       print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha
+       print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha
+       print*,'let FeOOH precipitate explictely?                   : ',ctrl_bio_FeOOHprecip_explicit
        print*,'threshold of dissolved Fe for FeOOH repcip          : ',par_FeOOH_Fethresh
        print*,'kinetic constant for Fe reduction                   : ',par_bio_remin_kFetoFe2
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
@@ -440,6 +457,7 @@ CONTAINS
        print*,'Number of timesteps in sub-inteval saving           : ',par_data_save_slice_n
        print*,'Auto save at run end?                               : ',ctrl_data_save_slice_autoend
        print*,'Save cdrmip data (only)?                            : ',ctrl_data_save_slice_cdrmip
+       print*,'Update carbonate chemistry for saving?              : ',ctrl_data_save_slice_carb_update
        ! --- DATA SAVING: TIME-SERIES -------------------------------------------------------------------------------------------- !
        print*,'--- BIOGEM DATA SAVING: TIME-SERIES ----------------'
        print*,'Atmospheric (interface) composition?                : ',ctrl_data_save_sig_ocnatm
@@ -569,6 +587,7 @@ CONTAINS
     ! adjust units of prescribed particulates sinking rate (m d-1 -> m yr-1)
     par_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate_physical/conv_d_yr
     par_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_reaction/conv_d_yr
+    par_bio_remin_POC_w0 = par_bio_remin_POC_w0/conv_d_yr
     ! adjust units of CH4 oxidation (d-1 -> yr-1)
     par_bio_remin_CH4rate = par_bio_remin_CH4rate/conv_d_yr
     ! opal dissolution
@@ -589,6 +608,7 @@ CONTAINS
     if (sed_select(is_FeCO3))    ctrl_carbchemupdate_full = .true.
     if (sed_select(is_Fe3Si2O4)) ctrl_carbchemupdate_full = .true.
     if (ocn_select(io_CH4))      ctrl_carbchemupdate_full = .true.
+    ! set uniform solubility parameter
     ! -------------------------------------------------------- !
     ! MISC
     ! -------------------------------------------------------- !
@@ -868,6 +888,18 @@ CONTAINS
        par_bio_remin_kl(:,:) = par_bio_remin_ballast_kl
     end if
 
+    ! *** load prescribed dust Fe solubility field (if requested) ***
+    ! NOTE: populate the 2D solubility field <par_det_Fe_sol_exp> uniformly to the value of the solubilty parameter, par_det_Fe_sol
+    !       if a spatially-explicit field is not requested
+    ! NOTE: convert the solubility field from percent to fractional solubility
+    if (ctrl_force_det_Fe_sol) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_det_Fe_sol_file)
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,par_det_Fe_sol_2D(:,:))
+       par_det_Fe_sol_2D(:,:) = par_det_Fe_sol_2D(:,:)/100.0
+    else
+       par_det_Fe_sol_2D(:,:) = par_det_Fe_sol
+    end if
+
     ! *** load prescribed POC scavenging coefficient field (if requested) ***
     if (ctrl_force_scav_fpart_POC) then
        loc_filename = TRIM(par_indir_name)//TRIM(par_scav_fpart_POC_file)
@@ -943,19 +975,21 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   !
   SUBROUTINE sub_init_redox()
+    ! NOTE: allocate sufficient array places for all potential transformations
+    !       also: a generous potential string length for automatically-generated variable names
     USE biogem_lib
     ! -------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     integer::n
-    CHARACTER(len=31),DIMENSION(:),ALLOCATABLE::loc_string     !
+    CHARACTER(len=63),DIMENSION(:),ALLOCATABLE::loc_string     !
     integer::lo,ls
     integer::loc_m,loc_tot_m
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     n = 0
-    allocate(loc_string(100),STAT=alloc_error)
+    allocate(loc_string(255),STAT=alloc_error)
     ! -------------------------------------------------------- !
     ! COUNT POTENTIAL REDOX REACTIONS
     ! -------------------------------------------------------- !
@@ -967,9 +1001,9 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_H2StoSO4_dSO4'
           n = n+1
-          loc_string(n) = 'redox_H2StoSO4_dO2' 
+          loc_string(n) = 'redox_H2StoSO4_dO2'
           n = n+1
-          loc_string(n) = 'redox_H2StoSO4_dALK'  
+          loc_string(n) = 'redox_H2StoSO4_dALK'
        end if
     end if
     if (ocn_select(io_NH4)) then
@@ -979,9 +1013,9 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_NH4toNO3_dNO3'
           n = n+1
-          loc_string(n) = 'redox_NH4toNO3_dO2'  
+          loc_string(n) = 'redox_NH4toNO3_dO2'
           n = n+1
-          loc_string(n) = 'redox_NH4toNO3_dALK'  
+          loc_string(n) = 'redox_NH4toNO3_dALK'
        end if
     end if
     if (ocn_select(io_CH4)) then
@@ -991,9 +1025,9 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_CH4toDIC_dDIC'
           n = n+1
-          loc_string(n) = 'redox_CH4toDIC_dO2'   
+          loc_string(n) = 'redox_CH4toDIC_dO2'
           n = n+1
-          loc_string(n) = 'redox_CH4toDIC_dALK'   
+          loc_string(n) = 'redox_CH4toDIC_dALK'
        end if
        if (ocn_select(io_SO4)) then
           n = n+1
@@ -1001,11 +1035,11 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_CH4toDICaom_dDIC'
           n = n+1
-          loc_string(n) = 'redox_CH4toDICaom_dH2S'   
+          loc_string(n) = 'redox_CH4toDICaom_dH2S'
           n = n+1
-          loc_string(n) = 'redox_CH4toDICaom_dSO4'  
+          loc_string(n) = 'redox_CH4toDICaom_dSO4'
           n = n+1
-          loc_string(n) = 'redox_CH4toDICaom_dALK'  
+          loc_string(n) = 'redox_CH4toDICaom_dALK'
        end if
     end if
     if (ocn_select(io_I) .AND. ocn_select(io_I)) then
@@ -1015,13 +1049,13 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_ItoIO3_dIO3'
           n = n+1
-          loc_string(n) = 'redox_ItoIO3_dO2'  
+          loc_string(n) = 'redox_ItoIO3_dO2'
           n = n+1
           loc_string(n) = 'redox_IO3toI_dI'
           n = n+1
           loc_string(n) = 'redox_IO3toI_dIO3'
           n = n+1
-          loc_string(n) = 'redox_IO3toI_dO2'  
+          loc_string(n) = 'redox_IO3toI_dO2'
        end if
     end if
     if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe)) then
@@ -1031,7 +1065,7 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_Fe2toFe3_dFe'
           n = n+1
-          loc_string(n) = 'redox_Fe2toFe3_dO2'  
+          loc_string(n) = 'redox_Fe2toFe3_dO2'
        end if
     end if
     if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
@@ -1041,11 +1075,11 @@ CONTAINS
           n = n+1
           loc_string(n) = 'redox_Fe3toFe2_dFe2'
           n = n+1
-          loc_string(n) = 'redox_Fe3toFe2_dH2S'  
+          loc_string(n) = 'redox_Fe3toFe2_dH2S'
           n = n+1
-          loc_string(n) = 'redox_Fe3toFe2_dSO4'  
+          loc_string(n) = 'redox_Fe3toFe2_dSO4'
           n = n+1
-          loc_string(n) = 'redox_Fe3toFe2_dALK'  
+          loc_string(n) = 'redox_Fe3toFe2_dALK'
        end if
     end if
     ! -------------------------------------------------------- ! (2) solid -> dissolved
@@ -1103,7 +1137,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! UPDATE RELATIONSHIPS BETWEEN TRACERS
   ! NOTE: the reverse transformation array <conv_ocn_sed> was never used and hence is no longer updated here
-  !       (01/01/2019 UPDATE: as has now been removed entirely ...) 
+  !       (01/01/2019 UPDATE: as has now been removed entirely ...)
   ! NOTE: update the basic oxic transformation (<conv_sed_ocn>) first:
   !       this is used to create particulate matter (e.g. biological uptake) as well as in the tracer auditing calculations
   SUBROUTINE sub_data_update_tracerrelationships()
@@ -1598,6 +1632,7 @@ CONTAINS
     int_misc_opn_fxsw_sig   = 0.0
     int_ocnsed_sig(:)       = 0.0
     int_diag_bio_sig(:)     = 0.0
+    int_diag_bioNORM_sig(:) = 0.0
     int_diag_geochem_old_sig(:) = 0.0
     int_diag_precip_sig(:)  = 0.0
     int_diag_iron_sig(:)    = 0.0
@@ -1607,7 +1642,7 @@ CONTAINS
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
     int_diag_redox_sig(:)   = 0.0
-    int_diag_ecogem_part    = 0.0 
+    int_diag_ecogem_part    = 0.0
     int_diag_ecogem_remin   = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
@@ -2151,8 +2186,8 @@ CONTAINS
        IF (loc_force_restore_select .AND. loc_force_flux_select) then
           CALL sub_report_error( &
                & 'biogem_data','sub_init_tracer_forcing_ocn', &
-               & 'You are being greedy ... and have both flux AND restoring atmospheric forcing selected'// &
-               & '(gem_config_atm.par) - Is this really what you intended?', &
+               & 'You are being greedy ... and have both flux AND restoring ocean forcing selected'// &
+               & '(gem_config_ocn.par) - Is this really what you intended?', &
                & 'CONTINUING', &
                & (/const_real_null/),.false. &
                & )
@@ -2314,7 +2349,7 @@ CONTAINS
        if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
           IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
           IF (.NOT. ocn_select(io_FeL)) loc_flag = .TRUE.
-          IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.       
+          IF (.NOT. ocn_select(io_L)) loc_flag = .TRUE.
        end if
        IF (.NOT. sed_select(is_POFe)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_POM_Fe)) loc_flag = .TRUE.
@@ -2328,7 +2363,6 @@ CONTAINS
             & 'STOPPING', &
             & (/const_real_null/),.true. &
             & )
-       loc_flag = .FALSE.
     end IF
     ! #### ADD CHECKS OF ADDITIONAL BIOLOGICAL OPTIONS HERE ###################################################################### !
     !
@@ -2393,29 +2427,29 @@ CONTAINS
           loc_flag = .FALSE.
        end if
     else
-       if (loc_flag) then
-          CALL sub_report_error( &
-               & 'biogem_data','sub_check_par', &
-               & 'although the production of dissolved organic matter production is set to zero '//&
-               & 'you have carelessly left some DOM tracers selected (FILE: gem_config_ocn.par) '// &
-               & 'The model will run quicker by de-selecting all currently selected DOM tracers.', &
-               & 'CONTINUING', &
-               & (/const_real_null/),.FALSE. &
-               & )
-          loc_flag = .FALSE.
-       end if
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par', &
+            & 'although the production of dissolved organic matter production is set to zero '//&
+            & 'you have carelessly left some DOM tracers selected (FILE: gem_config_ocn.par) '// &
+            & 'The model will run quicker by de-selecting all currently selected DOM tracers.', &
+            & 'CONTINUING', &
+            & (/const_real_null/),.FALSE. &
+            & )
     end if
     ! check Fe cycle self-consistency
+    ! check first that one of the key iron tracers are selected (iron (3+) or total dissolved Fe)
     if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
        SELECT CASE (trim(opt_geochem_Fe))
        CASE ('OLD','ALT')
-          ! NOTE: do not need to explicitly check for io_Fe (again!)
-          if ((.NOT. ocn_select(io_L)) .OR. (.NOT. ocn_select(io_FeL))) THEN
+          if ((.NOT. ocn_select(io_Fe)) .OR. (.NOT. ocn_select(io_L)) .OR. (.NOT. ocn_select(io_FeL))) THEN
+             loc_flag = .TRUE.
+          end if
+       CASE ('FeFe2TL')
+          if ((.NOT. ocn_select(io_Fe)) .OR. (.NOT. ocn_select(io_Fe2)) .OR. (.NOT. ocn_select(io_TL))) THEN
              loc_flag = .TRUE.
           end if
        CASE ('hybrid','lookup_4D')
-          ! NOTE: do not need to explicitly check for io_TDFe (again!)
-          if (.NOT. ocn_select(io_TL)) THEN
+          if ((.NOT. ocn_select(io_TDFe)) .OR. (.NOT. ocn_select(io_TL))) THEN
              loc_flag = .TRUE.
           end if
        case default
@@ -2424,7 +2458,8 @@ CONTAINS
        if (loc_flag) then
           CALL sub_report_error( &
                & 'biogem_data','sub_check_par', &
-               & 'The selected Fe tracers (base config) does not match the selected Fe scheme (user config).', &
+               & 'The selected Fe tracers (base config) does not match the selected Fe scheme (user config): ' // &
+               & trim(opt_geochem_Fe), &
                & 'STOPPING', &
                & (/const_real_null/),.TRUE. &
                & )
@@ -2451,6 +2486,16 @@ CONTAINS
                & (/const_real_null/),.FALSE. &
                & )
        ctrl_force_ocn_age1 = .false.
+    end if
+    if ( ctrl_force_ocn_age .AND. ctrl_force_ocn_age1 ) then
+          CALL sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You cannot select BOTH ctrl_force_ocn_age AND ctrl_force_ocn_age1.'// &
+               & 'The dual-tracer age tracer option (ctrl_force_ocn_age) will hence be deselected.', &
+               & 'CONTINUING', &
+               & (/const_real_null/),.FALSE. &
+               & )
+       ctrl_force_ocn_age = .false.
     end if
 
     ! *** parameter consistency check - isotopes, forcings ***
@@ -2870,6 +2915,8 @@ CONTAINS
   ! DATA SAVE META CONFIG
   SUBROUTINE sub_adj_par_save()
 
+    !
+    ! NOTE: the value of ctrl_data_save_sig_diag_redox_old is set independently
     select case (par_data_save_level)
     case (0:99)
        ctrl_data_save_slice_ocnatm = .false.
@@ -2885,51 +2932,62 @@ CONTAINS
        ctrl_data_save_slice_phys_atm = .false.
        ctrl_data_save_slice_phys_ocn = .false.
        ctrl_data_save_slice_misc = .false.
-       ctrl_data_save_slice_diag = .false.
        ctrl_data_save_slice_diag_bio = .false.
        ctrl_data_save_slice_diag_geochem = .false.
        ctrl_data_save_slice_diag_proxy = .false.
        ctrl_data_save_slice_diag_tracer = .false.
        ctrl_data_save_sig_ocnatm = .false.
        ctrl_data_save_sig_ocn = .false.
-       ctrl_data_save_sig_fexport = .false.
-       ctrl_data_save_sig_fairsea = .false.
        ctrl_data_save_sig_ocnsed = .false.
+       ctrl_data_save_sig_fairsea = .false.
        ctrl_data_save_sig_focnatm = .false.
        ctrl_data_save_sig_focnsed = .false.
        ctrl_data_save_sig_fsedocn = .false.
+       ctrl_data_save_sig_fexport = .false.
        ctrl_data_save_sig_ocn_sur = .false.
        ctrl_data_save_sig_carb_sur = .false.
        ctrl_data_save_sig_misc = .false.
        ctrl_data_save_sig_diag = .false.
+       ctrl_data_save_sig_diag_bio = .false.
+       ctrl_data_save_sig_diag_geochem = .false.
        ctrl_data_save_derived = .false.
        ctrl_data_save_GLOBAL = .false.
     case default
        ! set new *non namelist* defined sub-options (to broadly retain back-compatability)
-       ctrl_data_save_slice_diag_bio = ctrl_data_save_slice_diag
+       ctrl_data_save_slice_diag_bio     = ctrl_data_save_slice_diag
        ctrl_data_save_slice_diag_geochem = ctrl_data_save_slice_diag
-       ctrl_data_save_slice_diag_proxy = ctrl_data_save_slice_diag
-       ctrl_data_save_slice_diag_tracer = ctrl_data_save_slice_diag
-       ctrl_data_save_sig_diag_bio = ctrl_data_save_sig_diag
-       ctrl_data_save_sig_diag_geochem = ctrl_data_save_sig_diag
+       ctrl_data_save_slice_diag_proxy   = ctrl_data_save_slice_diag
+       ctrl_data_save_slice_diag_tracer  = ctrl_data_save_slice_diag
+       ctrl_data_save_sig_diag_bio       = ctrl_data_save_sig_diag
+       ctrl_data_save_sig_diag_geochem   = ctrl_data_save_sig_diag
     end select
 
     ! meta meta options
     if (ctrl_data_save_slice_cdrmip) par_data_save_level = 0
+    
+    ! no longer used! [REMOVE]
+    ctrl_data_save_slice_diag = .false.
 
     ! set BASIC options
     select case (par_data_save_level)
     case (2:99)
+       ctrl_data_save_slice_ocn    = .true.
        ctrl_data_save_slice_ocnatm = .true.
-       ctrl_data_save_slice_ocn = .true.
-       ctrl_data_save_slice_misc = .true.
-       if (flag_sedgem) ctrl_data_save_slice_ocnsed = .true.
-       ctrl_data_save_sig_ocnatm = .true.
-       ctrl_data_save_sig_ocn = .true.
-       ctrl_data_save_sig_ocn_sur = .true.
-       ctrl_data_save_sig_misc = .true.
-       ctrl_data_save_GLOBAL = .true.
-       if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
+       ctrl_data_save_slice_misc   = .true.
+       ctrl_data_save_slice_sur    = .true.
+       ctrl_data_save_sig_ocn      = .true.
+       ctrl_data_save_sig_ocnatm   = .true.
+       ctrl_data_save_sig_misc     = .true.
+       ctrl_data_save_sig_ocn_sur  = .true.
+       ctrl_data_save_GLOBAL       = .true.
+       If (flag_sedgem) then
+          ctrl_data_save_slice_ocnsed  = .true.
+          ctrl_data_save_slice_focnsed = .true.
+          ctrl_data_save_slice_fsedocn = .true.
+          ctrl_data_save_sig_ocnsed    = .true.
+          ctrl_data_save_sig_focnsed   = .true.
+          ctrl_data_save_sig_fsedocn   = .true.
+       end if
     case default
        ! NOTHING
     end select
@@ -2938,9 +2996,9 @@ CONTAINS
     case (0)
        ! save NOTHING
     case (1)
-       ! MINIMUM (biogeochem ONLY)
-       ctrl_data_save_slice_misc = .false.
-       ctrl_data_save_sig_misc = .false.
+       ! only (full) physics
+       ctrl_data_save_slice_phys_atm = .true.
+       ctrl_data_save_slice_phys_ocn = .true.
     case (2)
        ! BASIC (biogeochem + BASIC physics)
     case (3)
@@ -2948,21 +3006,18 @@ CONTAINS
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
     case (4)
        ! BASIC + geochem diagnostics
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (5)
        ! BASIC + biology + geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
@@ -2970,54 +3025,51 @@ CONTAINS
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_fairsea = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (6)
        ! BASIC + tracer + proxy diagnostics
+       ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
     case (7)
        ! BASIC + biology + tracer + proxy diagnostics
        ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
-       ctrl_data_save_sig_diag = .true.
     case (8)
        ! BASIC + biology + tracer + proxy + geochem diagnostics
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_sur = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_data_save_derived = .true.
     case (9)
        ! BASIC + full physics
@@ -3028,26 +3080,25 @@ CONTAINS
        ctrl_data_save_slice_focnatm = .true.
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
-       ctrl_data_save_slice_sur = .true.
+       ctrl_data_save_slice_carbconst = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       ctrl_data_save_slice_ocnsed = .false.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
     case (11)
        ! BASIC + biology + tracer + proxy + redox diagnostics
        ctrl_data_save_slice_bio = .true.
+       ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_bio_remin_redox_save=.true.
@@ -3060,15 +3111,11 @@ CONTAINS
        ! BASIC + FULL (inc. redox) geochem diagnostics
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (15)
        ! BASIC + biology + FULL (inc. redox) geochem diagnostics
@@ -3077,18 +3124,14 @@ CONTAINS
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
-       if (flag_sedgem) ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_fairsea = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
     case (16)
        ! BASIC + biology + tracer + proxy diagnostics + FULL (inc. redox) geochem
@@ -3100,16 +3143,14 @@ CONTAINS
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
        ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
-       ctrl_data_save_sig_carb_sur = .true.
-       ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
+       ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
+       ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_diag = .true.
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_data_save_derived = .true.
        ctrl_bio_remin_redox_save=.true.
     case (99)
@@ -3124,17 +3165,15 @@ CONTAINS
        ctrl_data_save_slice_phys_atm = .true.
        ctrl_data_save_slice_phys_ocn = .true.
        ctrl_data_save_slice_misc = .true.
-       ctrl_data_save_slice_diag = .true.
        ctrl_data_save_slice_diag_bio = .true.
        ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_slice_diag_proxy = .true.
        ctrl_data_save_slice_diag_tracer = .true.
-       if (flag_sedgem) ctrl_data_save_slice_ocnsed = .true.
        ctrl_data_save_slice_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_slice_fsedocn = .true.
        ctrl_data_save_sig_ocnatm = .true.
        ctrl_data_save_sig_ocn = .true.
        ctrl_data_save_sig_fexport = .true.
+       ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_ocn_sur = .true.
@@ -3144,11 +3183,8 @@ CONTAINS
        ctrl_data_save_sig_diag_bio = .true.
        ctrl_data_save_sig_diag_geochem = .true.
        ctrl_data_save_derived = .true.
-       ctrl_data_save_GLOBAL = .true.
-       if (flag_sedgem) ctrl_data_save_sig_ocnsed = .true.
-       ctrl_data_save_sig_focnsed = .true.
-       if (flag_sedgem) ctrl_data_save_sig_fsedocn = .true.
        ctrl_bio_remin_redox_save=.true.
+       ctrl_data_save_GLOBAL = .true.
     case default
        ! [leave user-specified settings]
     end select
