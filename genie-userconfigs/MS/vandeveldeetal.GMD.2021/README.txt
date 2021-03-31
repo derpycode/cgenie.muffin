@@ -78,16 +78,15 @@ Results from these experiments are used in Fig. 13
 ################################################################
 
 The published 'FeMIP' modern iron cycle [Tagliabue et al., How well do global ocean biogeochemistry models simulate dissolved iron distributions?, GBC DOI: 10.1002/2015GB005289 (2016)]
-together with the 2 alternative iron cycle configurations employing the new iron cycle parameterizations found in this paper,
-are run as follows.
+together with the 2 alternative iron cycle configurations employing the new iron cycle parameterizations found in this paper, are run as follows:
 
 (a) 'FeMIP'
-./runmuffin.sh muffin.CB.p_worjh2.BASESFe.FeMIP MS/vandeveldeetal.GMD.2021 muffin.CB.p_worjh2.BASESFe.FeMIP.SPIN 10000
+./runmuffin.sh muffin.CB.p_worjh2.BASESFe MS/vandeveldeetal.GMD.2021 muffin.CB.p_worjh2.BASESFe.FeMIP.SPIN 10000
 
-(b) as per 'FeMIP' (a) -- keeping scavening the same, but replacing the tracers: Fe, FeL, L, with: Fe, Fe2, TDL to introduce Fe2+ oxidation and Fe3+ reduction
+(b) as per 'FeMIP' (a) -- keeping scavening the same, but replacing the tracers: Fe, FeL, L, with: Fe, Fe2, TDL and adding the processes of Fe2+ oxidation and Fe3+ reduction
 ./runmuffin.sh muffin.CB.p_worjh2.BASESFeFe2TL MS/vandeveldeetal.GMD.2021 muffin.CB.p_worjh2.BASESFeFe2TL.SPIN 10000
 
-(c) as per (b), but scavening iron as FeOOH, and allowing this to undergo both Dissimilatory iron reduction and Dissimilatory sulphate reduction, and allowing pyrite formation
+(c) as per (b), but now scavening iron as FeOOH (rather than Fe3+) and allowing this to undergo both Dissimilatory iron reduction and Dissimilatory sulphate reduction, plus, allowing pyrite formation
 ./runmuffin.sh muffin.CB.p_worjh2.BASESFeFe2TLFeOOH MS/vandeveldeetal.GMD.2021 muffin.CB.p_worjh2.BASESFeFe2TLFeOOH.POM_FeOOHFeS2.SPIN 10000
 
 ################################################################
