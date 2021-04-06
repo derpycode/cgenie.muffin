@@ -963,11 +963,21 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     CHARACTER(len=255)::loc_filename                           ! filename string
+    integer::loc_len
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    ! set alt dir path string length
+    loc_len = LEN_TRIM(par_pindir_name)
     ! -------------------------------------------------------- !
     ! LOAD 2D FIELD
     ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! load geothermal 2D field
-    loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    ! -------------------------------------------------------- ! load BIOGEM virtual grid
+    if (loc_len > 0) then
+       loc_filename = TRIM(par_pindir_name)//TRIM(par_force_Vgrid_file)
+    else
+       loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    end if
     CALL sub_load_data_ij_INT(loc_filename,n_i,n_j,force_Vgrid(:,:))
     ! -------------------------------------------------------- !
     ! END

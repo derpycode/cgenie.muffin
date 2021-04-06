@@ -223,6 +223,8 @@ CONTAINS
        ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
+       ! allow scaling factor modification of value and cap at 100% (loc_sed_pres_fracC=1.0)
+       loc_sed_pres_fracC = max(1.0,par_sed_diagen_fracCpres_scale*loc_sed_pres_fracC)
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
@@ -1467,6 +1469,8 @@ CONTAINS
        ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
+       ! allow scaling factor modification of value and cap at 100% (loc_sed_pres_fracC=1.0)
+       loc_sed_pres_fracC = max(1.0,par_sed_diagen_fracCpres_scale*loc_sed_pres_fracC)
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
