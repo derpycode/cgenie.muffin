@@ -24,6 +24,7 @@ real,dimension(n_i,n_j),save::ccdis_sed
 real,dimension(n_i,n_j),save::ccsfave_sed
 real,dimension(n_i,n_j),save::errf_sed
 real,dimension(n_i,n_j),save::init_botT
+real,dimension(n_i,n_j),save::frc2_sed
 integer,dimension(n_i,n_j),save::izml_sed
 integer,save::irec_sed 
 
@@ -348,6 +349,7 @@ real:: frc_flx  ! flx fraction of caco3 when assuming two different classes of c
 logical::ktempdep_on = .false.
 logical::fracTdep_on = .false.
 real:: eapp_k = 50d0 ! kJ mol-1
+real:: dTdf = 15d0  ! C per 0.5 fraction change
 real:: loc_cnst_gas = 8.31d-3 ! kJ mol-1 K-1
 real:: loc_init_botT
 
@@ -362,6 +364,8 @@ signal_tracking=.true.
 ox_degall = par_sed_kanzaki2019_oxonly                    !  default true 
 ktempdep_on = par_sed_kanzaki2019_dT                        ! default false
 fracTdep_on = par_sed_kanzaki2019_fracDT                        ! default false
+eapp_k = par_sed_kanzaki2019_eappk                          ! user input default 50 kJ mol-1
+dTdf = par_sed_kanzaki2019_dTdfrc                          ! user input default 15 deg per 0.5 fraction 
 loc_reading = ctrl_continuing ! if continuing, read from previous run
 loc_reading = .false. ! always start from steady state
 
@@ -870,8 +874,10 @@ do
         ! ccflx(1) = ccflxi*max(0d0,1d0-par_sed_kanzaki2019_arg)
         ccflx(1) = ccflxi*max(0d0,1d0-frc_flx)
         if (fracTdep_on) then 
-            ccflx(1) =  ccflx(1) - (temp - loc_init_botT)/15d0 ! decrease with temperature 
+            ccflx(1) = max(0d0,1d0-frc_flx)
+            ccflx(1) =  ccflx(1) - (temp - loc_init_botT)/dTdf ! decrease with temperature 
             ccflx(1) = max(min( ccflx(1),1d0), 0d0) ! constraining between 0 and 1
+            ccflx(1) = ccflxi*ccflx(1)
         endif 
         ccflx(2) = ccflxi-ccflx(1)
     endif 
@@ -1702,6 +1708,7 @@ ccdis_sed(dum_i,dum_j) = sum(ccdis)
 izml_sed(dum_i,dum_j)= izml
 errf_sed(dum_i,dum_j)= err_f
 errf_sed(dum_i,dum_j)= sum(abs(frt - 1d0)*dz)/sum(dz) ! depth average of deviation of void/expansion of solid
+frc2_sed(dum_i,dum_j)= ccflx(2)/ccflxi
 
 ! assume 5cm for which average conc. of cc is calculated after Ridgwell and Hargreaves 2007
 zx_sample = 5d0  

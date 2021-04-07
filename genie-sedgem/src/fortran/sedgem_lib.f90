@@ -125,6 +125,9 @@ MODULE sedgem_lib
   logical::par_sed_kanzaki2019_dT                                ! change of k with temperature ?
   logical::par_sed_kanzaki2019_fracDT                            ! change of rain fraction with temperature ?
   NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_oxonly,par_sed_kanzaki2019_dT,par_sed_kanzaki2019_fracDT
+  REAL::par_sed_kanzaki2019_eappk                                ! apparent activation energy for CaCO3 dissolution (kJ mol-1)
+  REAL::par_sed_kanzaki2019_dTdfrc                               ! temperature change for 0.5 fraction change 
+  NAMELIST /ini_sedgem_nml/par_sed_kanzaki2019_eappk,par_sed_kanzaki2019_dTdfrc
   ! ------------------- DIAGENESIS SCHEME: opal ---------------------------------------------------------------------------------- !
   REAL::par_sed_opal_KSi0                                        ! base opal KSi value (yr-1)
   NAMELIST /ini_sedgem_nml/par_sed_opal_KSi0

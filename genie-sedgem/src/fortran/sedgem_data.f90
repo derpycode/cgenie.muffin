@@ -128,6 +128,8 @@ CONTAINS
        print*,'om degradation scheme, oxonly?                      : ',par_sed_kanzaki2019_oxonly
        print*,'change of k with temperature ?                      : ',par_sed_kanzaki2019_dT
        print*,'change of rainfraction with temperature ?           : ',par_sed_kanzaki2019_fracDT
+       print*,'activation energy for CaCO3 dissolution (kJ mol-1)  : ',par_sed_kanzaki2019_eappk
+       print*,'temperature change for 0.5 fraction change          : ',par_sed_kanzaki2019_dTdfrc
        ! --- DIAGENESIS SCHEME: opal --------------------------------------------------------------------------------------------- !
        print*,'base opal KSi value (yr-1)                          : ',par_sed_opal_KSi0
        ! --- CaCO3 PRODUCTION ---------------------------------------------------------------------------------------------------- !
