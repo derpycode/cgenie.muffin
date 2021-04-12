@@ -868,8 +868,8 @@ CONTAINS
        ! prescribed POC flux
        ! NOTE: force_restore_docn_nuts has been assigned a negative sign (in the forcing update of the main biogem subroutine) ...
        ! NOTE: allow depletion of PO4 < 0.0 so as to force export production to the prescribed value
-       ! NOTE: correct for DOM (given that force_restore_docn_nuts has been devied from a prescribed particulate flux)
-       loc_dPO4 = -force_restore_docn_nuts(io_PO4)/(1.0 - loc_bio_red_DOMtotal)
+       ! NOTE: DO NOT correct for DOM here
+       loc_dPO4 = -force_restore_docn_nuts(io_PO4)
     CASE ( &
          & '2N2T_PN_Tdep' &
          & )
@@ -914,7 +914,6 @@ CONTAINS
        else
           loc_frac_N2fix = 0.0
        end if
-
     CASE ( &
          & '3N2T_PNFe_Tdep' &
          & )
@@ -1023,6 +1022,11 @@ CONTAINS
        loc_bio_red_RDOMfrac = 1.0 - loc_bio_red_DOMfrac
        loc_bio_red_DOMtotal = 1.0
     end if
+    ! now correct fixed POC export scheme for (total) DOM production
+    SELECT CASE (par_bio_prodopt)
+    CASE ('bio_POCflux')
+       if ((1.0 - loc_bio_red_DOMtotal) > const_rns) loc_dPO4 = loc_dPO4/(1.0 - loc_bio_red_DOMtotal)
+    end select
 
     ! *** ADJUST PARTICULATE COMPOSITION 'REDFIELD' RATIOS *********************************************************************** !
     !
