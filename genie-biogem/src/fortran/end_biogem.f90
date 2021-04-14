@@ -81,6 +81,8 @@ SUBROUTINE end_biogem()
   DEALLOCATE(diag_redox,STAT=alloc_error)
   DEALLOCATE(int_diag_redox_timeslice,STAT=alloc_error)
   DEALLOCATE(int_diag_redox_sig,STAT=alloc_error)
+  DEALLOCATE(conv_lslo2idP,STAT=alloc_error)
+  DEALLOCATE(conv_lslo2idD,STAT=alloc_error)
   !- --------------------------------------------------------- ! misc
   DEALLOCATE(orb_pts,STAT=alloc_error)
   DEALLOCATE(orb_pts_loc,STAT=alloc_error)
