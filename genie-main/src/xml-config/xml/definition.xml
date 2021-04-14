@@ -8098,6 +8098,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 				<value datatype="real">0.0</value>
                         <description>global quartz d30Si (o/oo) </description>
                     </param>
+                    <param name="par_weather_kerogen_fracP">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen P (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracS">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen S (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracS_d34S">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen S d34S (o/oo)</description>
+                    </param>
                     <param name="opt_calibrate_T_0D">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>calibrate temperature fields to data</description>
@@ -8127,19 +8139,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">999.0</value>
                         <description>imposed maximum silicate weathering enhancement</description>
                     </param>
-                    <param name="par_weather_fCaCO3_enh_n">
+                    <param name="par_weather_CaCO3_enh_n">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaCO3 weathering scale factor</description>
                     </param>
-                    <param name="par_weather_fCaSiO3_enh_n">
+                    <param name="par_weather_CaSiO3_enh_n">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaSiO3 weathering scale factor</description>
                     </param>
-                    <param name="par_weather_fCaCO3_enh_nt">
+                    <param name="par_weather_CaCO3_enh_nt">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaCO3 weathering total inventory -- as years x enhancement factor</description>
                     </param>
-                    <param name="par_weather_fCaSiO3_enh_nt">
+                    <param name="par_weather_CaSiO3_enh_nt">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaSiO3 weathering total inventory -- as years x enhancement factor</description>
                     </param>
@@ -8154,6 +8166,54 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_CaSiO3_7Li_epsilon_DT">
                         <value datatype="real">-0.15</value>
                           <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
+                    </param>
+                    <param name="opt_weather_fixed">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix bulk silicate weathering</description>
+                    </param>
+                    <param name="opt_weather_fixed_Li">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Li fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Sr">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Sr fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Os">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Os fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenC">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen C fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenP">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen P fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenS">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen S fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_FeS2">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated FeS2 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaSO4">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated CaSO4 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_FeCO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated FeCO3 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Ca5PO43">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Ca5PO43 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_SiO2">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated SiO2 fluxes</description>
                     </param>
                       <!-- *** 2D WEATHERING PARAMETERS ********************************* -->
                     <param name="par_lith_data">

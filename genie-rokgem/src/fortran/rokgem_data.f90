@@ -172,7 +172,10 @@ CONTAINS
        print*,'global apatite d44Ca (o/oo)                         : ',par_weather_CaSiO3_fracCa5PO43_d44Ca
        print*,'global apatite weathering rate (mol PO4 yr-1)       : ',par_weather_Ca0PO41
        print*,'global quartz weathering rate (mol Si yr-1)         : ',par_weather_SiO2
-       print*,'global quartz d30Si (o/oo)                          : ',par_weather_SiO2_d30Si
+       print*,'global quartz d30Si (o/oo)                          : ',par_weather_SiO2_d30Si    
+       print*,'global kerogen P abundance                          : ',par_weather_kerogen_fracP
+       print*,'global kerogen S abundance                          : ',par_weather_kerogen_fracS
+       print*,'global kerogen S d34S (o/oo)                        : ',par_weather_kerogen_fracS_d34S
        print*,'calibrate temperature fields to global average data : ',opt_calibrate_T_0D
        print*,'calibrate runoff fields to global average data      : ',opt_calibrate_R_0D
        print*,'calibrate productivity fields to global average data: ',opt_calibrate_P_0D
@@ -182,13 +185,25 @@ CONTAINS
        print*,'mean global land prod. (kgC m-2 yr-1) to calib. to  : ',par_data_P_0D
        print*,'imposed maximum carbonate weathering enhancement    : ',par_n_max_CaCO3
        print*,'imposed maximum silicate weathering enhancement     : ',par_n_max_CaSiO3
-       print*,'enhanced weathering scale factor                    : ',par_weather_fCaCO3_enh_n
-       print*,'enhanced weathering scale factor                    : ',par_weather_fCaSiO3_enh_n
-       print*,'enhanced weathering total inventory                 : ',par_weather_fCaCO3_enh_nt
-       print*,'enhanced weathering total inventory                 : ',par_weather_fCaSiO3_enh_nt    
+       print*,'enhanced weathering scale factor                    : ',par_weather_CaCO3_enh_n
+       print*,'enhanced weathering scale factor                    : ',par_weather_CaSiO3_enh_n
+       print*,'enhanced weathering total inventory                 : ',par_weather_CaCO3_enh_nt
+       print*,'enhanced weathering total inventory                 : ',par_weather_CaSiO3_enh_nt    
        print*,'Li weathering scheme                                : ',trim(opt_weather_CaSiO3_fracLi)
        print*,'Fixed (non T-dep) clay fractionation?               : ',ctrl_weather_CaSiO3_7Li_epsilon_fixed
        print*,'T-dependent D7Li sensitivity (o/oo K-1)             : ',par_weather_CaSiO3_7Li_epsilon_DT
+       print*,'Fix bulk silicate weathering                        : ',opt_weather_fixed
+       print*,'Fix associated Li fluxes                            : ',opt_weather_fixed_Li
+       print*,'Fix associated Sr fluxes                            : ',opt_weather_fixed_Sr
+       print*,'Fix associated Os fluxes                            : ',opt_weather_fixed_Os
+       print*,'Fix associated kerogen C fluxes                     : ',opt_weather_fixed_kerogenC
+       print*,'Fix associated kerogen P fluxes                     : ',opt_weather_fixed_kerogenP
+       print*,'Fix associated kerogen S fluxes                     : ',opt_weather_fixed_kerogenS
+       print*,'Fix associated FeS2 fluxes                          : ',opt_weather_fixed_FeS2
+       print*,'Fix associated CaSO4 fluxes                         : ',opt_weather_fixed_CaSO4
+       print*,'Fix associated FeCO3 fluxes                         : ',opt_weather_fixed_FeCO3
+       print*,'Fix associated Ca5PO43 fluxes                       : ',opt_weather_fixed_Ca5PO43
+       print*,'Fix associated SiO2 fluxes                          : ',opt_weather_fixed_SiO2
        ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
        print*,'--- 2D WEATHERING PARAMETERS ---'
        print*,'name of lithological data set (part 1)              : ',par_lith_data
