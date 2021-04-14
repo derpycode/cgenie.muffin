@@ -192,7 +192,8 @@ CONTAINS
        print*,'Li weathering scheme                                : ',trim(opt_weather_CaSiO3_fracLi)
        print*,'Fixed (non T-dep) clay fractionation?               : ',ctrl_weather_CaSiO3_7Li_epsilon_fixed
        print*,'T-dependent D7Li sensitivity (o/oo K-1)             : ',par_weather_CaSiO3_7Li_epsilon_DT
-       print*,'Fix bulk silicate weathering                        : ',opt_weather_fixed
+       print*,'Fix bulk carbonate weathering                       : ',opt_weather_fixed_CaCO3
+       print*,'Fix bulk silicate weathering                        : ',opt_weather_fixed_CaSiO3
        print*,'Fix associated Li fluxes                            : ',opt_weather_fixed_Li
        print*,'Fix associated Sr fluxes                            : ',opt_weather_fixed_Sr
        print*,'Fix associated Os fluxes                            : ',opt_weather_fixed_Os

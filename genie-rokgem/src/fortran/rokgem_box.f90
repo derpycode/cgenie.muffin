@@ -834,13 +834,16 @@ CONTAINS
     ! NOTE: allow the primary silicate weathering to be 'fixed'
     !       (even as the derived elements could vary in response to climate)
     ! NOTE: implicitly, granitic is distinguished from basaltic weathering
-    if (opt_weather_fixed) then
+    if (opt_weather_fixed_CaCO3) then
        loc_weather_CaCO3   = par_weather_CaCO3
+    else
+       loc_weather_CaCO3   = adj_weather_CaCO3
+    end if
+    if (opt_weather_fixed_CaSiO3) then
        loc_weather_CaSiO3  = par_weather_CaSiO3
        loc_weather_CaSiO3b = par_weather_CaSiO3b
        loc_weather_CaSiO3g = par_weather_CaSiO3g
     else
-       loc_weather_CaCO3   = adj_weather_CaCO3
        loc_weather_CaSiO3  = adj_weather_CaSiO3
        loc_weather_CaSiO3b = adj_weather_CaSiO3b
        loc_weather_CaSiO3g = adj_weather_CaSiO3g

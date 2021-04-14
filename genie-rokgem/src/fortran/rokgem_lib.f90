@@ -214,7 +214,8 @@ MODULE rokgem_lib
   NAMELIST /ini_rokgem_nml/ctrl_weather_CaSiO3_7Li_epsilon_fixed
   REAL::par_weather_CaSiO3_7Li_epsilon_DT                                                ! T-dependent D7Li sensitivity (o/oo K-1)
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_7Li_epsilon_DT
-  LOGICAL::opt_weather_fixed                                                             ! fix bulk silicate weathering
+  LOGICAL::opt_weather_fixed_CaCO3                                                       ! fix bulk carbonate weathering
+  LOGICAL::opt_weather_fixed_CaSiO3                                                      ! fix bulk silicate weathering
   LOGICAL::opt_weather_fixed_Li                                                          ! fix associated Li fluxes
   LOGICAL::opt_weather_fixed_Sr                                                          ! fix associated Sr fluxes
   LOGICAL::opt_weather_fixed_Os                                                          ! fix associated Os fluxes
@@ -226,7 +227,7 @@ MODULE rokgem_lib
   LOGICAL::opt_weather_fixed_FeCO3                                                       ! fix associated FeCO3 fluxes
   LOGICAL::opt_weather_fixed_Ca5PO43                                                     ! fix associated Ca5PO43 fluxes
   LOGICAL::opt_weather_fixed_SiO2                                                        ! fix associated SiO2 fluxes
-  NAMELIST /ini_rokgem_nml/opt_weather_fixed  
+  NAMELIST /ini_rokgem_nml/opt_weather_fixed_CaCO3,opt_weather_fixed_CaSiO3  
   NAMELIST /ini_rokgem_nml/opt_weather_fixed_Li,opt_weather_fixed_Sr,opt_weather_fixed_Os  
   NAMELIST /ini_rokgem_nml/opt_weather_fixed_kerogenC,opt_weather_fixed_kerogenP,opt_weather_fixed_kerogenS
   NAMELIST /ini_rokgem_nml/opt_weather_fixed_FeS2,opt_weather_fixed_CaSO4,opt_weather_fixed_FeCO3,opt_weather_fixed_Ca5PO43

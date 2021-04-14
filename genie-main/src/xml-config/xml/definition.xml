@@ -8167,9 +8167,13 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">-0.15</value>
                           <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
                     </param>
-                    <param name="opt_weather_fixed">
+                    <param name="opt_weather_fixed_CaCO3">
                         <value datatype="boolean">.false.</value>
-                        <description>Fix bulk silicate weathering</description>
+                        <description>Fix bulk carbonate weathering</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaSiO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix bulk silicate  weathering</description>
                     </param>
                     <param name="opt_weather_fixed_Li">
                         <value datatype="boolean">.false.</value>
