@@ -49,6 +49,8 @@ SUBROUTINE initialise_sedgem( &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(sed_mask_muds(n_i,n_j),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(sed_mask_hydr(n_i,n_j),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(sed(n_sed,n_i,n_j,n_sed_tot),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(sed_top(n_sed,n_i,n_j),STAT=alloc_error)
@@ -85,6 +87,7 @@ SUBROUTINE initialise_sedgem( &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(sed_diag(n_diag_sed,n_i,n_j),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+
   ! ---------------------------------------------------------- ! initialize allocated arrays
   IF (ctrl_misc_debug2) print*, 'initialize allocated arrays'
   ! initialize dynamically-allocated arrays (those not done elsewhere)

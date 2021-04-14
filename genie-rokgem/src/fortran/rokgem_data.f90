@@ -185,7 +185,10 @@ CONTAINS
        print*,'enhanced weathering scale factor                    : ',par_weather_fCaCO3_enh_n
        print*,'enhanced weathering scale factor                    : ',par_weather_fCaSiO3_enh_n
        print*,'enhanced weathering total inventory                 : ',par_weather_fCaCO3_enh_nt
-       print*,'enhanced weathering total inventory                 : ',par_weather_fCaSiO3_enh_nt
+       print*,'enhanced weathering total inventory                 : ',par_weather_fCaSiO3_enh_nt    
+       print*,'Li weathering scheme                                : ',trim(opt_weather_CaSiO3_fracLi)
+       print*,'Fixed (non T-dep) clay fractionation?               : ',ctrl_weather_CaSiO3_7Li_epsilon_fixed
+       print*,'T-dependent D7Li sensitivity (o/oo K-1)             : ',par_weather_CaSiO3_7Li_epsilon_DT
        ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
        print*,'--- 2D WEATHERING PARAMETERS ---'
        print*,'name of lithological data set (part 1)              : ',par_lith_data
@@ -536,7 +539,7 @@ CONTAINS
 
     INTEGER                                 :: alloc_stat, i, ios
 
-    n_outputs = 29
+    n_outputs = 38
     ALLOCATE(time_series_names(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
     ALLOCATE(output_descriptions(n_outputs),stat=alloc_stat)
@@ -563,14 +566,23 @@ CONTAINS
          & 'DIC_flux_coast                                    ', &
          & 'Ca_flux_coast                                     ', &
          & 'DIC_13C_flux                                      ', &
+         & 'Os_flux                                           ', &
+         & '187Os_flux                                        ', &
+         & '188Os_flux                                        ', &
          & 'ALK_flux_land                                     ', &
          & 'DIC_flux_land                                     ', &
          & 'Ca_flux_land                                      ', &
          & 'DIC_13C_flux_land                                 ', &
+         & 'Os_flux_land                                      ', &
+         & '187Os_flux_land                                   ', &
+         & '188Os_flux_land                                   ', &
          & 'ALK_flux_ocean                                    ', &
          & 'DIC_flux_ocean                                    ', &
          & 'Ca_flux_ocean                                     ', &
-         & 'DIC_13C_flux_ocean                                ' /)
+         & 'DIC_13C_flux_ocean                                ', &
+         & 'Os_flux_ocean                                     ', &
+         & '187Os_flux_ocean                                  ', &
+         & '188Os_flux_ocean                                  ' /)
 
     output_descriptions = (/                                                       &
                                 !'---------------------------- inputs -----------------------------'
@@ -596,16 +608,25 @@ CONTAINS
          & 'DIC weathering flux (Tmol yr-1)                  ', & ! but as they are already spread over land for 2D schemes
          & 'Ca weathering flux (Tmol yr-1)                   ', & ! they are just set to the exact same fluxes as the ones below
          & 'DIC_13C weathering flux (Tmol yr-1)              ', & !
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ', &
                                 !'                            * land *                              '
          & 'ALK weathering flux (Tmol yr-1)                  ', &
          & 'DIC weathering flux (Tmol yr-1)                  ', &
          & 'Ca weathering flux (Tmol yr-1)                   ', &
          & 'DIC_13C weathering flux (Tmol yr-1)              ', &
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ', &
                                 ! '                            * ocean *                            '
          & 'ALK weathering flux (Tmol yr-1)                  ', &
          & 'DIC weathering flux (Tmol yr-1)                  ', &
          & 'Ca weathering flux (Tmol yr-1)                   ', &
-         & 'DIC_13C weathering flux (Tmol yr-1)              ' /)
+         & 'DIC_13C weathering flux (Tmol yr-1)              ', &
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ' /)
 
     ALLOCATE(outputs(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
@@ -784,7 +805,7 @@ CONTAINS
     OPEN(in,file=TRIM(par_indir_name)//TRIM(par_weathopt)//'_consts.dat',iostat=ios)
     call check_iostat(ios,__LINE__,__FILE__)
     DO i = 1,par_nliths
-       read(in,*,iostat=ios)(weath_consts(i,j),j=1,4)
+       read(in,*,iostat=ios)(weath_consts(i,j),j=1,7)
        call check_iostat(ios,__LINE__,__FILE__)
     END DO
     CLOSE(in,iostat=ios)

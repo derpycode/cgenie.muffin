@@ -7375,6 +7375,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">-15.0</value>
                         <description>Li low temperature alteration sink 7Li epsilon (o/oo)</description>
                     </param>
+                    <param name="ctrl_sed_lowTalt_7Li_epsilon_fixed">
+			<value datatype="boolean">.true.</value>
+                        <description>fixed (non T-dependent) temperature alteration  7Li epsilon?</description>
+                    </param>
+                    <param name="par_sed_lowTalt_7Li_epsilon_DT">
+			<value datatype="real">-0.07</value>
+                        <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
+                    </param>
                     <param name="par_sed_clay_fLi_alpha">
 			<value datatype="real">0.0</value>
                         <description>Li clay formation sink (mol yr-1) (Li/Ca normalized)</description>
@@ -7385,7 +7393,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="ctrl_sed_clay_7Li_epsilon_fixed">
 			<value datatype="boolean">.true.</value>
-                        <description>fixed (non T-dependent) MACC 7Li epsilon?  </description>
+                        <description>fixed (non T-dependent) MACC 7Li epsilon?</description>
+                    </param>
+                    <param name="par_sed_clay_7Li_epsilon_DT">
+			<value datatype="real">-0.15</value>
+                        <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
                     </param>
                     <param name="par_sed_hydroip_fCa">
 			<value datatype="real">0.0</value>
@@ -7470,6 +7482,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_hydroip_fDIC_d13C">
 			<value datatype="real">0.0</value>
                         <description>d13C</description>
+                    </param>
+                    <param name="ctrl_sed_Fhydr2D">
+			<value datatype="boolean">.false.</value>
+                        <description>Make hydrothermal input 2D?</description>
+                    </param>
+                    <param name="par_sed_Fhydr2D_name">
+                        <value datatype="string">hello_world</value>
+                        <description>2D hydrothermal input filename</description>
+                    </param>
+                    <param name="par_sed_T0C">
+			<value datatype="real">0.0</value>
+                        <description>Mean ocean floor reference temeprature (C)</description>
                     </param>
 <!-- MISC CONTROLS  -->
                     <param name="ctrl_sed_forcedohmega_ca">
@@ -7958,7 +7982,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">10.00E-6</value>
 			      <description>global silicate Li abundance</description>
                     </param>
-					<param name="par_weather_Li_Rscale">
+			<param name="par_weather_Li_Rscale">
 			<value datatype="real">10.000</value>
                         <description>global silicate Li weathering scaling</description>
                     </param>
@@ -8030,17 +8054,29 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.16</value>
                         <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
                     </param>
-                    <param name="par_weather_fracOs">
+                    <param name="par_weather_CaSiO3_fracOs">
 			<value datatype="real">0.0</value>
-                        <description>mean Os:Ca2+ ratio of weathering flux</description>
+                        <description>mean Os:Ca2+ ratio of silicate weathering flux</description>
                     </param>
-                    <param name="par_weather_187Os_188Os">
+                    <param name="par_weather_CaCO3_fracOs">
 			<value datatype="real">0.0</value>
-                        <description>mean 187Os/188Os ratio of weathering flux</description>
+                        <description>mean Os:Ca2+ ratio of carbonate weathering flux</description>
                     </param>
-                    <param name="par_weather_188Os_192Os">
+                    <param name="par_weather_CaSiO3_187Os_188Os">
 			<value datatype="real">0.0</value>
-                        <description>mean 188Os/192Os ratio of weathering flux</description>
+                        <description>mean 187Os/188Os ratio of silicate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaCO3_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 187Os/188Os ratio of carbonate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of silicate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaCO3_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of carbonate weathering flux</description>
                     </param>
                     <param name="par_weather_CaSiO3_fracCa5PO43">
 			<value datatype="real">0.0</value>
@@ -8106,6 +8142,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_fCaSiO3_enh_nt">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaSiO3 weathering total inventory -- as years x enhancement factor</description>
+                    </param>
+	           <param name="opt_weather_CaSiO3_fracLi">
+			<value datatype="string">""</value>
+                        <description>Li weathering scheme ('OLD','Pogge') -- '' is the fixed fractionation default</description>
+                    </param>
+                    <param name="ctrl_weather_CaSiO3_7Li_epsilon_fixed">
+                        <value datatype="boolean">.true.</value>
+                          <description>Fixed (non T-dep) clay fractionation?</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_7Li_epsilon_DT">
+                        <value datatype="real">-0.15</value>
+                          <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
                     </param>
                       <!-- *** 2D WEATHERING PARAMETERS ********************************* -->
                     <param name="par_lith_data">
