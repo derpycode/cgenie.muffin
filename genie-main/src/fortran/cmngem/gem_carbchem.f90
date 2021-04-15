@@ -159,7 +159,7 @@ CONTAINS
             &   fun_calc_lnk2_Hansson(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
             &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
-    case ('Roy')
+    case ('Roy/')
        dum_carbconst(icc_k1) = &
             & EXP( &
             &   fun_calc_lnk1_Roy(loc_rT,loc_T_ln,loc_S_p05,loc_S,loc_S_p15) + &
@@ -329,14 +329,6 @@ CONTAINS
       !      NOTE: following Hain et al. [2015,2018]
       ! Ks in the look-up tables are on the total pH scale,so convert to SWS scale for cGENIE
       !print*, dum_carbconst(icc_k)
-      loc_kSO4 = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
-            & )
 !    loc_conv_freetototal = -log(1.0 + loc_SO4tot/loc_kSO4)
 !    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/loc_kSO4 + loc_Ftot/dum_carbconst(icc_kHF))
 !    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
@@ -350,8 +342,7 @@ CONTAINS
             & )
       dum_carbconst(icc_kcal) = exp(log(dum_carbconst(icc_kcal)) + &
             & loc_conv_molaritytoconc + &
-            & loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3cal) &
             & )
       dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,loc_S,loc_T, &
@@ -363,8 +354,7 @@ CONTAINS
             & )
       dum_carbconst(icc_karg) = exp(log(dum_carbconst(icc_karg)) + &
             & loc_conv_molaritytoconc + &
-            & loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3arg) &
             & )
       ! (1b) adjust K1 and K2, K and Kw
       loc_k0 = fun_interp_4D(                                                  &
@@ -386,8 +376,8 @@ CONTAINS
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       !print*, dum_Ca,dum_Mg,dum_sal,dum_temp,dum_D,dum_carbconst(icc_k1)
-      dum_carbconst(icc_k1) = exp(log(dum_carbconst(icc_k1)) - &
-            & 1.0/log(loc_k0) + &
+      dum_carbconst(icc_k1) = exp(log(dum_carbconst(icc_k1)) + &
+            & log(loc_k0) + &
             & loc_conv_molaritytoconc + &
             & loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
@@ -403,7 +393,7 @@ CONTAINS
       dum_carbconst(icc_k2) = exp(log(dum_carbconst(icc_k2)) + &
             & loc_conv_molaritytoconc + &
             & loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
       !print*, dum_carbconst(icc_k1)
       dum_carbconst(icc_k) = &
@@ -420,7 +410,7 @@ CONTAINS
       dum_carbconst(icc_kW) = exp(log(dum_carbconst(icc_kW)) + &
             & loc_conv_molaritytoconc + &
             & loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2O) &
             & )
     end SELECT
   end SUBROUTINE sub_adj_carbconst
