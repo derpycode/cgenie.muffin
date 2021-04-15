@@ -89,6 +89,11 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_ox,par_sed_diagen_fracC2Ppres_anox,par_sed_diagen_fracC2Ppres_eux
   REAL::par_sed_diagen_fracCpres_scale                           ! Fractional POC burial scaling (Dunne scheme)
   NAMELIST /ini_sedgem_nml/par_sed_diagen_fracCpres_scale
+  LOGICAL::ctrl_sed_diagen_fracC2Ppres_wallmann2010              ! Apply Wallmann [2010] C:P remin parameterization?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_diagen_fracC2Ppres_wallmann2010
+  REAL::par_sed_diagen_fracC2Ppres_off                           ! C:P remin C/P offset
+  REAL::par_sed_diagen_fracC2Ppres_c0_O2                         ! C:P remin [O2] threshold (mol kg-1)
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_off,par_sed_diagen_fracC2Ppres_c0_O2  
   ! ------------------- DIAGENESIS SCHEME: ORGANIC MATTER HUELSE 2017 ------------------------------------------------------------ !
   character(len=63)::par_sed_huelse2017_kscheme                  ! Corg k parametrisation scheme ID string
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_kscheme

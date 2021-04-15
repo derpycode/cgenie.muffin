@@ -101,6 +101,9 @@ CONTAINS
        print*,'Fraction of P relative to C buried -- anoxic        : ',par_sed_diagen_fracC2Ppres_anox
        print*,'Fraction of P relative to C buried -- euxinic       : ',par_sed_diagen_fracC2Ppres_eux
        print*,'Fractional POC burial scaling (Dunne scheme)        : ',par_sed_diagen_fracCpres_scale
+       print*,'Apply Wallmann [2010] C:P remin parameterization?   : ',ctrl_sed_diagen_fracC2Ppres_wallmann2010
+       print*,'C:P remin C/P offset                                : ',par_sed_diagen_fracC2Ppres_off
+       print*,'C:P remin [O2] threshold (mol kg-1)                 : ',par_sed_diagen_fracC2Ppres_c0_O2       
        ! --- DIAGENESIS SCHEME: HUELSE 2017 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: HUELSE 2017 -----------------'
        print*,'Corg rate constant parameterization scheme          : ',par_sed_huelse2017_kscheme
