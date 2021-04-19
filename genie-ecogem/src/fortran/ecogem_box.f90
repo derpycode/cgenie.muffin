@@ -104,6 +104,8 @@ CONTAINS
     ! Calculate quota limitation terms
     ! N and Si take linear form
     if (nquota) limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) / ( qmax(iNitr,:) - qmin(iNitr,:))
+    ! adding no nitrogen limitation with nitrogen fixation - Fanny April 2021
+    if (nquota .and. Nfix.eq.1.0) limit(iNitr,:) = 1.0
     if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:))
     ! P and Fe take normalised Droop form
     if (pquota) limit(iPhos,:) = (1.0 - qmin(iPhos,:)/quota(iPhos,:)) / (1.0 - qmin(iPhos,:)/qmax(iPhos,:) )
@@ -285,6 +287,8 @@ CONTAINS
              if (useNO3)  VCN(:) = VCN(:) + up_inorg(iNO3,:)
              if (useNO2)  VCN(:) = VCN(:) + up_inorg(iNO2,:)
              if (useNH4)  VCN(:) = VCN(:) + up_inorg(iNH4,:)
+          ! Scaling nitrogen fixation with PO4 uptake via diazotroph N:P ratio - Fanny Apr21
+             if (Nfix.eq.1.0) VCN(:) = NPdiazo * up_inorg(iPO4,:)
           elseif (pquota) then
              VCN(:) = up_inorg(iPO4,:) * 16.0
           else
@@ -317,11 +321,15 @@ CONTAINS
           chlsynth(:) = rhochl(:) * VCN(:) * Cbiomass(:)
           ! Cost of biosynthesis
           costbiosynth(:) = biosynth*VCN(:)  ! s^-1
+          ! Biosynthetic cost of nitrogen fixation - Fanny Apr21
+          costbiosynth(:) = costbiosynth(:) + NFbiosynth(:)*VCN(:)  ! s^-1
           ! Mask strict heterotrophs
           isautotrophic = MERGE(1.0,0.0,autotrophy(:).gt.0.0)
           ! Output variables
           chlsynth(:) =  chlsynth(:) * isautotrophic
           PP(:)       = (PCPhot(:) - costbiosynth(:)) * isautotrophic
+          ! Geometric coast of nitrogen fixation - Fanny Apr21
+          if (Nfix.eq.1.0) PP(:)       = (NFgeo(:)*PCPhot(:) - costbiosynth(:)) * isautotrophic
           if (fundamental) PP(:) = PCPhot(:) * isautotrophic ! ignore cost of biosynthesis in fund. niche experiment
           totPP       =  sum(PCPhot(:) * Cbiomass(:) * isautotrophic) ! does not include cost of biosynthesis
           !-----------------------------------------------------------------
