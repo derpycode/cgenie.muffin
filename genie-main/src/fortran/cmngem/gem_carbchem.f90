@@ -341,7 +341,6 @@ CONTAINS
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       dum_carbconst(icc_kcal) = exp(log(dum_carbconst(icc_kcal)) + &
-            & loc_conv_molaritytoconc + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3cal) &
             & )
       dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
@@ -353,7 +352,6 @@ CONTAINS
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       dum_carbconst(icc_karg) = exp(log(dum_carbconst(icc_karg)) + &
-            & loc_conv_molaritytoconc + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3arg) &
             & )
       ! (1b) adjust K1 and K2, K and Kw
@@ -377,8 +375,7 @@ CONTAINS
             & )
       !print*, dum_Ca,dum_Mg,dum_sal,dum_temp,dum_D,dum_carbconst(icc_k1)
       dum_carbconst(icc_k1) = exp(log(dum_carbconst(icc_k1)) + &
-            & log(loc_k0) + &
-            & loc_conv_molaritytoconc + &
+!            & -1/log(loc_k0) + &
             & loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
             & )
@@ -391,7 +388,6 @@ CONTAINS
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       dum_carbconst(icc_k2) = exp(log(dum_carbconst(icc_k2)) + &
-            & loc_conv_molaritytoconc + &
             & loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
@@ -408,7 +404,6 @@ CONTAINS
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       dum_carbconst(icc_kW) = exp(log(dum_carbconst(icc_kW)) + &
-            & loc_conv_molaritytoconc + &
             & loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2O) &
             & )
