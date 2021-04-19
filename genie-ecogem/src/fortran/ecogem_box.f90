@@ -80,6 +80,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     integer :: io
+    real,dimension(iomax,npmax) :: denom ! JDW
     !
     ! *****************************************************************
     ! ******************** Evaluate Limitation ***********************
@@ -101,22 +102,29 @@ CONTAINS
     qreg(:,:)        = 0.0 ! (iomax,npmax)
     qreg_h(:,:)      = 0.0 ! (iomax,npmax)
 
+    ! JDW: precalculate qmin-qmax to avoid divide by zero errorss
+    denom = merge(1.0/(qmax - qmin),0.0,qmax.gt.0.0) ! JDW: calculate 1.0/denominator and take care of instances of 1.0/0.0
     ! Calculate quota limitation terms
     ! N and Si take linear form
-    if (nquota) limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) / ( qmax(iNitr,:) - qmin(iNitr,:))
-    ! adding no nitrogen limitation with nitrogen fixation - Fanny April 2021
-    if (nquota .and. Nfix.eq.1.0) limit(iNitr,:) = 1.0
-    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:))
+    ! Modified N for no N limitation by diazotrophs - Fanny Apr21
+    if (nquota) then
+      limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) * denom(iNitr,:)
+      limit(iNitr,:) = merge(1.0,limit(iNitr,:),pft.eq.'diazotroph')
+    endif
+    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) * denom(iSili,:) ! JDW
+    !if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:)) ! original
     ! P and Fe take normalised Droop form
     if (pquota) limit(iPhos,:) = (1.0 - qmin(iPhos,:)/quota(iPhos,:)) / (1.0 - qmin(iPhos,:)/qmax(iPhos,:) )
     if (fquota) limit(iIron,:) = (1.0 - qmin(iIron,:)/quota(iIron,:)) / (1.0 - qmin(iIron,:)/qmax(iIron,:) )
 
     ! Set Von Leibig limitation according to most limiting nutrient (excluding iCarb=1)
-    VLlimit(:) = minval(limit(2:iomax,:),1)
-
+    ! VLlimit(:) = minval(limit(2:iomax,:),1) ! original
+    VLlimit(:) = minval(limit(2:max(iNitr,iPhos,iIron),:),1) ! JDW: calculate limitation for N,P,Fe only
+    VLlimit = merge(minval(limit(2:iomax,:),1),minval(limit(2:max(iNitr,iPhos,iIron),:),1),silicify.eq.1.0) ! JDW: in case of diatom reset taking into account SiO2
     do io = 2,iomax ! skip carbon index; quota = X:C biomass ratio
        ! Calculate linear regulation term
-       qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) )
+       qreg(io,:) = (qmax(io,:) - quota(io,:)) * denom(io,:) ! JDW
+       !qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) ) ! original
        ! Transform regulation term using hill number
        qreg_h(io,:) = qreg(io,:) ** hill
     enddo
@@ -150,7 +158,6 @@ CONTAINS
     ! *****************************************************************
     ! ******************** Resource Acquisition ***********************
     ! *****************************************************************
-
     ! initialise
     up_inorg(2:iimax,:) = 0.0
     ! C-specific nutrient uptake
@@ -288,10 +295,10 @@ CONTAINS
              if (useNO2)  VCN(:) = VCN(:) + up_inorg(iNO2,:)
              if (useNH4)  VCN(:) = VCN(:) + up_inorg(iNH4,:)
           ! Scaling nitrogen fixation with PO4 uptake via diazotroph N:P ratio - Fanny Apr21
-             if (Nfix.eq.1.0) VCN(:) = NPdiazo * up_inorg(iPO4,:)
+             VCN(:) = merge(up_inorg(iPO4,:) * NPdiazo,VCN(:),pft.eq.'diazotroph')
           elseif (pquota) then
              VCN(:) = up_inorg(iPO4,:) * 16.0
-          else
+           else
              print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
              print*,"ERROR: Neither nquota nor pquota are set. Needed for chlorophyll synthesis"
              print*,"Stopped in SUBROUTINE photosynthesis (ecogem_box)."

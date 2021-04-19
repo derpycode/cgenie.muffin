@@ -28,6 +28,7 @@ SUBROUTINE initialise_ecogem(    &
   integer,DIMENSION(n_i,n_j),INTENT(in)::dum_k1                  !
   REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 !
   REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv    !
+  !integer :: stat - check if needed, was in DEV_PFT - Fanny Apr21
   CHARACTER(len=64)::site_string
   ! ---------------------------------------------------------- !
   ! local variables

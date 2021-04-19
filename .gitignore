@@ -1,0 +1,12 @@
+#Ignore files setting local netcdf libraries
+genie-main/makefile.arc
+genie-main/user.mak
+*.dep
+*.o
+*.mod
+*.a
+genie-main/*.xml
+genie-main/genie.exe
+genie-main/src/c/nccompare.exe
+genie-main/current_config.dat
+

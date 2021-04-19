@@ -104,9 +104,19 @@ MODULE ecogem_lib
   real :: biosynth                  !      cost of biosynthesis
   real :: k_w                       !      light attenuation by water
   real :: k_chl                     !      light attenuation by chlorophyll a
+  real :: vmaxDIC_a_pft_pico,vmaxDIC_b_pft_pico
+  real :: vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
+  real :: vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
+  real :: vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
+  real :: vmaxDIC_a_pft_diazotroph,vmaxDIC_b_pft_diazotroph
   namelist/ini_ecogem_nml/vmaxDIC_a,vmaxDIC_b,vmaxDIC_c
   namelist/ini_ecogem_nml/qcarbon_a,alphachl_a,PARfrac,chl2nmax,biosynth,k_w,k_chl
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_pico,vmaxDIC_b_pft_pico
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_diazotroph,vmaxDIC_b_pft_diazotroph
   logical::ctrl_restrict_mld    ! restrict MLD
   NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
   logical::ctrl_PARseaicelimit    ! PAR attenutation by sea-ice cover?
@@ -176,6 +186,12 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_b
   real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix
   NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_ef
+  ! ------------------- EXPORT PROPERTIES ---------------------------------------------------------------------------------------- !
+  LOGICAL::ctrl_bio_remin_POC_ballast_eco                         ! ballasting parameterization?
+  NAMELIST /ini_ecogem_nml/ctrl_bio_remin_POC_ballast_eco
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_kc                      !
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_ko                      !
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_kl
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                     ! continuing run?
   NAMELIST /ini_ecogem_nml/ctrl_continuing
@@ -209,11 +225,18 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/ ctrl_data_save_timeseries
   ! ------------------- MISC ----------------------------------------------------------------------------------------------------- !
   logical::ctrl_limit_neg_biomass
-  NAMELIST /ini_ecogem_nml/ctrl_limit_neg_biomass
+  NAMELIST /ini_ecogem_nml/ ctrl_limit_neg_biomass
+  ! functional type parameters
+  real::par_cocco_palatability_mod , par_cocco_vmax_mod
+  namelist /ini_ecogem_nml/ par_cocco_palatability_mod,par_cocco_vmax_mod
+  real::par_diatom_palatability_mod , par_diatom_vmax_mod
+  namelist /ini_ecogem_nml/ par_diatom_palatability_mod,par_diatom_vmax_mod
+  ! POC:DOC parameters
   real::par_beta_POCtoDOC
   namelist/ini_ecogem_nml/par_beta_POCtoDOC
   logical::ctrl_Tdep_POCtoDOC
   NAMELIST /ini_ecogem_nml/ctrl_Tdep_POCtoDOC
+
   ! ------------------- TEST" !--------------------------------------------------------------------------------------------------- !
   logical::ctrl_hello_world                                             ! hello world!
   NAMELIST /ini_ecogem_nml/ctrl_hello_world

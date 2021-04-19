@@ -393,6 +393,11 @@ subroutine ecogem(          &
                     elseif (io.eq.iChlo) then
                        assimilated(io,:) = 0.0                  ! don't assimilate chlorophyll
                     endif
+                    do jpred=1,npmax ! JDW - check do loop is needed
+                       if (io.eq.iSili .and. pft(jpred).eq.'zooplankton') then ! .and. silicify(:).eq.0.0) then
+                         assimilated(io,jpred) = 0.0                  ! don't assimilate Si if not selected - Scott April 2019
+                       endif
+                    enddo
                     unassimilated(:,:) = 1.0 - assimilated(:,:)
                  enddo
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -442,7 +447,8 @@ subroutine ecogem(          &
                     io=nut2quota(ii)
                     dbiomassdt(io,:) = dbiomassdt(io,:) + up_inorg(ii ,:) * BioC(:)
                  enddo
-
+                 ! Take into account nitrogen fixation here scaled with dbiomass in phosphorus - Fanny Jun20
+                 dbiomassdt(iNitr,:) = merge(dbiomassdt(iPhos,:)*40.0,dbiomassdt(iNitr,:),pft.eq.'diazotroph')
                  ! CHLOROPHYLL A SYNTHESIS
                  if (chlquota) dbiomassdt(iChlo,:) = chlsynth(:)
                  do io=1,iomax+iChl
@@ -519,8 +525,7 @@ subroutine ecogem(          &
 
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  orgbGraz(:,:) = 0.0
-
-                 do io=1,iomax
+                 do io=1,iomax !! Be aware this calculates also for Si "OM" - Fanny/Jamie - Jun19
                     ! mortality
                     dorgmatdt(io,1) = dorgmatdt(io,1) + sum(loc_biomass(io,:) * mortality(:)        * beta_mort(:)  ) ! fraction to DOM
                     dorgmatdt(io,2) = dorgmatdt(io,2) + sum(loc_biomass(io,:) * mortality(:)        * beta_mort_1(:)) ! fraction to POM
@@ -727,6 +732,7 @@ subroutine ecogem(          &
   if (nquota)  dum_egbg_sfcpart(is_PON   ,:,:,:) = orgmat_flux(iNitr,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   if (pquota)  dum_egbg_sfcpart(is_POP   ,:,:,:) = orgmat_flux(iPhos,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   if (fquota)  dum_egbg_sfcpart(is_POFe  ,:,:,:) = orgmat_flux(iIron,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
+  if (squota)  dum_egbg_sfcpart(is_opal  ,:,:,:) = (orgmat_flux(iSili,1,:,:,:) + orgmat_flux(iSili,2,:,:,:)) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} ! FMM/JDW June 2019, "DOSi + POSi"
   !ckc Isotopes particulate
   dum_egbg_sfcpart(is_POC_13C,:,:,:) = orgmatiso_flux(iCarb13C,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
 
@@ -763,8 +769,29 @@ subroutine ecogem(          &
   endif
 
   ! set initial values for protected fraction of POM and CaCO3
-  dum_egbg_sfcpart(is_POC_frac2  ,:,:,n_k) = par_bio_remin_POC_frac2
-  dum_egbg_sfcpart(is_CaCO3_frac2,:,:,n_k) = par_bio_remin_CaCO3_frac2
+  ! Added ballast parameterisation - Fanny, Aug20
+  ! NEED TO MAKE CARRYING COEF EXPLICIT (HARD CODING HERE BECAUSE WANT TO FIND A WAY TO DEFINE THEM ONLY ONE) - Fanny Aug20
+  ! Changed frac2 modification to be for imld:n_k rather than n_k
+  if (ctrl_bio_remin_POC_ballast_eco) then 
+     !dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+     !          &  ( par_bio_remin_kc(:,:)*dum_egbg_sfcpart(is_CaCO3,:,:,imld:n_k) + &
+     !          &    par_bio_remin_ko(:,:)*dum_egbg_sfcpart(is_opal,:,:,imld:n_k)  + &
+     !          &    par_bio_remin_kl(:,:)*dum_egbg_sfcpart(is_det,:,:,imld:n_k) )   &
+     !          &  /dum_egbg_sfcpart(is_POC,:,:,imld:n_k) ,                          &
+     !          &  0.0, dum_egbg_sfcpart(is_POC,:,:,imld:n_k) > const_real_nullsmall)
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+               &  ( 0.085*dum_egbg_sfcpart(is_CaCO3,:,:,imld:n_k) + &
+               &    0.025*dum_egbg_sfcpart(is_opal,:,:,imld:n_k)  + &
+               &    0.0*dum_egbg_sfcpart(is_det,:,:,imld:n_k) )   &
+               &  /dum_egbg_sfcpart(is_POC,:,:,imld:n_k) ,                          &
+               &  0.0, dum_egbg_sfcpart(is_POC,:,:,imld:n_k) > const_real_nullsmall)
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+              &  1.0,dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k), dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) > 1.0)
+  else
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = par_bio_remin_POC_frac2
+  endif
+
+  dum_egbg_sfcpart(is_CaCO3_frac2,:,:,imld:n_k) = par_bio_remin_CaCO3_frac2
 
   ! ---------------------------------------------------------- !
   ! END

@@ -156,7 +156,10 @@ CONTAINS
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b
        print*,'fractionation for intercellular C fixation          : ',par_d13C_DIC_Corg_ef
+       ! ------------------- BALLAST PROPERTIES ------------------------------------------------------------------------------ !
+       print*,'ballasting parameterization?                        : ',ctrl_bio_remin_POC_ballast_eco
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
+
        print*,'--- RUN CONTROL ------------------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing
        ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
@@ -333,30 +336,37 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'synechococcus') then
-          NO3up(jp)           = 0.0
+          NO3up(jp)           = 1.0
+          Nfix(jp)            = 0.0
+          calcify(jp)         = 0.0
+          silicify(jp)        = 0.0
+          autotrophy(jp)      = 1.0
+          heterotrophy(jp)    = 0.0
+       elseif (pft(jp).eq.'picoplankton') then
+          NO3up(jp)           = 1.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'picoeukaryote') then
-          NO3up(jp)           = 0.0
+          NO3up(jp)           = 1.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'diatom') then
-          NO3up(jp)           = 0.0
+          NO3up(jp)           = 1.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
-          silicify(jp)        = 0.0
+          silicify(jp)        = 1.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'coccolithophore') then
-          NO3up(jp)           = 0.0
+          NO3up(jp)           = 1.0
           Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
+          calcify(jp)         = 1.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
@@ -368,12 +378,19 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'phytoplankton') then
-          NO3up(jp)           = 0.0
+          NO3up(jp)           = 1.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
+       elseif (pft(jp).eq.'eukaryote') then
+           NO3up(jp)          = 1.0
+           Nfix(jp)           = 0.0
+           calcify(jp)        = 0.0
+           silicify(jp)       = 0.0
+           autotrophy(jp)     = 1.0
+           heterotrophy(jp)   = 0.0
        elseif (pft(jp).eq.'zooplankton') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -391,7 +408,7 @@ CONTAINS
        elseif (pft(jp).eq.'foram') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
+          calcify(jp)         = 1.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
           heterotrophy(jp)    = 1.0
@@ -400,7 +417,7 @@ CONTAINS
           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           print*,"! Unknown plankton functional type '"//trim(pft(jp))//"'"
           print*,"! Specified in input file "//TRIM(par_indir_name)//TRIM(par_ecogem_plankton_file)
-          print*,"Choose from Prochlorococcus, Synechococcus, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Phytoplankton, Zooplankton or Mixotroph"
+          print*,"Choose from Prochlorococcus, Synechococcus, Picoplankton, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Foraminifera, Phytoplankton, Zooplankton or Mixotroph"
           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           stop
        endif
@@ -441,6 +458,13 @@ CONTAINS
     ! maximum photosynthetic rate
     !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
     vmax(iDIC,:)    = (vmaxDIC_a  + log10(volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(volume(:)) + log10(volume(:))**2) * autotrophy(:)
+    ! modify rates for functional types
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_pico * volume(:) ** vmaxDIC_b_pft_pico,vmax(iDIC,:),pft.eq.'picoplankton')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_cocco * volume(:) ** vmaxDIC_b_pft_cocco,vmax(iDIC,:),pft.eq.'coccolithophore')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diatom * volume(:) ** vmaxDIC_b_pft_diatom,vmax(iDIC,:),pft.eq.'diatom')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_eukaryote * volume(:) ** vmaxDIC_b_pft_eukaryote,vmax(iDIC,:),pft.eq.'eukaryote')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diazotroph * volume(:) ** vmaxDIC_b_pft_diazotroph,vmax(iDIC,:),pft.eq.'diazotroph')
+
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
        qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
@@ -448,14 +472,14 @@ CONTAINS
        if (maxval((qmin(iNitr,:)/qmax(iNitr,:))).gt.1.0) print*,"WARNING: Nitrogen Qmin > Qmax. Population inviable!"
        if (useNO3) then ! nitrate parameters
           vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:)
-          affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) * NO3up(:)
+          affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) !* NO3up(:) Fanny - otherwise up_inorg(NO3) is NaN -> the best would be to prevent up_inorg to be Nan
        endif
-       if (useNO2) then ! nitrite parameters
-          vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:)
+       if (useNO2) then ! nitrite parameters - modified to account for nitrogen fixation - Fanny Jun20
+          vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:) * (1.0 - Nfix(:))
           affinity(iNO2,:) = affinNO2_a * volume(:) ** affinNO2_b * autotrophy(:)
        endif
-       if (useNH4) then ! ammonium parameters
-          vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:)
+       if (useNH4) then ! ammonium parameters - modified to account for nitrogen fixation - Fanny Jun20
+          vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:) * (1.0 - Nfix(:))
           affinity(iNH4,:) = affinNH4_a * volume(:) ** affinNH4_b * autotrophy(:)
        endif
        kexc(iNitr,:)      =    kexcN_a * volume(:) **    kexcN_b
@@ -472,6 +496,9 @@ CONTAINS
        vmax(iPO4,:)     = vmaxPO4_a  * volume(:) **  vmaxPO4_b * autotrophy(:)
        affinity(iPO4,:) = affinPO4_a * volume(:) ** affinPO4_b * autotrophy(:)
        kexc(iPhos,:)    =   kexcP_a  * volume(:) **    kexcP_b
+       ! modify for functional types
+       !vmax(iPO4,:)    = merge(vmax(iPO4,:)*par_cocco_vmax_mod,vmax(iPO4,:),calcify.eq.1.0)
+       !vmax(iPO4,:)    = merge(vmax(iPO4,:)*par_diatom_vmax_mod,vmax(iPO4,:),silicify.eq.1.0)
     endif
     !-----------------------------------------------------------------------------------------
     if (fquota) then ! iron parameters
@@ -481,6 +508,13 @@ CONTAINS
        vmax(iFe,:)     =  vmaxFe_a * volume(:) **  vmaxFe_b * autotrophy(:)
        affinity(iFe,:) = affinFe_a * volume(:) ** affinFe_b * autotrophy(:)
        kexc(iIron,:)   =  kexcFe_a * volume(:) **  kexcFe_b
+       ! Diazotrophs have higher Fe demands - Fanny Jun20
+       qmin(iIron,:)   = merge(qmin(iIron,:)*10.0,qmin(iIron,:),Nfix.eq.1.0)
+       qmax(iIron,:)   = merge(qmax(iIron,:)*10.0,qmax(iIron,:),Nfix.eq.1.0)
+       affinity(iFe,:) = merge(affinity(iFe,:)/10.0,affinity(iFe,:),Nfix.eq.1.0)
+      !!! FANNY CHECK
+      !io = 1
+      !write(*,*) 'qmin(iron)=',qmin(iIron,1:3), 'qmax(iron)=',qmax(iIron,1:3)
     endif
     !-----------------------------------------------------------------------------------------
     if (squota) then ! silicon parameters
@@ -488,10 +522,11 @@ CONTAINS
        qmax(iSili,:)     =   qmaxSi_a * volume(:) **    qmaxSi_b                 * silicify(:)
        if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
        vmax(iSiO2,:)     = vmaxSiO2_a * volume(:) **  vmaxSiO2_b * autotrophy(:) * silicify(:)
-       affinity(iSiO2,:) =affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
+       affinity(iSiO2,:) = affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
        kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
     endif
     !-----------------------------------------------------------------------------------------
+
     ! other parameters
     qcarbon(:)  =     qcarbon_a * volume(:) ** qcarbon_b
     alphachl(:) =    alphachl_a * volume(:) ** alphachl_b
@@ -714,6 +749,7 @@ CONTAINS
        random_n(n) = loc_plnktn_n
     END DO
     npmax=loc_n_elements
+
     ! close file pipe
     CLOSE(unit=in)
 
