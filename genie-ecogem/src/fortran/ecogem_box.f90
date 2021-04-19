@@ -333,6 +333,7 @@ CONTAINS
           ! Output variables
           chlsynth(:) =  chlsynth(:) * isautotrophic
           PP(:)       = (PCPhot(:) - costbiosynth(:)) * isautotrophic
+          if (fundamental) PP(:) = PCPhot(:) * isautotrophic ! ignore cost of biosynthesis in fund. niche experiment
           totPP       =  sum(PCPhot(:) * Cbiomass(:) * isautotrophic) ! does not include cost of biosynthesis
           !-----------------------------------------------------------------
        else ! else if it is extremely dark
