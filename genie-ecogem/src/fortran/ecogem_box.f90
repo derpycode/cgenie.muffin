@@ -294,8 +294,8 @@ CONTAINS
              if (useNO3)  VCN(:) = VCN(:) + up_inorg(iNO3,:)
              if (useNO2)  VCN(:) = VCN(:) + up_inorg(iNO2,:)
              if (useNH4)  VCN(:) = VCN(:) + up_inorg(iNH4,:)
-          ! Scaling nitrogen fixation with PO4 uptake via diazotroph N:P ratio - Fanny Apr21
-             VCN(:) = merge(up_inorg(iPO4,:) * NPdiazo,VCN(:),pft.eq.'diazotroph')
+             ! Scaling nitrogen fixation with PO4 uptake via diazotroph N:P ratio - Fanny Apr21
+             VCN(:) = merge(up_inorg(iPO4,:)*par_bio_NPdiaz,VCN(:),pft.eq.'diazotroph')
           elseif (pquota) then
              VCN(:) = up_inorg(iPO4,:) * 16.0
            else
@@ -329,14 +329,14 @@ CONTAINS
           ! Cost of biosynthesis
           costbiosynth(:) = biosynth*VCN(:)  ! s^-1
           ! Biosynthetic cost of nitrogen fixation - Fanny Apr21
-          costbiosynth(:) = costbiosynth(:) + NFbiosynth(:)*VCN(:)  ! s^-1
+          costbiosynth(:) = merge(biosynth*(1+NFbiocost),biosynth,pft.eq."diazotroph")*VCN(:)
           ! Mask strict heterotrophs
           isautotrophic = MERGE(1.0,0.0,autotrophy(:).gt.0.0)
           ! Output variables
           chlsynth(:) =  chlsynth(:) * isautotrophic
           PP(:)       = (PCPhot(:) - costbiosynth(:)) * isautotrophic
-          ! Geometric coast of nitrogen fixation - Fanny Apr21
-          if (Nfix.eq.1.0) PP(:)       = (NFgeo(:)*PCPhot(:) - costbiosynth(:)) * isautotrophic
+          ! Geometric cost of nitrogen fixation - Fanny Apr21
+          PP(:)       = merge(((1-NFgeocost)*PCPhot(:) - costbiosynth(:)) * isautotrophic,PP(:),pft.eq."diazotroph") 
           if (fundamental) PP(:) = PCPhot(:) * isautotrophic ! ignore cost of biosynthesis in fund. niche experiment
           totPP       =  sum(PCPhot(:) * Cbiomass(:) * isautotrophic) ! does not include cost of biosynthesis
           !-----------------------------------------------------------------

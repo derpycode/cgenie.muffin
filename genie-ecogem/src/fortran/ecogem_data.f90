@@ -365,7 +365,7 @@ CONTAINS
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'diazotroph') then
           NO3up(jp)           = 0.0
-          Nfix(jp)            = 0.0
+          Nfix(jp)            = 1.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
@@ -456,25 +456,31 @@ CONTAINS
     vmax(iDIC,:)    = merge(vmaxDIC_a_pft_cocco * volume(:) ** vmaxDIC_b_pft_cocco,vmax(iDIC,:),pft.eq.'coccolithophore')
     vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diatom * volume(:) ** vmaxDIC_b_pft_diatom,vmax(iDIC,:),pft.eq.'diatom')
     vmax(iDIC,:)    = merge(vmaxDIC_a_pft_eukaryote * volume(:) ** vmaxDIC_b_pft_eukaryote,vmax(iDIC,:),pft.eq.'eukaryote')
-    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diazotroph * volume(:) ** vmaxDIC_b_pft_diazotroph,vmax(iDIC,:),pft.eq.'diazotroph')
+    ! Diazotrophs are the same as picoplankton with cost added elsewhere - Fanny Apr21
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_pico * volume(:) ** vmaxDIC_b_pft_pico,vmax(iDIC,:),pft.eq.'diazotroph')
+    !vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diazotroph * volume(:) ** vmaxDIC_b_pft_diazotroph,vmax(iDIC,:),pft.eq.'diazotroph') ! Dutkiewiczetal(2020) does not account for separate cost of nitrogen fixation
 
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
-       ! Assume no nitrogen uptake if nitrogen fixation - Fanny Apr21
+       ! Assume no nitrogen uptake if nitrogen fixation (NO3up = 0.0 for diazo) - Fanny Apr21
        qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
        qmax(iNitr,:)      =    qmaxN_a * volume(:) **    qmaxN_b
        if (maxval((qmin(iNitr,:)/qmax(iNitr,:))).gt.1.0) print*,"WARNING: Nitrogen Qmin > Qmax. Population inviable!"
        if (useNO3) then ! nitrate parameters
-          vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:) * (1.0 - Nfix(:))
-          affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) !* NO3up(:) Fanny - otherwise up_inorg(NO3) is NaN -> the best would be to prevent up_inorg to be Nan
+          vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:)
+          affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) !* NO3up(:) Fanny - otherwise up_inorg(NO3) is NaN -> to check if works
        endif
        if (useNO2) then ! nitrite parameters
-          vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:) * (1.0 - Nfix(:))
+          vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:)
           affinity(iNO2,:) = affinNO2_a * volume(:) ** affinNO2_b * autotrophy(:)
+          ! no NO2 update for diazotrophs - Fanny Apr21
+          vmax(iNO2,:)     =  merge(0.0,vmax(iNO2,:),pft.eq.'diazotroph')
        endif
        if (useNH4) then ! ammonium parameters
-          vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:) * (1.0 - Nfix(:))
+          vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:)
           affinity(iNH4,:) = affinNH4_a * volume(:) ** affinNH4_b * autotrophy(:)
+          ! no  NH4 update for diazotrophs - Fanny Apr21
+          vmax(iNH4,:)     =  merge(0.0,vmax(iNH4,:),pft.eq.'diazotroph')
        endif
        kexc(iNitr,:)      =    kexcN_a * volume(:) **    kexcN_b
 
@@ -502,13 +508,10 @@ CONTAINS
        vmax(iFe,:)     =  vmaxFe_a * volume(:) **  vmaxFe_b * autotrophy(:)
        affinity(iFe,:) = affinFe_a * volume(:) ** affinFe_b * autotrophy(:)
        kexc(iIron,:)   =  kexcFe_a * volume(:) **  kexcFe_b
-       ! Diazotrophs have higher Fe demands - Fanny Jun20
-       qmin(iIron,:)   = merge(qmin(iIron,:)*10.0,qmin(iIron,:),Nfix.eq.1.0)
-       qmax(iIron,:)   = merge(qmax(iIron,:)*10.0,qmax(iIron,:),Nfix.eq.1.0)
-       affinity(iFe,:) = merge(affinity(iFe,:)/10.0,affinity(iFe,:),Nfix.eq.1.0)
-      !!! FANNY CHECK
-      !io = 1
-      !write(*,*) 'qmin(iron)=',qmin(iIron,1:3), 'qmax(iron)=',qmax(iIron,1:3)
+       ! Diazotrophs have higher Fe demands - Fanny Jun20 - Add parameters - Apr21
+       qmin(iIron,:)   = merge(qmin(iIron,:)*10.0,qmin(iIron,:),pft.eq.'diazotroph')
+       qmax(iIron,:)   = merge(qmax(iIron,:)*10.0,qmax(iIron,:),pft.eq.'diazotroph')
+       affinity(iFe,:) = merge(affinity(iFe,:)/10.0,affinity(iFe,:),pft.eq.'diazotroph')
     endif
     !-----------------------------------------------------------------------------------------
     if (squota) then ! silicon parameters

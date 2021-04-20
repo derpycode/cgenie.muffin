@@ -8558,20 +8558,20 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <description>maximum photosynthetic rate - a</description>
                     </param>
                     <param name="vmaxDIC_a_pft_eukaryote">
-      <value datatype="real">1.7</value>
-                    <description>maximum photosynthetic rate - a</description>
+                       <value datatype="real">1.7</value>
+                         <description>maximum photosynthetic rate - a</description>
                     </param>
                     <param name="vmaxDIC_b_pft_eukaryote">
-      <value datatype="real">-0.08</value>
-                    <description>maximum photosynthetic rate - a</description>
+                       <value datatype="real">-0.08</value>
+                         <description>maximum photosynthetic rate - a</description>
                     </param>
                     <param name="vmaxDIC_a_pft_diazotroph">
-      <value datatype="real">0.95</value>
-                    <description>Diazotroph maximum photosynthetic rate (d-1) - intercept</description>
+                       <value datatype="real">0.95</value>
+                         <description>Diazotroph maximum photosynthetic rate (d-1) - intercept</description>
                     </param>
                     <param name="vmaxDIC_b_pft_diazotroph">
-      <value datatype="real">-0.08</value>
-                    <description>Diazotroph maximum photosynthetic rate - exponent</description>
+                       <value datatype="real">-0.08</value>
+                         <description>Diazotroph maximum photosynthetic rate - exponent</description>
                     </param>
 
                     <param name="qcarbon_a">
@@ -8618,7 +8618,16 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
 	                  <description>PAR attenutation by sea-ice cover?</description>
                     </param>
-       <!-- Grazing parameters -->
+<!-- Diazotroph parameters -->
+                    <param name="NFbiosynthcost">
+			<value datatype="real">1.5</value>
+	                  <description>Biosynthetic cost of nitrogen fixation</description>
+                    </param>
+                    <param name="NFgeocost">
+			<value datatype="real">0.0</value>
+	                  <description>Geometric cost of nitrogen fixation</description>
+                    </param>
+<!-- Grazing parameters -->
                     <param name="trophic_tradeoff">
 			<value datatype="real">1.0</value>
 	                  <description>Auto/Hetero trade-off parameter</description>
