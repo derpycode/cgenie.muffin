@@ -349,13 +349,6 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
-       elseif (pft(jp).eq.'picoeukaryote') then
-          NO3up(jp)           = 1.0
-          Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
-          silicify(jp)        = 0.0
-          autotrophy(jp)      = 1.0
-          heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'diatom') then
           NO3up(jp)           = 1.0
           Nfix(jp)            = 0.0
@@ -417,7 +410,7 @@ CONTAINS
           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           print*,"! Unknown plankton functional type '"//trim(pft(jp))//"'"
           print*,"! Specified in input file "//TRIM(par_indir_name)//TRIM(par_ecogem_plankton_file)
-          print*,"Choose from Prochlorococcus, Synechococcus, Picoplankton, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Foraminifera, Phytoplankton, Zooplankton or Mixotroph"
+          print*,"Choose from Prochlorococcus, Synechococcus, Picoplankton, Diatom, Coccolithophore, Diazotroph, Foraminifera, Phytoplankton, Zooplankton or Mixotroph"
           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           stop
        endif
@@ -467,18 +460,19 @@ CONTAINS
 
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
+       ! Assume no nitrogen uptake if nitrogen fixation - Fanny Apr21
        qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
        qmax(iNitr,:)      =    qmaxN_a * volume(:) **    qmaxN_b
        if (maxval((qmin(iNitr,:)/qmax(iNitr,:))).gt.1.0) print*,"WARNING: Nitrogen Qmin > Qmax. Population inviable!"
        if (useNO3) then ! nitrate parameters
-          vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:)
+          vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:) * (1.0 - Nfix(:))
           affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) !* NO3up(:) Fanny - otherwise up_inorg(NO3) is NaN -> the best would be to prevent up_inorg to be Nan
        endif
-       if (useNO2) then ! nitrite parameters - modified to account for nitrogen fixation - Fanny Jun20
+       if (useNO2) then ! nitrite parameters
           vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:) * (1.0 - Nfix(:))
           affinity(iNO2,:) = affinNO2_a * volume(:) ** affinNO2_b * autotrophy(:)
        endif
-       if (useNH4) then ! ammonium parameters - modified to account for nitrogen fixation - Fanny Jun20
+       if (useNH4) then ! ammonium parameters
           vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:) * (1.0 - Nfix(:))
           affinity(iNH4,:) = affinNH4_a * volume(:) ** affinNH4_b * autotrophy(:)
        endif
