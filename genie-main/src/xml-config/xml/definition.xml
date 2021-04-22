@@ -8619,7 +8619,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 	                  <description>PAR attenutation by sea-ice cover?</description>
                     </param>
 <!-- Diazotroph parameters -->
-                    <param name="NFbiosynthcost">
+                    <param name="NFbiocost">
 			<value datatype="real">1.5</value>
 	                  <description>Biosynthetic cost of nitrogen fixation</description>
                     </param>
