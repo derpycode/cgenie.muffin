@@ -340,7 +340,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_kcal) = exp(log(dum_carbconst(icc_kcal)) + &
+      dum_carbconst(icc_kcal) = exp(dum_carbconst(icc_kcal) + &
 !            & loc_conv_molaritytoconc + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3cal) &
             & )
@@ -352,7 +352,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_karg) = exp(log(dum_carbconst(icc_karg)) + &
+      dum_carbconst(icc_karg) = exp(dum_carbconst(icc_karg) + &
 !            & loc_conv_molaritytoconc + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3arg) &
             & )
