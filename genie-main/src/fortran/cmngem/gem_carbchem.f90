@@ -376,8 +376,8 @@ CONTAINS
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       !print*, dum_Ca,dum_Mg,dum_sal,dum_temp,dum_D,dum_carbconst(icc_k1)
-      dum_carbconst(icc_k1) = exp(log(10**(log10(dum_carbconst(icc_k1)) - &
-            & log(loc_k0))) + &
+      dum_carbconst(icc_k1) = exp(log(dum_carbconst(icc_k1)) + &
+            & log(loc_k0) + &
 !            & loc_conv_molaritytoconc + &
             & loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
