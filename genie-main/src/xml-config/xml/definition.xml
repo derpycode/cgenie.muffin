@@ -7164,21 +7164,9 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			            <value datatype="real">1.0</value>
                         <description>Fraction of P relative to C buried -- euxinic</description>
                     </param>
-                    <param name="par_sed_diagen_fracCpres_scale">
-			<value datatype="real">1.0</value>
-                        <description>Fractional POC burial scaling (Dunne scheme)</description>
-                    </param>
-                    <param name="ctrl_sed_diagen_fracC2Ppres_wallmann2010">
+                    <param name="ctrl_sed_huelse2017_remin_POP">
 			<value datatype="boolean">.false.</value>
-                        <description>Apply Wallmann [2010] C:P remin parameterization?</description>
-                    </param>
-                    <param name="par_sed_diagen_fracC2Ppres_off">
-			<value datatype="real">11.0</value>
-                        <description>C:P remin C/P offset</description>
-                    </param>
-                    <param name="par_sed_diagen_fracC2Ppres_c0_O2">
-			<value datatype="real">32.0E-6</value>
-                        <description>C:P remin [O2] threshold (mol kg-1)</description>
+                        <description>Force complete return of PO4 to ocean in HUELSE 2017 scheme</description>
                     </param>
 <!-- DIAGENESIS SCHEME: HUELSE 2017  -->
                     <param name="par_sed_huelse2017_kscheme">
@@ -7201,7 +7189,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Simulate ocean Porg loss with buried sulf-OM?</description>
                     </param>
-		    <param name="par_sed_huelse2017_sim_P_loss_pres_fracC">
+					<param name="par_sed_huelse2017_sim_P_loss_pres_fracC">
 			<value datatype="boolean">.false.</value>
                         <description>Simulate ocean Porg loss related to Corg burial</description>
                     </param>
@@ -7224,10 +7212,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_huelse2017_k2_anoxic">
 			<value datatype="real">0.001</value>
                         <description>refractory Corg deg. rate order compared to labile</description>
-                    </param>
-                    <param name="ctrl_sed_huelse2017_remin_POP">
-			<value datatype="boolean">.false.</value>
-                        <description>Force complete return of PO4 to ocean in HUELSE 2017 scheme</description>
                     </param>
 <!-- DIAGENESIS SCHEME: ARCHER 1991  -->
                     <param name="par_sed_archer1991_dissc">

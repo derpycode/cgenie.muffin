@@ -100,10 +100,7 @@ CONTAINS
        print*,'Fraction of P relative to C buried -- oxic          : ',par_sed_diagen_fracC2Ppres_ox
        print*,'Fraction of P relative to C buried -- anoxic        : ',par_sed_diagen_fracC2Ppres_anox
        print*,'Fraction of P relative to C buried -- euxinic       : ',par_sed_diagen_fracC2Ppres_eux
-       print*,'Fractional POC burial scaling (Dunne scheme)        : ',par_sed_diagen_fracCpres_scale
-       print*,'Apply Wallmann [2010] C:P remin parameterization?   : ',ctrl_sed_diagen_fracC2Ppres_wallmann2010
-       print*,'C:P remin C/P offset                                : ',par_sed_diagen_fracC2Ppres_off
-       print*,'C:P remin [O2] threshold (mol kg-1)                 : ',par_sed_diagen_fracC2Ppres_c0_O2       
+       print*,'Return of PO4 to ocean in HUELSE 2017 scheme?       : ',ctrl_sed_huelse2017_remin_POP
        ! --- DIAGENESIS SCHEME: HUELSE 2017 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: HUELSE 2017 -----------------'
        print*,'Corg rate constant parameterization scheme          : ',par_sed_huelse2017_kscheme
@@ -117,7 +114,6 @@ CONTAINS
        print*,'Simulate ocean Porg loss with buried sulf-OM?       : ',par_sed_huelse2017_sim_P_loss
        print*,'Simulate ocean Porg loss related to Corg burial?    : ',par_sed_huelse2017_sim_P_loss_pres_fracC
        print*,'Simulate increased P-regeneration under anoxia?     : ',par_sed_huelse2017_sim_P_regeneration
-       print*,'Return of PO4 to ocean in HUELSE 2017 scheme?       : ',ctrl_sed_huelse2017_remin_POP
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'
        print*,'dissolution rate constant, units of 1/s             : ',par_sed_archer1991_dissc
