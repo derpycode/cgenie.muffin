@@ -78,6 +78,7 @@ CONTAINS
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
+    real::loc_C2P_rain,loc_C2P_remin
     REAL,DIMENSION(n_sed)::loc_new_sed                         ! new (sedimenting) top layer material
     REAL,DIMENSION(n_sed)::loc_dis_sed                         ! remineralized top layer material
     REAL,DIMENSION(n_sed)::loc_exe_sed                         ! top layer material to be exchanged with stack
@@ -223,11 +224,27 @@ CONTAINS
        ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
+       ! allow scaling factor modification of value and cap at 100% (loc_sed_pres_fracC=1.0)
+       loc_sed_pres_fracC = min(1.0,par_sed_diagen_fracCpres_scale*loc_sed_pres_fracC)
+       ! pre-calculate C/P rain and remin, following Wallmann [2010]
+       ! NOTE: assume that A in the Wallmann [2010] equation is the rain or Redfield ratio
+       !       par_sed_diagen_fracC2Ppres_off then has a value of 11.0
+       !       (this is simply rearranging a little the published equation)
+       if (loc_new_sed(is_POP) > const_rns) then
+          loc_C2P_rain = loc_new_sed(is_POC)/loc_new_sed(is_POP)
+       else
+          loc_C2P_rain = const_real_nullhigh
+       end if
+       if (ctrl_sed_diagen_fracC2Ppres_wallmann2010) then
+          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
+       else
+          loc_C2P_remin = loc_C2P_rain
+       end if
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
-       ! NOTE: apply par_sed_diagen_fracC2Ppres_ox to determine whether P is preferentially remineralized or not
-       !       (a value of zero will ensure that 100% of P is returned)
+       ! NOTE: apply the Wallmann [2010] C:P partitioning to the remineralized flux
+       !       cap the P remin flux at the total rain flux
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           if ( &
@@ -238,13 +255,14 @@ CONTAINS
              if (sed_type(is) == par_sed_type_scavenged) then
                 loc_dis_sed(is) = 0.0
              else
+                loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
                 case (is_POP)
-                   loc_sed_dis_frac = 1.0 - par_sed_diagen_fracC2Ppres_ox*loc_sed_pres_fracC
+                   loc_dis_sed(is) = (loc_sed_pres_fracC*loc_new_sed(is))/loc_C2P_remin
+                   if (loc_dis_sed(is) > loc_new_sed(is)) loc_dis_sed(is) = loc_new_sed(is)
                 case default
-                   loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
                 end select
-                loc_dis_sed(is)  = loc_sed_dis_frac*loc_new_sed(is)
              end if
           end if
        end DO
@@ -1349,6 +1367,7 @@ CONTAINS
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
+    real::loc_C2P_rain,loc_C2P_remin
     REAL,DIMENSION(n_sed)::loc_new_sed                         ! new (sedimenting) top layer material
     REAL,DIMENSION(n_sed)::loc_dis_sed                         ! remineralized top layer material
     REAL,DIMENSION(n_sed)::loc_exe_sed                         ! top layer material to be exchanged with stack
@@ -1467,6 +1486,22 @@ CONTAINS
        ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
+       ! allow scaling factor modification of value and cap at 100% (loc_sed_pres_fracC=1.0)
+       loc_sed_pres_fracC = min(1.0,par_sed_diagen_fracCpres_scale*loc_sed_pres_fracC)
+       ! pre-calculate C/P rain and remin, following Wallmann [2010]
+       ! NOTE: assume that A in the Wallmann [2010] equation is the rain or Redfield ratio
+       !       par_sed_diagen_fracC2Ppres_off then has a value of 11.0
+       !       (this is simply rearranging a little the published equation)
+       if (loc_new_sed(is_POP) > const_rns) then
+          loc_C2P_rain = loc_new_sed(is_POC)/loc_new_sed(is_POP)
+       else
+          loc_C2P_rain = const_real_nullhigh
+       end if
+       if (ctrl_sed_diagen_fracC2Ppres_wallmann2010) then
+          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
+       else
+          loc_C2P_remin = loc_C2P_rain
+       end if
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
@@ -1482,13 +1517,14 @@ CONTAINS
              if (sed_type(is) == par_sed_type_scavenged) then
                 loc_dis_sed(is) = 0.0
              else
+                loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
                 case (is_POP)
-                   loc_sed_dis_frac = 1.0 - par_sed_diagen_fracC2Ppres_ox*loc_sed_pres_fracC
+                   loc_dis_sed(is) = (loc_sed_pres_fracC*loc_new_sed(is))/loc_C2P_remin
+                   if (loc_dis_sed(is) > loc_new_sed(is)) loc_dis_sed(is) = loc_new_sed(is)
                 case default
-                   loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
                 end select
-                loc_dis_sed(is)  = loc_sed_dis_frac*loc_new_sed(is)
              end if
           end if
        end DO
