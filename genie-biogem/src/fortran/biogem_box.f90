@@ -357,7 +357,8 @@ CONTAINS
          & 'bio_PFe_OCMIP2',       &
          & 'bio_PFeSi',            &
          & 'bio_PFeSi_Ridgwell02', &
-         & 'bio_POCflux'           &
+         & 'bio_POCflux',          &
+         & 'bio_PNFe'              &
          & )
        ! biologically induced (mass balance) schemes
        call sub_calc_bio_uptake(dum_i,dum_j,dum_k1,dum_dt)
@@ -610,17 +611,18 @@ CONTAINS
          & '1N1T_PO4MM_Cd',     &
          & '2N2T_PO4MM_NO3',    &
          & '2N2T_PN_Tdep',      &
-         & '2N1T_PFe_Tdep',      &
+         & '2N1T_PFe_Tdep',     &
          & '3N2T_PNFe_Tdep'     &
          & )
        loc_kI = phys_ocnatm(ipoa_solfor,dum_i,dum_j)/phys_solar_constant
-    case (                        &
-         & 'Payal_Cd',            &
-         & 'bio_P',               &
-         & 'bio_PFe',             &
-         & 'bio_PFe_OCMIP2',      &
-         & 'bio_PFeSi',           &
-         & 'bio_PFeSi_Ridgwell02' &
+    case (                         &
+         & 'Payal_Cd',             &
+         & 'bio_P',                &
+         & 'bio_PFe',              &
+         & 'bio_PFe_OCMIP2',       &
+         & 'bio_PFeSi',            &
+         & 'bio_PFeSi_Ridgwell02', &
+         & 'bio_PNFe'              &
          & )
        ! calculate integrated insolation over depth of entire mixed layer
        ! => assume e-folding depth of 20 m (set in <par_bio_eI>) [Doney et al., 2006] (i.e., as in OCMIP-2 definition)
@@ -661,9 +663,10 @@ CONTAINS
          & 'bio_PFe',               &
          & 'bio_PFeSi',             &
          & 'bio_PFeSi_Ridgwell02',  &
+         & 'bio_PNFe',              &
          & '1N1T_PO4MM_Tdep',       &
          & '2N2T_PN_Tdep',          &
-         & '2N1T_PFe_Tdep',          &
+         & '2N1T_PFe_Tdep',         &
          & '3N2T_PNFe_Tdep'         &
          & )
        loc_kT = par_bio_kT0*exp((loc_TC+par_bio_kT_dT)/par_bio_kT_eT)
@@ -939,7 +942,8 @@ CONTAINS
        end if
 
     CASE ( &
-         & '3N2T_PNFe_Tdep' &
+         & '3N2T_PNFe_Tdep', &
+         & 'bio_PNFe'        &
          & )
        ! 3 x nutrient, 2 x 'taxa': PO4, DIN, Fe Michaelis-Menten - Fanny (July 2010)
        ! calculate PO4 depletion; loc_dPO4_1 is non-Nfixer productivity, loc_dPO4_2 is N-fixer productivity
@@ -1530,8 +1534,9 @@ CONTAINS
        if (sed_dep(is) == is_PON) then
           SELECT CASE (par_bio_prodopt)
           CASE ( &
-               & '2N2T_PN_Tdep',  &
-               & '3N2T_PNFe_Tdep' &
+               & '2N2T_PN_Tdep',   &
+               & '3N2T_PNFe_Tdep', &
+               & 'bio_PNFe'        &
                & )
              bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = loc_bio_NP*loc_dPO4_1 + par_bio_NPdiaz*loc_dPO4_2
           END select
@@ -1541,7 +1546,10 @@ CONTAINS
        ! NOTE: Fanny (July 2010)
        if (sed_dep(is) == is_POFe) then
           SELECT CASE (par_bio_prodopt)
-          CASE ('3N2T_PNFe_Tdep')
+          CASE ( &
+               &'3N2T_PNFe_Tdep', &
+               & 'bio_PNFe'       &
+               & )
              bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
                   & bio_part_red(is_POC,is_POFe,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4_1 &
                   & + par_bio_c0_Fe_Diaz/par_bio_c0_PO4*loc_dPO4_2
@@ -1669,7 +1677,8 @@ CONTAINS
        end if
     CASE ( &
          & '2N2T_PN_Tdep',   &
-         & '3N2T_PNFe_Tdep'  &
+         & '3N2T_PNFe_Tdep', &
+         & 'bio_PNFe'        &
          & )
        ! -------------------------------------------------------- ! adjustment due to N2 uptake
        ! adjust default biological tracer uptake stoichiometry due to N2 fixation (replacing some NO3 consumption)
@@ -1868,7 +1877,8 @@ CONTAINS
     CASE ( &
          & '2N2T_PO4MM_NO3', &
          & '2N2T_PN_Tdep',   &
-         & '3N2T_PNFe_Tdep'  &
+         & '3N2T_PNFe_Tdep', &
+         & 'bio_PNFe'        &
          & )
        diag_bio(idiag_bio_dPO4_1,dum_i,dum_j)     = loc_dPO4_1
        diag_bio(idiag_bio_dPO4_2,dum_i,dum_j)     = loc_dPO4_2

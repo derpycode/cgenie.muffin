@@ -2307,18 +2307,19 @@ CONTAINS
     ! check first-order consistency between biologial option, and selected dissolved and sedimentary tracers
     ! NOTE: only the existence of inconsistency will be highlighted, not exactly what the problem is ...
     SELECT CASE (par_bio_prodopt)
-    CASE (                        &
-         & '1N1T_PO4restore',     &
-         & '1N1T_PO4restoreLL',   &
-         & '1N1T_PO4MM',          &
-         & '1N1T_PO4MM_Tdep',     &
-         & '2N1T_PO4MM_SiO2',     &
-         & '2N2T_PN_Tdep',        &
-         & '2N1T_PFe_Tdep',       &
-         & '3N2T_PNFe_Tdep',      &
-         & 'bio_PFe',             &
-         & 'bio_PFeSi',           &
-         & 'bio_PFeSi_Ridgwell02' &
+    CASE (                         &
+         & '1N1T_PO4restore',      &
+         & '1N1T_PO4restoreLL',    &
+         & '1N1T_PO4MM',           &
+         & '1N1T_PO4MM_Tdep',      &
+         & '2N1T_PO4MM_SiO2',      &
+         & '2N2T_PN_Tdep',         &
+         & '2N1T_PFe_Tdep',        &
+         & '3N2T_PNFe_Tdep',       &
+         & 'bio_PFe',              &
+         & 'bio_PFeSi',            &
+         & 'bio_PFeSi_Ridgwell02', &
+         & 'bio_PNFe'              &
          & )
        IF (.NOT. ocn_select(io_PO4)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_POP)) loc_flag = .TRUE.
@@ -2333,10 +2334,11 @@ CONTAINS
        IF (.NOT. sed_select(is_opal)) loc_flag = .TRUE.
     end select
     SELECT CASE (par_bio_prodopt)
-    case (                    &
+    case (                     &
          & '2N2T_PO4MM_NO3',   &
          & '2N2T_PN_Tdep',     &
-         & '3N2T_PNFe_Tdep'    &
+         & '3N2T_PNFe_Tdep',   &
+         & 'bio_PNFe'          &
          & )
        IF (.NOT. ocn_select(io_NO3)) loc_flag = .TRUE.
        IF (.NOT. ocn_select(io_N2)) loc_flag = .TRUE.
@@ -2346,7 +2348,8 @@ CONTAINS
     SELECT CASE (par_bio_prodopt)
     case (                    &
          & '2N1T_PFe_Tdep',   &
-         & '3N2T_PNFe_Tdep'   &
+         & '3N2T_PNFe_Tdep',  &
+         & 'bio_PNFe'         &
          & )
        if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
           IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
