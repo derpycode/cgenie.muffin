@@ -239,7 +239,8 @@ CONTAINS
           loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
        else
           loc_C2P_remin = loc_C2P_rain
-       end if
+       end if 
+       if (loc_C2P_remin < const_real_nullsmall) loc_C2P_remin = loc_C2P_rain
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
@@ -258,8 +259,9 @@ CONTAINS
                 loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
                 case (is_POP)
-                   loc_dis_sed(is) = (loc_sed_pres_fracC*loc_new_sed(is))/loc_C2P_remin
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is_POC)/loc_C2P_remin
                    if (loc_dis_sed(is) > loc_new_sed(is)) loc_dis_sed(is) = loc_new_sed(is)
+                   if (ctrl_sed_dunne2007_remin_POP)      loc_dis_sed(is) = loc_new_sed(is)                   
                 case default
                    loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
                 end select
@@ -1502,6 +1504,7 @@ CONTAINS
        else
           loc_C2P_remin = loc_C2P_rain
        end if
+       if (loc_C2P_remin < const_real_nullsmall) loc_C2P_remin = loc_C2P_rain
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
@@ -1520,8 +1523,9 @@ CONTAINS
                 loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
                 case (is_POP)
-                   loc_dis_sed(is) = (loc_sed_pres_fracC*loc_new_sed(is))/loc_C2P_remin
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is_POC)/loc_C2P_remin
                    if (loc_dis_sed(is) > loc_new_sed(is)) loc_dis_sed(is) = loc_new_sed(is)
+                   if (ctrl_sed_dunne2007_remin_POP)      loc_dis_sed(is) = loc_new_sed(is)
                 case default
                    loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
                 end select

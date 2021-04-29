@@ -93,7 +93,9 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/ctrl_sed_diagen_fracC2Ppres_wallmann2010
   REAL::par_sed_diagen_fracC2Ppres_off                           ! C:P remin C/P offset
   REAL::par_sed_diagen_fracC2Ppres_c0_O2                         ! C:P remin [O2] threshold (mol kg-1)
-  NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_off,par_sed_diagen_fracC2Ppres_c0_O2  
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_off,par_sed_diagen_fracC2Ppres_c0_O2
+  LOGICAL::ctrl_sed_dunne2007_remin_POP                          ! Force return of PO4 to ocean in Dunne 2007 scheme
+  NAMELIST /ini_sedgem_nml/ctrl_sed_dunne2007_remin_POP  
   ! ------------------- DIAGENESIS SCHEME: ORGANIC MATTER HUELSE 2017 ------------------------------------------------------------ !
   character(len=63)::par_sed_huelse2017_kscheme                  ! Corg k parametrisation scheme ID string
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_kscheme
@@ -111,7 +113,7 @@ MODULE sedgem_lib
   REAL::par_sed_huelse2017_k2_anoxic                             ! refractory degradation rate constant under anoxia, units of 1/yr
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_k1,par_sed_huelse2017_k2,par_sed_huelse2017_k2_order,par_sed_huelse2017_k2_anoxic 
   LOGICAL::ctrl_sed_huelse2017_remin_POP                         ! Force return of PO4 to ocean in HUELSE 2017 scheme
-  NAMELIST /ini_sedgem_nml/ctrl_sed_huelse2017_remin_POP  
+  NAMELIST /ini_sedgem_nml/ctrl_sed_huelse2017_remin_POP
   ! ------------------- DIAGENESIS SCHEME: ARCHER 1991 --------------------------------------------------------------------------- !
   REAL::par_sed_archer1991_dissc                                 ! dissolution rate constant, units of 1/s
   REAL::par_sed_archer1991_disscpct                              ! dissolution rate scaling (%)
