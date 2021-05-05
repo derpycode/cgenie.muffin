@@ -7180,6 +7180,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">32.0E-6</value>
                         <description>C:P remin [O2] threshold (mol kg-1)</description>
                     </param>
+                    <param name="ctrl_sed_dunne2007_remin_POP">
+			<value datatype="boolean">.false.</value>
+                        <description>Force complete return of PO4 to ocean in Dunne 2007 scheme?</description>
+                    </param>
 <!-- DIAGENESIS SCHEME: HUELSE 2017  -->
                     <param name="par_sed_huelse2017_kscheme">
 			<value datatype="string">none</value>

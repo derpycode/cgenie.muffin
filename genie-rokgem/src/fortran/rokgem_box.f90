@@ -1136,6 +1136,15 @@ CONTAINS
     loc_standard = const_standards(ocn_type(io_DIC_13C))
     loc_force_flux_weather_o(io_DIC_13C) = loc_force_flux_weather_o(io_DIC_13C) + &
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracC_d13C,loc_standard)*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+    ! O2 consumption associated with Corg weathering (and conversion of C -> dissolved CO2)
+    ! NOTE: currently, this assumes an oxic atmosphere
+    ! NOTE: opt_short_circuit_atm is .true. by default
+    ! NOTE: H2S is dealt with later
+    IF (opt_short_circuit_atm) THEN
+       loc_force_flux_weather_o(io_O2)  = loc_force_flux_weather_o(io_O2)  - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+    ELSE
+       loc_force_flux_weather_a(ia_pO2) = loc_force_flux_weather_a(ia_pO2) - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+    ENDIF
     ! (2) associated P flux -- kerogen
     ! NOTE: plus (silicate) associated P flux -- retained for backwards compatability
     if (opt_weather_fixed_kerogenP) then
@@ -1311,16 +1320,13 @@ CONTAINS
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
-    ! oxidize the weathered species!
-    ! (1) O2 consumption associated with Corg weathering (and conversion of C -> dissolved CO2)
-    ! (2) O2 consumption associated with S weathering (and conversion of H2S -> H2SO4)
+    ! oxidize weathered sulphur species!
+    ! O2 consumption associated with S weathering (and conversion of H2S -> H2SO4)
     ! NOTE: currently, this assumes an oxic atmosphere
     ! NOTE: opt_short_circuit_atm is .true. by default
     IF (opt_short_circuit_atm) THEN
-       loc_force_flux_weather_o(io_O2)   = loc_force_flux_weather_o(io_O2)      - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
        loc_force_flux_weather_o(io_O2)   = loc_force_flux_weather_o(io_O2)      - 2.0*loc_force_flux_weather_o(io_H2S)
     ELSE
-       loc_force_flux_weather_a(ia_pO2)  = loc_force_flux_weather_a(ia_pO2)     - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
        loc_force_flux_weather_a(ia_pO2)  = loc_force_flux_weather_a(ia_pO2)     - 2.0*loc_force_flux_weather_o(io_H2S)
     ENDIF
     loc_force_flux_weather_o(io_SO4)     = loc_force_flux_weather_o(io_SO4)     + loc_force_flux_weather_o(io_H2S)
