@@ -951,6 +951,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012ocn = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012ocn = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012ocn', &
@@ -992,6 +993,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012sed = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012sed = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012sed', &

@@ -35,9 +35,9 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_lonm,loc_id_latm,loc_id_lon_e,loc_id_lat_e
     integer::loc_id_zt,loc_id_zt_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
-    integer,dimension(1:4)::loc_it_3
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
+    integer,dimension(1:3)::loc_it_3
     character(127)::loc_title,loc_timunit
     character(7)::loc_string_year
     real::loc_c0,loc_c1
@@ -208,70 +208,70 @@ CONTAINS
     !       define 1d data (t)
     !-----------------------------------------------------------------------
     loc_it(1) = loc_id_time
-    call sub_defvar ('time', dum_iou, 1, loc_it, loc_c0, loc_c0, 'T', 'D' &
+    call sub_defvar ('time', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'T', 'D' &
          &, 'Year', 'time', trim(loc_timunit))
-    call sub_defvar ('year', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'F','year', ' ',' ')
+    call sub_defvar ('year', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'F','year', ' ',' ')
     !-----------------------------------------------------------------------
     !       define 1d data (x, y or z)
     !-----------------------------------------------------------------------
     loc_it(1) = loc_id_lonm
-    call sub_defvar ('lon', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+    call sub_defvar ('lon', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
          &'longitude of the t grid', 'longitude', 'degrees_east')
     loc_it(1) = loc_id_latm
-    call sub_defvar ('lat', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+    call sub_defvar ('lat', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
          &'latitude of the t grid', 'latitude', 'degrees_north')
     loc_it(1) = loc_id_zt
-    call sub_defvar ('zt', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+    call sub_defvar ('zt', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
          &'z-level mid depth', 'depth', 'm')
     loc_it(1) = loc_id_xu
-    call sub_defvar ('xu', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+    call sub_defvar ('xu', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
          &'longitude of the u grid', 'longitude', 'degrees_east')
     loc_it(1) = loc_id_yu
-    call sub_defvar ('yu', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+    call sub_defvar ('yu', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
          &'latitude of the u grid', 'latitude', 'degrees_north')
     loc_it(1) = loc_id_lon_e
-    call sub_defvar ('lon_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('lon_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'longitude of t grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_lat_e
-    call sub_defvar ('lat_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('lat_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'latitude of t grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_zt_e
-    call sub_defvar ('zt_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('zt_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'depth of t grid edges', ' ', 'm')
     loc_it(1) = loc_id_xu_e
-    call sub_defvar ('xu_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('xu_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'longitude of u grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_yu_e
-    call sub_defvar ('yu_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('yu_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'latitude of u grid edges', ' ', 'degrees')
     SELECT CASE (dum_dd)
     CASE (2)
        ! MOC
        loc_it(1) = loc_id_latp
-       call sub_defvar ('lat_moc', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_moc', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of moc grid', 'latitude', 'degrees_north')
        loc_it(1) = loc_id_ztp
-       call sub_defvar ('zt_moc', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+       call sub_defvar ('zt_moc', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
             &'depth of moc grid', 'depth', 'm')
        call sub_putatttext ('zt_moc', dum_iou, 'positive', 'down')
        loc_it(1) = loc_id_latp_e
-       call sub_defvar ('lat_moc_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_moc_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of moc grid edges', 'latitude', 'degrees_north')
        loc_it(1) = loc_id_ztp_e
-       call sub_defvar ('zt_moc_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+       call sub_defvar ('zt_moc_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
             &'depth of moc grid edges', 'depth', 'm')
        ! PSI
        loc_it(1) = loc_id_lonps
-       call sub_defvar ('lon_psi', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+       call sub_defvar ('lon_psi', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
             &'longitude of psi grid', 'longitude', 'degrees_east')
        loc_it(1) = loc_id_latps
-       call sub_defvar ('lat_psi', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_psi', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of psi grid', 'latitude', 'degrees_north')
        loc_it(1) = loc_id_lonps_e
-       call sub_defvar ('lon_psi_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+       call sub_defvar ('lon_psi_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
             &'longitude of psi grid edges', 'longitude', 'degrees_east')
        loc_it(1) = loc_id_latps_e
-       call sub_defvar ('lat_psi_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_psi_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of psi grid edges', 'latitude', 'degrees_north')
     end select
     !-----------------------------------------------------------------------
@@ -281,13 +281,13 @@ CONTAINS
     CASE (2)
        loc_it(1) = loc_id_lonm
        loc_it(2) = loc_id_latm
-       call sub_defvar('grid_level',dum_iou,2,loc_it,loc_c0,100.0,' ','I', &
+       call sub_defvar('grid_level',dum_iou,2,loc_it(1:2),loc_c0,100.0,' ','I', &
             & 'grid definition','model_level_number','n/a')
-       call sub_defvar ('grid_mask', dum_iou, 2, loc_it, loc_c0, 100.0, ' ', 'F', &
+       call sub_defvar ('grid_mask', dum_iou, 2, loc_it(1:2), loc_c0, 100.0, ' ', 'F', &
             &'land-sea mask', ' ' ,'n/a')
-       call sub_defvar ('grid_topo', dum_iou, 2, loc_it, loc_c0, 100000., ' ', 'F', &
+       call sub_defvar ('grid_topo', dum_iou, 2, loc_it(1:2), loc_c0, 100000., ' ', 'F', &
             &'ocean depth ', ' ' ,'m')
-       call sub_defvar ('grid_area', dum_iou, 2, loc_it, loc_c0, 0.5099044E+15, ' ', 'F', &
+       call sub_defvar ('grid_area', dum_iou, 2, loc_it(1:2), loc_c0, 0.5099044E+15, ' ', 'F', &
             &'grid area ', ' ' ,'m2')
     end select
     SELECT CASE (dum_dd)
@@ -295,15 +295,15 @@ CONTAINS
        loc_it(1) = loc_id_lonm
        loc_it(2) = loc_id_latm
        loc_it(3) = loc_id_zt
-       call sub_defvar('grid_level',dum_iou,2,loc_it,loc_c0,100.0,' ','I', &
+       call sub_defvar('grid_level',dum_iou,2,loc_it(1:2),loc_c0,100.0,' ','I', &
             & 'grid definition','model_level_number','n/a')
-       call sub_defvar ('grid_mask', dum_iou, 2, loc_it, loc_c0, 100.0, ' ', 'F', &
+       call sub_defvar ('grid_mask', dum_iou, 2, loc_it(1:2), loc_c0, 100.0, ' ', 'F', &
             &'land-sea mask', ' ' ,'n/a')
-       call sub_defvar ('grid_topo', dum_iou, 2, loc_it, loc_c0, 100000., ' ', 'F', &
+       call sub_defvar ('grid_topo', dum_iou, 2, loc_it(1:2), loc_c0, 100000., ' ', 'F', &
             &'ocean depth ', ' ' ,'m')
-       call sub_defvar ('grid_area', dum_iou, 2, loc_it, loc_c0, 0.5099044E+15, ' ', 'F', &
+       call sub_defvar ('grid_area', dum_iou, 2, loc_it(1:2), loc_c0, 0.5099044E+15, ' ', 'F', &
             &'grid area ', ' ' ,'m2')
-       call sub_defvar('grid_mask_3d',dum_iou,3,loc_it,loc_c0, 1.,' ','F', &
+       call sub_defvar('grid_mask_3d',dum_iou,3,loc_it(1:3),loc_c0, 1.,' ','F', &
             & 'ocean mask',' ','n/a')
     end select
     !-----------------------------------------------------------------------

@@ -33,9 +33,9 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_lon,loc_id_lat,loc_id_lon_e,loc_id_lat_e
     integer::loc_id_depth,loc_id_depth_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
-    integer,dimension(1:4)::loc_it_3
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
+    integer,dimension(1:3)::loc_it_3
     character(127)::loc_title,loc_timunit
     character(127)::shrtstrng,longstrng,vardesc
     character(7)::loc_string_year
@@ -166,13 +166,11 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       define local variables
     !-----------------------------------------------------------------------
-    integer::loc_err,loc_id
     character(255) :: loc_title,loc_timunit
     real           :: loc_c0,loc_c1
     integer        :: loc_it(6),loc_id_time
     integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
     integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
-    integer        :: loc_id_misc
     !-----------------------------------------------------------------------
     !       initialize local variables 
     !-----------------------------------------------------------------------
@@ -221,7 +219,7 @@ CONTAINS
     call sub_defvar('lat', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
          & 'latitude of the t grid', 'latitude', 'degrees_north')
     loc_it(1) = loc_id_zt
-    call sub_defvar('zt', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+    call sub_defvar('zt', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
          &'z-level mid depth', 'depth', 'm')
     loc_it(1) = loc_id_lon_e
     call sub_defvar('lon_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
@@ -230,7 +228,7 @@ CONTAINS
     call sub_defvar('lat_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          & 'latitude of t grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_zt_e
-    call sub_defvar('zt_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar('zt_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'depth of t grid edges', ' ', 'm')
     !-----------------------------------------------------------------------
     !       define basic 2d/3d data (x,y)
@@ -253,6 +251,7 @@ CONTAINS
   END SUBROUTINE sub_init_netcdf
   ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   ! INITIALIZE netCDF
   SUBROUTINE sub_init_netcdf_tser(dum_name,dum_iou)
@@ -264,13 +263,9 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       define local variables
     !-----------------------------------------------------------------------
-    integer::loc_err,loc_id
     character(255) :: loc_title,loc_timunit
     real           :: loc_c0,loc_c1
-    integer        :: loc_it(6),loc_id_time,loc_id_site
-    integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
-    integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
-    integer        :: loc_id_misc
+    integer        :: loc_it(6),loc_id_time
     !-----------------------------------------------------------------------
     !       initialize local variables 
     !-----------------------------------------------------------------------
@@ -322,7 +317,7 @@ CONTAINS
     real::loc_c0,loc_c1
     logical::loc_defined
     character(255)::loc_name
-    integer::i, j, k, loc_i, loc_iou, loc_ntrec
+    integer::loc_i, loc_iou, loc_ntrec
     real,dimension(1:n_i)::loc_lon
     real,dimension(1:n_j)::loc_lat
     real,dimension(0:n_i)::loc_lon_e
@@ -413,6 +408,7 @@ CONTAINS
   END SUBROUTINE sub_update_netcdf
   ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   SUBROUTINE sub_update_netcdf_tser(k)
     !-----------------------------------------------------------------------
@@ -425,7 +421,7 @@ CONTAINS
     real::loc_c0,loc_c1
     logical::loc_defined
     character(255)::loc_name
-    integer::i, j, loc_i, loc_iou, loc_ntrec
+    integer::loc_i, loc_iou, loc_ntrec
 
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
@@ -480,9 +476,8 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
-    real,DIMENSION(n_i,n_j)::loc_ij,loc2_ij,loc_mask
-    CHARACTER(len=255)::loc_unitsname
+    INTEGER::loc_iou,loc_ntrec,io,jp,ii
+    real,DIMENSION(n_i,n_j)::loc_ij,loc_mask
     CHARACTER(len=255)::shrtstrng,longstrng,diamtr
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,n_i,n_j)
@@ -775,9 +770,8 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
+    INTEGER::loc_iou,loc_ntrec,io,jp,ii
     real,DIMENSION(48)::loc_ij
-    CHARACTER(len=255)::loc_unitsname
     CHARACTER(len=255)::shrtstrng,longstrng,diamtr
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,48)
