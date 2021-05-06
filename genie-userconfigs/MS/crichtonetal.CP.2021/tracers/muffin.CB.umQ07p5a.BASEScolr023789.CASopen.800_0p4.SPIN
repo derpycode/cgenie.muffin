@@ -43,7 +43,8 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 #
 # --- DATA SAVING ----------------------------------------------
 #
-bg_par_data_save_level=7
+# Preformed diagnostics option == BASIC + biology + tracer + proxy + redox
+bg_par_data_save_level=15
 # reduce output
 bg_ctrl_data_save_2d=.true.
 bg_ctrl_data_save_3d=.false.
@@ -55,11 +56,18 @@ bg_par_infile_sig_name='save_timeseries_EVERY000100.dat'
 #
 # specify forcings
 bg_par_forcing_name="Q_xxxxxx.RpCO2_Rp13CO2.Fsal_SUR"
-bg_par_atm_force_scale_val_4=-5.103
-# parameter: bg_par_atm_force_scale_val_3 -- default value modified by factor: 1120
-bg_par_atm_force_scale_val_3=0.001120
-# parameter: bg_par_ocn_force_scale_val_2 -- default value modified by factor: 0.1
-bg_par_ocn_force_scale_val_2=0.1
+bg_par_atm_force_scale_val_4=-5.724
+# parameter: bg_par_atm_force_scale_val_3 -- default value modified by factor: 800
+bg_par_atm_force_scale_val_3=0.000800
+# parameter: bg_par_ocn_force_scale_val_2 -- default value modified by factor: 0.4
+bg_par_ocn_force_scale_val_2=0.4
+#
+# --- MISC -----------------------------------------------------
+#
+# add preformed age and ensure Csoft is POC+DOC
+bg_ctrl_bio_preformed=.true.
+bg_ctrl_bio_preformed_CsoftPOConly=.false.
+bg_ctrl_force_ocn_age1=.true.
 #
 # --- END ------------------------------------------------------
 #
