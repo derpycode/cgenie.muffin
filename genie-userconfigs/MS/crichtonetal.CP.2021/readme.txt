@@ -3,8 +3,8 @@
 ################################################################
 
 For:
-'Modelling ocean circulation and CO2 since the middle Miocene'
-Katherine A. Crichton, Andy Ridgwell, Dan Lunt, Paul N. Pearson
+'Data-constrained assessment of ocean circulation changes since the middle Miocene in an Earth system model'
+Katherine A. Crichton, Andy Ridgwell, Dan Lunt, Alex Farnsworth, Paul N. Pearson
 
 ################################################################
 19/10/15 -- README.txt file creation (A.R.)
@@ -137,10 +137,9 @@ We also provide a parallel set of model configurations that include a compelte s
 
 The user-config files can be found in the subdirectory: tracers
 
-Further details of these tracers can be found in the 'muffin' user manual,
-Section 21.1 under 'Include ’preformed’ tracers'.
+Further details of these tracers can be found in the 'muffin' user manual, Section 21.1 under 'Include ’preformed’ tracers'.
 
-The commands to these experiments are:
+The commands for running these experiments are:
 
 -------------------------------------------
 ./runmuffin.sh muffin.CB.umQ00p0a.BASEScolr023789 MS/crichtonetal.CP.2021/tracers muffin.CB.umQ00p0a.BASEScolr023789.CASclosed.280_0p2.SPIN 10000
