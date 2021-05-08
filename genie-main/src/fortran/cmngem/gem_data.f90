@@ -366,6 +366,54 @@ end if
   ! ****************************************************************************************************************************** !
 
   ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - Kb
+  SUBROUTINE sub_load_gem_MyAMI_lookup_Kb()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_kb( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI K0 look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_Kb.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_kb(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_Kb
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
   ! DEFINE SCHMIDT NUMBER COEFFICIENTS
   SUBROUTINE sub_def_schmidtnumber()
     ! Schmidt Number coefficients

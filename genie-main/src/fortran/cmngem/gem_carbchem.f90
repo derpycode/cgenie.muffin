@@ -357,7 +357,7 @@ CONTAINS
             & exp(fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3arg) &
             & )
       ! (1b) adjust K1 and K2, K and Kw
-      loc_k0 = fun_interp_4D(                                                  &
+      dum_carbconst(icc_QCO2) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -376,9 +376,9 @@ CONTAINS
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
       !print*, dum_Ca,dum_Mg,dum_sal,dum_temp,dum_D,dum_carbconst(icc_k1)
-      dum_carbconst(icc_k1) = 10**(log10(dum_carbconst(icc_k1)) + &
-            & log10(loc_k0)) * &
-!            & loc_conv_molaritytoconc + &
+      dum_carbconst(icc_k1) = 10**(log10(dum_carbconst(icc_k1))) * &
+    !        & log10(loc_k0)) * &
+    !        & loc_conv_molaritytoconc + &
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
             & )
@@ -411,6 +411,19 @@ CONTAINS
 !            & loc_conv_molaritytoconc + &
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2O) &
+            & )
+      dum_carbconst(icc_kB) = fun_interp_4D(                                                  &
+            & lookup_gem_MyAMI_kb,dum_Ca,dum_Mg,loc_S,loc_T, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
+            & )
+      dum_carbconst(icc_kB) = dum_carbconst(icc_kB) * &
+!            & loc_conv_molaritytoconc + &
+            & exp(loc_conv_totaltoSWS + &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpBO3H3) &
             & )
     end SELECT
   end SUBROUTINE sub_adj_carbconst
