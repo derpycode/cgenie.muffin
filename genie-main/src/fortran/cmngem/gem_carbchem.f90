@@ -300,10 +300,10 @@ CONTAINS
       dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
     case ('Hain2015')
     ! initialize local variables
-      if (dum_temp <  (const_zeroC +  par_carbchem_Tmin))  then
-         loc_T = const_zeroC +  par_carbchem_Tmin
-      elseif (dum_temp > (const_zeroC + par_carbchem_Tmax)) then
-         loc_T = const_zeroC + par_carbchem_Tmax
+      if (dum_temp <  (par_carbchem_Tmin))  then
+         loc_T = par_carbchem_Tmin
+      elseif (dum_temp > (par_carbchem_Tmax)) then
+         loc_T = par_carbchem_Tmax
       else
          loc_T = dum_temp
       endif
@@ -365,6 +365,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
+      dum_carbconst(icc_QCO2) = dum_carbconst(icc_QCO2) * exp( ((1-(loc_P/1.01325))*32.3)/(const_R*loc_T) )
       !print*, log(loc_k0)
       !print*, dum_carbconst(icc_k1)
       dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
