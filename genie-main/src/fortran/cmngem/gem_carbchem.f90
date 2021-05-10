@@ -365,7 +365,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_QCO2) = dum_carbconst(icc_QCO2) * exp( ((1-(loc_P/1.01325))*32.3)/(const_R*loc_T) )
+      !dum_carbconst(icc_QCO2) = dum_carbconst(icc_QCO2) * exp( ((1-(loc_P/1.01325+1))*32.3)/(const_R*loc_T) )
       !print*, log(loc_k0)
       !print*, dum_carbconst(icc_k1)
       dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
