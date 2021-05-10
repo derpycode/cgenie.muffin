@@ -322,6 +322,18 @@ CONTAINS
       loc_TC       = dum_temp - const_zeroC
       loc_rRtimesT = 1.0/(const_R*dum_temp)
       loc_conv_molaritytoconc = LOG(1 - 0.001005*dum_sal)
+!      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
+!            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
+!            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+!            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+!            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+!            & lookup_i_sal_min,lookup_i_sal_max,                               &
+!            & lookup_i_temp_min,lookup_i_temp_max                              &
+!            & )
+!      dum_carbconst(icc_kHSO4) = exp(log(dum_carbconst(icc_kHSO4)) + &
+!            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHSO4) + &
+!            & loc_conv_molaritytoconc &
+!            & )
       loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
       loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
       loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
@@ -332,6 +344,20 @@ CONTAINS
 !    loc_conv_freetototal = -log(1.0 + loc_SO4tot/loc_kSO4)
 !    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/loc_kSO4 + loc_Ftot/dum_carbconst(icc_kHF))
 !    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
+      print*, dum_carbconst(icc_kHSO4)
+      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
+            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
+            & )
+      dum_carbconst(icc_kHSO4) = dum_carbconst(icc_kHSO4) * &
+            & exp(loc_conv_freetoSWS + & 
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHSO4) &
+            & )
+      print*, dum_carbconst(icc_kHSO4)
       dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &

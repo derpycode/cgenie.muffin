@@ -823,13 +823,14 @@ MODULE gem_cmn
   REAL,PARAMETER::lookup_sal_max   = 45                         ! 
   REAL,PARAMETER::lookup_temp_max  = 318.15                         ! 
   ! -------------------- look-up tables ------------------------------------------------------------------------------------------ !
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kcal  ! carbonate constant kspCal look-up table (Hain et al. 2015)
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_karg  ! carbonate constant kspArg look-up table (Hain et al. 2015)
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k1   ! carbonate constant k1 look-up table (Hain et al. 2015)     
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k2   ! carbonate constant k2 look-up table (Hain et al. 2015)     
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kW   ! carbonate constant kW look-up table (Hain et al. 2015)    
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k   ! carbonate constant k look-up table (Hain et al. 2015) 
-  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kb   ! carbonate constant kb look-up table (Hain et al. 2015)               ! 
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kcal  ! equilibrium constant kspCal look-up table (Hain et al. 2015)
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_karg  ! equilibrium constant kspArg look-up table (Hain et al. 2015)
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k1   ! dissociation constant k1 look-up table (Hain et al. 2015)     
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k2   ! dissociation constant k2 look-up table (Hain et al. 2015)     
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kW   ! dissociation constant kW look-up table (Hain et al. 2015)    
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k   ! equilibrium constant k look-up table (Hain et al. 2015) 
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kb   ! dissociation constant kb look-up table (Hain et al. 2015)               
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kSO4   ! carbonate constant kb look-up table (Hain et al. 2015)        
 
   ! *** miscellaneous - dummy values ***
   REAL,PARAMETER::const_real_null       = -0.999999E+19                 ! 

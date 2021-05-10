@@ -20,6 +20,7 @@ SUBROUTINE initialise_gem()
     call sub_load_gem_MyAMI_lookup_Kw
     call sub_load_gem_MyAMI_lookup_K0
     call sub_load_gem_MyAMI_lookup_Kb
+    call sub_load_gem_MyAMI_lookup_KSO4
   endif
 
   ! *** initialize GeM ***
