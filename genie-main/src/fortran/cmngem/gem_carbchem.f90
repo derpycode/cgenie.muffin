@@ -300,10 +300,10 @@ CONTAINS
       dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
     case ('Hain2015')
     ! initialize local variables
-      if (dum_temp <  (par_carbchem_Tmin))  then
-         loc_T = par_carbchem_Tmin
-      elseif (dum_temp > (par_carbchem_Tmax)) then
-         loc_T = par_carbchem_Tmax
+      if (dum_temp <  (par_carbchem_Tmin + const_zeroC))  then
+         loc_T = par_carbchem_Tmin + const_zeroC
+      elseif (dum_temp > (par_carbchem_Tmax + const_zeroC)) then
+         loc_T = par_carbchem_Tmax + const_zeroC
       else
          loc_T = dum_temp
       endif
@@ -322,14 +322,14 @@ CONTAINS
       loc_TC       = dum_temp - const_zeroC
       loc_rRtimesT = 1.0/(const_R*dum_temp)
       loc_conv_molaritytoconc = LOG(1 - 0.001005*dum_sal)
-!      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
-!            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
-!            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-!            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-!            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-!            & lookup_i_sal_min,lookup_i_sal_max,                               &
-!            & lookup_i_temp_min,lookup_i_temp_max                              &
-!            & )
+      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
+            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
+            & lookup_i_sal_min,lookup_i_sal_max,                               &
+            & lookup_i_temp_min,lookup_i_temp_max                              &
+            & )
 !      dum_carbconst(icc_kHSO4) = exp(log(dum_carbconst(icc_kHSO4)) + &
 !            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHSO4) + &
 !            & loc_conv_molaritytoconc &
@@ -344,7 +344,6 @@ CONTAINS
 !    loc_conv_freetototal = -log(1.0 + loc_SO4tot/loc_kSO4)
 !    loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/loc_kSO4 + loc_Ftot/dum_carbconst(icc_kHF))
 !    loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
-      print*, dum_carbconst(icc_kHSO4)
       dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
@@ -357,7 +356,6 @@ CONTAINS
             & exp(loc_conv_freetoSWS + & 
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHSO4) &
             & )
-      print*, dum_carbconst(icc_kHSO4)
       dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &

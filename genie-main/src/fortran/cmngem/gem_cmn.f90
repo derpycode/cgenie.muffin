@@ -810,11 +810,11 @@ MODULE gem_cmn
   !  Bunsen Solubility Coefficient coefficients
   real,dimension(6,n_atm)::par_bunsen_coef    
   ! *** look-up table dimenstions for carbonate constants ***
-  INTEGER,PARAMETER::lookup_i_Ca_min      = 0                   ! 0-59 mmol
-  INTEGER,PARAMETER::lookup_i_Ca_max      = 60                  ! 0-59 mmol
-  INTEGER,PARAMETER::lookup_i_Mg_min   = 0                      ! 0-59 mmol
-  INTEGER,PARAMETER::lookup_i_Mg_max   = 60                     ! 0-59 mmol
-  INTEGER,PARAMETER::lookup_i_sal_min   = 30                     ! 30-40 PSU
+  INTEGER,PARAMETER::lookup_i_Ca_min      = 1                   ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_Ca_max      = 60                  ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_Mg_min   = 1                      ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_Mg_max   = 60                     ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_sal_min   = 30                     ! 30-45 PSU
   INTEGER,PARAMETER::lookup_i_sal_max   = 45                    ! 30-45 PSU
   INTEGER,PARAMETER::lookup_i_temp_min  = 273                     ! 0-45degC
   INTEGER,PARAMETER::lookup_i_temp_max  = 318                    ! 0-45degC
