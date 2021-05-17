@@ -76,7 +76,7 @@ eg_ctrl_debug_eco_init      =.false.
 eg_par_ecogem_plankton_file ='8P7Z1F.eco'
 eg_ctrl_grazing_explicit=.true.
 eg_gkernel_cap = .false.
-eg_par_ecogem_grazing_file  ='8P7Z1F_testpal.zoo'
+eg_par_ecogem_grazing_file  ='8P7Z1F.zoo'
 
 #################### Nitrogen ############################
 eg_useNO3                   =.false.

@@ -457,8 +457,8 @@ CONTAINS
     vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diatom * volume(:) ** vmaxDIC_b_pft_diatom,vmax(iDIC,:),pft.eq.'diatom')
     vmax(iDIC,:)    = merge(vmaxDIC_a_pft_eukaryote * volume(:) ** vmaxDIC_b_pft_eukaryote,vmax(iDIC,:),pft.eq.'eukaryote')
     ! Diazotrophs are the same as picoplankton with cost added elsewhere - Fanny Apr21
-    !(iDIC,:)    = merge(vmaxDIC_a_pft_pico * volume(:) ** vmaxDIC_b_pft_pico,vmax(iDIC,:),pft.eq.'diazotroph')
-    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diazotroph * volume(:) ** vmaxDIC_b_pft_diazotroph,vmax(iDIC,:),pft.eq.'diazotroph') ! Dutkiewiczetal(2020) does not account for separate cost of nitrogen fixation
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_pico * volume(:) ** vmaxDIC_b_pft_pico,vmax(iDIC,:),pft.eq.'diazotroph')
+    !vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diazotroph * volume(:) ** vmaxDIC_b_pft_diazotroph,vmax(iDIC,:),pft.eq.'diazotroph') ! Dutkiewiczetal(2020) does not account for separate cost of nitrogen fixation
 
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
