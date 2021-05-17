@@ -932,7 +932,6 @@ CONTAINS
     ! optional additional T-dep clay 7Li fractionation
     if (.NOT. ctrl_weather_CaSiO3_7Li_epsilon_fixed) then
        loc_epsilon = loc_epsilon + par_weather_CaSiO3_7Li_epsilon_DT * (loc_avSLT - loc_SLT0)
-       loc_epsilon  = max(0.6,loc_epsilon)
     end if
     ! calculate isotopic weathering flux
     loc_force_flux_weather_o(io_Li_7Li) = loc_force_flux_weather_o(io_Li_7Li) + &
