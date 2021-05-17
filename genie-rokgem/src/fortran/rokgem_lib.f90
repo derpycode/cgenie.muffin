@@ -170,10 +170,15 @@ MODULE rokgem_lib
   REAL::par_weather_CaSiO3b_d88Sr                                                         ! basaltic d88Sr (o/oo)
   REAL::par_weather_CaSiO3g_d88Sr                                                        ! granitic d88r (o/oo) 
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3b_d88Sr,par_weather_CaSiO3g_d88Sr
-  REAL::par_weather_fracOs								 ! Os:Ca2+ ratio in weathering flux
-  REAL::par_weather_187Os_188Os								 ! 187Os/188Os ratio of weathering flux
-  REAL::par_weather_188Os_192Os								 ! 188Os/192Os ratio of weathering flux
-  NAMELIST /ini_rokgem_nml/par_weather_fracOs,par_weather_187Os_188Os,par_weather_188Os_192Os
+  REAL::par_weather_CaSiO3_fracOs                                                        ! Os:Ca2+ ratio in silicate weathering flux
+  REAL::par_weather_CaCO3_fracOs                                                         ! Os:Ca2+ ratio in carbonate weathering flux
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracOs,par_weather_CaCO3_fracOs
+  REAL::par_weather_CaSiO3_187Os_188Os                                                   ! 187Os/188Os ratio of silicate weathering flux
+  REAL::par_weather_CaCO3_187Os_188Os                                                    ! 187Os/188Os ratio of carbonate weathering flux
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_187Os_188Os,par_weather_CaCO3_187Os_188Os
+  REAL::par_weather_CaSiO3_188Os_192Os                                                   ! 188Os/192Os ratio of silicate weathering flux
+  REAL::par_weather_CaCO3_188Os_192Os                                                    ! 188Os/192Os ratio of carbonate weathering flux
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_188Os_192Os,par_weather_CaCO3_188Os_192Os
   real:: par_weather_CaSiO3_fracCa5PO43                                                  ! global silicate apatite relative abundance
   REAL:: par_weather_CaSiO3_fracCa5PO43_d44Ca                                            ! global apatite d44Ca
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracCa5PO43,par_weather_CaSiO3_fracCa5PO43_d44Ca
@@ -199,6 +204,12 @@ MODULE rokgem_lib
   real::par_weather_fCaCO3_enh_nt                              ! enhanced weathering total inventory
   real::par_weather_fCaSiO3_enh_nt                             ! enhanced weathering total inventory
   NAMELIST /ini_rokgem_nml/par_weather_fCaCO3_enh_nt,par_weather_fCaSiO3_enh_nt
+  CHARACTER(len=63)::opt_weather_CaSiO3_fracLi                                           ! Li weathering scheme
+  NAMELIST /ini_rokgem_nml/opt_weather_CaSiO3_fracLi
+  LOGICAL::ctrl_weather_CaSiO3_7Li_epsilon_fixed                                         ! Fixed (non T-dep) clay fractionation?
+  NAMELIST /ini_rokgem_nml/ctrl_weather_CaSiO3_7Li_epsilon_fixed
+  REAL::par_weather_CaSiO3_7Li_epsilon_DT                                                ! T-dependent D7Li sensitivity (o/oo K-1)
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_7Li_epsilon_DT
   ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_lith_data 
   CHARACTER(len=63)::par_lith_data2 
@@ -346,8 +357,20 @@ MODULE rokgem_lib
   REAL                                           :: total_calcium_flux(n_i,n_j)                    ! Ca2+ weathering fluxes
   REAL                                           :: total_calcium_flux_Ca(n_i,n_j)
   REAL                                           :: total_calcium_flux_Si(n_i,n_j)  
+  REAL                                           :: total_osmium_flux_Ca(n_i,n_j) 
+  REAL                                           :: total_187osmium_flux_Ca(n_i,n_j) 
+  REAL                                           :: total_188osmium_flux_Ca(n_i,n_j) 
+  REAL                                           :: total_osmium_flux_Si(n_i,n_j) 
+  REAL                                           :: total_187osmium_flux_Si(n_i,n_j) 
+  REAL                                           :: total_188osmium_flux_Si(n_i,n_j) 
   REAL                                           :: weather_fCaCO3_2D(n_i,n_j)                     ! weathering fluxes after T & P feedbacks
   REAL                                           :: weather_fCaSiO3_2D(n_i,n_j)
+  REAL                                           :: weather_fCaCO3_Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaCO3_187Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaCO3_188Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaSiO3_Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaSiO3_187Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaSiO3_188Os_2D(n_i,n_j)
   REAL                                           :: orogeny(n_i,n_j)                               ! Orogeny Landmask to divide weathering into kinetic and transport limited regimes. Used if opt_weath_regimes=.true.
   REAL                                           :: regimes_calib(n_i,n_j)                         ! Array for use in calculations involving different weathering regimes.
   
@@ -410,7 +433,7 @@ subroutine define_river_array()
       ! locals
       integer :: alloc_stat
       
-      ALLOCATE(weath_consts(par_nliths,4),stat=alloc_stat)                                                ! coeffs in weathering equations
+      ALLOCATE(weath_consts(par_nliths,7),stat=alloc_stat)                                                ! coeffs in weathering equations
       call check_iostat(alloc_stat,__LINE__,__FILE__)
       ALLOCATE(lithology_names(par_nliths),stat=alloc_stat)
       call check_iostat(alloc_stat,__LINE__,__FILE__)
