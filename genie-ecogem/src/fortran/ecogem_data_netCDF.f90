@@ -166,13 +166,11 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       define local variables
     !-----------------------------------------------------------------------
-    integer::loc_err,loc_id
     character(255) :: loc_title,loc_timunit
     real           :: loc_c0,loc_c1
     integer        :: loc_it(6),loc_id_time
     integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
     integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
-    integer        :: loc_id_misc
     !-----------------------------------------------------------------------
     !       initialize local variables 
     !-----------------------------------------------------------------------
@@ -264,13 +262,9 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       define local variables
     !-----------------------------------------------------------------------
-    integer::loc_err,loc_id
     character(255) :: loc_title,loc_timunit
     real           :: loc_c0,loc_c1
-    integer        :: loc_it(6),loc_id_time,loc_id_site
-    integer        :: loc_id_lonm,loc_id_latm,loc_id_zt
-    integer        :: loc_id_lon_e,loc_id_lat_e,loc_id_zt_e
-    integer        :: loc_id_misc
+    integer        :: loc_it(6),loc_id_time
     !-----------------------------------------------------------------------
     !       initialize local variables 
     !-----------------------------------------------------------------------
@@ -322,7 +316,7 @@ CONTAINS
     real::loc_c0,loc_c1
     logical::loc_defined
     character(255)::loc_name
-    integer::i, j, k, loc_i, loc_iou, loc_ntrec
+    integer::loc_i, loc_iou, loc_ntrec
     real,dimension(1:n_i)::loc_lon
     real,dimension(1:n_j)::loc_lat
     real,dimension(0:n_i)::loc_lon_e
@@ -425,7 +419,7 @@ CONTAINS
     real::loc_c0,loc_c1
     logical::loc_defined
     character(255)::loc_name
-    integer::i, j, loc_i, loc_iou, loc_ntrec
+    integer::loc_i, loc_iou, loc_ntrec
 
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
@@ -480,9 +474,8 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
-    real,DIMENSION(n_i,n_j)::loc_ij,loc2_ij,loc_mask
-    CHARACTER(len=255)::loc_unitsname
+    INTEGER::loc_iou,loc_ntrec,io,jp,ii
+    real,DIMENSION(n_i,n_j)::loc_ij,loc_mask
     CHARACTER(len=255)::shrtstrng,longstrng,diamtr
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,n_i,n_j)
@@ -531,6 +524,14 @@ CONTAINS
              call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
              call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
           endif
+          ! Write plankton export rate - Fanny/Maria - Aug19
+          if (io.le.iomax) then
+             loc_ij(:,:) = int_export_timeslice(io,jp,:,:,n_k)
+             write (shrtstrng, "(A8,A,A1,I3.3)") "_Export_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A,A17,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Export - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+             call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
+          endif
        end do
        ! Write community total biomasses and inorganic resource fluxes
        write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
@@ -550,6 +551,14 @@ CONTAINS
     write (longstrng, "(A22)") 'Temperature Limitation'
     call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
     call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+    ! Zoo food limitation status - Maria May 2019
+    DO jp=1,npmax
+       loc_ij(:,:) = int_zoogamma_timeslice(jp,:,:,n_k)
+       write (shrtstrng, "(A12,I3.3)") "_Gamma_Food_",jp
+       write (longstrng, "(A37,I3.3)") 'Zooplankton food limitation - Popn. #',jp
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+    end do
 
     DO ii=1,iimax
        ! Create description strings
@@ -775,9 +784,8 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou,loc_ntrec,io,jp,pj,ii,ko
+    INTEGER::loc_iou,loc_ntrec,io,jp,ii
     real,DIMENSION(48)::loc_ij
-    CHARACTER(len=255)::loc_unitsname
     CHARACTER(len=255)::shrtstrng,longstrng,diamtr
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,48)
