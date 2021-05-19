@@ -223,7 +223,7 @@ CONTAINS
     par_ref_R0 = par_ref_R0 / conv_yr_s
     ! convert par_data_R0 to mm/s
     par_data_R_0D = par_data_R_0D / conv_yr_s
-    
+
   END SUBROUTINE sub_load_goin_rokgem
   ! ****************************************************************************************************************************** !
 
@@ -430,8 +430,6 @@ CONTAINS
     END DO
     close(unit=in)
 
-    !PRINT*,'output years_0d:'
-    !write(6,fmt='(f14.1)'),output_years_0d
     output_tsteps_0d = int(tsteps_per_year*(output_years_0d-start_year))
     output_counter_0d = 1
 
@@ -471,8 +469,6 @@ CONTAINS
     END DO
     close(in)
 
-    !PRINT*,'output years_2d:'
-    !write(6,fmt='(f14.1)'),output_years_2d
     output_tsteps_2d = int(tsteps_per_year*(output_years_2d-start_year))
     output_counter_2d = 1
 
@@ -496,8 +492,6 @@ CONTAINS
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN 
        year = output_years_2d(output_counter_2d)
     ENDIF
-
-    !print*,tstep_count,output_counter_0d,output_counter_2d,year
 
     year_int = int(year)
     year_remainder = int(1000*(year - real(year_int)))
@@ -728,7 +722,7 @@ CONTAINS
        END DO
        ! calculate fractional coverage
        fracs(k) = SUM(dum_array_3D(k,:,:))/nlandcells
-       PRINT*,TRIM(dum_filenames(k)),' | ',n,' | ',SUM(dum_array_3D(k,:,:)),' | ',fracs(k)
+       if (ctrl_debug_init > 1) PRINT*,TRIM(dum_filenames(k)),' | ',n,' | ',SUM(dum_array_3D(k,:,:)),' | ',fracs(k)
     END DO
     if (ctrl_debug_init > 1) print*,'total coverage (should be 1): ',SUM(fracs(:))
     if (ctrl_debug_init > 1) print*,'total land cells covered: ',SUM(dum_array_3D(:,:,:))
@@ -763,7 +757,7 @@ CONTAINS
     ENDIF
 
     !save modified lithological maps
-    PRINT*,'saving modified lithological maps'
+    if (ctrl_debug_init > 1) PRINT*,'saving modified lithological maps'
     DO k=1,dum_nfiles
        CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(dum_filenames(k)),n_i,n_j,dum_array_3D(k,:,:))
     END DO
@@ -799,7 +793,6 @@ CONTAINS
     REAL, INTENT(inout)                    :: dum_lithology(par_nliths,n_i,n_j)
 
     ! read in k and f constants and fCa and fSi fractions
-
     if (ctrl_debug_init > 1) print*,'Reading in weathering constants'
     call check_unit(in,__LINE__,__FILE__)
     OPEN(in,file=TRIM(par_indir_name)//TRIM(par_weathopt)//'_consts.dat',iostat=ios)
@@ -810,11 +803,9 @@ CONTAINS
     END DO
     CLOSE(in,iostat=ios)
     call check_iostat(ios,__LINE__,__FILE__)
-    write(6,fmt='(f14.3)') weath_consts
-
+    if (ctrl_debug_init > 1) write(6,fmt='(f14.3)') weath_consts
 
     ! read in lithological data
-
     CALL sub_data_input_3D                (                                                 &
          & TRIM(par_indir_name)//'lithologies'//'_'//      &
          & TRIM(par_lith_data)//                           &

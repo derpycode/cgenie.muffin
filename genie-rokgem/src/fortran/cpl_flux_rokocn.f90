@@ -15,7 +15,7 @@
 
 ! ******************************************************************************************************************************** !
 ! COUPLE FLUXES: rok->OCN
- SUBROUTINE cpl_flux_rokocn(    &
+SUBROUTINE cpl_flux_rokocn(    &
      & dum_dts,                 &
      & dum_n_maxocn,            &
      & dum_nr_maxi,dum_nr_maxj, &

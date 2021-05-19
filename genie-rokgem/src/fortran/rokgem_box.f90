@@ -974,54 +974,54 @@ CONTAINS
     ! (2) silicate Sr weathering flux
     select case (opt_weather_CaSiO3)
     case ("Wallmann")
-    ! (2a) basalt & granite
-    ! initialization
-    ! NOTE: populate array with bulk flux and isotopic delta values
-    loc_weather_o(:) = 0.0
-    loc_weather_o(io_Sr) = par_weather_CaSiO3b_fracSr*weather_fCaSiO3b
-    loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3b_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
-    loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3b_d88Sr
-    ! calculate Sr ISOTOPES -- 87Sr
-    ! NOTE: do not update <loc_weather_o> yet as it is needed for the d88Sr calculation ...
-    loc_87Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),1)
-    ! calculate Sr ISOTOPES -- 88Sr
-    loc_88Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),2)
-    ! update flux array
-    loc_weather_o(io_Sr_87Sr) = loc_87Sr
-    loc_weather_o(io_Sr_88Sr) = loc_88Sr
-    loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
-    ! initialization
-    ! NOTE: populate array with bulk flux and isotopic delta values
-    loc_weather_o(:) = 0.0
-    loc_weather_o(io_Sr) = par_weather_CaSiO3g_fracSr*weather_fCaSiO3g
-    loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3g_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
-    loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3g_d88Sr
-    ! calculate Sr ISOTOPES -- 87Sr
-    ! NOTE: do not update <loc_weather_o> yet as it is needed for the d88Sr calculation ...
-    loc_87Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),1)
-    ! calculate Sr ISOTOPES -- 88Sr
-    loc_88Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),2)
-    ! update flux array
-    loc_weather_o(io_Sr_87Sr) = loc_87Sr
-    loc_weather_o(io_Sr_88Sr) = loc_88Sr
-    loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)  
+       ! (2a) basalt & granite
+       ! initialization
+       ! NOTE: populate array with bulk flux and isotopic delta values
+       loc_weather_o(:) = 0.0
+       loc_weather_o(io_Sr) = par_weather_CaSiO3b_fracSr*weather_fCaSiO3b
+       loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3b_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
+       loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3b_d88Sr
+       ! calculate Sr ISOTOPES -- 87Sr
+       ! NOTE: do not update <loc_weather_o> yet as it is needed for the d88Sr calculation ...
+       loc_87Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),1)
+       ! calculate Sr ISOTOPES -- 88Sr
+       loc_88Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),2)
+       ! update flux array
+       loc_weather_o(io_Sr_87Sr) = loc_87Sr
+       loc_weather_o(io_Sr_88Sr) = loc_88Sr
+       loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
+       ! initialization
+       ! NOTE: populate array with bulk flux and isotopic delta values
+       loc_weather_o(:) = 0.0
+       loc_weather_o(io_Sr) = par_weather_CaSiO3g_fracSr*weather_fCaSiO3g
+       loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3g_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
+       loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3g_d88Sr
+       ! calculate Sr ISOTOPES -- 87Sr
+       ! NOTE: do not update <loc_weather_o> yet as it is needed for the d88Sr calculation ...
+       loc_87Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),1)
+       ! calculate Sr ISOTOPES -- 88Sr
+       loc_88Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),2)
+       ! update flux array
+       loc_weather_o(io_Sr_87Sr) = loc_87Sr
+       loc_weather_o(io_Sr_88Sr) = loc_88Sr
+       loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)  
     case default
-    ! (2b) GLOBAL MEAN
-    ! initialization
-    ! NOTE: populate array with bulk flux and isotopic delta values
-    loc_weather_o(:) = 0.0
-    loc_weather_o(io_Sr) = par_weather_CaSiO3_fracSr*weather_fCaSiO3
-    loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
-    loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3_d88Sr
-    ! calculate Sr ISOTOPES -- 87Sr
-    ! NOTE: do not update <loc_weather_o> yet as it is needed for the d88Sr calculation ...
-    loc_87Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),1)
-    ! calculate Sr ISOTOPES -- 88Sr
-    loc_88Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),2)
-    ! update flux array
-    loc_weather_o(io_Sr_87Sr) = loc_87Sr
-    loc_weather_o(io_Sr_88Sr) = loc_88Sr
-    loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
+       ! (2b) GLOBAL MEAN
+       ! initialization
+       ! NOTE: populate array with bulk flux and isotopic delta values
+       loc_weather_o(:) = 0.0
+       loc_weather_o(io_Sr) = par_weather_CaSiO3_fracSr*weather_fCaSiO3
+       loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
+       loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3_d88Sr
+       ! calculate Sr ISOTOPES -- 87Sr
+       ! NOTE: do not update <loc_weather_o> yet as it is needed for the d88Sr calculation ...
+       loc_87Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),1)
+       ! calculate Sr ISOTOPES -- 88Sr
+       loc_88Sr = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,loc_weather_o(:),2)
+       ! update flux array
+       loc_weather_o(io_Sr_87Sr) = loc_87Sr
+       loc_weather_o(io_Sr_88Sr) = loc_88Sr
+       loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
     end select
     ! ######################################################################################################################### !
 
@@ -1062,9 +1062,6 @@ CONTAINS
     loc_weather_o(io_Os_187Os) = loc_187Os
     loc_weather_o(io_Os_188Os) = loc_188Os
     loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
-
-!    print*,loc_force_flux_weather_o(io_Os)-loc_force_flux_weather_o(io_Os_187Os)-loc_force_flux_weather_o(io_Os_192Os)
-
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
@@ -1439,14 +1436,10 @@ CONTAINS
 
     ENDIF
 
-
-
     ! Save data to files calcium_lith.dat where 'lith' is the lithology
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
        IF (opt_2d_ascii_output) THEN
           DO k = 1,par_nliths
-             !          PRINT*,'Saving map of calcium flux for ',TRIM(lithology_names(k)),                            &
-             !                &' to calcium_',lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'.dat'
              call check_unit(17,__LINE__,__FILE__)
              OPEN(17,file=TRIM(par_outdir_name)// &  
                   & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_'//       &
@@ -1580,8 +1573,6 @@ CONTAINS
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
        IF (opt_2d_ascii_output) THEN
           DO k = 1,par_nliths
-             !          PRINT*,'Saving map of calcium flux for ',TRIM(lithology_names(k)),                            &
-             !                &' to calcium_',lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'.dat'
              call check_unit(17,__LINE__,__FILE__)
              OPEN(17,file=TRIM(par_outdir_name)// &
                   & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_year_'// &
@@ -1764,7 +1755,7 @@ CONTAINS
              loc_weather_o(:) = 0.0
              IF (k.eq.1) THEN ! carbonate-rich sediments are the only source of carbonate-associated Os 
                 dum_total_osmium_flux_Ca(i,j) = dum_total_osmium_flux_Ca(i,j) +               &
-                  &        dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
+                     &        dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
                 loc_weather_o(io_Os) = dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
                 ! convert Os isotope ratios into delta notation before calculating total abundances in order to be consistent with how isotopes are treated elsewhere
                 loc_weather_o(io_Os_187Os) = 1000.0*(weath_consts(k,6)*weath_consts(k,7)/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
@@ -1773,7 +1764,7 @@ CONTAINS
                 dum_total_188osmium_flux_Ca(i,j) = dum_total_188osmium_flux_Ca(i,j) + fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),2)
              ELSE ! Assumption: in all other lithologies, Os is associated with weathering of silicates
                 dum_total_osmium_flux_Si(i,j) = dum_total_osmium_flux_Si(i,j) +               &
-                  &        dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
+                     &        dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
                 loc_weather_o(io_Os) = dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
                 loc_weather_o(io_Os_187Os) = 1000.0*(weath_consts(k,6)*weath_consts(k,7)/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
                 loc_weather_o(io_Os_188Os) = 1000.0*(weath_consts(k,7)/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
@@ -1893,7 +1884,6 @@ CONTAINS
     ENDIF
 
     ! extract temperature to local array to please intel compilers
-    !                     print*,"before calib", loc_SLT(:,1)
     DO i=1,n_i
        DO j=1,n_j
           loc_SLT(i,j) = dum_sfcatm1(ia_T,i,j)
@@ -1910,8 +1900,6 @@ CONTAINS
           ENDIF
        END DO
     END DO
-    ! extract temperature to local array to please intel compilers
-    !                     print*,"after calib", loc_SLT(:,1)
 
     ! calculate mean surface productivity (kgC m-2 yr-1)
     SELECT case (par_prodopt)
