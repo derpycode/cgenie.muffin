@@ -30,20 +30,21 @@ MODULE gem_carbchem
   ! NOTE: parameter values for the effect of pressure on KHS are from Millero [1983]
   ! NOTE: parameter values for the effect of pressure on KHN4 are from Millero [1995]
   ! NOTE: all pressure correction choices follow Lewis and Wallace [1998] ('CO2SYS.EXE' program) whereever possible
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2CO3    = (/ -2.550E+1, +1.271E-1, +0.000E+0, -3.080E+0, +8.770E-2 /)
+  ! NOTE: parameter values were updated according to table 7 in Orr [2015]
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2CO3    = (/ -2.550E+1, +1.271E-1, +0.000E+0, -3.080E+0, -8.770E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpHCO3     = (/ -1.582E+1, -2.190E-2, +0.000E+0, +1.130E+0, -1.475E-1 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpBO3H3    = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2O      = (/ -2.002E+1, +1.119E-1, -1.409E-3, -5.130E+0, +7.940E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2O      = (/ -2.002E+1, +1.119E-1, -1.409E-3, -5.130E+0, -7.940E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH4SiO4   = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHSO4     = (/ -1.803E+1, +4.660E-2, +3.160E-4, -4.530E+0, +9.000E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHF       = (/ -9.780E+0, -9.000E-3, -9.420E-4, -3.910E+0, +5.400E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH3PO4    = (/ -1.451E+1, +1.211E-1, -3.210E-4, -2.670E+0, +4.270E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2PO4    = (/ -2.312E+1, +1.758E-1, -2.647E-3, -5.150E+0, +9.000E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHPO4     = (/ -2.657E+1, +2.020E-1, -3.042E-3, -4.080E+0, +7.140E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3cal = (/ -4.876E+1, +5.304E-1, +0.000E+0, -1.176E+1, +3.692E-1 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3arg = (/ -4.596E+1, +5.304E-1, +0.000E+0, -1.176E+1, +3.692E-1 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.107E+1, +9.000E-3, -9.420E-4, +2.890E+0, +5.400E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+0, +8.890E-1, -9.050E-3, -5.030E+0, +8.140E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHSO4     = (/ -1.803E+1, +4.660E-2, -3.160E-4, -4.530E+0, -9.000E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHF       = (/ -9.780E+0, -9.000E-3, -9.420E-4, -3.910E+0, -5.400E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH3PO4    = (/ -1.451E+1, +1.211E-1, -3.210E-4, -2.670E+0, -4.270E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2PO4    = (/ -2.312E+1, +1.758E-1, -2.647E-3, -5.150E+0, -9.000E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHPO4     = (/ -2.657E+1, +2.020E-1, -3.042E-3, -4.080E+0, -7.140E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3cal = (/ -4.876E+1, +5.304E-1, +0.000E+0, -1.176E+1, -3.692E-1 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3arg = (/ -4.596E+1, +5.304E-1, +0.000E+0, -1.176E+1, -3.692E-1 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.107E+1, +9.000E-3, -9.420E-4, +2.890E+0, -5.400E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+0, +8.890E-2, -9.050E-4, -5.030E+0, -8.140E-2 /)
 
 
 CONTAINS
@@ -171,6 +172,19 @@ CONTAINS
             & EXP( &
             &   fun_calc_lnk2_Roy(loc_rT,loc_T_ln,loc_S_p05,loc_S,loc_S_p15) + &
             &   loc_conv_molaritytoconc + &
+            &   loc_conv_totaltoSWS + & 
+            &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
+            & )
+    case ('Luecker/')
+       dum_carbconst(icc_k1) = &
+            & EXP( &
+            &   fun_calc_lnk1_Luecker(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
+            &   loc_conv_totaltoSWS + & 
+            &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & )
+       dum_carbconst(icc_k2)= &
+            & EXP( &
+            &   fun_calc_lnk2_Luecker(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
             &   loc_conv_totaltoSWS + & 
             &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
@@ -1354,6 +1368,34 @@ CONTAINS
     fun_calc_lnk2_Roy = -9.226508 - 3351.6106*dum_rT - 0.2005743*dum_T_ln &
          & + (-0.106901773 - 23.9722*dum_rT)*dum_S_p05 + 0.1130822*dum_S - 0.00846934*dum_S_p15
   END FUNCTION fun_calc_lnk2_Roy
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE ln(K1) DISSOCIATION CONSTANT
+  FUNCTION fun_calc_lnk1_Luecker(dum_rT,dum_T_ln,dum_S,dum_S_p20)
+    ! result variable
+    REAL::fun_calc_lnk1_Luecker
+    ! dummy arguments
+    REAL,INTENT(IN)::dum_rT,dum_T_ln,dum_S,dum_S_p20
+    ! first carbonic acid apparent ionization constant [Luecker et al., 2000]
+    ! NOTE: total pH scale; [mol (kg-sol)-1]
+    fun_calc_lnk1_Luecker = LOG(10**(61.2172 - 3633.86*dum_rT - 9.67770*dum_T_ln &
+         & + 0.011555*dum_S - 0.0001152*dum_S_p20))
+  END FUNCTION fun_calc_lnk1_Luecker
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE ln(K2) DISSOCIATION CONSTANT
+  FUNCTION fun_calc_lnk2_Luecker(dum_rT,dum_T_ln,dum_S,dum_S_p20)
+    ! result variable
+    REAL::fun_calc_lnk2_Luecker
+    ! dummy arguments
+    REAL,INTENT(IN)::dum_rT,dum_T_ln,dum_S,dum_S_p20
+    ! second carbonic acid apparent ionization constant [Luecker et al., 2000]
+    ! NOTE: total pH scale; [mol (kg-sol)-1]
+    fun_calc_lnk2_Luecker = LOG(10**(-25.9290 - 471.78*dum_rT + 3.16967*dum_T_ln &
+         & + 0.01781*dum_S - 0.0001122*dum_S_p20))
+  END FUNCTION fun_calc_lnk2_Luecker
   ! ****************************************************************************************************************************** !
 
 
