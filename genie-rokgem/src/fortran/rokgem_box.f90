@@ -1247,12 +1247,17 @@ CONTAINS
             & loc_force_flux_weather_a(ia_PCO2)/1.0E12, &
             & loc_force_flux_weather_o(io_ALK)/1.0E12,loc_force_flux_weather_o(io_DIC)/1.0E12, &
             & loc_force_flux_weather_o(io_Ca)/1.0E12,loc_force_flux_weather_o(io_DIC_13C)/1.0E12, &
+            & loc_force_flux_weather_o(io_Os),loc_force_flux_weather_o(io_Os_187Os),loc_force_flux_weather_o(io_Os_188Os), &
             & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &
             & sum(loc_force_flux_weather_o_land(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC_13C,:,:))/1.0E12, &
+            & sum(loc_force_flux_weather_o_land(io_Os,:,:)),sum(loc_force_flux_weather_o_land(io_Os_187Os,:,:)), &
+            & sum(loc_force_flux_weather_o_land(io_Os_188Os,:,:)), &
             & sum(loc_force_flux_weather_o_ocean(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_ocean(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC_13C,:,:))/1.0E12/)
+            & sum(loc_force_flux_weather_o_ocean(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC_13C,:,:))/1.0E12, &
+            & sum(loc_force_flux_weather_o_ocean(io_Os,:,:)),sum(loc_force_flux_weather_o_ocean(io_Os_187Os,:,:)), &
+            & sum(loc_force_flux_weather_o_ocean(io_Os_188Os,:,:))/)
 
-       call sub_output_0d(n_outputs,(/12,21,25/),outputs,output_descriptions,time_series_names)
+       call sub_output_0d(n_outputs,(/12,24,31/),outputs,output_descriptions,time_series_names)
 
     ENDIF
 
@@ -2138,7 +2143,7 @@ CONTAINS
             & sum(loc_force_flux_weather_o_ocean(io_Os,:,:)),sum(loc_force_flux_weather_o_ocean(io_Os_187Os,:,:)), &
             & sum(loc_force_flux_weather_o_ocean(io_Os_188Os,:,:))/)
 
-       call sub_output_0d(n_outputs,(/12,22,29/),outputs,output_descriptions,time_series_names)
+       call sub_output_0d(n_outputs,(/12,24,31/),outputs,output_descriptions,time_series_names)
 
     ENDIF
 
