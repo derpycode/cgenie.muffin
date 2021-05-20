@@ -4233,6 +4233,8 @@ CONTAINS
     else
        loc_Os_scavenging = 0.0
     end if
+    ! Make sure the amount of scavenged Os >= 0
+    loc_Os_scavenging = max(0.0,loc_Os_scavenging)
     ! Assume no isotopic fractionation during scavenging
     loc_Os_187Os_scavenging = loc_Os_187Os*loc_Os_scavenging/loc_Os
     loc_Os_188Os_scavenging = loc_Os_188Os*loc_Os_scavenging/loc_Os

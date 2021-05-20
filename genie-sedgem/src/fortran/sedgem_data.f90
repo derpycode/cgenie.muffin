@@ -152,7 +152,7 @@ CONTAINS
        print*,'--- ISOTOPIC FRACTIONATION -------------------------'
        print*,'set fixed d13C fractionation of Corg w.r.t. CaCO3?  : ',ctrl_sed_Corgburial_fixedD13C
        print*,'fractionation for intercellular C fixation          : ',par_d13C_DIC_Corg_ef
-       print*,'Benthic foram 13C fractionation scheme ID string    : ',opt_sed_foram_b_13C_delta
+       print*,'Benthic foram 13C fractionation scheme ID string    : ',trim(opt_sed_foram_b_13C_delta)
        print*,'7/6Li fractionation between Li and LiCO3            : ',par_d7Li_LiCO3_epsilon
        print*,'44/40Ca fractionation between Ca and CaCO3 (corals) : ',par_d44Ca_CaCO3_epsilon
        print*,'abiotic 44/40Ca fractionation between Ca and cal    : ',par_d44Ca_abioticcal_epsilon0
@@ -166,9 +166,12 @@ CONTAINS
        print*,'hydrothermal Li flux d7Li (o/oo)                    : ',par_sed_hydroip_fLi_d7Li
        print*,'Li low-T alteration sink (mol yr-1) (Li/Ca norm)    : ',par_sed_lowTalt_fLi_alpha
        print*,'Li low-T alteration sink 7Li epsilon (o/oo)         : ',par_sed_lowTalt_7Li_epsilon
+       print*,'fixed (non T-dependent) low-T 7Li epsilon?          : ',ctrl_sed_lowTalt_7Li_epsilon_fixed
+       print*,'T-dependent D7Li sensitivity (o/oo K-1)             : ',par_sed_lowTalt_7Li_epsilon_DT
        print*,'Li clay formation sink (mol yr-1) (Li/Ca norm)      : ',par_sed_clay_fLi_alpha
        print*,'Li clay formation sink 7Li epsilon (o/oo)           : ',par_sed_clay_7Li_epsilon
        print*,'fixed (non T-dependent) MACC 7Li epsilon?           : ',ctrl_sed_clay_7Li_epsilon_fixed
+       print*,'T-dependent D7Li sensitivity (o/oo K-1)             : ',par_sed_clay_7Li_epsilon_DT
        print*,'hydrothermal Ca flux (mol yr-1)                     : ',par_sed_hydroip_fCa
        print*,'hydrothermal Ca flux d44Ca (o/oo)                   : ',par_sed_hydroip_fCa_d44Ca
        print*,'hydrothermal Mg flux (mol yr-1)                     : ',par_sed_hydroip_fMg
@@ -181,6 +184,9 @@ CONTAINS
        print*,'CO2 low-T alteration (weathering!) sink (mol yr-1)  : ',par_sed_lowTalt_fCO2
        print*,'hydrothermal CO2 outgassing (mol yr-1)              : ',par_sed_hydroip_fDIC
        print*,'d13C                                                : ',par_sed_hydroip_fDIC_d13C
+       print*,'Make hydrothermal input 2D?                         : ',ctrl_sed_Fhydr2D
+       print*,'2D hydrothermal input filename                      : ',trim(par_sed_Fhydr2D_name)
+       print*,'Mean ocean floor reference temeprature (C)          : ',par_sed_T0C
        ! --- MISC CONTROLS ------------------------------------------------------------------------------------------------------- !
        print*,'--- MISC CONTROLS ----------------------------------'
        print*,'Ca-only adjustment for forced ocean saturation?     : ',ctrl_sed_forcedohmega_ca
@@ -236,7 +242,7 @@ CONTAINS
     par_sed_ashevent_fash = 1.8
     ! revise diagenesis options
     if (ctrl_sed_Fcaco3) par_sed_diagen_CaCO3opt = 'ALL'
-    if (ctrl_sed_Fopal) par_sed_diagen_opalopt = 'ALL'
+    if (ctrl_sed_Fopal) par_sed_diagen_opalopt   = 'ALL'
 
   END SUBROUTINE sub_load_goin_sedgem
   ! ****************************************************************************************************************************** !
@@ -825,6 +831,14 @@ CONTAINS
        loc_ij(:,:) = 0.0
     endif
     sed_Fsed_opal = loc_ij
+    ! load alternative hydrothermal input mask
+    if (ctrl_sed_Fhydr2D) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fhydr2D_name)
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+    else
+       loc_ij(:,:) = 0.0
+    endif
+    sed_mask_hydr = loc_ij
     ! initialize diagnostics data array
     sed_diag(:,:,:) = 0.0
   END SUBROUTINE sub_init_sed
