@@ -291,8 +291,12 @@ MODULE ecogem_lib
   !ckc isotope arrays for water (like nutrient) and plankton groups (like plankton)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::nutiso        !ckc isotopes of nutrient (iimaxiso, i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::plankiso      !ckc isotopes in plankton (npmax,iomaxiso,i,j,k)
+  ! Plankton fluxes
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::uptake_flux   ! inorganic nutrient uptake flux for each plankton (iomax,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::export_flux   ! surface export flux for each plankton (iomax,npmax,i,j,k)    Fanny/Maria - Aug19
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::n2fix_flux    ! N2 fixation rate for each plankton (npmax,i,j,k)    Fanny - May21
+  REAL             ,ALLOCATABLE,DIMENSION(:)        ::VCN           ! Total N uptake for each plankton (npmax)   Fanny - May21
+
   !ckc isotope uptake flux array, to trace full food web interaction
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::up_flux_iso   !ckc rate of upstake isotopes (iimaxiso,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carb      ! carbonate chemistry variables
@@ -382,6 +386,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_nutrient_timeslice !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_zoogamma_timeslice !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_export_timeslice   ! Surface export flux for each plankton (iomax,npmax,i,j,k)  Fanny/Maria - Aug19
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_n2fix_timeslice    ! N2 fixation for each plankton (npmax,i,j,k)  Fanny - May21
 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
 

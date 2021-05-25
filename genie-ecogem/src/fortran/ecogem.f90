@@ -448,7 +448,7 @@ subroutine ecogem(          &
                     dbiomassdt(io,:) = dbiomassdt(io,:) + up_inorg(ii ,:) * BioC(:)
                  enddo
                  ! Scale N dbiomass for diazotrophs with phosphorus - Fanny Apr21
-                 dbiomassdt(iNitr,:) = merge(dbiomassdt(iPhos,:)*par_bio_NPdiaz,dbiomassdt(iNitr,:),pft.eq.'diazotroph')
+                 dbiomassdt(iNitr,:) = merge(dbiomassdt(iPhos,:)*40.0,dbiomassdt(iNitr,:),pft.eq.'diazotroph')
                  ! CHLOROPHYLL A SYNTHESIS
                  if (chlquota) dbiomassdt(iChlo,:) = chlsynth(:)
                  do io=1,iomax+iChl
@@ -601,6 +601,9 @@ subroutine ecogem(          &
                     uptake_flux(io,:,i,j,k) = up_inorg(io,:) * BioC(:) ! mmol/m^3/s
                     export_flux(io,:,i,j,k) = dorgmatdt_plankton(io,:) ! mmol/m^3/s   - Fanny/Maria Aug19
                  enddo
+                 if (nquota) then
+                    n2fix_flux(:,i,j,k) = VCN(:) ! mmol/m^3/s    - Fanny May21
+                 end if
 
                  if (c13trace) then
                     do io=1,iomaxiso
@@ -869,12 +872,13 @@ SUBROUTINE diag_ecogem_timeslice( &
 
      ! NOTE: do not time increment weight quantities such as <int_bio_remin_timeslice> or <int_bio_settle_timeslice>,
      !       because they represent discrete increments rather than a flux or weightable concentration value
-     int_plankton_timeslice(:,:,:,:,:) = int_plankton_timeslice(:,:,:,:,:) + loc_dtyr *      plankton(:,:,:,:,:)        ! mmol m^-3
-     int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr *   uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
-     int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) + loc_dtyr *    phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
-     int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr *        nutrient(:,:,:,:)        ! mmol m^-3
-     int_zoogamma_timeslice(:,:,:,:) =   int_zoogamma_timeslice(:,:,:,:) + loc_dtyr * zoo_limit(:,:,:,:)              ! mmol m^-3
+     int_plankton_timeslice(:,:,:,:,:) = int_plankton_timeslice(:,:,:,:,:) + loc_dtyr * plankton(:,:,:,:,:)         ! mmol m^-3
+     int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr * uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
+     int_gamma_timeslice(:,:,:,:,:)  =   int_gamma_timeslice(:,:,:,:,:)  + loc_dtyr * phys_limit(:,:,:,:,:)         ! mmol m^-3 d^-1
+     int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr * nutrient(:,:,:,:)             ! mmol m^-3
+     int_zoogamma_timeslice(:,:,:,:) =   int_zoogamma_timeslice(:,:,:,:) + loc_dtyr * zoo_limit(:,:,:,:)            ! mmol m^-3
      int_export_timeslice(:,:,:,:,:) =   int_export_timeslice(:,:,:,:,:) + loc_dtyr * export_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
+     int_n2fix_timeslice(:,:,:,:)    =   int_n2fix_timeslice(:,:,:,:)    + loc_dtyr * n2fix_flux(:,:,:,:) * pday    ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
   end if
 
   ! write time-slice data and re-set integration

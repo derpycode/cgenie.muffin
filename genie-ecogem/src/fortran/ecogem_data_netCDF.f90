@@ -480,6 +480,7 @@ CONTAINS
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,n_i,n_j)
     real::totalfluxes(iomax,n_i,n_j)
+    real::totaln2fix(n_i,n_j)
     real::weightedmean(n_i,n_j)
     real::weighteddev(n_i,n_j)
     real::minsize(n_i,n_j),maxsize(n_i,n_j)
@@ -500,6 +501,7 @@ CONTAINS
     loc_c1 = 1.0
     totalplankton = 0.0
     totalfluxes = 0.0
+    totaln2fix = 0.0
     DO io=1,iomax+iChl
        DO jp=1,npmax
           if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
@@ -532,7 +534,21 @@ CONTAINS
              call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
              call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
           endif
+          ! Write phytoplankton n2 fixation - Fanny - May21
+          if ((io.le.iomax).and.(io.eq.iNO3).and.(Nfix(jp).gt.0.0)) then 
+             loc_ij(:,:) = int_n2fix_timeslice(jp,:,:,n_k)
+             write (shrtstrng, "(A12,I3.3)") "_N2fixation_",jp   
+             write (longstrng, "(A,A28,I3.3,A2,A,A8,A,A1)") ' Nitrogen fixation - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+             call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:)) 
+             totaln2fix(:,:) = totaln2fix(:,:) + int_n2fix_timeslice(jp,:,:,n_k)    
+          endif
        end do
+       write (shrtstrng, "(A12)") "_N2fix_Total" 
+       write (longstrng, "(A19)") "N2 fixation - Total" 
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totalplankton(io,:,:),loc_mask(:,:))   
+
        ! Write community total biomasses and inorganic resource fluxes
        write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
        write (longstrng, "(A,A16)") trim(adjustl(quotastrng(io))) ," Biomass - Total" 

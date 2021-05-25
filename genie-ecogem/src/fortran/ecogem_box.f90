@@ -272,7 +272,8 @@ CONTAINS
     ! ---------------------------------------------------------- !
     real,dimension(npmax)::isautotrophic
     real                 ::E0
-    real,dimension(npmax)::Cbiomass,chl,VCN,Chl2C,costbiosynth
+    real,dimension(npmax)::Cbiomass,chl,Chl2C,costbiosynth
+    !real,dimension(npmax)::Cbiomass,chl,VCN,Chl2C,costbiosynth
     real,dimension(npmax)::alpha,PCmax,PCPhot,rhochl
 
     ! initialise
