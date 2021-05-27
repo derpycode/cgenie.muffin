@@ -478,7 +478,7 @@ CONTAINS
     REAL                            :: loc_weather_ratio_CaSiO3g
     REAL                            :: loc_weather_ratio_CaCO3
     REAL                            :: loc_weather_ratio_CaSiO3_WD
-
+    
     real::loc_weather_CaCO3   ! (climate) modified CaCO3 weathering flux
     real::loc_weather_CaSiO3  ! (climate) modified CaSiO3 weathering flux
     real::loc_weather_CaSiO3b ! (climate) modified CaSiO3 weathering flux
@@ -1569,14 +1569,10 @@ CONTAINS
 
     ENDIF
 
-
-
     ! Save data to files calcium_lith.dat where 'lith' is the lithology
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
        IF (opt_2d_ascii_output) THEN
           DO k = 1,par_nliths
-             !          PRINT*,'Saving map of calcium flux for ',TRIM(lithology_names(k)),                            &
-             !                &' to calcium_',lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'.dat'
              call check_unit(17,__LINE__,__FILE__)
              OPEN(17,file=TRIM(par_outdir_name)// &  
                   & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_'//       &
@@ -1710,8 +1706,6 @@ CONTAINS
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
        IF (opt_2d_ascii_output) THEN
           DO k = 1,par_nliths
-             !          PRINT*,'Saving map of calcium flux for ',TRIM(lithology_names(k)),                            &
-             !                &' to calcium_',lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'.dat'
              call check_unit(17,__LINE__,__FILE__)
              OPEN(17,file=TRIM(par_outdir_name)// &
                   & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_year_'// &
@@ -1894,7 +1888,7 @@ CONTAINS
              loc_weather_o(:) = 0.0
              IF (k.eq.1) THEN ! carbonate-rich sediments are the only source of carbonate-associated Os 
                 dum_total_osmium_flux_Ca(i,j) = dum_total_osmium_flux_Ca(i,j) +               &
-                  &        dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
+                     &        dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
                 loc_weather_o(io_Os) = dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
                 ! convert Os isotope ratios into delta notation before calculating total abundances in order to be consistent with how isotopes are treated elsewhere
                 loc_weather_o(io_Os_187Os) = 1000.0*(weath_consts(k,6)*weath_consts(k,7)/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
@@ -1903,7 +1897,7 @@ CONTAINS
                 dum_total_188osmium_flux_Ca(i,j) = dum_total_188osmium_flux_Ca(i,j) + fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),2)
              ELSE ! Assumption: in all other lithologies, Os is associated with weathering of silicates
                 dum_total_osmium_flux_Si(i,j) = dum_total_osmium_flux_Si(i,j) +               &
-                  &        dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
+                     &        dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
                 loc_weather_o(io_Os) = dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
                 loc_weather_o(io_Os_187Os) = 1000.0*(weath_consts(k,6)*weath_consts(k,7)/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
                 loc_weather_o(io_Os_188Os) = 1000.0*(weath_consts(k,7)/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
@@ -1913,7 +1907,6 @@ CONTAINS
           END DO
        END DO
     END DO
-
 
     ! Save data to file calcium_total.dat
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
@@ -2023,7 +2016,6 @@ CONTAINS
     ENDIF
 
     ! extract temperature to local array to please intel compilers
-    !                     print*,"before calib", loc_SLT(:,1)
     DO i=1,n_i
        DO j=1,n_j
           loc_SLT(i,j) = dum_sfcatm1(ia_T,i,j)
@@ -2040,8 +2032,6 @@ CONTAINS
           ENDIF
        END DO
     END DO
-    ! extract temperature to local array to please intel compilers
-    !                     print*,"after calib", loc_SLT(:,1)
 
     ! calculate mean surface productivity (kgC m-2 yr-1)
     SELECT case (par_prodopt)
