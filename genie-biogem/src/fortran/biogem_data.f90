@@ -4283,6 +4283,7 @@ CONTAINS
   !        2 == 2D (uniform across surface)
   !        0 == forcing at a point
   !       -1 == SURFACE (spatially explicit across surface -- needs 2D file '_SUR')
+  !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       ELSE, 2D spatially explicit forcing (needs a pair of 2D files '_I' and '_II')
   SUBROUTINE sub_init_force_flux_sed()
     ! local variables
@@ -4305,6 +4306,8 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 0.0
           elseif (force_sed_uniform(is) == -1) then
              loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -2) then
+             loc_ij(:,:) = 0.0
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_I'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
@@ -4324,6 +4327,9 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 1.0
           elseif (force_sed_uniform(is) == -1) then
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_SUR'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -2) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_II'//TRIM(string_data_ext)
