@@ -327,11 +327,11 @@ ifeq ($(F77),gfortran)
     FFLAGS += -fno-automatic
   endif
   ifeq ($(BUILD),DEBUG)
-    FFLAGS += -g -ffpe-trap=zero,overflow,invalid -O0 -Wall -fbounds-check
+    FFLAGS += -g -ffpe-trap=zero,overflow,underflow,invalid -O0 -Wall -fbounds-check
     FFLAGS += -Wextra
-    #FFLAGS += -pedantic
+    FFLAGS += -pedantic
     FFLAGS += -fbacktrace
-    #FFLAGS += -fconserve-stack
+    FFLAGS += -fconserve-stack
     FFLAGS += -fstack-check
     #FFLAGS +=  -fno-automatic
   endif
