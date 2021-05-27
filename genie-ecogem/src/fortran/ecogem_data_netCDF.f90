@@ -474,13 +474,13 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
     !-----------------------------------------------------------------------
-    INTEGER::loc_iou,loc_ntrec,io,jp,ii
+    INTEGER::loc_iou,loc_ntrec,io,jp,ii,i,j
     real,DIMENSION(n_i,n_j)::loc_ij,loc_mask
     CHARACTER(len=255)::shrtstrng,longstrng,diamtr
     real::loc_c0,loc_c1
     real::totalplankton(iomax+iChl,n_i,n_j)
     real::totalfluxes(iomax,n_i,n_j)
-    real::totaln2fix(n_i,n_j)
+    real::totaln2fix(n_i,n_j), globaln2fix
     real::weightedmean(n_i,n_j)
     real::weighteddev(n_i,n_j)
     real::minsize(n_i,n_j),maxsize(n_i,n_j)
@@ -502,6 +502,7 @@ CONTAINS
     totalplankton = 0.0
     totalfluxes = 0.0
     totaln2fix = 0.0
+    globaln2fix = 0.0
     DO io=1,iomax+iChl
        DO jp=1,npmax
           if ((io.le.iomax).or.(autotrophy(jp).gt.0.0)) then ! do not output non-existent chlorophyll for non-autotroph
@@ -535,19 +536,19 @@ CONTAINS
              call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
           endif
           ! Write phytoplankton n2 fixation - Fanny - May21
-          if ((io.le.iomax).and.(io.eq.iNO3).and.(Nfix(jp).gt.0.0)) then 
+          if ((io.eq.iNO3).and.(Nfix(jp).gt.0.0)) then 
              loc_ij(:,:) = int_n2fix_timeslice(jp,:,:,n_k)
              write (shrtstrng, "(A12,I3.3)") "_N2fixation_",jp   
-             write (longstrng, "(A,A28,I3.3,A2,A,A8,A,A1)") ' Nitrogen fixation - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             write (longstrng, "(A28,I3.3,A2,A,A8,A,A1)") 'Nitrogen fixation - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
              call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
              call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:)) 
              totaln2fix(:,:) = totaln2fix(:,:) + int_n2fix_timeslice(jp,:,:,n_k)    
           endif
        end do
-       write (shrtstrng, "(A12)") "_N2fix_Total" 
+       write (shrtstrng, "(A17)") "_N2fixation_Total" 
        write (longstrng, "(A19)") "N2 fixation - Total" 
-       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totalplankton(io,:,:),loc_mask(:,:))   
+       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totaln2fix(:,:),loc_mask(:,:))   
 
        ! Write community total biomasses and inorganic resource fluxes
        write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
@@ -560,7 +561,17 @@ CONTAINS
           call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
           call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,totalfluxes(io,:,:),loc_mask(:,:)) 
        endif
-    end do
+    end do   
+
+    ! Quick NF rate diagnosis - Fanny
+    !do i=1,n_i
+    !  do j=1,n_j
+    !    globaln2fix = globaln2fix + totaln2fix(i,j)*ocn_grid_vol(i,j,n_k) !mmol N2 d-1
+    !  end do
+    !end do
+   !!! TEST Fanny
+   !write(*,*) "N2Fix =", globaln2fix
+
     ! temperature limitation status
     loc_ij(:,:) = int_gamma_timeslice(iomax+1,1,:,:,n_k)
     write (shrtstrng, "(A9)") "_xGamma_T"   

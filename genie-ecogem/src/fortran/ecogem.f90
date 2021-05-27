@@ -601,9 +601,7 @@ subroutine ecogem(          &
                     uptake_flux(io,:,i,j,k) = up_inorg(io,:) * BioC(:) ! mmol/m^3/s
                     export_flux(io,:,i,j,k) = dorgmatdt_plankton(io,:) ! mmol/m^3/s   - Fanny/Maria Aug19
                  enddo
-                 if (nquota) then
-                    n2fix_flux(:,i,j,k) = VCN(:) ! mmol/m^3/s    - Fanny May21
-                 end if
+                 n2fix_flux(:,i,j,k) = merge(VCN(:)/2 * BioC(:),0.0,Nfix(:).eq.1.0) ! mmolN2/m^3/s    - Fanny May21
 
                  if (c13trace) then
                     do io=1,iomaxiso
@@ -878,7 +876,7 @@ SUBROUTINE diag_ecogem_timeslice( &
      int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr * nutrient(:,:,:,:)             ! mmol m^-3
      int_zoogamma_timeslice(:,:,:,:) =   int_zoogamma_timeslice(:,:,:,:) + loc_dtyr * zoo_limit(:,:,:,:)            ! mmol m^-3
      int_export_timeslice(:,:,:,:,:) =   int_export_timeslice(:,:,:,:,:) + loc_dtyr * export_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
-     int_n2fix_timeslice(:,:,:,:)    =   int_n2fix_timeslice(:,:,:,:)    + loc_dtyr * n2fix_flux(:,:,:,:) * pday    ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
+     int_n2fix_timeslice(:,:,:,:)    =   int_n2fix_timeslice(:,:,:,:)    + loc_dtyr * n2fix_flux(:,:,:,:) * pday    ! mmol m^-3 d^-1  nitrogen fixation per plankton Fanny - May21
   end if
 
   ! write time-slice data and re-set integration
