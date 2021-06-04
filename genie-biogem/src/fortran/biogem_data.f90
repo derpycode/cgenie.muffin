@@ -4308,6 +4308,8 @@ CONTAINS
              loc_ij(:,:) = 0.0
           elseif (force_sed_uniform(is) == -2) then
              loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -4) then
+             loc_ij(:,:) = 0.0
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_I'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
@@ -4329,6 +4331,9 @@ CONTAINS
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_SUR'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
           elseif (force_sed_uniform(is) == -2) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -4) then
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
           else

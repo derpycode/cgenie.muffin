@@ -2706,7 +2706,7 @@ CONTAINS
        end if
     end if
     !----------------------------------------------------------------
-    !       PARTICULATE FLUXES
+    ! PARTICULATE FLUXES -- surface
     !----------------------------------------------------------------
     If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
        DO l=1,n_l_sed
@@ -2742,8 +2742,74 @@ CONTAINS
                & par_sed_type_scavenged,n_itype_min:n_itype_max, &
                & par_sed_type_frac)
              call sub_adddef_netcdf(loc_iou,3,'bio_export_'//trim(string_sed(is)), &
-                  & 'biological export - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
+                  & 'biological export (flux density) - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
              call sub_putvar2d('bio_export_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
+          !---------------------------------------------------------- flux
+          ! simply multiply bulk (flux density) array by area again
+          SELECT CASE (sed_type(is))
+          CASE (par_sed_type_bio,par_sed_type_abio, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_scavenged)
+             loc_ij(:,:) = phys_ocn(ipo_A,:,:,loc_k1)*loc_ij(:,:)
+             loc_unitsname = 'mol yr-1'
+             call sub_adddef_netcdf(loc_iou,3,'bio_fexport_'//trim(string_sed(is)), &
+                  & 'biological export (flux) - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
+             call sub_putvar2d('bio_fexport_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
+       end do
+    end if
+    !----------------------------------------------------------------
+    ! PARTICULATE FLUXES -- benthic
+    !----------------------------------------------------------------
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          loc_ij(:,:) = const_real_zero
+          !---------------------------------------------------------- flux density
+          DO i=1,n_i
+             DO j=1,n_j
+                loc_k1 = goldstein_k1(i,j)
+                IF (n_k >= loc_k1) THEN
+                   SELECT CASE (sed_type(is))
+                   CASE (par_sed_type_bio,par_sed_type_abio, &
+                        & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+                        & par_sed_type_scavenged)
+                      loc_ij(i,j) = int_bio_settle_timeslice(is,i,j,loc_k1)*phys_ocn(ipo_rA,i,j,loc_k1)/int_t_timeslice
+                      loc_unitsname = 'mol m-2 yr-1'
+                   case (n_itype_min:n_itype_max)
+                      loc_tot  = int_bio_settle_timeslice(sed_dep(is),i,j,loc_k1)*phys_ocn(ipo_rA,i,j,loc_k1)/int_t_timeslice
+                      loc_frac = int_bio_settle_timeslice(is,i,j,loc_k1)*phys_ocn(ipo_rA,i,j,loc_k1)/int_t_timeslice
+                      loc_standard = const_standards(sed_type(is))
+                      loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      loc_unitsname = 'o/oo'
+                   CASE (par_sed_type_frac)
+                      loc_ij(i,j) = int_bio_settle_timeslice(is,i,j,loc_k1)
+                      loc_unitsname = 'n/a'
+                   end SELECT
+                end if
+             end do
+          end do
+          SELECT CASE (sed_type(is))
+          CASE (par_sed_type_bio,par_sed_type_abio, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_scavenged,n_itype_min:n_itype_max, &
+               & par_sed_type_frac)
+             call sub_adddef_netcdf(loc_iou,3,'bio_rain_'//trim(string_sed(is)), &
+                  & 'biological rain (flux density) - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
+             call sub_putvar2d('bio_rain_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
+          !---------------------------------------------------------- flux
+          ! simply multiply bulk (flux density) array by area again
+          SELECT CASE (sed_type(is))
+          CASE (par_sed_type_bio,par_sed_type_abio, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_scavenged)
+             loc_ij(:,:) = phys_ocn(ipo_A,:,:,loc_k1)*loc_ij(:,:)
+             loc_unitsname = 'mol yr-1'
+             call sub_adddef_netcdf(loc_iou,3,'bio_frain_'//trim(string_sed(is)), &
+                  & 'biological rain (flux) - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
+             call sub_putvar2d('bio_frain_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
           end SELECT
        end do
     end if

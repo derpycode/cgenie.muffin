@@ -3191,7 +3191,7 @@ CONTAINS
           loc_standard = const_standards(sed_type(is))
           loc_sed_ave = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
           write(unit=out,fmt='(A13,A16,A3,f10.3,A10)',iostat=ios) &
-               & ' Export flux ',string_sed(is),' : ', &
+               & ' Rain flux   ',string_sed(is),' : ', &
                & loc_sed_ave, &
                & ' o/oo     '
           call check_iostat(ios,__LINE__,__FILE__)
@@ -3484,7 +3484,15 @@ CONTAINS
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        SELECT CASE (sed_type(is))
-       CASE (1,2,3,4)
+       CASE (1:7)
+          ! NOTE:
+          !      '1' -> assigned to primary biogenic phases; POM (represented by POC), CaCO3, opal (all contributing to bulk composition)
+          !      '2' -> assigned to abiotic material (contributing to bulk composition); det, ash
+          !      '3' -> assigned to elemental components associated with POC; P, N, Cd, Fe
+          !      '4' -> assigned to elemental components associated with CaCO3; Cd
+          !      '5' -> assigned to elemental components associated with opal; Ge
+          !      '6' -> assigned to elemental components associated with det; Li
+          !      '7' -> assigned to particle-reactive scavenged elements; 231Pa, 230Th, Fe
           loc_sed_ave = SUM(int_bio_settle_timeslice(is,:,:,n_k))/int_t_timeslice/loc_ocn_tot_A
           write(unit=out,fmt='(A13,A16,A3,f10.3,A15,A5,E15.7,A9)',iostat=ios) &
                & ' Export flux ',string_sed(is),' : ', &
@@ -3495,6 +3503,7 @@ CONTAINS
                & ' mol yr-1'
           call check_iostat(ios,__LINE__,__FILE__)
        case (n_itype_min:n_itype_max)
+          ! (isotope tracers types)
           loc_tot  = SUM(int_bio_settle_timeslice(sed_dep(is),:,:,n_k))/int_t_timeslice/loc_ocn_tot_A
           loc_frac = SUM(int_bio_settle_timeslice(is,:,:,n_k))/int_t_timeslice/loc_ocn_tot_A
           loc_standard = const_standards(sed_type(is))
@@ -3516,10 +3525,18 @@ CONTAINS
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        SELECT CASE (sed_type(is))
-       CASE (1,2,3,4)
+       CASE (1:7)
+          ! NOTE:
+          !      '1' -> assigned to primary biogenic phases; POM (represented by POC), CaCO3, opal (all contributing to bulk composition)
+          !      '2' -> assigned to abiotic material (contributing to bulk composition); det, ash
+          !      '3' -> assigned to elemental components associated with POC; P, N, Cd, Fe
+          !      '4' -> assigned to elemental components associated with CaCO3; Cd
+          !      '5' -> assigned to elemental components associated with opal; Ge
+          !      '6' -> assigned to elemental components associated with det; Li
+          !      '7' -> assigned to particle-reactive scavenged elements; 231Pa, 230Th, Fe
           loc_sed_ave = SUM(int_focnsed_timeslice(is,:,:))/int_t_timeslice/loc_ocn_tot_A
           write(unit=out,fmt='(A13,A16,A3,f10.3,A15,A5,E15.7,A9)',iostat=ios) &
-               & ' Export flux ',string_sed(is),' : ', &
+               & ' Bottom flux ',string_sed(is),' : ', &
                & conv_mol_umol*loc_sed_ave/conv_m2_cm2, &
                & ' umol cm-2 yr-1', &
                & ' <-> ', &
@@ -3527,12 +3544,13 @@ CONTAINS
                & ' mol yr-1'
           call check_iostat(ios,__LINE__,__FILE__)
        case (n_itype_min:n_itype_max)
+          ! (isotope tracers types)
           loc_tot  = SUM(int_focnsed_timeslice(sed_dep(is),:,:))/int_t_timeslice/loc_ocn_tot_A
           loc_frac = SUM(int_focnsed_timeslice(is,:,:))/int_t_timeslice/loc_ocn_tot_A
           loc_standard = const_standards(sed_type(is))
           loc_sed_ave = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
           write(unit=out,fmt='(A13,A16,A3,f10.3,A10)',iostat=ios) &
-               & ' Export flux ',string_sed(is),' : ', &
+               & ' Bottom flux ',string_sed(is),' : ', &
                & loc_sed_ave, &
                & ' o/oo     '
           call check_iostat(ios,__LINE__,__FILE__)
