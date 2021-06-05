@@ -27,14 +27,14 @@ For the initial 10,000 year spinup:
 
 The deglacial transient (shown in Figure 4,5 and S8) is then simulated in 4 different deglacial experiment stages (i-iv):
 
-(i) 
+--- (i) ---
 
-./runmuffin.sh muffin.CBSR.p_worjh2.BASES_nosed_tracers MS/shaoetal.2021 LGM.SOsalt0NAbluesalt-0.05_184_174 1000 SPIN.worjh2.Fe14C.preAge.Dye.LGM_Csoft
+./runmuffin.sh muffin.CBSR.p_worjh2.BASES_nosed_tracers MS/shaoetal.2021 LGM.SOsalt0NAbluesalt-0.05_184_174 1000 SPIN.worjh2.Fe.preAge.LGM_Csoft
 
 which spans 18.4-17.4 ka of the deglacial transient simulation, with -0.05 Sv of salt flux into the North Atlantic.
 This uses the initial spin-up, SPIN.worjh2.Fe.preAge.LGM_Csoft, as a restart.
 
-(ii) 
+--- (ii) ---
 
 ./runmuffin.sh muffin.CBSR.p_worjh2.BASES_nosed_SO10_tracers MS/shaoetal.2021 LGM.SOsalt0.05wind10NAbluesalt-0.1_174_164 1000 LGM.SOsalt0NAbluesalt-0.05_184_174
 
@@ -42,7 +42,7 @@ which spans 17.4-16.4 ka of the deglacial transient simulation, with -0.1 Sv of 
 10% enhanced wind stress over the Southern Ocean. 
 This uses LGM.SOsalt0NAbluesalt-0.05_184_174 as a restart.
 
-(iii)
+--- (iii) ---
 
 ./runmuffin.sh muffin.CBSR.p_worjh2.BASES_nosed_SO30_tracers MS/shaoetal.2021 LGM.SOsalt0.1wind30NAbluesalt-0.1_164_161 300 LGM.SOsalt0.05wind10NAbluesalt-0.1_174_164
 
@@ -50,7 +50,7 @@ This uses LGM.SOsalt0NAbluesalt-0.05_184_174 as a restart.
 30% enhanced wind stress over the Southern Ocean.
 This uses LGM.SOsalt0.05wind10NAbluesalt-0.1_174_164 as a restart.
 
-(iv)
+--- (iv) ---
 
 ./runmuffin.sh muffin.CBSR.p_worjh2.BASES_nosed_SO10_tracers MS/shaoetal.2021 LGM.SOsalt0.1wind10NAbluesalt-0.1_161_15 1100 LGM.SOsalt0.1wind30NAbluesalt-0.1_164_161
 
@@ -86,13 +86,13 @@ The control (CTRL) experiemnt is used in the analysis of the steady-state AOU-ba
 The perturbation experiment is identical, except radiative forcing (TOA) equivalent to a doubling of pCO2, is applied.
 All experiments are run for 2,000 years and follow on from their corresponding restart.
  
-./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 210316.muffin.CB.p_worjh2.BASEScol023789.CTRL 2000 muffin.CB.p_worjh2.BASEScol023789.SPIN
-./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 210316.muffin.CB.p_worjh2.BASEScol023789.noCaCO3.CTRL 2000 muffin.CB.p_worjh2.BASEScol023789.noCaCO3.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 muffin.CB.p_worjh2.BASEScol023789.CTRL 2000 muffin.CB.p_worjh2.BASEScol023789.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 muffin.CB.p_worjh2.BASEScol023789.noCaCO3.CTRL 2000 muffin.CB.p_worjh2.BASEScol023789.noCaCO3.SPIN
 
 (controls)
 
-./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 210316.muffin.CB.p_worjh2.BASEScol023789.EXPT 2000 muffin.CB.p_worjh2.BASEScol023789.SPIN
-./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 210316.muffin.CB.p_worjh2.BASEScol023789.noCaCO3.EXPT 2000 muffin.CB.p_worjh2.BASEScol023789.noCaCO3.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 muffin.CB.p_worjh2.BASEScol023789.EXPT 2000 muffin.CB.p_worjh2.BASEScol023789.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASEScol023789 MS/shaoetal.2021 muffin.CB.p_worjh2.BASEScol023789.noCaCO3.EXPT 2000 muffin.CB.p_worjh2.BASEScol023789.noCaCO3.SPIN
 
 (perturbations)
 
