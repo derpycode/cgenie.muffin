@@ -1011,7 +1011,7 @@ subroutine biogem(        &
                  IF (force_flux_sed_select(is)) THEN
                     if (force_sed_uniform(is) == -2) then
                        locijk_fpart(is,i,j,loc_k1) = locijk_fpart(is,i,j,loc_k1) + force_flux_sed(is,i,j)
-                    elseif (force_sed_uniform(is) == -4) then
+                    elseif (force_sed_uniform(is) == -5) then
                        locijk_fpart(is,i,j,min(n_k,loc_k1+1)) = locijk_fpart(is,i,j,min(n_k,loc_k1+1)) + force_flux_sed(is,i,j)
                     else
                        locijk_fpart(is,i,j,n_k) = locijk_fpart(is,i,j,n_k) + force_flux_sed(is,i,j)

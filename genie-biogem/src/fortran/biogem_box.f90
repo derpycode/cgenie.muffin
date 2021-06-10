@@ -2940,7 +2940,7 @@ CONTAINS
        loc_klim = loc_k1
     elseif (maxval(FINDLOC(force_sed_uniform(:),-2)) > 0) then
        loc_klim = loc_k1
-    elseif (maxval(FINDLOC(force_sed_uniform(:),-4)) > 0) then
+    elseif (maxval(FINDLOC(force_sed_uniform(:),-5)) > 0) then
        loc_klim = loc_k1       
     end if
     ! -------------------------------------------------------- !
