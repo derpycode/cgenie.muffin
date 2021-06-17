@@ -172,7 +172,10 @@ CONTAINS
        print*,'global apatite d44Ca (o/oo)                         : ',par_weather_CaSiO3_fracCa5PO43_d44Ca
        print*,'global apatite weathering rate (mol PO4 yr-1)       : ',par_weather_Ca0PO41
        print*,'global quartz weathering rate (mol Si yr-1)         : ',par_weather_SiO2
-       print*,'global quartz d30Si (o/oo)                          : ',par_weather_SiO2_d30Si
+       print*,'global quartz d30Si (o/oo)                          : ',par_weather_SiO2_d30Si    
+       print*,'global kerogen P abundance                          : ',par_weather_kerogen_fracP
+       print*,'global kerogen S abundance                          : ',par_weather_kerogen_fracS
+       print*,'global kerogen S d34S (o/oo)                        : ',par_weather_kerogen_fracS_d34S
        print*,'calibrate temperature fields to global average data : ',opt_calibrate_T_0D
        print*,'calibrate runoff fields to global average data      : ',opt_calibrate_R_0D
        print*,'calibrate productivity fields to global average data: ',opt_calibrate_P_0D
@@ -182,10 +185,26 @@ CONTAINS
        print*,'mean global land prod. (kgC m-2 yr-1) to calib. to  : ',par_data_P_0D
        print*,'imposed maximum carbonate weathering enhancement    : ',par_n_max_CaCO3
        print*,'imposed maximum silicate weathering enhancement     : ',par_n_max_CaSiO3
-       print*,'enhanced weathering scale factor                    : ',par_weather_fCaCO3_enh_n
-       print*,'enhanced weathering scale factor                    : ',par_weather_fCaSiO3_enh_n
-       print*,'enhanced weathering total inventory                 : ',par_weather_fCaCO3_enh_nt
-       print*,'enhanced weathering total inventory                 : ',par_weather_fCaSiO3_enh_nt
+       print*,'enhanced weathering scale factor                    : ',par_weather_CaCO3_enh_n
+       print*,'enhanced weathering scale factor                    : ',par_weather_CaSiO3_enh_n
+       print*,'enhanced weathering total inventory                 : ',par_weather_CaCO3_enh_nt
+       print*,'enhanced weathering total inventory                 : ',par_weather_CaSiO3_enh_nt    
+       print*,'Li weathering scheme                                : ',trim(opt_weather_CaSiO3_fracLi)
+       print*,'Fixed (non T-dep) clay fractionation?               : ',ctrl_weather_CaSiO3_7Li_epsilon_fixed
+       print*,'T-dependent D7Li sensitivity (o/oo K-1)             : ',par_weather_CaSiO3_7Li_epsilon_DT
+       print*,'Fix bulk carbonate weathering                       : ',opt_weather_fixed_CaCO3
+       print*,'Fix bulk silicate weathering                        : ',opt_weather_fixed_CaSiO3
+       print*,'Fix associated Li fluxes                            : ',opt_weather_fixed_Li
+       print*,'Fix associated Sr fluxes                            : ',opt_weather_fixed_Sr
+       print*,'Fix associated Os fluxes                            : ',opt_weather_fixed_Os
+       print*,'Fix associated kerogen C fluxes                     : ',opt_weather_fixed_kerogenC
+       print*,'Fix associated kerogen P fluxes                     : ',opt_weather_fixed_kerogenP
+       print*,'Fix associated kerogen S fluxes                     : ',opt_weather_fixed_kerogenS
+       print*,'Fix associated FeS2 fluxes                          : ',opt_weather_fixed_FeS2
+       print*,'Fix associated CaSO4 fluxes                         : ',opt_weather_fixed_CaSO4
+       print*,'Fix associated FeCO3 fluxes                         : ',opt_weather_fixed_FeCO3
+       print*,'Fix associated Ca5PO43 fluxes                       : ',opt_weather_fixed_Ca5PO43
+       print*,'Fix associated SiO2 fluxes                          : ',opt_weather_fixed_SiO2
        ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
        print*,'--- 2D WEATHERING PARAMETERS ---'
        print*,'name of lithological data set (part 1)              : ',par_lith_data
@@ -220,7 +239,7 @@ CONTAINS
     par_ref_R0 = par_ref_R0 / conv_yr_s
     ! convert par_data_R0 to mm/s
     par_data_R_0D = par_data_R_0D / conv_yr_s
-    
+
   END SUBROUTINE sub_load_goin_rokgem
   ! ****************************************************************************************************************************** !
 
@@ -427,8 +446,6 @@ CONTAINS
     END DO
     close(unit=in)
 
-    !PRINT*,'output years_0d:'
-    !write(6,fmt='(f14.1)'),output_years_0d
     output_tsteps_0d = int(tsteps_per_year*(output_years_0d-start_year))
     output_counter_0d = 1
 
@@ -468,8 +485,6 @@ CONTAINS
     END DO
     close(in)
 
-    !PRINT*,'output years_2d:'
-    !write(6,fmt='(f14.1)'),output_years_2d
     output_tsteps_2d = int(tsteps_per_year*(output_years_2d-start_year))
     output_counter_2d = 1
 
@@ -493,8 +508,6 @@ CONTAINS
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN 
        year = output_years_2d(output_counter_2d)
     ENDIF
-
-    !print*,tstep_count,output_counter_0d,output_counter_2d,year
 
     year_int = int(year)
     year_remainder = int(1000*(year - real(year_int)))
@@ -536,7 +549,7 @@ CONTAINS
 
     INTEGER                                 :: alloc_stat, i, ios
 
-    n_outputs = 29
+    n_outputs = 38
     ALLOCATE(time_series_names(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
     ALLOCATE(output_descriptions(n_outputs),stat=alloc_stat)
@@ -563,14 +576,20 @@ CONTAINS
          & 'DIC_flux_coast                                    ', &
          & 'Ca_flux_coast                                     ', &
          & 'DIC_13C_flux                                      ', &
+         & 'Os_flux                                           ', &
+         & '187Os_flux                                        ', &
+         & '188Os_flux                                        ', &
          & 'ALK_flux_land                                     ', &
          & 'DIC_flux_land                                     ', &
          & 'Ca_flux_land                                      ', &
          & 'DIC_13C_flux_land                                 ', &
+         & 'Os_flux_land                                      ', &
+         & '187Os_flux_land                                   ', &
+         & '188Os_flux_land                                   ', &
          & 'ALK_flux_ocean                                    ', &
          & 'DIC_flux_ocean                                    ', &
          & 'Ca_flux_ocean                                     ', &
-         & 'DIC_13C_flux_ocean                                ' /)
+         & 'DIC_13C_flux_ocean                                '/)
 
     output_descriptions = (/                                                       &
                                 !'---------------------------- inputs -----------------------------'
@@ -596,16 +615,22 @@ CONTAINS
          & 'DIC weathering flux (Tmol yr-1)                  ', & ! but as they are already spread over land for 2D schemes
          & 'Ca weathering flux (Tmol yr-1)                   ', & ! they are just set to the exact same fluxes as the ones below
          & 'DIC_13C weathering flux (Tmol yr-1)              ', & !
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ', &
                                 !'                            * land *                              '
          & 'ALK weathering flux (Tmol yr-1)                  ', &
          & 'DIC weathering flux (Tmol yr-1)                  ', &
          & 'Ca weathering flux (Tmol yr-1)                   ', &
          & 'DIC_13C weathering flux (Tmol yr-1)              ', &
+         & 'Os weathering flux (mol yr-1)                    ', &
+         & '187Os weathering flux (mol yr-1)                 ', &
+         & '188Os weathering flux (mol yr-1)                 ', &
                                 ! '                            * ocean *                            '
          & 'ALK weathering flux (Tmol yr-1)                  ', &
          & 'DIC weathering flux (Tmol yr-1)                  ', &
          & 'Ca weathering flux (Tmol yr-1)                   ', &
-         & 'DIC_13C weathering flux (Tmol yr-1)              ' /)
+         & 'DIC_13C weathering flux (Tmol yr-1)              '/)
 
     ALLOCATE(outputs(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
@@ -707,7 +732,7 @@ CONTAINS
        END DO
        ! calculate fractional coverage
        fracs(k) = SUM(dum_array_3D(k,:,:))/nlandcells
-       PRINT*,TRIM(dum_filenames(k)),' | ',n,' | ',SUM(dum_array_3D(k,:,:)),' | ',fracs(k)
+       if (ctrl_debug_init > 1) PRINT*,TRIM(dum_filenames(k)),' | ',n,' | ',SUM(dum_array_3D(k,:,:)),' | ',fracs(k)
     END DO
     if (ctrl_debug_init > 1) print*,'total coverage (should be 1): ',SUM(fracs(:))
     if (ctrl_debug_init > 1) print*,'total land cells covered: ',SUM(dum_array_3D(:,:,:))
@@ -742,7 +767,7 @@ CONTAINS
     ENDIF
 
     !save modified lithological maps
-    PRINT*,'saving modified lithological maps'
+    if (ctrl_debug_init > 1) PRINT*,'saving modified lithological maps'
     DO k=1,dum_nfiles
        CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(dum_filenames(k)),n_i,n_j,dum_array_3D(k,:,:))
     END DO
@@ -778,22 +803,19 @@ CONTAINS
     REAL, INTENT(inout)                    :: dum_lithology(par_nliths,n_i,n_j)
 
     ! read in k and f constants and fCa and fSi fractions
-
     if (ctrl_debug_init > 1) print*,'Reading in weathering constants'
     call check_unit(in,__LINE__,__FILE__)
     OPEN(in,file=TRIM(par_indir_name)//TRIM(par_weathopt)//'_consts.dat',iostat=ios)
     call check_iostat(ios,__LINE__,__FILE__)
     DO i = 1,par_nliths
-       read(in,*,iostat=ios)(weath_consts(i,j),j=1,4)
+       read(in,*,iostat=ios)(weath_consts(i,j),j=1,7)
        call check_iostat(ios,__LINE__,__FILE__)
     END DO
     CLOSE(in,iostat=ios)
     call check_iostat(ios,__LINE__,__FILE__)
-    write(6,fmt='(f14.3)') weath_consts
-
+    if (ctrl_debug_init > 1) write(6,fmt='(f14.3)') weath_consts
 
     ! read in lithological data
-
     CALL sub_data_input_3D                (                                                 &
          & TRIM(par_indir_name)//'lithologies'//'_'//      &
          & TRIM(par_lith_data)//                           &

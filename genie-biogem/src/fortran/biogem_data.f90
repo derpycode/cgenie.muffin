@@ -964,11 +964,21 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     CHARACTER(len=255)::loc_filename                           ! filename string
+    integer::loc_len
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    ! set alt dir path string length
+    loc_len = LEN_TRIM(par_pindir_name)
     ! -------------------------------------------------------- !
     ! LOAD 2D FIELD
     ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! load geothermal 2D field
-    loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    ! -------------------------------------------------------- ! load BIOGEM virtual grid
+    if (loc_len > 0) then
+       loc_filename = TRIM(par_pindir_name)//TRIM(par_force_Vgrid_file)
+    else
+       loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    end if
     CALL sub_load_data_ij_INT(loc_filename,n_i,n_j,force_Vgrid(:,:))
     ! -------------------------------------------------------- !
     ! END
@@ -2994,8 +3004,9 @@ CONTAINS
   ! DATA SAVE META CONFIG
   SUBROUTINE sub_adj_par_save()
 
-    !
-    ! NOTE: the value of ctrl_data_save_sig_diag_redox_old is set independently
+    ! initialize save options to false
+    ! NOTE: the value of ctrl_data_save_sig_diag_redox_old is set independently (and not set to false here)
+    ! NOTE: the value of ctrl_bio_remin_redox_save is set independently (and not set to false here)
     select case (par_data_save_level)
     case (0:99)
        ctrl_data_save_slice_ocnatm = .false.
@@ -4271,6 +4282,7 @@ CONTAINS
   !        2 == 2D (uniform across surface)
   !        0 == forcing at a point
   !       -1 == SURFACE (spatially explicit across surface -- needs 2D file '_SUR')
+  !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       ELSE, 2D spatially explicit forcing (needs a pair of 2D files '_I' and '_II')
   SUBROUTINE sub_init_force_flux_sed()
     ! local variables
@@ -4293,6 +4305,10 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 0.0
           elseif (force_sed_uniform(is) == -1) then
              loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -2) then
+             loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -5) then
+             loc_ij(:,:) = 0.0
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_I'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
@@ -4312,6 +4328,12 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 1.0
           elseif (force_sed_uniform(is) == -1) then
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_SUR'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -2) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -5) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_II'//TRIM(string_data_ext)

@@ -1009,12 +1009,18 @@ subroutine biogem(        &
                  end if
               end if
               ! SEDIMENT TRACERS #1
-              ! NOTE: currently, fluxes are valid at the ocean surface only
-              ! NOTE: addition is made directly to particulate sedimentary tracer array (scaled by time-step and cell mass)
+              ! NOTE: the default is that fluxes are valid at the ocean surface only
+              !       but force_sed_uniform(is) == -2 provides for the particles being released in the benthic ocean layer instead
               DO l=1,n_l_sed
                  is = conv_iselected_is(l)
                  IF (force_flux_sed_select(is)) THEN
-                    locijk_fpart(is,i,j,n_k) = locijk_fpart(is,i,j,n_k) + force_flux_sed(is,i,j)
+                    if (force_sed_uniform(is) == -2) then
+                       locijk_fpart(is,i,j,loc_k1) = locijk_fpart(is,i,j,loc_k1) + force_flux_sed(is,i,j)
+                    elseif (force_sed_uniform(is) == -5) then
+                       locijk_fpart(is,i,j,min(n_k,loc_k1+1)) = locijk_fpart(is,i,j,min(n_k,loc_k1+1)) + force_flux_sed(is,i,j)
+                    else
+                       locijk_fpart(is,i,j,n_k) = locijk_fpart(is,i,j,n_k) + force_flux_sed(is,i,j)
+                    end if
                  END IF
               END DO
               ! SEDIMENT TRACERS #2
@@ -1037,7 +1043,7 @@ subroutine biogem(        &
                  !
                  ! ############################################################################################################### !
               end SELECT
-              !
+              ! GEOTHERMAL INPUT
               ! NOTE: create units equivalent of (degrees C yr-1) :o)
               !       i.e. W m-2 times seconds-in-a-year times area divided by heat capacity (J K-1 g-1) ...
               if (ctrl_force_Fgeothermal2D) then

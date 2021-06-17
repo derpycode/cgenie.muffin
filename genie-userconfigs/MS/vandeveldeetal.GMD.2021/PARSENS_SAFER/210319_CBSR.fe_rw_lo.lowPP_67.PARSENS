@@ -1,0 +1,163 @@
+#
+# --- CLIMATE ---------------------------------------------------------
+#
+# set no climate feedback
+ea_36=y
+#
+# --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
+#
+# biological scheme ID string
+bg_par_bio_prodopt=bio_PFe
+# [PO4] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_PO4=0.10E-06
+# [Fe] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_Fe=0.10E-09
+# biological uptake time-scale
+bg_par_bio_tau=63.3827
+#
+# --- ORGANIC MATTER EXPORT RATIOS ------------------------------------
+#
+# production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# --- INORGANIC MATTER EXPORT RATIOS ----------------------------------
+#
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+bg_par_bio_red_POC_CaCO3=0.0485
+# exponent for modifier of CaCO3:POC export ratio
+bg_par_bio_red_POC_CaCO3_pP=0.7440
+#
+# --- REMINERALIZATION ------------------------------------------------
+#
+# Martin curve rather than two fractions
+bg_par_bio_remin_fun='Martin1987'
+bg_par_bio_remin_martin_b=-0.7
+bg_par_bio_remin_z0=80.84 
+# DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=0.5
+# initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=0.0
+# initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.45
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1.8905e+003
+# remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+#
+# --- IRON ----------------------------------------------------------
+#
+bg_opt_geochem_Fe='FeFe2TL'
+# aeolian Fe solubility
+bg_par_det_Fe_sol=0.002014275
+#exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
+bg_par_det_Fe_sol_exp=0.500
+# modifier of the scavenging rate of dissolved Fe
+bg_par_scav_Fe_sf_POC=0.344104
+bg_par_scav_Fe_sf_CaCO3=0.000
+bg_par_scav_Fe_sf_opal=0.000
+bg_par_scav_Fe_sf_det=0.000
+# no scavenged regeneration
+bg_par_scav_fremin=0.0
+# return POFe
+bg_ctrl_bio_NO_fsedFe=.false.
+# Variable Fe:C
+bg_ctrl_bio_red_fixedFetoC=.false.
+# adjust pK'(FeL)
+bg_par_K_FeL_pP=11.0
+#(max) C/Fe organic matter ratio
+bg_par_bio_red_POFe_POC=250000.0
+#[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- power
+bg_par_bio_FetoC_pP=-0.4225
+#[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- scaling
+bg_par_bio_FetoC_K=103684.0
+#[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- constant
+bg_par_bio_FetoC_C=0.0
+#
+# kinetic constant for iron oxide reactivity - baseline
+bg_par_bio_remin_kFeOOHtoFe2=28366
+#
+# Pyrite precipitation - baseline from Rickard
+bg_par_bio_FeS2precip_k=31595
+#
+# FeOOH inhibition/limitation constant - random baseline
+bg_par_bio_remin_c0_FeOOH=2.1201
+bg_par_bio_remin_ci_FeOOH=0.0029999
+#
+bg_par_d56Fe_FeCO3_alpha=0.9997 # 0.9997
+bg_par_d56Fe_Fered_alpha=0.9987 # 0.9987
+bg_par_d56Fe_Fe2ox_alpha=1.0008 # 1.0008
+bg_par_d56Fe_FeS2_alpha=0.9978  # 0.9978 
+#
+# --- SEDIMENTS ------------------------------------------------
+#
+# sediment diagenesis options
+sg_par_sed_diagen_CaCO3opt=NONE
+sg_ctrl_sed_bioturb=.false.
+sg_par_n_sed_mix=10
+# additional detrital flux (g cm-2 kyr-1)
+sg_par_sed_fdet=0.180
+#
+# --- WEATHERING ------------------------------------------------------
+#
+# set a OPEN system
+bg_ctrl_force_sed_closedsystem=.false.
+# set generic unit carbonate and silicate weathering rate (and outgassing) (invarient)
+# CO2 outgassing rate (mol C yr-1)
+rg_par_outgas_CO2=1.0
+# global silicate weathering rate (mol Ca2+ yr-1)
+rg_par_weather_CaSiO3=1.0
+# global carbonate weathering rate (mol Ca2+ yr-1)
+rg_par_weather_CaCO3=1.0
+# d13C
+rg_par_outgas_CO2_d13C=-0.0
+rg_par_weather_CaCO3_d13C=0.0
+# ratio of pyrite to silicate rock weathering (modern values - Raiswell and Canfield, 2012)
+rg_par_weather_CaSiO3_fracFeS2=1.3E12 #mol yr-1
+# ratio of siderite to carbonate rock weathering
+rg_par_weather_CaCO3_fracFeCO3=0.0E12  #mol yr-1
+#
+# --- DATA SAVING -----------------------------------------------------
+#
+bg_ctrl_data_save_sig_diag_redox_old=.false.
+bg_par_data_save_level=15
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=1
+#
+# --- MISCELLANEOUS ---------------------------------------------------
+#
+# Precambrian ocean -> assumed high concentrations of Si, avoid crashing of carbonate chemistry scheme by removing it from calc
+gm_ctrl_carbchem_noH3SiO4=.true.
+#
+# delaying factor
+bg_par_bio_geochem_tau=45.0
+#
+# reflective boundary (avoid sedgem supernegative oxygen)
+bg_ctrl_force_sed_reflective_POM=.true.
+#
+# isopycnal/diapycnal mixing -> parametrisation causes strong negative values in low oxygen worlds
+go_diso=.false.
+#
+# --- FORCINGS --------------------------------------------------------
+#
+# change PO4 inventory to 50% PDL -> lower has too much deep-water oxygen 
+bg_ocn_init_8=1.0795e-06
+#
+bg_ocn_init_9=1.0e-09
+bg_ocn_init_83=1.0e-09
+#
+# specify forcings
+bg_par_forcing_name=SVDV.muffin.CBS.fe_rw_lo.RpCO2_Rp13CO2_RpO2_FFe2
+bg_par_atm_force_scale_val_3=5337.6E-06 # 16 PAL CO2, because modern solar constant and comes fastest to steady-state
+bg_par_atm_force_scale_val_4=-6.5
+bg_par_atm_force_scale_val_6=0.02095
+bg_par_ocn_force_scale_val_9=0.0   #mol yr-1 Fe3+ surface flux
+bg_par_ocn_force_scale_val_86=0.0  #mol yr-1 Fe3+ surface flux
+bg_par_ocn_force_scale_val_12=0.0  #mol yr-1 ALK surface flux
+bg_par_ocn_force_scale_val_38=30.2e12 #mol yr-1 SO4 surface flux
+#
+bg_par_ocn_force_scale_val_83=15.1e12 #mol yr-1 Fe2 influx at seafloor 'hydrothermal'
+bg_par_ocn_force_scale_val_87=0.0     #permille Fe2 influx at seafloor 'hydrothermal'                                                                                     
+#
+# --- END -------------------------------------------------------------
+#
+#

@@ -1,0 +1,258 @@
+#
+#
+# --- CLIMATE --------------------------------------------------
+#
+# set no climate feedback
+ea_36=y
+#
+# --- BIOLOGICAL NEW PRODUCTION --------------------------------
+#
+# maximum rate of conversion of dissolved PO4 into organic matter by phytoplankton (mol kg-1 yr-1)
+bg_par_bio_k0_PO4=1.9582242E-06
+#[PO4] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_PO4=2.1989611E-07
+#
+# --- ORGANIC MATTER EXPORT RATIOS -----------------------------
+#
+#production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# --- INORGANIC MATTER EXPORT RATIOS ---------------------------
+#
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+bg_par_bio_red_POC_CaCO3=0.043
+# exponent for modifier of CaCO3:POC export ratio
+bg_par_bio_red_POC_CaCO3_pP=0.8053406
+#
+# --- REMINERALIZATION -----------------------------------------
+#
+#DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=0.5
+#initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=6.4591110E-02
+# depth of remineralization or particulate organic matter
+bg_par_bio_remin_POC_eL1=550.5195
+#remineralization length #2 for POC
+bg_par_bio_remin_POC_eL2=1000000.0
+#initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.468
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1083.486
+#remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+#
+# --- SEDIMENTS ------------------------------------------------
+#
+# Sediment grid
+SEDGEMNLONSOPTS='$(DEFINE)SEDGEMNLONS=36'
+SEDGEMNLATSOPTS='$(DEFINE)SEDGEMNLATS=36'
+# sediment  grid options
+sg_par_sed_Dmax_neritic=1000.0
+sg_par_sed_topo_D_name="worbe2.190813.depth.36x36"
+sg_par_sed_reef_mask_name="worbe2.190813.reefmask.36x36"
+sg_par_sedcore_save_mask_name="worbe2.190813.sedcoremask.36x36"
+# sediment diagenesis options
+sg_par_sed_diagen_CaCO3opt="ridgwell2001lookup"
+sg_ctrl_sed_bioturb=.true.
+sg_ctrl_sed_bioturb_Archer=.false.
+sg_par_n_sed_mix=20
+# set invarient surface bioturbation mixing rate
+sg_par_sed_mix_k_sur_max=0.15
+sg_par_sed_mix_k_sur_min=0.15
+# no additional detrital flux
+sg_par_sed_fdet=0.0
+# total reefal burial rate -- 4.4 Tmol CaCO3 yr-1
+sg_par_sed_CaCO3burialTOT=4.0E12
+sg_par_sed_hydroip_fMg=-0.1981612E13
+#Corg burial
+sg_par_sed_CorgburialTOT=2.57E+12
+sg_par_sed_Corgburial_Dd13C=-30
+#
+# --- WEATHERING -----------------------------------------------
+#
+# set a 'OPEN' system
+bg_ctrl_force_sed_closedsystem=.false.
+#re-route rivers to avoid arctic bias
+rg_opt_weather_runoff=.TRUE.
+# set CaCO3_weathering-temperature feedback
+rg_opt_weather_T_Ca=.TRUE.
+# set CaSiO3_weathering-temperature feedback
+rg_opt_weather_T_Si=.TRUE.
+# weathering reference mean global land surface temperature (C)
+rg_par_ref_T0=8.48
+#CO2 outgassing rate (mol C yr-1)
+rg_par_outgas_CO2=8.575E+12
+# global silicate weathering rate (mol Ca2+ yr-1)
+rg_par_weather_CaSiO3=6E+12
+#W/D option
+rg_opt_weather_CaSiO3='Brady_FULL'
+rg_par_weather_CaSiO3_fracMg=0.33
+# global carbonate weathering rate (mol Ca2+ yr-1)
+rg_par_weather_CaCO3=8.4E+12
+# d13C
+rg_par_outgas_CO2_d13C=-6.0
+rg_par_weather_CaCO3_d13C=3.0
+#
+# --- GEOCHEM ACCELERATION -------------------------------------
+#
+gl_ctrl_update_pCO2=.true.
+ma_gem_notyr_min=10
+ma_gem_notyr_max=10
+ma_gem_yr_min=990
+ma_gem_yr_max=990
+ma_gem_dyr=0
+ma_gem_adapt_auto=.false.
+#
+# --- DATA SAVING ----------------------------------------------
+#
+bg_par_data_save_level=4
+bg_ctrl_debug_lvl0=.true.
+ma_debug_loop=1
+#
+# --- FORCINGS -------------------------------------------------
+#
+#bg_par_forcing_name="worbe2.detplusopalSED"
+bg_par_forcing_name="worbe2.FpCO2_Fp13CO2.detplusopalSED_year2"
+bg_par_atm_force_scale_val_3=1000.0
+bg_par_atm_force_scale_val_4=-25.0
+#
+# --- Os CYCLE -------------------------------------------------
+#
+# INITIAL CONDITIONS
+bg_ocn_init_104=5.0E-14
+bg_ocn_init_105=1.05
+bg_ocn_init_106=0.3244
+#
+# RIVER FLUX
+rg_par_weather_CaSiO3_fracOs=1.9184574446472725E-10
+rg_par_weather_CaCO3_fracOs=1.9184574446472725E-10
+rg_par_weather_CaSiO3_187Os_188Os=1.153
+rg_par_weather_CaCO3_187Os_188Os=1.153
+rg_par_weather_CaSiO3_188Os_192Os=0.3244
+rg_par_weather_CaCO3_188Os_192Os=0.3244
+#
+# HYDROTHERMAL FLUX
+sg_par_sed_hydroip_fOs=520.0
+sg_par_sed_hydroip_fOs_187Os_188Os=0.5625
+sg_par_sed_hydroip_fOs_188Os_192Os=0.3244
+#
+# SEAFLOOR DEPOSITION
+sg_ctrl_sed_Os_O2=.false.
+sg_par_sed_Os_depTOT=0
+sg_par_sed_Os_dep=5.947E-6
+#sg_par_sed_Os_dep_oxic=173.908572062
+#sg_par_sed_Os_dep_suboxic=173.908572062
+#
+# WATERCOLUMN SCAVENGING
+bg_par_bio_remin_kOstoPOMOS=0.0
+#
+# CARBOANTE FORMATION
+bg_par_bio_red_CaCO3_OsCO3=0.0
+bg_par_bio_red_CaCO3_OsCO3_alpha=0.0
+#
+#
+# --- Li CYCLE -------------------------------------------------
+#
+# INITIAL CONDITIONS
+bg_ocn_init_53= 27E-6 #Li
+bg_ocn_init_54= 31.5 #7Li
+#
+# RIVER FLUX
+#Li flux dependence on W/D
+rg_opt_weather_CaSiO3_fracLi='Pogge'
+rg_ctrl_weather_CaSiO3_7Li_epsilon_fixed=.false.
+rg_par_weather_CaSiO3_7Li_epsilon_DT=-15
+#fluxes
+rg_par_weather_CaSiO3_fracLi = 0.001332312 #global silicate Li abundance default: 10.00E-6 #0.00170
+rg_par_weather_Li_Rscale = 0.0 #global silicate Li weathering scaling default: 10.000
+rg_par_weather_Li_Roffset = 0.0 #global silicate Li weathering offset default: 1.400
+rg_par_weather_CaSiO3_Li_d7Li = 23.25 #global silicate (bulk Earth) d7Li (o/oo) default: 0.0
+#rg_par_weather_Li_7Li_epsilon = #secondary clay fractionation (o/oo) default: -16.0
+#
+# HYDROTHERMAL FLUX
+sg_par_sed_hydroip_fLi= 6E9 #hydrothermal Li flux (mol yr-1) default: 0.0
+sg_par_sed_hydroip_fLi_d7Li = 8.2 #hydrothermal Li flux d7Li (o/oo) default: 4.0 #was 8.3 8.2 too low
+#
+# CARBOANTE FRACTIONATION
+#bg_par_bio_red_CaCO3_LiCO3= #default CaCO3 Ca:Li ratio default: 0.0
+bg_par_bio_red_CaCO3_LiCO3_alpha= 0.02 #partition coefficient default: 1.0
+#bg_par_d7Li_LiCO3_epsilon= #fractionation factor between Li and LiCO3 default: 4.0
+#sg_par_bio_red_CaCO3_LiCO3= #default CaCO3 Ca:Li ratio default: 0.0
+sg_par_bio_red_CaCO3_LiCO3_alpha= 0.003444365 #partition coefficient default: 0.005
+#sg_par_d7Li_LiCO3_epsilon= #fractionation factor between Li and LiCO3 default: -2.0
+#
+# ALTERATION SINK
+sg_par_sed_lowTalt_fLi_alpha = 3.08094E-8 #Li low temperature alteration sink (mol yr-1) (Li/Ca normalized) default: 0.0 #4.5 too low 4.51 too high was 3.082
+#sg_par_sed_lowTalt_7Li_epsilon = #Li low temperature alteration sink 7Li epsilon (o/oo) default: -15.0
+#
+# CLAY SINK
+sg_par_sed_clay_fLi_alpha = 8.4 #Li clay formation sink (mol yr-1) (Li/Ca normalized) default: 0.0
+#sg_par_sed_clay_7Li_epsilon = #Li clay formation sink 7Li epsilon (o/oo) default: -15.0
+#
+# --- Sr CYCLE -------------------------------------------------
+#
+# INITIAL CONDITIONS
+bg_ocn_init_98= 92.837E-6#Sr
+bg_ocn_init_99= 0.0 #87Sr
+bg_ocn_init_100= 0.499 #88Sr
+#
+# RIVER FLUX
+rg_par_weather_CaSiO3_fracSr= 0.003 #global silicate Sr abundance (as a proportion of [Ca+Mg]) default: 0.00532
+#rg_par_weather_CaSiO3b_fracSr= #basaltic silicate Sr abundance (as a proportion of [Ca+Mg]) default: 0.0057471
+#rg_par_weather_CaSiO3g_fracSr= #granitic silicate Sr abundance (as a proportion of [Ca+Mg]) default: 0.0050847
+rg_par_weather_CaCO3_fracSr= 0.0019 #global carbonate Sr abundance (as a proportion of [Ca(+Mg)]) default: 0.002
+rg_par_weather_CaSiO3_r87Sr= 0.716 #mean silicate r87Ca default: 0.714124875207987 0.711 too low 0.712 too high
+#rg_par_weather_CaSiO3b_r87Sr= #basaltic silicate r87Ca default: 0.705
+#rg_par_weather_CaSiO3g_r87Sr= #granitic silicate r87Ca default: 0.71914
+rg_par_weather_CaCO3_r87Sr= 0.708 #mean carbonate r87Ca default: 0.7077
+rg_par_weather_CaSiO3_d88Sr= 0.36 #mean silicate d88Sr (o/oo) default: 0.36
+#rg_par_weather_CaSiO3b_d88Sr= #basaltic silicate d88Sr (o/oo) default: 0.36
+#rg_par_weather_CaSiO3g_d88Sr= #granitic silicate d88Sr (o/oo) default: 0.36
+rg_par_weather_CaCO3_d88Sr= 0.27 #mean carbonate d88Sr (o/oo) default: 0.16
+#
+# HYDROTHERMAL FLUX
+sg_par_sed_hydroip_fSr= 3.1E9 #hydrothermal Sr flux (mol yr-1) default: 3.1E9
+sg_par_sed_hydroip_fSr_r87Sr= 0.703 #hydrothermal Sr flux r87Sr (87/86) default: 0.7025
+sg_par_sed_hydroip_fSr_d88Sr= 0.256 #hydrothermal Sr flux d88Sr (o/oo) default: 0.24
+#
+# CARBOANTE FRACTIONATION
+bg_par_d88Sr_SrCO3_epsilon= -0.18 #88/86Sr fractionation between Sr and SrCO3 default: -0.236
+#bg_par_bio_red_CaCO3_SrCO3= #Default CaCO3 Ca:Sr ratio default: 0.0
+bg_par_bio_red_CaCO3_SrCO3_alpha= 0.18 #0.07 #partition coefficient default: 0.176
+sg_par_bio_red_CaCO3_SrCO3_alpha= 0.64581 #neritic carbonate partition coefficient default: 0.9 #0.645 too small 0.645835 too strong #was 0.64581
+sg_par_d88Sr_SrCO3_epsilon= -0.18 #88/86Sr fractionation between Sr and SrCO3 default: -0.236
+#
+# SEA FLOOR ALTERATION
+sg_par_sed_lowTalt_fSr_alpha= 0.0 #0.000000005 #Sr low-T alteration sink default: 0.0
+#
+# SEA FLOOR RECRYSTALIZATION
+#sg_par_sed_SrCO3recryst= 6.229E-5 #Prescribed SrCO3 recrystlization rate (mol cm-2 yr-1) default: 0.0
+sg_par_sed_SrCO3recrystTOT= 3.4E9 #Prescribed global SrCO3 recrystlization rate (mol yr-1) default: 0.0
+sg_par_r87Sr_SrCO3recryst= 0.7087 #r87Sr of recrystalizing SrCO3 default: 0.70838
+sg_par_d88Sr_SrCO3recryst= 0.39 #d88Sr of recrystalizing SrCO3 default: 0.172
+#
+# --- 44Ca CYCLE -----------------------------------------------
+
+# INITIAL CONDITIONS
+bg_ocn_init_35=1.025E-02
+bg_ocn_init_76=0.8
+#
+# RIVER FLUX
+# NOTE: Heiko values! (against SRM915) from Holden et al 2012
+rg_par_weather_CaSiO3_d44Ca=-0.94
+rg_par_weather_CaCO3_d44Ca=-1.0
+#
+# HYDROTHERMAL FLUX
+# NOTE: assume 2.0 Tmol yt-1 Ca input [Blattler et al., 2011] (and DePaolo [2004])
+# NOTE: assume 0.9 o/oo d44Ca input [Blattler et al., 2011] (and Heuser et al. [2005])
+sg_par_sed_hydroip_fCa=0.1981612E13
+sg_par_sed_hydroip_fCa_d44Ca=-0.9825
+#
+# CARBOANTE FRACTIONATION
+# NOTE: Heiko values! -1.1 for forams based on Holmden 2012
+sg_par_d44Ca_CaCO3_epsilon=-1.10
+bg_par_d44Ca_CaCO3_epsilon=-1.10
+#
+# --- END ------------------------------------------------------
+#
+#

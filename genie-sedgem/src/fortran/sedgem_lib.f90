@@ -87,8 +87,15 @@ MODULE sedgem_lib
   REAL::par_sed_diagen_fracC2Ppres_anox                          ! Fraction of P relative to C buried -- anoxic
   REAL::par_sed_diagen_fracC2Ppres_eux                           ! Fraction of P relative to C buried -- euxinic
   NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_ox,par_sed_diagen_fracC2Ppres_anox,par_sed_diagen_fracC2Ppres_eux
-  LOGICAL::ctrl_sed_huelse2017_remin_POP                         ! Force return of PO4 to ocean in HUELSE 2017 scheme
-  NAMELIST /ini_sedgem_nml/ctrl_sed_huelse2017_remin_POP  
+  REAL::par_sed_diagen_fracCpres_scale                           ! Fractional POC burial scaling (Dunne scheme)
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_fracCpres_scale
+  LOGICAL::ctrl_sed_diagen_fracC2Ppres_wallmann2010              ! Apply Wallmann [2010] C:P remin parameterization?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_diagen_fracC2Ppres_wallmann2010
+  REAL::par_sed_diagen_fracC2Ppres_off                           ! C:P remin C/P offset
+  REAL::par_sed_diagen_fracC2Ppres_c0_O2                         ! C:P remin [O2] threshold (mol kg-1)
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_off,par_sed_diagen_fracC2Ppres_c0_O2
+  LOGICAL::ctrl_sed_dunne2007_remin_POP                          ! Force return of PO4 to ocean in Dunne 2007 scheme
+  NAMELIST /ini_sedgem_nml/ctrl_sed_dunne2007_remin_POP  
   ! ------------------- DIAGENESIS SCHEME: ORGANIC MATTER HUELSE 2017 ------------------------------------------------------------ !
   character(len=63)::par_sed_huelse2017_kscheme                  ! Corg k parametrisation scheme ID string
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_kscheme
@@ -105,6 +112,8 @@ MODULE sedgem_lib
   REAL::par_sed_huelse2017_k2_order                              ! k2 = k1/par_sed_huelse2017_k2_order
   REAL::par_sed_huelse2017_k2_anoxic                             ! refractory degradation rate constant under anoxia, units of 1/yr
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_k1,par_sed_huelse2017_k2,par_sed_huelse2017_k2_order,par_sed_huelse2017_k2_anoxic 
+  LOGICAL::ctrl_sed_huelse2017_remin_POP                         ! Force return of PO4 to ocean in HUELSE 2017 scheme
+  NAMELIST /ini_sedgem_nml/ctrl_sed_huelse2017_remin_POP
   ! ------------------- DIAGENESIS SCHEME: ARCHER 1991 --------------------------------------------------------------------------- !
   REAL::par_sed_archer1991_dissc                                 ! dissolution rate constant, units of 1/s
   REAL::par_sed_archer1991_disscpct                              ! dissolution rate scaling (%)
@@ -173,13 +182,19 @@ MODULE sedgem_lib
   real::par_sed_hydroip_fLi_d7Li                                 ! hydrothermal Li flux d7Li (o/oo)                      
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fLi,par_sed_hydroip_fLi_d7Li
   real::par_sed_lowTalt_fLi_alpha                                ! Li low temperature alteration sink (mol yr-1) (Li/Ca normalized)
-  real::par_sed_lowTalt_7Li_epsilon                              ! Li low temperature alteration sink 7Li epsilon (o/oo)
+  real::par_sed_lowTalt_7Li_epsilon                              ! Li low temperature alteration sink 7Li epsilon (o/oo)           
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fLi_alpha,par_sed_lowTalt_7Li_epsilon
+  LOGICAL::ctrl_sed_lowTalt_7Li_epsilon_fixed                    ! fixed (non T-dependent) temperature alteration 7Li epsilon?           
+  NAMELIST /ini_sedgem_nml/ctrl_sed_lowTalt_7Li_epsilon_fixed
+  real::par_sed_lowTalt_7Li_epsilon_DT                           ! T-dependent D7Li sensitivity (o/oo K-1)             
+  NAMELIST /ini_sedgem_nml/par_sed_lowTalt_7Li_epsilon_DT
   real::par_sed_clay_fLi_alpha                                   ! Li clay formation sink (mol yr-1) (Li/Ca norm)
   real::par_sed_clay_7Li_epsilon                                 ! Li clay formation sink 7Li epsilon (o/oo)              
   NAMELIST /ini_sedgem_nml/par_sed_clay_fLi_alpha,par_sed_clay_7Li_epsilon
   LOGICAL::ctrl_sed_clay_7Li_epsilon_fixed                       ! fixed (non T-dependent) MACC 7Li epsilon?            
   NAMELIST /ini_sedgem_nml/ctrl_sed_clay_7Li_epsilon_fixed
+  real::par_sed_clay_7Li_epsilon_DT                              ! T-dependent D7Li sensitivity (o/oo K-1)             
+  NAMELIST /ini_sedgem_nml/par_sed_clay_7Li_epsilon_DT
   real::par_sed_hydroip_fCa                                      ! hydrothermal Ca flux (mol yr-1) 
   real::par_sed_hydroip_fCa_d44Ca                                ! hydrothermal Ca flux d44Ca (o/oo)                      
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fCa,par_sed_hydroip_fCa_d44Ca
@@ -199,17 +214,23 @@ MODULE sedgem_lib
   real::par_sed_hydroip_fDIC                                     ! hydrothermal CO2 outgassing (mol yr-1)    
   real::par_sed_hydroip_fDIC_d13C                                ! d13C                
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fDIC,par_sed_hydroip_fDIC_d13C
-  real::par_sed_Os_depTOT					 ! deposition rate of Os in oxic bottom waters (mol yr-1)
+  real::par_sed_Os_depTOT                                        ! deposition rate of Os in oxic bottom waters (mol yr-1)
   real::par_sed_Os_dep                                           ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
-  real::par_sed_Os_dep_oxic					 ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
-  real::par_sed_Os_dep_suboxic					 ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_oxic                                      ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_suboxic                                   ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
   real::par_sed_Os_O2_threshold                                  ! oxygen threshold for oxic/suboxic deposition
-  logical::ctrl_sed_Os_O2                                           ! switch to turn on oxygen dependent deposition
+  logical::ctrl_sed_Os_O2                                        ! switch to turn on oxygen dependent deposition
   NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic,par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
-  real::par_sed_hydroip_fOs					 ! hydrothermal Os flux (mol yr-1)
-  real::par_sed_hydroip_fOs_187Os_188Os				 ! 187Os/188Os ratio of hydrothermal Os flux
-  real::par_sed_hydroip_fOs_188Os_192Os				 ! 188Os/192Os ratio of hydrothermal Os flux
+  real::par_sed_hydroip_fOs                                      ! hydrothermal Os flux (mol yr-1)
+  real::par_sed_hydroip_fOs_187Os_188Os                          ! 187Os/188Os ratio of hydrothermal Os flux
+  real::par_sed_hydroip_fOs_188Os_192Os                          ! 188Os/192Os ratio of hydrothermal Os flux
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fOs,par_sed_hydroip_fOs_187Os_188Os,par_sed_hydroip_fOs_188Os_192Os
+  logical::ctrl_sed_Fhydr2D                                      ! Make hydrothermal input 2D?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_Fhydr2D
+  CHARACTER(len=127)::par_sed_Fhydr2D_name                       ! 2D hydrothermal input filename
+  NAMELIST /ini_sedgem_nml/par_sed_Fhydr2D_name
+  real::par_sed_T0C                                              ! Mean ocean floor reference temeprature (C)                  
+  NAMELIST /ini_sedgem_nml/par_sed_T0C
   ! ------------------- MISC CONTROLS -------------------------------------------------------------------------------------------- !
   logical::ctrl_sed_forcedohmega_ca                              ! Ca-only adjustment for forced ocean saturation?
   NAMELIST /ini_sedgem_nml/ctrl_sed_forcedohmega_ca
@@ -281,7 +302,7 @@ MODULE sedgem_lib
   INTEGER,PARAMETER::n_i = ilon1_sed                           ! max i dimension copied from genie_control
   INTEGER,PARAMETER::n_j = ilat1_sed                           ! max j dimension copied from genie_control
   ! grid properties array dimensions 
-  INTEGER,PARAMETER::n_phys_sed     = 14                       ! # grid properties descriptors
+  INTEGER,PARAMETER::n_phys_sed     = 15                       ! # grid properties descriptors
   ! options array dimensions
   INTEGER,PARAMETER::n_opt_sed      = 26                       ! 
   ! 
@@ -301,8 +322,9 @@ MODULE sedgem_lib
   INTEGER,PARAMETER::ips_mask_sed                         = 10 ! sediment grid point mask (sediment = 1.0)
   INTEGER,PARAMETER::ips_mask_sed_reef                    = 11 ! reef grid point mask (reef = 1.0)
   INTEGER,PARAMETER::ips_mask_sed_muds                    = 12 ! shallow sediment grid point mask (muds = 1.0)
-  INTEGER,PARAMETER::ips_poros                            = 13 ! sediment surface porosity
-  INTEGER,PARAMETER::ips_mix_k0                           = 14 ! maximum (surface) sediment bioturbation mixing rate (cm2 yr-1)
+  INTEGER,PARAMETER::ips_mask_sed_hydr                    = 13 ! hydrothermal grid point mask (input == 1.0)
+  INTEGER,PARAMETER::ips_poros                            = 14 ! sediment surface porosity
+  INTEGER,PARAMETER::ips_mix_k0                           = 15 ! maximum (surface) sediment bioturbation mixing rate (cm2 yr-1)
   ! options - sediements
   INTEGER,PARAMETER::iopt_sed_save_diag_final             = 20 ! save final sediment data?
   INTEGER,PARAMETER::iopt_sed_save_diag                   = 21 ! save sediment diagnostics time-slice data?
@@ -364,6 +386,7 @@ MODULE sedgem_lib
        & 'mask_sed        ', &
        & 'mask_sed_reef   ', &
        & 'mask_sed_muds   ', &
+       & 'mask_sed_hydr   ', &
        & 'poros           ', &
        & 'misc_k0         ' /)
   ! sediment diagnostics
@@ -415,6 +438,7 @@ MODULE sedgem_lib
   LOGICAL,ALLOCATABLE,DIMENSION(:,:)::sed_mask                 ! sediment mask (.TRUE. == sediment grid point exists)
   LOGICAL,ALLOCATABLE,DIMENSION(:,:)::sed_mask_reef            ! shallow water sediment mask - coral reefs
   LOGICAL,ALLOCATABLE,DIMENSION(:,:)::sed_mask_muds            ! shallow water sediment mask - muds
+  REAL,ALLOCATABLE,DIMENSION(:,:)::sed_mask_hydr               ! hydrothermal input mask
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)::sed                     ! the sediment layer stack
   REAL,ALLOCATABLE,DIMENSION(:,:,:)::sed_top                   ! top sedimentary layer
   REAL,ALLOCATABLE,DIMENSION(:,:)::sed_top_h                   ! top height of sedimentary column (cm)

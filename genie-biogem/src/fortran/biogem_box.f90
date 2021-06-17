@@ -868,8 +868,8 @@ CONTAINS
        ! prescribed POC flux
        ! NOTE: force_restore_docn_nuts has been assigned a negative sign (in the forcing update of the main biogem subroutine) ...
        ! NOTE: allow depletion of PO4 < 0.0 so as to force export production to the prescribed value
-       ! NOTE: correct for DOM (given that force_restore_docn_nuts has been devied from a prescribed particulate flux)
-       loc_dPO4 = -force_restore_docn_nuts(io_PO4)/(1.0 - loc_bio_red_DOMtotal)
+       ! NOTE: DO NOT correct for DOM here
+       loc_dPO4 = -force_restore_docn_nuts(io_PO4)
     CASE ( &
          & '2N2T_PN_Tdep' &
          & )
@@ -914,7 +914,6 @@ CONTAINS
        else
           loc_frac_N2fix = 0.0
        end if
-
     CASE ( &
          & '3N2T_PNFe_Tdep' &
          & )
@@ -1023,6 +1022,11 @@ CONTAINS
        loc_bio_red_RDOMfrac = 1.0 - loc_bio_red_DOMfrac
        loc_bio_red_DOMtotal = 1.0
     end if
+    ! now correct fixed POC export scheme for (total) DOM production
+    SELECT CASE (par_bio_prodopt)
+    CASE ('bio_POCflux')
+       if ((1.0 - loc_bio_red_DOMtotal) > const_rns) loc_dPO4 = loc_dPO4/(1.0 - loc_bio_red_DOMtotal)
+    end select
 
     ! *** ADJUST PARTICULATE COMPOSITION 'REDFIELD' RATIOS *********************************************************************** !
     !
@@ -2931,9 +2935,20 @@ CONTAINS
     ! -------------------------------------------------------- ! test for possibilty of precip in water column
     ! if so: assume particules could be present at any/every depth in the local water column
     ! if not: assume particulates present only in surface layer
+    ! NOTE: check for a benthic (or sub-benthic) part6icle flux forcing (i.e. other than surface)
+    !       and be sure to also then search the full water column for particles
+    ! NOTE: used maxval with FINDLOC becasue the returned variable is a vector
+    ! NOTE: FINDLOC is 2008 FORTRAN and not friendly to old compilers ...
     if (sed_select(is_Fe3Si2O4) .OR. sed_select(is_FeCO3) .OR. sed_select(is_FeS2) .OR. sed_select(is_FeOOH)) then
        loc_klim = loc_k1
+!!$    elseif (maxval(FINDLOC(force_sed_uniform(:),-2)) > 0) then
+    elseif (fun_find_int_i(-2,force_sed_uniform(:)) > 0) then
+       loc_klim = loc_k1
+!!$    elseif (maxval(FINDLOC(force_sed_uniform(:),-5)) > 0) then
+    elseif (fun_find_int_i(-5,force_sed_uniform(:)) > 0) then
+       loc_klim = loc_k1       
     end if
+    ! -------------------------------------------------------- !
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
@@ -2941,7 +2956,7 @@ CONTAINS
        loc_diag_redox(:,:)  = 0.0
        loc_diag_precip(:,:) = 0.0
     end if
-
+    
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ! *** k WATER-COLUMN LOOP START ***
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -2949,13 +2964,15 @@ CONTAINS
     DO k=n_k,loc_klim,-1
        ! find some particulates in the water column
        ! NOTE: save total mineral load (seperately from total particulate load)
+       ! NOTE: allow for non-zero negative sediment concentrations (which can arise from a negatve particle flux)
+       !       to be detected ...
        loc_part_tot = 0.0
        if (sed_select(is_CaCO3)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_CaCO3),k)
        if (sed_select(is_opal))  loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
        if (sed_select(is_det))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
        loc_part_tot_mineral = loc_part_tot
        if (sed_select(is_POC))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
-       If (loc_part_tot  > const_real_nullsmall) then
+       If (abs(loc_part_tot)  > const_real_nullsmall) then
           ! if the identified particulate material is already residing in the bottom-most ocean layer, flag as sediment flux
           If (k == loc_k1) then
              loc_bio_remin_min_k = loc_k1 - 1
@@ -3132,7 +3149,7 @@ CONTAINS
              ! if (sed_select(is_xxx)) then
              ! end if
              ! ################################################################################################################### !
-          end If
+          end if
 
           ! >>>>>>>>>>>>>>>>>>>>>>>>>
           ! *** kk SUB-LOOP START ***
@@ -4263,6 +4280,8 @@ CONTAINS
     else
        loc_Os_scavenging = 0.0
     end if
+    ! Make sure the amount of scavenged Os >= 0
+    loc_Os_scavenging = max(0.0,loc_Os_scavenging)
     ! Assume no isotopic fractionation during scavenging
     loc_Os_187Os_scavenging = loc_Os_187Os*loc_Os_scavenging/loc_Os
     loc_Os_188Os_scavenging = loc_Os_188Os*loc_Os_scavenging/loc_Os

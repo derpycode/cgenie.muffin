@@ -451,6 +451,7 @@ CONTAINS
 
     ! local variables
     INTEGER                         :: i, j, k
+    REAL                            :: n, m
     REAL                            :: loc_avSLT
     REAL                            :: loc_SLT(n_i,n_j)
     REAL                            :: loc_SLT0
@@ -472,12 +473,16 @@ CONTAINS
     REAL                            :: loc_CO20
     REAL                            :: loc_maxCO2
     REAL                            :: loc_minCO2
-    !REAL                            :: loc_A
     REAL                            :: loc_weather_ratio_CaSiO3
     REAL                            :: loc_weather_ratio_CaSiO3b
     REAL                            :: loc_weather_ratio_CaSiO3g
     REAL                            :: loc_weather_ratio_CaCO3
-    REAL                            :: n, m
+    REAL                            :: loc_weather_ratio_CaSiO3_WD
+    
+    real::loc_weather_CaCO3   ! (climate) modified CaCO3 weathering flux
+    real::loc_weather_CaSiO3  ! (climate) modified CaSiO3 weathering flux
+    real::loc_weather_CaSiO3b ! (climate) modified CaSiO3 weathering flux
+    real::loc_weather_CaSiO3g ! (climate) modified CaSiO3 weathering flux
 
     REAL                            :: loc_force_flux_weather_a(n_atm)            ! total fluxes (atmosphere variables) 
     REAL                            :: loc_force_flux_weather_a_percell(n_ocn)                    ! flux per grid cell for even distribution (atmosphere variables)
@@ -725,13 +730,13 @@ CONTAINS
     ! -------------------------------------------------------- ! enhance weathering for highly weatherable reservoir
     ! partially consistent with Mills et al. [2011] (and see thesis)
     ! the difference being that enhanced weathering is applied as a scalar to existing modifier rather than an absolute limit
-    if (par_weather_fCaCO3_enh_nt > const_real_nullsmall) then
+    if (par_weather_CaCO3_enh_nt > const_real_nullsmall) then
        ! SIMPLER: the enhancement of weathering is uniform until the 'reservoir' of easily weatherable material is depleted
-       loc_weather_ratio_CaCO3 = par_weather_fCaCO3_enh_n*loc_weather_ratio_CaCO3
-       par_weather_fCaCO3_enh_nt = par_weather_fCaCO3_enh_nt - conv_s_yr*dum_dts*par_weather_fCaCO3_enh_n
+       loc_weather_ratio_CaCO3 = par_weather_CaCO3_enh_n*loc_weather_ratio_CaCO3
+       par_weather_CaCO3_enh_nt = par_weather_CaCO3_enh_nt - conv_s_yr*dum_dts*par_weather_CaCO3_enh_n
     end if
-    ! -------------------------------------------------------- ! set actual weathering flux
-    weather_fCaCO3  = loc_weather_ratio_CaCO3*par_weather_CaCO3
+    ! -------------------------------------------------------- ! set actual (adjusted) carbonate weathering flux
+    adj_weather_CaCO3 = loc_weather_ratio_CaCO3*par_weather_CaCO3
     ! -------------------------------------------------------- !
 
     ! -------------------------------------------------------- !
@@ -760,14 +765,17 @@ CONTAINS
        n = exp(par_k_Tg*(loc_avSLT - loc_SLT0))
        IF (n < 0.0) n = 0.0
        loc_weather_ratio_CaSiO3g = n 
-       n = 0.0       
+       n = (loc_weather_ratio_CaSiO3b+loc_weather_ratio_CaSiO3g)/2.0   
     case default
        n = 1.0
     end select
-    loc_weather_ratio_CaSiO3 = n    
+    loc_weather_ratio_CaSiO3    = n
+    loc_weather_ratio_CaSiO3_WD = loc_weather_ratio_CaSiO3
     ! -------------------------------------------------------- ! (2) additional weathering rate modifiers
     ! NOTE: make sure that weathering modifiers stay positive
     ! NOTE: these modifiers are cumulative (in a product sense)
+    ! NOTE: do not update loc_weather_ratio_CaSiO3_WD ... impact of rainfall (R) and productivity (P) modifiers
+    !       on W/D need to be sorted out 'properly'
     IF (opt_weather_R_Si) THEN
        IF (opt_weather_R_explicit) THEN
           n = (loc_R/loc_R0)**par_beta
@@ -796,58 +804,77 @@ CONTAINS
     ! -------------------------------------------------------- ! enhance weathering for highly weatherable reservoir
     ! partially consistent with Mills et al. [2011] (and see thesis)
     ! the difference being that enhanced weathering is applied as a scalar to existing modifier rather than an absolute limit
-    if (par_weather_fCaSiO3_enh_nt > const_real_nullsmall) then
+    if (par_weather_CaSiO3_enh_nt > const_real_nullsmall) then
        ! SIMPLER: the enhancement of weathering is uniform until the 'reservoir' of easily weatherable material is depleted
-       loc_weather_ratio_CaSiO3 = par_weather_fCaSiO3_enh_n*loc_weather_ratio_CaSiO3
-       par_weather_fCaSiO3_enh_nt = par_weather_fCaSiO3_enh_nt - conv_s_yr*dum_dts*loc_weather_ratio_CaSiO3
+       loc_weather_ratio_CaSiO3  = par_weather_CaSiO3_enh_n*loc_weather_ratio_CaSiO3
+       par_weather_CaSiO3_enh_nt = par_weather_CaSiO3_enh_nt - conv_s_yr*dum_dts*loc_weather_ratio_CaSiO3
     end if
-    ! -------------------------------------------------------- ! set actual weathering flux
+    ! -------------------------------------------------------- ! set actual (adjusted) silicate weathering flux
     select case (opt_weather_CaSiO3)
     case ("Wallmann")
-       weather_fCaSiO3b = loc_weather_ratio_CaSiO3b*par_weather_CaSiO3b
-       weather_fCaSiO3g = loc_weather_ratio_CaSiO3g*par_weather_CaSiO3g 
-       weather_fCaSiO3  = weather_fCaSiO3b + weather_fCaSiO3g
+       adj_weather_CaSiO3b = loc_weather_ratio_CaSiO3b*par_weather_CaSiO3b
+       adj_weather_CaSiO3g = loc_weather_ratio_CaSiO3g*par_weather_CaSiO3g 
+       adj_weather_CaSiO3  = adj_weather_CaSiO3b + adj_weather_CaSiO3g
     case default
-       weather_fCaSiO3  = loc_weather_ratio_CaSiO3*par_weather_CaSiO3
-       weather_fCaSiO3b = weather_fCaSiO3/2.0
-       weather_fCaSiO3g = weather_fCaSiO3/2.0
+       adj_weather_CaSiO3  = loc_weather_ratio_CaSiO3*par_weather_CaSiO3
+       adj_weather_CaSiO3b = adj_weather_CaSiO3/2.0
+       adj_weather_CaSiO3g = adj_weather_CaSiO3/2.0
+       ! create basaltic/granitic parameter values
+       par_weather_CaSiO3b = par_weather_CaSiO3/2.0
+       par_weather_CaSiO3g = par_weather_CaSiO3/2.0
        par_weather_CaSiO3b_fracMg = par_weather_CaSiO3_fracMg
        par_weather_CaSiO3g_fracMg = par_weather_CaSiO3_fracMg
     end select
     ! -------------------------------------------------------- !
 
     ! -------------------------------------------------------- !
-    ! CALCULATE DERIVED ELEMETAL (AND ISOTOPIC) FLUXES
+    ! CALCULATE PRIMARY ELEMETAL (AND ISOTOPIC) FLUXES
     ! -------------------------------------------------------- !
-    ! cations and alkalinity
+    ! -------------------------------------------------------- ! (0) set local weathering
+    ! NOTE: allow the primary silicate weathering to be 'fixed'
+    !       (even as the derived elements could vary in response to climate)
+    ! NOTE: implicitly, granitic is distinguished from basaltic weathering
+    if (opt_weather_fixed_CaCO3) then
+       loc_weather_CaCO3   = par_weather_CaCO3
+    else
+       loc_weather_CaCO3   = adj_weather_CaCO3
+    end if
+    if (opt_weather_fixed_CaSiO3) then
+       loc_weather_CaSiO3  = par_weather_CaSiO3
+       loc_weather_CaSiO3b = par_weather_CaSiO3b
+       loc_weather_CaSiO3g = par_weather_CaSiO3g
+    else
+       loc_weather_CaSiO3  = adj_weather_CaSiO3
+       loc_weather_CaSiO3b = adj_weather_CaSiO3b
+       loc_weather_CaSiO3g = adj_weather_CaSiO3g
+    end if
+    ! -------------------------------------------------------- ! (1) cations and alkalinity 
     loc_force_flux_weather_o(io_Ca) = &
-         & (1.0 - par_weather_CaSiO3b_fracMg)*weather_fCaSiO3b + (1.0 - par_weather_CaSiO3g_fracMg)*weather_fCaSiO3g + &
-         & weather_fCaCO3
+         & (1.0 - par_weather_CaSiO3b_fracMg)*loc_weather_CaSiO3b + (1.0 - par_weather_CaSiO3g_fracMg)*loc_weather_CaSiO3g + &
+         & loc_weather_CaCO3
     loc_force_flux_weather_o(io_Mg) = &
-         & par_weather_CaSiO3b_fracMg*weather_fCaSiO3b + par_weather_CaSiO3g_fracMg*weather_fCaSiO3g
-    loc_force_flux_weather_o(io_ALK) = 2.0*weather_fCaSiO3 + 2.0*weather_fCaCO3
-
-    ! bulk carbon
+         & par_weather_CaSiO3b_fracMg*loc_weather_CaSiO3b + par_weather_CaSiO3g_fracMg*loc_weather_CaSiO3g
+    loc_force_flux_weather_o(io_ALK) = 2.0*loc_weather_CaSiO3 + 2.0*loc_weather_CaCO3
+    ! -------------------------------------------------------- ! (2) bulk carbon
     IF (opt_short_circuit_atm.eqv..true.) THEN
        IF (opt_outgas_eq_Si.eqv..true.) THEN
-          loc_force_flux_weather_o(io_DIC) = weather_fCaSiO3 + weather_fCaCO3
+          loc_force_flux_weather_o(io_DIC) = loc_weather_CaSiO3 + loc_weather_CaCO3
        ELSE
-          loc_force_flux_weather_o(io_DIC) = par_outgas_CO2 + weather_fCaCO3
+          loc_force_flux_weather_o(io_DIC) = par_outgas_CO2 + loc_weather_CaCO3
        ENDIF
     ELSE
        IF (opt_outgas_eq_Si.eqv..true.) THEN
           ! NOTE: '-' because coming out of atmosphere
           ! NOTE: not 2.0*weather_fCaSiO3 becasue outgassing is being assumed to balance net silicate weathering
-          loc_force_flux_weather_a(ia_PCO2) = -(weather_fCaSiO3 + weather_fCaCO3)
+          loc_force_flux_weather_a(ia_PCO2) = -(loc_weather_CaSiO3 + loc_weather_CaCO3)
        ELSE 
           ! NOTE: '-' because coming out of atmosphere
           ! NOTE: straight-forward -- outgassing minus CO2 consumed in weathering
-          loc_force_flux_weather_a(ia_PCO2) = par_outgas_CO2 -(2.0*weather_fCaSiO3 + weather_fCaCO3)
+          loc_force_flux_weather_a(ia_PCO2) = par_outgas_CO2 -(2.0*loc_weather_CaSiO3 + loc_weather_CaCO3)
        ENDIF
-       loc_force_flux_weather_o(io_DIC) = 2.0*weather_fCaSiO3 + 2.0*weather_fCaCO3
+       loc_force_flux_weather_o(io_DIC) = 2.0*loc_weather_CaSiO3 + 2.0*loc_weather_CaCO3
     ENDIF
-
-    ! d13C
+    ! -------------------------------------------------------- ! (3) bulk carbon -- d13C
     ! NOTE: does not matter how the standard is derived -- it is al the same standard! (13C)
     loc_standard = const_standards(atm_type(ia_pCO2_13C))
     loc_d13C = fun_calc_isotope_delta( &
@@ -856,47 +883,88 @@ CONTAINS
     IF (opt_short_circuit_atm.eqv..true.) THEN
        IF (opt_outgas_eq_Si.eqv..true.) THEN
           loc_force_flux_weather_o(io_DIC_13C) =  &
-               & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3 + &
-               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3
+               & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*loc_weather_CaSiO3 + &
+               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*loc_weather_CaCO3
        ELSE
           loc_force_flux_weather_o(io_DIC_13C) =  &
                & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*par_outgas_CO2 + &
-               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3       
+               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*loc_weather_CaCO3       
        ENDIF
     ELSE
        IF (opt_outgas_eq_Si.eqv..true.) THEN
           ! NOTE: '-' because coming out of atmosphere
           loc_force_flux_weather_a(ia_pCO2_13C) = &
                & -( &
-               &   fun_calc_isotope_fraction(loc_d13C,loc_standard)*weather_fCaSiO3 + &
-               &   fun_calc_isotope_fraction(loc_d13C,loc_standard)*weather_fCaCO3 &
+               &   fun_calc_isotope_fraction(loc_d13C,loc_standard)*loc_weather_CaSiO3 + &
+               &   fun_calc_isotope_fraction(loc_d13C,loc_standard)*loc_weather_CaCO3 &
                & ) 
        ELSE
           ! NOTE: '-' because coming out of atmosphere
           loc_force_flux_weather_a(ia_pCO2_13C) = &
                & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*par_outgas_CO2 - & 
                & ( &
-               & 2.0*fun_calc_isotope_fraction(loc_d13C,loc_standard)*weather_fCaSiO3 + &
-               & fun_calc_isotope_fraction(loc_d13C,loc_standard)*weather_fCaCO3 &
+               & 2.0*fun_calc_isotope_fraction(loc_d13C,loc_standard)*loc_weather_CaSiO3 + &
+               & fun_calc_isotope_fraction(loc_d13C,loc_standard)*loc_weather_CaCO3 &
                & ) 
        ENDIF
        loc_standard = const_standards(ocn_type(io_DIC_13C))
        loc_force_flux_weather_o(io_DIC_13C) = &
-            & 2.0*fun_calc_isotope_fraction(loc_d13C,loc_standard)*weather_fCaSiO3 + &
-            & fun_calc_isotope_fraction(loc_d13C,loc_standard)*weather_fCaCO3 + &
-            & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3
+            & 2.0*fun_calc_isotope_fraction(loc_d13C,loc_standard)*loc_weather_CaSiO3 + &
+            & fun_calc_isotope_fraction(loc_d13C,loc_standard)*loc_weather_CaCO3 + &
+            & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*loc_weather_CaCO3
     ENDIF
-    ! d14C
-    ! NOTE assume completely radio carbon dead ...
+    ! -------------------------------------------------------- ! (4) bulk carbon -- d14C
+    ! NOTE: assume completely radiocarbon dead ...
     loc_force_flux_weather_o(io_DIC_14C) = 0.0
+    ! -------------------------------------------------------- ! (5) Ca ISOTOPES
+    ! NOTE: Ca from both CaCO3 and the fraction of CaSiO3 that is not assumed Mg
+    loc_standard = const_standards(ocn_type(io_Ca_44Ca))
+    ! silicate 44Ca weathering flux
+    loc_epsilon = par_weather_CaSiO3_d44Ca
+    loc_force_flux_weather_o(io_Ca_44Ca) = loc_force_flux_weather_o(io_Ca_44Ca) + &
+         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*(1.0 - par_weather_CaSiO3_fracMg)*loc_weather_CaSiO3
+    ! carbonate 44Ca weathering flux
+    loc_epsilon = par_weather_CaCO3_d44Ca
+    loc_force_flux_weather_o(io_Ca_44Ca) = loc_force_flux_weather_o(io_Ca_44Ca) + &
+         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*loc_weather_CaCO3
+    ! -------------------------------------------------------- ! 
 
+    ! -------------------------------------------------------- !
+    ! CALCULATE DERIVED ELEMETAL (AND ISOTOPIC) FLUXES
+    ! -------------------------------------------------------- !
+    
     ! ######################################################################################################################### !
     ! LITHIUM CODE
-    ! bulk silicate Li weathering flux
-    loc_force_flux_weather_o(io_Li) = loc_force_flux_weather_o(io_Li) + &
-         & par_weather_CaSiO3_fracLi*weather_fCaSiO3
+    ! fixed vs. W/D empirical relationship -- see: Pogge von Strandmann [2020] (Elements)
+    ! NOTE: previously: weather_fCaSiO3 = loc_weather_ratio_CaSiO3*par_weather_CaSiO3
+    !       (and may have been further modified)
+    !       loc_weather_ratio_CaSiO3_WD == loc_weather_ratio_CaSiO3 before further modifications are carried out
+    ! (0) set local weathering fluxes
+    !     NOTE: granitic IS NOT distinguished from basaltic weathering
+    if (opt_weather_fixed_Li) then
+       loc_weather_CaCO3  = par_weather_CaCO3
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaCO3  = adj_weather_CaCO3
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    ! calculate Li weathering
+    select case (opt_weather_CaSiO3_fracLi)
+    case ("Pogge")
+       ! bulk silicate Li weathering flux
+       ! NOTE: yield increases with loc_weather_ratio_CaSiO3_WD
+       loc_force_flux_weather_o(io_Li) = loc_force_flux_weather_o(io_Li) + &
+            & par_weather_CaSiO3_fracLi*loc_weather_CaSiO3*exp(0.4883*log(loc_weather_ratio_CaSiO3_WD))
+       ! calculate net Li isotopic weathering signature
+       ! NOTE: epsilon decreases with loc_weather_ratio_CaSiO3_WD
+       ! NOTE: 0.6 o/oo == crustal mean (as a minimum possible value of weathered d7Li)
+       loc_standard = const_standards(ocn_type(io_Li_7Li))
+       loc_epsilon  = par_weather_CaSiO3_Li_d7Li - 5.4079*log(loc_weather_ratio_CaSiO3_WD)
+       loc_epsilon  = max(0.6,loc_epsilon)
+    case ("OLD")
 !!$    ! adjust dissolved load for clay formation
-!!$    loc_R_flux = 1.0/(1.0 + exp(par_weather_Li_Rscale*(1.0 - loc_weather_ratio_CaSiO3 + par_weather_Li_Roffset/par_weather_Li_Rscale)))
+!!$    loc_R_flux = 1.0/ &
+!!$         & (1.0 + exp(par_weather_Li_Rscale*(1.0 - loc_weather_ratio_CaSiO3 + par_weather_Li_Roffset/par_weather_Li_Rscale)))
 !!$    loc_force_flux_weather_o(io_Li) = loc_R_flux*loc_force_flux_weather_o(io_Li)
 !!$    ! calculate clay fractionation
 !!$    IF (loc_weather_ratio_CaSiO3 > const_real_nullsmall) then
@@ -904,36 +972,44 @@ CONTAINS
 !!$    else
 !!$       loc_epsilon = par_weather_CaSiO3_Li_d7Li
 !!$    end IF
-    ! calculate net Li isotopic weathering signature
-    loc_standard = const_standards(ocn_type(io_Li_7Li))
-    loc_epsilon = par_weather_CaSiO3_Li_d7Li
+    case default
+       ! bulk silicate Li weathering flux
+       loc_force_flux_weather_o(io_Li) = loc_force_flux_weather_o(io_Li) + &
+            & par_weather_CaSiO3_fracLi*loc_weather_CaSiO3
+       ! calculate net Li isotopic weathering signature
+       loc_standard = const_standards(ocn_type(io_Li_7Li))
+       loc_epsilon  = par_weather_CaSiO3_Li_d7Li
+    end select
+    ! optional additional T-dep clay 7Li fractionation
+    if (.NOT. ctrl_weather_CaSiO3_7Li_epsilon_fixed) then
+       loc_epsilon = loc_epsilon + par_weather_CaSiO3_7Li_epsilon_DT * (loc_avSLT - loc_SLT0)
+    end if
+    ! calculate isotopic weathering flux
     loc_force_flux_weather_o(io_Li_7Li) = loc_force_flux_weather_o(io_Li_7Li) + &
          & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*loc_force_flux_weather_o(io_Li)
     ! bulk carbonate flux
-    ! 
-    ! *** DISCOUNT LI CONTENT OF CARBONATES ***
-    ! 
-    ! ######################################################################################################################### !
-
-    ! ######################################################################################################################### !
-    ! Ca ISOTOPES
-    loc_standard = const_standards(ocn_type(io_Ca_44Ca))
-    ! silicate 44Ca weathering flux
-    loc_epsilon = par_weather_CaSiO3_d44Ca
-    loc_force_flux_weather_o(io_Ca_44Ca) = loc_force_flux_weather_o(io_Ca_44Ca) + &
-         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*(1.0 - par_weather_CaSiO3_fracMg)*weather_fCaSiO3
-    ! carbonate 44Ca weathering flux
-    loc_epsilon = par_weather_CaCO3_d44Ca
-    loc_force_flux_weather_o(io_Ca_44Ca) = loc_force_flux_weather_o(io_Ca_44Ca) + &
-         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*weather_fCaCO3
+    ! NOTE: *** DISCOUNT LI CONTENT OF CARBONATES ***
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
     ! STRONTIUM CODE
+    ! (0) set local weathering fluxes
+    !     NOTE: implicitly, granitic is distinguished from basaltic weathering
+    if (opt_weather_fixed_Sr) then
+       loc_weather_CaCO3   = par_weather_CaCO3
+       loc_weather_CaSiO3  = par_weather_CaSiO3
+       loc_weather_CaSiO3b = par_weather_CaSiO3b
+       loc_weather_CaSiO3g = par_weather_CaSiO3g
+    else
+       loc_weather_CaCO3   = adj_weather_CaCO3
+       loc_weather_CaSiO3  = adj_weather_CaSiO3
+       loc_weather_CaSiO3b = adj_weather_CaSiO3b
+       loc_weather_CaSiO3g = adj_weather_CaSiO3g
+    end if
     ! (1) carbonate Sr weathering flux
     ! initialization -- populate array with bulk flux and isotopic delta values
     loc_weather_o(:) = 0.0
-    loc_weather_o(io_Sr) = par_weather_CaCO3_fracSr*weather_fCaCO3
+    loc_weather_o(io_Sr) = par_weather_CaCO3_fracSr*loc_weather_CaCO3
     loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaCO3_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
     loc_weather_o(io_Sr_88Sr) = par_weather_CaCO3_d88Sr
     ! calculate Sr ISOTOPES -- 87Sr
@@ -952,7 +1028,7 @@ CONTAINS
     ! initialization
     ! NOTE: populate array with bulk flux and isotopic delta values
     loc_weather_o(:) = 0.0
-    loc_weather_o(io_Sr) = par_weather_CaSiO3b_fracSr*weather_fCaSiO3b
+    loc_weather_o(io_Sr) = par_weather_CaSiO3b_fracSr*loc_weather_CaSiO3b
     loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3b_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
     loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3b_d88Sr
     ! calculate Sr ISOTOPES -- 87Sr
@@ -967,7 +1043,7 @@ CONTAINS
     ! initialization
     ! NOTE: populate array with bulk flux and isotopic delta values
     loc_weather_o(:) = 0.0
-    loc_weather_o(io_Sr) = par_weather_CaSiO3g_fracSr*weather_fCaSiO3g
+    loc_weather_o(io_Sr) = par_weather_CaSiO3g_fracSr*loc_weather_CaSiO3g
     loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3g_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
     loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3g_d88Sr
     ! calculate Sr ISOTOPES -- 87Sr
@@ -984,7 +1060,7 @@ CONTAINS
     ! initialization
     ! NOTE: populate array with bulk flux and isotopic delta values
     loc_weather_o(:) = 0.0
-    loc_weather_o(io_Sr) = par_weather_CaSiO3_fracSr*weather_fCaSiO3
+    loc_weather_o(io_Sr) = par_weather_CaSiO3_fracSr*loc_weather_CaSiO3
     loc_weather_o(io_Sr_87Sr) = 1000.0*(par_weather_CaSiO3_r87Sr/const_standardsR(ocn_type(io_Sr_87Sr)) - 1.0)
     loc_weather_o(io_Sr_88Sr) = par_weather_CaSiO3_d88Sr
     ! calculate Sr ISOTOPES -- 87Sr
@@ -1001,12 +1077,22 @@ CONTAINS
 
     ! ######################################################################################################################### !
     ! OSMIUM CODE
+    ! (0) set local weathering fluxes
+    !     NOTE: granitic IS NOT distinguished from basaltic weathering
+    if (opt_weather_fixed_Os) then
+       loc_weather_CaCO3  = par_weather_CaCO3
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaCO3  = adj_weather_CaCO3
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    ! (1) carbonate weathering
     ! initialization
     ! NOTE: populate array with bulk flux and isotopic delta values
     loc_weather_o(:) = 0.0
-    loc_weather_o(io_Os) = par_weather_fracOs*(weather_fCaCO3 + weather_fCaSiO3)
-    loc_weather_o(io_Os_187Os) = 1000.0*(par_weather_187Os_188Os*par_weather_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
-    loc_weather_o(io_Os_188Os) = 1000.0*(par_weather_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+    loc_weather_o(io_Os) = par_weather_CaCO3_fracOs*loc_weather_CaCO3
+    loc_weather_o(io_Os_187Os) = 1000.0*(par_weather_CaCO3_187Os_188Os*par_weather_CaCO3_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+    loc_weather_o(io_Os_188Os) = 1000.0*(par_weather_CaCO3_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
     ! calculate Os ISOTOPES -- 187Os
     ! NOTE: do not update <loc_weather_o> yet as it is needed for the d188Os calculation ...
     loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),1)
@@ -1016,29 +1102,71 @@ CONTAINS
     loc_weather_o(io_Os_187Os) = loc_187Os
     loc_weather_o(io_Os_188Os) = loc_188Os
     loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
-
-!    print*,loc_force_flux_weather_o(io_Os)-loc_force_flux_weather_o(io_Os_187Os)-loc_force_flux_weather_o(io_Os_192Os)
-
+    ! (2) silicate weathering
+    ! initialization
+    ! NOTE: populate array with bulk flux and isotopic delta values
+    loc_weather_o(:) = 0.0
+    loc_weather_o(io_Os) = par_weather_CaSiO3_fracOs*loc_weather_CaSiO3
+    loc_weather_o(io_Os_187Os) = 1000.0*(par_weather_CaSiO3_187Os_188Os*par_weather_CaSiO3_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+    loc_weather_o(io_Os_188Os) = 1000.0*(par_weather_CaSiO3_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+    ! calculate Os ISOTOPES -- 187Os
+    ! NOTE: do not update <loc_weather_o> yet as it is needed for the d188Os calculation ...
+    loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),1)
+    ! calculate Os ISOTOPES -- 188Os
+    loc_188Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),2)
+    ! update flux array
+    loc_weather_o(io_Os_187Os) = loc_187Os
+    loc_weather_o(io_Os_188Os) = loc_188Os
+    loc_force_flux_weather_o(:) = loc_force_flux_weather_o(:) + loc_weather_o(:)
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
-    ! ORGANIC MATTER / NUTRIENTS
-    ! bulk silicate C (kerogen) flux (and isotopic signature)
+    ! ORGANIC MATTER / NUTRIENTS (KEROGEN)
+    ! NOTE: granitic IS NOT distinguished from basaltic weathering
+    ! NOTE: no carbonate weathering component
+    ! NOTE: fixed vs. climate-modified (adjusted) option implemented for each kerogen elemental component
+    ! (1) bulk 'silicate' C (kerogen) flux (and isotopic signature)
+    if (opt_weather_fixed_kerogenC) then
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
     loc_force_flux_weather_o(io_DIC) = loc_force_flux_weather_o(io_DIC) + &
-         & par_weather_CaSiO3_fracC*weather_fCaSiO3
+         & par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     loc_standard = const_standards(ocn_type(io_DIC_13C))
     loc_force_flux_weather_o(io_DIC_13C) = loc_force_flux_weather_o(io_DIC_13C) + &
-         & fun_calc_isotope_fraction(par_weather_CaSiO3_fracC_d13C,loc_standard)*par_weather_CaSiO3_fracC*weather_fCaSiO3
-    ! bulk silicate P flux
-    loc_force_flux_weather_o(io_PO4) = loc_force_flux_weather_o(io_PO4) + &
-         & par_weather_CaSiO3_fracP*weather_fCaSiO3
+         & fun_calc_isotope_fraction(par_weather_CaSiO3_fracC_d13C,loc_standard)*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ! O2 consumption associated with Corg weathering (and conversion of C -> dissolved CO2)
+    ! NOTE: currently, this assumes an oxic atmosphere
+    ! NOTE: opt_short_circuit_atm is .true. by default
+    ! NOTE: H2S is dealt with later
     IF (opt_short_circuit_atm) THEN
-       loc_force_flux_weather_o(io_O2) = loc_force_flux_weather_o(io_O2) - 1.0*par_weather_CaSiO3_fracC*weather_fCaSiO3
+       loc_force_flux_weather_o(io_O2)  = loc_force_flux_weather_o(io_O2)  - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ELSE
-       ! NOTE: '-' because coming out of atmosphere
-       loc_force_flux_weather_a(ia_pO2) = loc_force_flux_weather_a(ia_pO2) - 1.0*par_weather_CaSiO3_fracC*weather_fCaSiO3
+       loc_force_flux_weather_a(ia_pO2) = loc_force_flux_weather_a(ia_pO2) - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ENDIF
+    ! (2) associated P flux -- kerogen
+    ! NOTE: plus (silicate) associated P flux -- retained for backwards compatability
+    if (opt_weather_fixed_kerogenP) then
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    loc_force_flux_weather_o(io_PO4) = loc_force_flux_weather_o(io_PO4) + &
+         & par_weather_kerogen_fracP*par_weather_CaSiO3_fracC*loc_weather_CaSiO3 + &
+         & par_weather_CaSiO3_fracP*loc_weather_CaSiO3
+    ! (3) associated S flux -- kerogen (and isotopic signature)
+    if (opt_weather_fixed_kerogenS) then
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    loc_force_flux_weather_o(io_H2S) = loc_force_flux_weather_o(io_H2S) + &
+         & par_weather_kerogen_fracS*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+    loc_standard = const_standards(ocn_type(io_H2S_34S))
+    loc_force_flux_weather_o(io_H2S_34S) = loc_force_flux_weather_o(io_H2S_34S) + &
+         & fun_calc_isotope_fraction(par_weather_kerogen_fracS_d34S,loc_standard)* &
+         & par_weather_kerogen_fracS*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
@@ -1050,95 +1178,115 @@ CONTAINS
     ! currently, in biogem_box: 4Fe + 7H2S + SO4 -> 4FeS2 + 6H
     ! NOTE: set Fe flux as Fe2 (not TDFe  for now / here)
     ! NOTE: remember he alkalinity associated with adding SO42- to the ocean ...
-    ! S
+    ! (0) set local weathering fluxes
+    !     NOTE: granitic IS NOT distinguished from basaltic weathering
+    !     NOTE: no carbonate weathering component
+    if (opt_weather_fixed_FeS2) then
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    ! (1) S
     loc_force_flux_weather_o(io_H2S) = loc_force_flux_weather_o(io_H2S) + &
-         & (7.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+         & (7.0*par_weather_CaSiO3_fracFeS2*loc_weather_CaSiO3)/4.0
     loc_standard = const_standards(ocn_type(io_H2S_34S))
     loc_force_flux_weather_o(io_H2S_34S) = loc_force_flux_weather_o(io_H2S_34S) + &
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracFeS2_d34S,loc_standard)* &
-         & (7.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+         & (7.0*par_weather_CaSiO3_fracFeS2*loc_weather_CaSiO3)/4.0
     loc_force_flux_weather_o(io_SO4) = loc_force_flux_weather_o(io_SO4) + &
-         & (1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+         & (1.0*par_weather_CaSiO3_fracFeS2*loc_weather_CaSiO3)/4.0
     loc_standard = const_standards(ocn_type(io_SO4_34S))
     loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_SO4_34S) + &
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracFeS2_d34S,loc_standard)* &
-         & (1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
+         & (1.0*par_weather_CaSiO3_fracFeS2*loc_weather_CaSiO3)/4.0
     loc_force_flux_weather_o(io_ALK) = loc_force_flux_weather_o(io_ALK) - &
-         & 2.0*(1.0*par_weather_CaSiO3_fracFeS2*weather_fCaSiO3)/4.0
-    ! Fe
+         & 2.0*(1.0*par_weather_CaSiO3_fracFeS2*loc_weather_CaSiO3)/4.0
+    ! (2) Fe
     loc_force_flux_weather_o(io_Fe2) = loc_force_flux_weather_o(io_Fe2) + &
-         & par_weather_CaSiO3_fracFeS2*weather_fCaSiO3
+         & par_weather_CaSiO3_fracFeS2*loc_weather_CaSiO3
     loc_standard = const_standards(ocn_type(io_Fe2_56Fe))
     loc_force_flux_weather_o(io_Fe2_56Fe) = loc_force_flux_weather_o(io_Fe2_56Fe) + &
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracFeS2_d56Fe,loc_standard)* &
-         & par_weather_CaSiO3_fracFeS2*weather_fCaSiO3
-    ! O2 consumption associated with pyrite weathering (and conversion of H2S -> H2SO4)
-    ! NOTE: pyrite weathering should be the only source of H2S
-    IF (.NOT. opt_short_circuit_atm) THEN
-       loc_force_flux_weather_a(ia_pO2)     = loc_force_flux_weather_a(ia_pO2)     - 2.0*loc_force_flux_weather_o(io_H2S)
-       loc_force_flux_weather_o(io_SO4)     = loc_force_flux_weather_o(io_SO4)     + loc_force_flux_weather_o(io_H2S)
-       loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_SO4_34S) + loc_force_flux_weather_o(io_H2S_34S)
-       loc_force_flux_weather_o(io_ALK)     = loc_force_flux_weather_o(io_ALK)     - 2.0*loc_force_flux_weather_o(io_H2S)
-       loc_force_flux_weather_o(io_H2S)     = 0.0
-       loc_force_flux_weather_o(io_H2S_34S) = 0.0
-    ENDIF
+         & par_weather_CaSiO3_fracFeS2*loc_weather_CaSiO3
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
     ! GYPSUM
     ! NOTE: no net ALK input (Ca2+ PLUS SO42-)
-    ! bulk carbonate/evapourite (gypsum) S flux (and isotopic signature)
+    ! (0) set local weathering fluxes
+    !     NOTE: no silicate weathering component
+    if (opt_weather_fixed_CaSO4) then
+       loc_weather_CaCO3 = par_weather_CaCO3
+    else
+       loc_weather_CaCO3 = adj_weather_CaCO3
+    end if
+    ! (1) bulk carbonate/evapourite (gypsum) S flux (and isotopic signature)
     loc_force_flux_weather_o(io_SO4) = loc_force_flux_weather_o(io_SO4) + &
-         & par_weather_CaCO3_fracCaSO4*weather_fCaCO3
+         & par_weather_CaCO3_fracCaSO4*loc_weather_CaCO3
     loc_standard = const_standards(ocn_type(io_H2S_34S))
     loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_SO4_34S) + &
          & fun_calc_isotope_fraction(par_weather_CaCO3_fracCaSO4_d34S,loc_standard)* &
-         & par_weather_CaCO3_fracCaSO4*weather_fCaCO3
-    ! bulk carbonate/evapourite (gypsum) Ca flux (and isotopic signature)
+         & par_weather_CaCO3_fracCaSO4*loc_weather_CaCO3
+    ! (2) bulk carbonate/evapourite (gypsum) Ca flux (and isotopic signature)
     loc_force_flux_weather_o(io_Ca) = loc_force_flux_weather_o(io_Ca) + &
-         & par_weather_CaCO3_fracCaSO4*weather_fCaCO3
+         & par_weather_CaCO3_fracCaSO4*loc_weather_CaCO3
     loc_standard = const_standards(ocn_type(io_Ca_44Ca))
     loc_force_flux_weather_o(io_Ca_44Ca) = loc_force_flux_weather_o(io_Ca_44Ca) + &
          & fun_calc_isotope_fraction(par_weather_CaCO3_fracCaSO4_d44Ca,loc_standard)* &
-         & par_weather_CaCO3_fracCaSO4*weather_fCaCO3
+         & par_weather_CaCO3_fracCaSO4*loc_weather_CaCO3
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
     ! SIDERITE
     ! NOTE: set Fe flux as Fe2 (not TDFe  for now / here)
     ! NOTE: not net ALK input
-    ! bulk siderite (FeCO3) -- Fe
+    ! (0) set local weathering fluxes
+    !     NOTE: no silicate weathering component
+    if (opt_weather_fixed_FeCO3) then
+       loc_weather_CaCO3 = par_weather_CaCO3
+    else
+       loc_weather_CaCO3 = adj_weather_CaCO3
+    end if
+    ! (1) bulk siderite (FeCO3) -- Fe
     loc_force_flux_weather_o(io_Fe2) = loc_force_flux_weather_o(io_Fe2) + &
-         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
+         & par_weather_CaCO3_fracFeCO3*loc_weather_CaCO3
     loc_standard = const_standards(ocn_type(io_Fe2_56Fe))
     loc_force_flux_weather_o(io_Fe2_56Fe) = loc_force_flux_weather_o(io_Fe2_56Fe) + &
          & fun_calc_isotope_fraction(par_weather_CaCO3_fracFeCO3_d56Fe,loc_standard)* &
-         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
-    ! bulk siderite (FeCO3) -- CO32-
+         & par_weather_CaCO3_fracFeCO3*loc_weather_CaCO3
+    ! (2) bulk siderite (FeCO3) -- CO32-
     loc_force_flux_weather_o(io_DIC) = loc_force_flux_weather_o(io_DIC) + &
-         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
+         & par_weather_CaCO3_fracFeCO3*loc_weather_CaCO3
     loc_standard = const_standards(ocn_type(io_DIC_13C))
     loc_force_flux_weather_o(io_DIC_13C) = loc_force_flux_weather_o(io_DIC_13C) + &
          & fun_calc_isotope_fraction(par_weather_CaCO3_fracFeCO3_d13C,loc_standard)* &
-         & par_weather_CaCO3_fracFeCO3*weather_fCaCO3
+         & par_weather_CaCO3_fracFeCO3*loc_weather_CaCO3
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
     ! APATITE
     ! NOTE: include ALK
-    ! bulk apatite (Ca5PO43)
+    ! (0) set local weathering fluxes
+    !     NOTE: granitic IS NOT distinguished from basaltic weathering
+    !     NOTE: no carbonate weathering component
+    if (opt_weather_fixed_Ca5PO43) then
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    ! (1) bulk apatite (Ca5PO43)
     loc_force_flux_weather_o(io_PO4) = loc_force_flux_weather_o(io_PO4) + &
-         & 3.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
+         & 3.0*par_weather_CaSiO3_fracCa5PO43*loc_weather_CaSiO3
     loc_force_flux_weather_o(io_Ca) = loc_force_flux_weather_o(io_Ca) + &
-         & 5.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
+         & 5.0*par_weather_CaSiO3_fracCa5PO43*loc_weather_CaSiO3
     loc_force_flux_weather_o(io_ALK) = loc_force_flux_weather_o(io_ALK) + &
-         & 2.0*5.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
-    ! *** CALCIUM ISOTOPES ***
+         & 2.0*5.0*par_weather_CaSiO3_fracCa5PO43*loc_weather_CaSiO3
+    ! (2) calcium isotopes
     loc_standard = const_standards(ocn_type(io_Ca_44Ca))
     ! apatite 44Ca weathering flux
     loc_epsilon = par_weather_CaSiO3_fracCa5PO43_d44Ca
     loc_force_flux_weather_o(io_Ca_44Ca) = loc_force_flux_weather_o(io_Ca_44Ca) + &
-         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*5.0*par_weather_CaSiO3_fracCa5PO43*weather_fCaSiO3
+         & fun_calc_isotope_fraction(loc_epsilon,loc_standard)*5.0*par_weather_CaSiO3_fracCa5PO43*loc_weather_CaSiO3
     ! add simple/direct P input (no Ca assumed/included)
     loc_force_flux_weather_o(io_PO4) = loc_force_flux_weather_o(io_PO4) + &
          & par_weather_Ca0PO41
@@ -1146,15 +1294,23 @@ CONTAINS
 
     ! ######################################################################################################################### !
     ! SILICA
-    ! bulk silicate Si flux (and isotopic signature)
+    ! (0) set local weathering fluxes
+    !     NOTE: granitic IS NOT distinguished from basaltic weathering
+    !     NOTE: no carbonate weathering component
+    if (opt_weather_fixed_SiO2) then
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    ! (1) bulk silicate Si flux (and isotopic signature)
     ! NOTE: despite the shorthand for silicates as 'CaSiO3', no simple 1:1 correspondence between Ca and Si should be assumed ...
     loc_force_flux_weather_o(io_SiO2) = loc_force_flux_weather_o(io_SiO2) + &
-         & par_weather_CaSiO3_fracSi*weather_fCaSiO3
+         & par_weather_CaSiO3_fracSi*loc_weather_CaSiO3
     loc_standard = const_standards(ocn_type(io_SiO2_30Si))
     loc_force_flux_weather_o(io_SiO2_30Si) = loc_force_flux_weather_o(io_SiO2_30Si) + &
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracSi_d30Si,loc_standard)* &
-         & par_weather_CaSiO3_fracSi*weather_fCaSiO3
-    ! quartz on its own ...
+         & par_weather_CaSiO3_fracSi*loc_weather_CaSiO3
+    ! (2) quartz on its own, which is a fixed flux
     loc_force_flux_weather_o(io_SiO2) = loc_force_flux_weather_o(io_SiO2) + &
          & par_weather_SiO2
     loc_standard = const_standards(ocn_type(io_SiO2_30Si))
@@ -1163,6 +1319,26 @@ CONTAINS
          & par_weather_SiO2
     ! ######################################################################################################################### !
 
+    ! ######################################################################################################################### !
+    ! oxidize weathered sulphur species!
+    ! O2 consumption associated with S weathering (and conversion of H2S -> H2SO4)
+    ! NOTE: currently, this assumes an oxic atmosphere
+    ! NOTE: opt_short_circuit_atm is .true. by default
+    IF (opt_short_circuit_atm) THEN
+       loc_force_flux_weather_o(io_O2)   = loc_force_flux_weather_o(io_O2)      - 2.0*loc_force_flux_weather_o(io_H2S)
+    ELSE
+       loc_force_flux_weather_a(ia_pO2)  = loc_force_flux_weather_a(ia_pO2)     - 2.0*loc_force_flux_weather_o(io_H2S)
+    ENDIF
+    loc_force_flux_weather_o(io_SO4)     = loc_force_flux_weather_o(io_SO4)     + loc_force_flux_weather_o(io_H2S)
+    loc_force_flux_weather_o(io_SO4_34S) = loc_force_flux_weather_o(io_SO4_34S) + loc_force_flux_weather_o(io_H2S_34S)
+    loc_force_flux_weather_o(io_ALK)     = loc_force_flux_weather_o(io_ALK)     - 2.0*loc_force_flux_weather_o(io_H2S)
+    loc_force_flux_weather_o(io_H2S)     = 0.0
+    loc_force_flux_weather_o(io_H2S_34S) = 0.0    
+    ! ######################################################################################################################### !
+    
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- !
+    
     ! Spread out atmosphere variables' fluxes onto land
     DO k=3,n_atm
        loc_force_flux_weather_a_percell(k)  = loc_force_flux_weather_a(k)/nlandcells
@@ -1197,7 +1373,7 @@ CONTAINS
 
        outputs = (/loc_avSLT,loc_maxSLT,loc_minSLT,loc_R*conv_yr_s,loc_maxR*conv_yr_s,loc_minR*conv_yr_s, &
             & loc_avP,loc_maxP,loc_minP,loc_CO2,loc_maxCO2,loc_minCO2, &
-            & loc_weather_ratio_CaCO3,loc_weather_ratio_CaSiO3,weather_fCaCO3/1.0E12,weather_fCaSiO3/1.0E12, &
+            & loc_weather_ratio_CaCO3,loc_weather_ratio_CaSiO3,adj_weather_CaCO3/1.0E12,adj_weather_CaSiO3/1.0E12, &
             & loc_force_flux_weather_a(ia_PCO2)/1.0E12, &
             & loc_force_flux_weather_o(io_ALK)/1.0E12,loc_force_flux_weather_o(io_DIC)/1.0E12, &
             & loc_force_flux_weather_o(io_Ca)/1.0E12,loc_force_flux_weather_o(io_DIC_13C)/1.0E12, &
@@ -1393,14 +1569,10 @@ CONTAINS
 
     ENDIF
 
-
-
     ! Save data to files calcium_lith.dat where 'lith' is the lithology
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
        IF (opt_2d_ascii_output) THEN
           DO k = 1,par_nliths
-             !          PRINT*,'Saving map of calcium flux for ',TRIM(lithology_names(k)),                            &
-             !                &' to calcium_',lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'.dat'
              call check_unit(17,__LINE__,__FILE__)
              OPEN(17,file=TRIM(par_outdir_name)// &  
                   & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_'//       &
@@ -1508,7 +1680,7 @@ CONTAINS
        conv_factor(k) = weath_consts(k,1) * conv_GEM_CO2 * rescale_runoff * r_avg_runoff
     end do
 
-    ! Calculate F_HCO_3- (calcium_flux)       
+    ! Calculate F_HCO_3- (calcium_flux)    
     DO k = 1, par_nliths
        DO i = 1, n_i
           DO j = 1, n_j
@@ -1534,8 +1706,6 @@ CONTAINS
     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
        IF (opt_2d_ascii_output) THEN
           DO k = 1,par_nliths
-             !          PRINT*,'Saving map of calcium flux for ',TRIM(lithology_names(k)),                            &
-             !                &' to calcium_',lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'.dat'
              call check_unit(17,__LINE__,__FILE__)
              OPEN(17,file=TRIM(par_outdir_name)// &
                   & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_year_'// &
@@ -1668,6 +1838,90 @@ CONTAINS
 
   END SUBROUTINE sum_calcium_flux_CaSi
 
+  SUBROUTINE sum_calcium_flux_CaSiOs(dum_calcium_flux,dum_total_calcium_flux_Ca,dum_total_calcium_flux_Si,dum_total_osmium_flux_Ca,dum_total_187osmium_flux_Ca,dum_total_188osmium_flux_Ca,dum_total_osmium_flux_Si,dum_total_187osmium_flux_Si,dum_total_188osmium_flux_Si)
+
+    REAL, INTENT(in)                :: dum_calcium_flux(par_nliths,n_i,n_j)            ! F_HCO_3- is sum of this
+    REAL, INTENT(inout)             :: dum_total_calcium_flux_Ca(n_i,n_j)              ! F_HCO_3- for Ca rocks
+    REAL, INTENT(inout)             :: dum_total_calcium_flux_Si(n_i,n_j)              ! F_HCO_3- for Si rocks
+    REAL, INTENT(inout)             :: dum_total_osmium_flux_Ca(n_i,n_j)               ! Os from carbonate weathering
+    REAL, INTENT(inout)             :: dum_total_187osmium_flux_Ca(n_i,n_j)            ! 187Os from carbonate weathering
+    REAL, INTENT(inout)             :: dum_total_188osmium_flux_Ca(n_i,n_j)            ! 188Os from carbonate weathering
+    REAL, INTENT(inout)             :: dum_total_osmium_flux_Si(n_i,n_j)               ! Os from silicate weathering
+    REAL, INTENT(inout)             :: dum_total_187osmium_flux_Si(n_i,n_j)               ! 187Os from silicate weathering
+    REAL, INTENT(inout)             :: dum_total_188osmium_flux_Si(n_i,n_j)               ! 188Os from silicate weathering
+    REAL                            :: loc_weather_o(n_ocn)
+
+    INTEGER                         :: i, j, k
+
+    ! k = 1 is for carb rock type - corresponding to Carbonate rock weathering
+    ! all other rock types are taken to be silicates (2 onwards); not sure if this is correct!
+    ! Now have 0.125 of sand rock type as Carbonate weathering also - so have extra array terms for fCa and fSi in weath_consts array
+    dum_total_calcium_flux_Ca(:,:) = 0.0
+    DO k=1,par_nliths
+       DO i=1,n_i
+          DO j=1,n_j
+             dum_total_calcium_flux_Ca(i,j) = dum_total_calcium_flux_Ca(i,j) +               &
+                  &        dum_calcium_flux(k,i,j) * weath_consts(k,3)
+          END DO
+       END DO
+    END DO
+
+    dum_total_calcium_flux_Si(:,:) = 0.0
+    DO k=1,par_nliths
+       DO i=1,n_i
+          DO j=1,n_j
+             dum_total_calcium_flux_Si(i,j) = dum_total_calcium_flux_Si(i,j) +               &
+                  &        dum_calcium_flux(k,i,j) * weath_consts(k,4)
+          END DO
+       END DO
+    END DO
+
+    dum_total_osmium_flux_Ca(:,:) = 0.0
+    dum_total_187osmium_flux_Ca(:,:) = 0.0
+    dum_total_188osmium_flux_Ca(:,:) = 0.0
+    dum_total_osmium_flux_Si(:,:) = 0.0
+    dum_total_187osmium_flux_Si(:,:) = 0.0
+    dum_total_188osmium_flux_Si(:,:) = 0.0
+    DO k=1,par_nliths
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_weather_o(:) = 0.0
+             IF (k.eq.1) THEN ! carbonate-rich sediments are the only source of carbonate-associated Os 
+                dum_total_osmium_flux_Ca(i,j) = dum_total_osmium_flux_Ca(i,j) +               &
+                     &        dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
+                loc_weather_o(io_Os) = dum_calcium_flux(k,i,j) * weath_consts(k,3) * weath_consts(k,5)
+                ! convert Os isotope ratios into delta notation before calculating total abundances in order to be consistent with how isotopes are treated elsewhere
+                loc_weather_o(io_Os_187Os) = 1000.0*(weath_consts(k,6)*weath_consts(k,7)/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+                loc_weather_o(io_Os_188Os) = 1000.0*(weath_consts(k,7)/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+                dum_total_187osmium_flux_Ca(i,j) = dum_total_187osmium_flux_Ca(i,j) + fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),1)
+                dum_total_188osmium_flux_Ca(i,j) = dum_total_188osmium_flux_Ca(i,j) + fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),2)
+             ELSE ! Assumption: in all other lithologies, Os is associated with weathering of silicates
+                dum_total_osmium_flux_Si(i,j) = dum_total_osmium_flux_Si(i,j) +               &
+                     &        dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
+                loc_weather_o(io_Os) = dum_calcium_flux(k,i,j) * weath_consts(k,4) * weath_consts(k,5)
+                loc_weather_o(io_Os_187Os) = 1000.0*(weath_consts(k,6)*weath_consts(k,7)/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+                loc_weather_o(io_Os_188Os) = 1000.0*(weath_consts(k,7)/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+                dum_total_187osmium_flux_Si(i,j) = dum_total_187osmium_flux_Si(i,j) + fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),1)
+                dum_total_188osmium_flux_Si(i,j) = dum_total_188osmium_flux_Si(i,j) + fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),2)
+             ENDIF
+          END DO
+       END DO
+    END DO
+
+    ! Save data to file calcium_total.dat
+    IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
+       IF (opt_2d_ascii_output) THEN
+          CALL sub_save_data_ij( &
+               & TRIM(par_outdir_name)//'calcium_total_Ca_year_'//TRIM(year_text)//'.dat',n_i,n_j,dum_total_calcium_flux_Ca(:,:) &
+               & )   
+          CALL sub_save_data_ij( &
+               & TRIM(par_outdir_name)//'calcium_total_Si_year_'//TRIM(year_text)//'.dat',n_i,n_j,dum_total_calcium_flux_Si(:,:) &
+               & )
+       ENDIF
+    ENDIF
+
+  END SUBROUTINE sum_calcium_flux_CaSiOs
+
 
   !========================================================================================!
 
@@ -1762,7 +2016,6 @@ CONTAINS
     ENDIF
 
     ! extract temperature to local array to please intel compilers
-    !                     print*,"before calib", loc_SLT(:,1)
     DO i=1,n_i
        DO j=1,n_j
           loc_SLT(i,j) = dum_sfcatm1(ia_T,i,j)
@@ -1779,8 +2032,6 @@ CONTAINS
           ENDIF
        END DO
     END DO
-    ! extract temperature to local array to please intel compilers
-    !                     print*,"after calib", loc_SLT(:,1)
 
     ! calculate mean surface productivity (kgC m-2 yr-1)
     SELECT case (par_prodopt)
@@ -1873,19 +2124,38 @@ CONTAINS
        END DO
     ENDIF
 
+
     ! calibrations
     IF (calibrate_weath) THEN
        SELECT case (par_weathopt)
        case ('GKWM')
           weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
           weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
+          weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
+          weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
+          weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
+          weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
+          weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
+          weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
        case ('GEM_CO2')
           weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
           weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
+          weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
+          weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
+          weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
+          weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
+          weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
+          weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
        end SELECT
     ELSE
        weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)
        weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)
+       weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)
+       weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)
+       weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)
+       weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)
+       weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)
+       weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)
     ENDIF
 
     loc_force_flux_weather_o_land(io_Ca,:,:) = weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)
@@ -1943,9 +2213,14 @@ CONTAINS
     ENDIF
     loc_force_flux_weather_o_land(io_DIC_14C,:,:) = 0.0
 
+    ! Osmium flux
+    loc_force_flux_weather_o_land(io_Os,:,:) = weather_fCaCO3_Os_2D(:,:) + weather_fCaSiO3_Os_2D(:,:)
+    loc_force_flux_weather_o_land(io_Os_187Os,:,:) = weather_fCaCO3_187Os_2D(:,:) + weather_fCaSiO3_187Os_2D(:,:)
+    loc_force_flux_weather_o_land(io_Os_188Os,:,:) = weather_fCaCO3_188Os_2D(:,:) + weather_fCaSiO3_188Os_2D(:,:)
+
     ! route fluxes into the coastal ocean cells (to pass to biogem in coupled model) and save the output to file
     DO k=1,n_ocn
-       IF((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C)) THEN
+       IF((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C).OR.(k.EQ.io_Os).OR.(k.EQ.io_Os_187Os).OR.(k.EQ.io_Os_188Os)) THEN
           CALL sub_coastal_output( loc_force_flux_weather_o_land(k,:,:), &
                runoff_drainto(:,:,:),runoff_detail(:,:), &
                loc_force_flux_weather_o_ocean(k,:,:))
@@ -1972,12 +2247,18 @@ CONTAINS
             & sum(loc_force_flux_weather_a_land(ia_PCO2,:,:))/1.0E12, &
             & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &
             & sum(loc_force_flux_weather_o_land(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC_13C,:,:))/1.0E12, &
+            & sum(loc_force_flux_weather_o_land(io_Os,:,:)),sum(loc_force_flux_weather_o_land(io_Os_187Os,:,:)), &
+            & sum(loc_force_flux_weather_o_land(io_Os_188Os,:,:)), &
             & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &
             & sum(loc_force_flux_weather_o_land(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC_13C,:,:))/1.0E12, &
+            & sum(loc_force_flux_weather_o_land(io_Os,:,:)),sum(loc_force_flux_weather_o_land(io_Os_187Os,:,:)), &
+            & sum(loc_force_flux_weather_o_land(io_Os_188Os,:,:)), &
             & sum(loc_force_flux_weather_o_ocean(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_ocean(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC_13C,:,:))/1.0E12/)
+            & sum(loc_force_flux_weather_o_ocean(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC_13C,:,:))/1.0E12, &
+            & sum(loc_force_flux_weather_o_ocean(io_Os,:,:)),sum(loc_force_flux_weather_o_ocean(io_Os_187Os,:,:)), &
+            & sum(loc_force_flux_weather_o_ocean(io_Os_188Os,:,:))/)
 
-       call sub_output_0d(n_outputs,(/12,21,25/),outputs,output_descriptions,time_series_names)
+       call sub_output_0d(n_outputs,(/12,22,29/),outputs,output_descriptions,time_series_names)
 
     ENDIF
 
@@ -1990,7 +2271,7 @@ CONTAINS
 
        IF (opt_2d_ascii_output) THEN
           DO k=1,n_ocn
-             IF ((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C)) THEN
+             IF ((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C).OR.(k.EQ.io_Os)) THEN
                 CALL sub_save_data_ij( &
                      & TRIM(par_outdir_name)//'spatial_land_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
                      & n_i,n_j,loc_force_flux_weather_o_land(k,:,:))                                 

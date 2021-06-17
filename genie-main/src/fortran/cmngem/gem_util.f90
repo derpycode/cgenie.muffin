@@ -297,6 +297,41 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! FIND INDEX OF STRING (in a vector)
+  FUNCTION fun_find_int_i(dum_int,dum_data)
+    ! common blocks
+    IMPLICIT NONE
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    INTEGER::fun_find_int_i
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    integer,INTENT(in)::dum_int
+    integer,DIMENSION(:),INTENT(in)::dum_data
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::i,loc_imax
+    ! -------------------------------------------------------- !
+    ! FIND i
+    ! -------------------------------------------------------- !
+    loc_imax = size(dum_data)
+    i = 0
+    do i=1,loc_imax
+       if (dum_int == dum_data(i)) exit 
+    end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+    fun_find_int_i = i
+    ! -------------------------------------------------------- !
+  END FUNCTION fun_find_int_i
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! CONVERT AN INTEGER NUMBER INTO AN n-CHARACTER STRING
   ! NOTE: errors are generated here if the number of digits 'dum_n' is too small for the passed integer
   FUNCTION fun_conv_num_char_n(dum_n,dum_integer)
@@ -953,6 +988,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012ocn = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012ocn = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012ocn', &
@@ -994,6 +1030,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012sed = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012sed = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012sed', &
