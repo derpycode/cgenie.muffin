@@ -816,12 +816,12 @@ MODULE gem_cmn
   INTEGER,PARAMETER::lookup_i_Mg_max   = 60                     ! 1-60 mmol
   INTEGER,PARAMETER::lookup_i_sal_min   = 30                     ! 30-45 PSU
   INTEGER,PARAMETER::lookup_i_sal_max   = 45                    ! 30-45 PSU
-  INTEGER,PARAMETER::lookup_i_temp_min  = 273                     ! 0-45degC
-  INTEGER,PARAMETER::lookup_i_temp_max  = 318                    ! 0-45degC
+  INTEGER,PARAMETER::lookup_i_temp_min  = 271                     ! -2-50degC
+  INTEGER,PARAMETER::lookup_i_temp_max  = 323                    ! -2-50degC
   REAL,PARAMETER::lookup_Ca_max      = 0.060                    ! 
   REAL,PARAMETER::lookup_Mg_max   = 0.060                       ! 
   REAL,PARAMETER::lookup_sal_max   = 45                         ! 
-  REAL,PARAMETER::lookup_temp_max  = 318.15                         ! 
+  REAL,PARAMETER::lookup_temp_max  = 323.15                         ! 
   ! -------------------- look-up tables ------------------------------------------------------------------------------------------ !
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kcal  ! equilibrium constant kspCal look-up table (Hain et al. 2015)
   REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_karg  ! equilibrium constant kspArg look-up table (Hain et al. 2015)
