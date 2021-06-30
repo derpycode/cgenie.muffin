@@ -141,13 +141,13 @@ CONTAINS
     IF (loc_new_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
             & 'sedgem_box','sub_update_sed','sediment input < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'WARNING', &
             & (/real(dum_i), real(dum_j), loc_new_sed_vol, &
             & loc_new_sed(is_POC),   &
             & loc_new_sed(is_CaCO3), &
             & loc_new_sed(is_opal),  &
             & loc_new_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
 
@@ -1411,13 +1411,13 @@ CONTAINS
     IF (loc_new_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
             & 'sedgem_box','sub_update_sed_mud','sediment input < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'WARNING', &
             & (/real(dum_i), real(dum_j), loc_new_sed_vol, &
             & loc_new_sed(is_POC),   &
             & loc_new_sed(is_CaCO3), &
             & loc_new_sed(is_opal),  &
             & loc_new_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
 
