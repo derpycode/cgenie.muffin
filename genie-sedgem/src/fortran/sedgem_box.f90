@@ -344,25 +344,25 @@ CONTAINS
        ! set fractional flux of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = (1.0 - par_sed_diagen_fracCpres_ox)*loc_new_sed(is_POC)
     end select
-    ! error-catching of negative dissoluiton: return rain flux back to ocean
-    If (loc_dis_sed(is_POC) < -const_real_nullsmall) then
-       CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_POC) < 0.0 cm3', &
-            & 'CONTINUING: set loc_dis_sed = loc_new_sed', &
-            & (/real(dum_i), real(dum_j), loc_dis_sed(is_POC), loc_new_sed(is_POC) &
-            & /),.FALSE. &
-            & )
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          if ( &
-               & (sed_dep(is) == is_POC) .OR. &
-               & (sed_type(is) == par_sed_type_POM) .OR. &
-               & (sed_type(sed_dep(is)) == par_sed_type_POM) &
-               & ) then
-             loc_dis_sed(is) = loc_new_sed(is)
-          end if
-       end DO
-    end if
+!!$    ! error-catching of negative dissolution: return rain flux back to ocean
+!!$    If (loc_dis_sed(is_POC) < -const_real_nullsmall) then
+!!$       CALL sub_report_error( &
+!!$            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_POC) < 0.0 cm3', &
+!!$            & 'CONTINUING: set loc_dis_sed = loc_new_sed', &
+!!$            & (/real(dum_i), real(dum_j), loc_dis_sed(is_POC), loc_new_sed(is_POC) &
+!!$            & /),.FALSE. &
+!!$            & )
+!!$       DO l=1,n_l_sed
+!!$          is = conv_iselected_is(l)
+!!$          if ( &
+!!$               & (sed_dep(is) == is_POC) .OR. &
+!!$               & (sed_type(is) == par_sed_type_POM) .OR. &
+!!$               & (sed_type(sed_dep(is)) == par_sed_type_POM) &
+!!$               & ) then
+!!$             loc_dis_sed(is) = loc_new_sed(is)
+!!$          end if
+!!$       end DO
+!!$    end if
 
     IF (ctrl_misc_debug4) print*,'*** diagenesis - CaCO3 dissolution ***'
     ! *** diagenesis - CaCO3 dissolution ***
@@ -421,25 +421,25 @@ CONTAINS
           end if
        end DO
     end select
-    ! error-catching of negative dissolution: return rain flux back to ocean
-    If (loc_dis_sed(is_CaCO3) < -const_real_nullsmall) then
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          if ( &
-               & (sed_dep(is) == is_CaCO3) .OR. &
-               & (sed_type(is) == par_sed_type_CaCO3) .OR. &
-               & (sed_type(sed_dep(is)) == par_sed_type_CaCO3) &
-               & ) then
-             loc_dis_sed(is) = loc_new_sed(is)
-          end if
-       end DO
-       CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_CaCO3) < 0.0 cm3', &
-            & 'CONTINUING', &
-            & (/real(dum_i), real(dum_j), loc_dis_sed(is_CaCO3) &
-            & /),.FALSE. &
-            & )
-    end if
+!!$    ! error-catching of negative dissolution: return rain flux back to ocean
+!!$    If (loc_dis_sed(is_CaCO3) < -const_real_nullsmall) then
+!!$       DO l=1,n_l_sed
+!!$          is = conv_iselected_is(l)
+!!$          if ( &
+!!$               & (sed_dep(is) == is_CaCO3) .OR. &
+!!$               & (sed_type(is) == par_sed_type_CaCO3) .OR. &
+!!$               & (sed_type(sed_dep(is)) == par_sed_type_CaCO3) &
+!!$               & ) then
+!!$             loc_dis_sed(is) = loc_new_sed(is)
+!!$          end if
+!!$       end DO
+!!$       CALL sub_report_error( &
+!!$            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_CaCO3) < 0.0 cm3', &
+!!$            & 'CONTINUING', &
+!!$            & (/real(dum_i), real(dum_j), loc_dis_sed(is_CaCO3) &
+!!$            & /),.FALSE. &
+!!$            & )
+!!$    end if
 
     IF (ctrl_misc_debug4) print*,'*** diagenesis - opal dissolution ***'
     ! *** diagenesis - opal dissolution ***
@@ -487,25 +487,25 @@ CONTAINS
           end if
        end DO
     end select
-    ! default and error-catching of negative dissoluiton: return rain flux back to ocean
-    If (loc_dis_sed(is_opal) < -const_real_nullsmall) then
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          if ( &
-               & (sed_dep(is) == is_opal) .OR. &
-               & (sed_type(is) == par_sed_type_opal) .OR. &
-               & (sed_type(sed_dep(is)) == par_sed_type_opal) &
-               & ) then
-             loc_dis_sed(is) = loc_new_sed(is)
-          end if
-       end DO
-       CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_opal) < 0.0 cm3', &
-            & 'CONTINUING', &
-            & (/real(dum_i), real(dum_j), loc_dis_sed(is_opal) &
-            & /),.FALSE. &
-            & )
-    end if
+!!$    ! default and error-catching of negative dissoluiton: return rain flux back to ocean
+!!$    If (loc_dis_sed(is_opal) < -const_real_nullsmall) then
+!!$       DO l=1,n_l_sed
+!!$          is = conv_iselected_is(l)
+!!$          if ( &
+!!$               & (sed_dep(is) == is_opal) .OR. &
+!!$               & (sed_type(is) == par_sed_type_opal) .OR. &
+!!$               & (sed_type(sed_dep(is)) == par_sed_type_opal) &
+!!$               & ) then
+!!$             loc_dis_sed(is) = loc_new_sed(is)
+!!$          end if
+!!$       end DO
+!!$       CALL sub_report_error( &
+!!$            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_opal) < 0.0 cm3', &
+!!$            & 'CONTINUING', &
+!!$            & (/real(dum_i), real(dum_j), loc_dis_sed(is_opal) &
+!!$            & /),.FALSE. &
+!!$            & )
+!!$    end if
     
     IF (ctrl_misc_debug4) print*,'*** diagenesis - calculate total solids dissolved ***'
     ! *** diagenesis - calculate total solids dissolved ***
@@ -518,13 +518,13 @@ CONTAINS
     IF (loc_dis_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
             & 'sedgem_box','sub_update_sed','sediment dissolution < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'CONTINUING', &
             & (/real(dum_i), real(dum_j), loc_dis_sed_vol, &
             & loc_dis_sed(is_POC),   &
             & loc_dis_sed(is_CaCO3), &
             & loc_dis_sed(is_opal),  &
             & loc_dis_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
     ! set OMEN output data array values
@@ -1658,14 +1658,14 @@ CONTAINS
     ! catch negative sediment dissolution
     IF (loc_dis_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','sediment dissolution < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'sedgem_box','sub_update_sed_mud','sediment dissolution < 0.0 cm3', &
+            & 'CONTINUING', &
             & (/real(dum_i), real(dum_j), loc_dis_sed_vol, &
             & loc_dis_sed(is_POC),   &
             & loc_dis_sed(is_CaCO3), &
             & loc_dis_sed(is_opal),  &
             & loc_dis_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
     ! set OMEN output data array values
