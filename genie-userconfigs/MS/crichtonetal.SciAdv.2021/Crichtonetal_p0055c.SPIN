@@ -53,9 +53,6 @@ bg_par_data_save_level=7
 bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2"
 bg_par_atm_force_scale_val_3=834.0E-06
 bg_par_atm_force_scale_val_4=-4.9
-bg_par_windspeed_file="p0055c_windspeed.dat"
-#re-scale gas transfer coeff to give ~0.058 mol m-2 yr-1 uatm-1 global mean air-sea coefficient (original: 0.310)
-bg_par_gastransfer_a=0.5196
 #
 # --- MISC -----------------------------------------------------
 #
