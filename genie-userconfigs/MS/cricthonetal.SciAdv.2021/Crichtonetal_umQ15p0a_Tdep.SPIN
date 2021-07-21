@@ -55,13 +55,8 @@ bg_par_bio_remin_POC_Ea2=80000.0
 bg_par_bio_remin_POC_frac2=0.008
 # --- DATA SAVING -----------------------------------------------------
 #
-bg_par_data_save_level=5
-bg_ctrl_debug_lvl0=.true.
-ma_debug_loop=1
-bg_ctrl_data_save_sig_diag=.true.
-bg_ctrl_bio_remin_redox_save=.true.
-bg_ctrl_bio_preformed=.true.
-bg_ctrl_bio_preformed_CsoftPOConly=.false.
+# BASIC + biology + tracer + proxy diagnostics
+bg_par_data_save_level=7
 #
 # --- FORCINGS --------------------------------------------------------
 #
