@@ -31,8 +31,8 @@ Crichtonetal_*_Tdep.SPIN - tempereature-dependent biological pump model (Crichto
 
 (2) Late Paleocene Early Eocene spinups
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.p0055c.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_p0055c.SPIN 10000
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.p0055c.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_p0055c_Tdep.SPIN 10000
+./runmuffin.sh muffin.CB.p_p0055c.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_p0055c.SPIN 10000
+./runmuffin.sh muffin.CB.p_p0055c.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_p0055c_Tdep.SPIN 10000
 
 (3) Miocene spinups
 
