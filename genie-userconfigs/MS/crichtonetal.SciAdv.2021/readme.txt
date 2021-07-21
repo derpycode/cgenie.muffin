@@ -31,24 +31,24 @@ Crichtonetal_*_Tdep.SPIN - tempereature-dependent biological pump model (Crichto
 
 (2) Late Paleocene Early Eocene spinups
 
-./runmuffin.sh muffin.CB.p_p0055c.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_p0055c.SPIN 10000
-./runmuffin.sh muffin.CB.p_p0055c.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_p0055c_Tdep.SPIN 10000
+./runmuffin.sh muffin.CB.p_p0055c.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_p_p0055c.SPIN 10000
+./runmuffin.sh muffin.CB.p_p0055c.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_p_p0055c_Tdep.SPIN 10000
 
 (3) Miocene spinups
 
-./runmuffin.sh muffin.CB.umQ15p0a.colx MS/crichtonetal.SciAdv.2021 Crichtonetal_umQ15p0a.SPIN 10000
-./runmuffin.sh muffin.CB.umQ15p0a.colx MS/crichtonetal.SciAdv.2021 Crichtonetal_umQ15p0a_Tdep.SPIN 10000
+./runmuffin.sh muffin.CB.umQ15p0a.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_umQ15p0a.SPIN 10000
+./runmuffin.sh muffin.CB.umQ15p0a.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_umQ15p0a_Tdep.SPIN 10000
 
 (4) Future simulations
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2.transient.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2_Tdep.transient.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2.transient.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2_Tdep.transient.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2.transient.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2_Tdep.transient.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2.transient.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2_Tdep.transient.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2.transient.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEScolx MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2_Tdep.transient.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2.transient.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES MS/crichtonetal.SciAdv.2021 Crichtonetal_worjh2_Tdep.transient.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
 
 ################################################################
 ################################################################

@@ -2,7 +2,7 @@
 #
 # --- CLIMATE ---------------------------------------------------------
 #
-# set no climate feedback
+# set climate feedback
 ea_36=y
 #
 # --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
