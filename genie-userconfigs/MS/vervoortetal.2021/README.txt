@@ -3,12 +3,13 @@
 ################################################################
 
 For:
-'Earth System Model Analysis of how Astronomical Forcing is Imprinted onto the Marine Geological Record'
+'Earth System Model Analysis of how Astronomical Forcing is Imprinted onto the Marine Geological Record: The Role of the Inorganic (Carbonate) Carbon Cycle and Feedbacks'
 P. Vervoort, S. Kirtland Turner, F. Rochholz, A. Ridgwell
 
 ################################################################
 06/15/2020 -- README.txt file creation (PV)
 07/01/2021 -- update (AR)
+07/23/2021 -- revised
 ################################################################
 
 Provided is the code used to create the model experiments presented in the paper.
