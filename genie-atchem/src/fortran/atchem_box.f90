@@ -97,6 +97,21 @@ CONTAINS
     
     real::landmask(n_i,n_j)                                    ! 
     
+    ! logical::checkstuff = .true.
+    logical::checkstuff = .false.
+    
+    
+    if (checkstuff) print *, ' <<<< now in sub_calc_terrbio >>>> '
+    
+    
+    if ( .not. atm_select(ia_pCO2) ) then 
+       if (checkstuff) then 
+          print*, 'pCO2 is traced: nothing to do in slab-biosphere'
+          print*, 'Return to atchem '
+       endif 
+       return
+    endif 
+    
     ! in this initial attempt, landmask is not used; 
     ! one probably have to referred to *.k1 data as done in rokgem 
     ! (and additionally creating subroutines to read data as when initializing rokgem) 
@@ -128,9 +143,10 @@ CONTAINS
     loc_litter = sum(loc_litter2)!/real(n_i*n_j)   
     loc_vegi = sum(loc_vegi2)!/real(n_i*n_j)   
     
-    
-    loc_Ratm = sum(atm(ia_pCO2_13C,:,:))/sum(atm(ia_pCO2,:,:))
-    loc_Rterr = sum(atm_slabbiosphere(ia_pCO2_13C,:,:))/sum(atm_slabbiosphere(ia_pCO2,:,:))
+    if ( atm_select(ia_pCO2_13C) ) then 
+       loc_Ratm = sum(atm(ia_pCO2_13C,:,:))/sum(atm(ia_pCO2,:,:))
+       loc_Rterr = sum(atm_slabbiosphere(ia_pCO2_13C,:,:))/sum(atm_slabbiosphere(ia_pCO2,:,:))
+    endif 
     
     ! print *,loc_CO2,loc_avSLT
     ! print *, size(tstar_atm),sum(tstar_atm)
@@ -205,15 +221,18 @@ CONTAINS
     atm_slabbiosphere(ia_pCO2,:,:) = &
          & atm_slabbiosphere(ia_pCO2,:,:) - loc_Fresp/real(n_i*n_j)  + loc_Fnpp/real(n_i*n_j) 
     ! d13C
-    dum_fatm(ia_pCO2_13C,:,:) = &
-         & dum_fatm(ia_pCO2_13C,:,:) + loc_Rterr*loc_Fresp/real(n_i*n_j) - loc_Ratm*loc_Fnpp/real(n_i*n_j)
+    if ( atm_select(ia_pCO2_13C) ) then 
+       dum_fatm(ia_pCO2_13C,:,:) = &
+            & dum_fatm(ia_pCO2_13C,:,:) + loc_Rterr*loc_Fresp/real(n_i*n_j) - loc_Ratm*loc_Fnpp/real(n_i*n_j)
     ! distribute evenly
-    atm_slabbiosphere(ia_pCO2_13C,:,:) = &
-         & atm_slabbiosphere(ia_pCO2_13C,:,:) - loc_Rterr*loc_Fresp/real(n_i*n_j) + loc_Ratm*loc_Fnpp/real(n_i*n_j) 
+       atm_slabbiosphere(ia_pCO2_13C,:,:) = &
+            & atm_slabbiosphere(ia_pCO2_13C,:,:) - loc_Rterr*loc_Fresp/real(n_i*n_j) + loc_Ratm*loc_Fnpp/real(n_i*n_j) 
+    endif 
 
     if (par_atm_slabsave) then 
        slab_time_cnt = slab_time_cnt + dum_dtyr
        if (slab_time_cnt > slab_save_dtyr) then 
+           if (checkstuff) print *, ' --- slab saving --- '
            loc_time = slab_time_cnt2 + 0.5*slab_time_cnt 
            slab_time_cnt2 = slab_time_cnt2 + slab_time_cnt
            ! print *,'!!! saving vertual box biosphere in atmchem !!!',slab_time_cnt2
@@ -234,7 +253,8 @@ CONTAINS
               & loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
            close(utest)
            ! slab_time_cnt = slab_time_cnt - slab_save_dtyr
-           slab_time_cnt = 0.
+           slab_time_cnt = 0. 
+           if (checkstuff) print *, ' --- slab saved --- '
        endif 
     endif 
 
