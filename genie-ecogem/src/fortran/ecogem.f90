@@ -83,6 +83,9 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax,npmax)              ::dorgmatdt_plankton ! POM export for each plankton    Fanny/Maria - Aug19
   !REAL,DIMENSION(npmax)                    ::diameter     !ckc for size dependent fractionation
 
+  REAL                                     ::dn2dt        !N2 uptake - Fanny Jul21
+  REAL,DIMENSION(n_i,n_j,n_k)              ::n2_flux      !N2 uptake array - Fanny Jul21
+
   REAL,DIMENSION(npmax)                    ::mortality,respiration
   REAL,DIMENSION(npmax)                    ::beta_mort_1,beta_graz_1
   REAL,DIMENSION(iomax+iChl,npmax)         ::assimilated,unassimilated
@@ -134,6 +137,7 @@ subroutine ecogem(          &
   orgmat_flux(:,:,:,:,:) = 0.0
   nutiso_flux(:,:,:,:) = 0.0 !ckc isotopes
   orgmatiso_flux(:,:,:,:,:) = 0.0 !ckc isotopes
+  n2_flux(:,:,:) = 0.0 !initialise - Fanny Jul21
   !
   phys_limit(:,:,:,:,:) = 0.0
   zoo_limit(:,:,:,:) = 0.0
@@ -410,6 +414,7 @@ subroutine ecogem(          &
                  ! NUTRIENTS (Only direct interactions with biota - remineralisation of detritus done in BIOGEM)
                  dnutrientdt(:) = 0.0 ! initialise
                  dnutisodt(:) = 0.0 !ckc initialise isotopes
+                 dn2dt = 0.0 ! initialise total N2 fixation - Fanny - Jul21
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  ! uptake by phytoplankton
                  do ii=1,iimax
@@ -602,6 +607,7 @@ subroutine ecogem(          &
                     export_flux(io,:,i,j,k) = dorgmatdt_plankton(io,:) ! mmol/m^3/s   - Fanny/Maria Aug19
                  enddo
                  n2fix_flux(:,i,j,k) = merge(VCN(:)/2 * BioC(:),0.0,Nfix(:).eq.1.0) ! mmolN2/m^3/s    - Fanny May21
+                 dn2dt = -sum(n2fix_flux(:,i,j,k)) ! - N2 uptake by phytoplankton (mmolN2/m^3/s) - Fanny - Jul21
 
                  if (c13trace) then
                     do io=1,iomaxiso
@@ -627,6 +633,7 @@ subroutine ecogem(          &
                  ! ---------------------------------------------------------- !
                  nutrient_flux(:,i,j,k) = nutrient_flux(:,i,j,k) + dnutrientdt(:) * dum_dts/real(nsubtime)
                  orgmat_flux(:,:,i,j,k) = orgmat_flux(:,:,i,j,k) + dorgmatdt(:,:) * dum_dts/real(nsubtime)
+                 n2_flux(i,j,k) = n2_flux(i,j,k) + dn2dt * dum_dts/real(nsubtime) !N2 flux uptake - Fanny Jul21
                  !ckc pass isotopes back to Biogem
                  if (c13trace) then
                     nutiso_flux(:,i,j,k)      = nutiso_flux(:,i,j,k)      + dnutisodt(:)      * dum_dts/real(nsubtime) !ckc
@@ -744,7 +751,12 @@ subroutine ecogem(          &
   dum_egbg_sfcdiss(io_O2  ,:,:,:) = - 138.0 / 106.0 * nutrient_flux(iDIC ,:,:,:) / 1.0e3 / conv_m3_kg
   ! Photosynthesis-related changes in Alkalinity (REQUIRES MACRONUTRIENT UPTAKE FLUX - Ideally nitrate uptake flux)
   if (useNO3) then
+     dum_egbg_sfcdiss(io_O2 ,:,:,:) = - (5.0/4.0) * nutrient_flux(iNO3 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NO3 uptake: H+ + NO3- → PON +(5/4)O2 + 1/2H2O - Fanny/Chris Jul21
      dum_egbg_sfcdiss(io_ALK ,:,:,:) = - 1.0 * nutrient_flux(iNO3 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
+     dum_egbg_sfcdiss(io_O2 ,:,:,:) = (3.0/4.0) * n2_flux(:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for N2 uptake: N2 + 3H2 + (3/4)O2 → PON + (3/2)H2O - Fanny/Chris Jul21
+  elseif (useNH4) then
+     dum_egbg_sfcdiss(io_O2 ,:,:,:) = (3.0/4.0) * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NH4 uptake: NH4+ + (3/4)O2 → PON + H+ + 3/2H2O - Fanny/Chris Jul21
+     dum_egbg_sfcdiss(io_ALK ,:,:,:) = 1.0 * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - Fanny/Chris Jul21
   elseif (usePO4) then
      dum_egbg_sfcdiss(io_ALK ,:,:,:) = -16.0 * nutrient_flux(iPO4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   else
