@@ -23,9 +23,11 @@ bg_par_bio_red_DOMfrac=0.66
 #
 # *** INORGANIC MATTER EXPORT RATIOS ********************************
 #
-# fixed CaCO3:POC
+# set fixed CaCO3:POC export rain ratio
 bg_opt_bio_CaCO3toPOCrainratio='FIXED'
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+# NOTE: the current calibrated Eocene value is 0.200,
+#       whereas the modern uniform equivalent is closer to 0.100
 bg_par_bio_red_POC_CaCO3=0.200
 #
 # *** REMINERALIZATION **********************************************
@@ -47,14 +49,14 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 #
 # *** SEDIMENTS *****************************************************
 #
-# max depth cut-off for neritic (non deep sea) sediment grid points
-# NOTE: sediments shallow that this, not defined as reefal cells, are assumed as 'mud'
+# max cut-off depth for neritic (non deep sea) sediment grid points
+# NOTE: sediment grid points shallower that this and not defined as reefal cells, are assumed to be 'mud'
 sg_par_sed_Dmax_neritic=0.0
 # sediment diagenesis option
 # NOTE: "ridgwell2001lookup" is the the simplest/fastest option
 sg_par_sed_diagen_CaCO3opt="ridgwell2001lookup"
 # bioturbation
-# NOTE: turn off bioturbation to equilibriate the system faster
+# NOTE: turn OFF bioturbation to equilibriate the system faster
 sg_ctrl_sed_bioturb=.FALSE.
 # generic paleo detrital flux (g cm-2 kyr-1)
 # NOTE: set to zero when applying a dust field (unless an additional detrital flux is required)
