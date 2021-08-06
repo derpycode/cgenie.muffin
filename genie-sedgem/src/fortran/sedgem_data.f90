@@ -1332,7 +1332,7 @@ CONTAINS
     ! calculate d13C
     DO i=1,n_i
        DO j=1,n_j
-          if (loc_mask_reef(i,j)*loc_fsed(is_CaCO3,i,j) > const_real_nullsmall) then
+          if (loc_fsed(is_CaCO3,i,j) > const_real_nullsmall) then
              loc_tot  = loc_fsed(sed_dep(is_CaCO3_13C),i,j)
              loc_frac = loc_fsed(is_CaCO3_13C,i,j)
              loc_standard = const_standards(sed_type(is_CaCO3_13C))
@@ -1340,7 +1340,7 @@ CONTAINS
           else
              loc_CaCO3_d13C(i,j) = 0.0
           end if
-          if (loc_mask_reef(i,j)*loc_fsed(is_POC,i,j) > const_real_nullsmall) then
+          if (loc_fsed(is_POC,i,j) > const_real_nullsmall) then
              loc_tot  = loc_fsed(sed_dep(is_POC_13C),i,j)
              loc_frac = loc_fsed(is_POC_13C,i,j)
              loc_standard = const_standards(sed_type(is_POC_13C))
@@ -1380,6 +1380,7 @@ CONTAINS
     write(unit=out,fmt='(A28,e14.6,A3)',iostat=ios) &
          & ' Total deep-sea area       :',sum(loc_mask_dsea(:,:)*phys_sed(ips_A,:,:)),'m2'
     call check_iostat(ios,__LINE__,__FILE__)
+    Write(unit=out,fmt=*) '---------------------------------'
     ! local variables 
     loc_tot_mask_area = sum(loc_mask_dsea(:,:)*loc_area(:,:))
     ! POC
@@ -1395,20 +1396,52 @@ CONTAINS
     else
        loc_mean_sedgrid = 0.0
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' POC rain                  :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot1_sedgrid,' GtC yr-1'
+         & ' POC rain                  :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot1_sedgrid,' PgC yr-1'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' POC diss                  :',loc_tot2_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot2_sedgrid,' GtC yr-1'
+         & ' POC diss                  :',loc_tot2_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot2_sedgrid,' PgC yr-1'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9,A6,f6.2,A2)',iostat=ios) &
          & ' Total POC pres            :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ', &
-         & 1.0E-12*conv_C_mol_kg*(loc_tot1_sedgrid - loc_tot2_sedgrid),' GtC yr-1','   =  ',loc_pres_sedgrid,' %'
+         & 1.0E-12*conv_C_mol_kg*(loc_tot1_sedgrid - loc_tot2_sedgrid),' PgC yr-1','   =  ',loc_pres_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
          & ' Mean wt% POC              :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
+    Write(unit=out,fmt=*) '---------------------------------'
+    ! POC d13C (weighted by area and POC sedimentation rate)
+    if (sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)) > const_real_nullsmall) then
+       loc_sed_d13C_mean = &
+            & sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)*loc_POC_d13C(:,:))/ &
+            & sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:))
+    else
+       loc_sed_d13C_mean = -999.9
+    end if
+    write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
+         & ' Mean weighted d13C POC    :',loc_sed_d13C_mean,'o/oo'
+    Write(unit=out,fmt=*) '---------------------------------'
+    ! POP
+    loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POP,:,:))
+    loc_tot2_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fdis(is_POP,:,:))
+    if (abs(loc_tot1_sedgrid) > const_real_nullsmall) then 
+       loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
+    else
+       loc_pres_sedgrid = 0.0
+    end if
+    if (loc_pres_sedgrid > const_real_nullsmall) then 
+       write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+            & ' POP rain                  :',loc_tot1_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+            & ' POP diss                  :',loc_tot2_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A12,A22,f6.2,A2)',iostat=ios) &
+            & ' Total POP pres            :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1   ', &
+            & '                 =  ',loc_pres_sedgrid,' %'
+       call check_iostat(ios  ,__LINE__,__FILE__)
+       Write(unit=out,fmt=*) '---------------------------------'    
+    end if
     ! CaCO3
     loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:))
     loc_tot2_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fdis(is_CaCO3,:,:))
@@ -1422,20 +1455,31 @@ CONTAINS
     else
        loc_mean_sedgrid = 0.0
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' CaCO3 rain                :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_CaCO3_mol_kgC*loc_tot1_sedgrid,' GtC yr-1'
+         & ' CaCO3 rain                :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_CaCO3_mol_kgC*loc_tot1_sedgrid,' PgC yr-1'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' CaCO3 diss                :',loc_tot2_sedgrid,' mol yr-1 = ',1.0E-12*conv_CaCO3_mol_kgC*loc_tot2_sedgrid,' GtC yr-1'
+         & ' CaCO3 diss                :',loc_tot2_sedgrid,' mol yr-1 = ',1.0E-12*conv_CaCO3_mol_kgC*loc_tot2_sedgrid,' PgC yr-1'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9,A6,f6.2,A2)',iostat=ios) &
          & ' Total CaCO3 pres          :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ', &
-         & 1.0E-12*conv_CaCO3_mol_kgC*(loc_tot1_sedgrid - loc_tot2_sedgrid),' GtC yr-1','   =  ',loc_pres_sedgrid,' %'
+         & 1.0E-12*conv_CaCO3_mol_kgC*(loc_tot1_sedgrid - loc_tot2_sedgrid),' PgC yr-1','   =  ',loc_pres_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
          & ' Mean wt% CaCO3            :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
+    Write(unit=out,fmt=*) '---------------------------------'
+    ! CaCO3 d13C (weighted by area and CaCO3 sedimentation rate)
+    if (sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:)) > const_real_nullsmall) then
+       loc_sed_d13C_mean = &
+            & sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:)*loc_CaCO3_d13C(:,:))/ &
+            & sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:))
+    else
+       loc_sed_d13C_mean = -999.9
+    end if
+    write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
+         & ' Mean weighted d13C CaCO3  :',loc_sed_d13C_mean,'o/oo'
+    Write(unit=out,fmt=*) '---------------------------------'
     ! CaCO3:POC
     loc_tot1_sedgrid = SUM(loc_mask_dsea(:,:)*loc_fsed(is_POC,:,:))
     loc_tot2_sedgrid = SUM(loc_mask_dsea(:,:)*loc_fsed(is_CaCO3,:,:))
@@ -1444,36 +1488,39 @@ CONTAINS
     else
        loc_rain_sedgrid = 0.0
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,f7.3)',iostat=ios) &
          & ' CaCO3/POC rain ratio      :',loc_rain_sedgrid
     call check_iostat(ios,__LINE__,__FILE__)
-    ! opal
-    loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_opal,:,:))
-    loc_tot2_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fdis(is_opal,:,:))
-    if (abs(loc_tot1_sedgrid) > 0.0) then 
-       loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
-    else
-       loc_pres_sedgrid = 0.0
-    end if
-    if (loc_tot_mask_area > const_real_nullsmall) then 
-       loc_mean_sedgrid = sum(loc_mask_dsea(:,:)*loc_sed_coretop(is_opal,:,:)*loc_area(:,:))/loc_tot_mask_area
-    else
-       loc_mean_sedgrid = 0.0
-    end if
     Write(unit=out,fmt=*) '---------------------------------'
-    write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' opal rain                 :',loc_tot1_sedgrid,' mol yr-1'
-    call check_iostat(ios,__LINE__,__FILE__)
-    write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' opal diss                 :',loc_tot2_sedgrid,' mol yr-1'
-    call check_iostat(ios,__LINE__,__FILE__)
-    write(unit=out,fmt='(A28,e14.6,A12,f6.2,A2)',iostat=ios) &
-         & ' Total opal pres           :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ',loc_pres_sedgrid,' %'
-    call check_iostat(ios,__LINE__,__FILE__)
-    write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
-         & ' Mean wt% opal             :',loc_mean_sedgrid,' %'
-    call check_iostat(ios,__LINE__,__FILE__)
+    ! opal
+    if (sed_select(is_opal)) then
+       loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_opal,:,:))
+       loc_tot2_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fdis(is_opal,:,:))
+       if (abs(loc_tot1_sedgrid) > 0.0) then 
+          loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
+       else
+          loc_pres_sedgrid = 0.0
+       end if
+       if (loc_tot_mask_area > const_real_nullsmall) then 
+          loc_mean_sedgrid = sum(loc_mask_dsea(:,:)*loc_sed_coretop(is_opal,:,:)*loc_area(:,:))/loc_tot_mask_area
+       else
+          loc_mean_sedgrid = 0.0
+       end if
+       Write(unit=out,fmt=*) '---------------------------------'
+       write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
+            & ' opal rain                 :',loc_tot1_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
+            & ' opal diss                 :',loc_tot2_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A12,f6.2,A2)',iostat=ios) &
+            & ' Total opal pres           :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ',loc_pres_sedgrid,' %'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
+            & ' Mean wt% opal             :',loc_mean_sedgrid,' %'
+       call check_iostat(ios,__LINE__,__FILE__)
+       Write(unit=out,fmt=*) '---------------------------------'
+    end if
     ! Li
     if (sed_select(is_LiCO3) .AND. sed_select(is_detLi)) then
        Write(unit=out,fmt=*) '---------------------------------'
@@ -1493,8 +1540,8 @@ CONTAINS
        write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
             & ' Li detrital source        :',loc_tot2_sedgrid,' mol yr-1'
        call check_iostat(ios,__LINE__,__FILE__)
+       Write(unit=out,fmt=*) '---------------------------------'
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
 
     ! CORAL REEF DIAGNOSTICS
     Write(unit=out,fmt=*) ' '
@@ -1560,6 +1607,7 @@ CONTAINS
        write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
             & ' Li detrital source        :',loc_tot2_sedgrid,' mol yr-1'
        call check_iostat(ios,__LINE__,__FILE__)
+       Write(unit=out,fmt=*) '---------------------------------'
     end if
     ! Corg
     if (par_sed_Corgburial > const_real_nullsmall) then
@@ -1569,7 +1617,6 @@ CONTAINS
        else
           loc_mean_sedgrid = 0.0
        end if
-       Write(unit=out,fmt=*) '---------------------------------'
        write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
             & ' POC production            :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot1_sedgrid,' GtC yr-1'
        call check_iostat(ios,__LINE__,__FILE__)
@@ -1587,6 +1634,7 @@ CONTAINS
        end if
        write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
             & ' Mean weighted d13C CaCO3  :',loc_sed_d13C_mean,'o/oo'
+       Write(unit=out,fmt=*) '---------------------------------'
     end if
     ! Sr
     IF (sed_select(is_SrCO3_87Sr) .AND. sed_select(is_SrCO3_88Sr)) THEN
@@ -1640,8 +1688,8 @@ CONTAINS
        end if
        write(unit=out,fmt='(A28,f10.2,A5)',iostat=ios) &
             & ' Sr source -- 88Sr         :',loc_sig,' o/oo'
+       Write(unit=out,fmt=*) '---------------------------------'
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
 
     ! SHALLOW WATER SEDIMENTS DIAGNOSTICS
     Write(unit=out,fmt=*) ' '
@@ -1655,6 +1703,7 @@ CONTAINS
     write(unit=out,fmt='(A28,e14.6,A3)',iostat=ios) &
          & ' Total area                :',sum(loc_mask_muds(:,:)*phys_sed(ips_A,:,:)),'m2'
     call check_iostat(ios,__LINE__,__FILE__)
+    Write(unit=out,fmt=*) '---------------------------------'
     ! local variables 
     loc_tot_mask_area = sum(loc_mask_muds(:,:)*loc_area(:,:))
     ! POC
@@ -1670,20 +1719,52 @@ CONTAINS
     else
        loc_mean_sedgrid = 0.0
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' POC rain                  :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot1_sedgrid,' GtC yr-1'
+         & ' POC rain                  :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot1_sedgrid,' PgC yr-1'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' POC diss                  :',loc_tot2_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot2_sedgrid,' GtC yr-1'
+         & ' POC diss                  :',loc_tot2_sedgrid,' mol yr-1 = ',1.0E-12*conv_C_mol_kg*loc_tot2_sedgrid,' PgC yr-1'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9,A6,f6.2,A2)',iostat=ios) &
          & ' Total POC pres            :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ', &
-         & 1.0E-12*conv_C_mol_kg*(loc_tot1_sedgrid - loc_tot2_sedgrid),' GtC yr-1','   =  ',loc_pres_sedgrid,' %'
+         & 1.0E-12*conv_C_mol_kg*(loc_tot1_sedgrid - loc_tot2_sedgrid),' PgC yr-1','   =  ',loc_pres_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
          & ' Mean wt% POC              :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
+    Write(unit=out,fmt=*) '---------------------------------'
+    ! POC d13C (weighted by area and POC sedimentation rate)
+    if (sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)) > const_real_nullsmall) then
+       loc_sed_d13C_mean = &
+            & sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)*loc_POC_d13C(:,:))/ &
+            & sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:))
+    else
+       loc_sed_d13C_mean = -999.9
+    end if
+    write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
+         & ' Mean weighted d13C POC    :',loc_sed_d13C_mean,'o/oo'
+    Write(unit=out,fmt=*) '---------------------------------'    
+    ! POP
+    loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_POP,:,:))
+    loc_tot2_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fdis(is_POP,:,:))
+    if (abs(loc_tot1_sedgrid) > const_real_nullsmall) then 
+       loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
+    else
+       loc_pres_sedgrid = 0.0
+    end if
+    if (loc_pres_sedgrid > const_real_nullsmall) then 
+       write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+            & ' POP rain                  :',loc_tot1_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+            & ' POP diss                  :',loc_tot2_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A12,A22,f6.2,A2)',iostat=ios) &
+            & ' Total POP pres            :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1   ', &
+            & '                   =  ',loc_pres_sedgrid,' %'
+       call check_iostat(ios,__LINE__,__FILE__)
+       Write(unit=out,fmt=*) '---------------------------------'    
+    end if
     ! CaCO3
     loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:))
     loc_tot2_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fdis(is_CaCO3,:,:))
@@ -1697,7 +1778,6 @@ CONTAINS
     else
        loc_mean_sedgrid = 0.0
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
          & ' CaCO3 rain                :',loc_tot1_sedgrid,' mol yr-1 = ',1.0E-12*conv_CaCO3_mol_kgC*loc_tot1_sedgrid,' GtC yr-1'
     call check_iostat(ios,__LINE__,__FILE__)
@@ -1706,11 +1786,12 @@ CONTAINS
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9,A6,f6.2,A2)',iostat=ios) &
          & ' Total CaCO3 pres          :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ', &
-         & 1.0E-12*conv_CaCO3_mol_kgC*(loc_tot1_sedgrid - loc_tot2_sedgrid),' GtC yr-1','   =  ',loc_pres_sedgrid,' %'
+         & 1.0E-12*conv_CaCO3_mol_kgC*(loc_tot1_sedgrid - loc_tot2_sedgrid),' PgC yr-1','   =  ',loc_pres_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
          & ' Mean wt% CaCO3            :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
+    Write(unit=out,fmt=*) '---------------------------------'
     ! CaCO3:POC
     loc_tot1_sedgrid = SUM(loc_mask_muds(:,:)*(sed_fsed(is_POC,:,:) + sed_fsed_OLD(is_POC,:,:)))
     loc_tot2_sedgrid = SUM(loc_mask_muds(:,:)*(sed_fsed(is_CaCO3,:,:) + sed_fsed_OLD(is_CaCO3,:,:)))
@@ -1719,40 +1800,41 @@ CONTAINS
     else
        loc_rain_sedgrid = 0.0
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,f7.3)',iostat=ios) &
          & ' CaCO3/POC rain ratio      :', &
          & loc_rain_sedgrid
     call check_iostat(ios,__LINE__,__FILE__)
-    ! opal
-    loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_opal,:,:))
-    loc_tot2_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fdis(is_opal,:,:))
-    if (abs(loc_tot1_sedgrid) > 0.0) then 
-       loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
-    else
-       loc_pres_sedgrid = 0.0
-    end if
-    if (loc_tot_mask_area > const_real_nullsmall) then 
-       loc_mean_sedgrid = sum(loc_mask_muds(:,:)*loc_sed_coretop(is_opal,:,:)*loc_area(:,:))/loc_tot_mask_area
-    else
-       loc_mean_sedgrid = 0.0
-    end if
     Write(unit=out,fmt=*) '---------------------------------'
-    write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' opal rain                 :',loc_tot1_sedgrid,' mol yr-1'
-    call check_iostat(ios,__LINE__,__FILE__)
-    write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
-         & ' opal diss                 :',loc_tot2_sedgrid,' mol yr-1'
-    call check_iostat(ios,__LINE__,__FILE__)
-    write(unit=out,fmt='(A28,e14.6,A12,f6.2,A2)',iostat=ios) &
-         & ' Total opal pres           :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ',loc_pres_sedgrid,' %'
-    call check_iostat(ios,__LINE__,__FILE__)
-    write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
-         & ' Mean wt% opal             :',loc_mean_sedgrid,' %'
-    call check_iostat(ios,__LINE__,__FILE__)
+    ! opal
+    if (sed_select(is_opal)) then
+       loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_opal,:,:))
+       loc_tot2_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fdis(is_opal,:,:))
+       if (abs(loc_tot1_sedgrid) > 0.0) then 
+          loc_pres_sedgrid = 100.0*(loc_tot1_sedgrid - loc_tot2_sedgrid)/loc_tot1_sedgrid
+       else
+          loc_pres_sedgrid = 0.0
+       end if
+       if (loc_tot_mask_area > const_real_nullsmall) then 
+          loc_mean_sedgrid = sum(loc_mask_muds(:,:)*loc_sed_coretop(is_opal,:,:)*loc_area(:,:))/loc_tot_mask_area
+       else
+          loc_mean_sedgrid = 0.0
+       end if
+       write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
+            & ' opal rain                 :',loc_tot1_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
+            & ' opal diss                 :',loc_tot2_sedgrid,' mol yr-1'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,e14.6,A12,f6.2,A2)',iostat=ios) &
+            & ' Total opal pres           :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1 = ',loc_pres_sedgrid,' %'
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt='(A28,f6.2,A2)',iostat=ios) &
+            & ' Mean wt% opal             :',loc_mean_sedgrid,' %'
+       call check_iostat(ios,__LINE__,__FILE__)
+       Write(unit=out,fmt=*) '---------------------------------'
+    end if
     ! Li
     if (sed_select(is_LiCO3) .AND. sed_select(is_detLi)) then
-       Write(unit=out,fmt=*) '---------------------------------'
        loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_LiCO3,:,:))
        loc_tot2_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fdis(is_LiCO3,:,:))
        write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
@@ -1769,8 +1851,8 @@ CONTAINS
        write(unit=out,fmt='(A28,e14.6,A12,f7.3,A9)',iostat=ios) &
             & ' Li detrital source        :',loc_tot2_sedgrid,' mol yr-1'
        call check_iostat(ios,__LINE__,__FILE__)
+       Write(unit=out,fmt=*) '---------------------------------'
     end if
-    Write(unit=out,fmt=*) '---------------------------------'
 
     ! DIAGNOSTICS ON GLOBAL GRID
     Write(unit=out,fmt=*) ' '

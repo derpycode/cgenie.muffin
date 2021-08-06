@@ -7105,7 +7105,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="par_sed_mix_k_sur_min">
 			<value datatype="real">0.0001</value>
-                        <description>maximum surface bioturbation mixing rate (cm2 yr-1)</description>
+                        <description>minimum surface bioturbation mixing rate (cm2 yr-1)</description>
                     </param>
                     <param name="ctrl_sed_noerosion">
 			<value datatype="boolean">.false.</value>
