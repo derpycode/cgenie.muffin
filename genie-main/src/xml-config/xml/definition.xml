@@ -899,7 +899,7 @@
                         </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="107">
+                   <paramArray name="sed_select" dimension="1" extent="109">
                         <description>tracer selection</description>
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -1326,6 +1326,14 @@
                             <description></description>
                         </param>
                         <param name="sed_select(107)" index="107">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(108)" index="108">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(109)" index="109">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
@@ -5304,6 +5312,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_bio_FeS2precip_explicit">
 			<value datatype="boolean">.false.</value>
                         <description>Explicit FeS2 precip stiochiometry?</description>
+                    </param>
+                    <param name="par_bio_Kd_PO4_FeOOH">
+			<value datatype="real">0.0</value>
+                        <description>Ads constant for PO4 adsorption on (POM-)FeOOH</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">

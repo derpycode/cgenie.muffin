@@ -36,6 +36,7 @@
  POM_Os           97  03  07  'POM scavenged Os'                     'wt%'     0.00     100.00
  POM_Os_187Os     98  97  26  'POM scavenged Os-187Os'               'o/oo'   -9.99E+2    9.99E+2
  POM_Os_188Os     99  97  27  'POM scavenged Os-188Os'               'o/oo'   -9.99E+2    9.99E+2
+ PO4_POM_FeOOH   108 103  07  'PO4 sorbed onto POM scavenged FeOOH'  'wt%'     0.00     100.00
  CaCO3            14  14  01  'calcium carbonate (CaCO3)'            'wt%'     0.00     100.00
  CaCO3_13C        15  14  11  'd13C of CaCO3'                        'o/oo'   -9.99E+2    9.99E+2
  CaCO3_14C        16  14  12  'd14C of CaCO3'                        'o/oo'   -9.99E+5    9.99E+5
@@ -68,6 +69,7 @@
  FeS2_56Fe        93  91  22  'd56Fe of FeS2'                        'o/oo'   -9.99E+2    9.99E+2
  FeOOH            95  95  06  'Fe (hydr)oxides'                      'wt%'     0.00     100.00
  FeOOH_56Fe       96  95  22  'd56Fe of FeOOH'                       'o/oo'   -9.99E+2    9.99E+2
+ PO4_FeOOH       109  95  07  'PO4 sorbed onto FeOOH'                'wt%'     0.00     100.00
  Fe3Si2O4        105 105  06  'greenalite'                           'wt%'     0.00     100.00
  Fe3Si2O4_56Fe   106 105  22  '56Fe of greenalite'                   'o/oo'   -9.99E+2    9.99E+2
  Fe3Si2O4_30Si   107 105  16  '30Si of greenalite'                   'o/oo'   -9.99E+2    9.99E+2

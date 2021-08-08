@@ -174,6 +174,8 @@ CONTAINS
     conv_sed_ocn(io_O2,is_FeOOH)                 = 0.0
     conv_sed_ocn(io_Fe,is_POM_FeOOH)             = 1.0
     conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0 
+    conv_sed_ocn(io_PO4,is_PO4_POM_FeOOH)        = 1.0
+    conv_sed_ocn(io_PO4,is_PO4_FeOOH)            = 1.0
     conv_sed_ocn(io_O2,is_POM_FeOOH)             = 0.0
     conv_sed_ocn(io_Os,is_POM_Os)                = 1.0
     conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)    = 1.0

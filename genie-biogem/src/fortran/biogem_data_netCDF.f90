@@ -3480,7 +3480,8 @@ CONTAINS
     !       PARTICULATE CONCENTRATION FIELD
     !----------------------------------------------------------------
     loc_sed_mask = loc_mask
-    If (ctrl_data_save_slice_bio .AND. ctrl_data_save_derived) then
+    ! If (ctrl_data_save_slice_bio .AND. ctrl_data_save_derived) then
+    If (ctrl_data_save_slice_bio ) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           loc_ijk(:,:,:) = const_real_zero

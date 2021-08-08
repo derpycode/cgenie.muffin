@@ -1211,6 +1211,7 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
     END IF
+    
   END SUBROUTINE sub_init_data_save_runtime
   ! ****************************************************************************************************************************** !
 
@@ -3065,6 +3066,7 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
     END IF
+        
   END SUBROUTINE sub_data_save_runtime
   ! ****************************************************************************************************************************** !
 

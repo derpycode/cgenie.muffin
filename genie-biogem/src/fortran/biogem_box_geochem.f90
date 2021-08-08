@@ -874,6 +874,122 @@ CONTAINS
   ! ****************************************************************************************************************************** !
 
 
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE PO4 adsorption on FeOOH (YK 12.15.2020)
+  SUBROUTINE sub_calc_ads_PO4_FeOOH(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_FeOOH,loc_dPO4,loc_PO4_FeOOH
+    real::loc_f,loc_Kd
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_PO4_ads = 0.0
+    loc_PO4 = 0.0
+    loc_PO4_FeOOH = 0.0
+    loc_FeOOH = 0.0
+    loc_dPO4 = 0.0 
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! ads coefficient
+    loc_Kd = par_bio_Kd_PO4_FeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE PO4 ads on FeOOH 
+    ! -------------------------------------------------------- !
+    DO k=n_k,dum_k1,-1
+       loc_PO4(k) = ocn(io_PO4,dum_i,dum_j,k)
+       loc_FeOOH(k) = bio_part(is_FeOOH,dum_i,dum_j,k)
+       loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_FeOOH(k)*1e6 *1e-6
+       loc_PO4_FeOOH(k) = bio_part(is_PO4_FeOOH,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_PO4_FeOOH(k)
+       if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
+    enddo 
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    bio_part(is_PO4_FeOOH,dum_i,dum_j,:) = bio_part(is_PO4_FeOOH,dum_i,dum_j,:) + loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_FeOOH_dPO4,dum_i,dum_j,:) = loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_ads_PO4_FeOOH
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE PO4 adsorption on POM assoc. FeOOH (YK 12.13.2020)
+  SUBROUTINE sub_calc_ads_PO4_POM_FeOOH(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_POM_FeOOH,loc_dPO4,loc_PO4_POM_FeOOH
+    real::loc_f,loc_Kd
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_PO4_ads = 0.0 
+    loc_PO4 = 0.0
+    loc_PO4_POM_FeOOH = 0.0
+    loc_POM_FeOOH = 0.0
+    loc_dPO4 = 0.0
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! ads coefficient
+    loc_Kd = par_bio_Kd_PO4_FeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE PO4 ads on FeOOH 
+    ! -------------------------------------------------------- !
+    DO k=n_k,dum_k1,-1
+       loc_PO4(k) = ocn(io_PO4,dum_i,dum_j,k)
+       loc_POM_FeOOH(k) = bio_part(is_POM_FeOOH,dum_i,dum_j,k)
+       ! loc_PO4_ads(k) = ocn_ads_POM_FeOOH_dPO4(dum_i,dum_j,k)
+       loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_POM_FeOOH(k)*1e6 *1e-6
+       loc_PO4_POM_FeOOH(k) = bio_part(is_PO4_POM_FeOOH,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_PO4_POM_FeOOH(k)
+       if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
+    enddo 
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    bio_part(is_PO4_POM_FeOOH,dum_i,dum_j,:) = bio_part(is_PO4_POM_FeOOH,dum_i,dum_j,:) + loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_POMFeOOH_dPO4,dum_i,dum_j,:) = loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_ads_PO4_POM_FeOOH
+  ! ****************************************************************************************************************************** !
+
+
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE AQUATIC IRONSULPHIDE FORMATION
   SUBROUTINE sub_calc_form_FeS(dum_i,dum_j,dum_k1)

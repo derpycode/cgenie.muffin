@@ -701,6 +701,7 @@ subroutine biogem(        &
      !  !$omp parallel private(nthreads, tid)
      !  ! Obtain thread number
      !  tid = OMP_get_thread_num()
+     ! 
 
      do n=1,n_vocn
 
@@ -715,6 +716,10 @@ subroutine biogem(        &
         call sub_box_remin_part(loc_dtyr,vocn(n),vphys_ocn(n),vbio_part(n),vbio_remin(n))
 
      end do
+     
+     
+     ! ****************************************************************************************************************************
+     
 
      ! [temp code in retaining primary use of <bio_remin>] ************************************************************************
      bio_part(:,:,:,:) = fun_lib_conv_vsedTOsed(vbio_part(:))
@@ -1780,6 +1785,19 @@ subroutine biogem(        &
               if (sed_select(is_FeOOH)) then
                  call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
               end if
+              
+              !---- YK added 12.13.2020
+              ! *** PO4 adsorption ***
+              if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
+                 if (sed_select(is_FeOOH)) then
+                    call sub_calc_ads_PO4_FeOOH(i,j,loc_k1,loc_dtyr)
+                 end if
+                 if (sed_select(is_POM_FeOOH)) then
+                    call sub_calc_ads_PO4_POM_FeOOH(i,j,loc_k1,loc_dtyr)
+                 end if
+              endif 
+              ! ---- end 
+              
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
                  if (ctrl_bio_FeS2precip_explicit) then
@@ -1952,7 +1970,8 @@ subroutine biogem(        &
      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
      ! *** (i,j) GRID PT LOOP END *** !
      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
-
+     
+        
      ! *** CALCULATE TRACER ANOMOLY ***
      ! NOTE: also, for now, vectorize <ocn>
      IF (ctrl_debug_lvl1) print*, '*** CALCULATE TRACER ANOMOLY ***'
@@ -2013,7 +2032,7 @@ subroutine biogem(        &
           & dum_sfxsumrok1,      &
           & .false.,             &
           & .true.               &
-          & )
+          & )     
      CALL end_biogem()
      STOP
   end If

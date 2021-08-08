@@ -2892,12 +2892,14 @@ CONTAINS
        diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,:) = 0.0
        diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,:) = 0.0
        diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dPO4,dum_i,dum_j,:) = 0.0 ! YK added 01.19.2021
     end if
     if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2) .AND. sed_select(is_POM_FeOOH)) then
-       diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,:) = 0.0
-       diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,:) = 0.0
-       diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,:) = 0.0
-       diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_POMFeOOH_dFe2,dum_i,dum_j,:) = 0.0 !  ^ 
+       diag_react(idiag_react_POMFeOOH_dH2S,dum_i,dum_j,:) = 0.0 !  |  YK modified 12.28.2020 
+       diag_react(idiag_react_POMFeOOH_dSO4,dum_i,dum_j,:) = 0.0 !  |
+       diag_react(idiag_react_POMFeOOH_dALK,dum_i,dum_j,:) = 0.0 !  v
+       diag_react(idiag_react_POMFeOOH_dPO4,dum_i,dum_j,:) = 0.0 ! YK added 12.28.2020
     end if
     ! pre-calculate size reciprocal
     loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
@@ -3756,6 +3758,34 @@ CONTAINS
                       end if
                    end if
                 end if
+                
+                
+                
+                ! *** Scavenge PO4 from water column onto FeOOH ***
+                ! NOTE: look for both 'free' and POM-associated forms
+                ! if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
+                   ! if (sed_select(is_FeOOH)) then
+                      ! if (dum_vocn%mk(io2l(io_PO4),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
+                         ! call sub_box_scav_PO4_FeOOH(              &
+                              ! & dum_vocn%mk(io2l(io_PO4),kk),      &
+                              ! & dum_i,dum_j,kk,                    &
+                              ! & loc_bio_part_TMP(:,kk),            &
+                              ! & loc_bio_remin(:,kk)                &
+                              ! & )
+                      ! end if
+                   ! elseif (sed_select(is_POM_FeOOH)) then
+                      ! if (dum_vocn%mk(io2l(io_PO4),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)>const_rns) then
+                         ! call sub_box_scav_PO4_POM_FeOOH(                     &
+                              ! & dum_vocn%mk(io2l(io_PO4),kk),                 &
+                              ! & dum_i,dum_j,kk,                               &
+                              ! & loc_bio_part_TMP(:,kk),                       &
+                              ! & loc_bio_remin(:,kk)                           &
+                              ! & )
+                      ! end if
+                  ! end if
+                ! end if
+                
+                
 
              end If
           end do
@@ -4026,7 +4056,7 @@ CONTAINS
     ! -------------------------------------------------------- !
   end SUBROUTINE sub_box_react_POMFeOOH_H2S
   ! ****************************************************************************************************************************** !
-
+  
 
   ! ****************************************************************************************************************************** !
   ! SCAVENGING
