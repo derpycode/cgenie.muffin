@@ -78,16 +78,16 @@ sg_ctrl_sed_dunne2007_remin_POP=.true.
 #
 # *** WEATHERING ****************************************************
 #
-# NOTE: the closed system spinup has 0.172485E+14 mol CaCO3 yr-1 of global burial
+# NOTE: the closed system spinup has 0.206013E+14 mol CaCO3 yr-1 of global burial
 #       splitting in a 2:3 ratio between silicate:carbonate weathering gives:
-#       0.172485E+14 * 2/5 = 6.899400000000000e+12 silicate weathering
-#       0.172485E+14 * 3/5 = 1.034910000000000e+13 carbonate weathering
+#       0.206013E+14 * 2/5 = 8.240520000000000e+12 silicate weathering
+#       0.206013E+14 * 3/5 = 1.236078000000000e+13 carbonate weathering
 #       and 0.371907E+13 mol yr-1 of POC burial
 # NOTE: following the calculation in Secion 21.9
 #       gamma = (-6.0 - 2.65)/(-24.40 - 2.65) = 0.32
 #       => CO2 outgassing must be enhanced by 0.32 x POC burial = 1.190102400000000e+12
 #       => kerogen weathering = 0.68 x POC burial = 2.528967600000000e+12
-#          or a ratio of 2.528967600000000e+12/6.899400000000000e+12 = 0.367 with silicate weathering
+#          or a ratio of 2.528967600000000e+12/8.240520000000000e+12 = 0.307 with silicate weathering
 # set an 'OPEN' system
 bg_ctrl_force_sed_closedsystem=.FALSE.
 # set CaCO3_weathering-temperature feedback
@@ -97,17 +97,17 @@ rg_opt_weather_T_Si=.true.
 # weathering reference mean global land air surface temperature (C)
 rg_par_ref_T0=12.03
 # global carbonate weathering rate (mol Ca2+ yr-1)
-rg_par_weather_CaCO3=1.034910000000000e+13
+rg_par_weather_CaCO3=1.236078000000000e+13
 # global silicate weathering rate (mol Ca2+ yr-1)
-rg_par_weather_CaSiO3=6.899400000000000e+12
+rg_par_weather_CaSiO3=8.240520000000000e+12
 # CO2 outgassing rate (mol C yr-1)
-rg_par_outgas_CO2=8.089502400000000e+12
+rg_par_outgas_CO2=9.430622400000000e+12
 # set isotopic values of CO2 outgassing and carbonate weathering
-# NOTE: calculate d13C of CaCO3 weathering as per Secion 21.9
+# NOTE: d13C of CaCO3 weathering == d13C of CaCO3 burial
 rg_par_outgas_CO2_d13C=-6.0
-rg_par_weather_CaCO3_d13C=8.4
+rg_par_weather_CaCO3_d13C=2.65
 # kerogen weathering ratio and isotopic composiiton
-rg_par_weather_CaSiO3_fracC=0.367
+rg_par_weather_CaSiO3_fracC=0.307
 rg_par_weather_CaSiO3_fracC_d13C=-24.40
 #
 # *** GEOCHEM ACCELERATION ******************************************
