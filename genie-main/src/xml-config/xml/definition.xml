@@ -2106,6 +2106,10 @@
 			<value datatype="boolean">.true.</value>
                         <description></description>
                     </param>
+                    <param name="opt_delf2x_cesm">
+			<value datatype="boolean">.false.</value>
+                        <description>apply CESM state-dependent climate sensitivity</description>
+                    </param>
                 </namelist>
             </file>
         </model>
@@ -4020,9 +4024,17 @@
 			<value datatype="boolean">.true.</value>
                         <description>Set dissolution flux = rain flux to close system?</description>
                     </param>
+                    <param name="ctrl_force_sed_closedsystem_SUR">
+			<value datatype="boolean">.false.</value>
+                        <description>Set dissolution flux = rain flux at surface?</description>
+                    </param>
                     <param name="ctrl_force_sed_closed_P">
 			<value datatype="boolean">.false.</value>
                         <description>Balance the P cycle (with weathering)?</description>
+                    </param>
+                    <param name="ctrl_force_sed_closed_C">
+			<value datatype="boolean">.false.</value>
+                        <description>Balance the C cycle (with weathering)?</description>
                     </param>
                     <param name="ctrl_force_sed_reflective_POM">
 			<value datatype="boolean">.false.</value>
@@ -4055,6 +4067,10 @@
                     <param name="ctrl_force_Cd_alpha">
 			<value datatype="boolean">.false.</value>
                         <description>Replace internal [Cd/P]POM/[Cd/P]SW alpha?</description>
+                    </param>
+                    <param name="ctrl_force_det_Fe_sol">
+			<value datatype="boolean">.false.</value>
+                        <description>Replace internal dust Fe solubility field?</description>
                     </param>
                     <param name="ctrl_force_scav_fpart_POC">
 			<value datatype="boolean">.false.</value>
@@ -4095,6 +4111,10 @@
                     <param name="par_Cd_alpha_file">
 			<value datatype="string">Cd_alpha.dat</value>
                         <description></description>
+                    </param>
+                    <param name="par_det_Fe_sol_file">
+			<value datatype="string">worjh2.det_Fe_sol.NULL.dat</value>
+                        <description>Filename for dust Fe solubility field</description>
                     </param>
                     <param name="par_scav_fpart_POC_file">
 			<value datatype="string">scav_fpart_POC.dat</value>
@@ -4139,6 +4159,14 @@
                     <param name="par_force_Fgeothermal2D_file">
 			<value datatype="string">NONE.dat</value>
                         <description>Filename for 2D geothermal heat input field</description>
+                    </param>
+                    <param name="ctrl_force_Vgrid">
+			<value datatype="boolean">.false.</value>
+                        <description>Use virtual grid (for remin)?</description>
+                    </param>
+                    <param name="par_force_Vgrid_file">
+			<value datatype="string">NONE.dat</value>
+                        <description>Filename for virtual grid</description>
                     </param>
 <!-- BIOLOGICAL NEW PRODUCTION  -->
                     <param name="par_bio_prodopt">
@@ -4368,6 +4396,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>RDOM degradation by (surface) photolysis only?</description>
                     </param>
+                    <param name="opt_bio_red_DOMfrac">
+			<value datatype="string">DEFAULT</value>
+                        <description>DOM production option</description>
+                    </param>
+                    <param name="par_bio_red_DOMfrac_Tdep_const">
+			<value datatype="real">0.419</value>
+                        <description>DOM production constant in Dunne et al. [2005]</description>
+                    </param>
+                    <param name="par_bio_red_DOMfrac_Tdep_gamma">
+			<value datatype="real">0.0101</value>
+                        <description>DOM production scalar in Dunne et al. [2005]</description>
+                    </param>
+                    <param name="ctrl_bio_remin_DOM_Tdep">
+			<value datatype="boolean">.false.</value>
+                        <description>T-dependent DOM remineralization?</description>
+                    </param>
                     <param name="par_bio_remin_CH4rate">
 			<value datatype="real">1.0e-4</value>
                         <description>Specific CH4 oxidation rate (d-1)</description>
@@ -4507,6 +4551,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_POC_Ea2">
 			<value datatype="real">80000.0</value>
                         <description>'Activation energy #2 for POC (J)</description>
+                    </param>
+                    <param name="par_bio_remin_DOC_K1">
+			<value datatype="real">1.0E12</value>
+                        <description>Degradation rate constant #1 for DOC (yr-1)</description>
                     </param>
                     <param name="par_bio_remin_POC_dfrac2">
 			<value datatype="real">0.0</value>
@@ -4792,20 +4840,24 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">FIXED</value>
                         <description>CaCO3 44Ca fractionation scheme ID string [alt: 'Fantle']</description>
                     </param>
+                    <param name="par_d13C_DIC_Corg_epsilon">
+                       <value datatype="real">-25.0</value>
+                       <description>FIXED fractionation D13C</description>
+                    </param>
                     <param name="par_d13C_DIC_Corg_b">
                        <value datatype="real">171.0</value>
                        <description>b value for Popp et al. fractionation</description>
                     </param>
                     <param name="par_d13C_DIC_Corg_ef">
-                       <value datatype="real">25.</value>
+                       <value datatype="real">25.0</value>
                        <description>Fractionation for intercellular C fixation (Ridgwell, 2001, PhD. Thesis)</description>
                     </param>
 		    <param name="par_d13C_DIC_Corg_ef_sp">
-		       <value datatype="real">25.</value>
+		       <value datatype="real">25.0</value>
 		       <description>Fractionation for intercellular C fixation of siliceous phytoplankton (Ridgwell, 2001, PhD. Thesis)</description>
 		    </param>
 		    <param name="par_d13C_DIC_Corg_ef_nsp">
-		       <value datatype="real">20.</value>
+		       <value datatype="real">20.0</value>
 		       <description>Fractionation for intercellular C fixation of non-siliceous phytoplankton (Ridgwell, 2001, PhD. Thesis)</description>
 		    </param>
 		    <param name="par_d30Si_opal_epsilon">
@@ -4844,6 +4896,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0</value>
                         <description>188/192Os fractionation between Os and OsCO3</description>
                     </param>
+                    <param name="par_d56Fe_Corg_FeOOH_epsilon">
+			<value datatype="real">-1.3</value>
+                        <description>dissimilatory iron reduction fractionation</description>
+                    </param>
                     <param name="par_d13C_Corg_CH4_epsilon">
 			<value datatype="real">-35.0</value>
                         <description>methanogenesis fractionation</description>
@@ -4851,6 +4907,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_d34S_Corg_SO4_epsilon">
 			<value datatype="real">-40.0</value>
                         <description>sulphate reduction S fractionation</description>
+                    </param>
+                    <param name="par_d34S_AOM_alpha">
+			<value datatype="real">1.0</value>
+                        <description>AOM S fractionation</description>
+                    </param>
+                    <param name="par_d34S_AerSox_alpha">
+			<value datatype="real">1.0</value>
+                        <description>Aerobic S oxidation S fractionation</description>
+                    </param>
+                    <param name="par_d34S_ISO_alpha">
+			<value datatype="real">1.0</value>
+                        <description>iron-mediated S oxidation S fractionation</description>
                     </param>
                     <param name="par_bio_uptake_dN2_epsilon">
 			<value datatype="real">0.0</value>
@@ -5354,6 +5422,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_data_save_slice_cdrmip">
 			<value datatype="boolean">.false.</value>
                         <description>Save cdrmip data (only)?</description>
+                    </param>
+                    <param name="ctrl_data_save_slice_carb_update">
+			<value datatype="boolean">.true.</value>
+                        <description>Update carbonate chemistry for saving?</description>
                     </param>
 <!-- DATA SAVING: TIME-SERIES -->
                     <param name="ctrl_data_save_sig_ocnatm">
@@ -6616,6 +6688,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
                         <description>Surface ocean saturation state target</description>
                     </param>
+                    <param name="par_force_invert_wtpctcaco3">
+			<value datatype="real">-99.9</value>
+                        <description>Sediment wt% CaCO3 target</description>
+                    </param>
                     <param name="ctrl_force_invert_noneg">
 			<value datatype="boolean">.false.</value>
                         <description>Prevent negative inversion fluxes?</description>
@@ -7303,6 +7379,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">-15.0</value>
                         <description>Li low temperature alteration sink 7Li epsilon (o/oo)</description>
                     </param>
+                    <param name="ctrl_sed_lowTalt_7Li_epsilon_fixed">
+			<value datatype="boolean">.true.</value>
+                        <description>fixed (non T-dependent) temperature alteration  7Li epsilon?</description>
+                    </param>
+                    <param name="par_sed_lowTalt_7Li_epsilon_DT">
+			<value datatype="real">-0.07</value>
+                        <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
+                    </param>
                     <param name="par_sed_clay_fLi_alpha">
 			<value datatype="real">0.0</value>
                         <description>Li clay formation sink (mol yr-1) (Li/Ca normalized)</description>
@@ -7313,7 +7397,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="ctrl_sed_clay_7Li_epsilon_fixed">
 			<value datatype="boolean">.true.</value>
-                        <description>fixed (non T-dependent) MACC 7Li epsilon?  </description>
+                        <description>fixed (non T-dependent) MACC 7Li epsilon?</description>
+                    </param>
+                    <param name="par_sed_clay_7Li_epsilon_DT">
+			<value datatype="real">-0.15</value>
+                        <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
                     </param>
                     <param name="par_sed_hydroip_fCa">
 			<value datatype="real">0.0</value>
@@ -7398,6 +7486,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_hydroip_fDIC_d13C">
 			<value datatype="real">0.0</value>
                         <description>d13C</description>
+                    </param>
+                    <param name="ctrl_sed_Fhydr2D">
+			<value datatype="boolean">.false.</value>
+                        <description>Make hydrothermal input 2D?</description>
+                    </param>
+                    <param name="par_sed_Fhydr2D_name">
+                        <value datatype="string">hello_world</value>
+                        <description>2D hydrothermal input filename</description>
+                    </param>
+                    <param name="par_sed_T0C">
+			<value datatype="real">0.0</value>
+                        <description>Mean ocean floor reference temeprature (C)</description>
                     </param>
 <!-- MISC CONTROLS  -->
                     <param name="ctrl_sed_forcedohmega_ca">
@@ -7886,7 +7986,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">10.00E-6</value>
 			      <description>global silicate Li abundance</description>
                     </param>
-					<param name="par_weather_Li_Rscale">
+			<param name="par_weather_Li_Rscale">
 			<value datatype="real">10.000</value>
                         <description>global silicate Li weathering scaling</description>
                     </param>
@@ -7958,17 +8058,29 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.16</value>
                         <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
                     </param>
-                    <param name="par_weather_fracOs">
+                    <param name="par_weather_CaSiO3_fracOs">
 			<value datatype="real">0.0</value>
-                        <description>mean Os:Ca2+ ratio of weathering flux</description>
+                        <description>mean Os:Ca2+ ratio of silicate weathering flux</description>
                     </param>
-                    <param name="par_weather_187Os_188Os">
+                    <param name="par_weather_CaCO3_fracOs">
 			<value datatype="real">0.0</value>
-                        <description>mean 187Os/188Os ratio of weathering flux</description>
+                        <description>mean Os:Ca2+ ratio of carbonate weathering flux</description>
                     </param>
-                    <param name="par_weather_188Os_192Os">
+                    <param name="par_weather_CaSiO3_187Os_188Os">
 			<value datatype="real">0.0</value>
-                        <description>mean 188Os/192Os ratio of weathering flux</description>
+                        <description>mean 187Os/188Os ratio of silicate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaCO3_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 187Os/188Os ratio of carbonate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of silicate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaCO3_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of carbonate weathering flux</description>
                     </param>
                     <param name="par_weather_CaSiO3_fracCa5PO43">
 			<value datatype="real">0.0</value>
@@ -8034,6 +8146,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_fCaSiO3_enh_nt">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaSiO3 weathering total inventory -- as years x enhancement factor</description>
+                    </param>
+	           <param name="opt_weather_CaSiO3_fracLi">
+			<value datatype="string">""</value>
+                        <description>Li weathering scheme ('OLD','Pogge') -- '' is the fixed fractionation default</description>
+                    </param>
+                    <param name="ctrl_weather_CaSiO3_7Li_epsilon_fixed">
+                        <value datatype="boolean">.true.</value>
+                          <description>Fixed (non T-dep) clay fractionation?</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_7Li_epsilon_DT">
+                        <value datatype="real">-0.15</value>
+                          <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
                     </param>
                       <!-- *** 2D WEATHERING PARAMETERS ********************************* -->
                     <param name="par_lith_data">
@@ -8166,6 +8290,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_force_T">
                       <value datatype="boolean">.FALSE.</value>
                       <description>Force ecogem with a temperature field</description>
+                    </param>
+                    <param name="par_beta_POCtoDOC">
+			<value datatype="real">1.0</value>
+	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
+                    </param>
+                    <param name="ctrl_Tdep_POCtoDOC">
+                      <value datatype="boolean">.FALSE.</value>
+                      <description>Temperature-dependent POC/DOC partitioning?</description>
                     </param>
 <!-- Character strings  -->
                     <param name="ctrl_tdep_form">
@@ -8562,6 +8694,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
 	                  <description>Width of grazing kernel - exponent</description>
                     </param>
+                    <param name="gkernel_cap">
+			<value datatype="boolean">.true.</value>
+	                  <description>Set small values of gkernel to zero (like in wardetal.2018) - Fanny Mar21</description>
+                    </param>
+
+                    <param name="ctrl_grazing_explicit">
+			<value datatype="boolean">.false.</value>
+	                  <description>Select plankton specific grazing parameters JDW_FMM_2020</description>
+                    </param>
+                    <param name="par_ecogem_grazing_file">
+			<value datatype="string">one_plankton.zoo</value>
+	                  <description>Plankton specific grazing input file</description>
+                    </param>
 <!-- Other loss parameters -->
                     <param name="respir_a">
 			<value datatype="real">0.05</value>
@@ -8610,10 +8755,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="beta_mort_c">
 			<value datatype="real">100.0</value>
 	                  <description>Fraction mortality to dissolved - midpoint vol.</description>
-                    </param>
-                    <param name="par_beta_POCtoDOC">
-			<value datatype="real">1.0</value>
-	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
                     </param>
 <!-- initial fractional abundance of particulate export -->
                     <param name="par_bio_remin_POC_frac2">

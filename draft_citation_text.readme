@@ -1,0 +1,4 @@
+
+The code for the version of the ‘muffin’ release of the cGENIE Earth system model used in this paper, is tagged as v0.xxx, and is assigned a DOI: 10.5281/zenodo.xxxxxxx. 
+Configuration files for the specific experiments presented in the paper can be found in the directory: genie-userconfigs/MS/yyyyyyy. Details of the experiments, plus the command line needed to run each one, are given in the readme.txt file in that directory. All other configuration files and boundary conditions are provided as part of the code release.
+A manual detailing code installation, basic model configuration, tutorials covering various aspects of model configuration and experimental design, plus results output and processing, is assigned a DOI: 10.5281/zenodo.xxxxxxx. 

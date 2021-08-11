@@ -322,6 +322,7 @@ CONTAINS
           ! Output variables
           chlsynth(:) =  chlsynth(:) * isautotrophic
           PP(:)       = (PCPhot(:) - costbiosynth(:)) * isautotrophic
+          if (fundamental) PP(:) = PCPhot(:) * isautotrophic ! ignore cost of biosynthesis in fund. niche experiment
           totPP       =  sum(PCPhot(:) * Cbiomass(:) * isautotrophic) ! does not include cost of biosynthesis
           !-----------------------------------------------------------------
        else ! else if it is extremely dark
@@ -348,6 +349,7 @@ CONTAINS
   SUBROUTINE grazing(          &
        &                  biomass,  &
        &                  gamma_T,  &
+	   &                  zoolimit,  &
        &                  GrazingMat &
        &                 )
 
@@ -358,6 +360,7 @@ CONTAINS
     real,                                  intent(in)  :: gamma_T
     real,dimension(iomax+iChl,npmax)      ,intent(in)  :: biomass
     real,dimension(iomax+iChl,npmax,npmax),intent(out) :: GrazingMat
+    real,dimension(npmax,npmax),intent(out)            :: zoolimit
     ! ---------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
@@ -415,7 +418,7 @@ CONTAINS
           do jprey=1,npmax ! sum all the prey carbon of predator, weighted by availability (preference)
              if (gkernel(jpred,jprey).gt.0.0) then
                 food1 = food1 +  gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey)      ! available food
-                food2 = food2 + (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns ! available food ^ ns
+                food2 = food2 + (gkernel(jpred,jprey)*palatability(jprey) * biomass(iCarb,jprey))**ns_array(jpred) ! available food ^ ns
              endif
           enddo
           ! calculate grazing effort
@@ -426,12 +429,13 @@ CONTAINS
           ! loop prey to calculate grazing rates on each prey and element
           do jprey=1,npmax
              if (biomass(iCarb,jprey).gt.0.0.and.food2.gt.0.0) then ! if any prey food available
-                GrazingMat(iCarb,jpred,jprey) = tmp1 * gamma_T * graz(jpred) &                        ! total grazing rate
-                     &             * (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns/food2 ! * switching
+                GrazingMat(iCarb,jpred,jprey) = tmp1 * gamma_T * graz(jpred)   &                        ! total grazing rate
+                     &             * (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! * switching
+                zoolimit(jpred,jprey) = tmp1 *(gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! food limitation calulation for zooplankton - Maria May 2019
                 ! other organic elements (+ chlorophyll) are grazed in stoichiometric relation to carbon
                 do io=2,iomax+iChl
                    if (biomass(iCarb,jprey).gt.0.0) then
-                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) & 
+                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) &
                            &                                      * biomass(io,jprey)/biomass(iCarb,jprey)
                    endif
                 enddo ! io
@@ -439,6 +443,7 @@ CONTAINS
           enddo ! jprey
        endif  ! endif non-zero max grazing rate
     enddo ! jpred
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -449,7 +454,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
-  ! ****************************************************************************************************************************** !  
+  ! ****************************************************************************************************************************** !
   !ckc fractiontion to calculate nutrient isotopes uptake rates based on up_inorg
   SUBROUTINE nut_fractionation (           &
        up_inorg,    &
@@ -554,4 +559,3 @@ CONTAINS
   ! ****************************************************************************************************************************** !
 
 END MODULE ecogem_box
-

@@ -68,9 +68,12 @@ CONTAINS
     conv_sed_ocn(io_Fe_56Fe,is_POFe_56Fe)        = 1.0
     conv_sed_ocn(io_TDFe,is_POFe)                = 1.0
     conv_sed_ocn(io_TDFe_56Fe,is_POFe_56Fe)      = 1.0
+    conv_sed_ocn(io_Fe2,is_POFe)                 = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_POFe_56Fe)       = 1.0
     conv_sed_ocn(io_O2,is_POC)                   = -1.0
     conv_sed_ocn(io_O2,is_PON)                   = -1.0
     conv_sed_ocn(io_O2,is_POP)                   = -1.0
+    conv_sed_ocn(io_O2,is_POFe)                  = 0.0 ! assume by default, no exchange of O2 with Fe uptake/release
     conv_sed_ocn(io_Cd,is_POCd)                  = 1.0
     conv_sed_ocn(io_Cd_114Cd,is_POCd_114Cd)      = 1.0
     conv_sed_ocn(io_I,is_POI)                    = 1.0
@@ -583,6 +586,37 @@ CONTAINS
     ! END
     ! -------------------------------------------------------- !
   END subroutine sub_load_data_nstr
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD IN ij (2D) INTEGER DATA
+  SUBROUTINE sub_load_data_ij_INT(dum_filename,dum_i,dum_j,dum_data)
+    ! common blocks
+    IMPLICIT NONE
+    ! dummy variables
+    CHARACTER(len=*),INTENT(in)::dum_filename
+    integer,intent(in)::dum_i,dum_j
+    integer,INTENT(inout),DIMENSION(dum_i,dum_j)::dum_data
+    ! local variables
+    INTEGER::i,j
+    integer::ios
+    ! read data
+    OPEN(unit=in,status='old',file=TRIM(dum_filename),action='read',IOSTAT=ios)
+    If (ios /= 0) then
+       CALL sub_report_error( &
+            & 'gem_util','sub_load_data_ij', &
+            & 'File <'//trim(dum_filename)//'> does not exist', &
+            & 'STOPPING', &
+            & (/const_real_zero/),.true. &
+            & )
+    else
+       DO j=dum_j,1,-1
+          READ(unit=in,fmt=*) (dum_data(i,j),i=1,dum_i)
+       ENDDO
+    end if
+    CLOSE(in)
+  END SUBROUTINE sub_load_data_ij_INT
   ! ****************************************************************************************************************************** !
 
 
@@ -2279,6 +2313,7 @@ CONTAINS
     string_atm_tlname(:) = ' '
     atm_mima(:,:)        = 0.0
     conv_ia_lselected(:) = 0
+    ia2l(:)              = 0
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.atm'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -2380,6 +2415,7 @@ CONTAINS
     string_ocn_tlname(:) = ' '
     ocn_mima(:,:)        = 0.0
     conv_io_lselected(:) = 0
+    io2l(:)              = 0
     ! check file format and determine number of lines of data
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.ocn'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
@@ -2481,6 +2517,7 @@ CONTAINS
     string_sed_tlname(:) = ' '
     sed_mima(:,:)        = 0.0
     conv_is_lselected(:) = 0
+    is2l(:)              = 0
     ! check file format
     loc_filename = TRIM(par_gem_indir_name)//'tracer_define.sed'
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
