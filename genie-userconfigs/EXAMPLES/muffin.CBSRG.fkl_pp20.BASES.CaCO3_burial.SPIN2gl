@@ -84,11 +84,13 @@ rg_par_ref_T0=12.03
 rg_par_weather_CaCO3=1.034910000000000e+13
 # global silicate weathering rate (mol Ca2+ yr-1)
 rg_par_weather_CaSiO3=6.899400000000000e+12
+# CO2 outgassing rate (mol C yr-1)
+rg_par_outgas_CO2=6.899400000000000e+12
 # set isotopic values of CO2 outgassing and carbonate weathering
-# NOTE: calculate d13C of CaCO3 weathering to balance d13C of CaCO3 burial (2.767 o/oo) minus outgasing
-#       (0.172485E+14*2.767-6.899400000000000e+12*(-6))/1.034910000000000e+13
+# NOTE: calculate d13C of CaCO3 weathering to balance d13C of CaCO3 burial (2.65 o/oo) minus outgasing
+#       (0.172485E+14*2.65-6.899400000000000e+12*(-6))/1.034910000000000e+13
 rg_par_outgas_CO2_d13C=-6.0
-rg_par_weather_CaCO3_d13C=8.6
+rg_par_weather_CaCO3_d13C=8.4
 #
 # *** GEOCHEM ACCELERATION ******************************************
 #
