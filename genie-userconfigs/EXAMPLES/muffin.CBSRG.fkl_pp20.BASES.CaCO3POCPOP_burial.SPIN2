@@ -54,12 +54,8 @@ sg_par_sed_Dmax_neritic=0.0
 # NOTE: "ridgwell2001lookup" is the the simplest/fastest option
 sg_par_sed_diagen_CaCO3opt="ridgwell2001lookup"
 # bioturbation
-# NOTE: turn ON bioturbation to capture carbonate compensation dynamics
-sg_ctrl_sed_bioturb=.TRUE.
-# force an invarient surface bioturbation mixing rate 
-# (otherwise bioturbation becomes a function of [O2] and F(POC) following Archer et al. [2002])
-sg_par_sed_mix_k_sur_max=0.15
-sg_par_sed_mix_k_sur_min=0.15
+# NOTE: turn OFF bioturbation to equilibriate the system faster
+sg_ctrl_sed_bioturb=.FALSE.
 # generic paleo detrital flux (g cm-2 kyr-1)
 # NOTE: set to zero when applying a dust field (unless an additional detrital flux is required)
 sg_par_sed_fdet=0.180
