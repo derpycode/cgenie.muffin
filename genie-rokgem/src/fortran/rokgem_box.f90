@@ -1167,6 +1167,16 @@ CONTAINS
     loc_force_flux_weather_o(io_H2S_34S) = loc_force_flux_weather_o(io_H2S_34S) + &
          & fun_calc_isotope_fraction(par_weather_kerogen_fracS_d34S,loc_standard)* &
          & par_weather_kerogen_fracS*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+    ! (4) associated ALK (implicit nitrogen) flux
+    ! NOTE: excluding S-associated ALK
+    ! NOTE: tie ALK to C weathering (via par_weather_kerogen_fracALK) only for now
+    if (opt_weather_fixed_kerogenP) then
+       loc_weather_CaSiO3 = par_weather_CaSiO3
+    else
+       loc_weather_CaSiO3 = adj_weather_CaSiO3
+    end if
+    loc_force_flux_weather_o(io_ALK) = loc_force_flux_weather_o(io_ALK) + &
+         & par_weather_kerogen_fracALK*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !

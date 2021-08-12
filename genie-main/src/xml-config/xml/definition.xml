@@ -8134,6 +8134,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
 			      <description>global kerogen P (relative to C) abundance</description>
                     </param>
+                    <param name="par_weather_kerogen_fracALK">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen ALK (relative to C) abundance</description>
+                    </param>
                     <param name="par_weather_kerogen_fracS">
 			<value datatype="real">0.0</value>
 			      <description>global kerogen S (relative to C) abundance</description>

@@ -188,9 +188,11 @@ MODULE rokgem_lib
   REAL::par_weather_SiO2_d30Si                                                           ! global quartz d30Si (o/oo)
   NAMELIST /ini_rokgem_nml/par_weather_SiO2,par_weather_SiO2_d30Si  
   real:: par_weather_kerogen_fracP                                                       ! global kerogen P relative (to C) abundance
+  real:: par_weather_kerogen_fracALK                                                     ! global kerogen 'ALK' relative (to C) abundance
+  NAMELIST /ini_rokgem_nml/par_weather_kerogen_fracP,par_weather_kerogen_fracALK  
   real:: par_weather_kerogen_fracS                                                       ! global kerogen S relative (to C) abundance
   REAL:: par_weather_kerogen_fracS_d34S                                                  ! global kerogen S d34S
-  NAMELIST /ini_rokgem_nml/par_weather_kerogen_fracP,par_weather_kerogen_fracS,par_weather_kerogen_fracS_d34S  
+  NAMELIST /ini_rokgem_nml/par_weather_kerogen_fracS,par_weather_kerogen_fracS_d34S  
   LOGICAL:: opt_calibrate_T_0D                                                           ! calibrate temperature fields to global average data
   LOGICAL:: opt_calibrate_R_0D                                                           ! calibrate runoff fields to global average data
   LOGICAL:: opt_calibrate_P_0D                                                           ! calibrate productivity fields to global average data

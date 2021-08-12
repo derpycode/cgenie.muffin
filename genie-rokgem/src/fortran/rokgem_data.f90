@@ -174,6 +174,7 @@ CONTAINS
        print*,'global quartz weathering rate (mol Si yr-1)         : ',par_weather_SiO2
        print*,'global quartz d30Si (o/oo)                          : ',par_weather_SiO2_d30Si    
        print*,'global kerogen P abundance                          : ',par_weather_kerogen_fracP
+       print*,'global kerogen ALK abundance                        : ',par_weather_kerogen_fracALK
        print*,'global kerogen S abundance                          : ',par_weather_kerogen_fracS
        print*,'global kerogen S d34S (o/oo)                        : ',par_weather_kerogen_fracS_d34S
        print*,'calibrate temperature fields to global average data : ',opt_calibrate_T_0D
