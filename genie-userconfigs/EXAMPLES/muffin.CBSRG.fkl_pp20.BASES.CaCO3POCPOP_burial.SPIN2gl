@@ -116,17 +116,11 @@ rg_par_weather_kerogen_fracALK=-3.416080718374731e-01
 # NOTE: geochem acceleration requires: ma_flag_gemlite=.TRUE.
 # re-partition CO2 between ocean and atmosphere
 gl_ctrl_update_pCO2=.true.
-# for NO (~0:1) acceleration
-# (or configure the base-config with ma_flag_gemlite=.FALSE.)
-ma_gem_notyr_min=9999999
-ma_gem_notyr_max=9999999
-ma_gem_yr_min=1
-ma_gem_yr_max=1
-#### for e.g. 10:1 acceleration
-###ma_gem_notyr_min=10
-###ma_gem_notyr_max=10
-###ma_gem_yr_min=90
-###ma_gem_yr_max=90
+# 10:1 acceleration
+ma_gem_notyr_min=10
+ma_gem_notyr_max=10
+ma_gem_yr_min=90
+ma_gem_yr_max=90
 #
 # *** DATA SAVING ***************************************************
 #
