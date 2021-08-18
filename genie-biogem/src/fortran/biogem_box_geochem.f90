@@ -1934,6 +1934,202 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! OXIDATION OF IODIDE
+  SUBROUTINE sub_box_oxidize_ItoIO3(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    integer::l,io,k,id
+    real::loc_O2,loc_I
+    real::loc_I_oxidation,loc_I_remin
+    real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_remin(io,:) = 0.0
+    end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! OXIDIZE IODIDE
+    ! -------------------------------------------------------- !
+    ! look for some I and see if it can be instantaneously oxidized (using O2; if there is any!)
+    ! 2I + 3O2 -> 2IO3
+    ! NOTE: loc_I_oxidation_const units are (???)
+    DO k=n_k,dum_k1,-1
+       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_I  = ocn(io_I,dum_i,dum_j,k)
+       if ((loc_O2 > const_real_nullsmall) .AND. (loc_I > const_real_nullsmall)) then
+          ! calculate I oxidation, and cap value at I concentration if necessary
+          ! NOTE: 'complete' option has been removed and can be implemented by a very short lifetime
+          SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
+          CASE ('Fennel')
+             ! from: Fennel et al. [2005]
+             ! oxidation rate constant: 6 yr-1
+             ! NOTE: fixed rate replaced by: par_bio_remin_kItoIO3
+             ! oxidation half saturation for oxygen: 2.0E-05 mol kg-1
+             ! NOTE: fixed half saturation replaced by: par_bio_remin_cO2_ItoIO3
+             loc_I_oxidation = dum_dtyr*par_bio_remin_kItoIO3*loc_I*(loc_O2/(par_bio_remin_cO2_ItoIO3 + loc_O2))
+          case ('lifetime')
+             ! NOTE: 
+             if (par_bio_remin_Ilifetime > dum_dtyr) then
+                loc_I_oxidation = min((dum_dtyr/par_bio_remin_Ilifetime)*loc_I,(2.0/3.0)*loc_O2)
+             else
+                loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
+             end if
+          case ('DOI')
+             ! NOTE: in the absence of explicit NH4+ and NH4+ oxidation,
+             !       one can scale NH4+ oxidation with DON remin following Martin et al. [2019]
+             !       => by analogy, scale I- oxidation with DOI (and POI) remin
+             ! NOTE: ctrl_bio_remin_redox_save must be .TRUE.
+             ! NOTE: (loc_O2/(loc_O2 + par_bio_remin_cO2_IO3toI)) -> provides low [O2] inhibition
+             if (ctrl_bio_remin_redox_save) then
+                loc_I_remin = diag_redox(conv_lslo2idP(is2l(is_POI),io2l(io_I)),dum_i,dum_j,k) + &
+                     & diag_redox(conv_lslo2idD(is2l(is_POI),io2l(io_I)),dum_i,dum_j,k)
+                loc_I_oxidation = dum_dtyr*par_bio_remin_kItoIO3*io_I* &
+                     & (loc_O2/(loc_O2 + par_bio_remin_cO2_ItoIO3))*(1.0 - io_I/(io_I + loc_I_remin/dum_dtyr))
+             else
+                loc_I_oxidation = 0.0
+             end if
+          case default
+             loc_I_oxidation = 0.0
+          end select
+          ! but don't oxidize too much I-
+          loc_I_oxidation = min(loc_I_oxidation,loc_f*loc_I,loc_f*(2.0/3.0)*loc_O2)
+          ! calculate tracer remin changes
+          loc_bio_remin(io_I,k)   = -loc_I_oxidation
+          loc_bio_remin(io_IO3,k) = loc_I_oxidation
+          loc_bio_remin(io_O2,k)  = -(3.0/2.0)*loc_I_oxidation
+       end if
+    end DO
+    ! -------------------------------------------------------- !
+    ! WRITE GLOBAL ARRAY DATA
+    ! -------------------------------------------------------- !
+    ! write ocean tracer remineralization field (global array)
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
+    end do
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
+    id = fun_find_str_i('redox_ItoIO3_dI',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_I,:)
+    id = fun_find_str_i('redox_ItoIO3_dIO3',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_IO3,:)
+    id = fun_find_str_i('redox_ItoIO3_dO2',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_oxidize_ItoIO3
+  ! ****************************************************************************************************************************** !
+
+  
+  ! ****************************************************************************************************************************** !
+  ! REDUCTION OF IODATE
+  SUBROUTINE sub_box_reduce_IO3toI(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    integer::l,io,k,id
+    real::loc_O2,loc_IO3
+    real::loc_IO3_reduction
+    real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_remin(io,:) = 0.0
+    end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! REDUCE IODATE
+    ! -------------------------------------------------------- !
+    ! look for some IO3 and see if it can be instantaneously reduced
+    ! 2IO3 -> 2I + 3O2
+    DO k=n_k,dum_k1,-1
+       loc_O2   = ocn(io_O2,dum_i,dum_j,k)
+       loc_IO3  = ocn(io_IO3,dum_i,dum_j,k)
+       if (loc_IO3 > const_real_nullsmall) then
+          ! calculate IO3 reduction
+          SELECT CASE (opt_bio_remin_reduce_IO3toI)
+          case ('inhibition')
+             ! NOTE: (par_bio_remin_cO2_IO3toI/(par_bio_remin_cO2_IO3toI + loc_O2)) -> provides high [O2] inhibition
+             loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
+                  & (loc_IO3/(loc_IO3 + par_bio_remin_cIO3_IO3toI))*(par_bio_remin_cO2_IO3toI/(par_bio_remin_cO2_IO3toI + loc_O2))
+          case ('threshold')
+             if (loc_O2 < par_bio_remin_cO2_IO3toI) then
+                loc_IO3_reduction = loc_IO3
+             else
+                loc_IO3_reduction = 0.0
+             endif
+          case ('remin')
+             ! NOTE: use SO4 reduction (H2S production) rate to scale the rate of IO3 reduction (via par_bio_remin_SO4toIO3)
+             !       becasue SO4 reduction is [O2] sensitive, no need for addiitonal [O2] inhibition term
+             ! NOTE: because [IO3] is so low relative to electron acceptor requirement,
+             !       => don't both with either a [IO3] dependence or limitaion (meaning that IO3 reduction can do to completion)
+                loc_SO4_reduction = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_H2S)),dum_i,dum_j,k) + &
+                     & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_H2S)),dum_i,dum_j,k)
+             loc_IO3_reduction = dum_dtyr*par_bio_remin_SO4toIO3*loc_SO4_reduction
+          case default
+             loc_IO3_reduction = 0.0
+          end select
+          ! but don't reduce too much IO-
+          loc_IO3_reduction = min(loc_IO3_reduction,loc_f*loc_IO3)
+          ! calculate tracer remin changes
+          loc_bio_remin(io_IO3,k) = -loc_IO3_reduction
+          loc_bio_remin(io_I,k)   = loc_IO3_reduction
+          loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_IO3_reduction
+       end if
+    end DO
+    ! -------------------------------------------------------- !
+    ! WRITE GLOBAL ARRAY DATA
+    ! -------------------------------------------------------- !
+    ! write ocean tracer remineralization field (global array)
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
+    end do
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record diagnostics (mol kg-1)
+    id = fun_find_str_i('redox_IO3toI_dI',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_I,:)
+    id = fun_find_str_i('redox_IO3toI_dIO3',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_IO3,:)
+    id = fun_find_str_i('redox_IO3toI_dO2',string_diag_redox)
+    diag_redox(id,dum_i,dum_j,:) = loc_bio_remin(io_O2,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_reduce_IO3toI
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! ### >>> TEMPORARY CODE ... ################################################################################################### !
+  ! ****************************************************************************************************************************** !
+  ! OXIDATION OF IODIDE
   SUBROUTINE sub_calc_bio_remin_oxidize_I(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
@@ -2013,6 +2209,8 @@ CONTAINS
     ! END
     ! -------------------------------------------------------- !
   end SUBROUTINE sub_calc_bio_remin_oxidize_I
+  ! ****************************************************************************************************************************** !
+  ! ### <<< TEMPORARY CODE ... ################################################################################################### !
   ! ****************************************************************************************************************************** !
 
 
