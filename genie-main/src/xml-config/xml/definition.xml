@@ -1337,6 +1337,14 @@
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
+                        <param name="sed_select(110)" index="110">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(111)" index="111">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
                   </paramArray>
 <!-- GEOCHEM CONTROLS  -->
                     <param name="par_carbconstset_name">
@@ -4504,6 +4512,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">1.13</value>
                         <description>Activity coefficient for aqueous SiO2</description>
                     </param>
+                     <param name="par_bio_remin_gammaPO4">
+                        <value datatype="real">0.0529</value>
+                        <description>Activity coefficient for aqueous PO4 as HPO42-; Pierrot and Millero, 2017, Aquatic geochemistry</description>
+                    </param>
                     <param name="ctrl_bio_remin_POC_fixed">
 			<value datatype="boolean">.true.</value>
                         <description>fixed-profile POM remineralization?</description>
@@ -5216,6 +5228,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_d56Fe_FeCO3_alpha">
 			<value datatype="real">0.9997</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
+                    </param>
+                    <param name="par_bio_Fe3PO42precip_sf">
+			<value datatype="real">8.19936E-11</value>
+                        <description>kinetic factor for Fe3PO42 precipitation in M yr-1 [Derry 2015]</description>
+                    </param>
+                    <param name="par_bio_Fe3PO42precip_exp">
+			<value datatype="real">1.3</value>
+                        <description>Rate law power for Fe3PO42 precipitation</description>
+                    </param>
+                    <param name="par_bio_Fe3PO42precip_eq">
+			<value datatype="real">1.0e-11</value>
+                        <description>Thermodynamic const for Fe3PO42 precipitation</description>
+                    </param>
+                    <param name="par_d56Fe_Fe3PO42_alpha">
+			<value datatype="real">1.0</value>
+                        <description>fractionation factor d56/54 Fe in Fe3PO42 precipitation</description>
                     </param>
                     <param name="par_bio_Fe3Si2O4precip_sf">
 			<value datatype="real">6.133e-09</value>

@@ -155,6 +155,9 @@ CONTAINS
     conv_sed_ocn(io_Fe2,is_FeCO3)                = 1.0
     conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)        = 1.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeCO3_56Fe)      = 1.0
+    conv_sed_ocn(io_PO4,is_Fe3PO42)              = 2.0
+    conv_sed_ocn(io_Fe2,is_Fe3PO42)              = 3.0
+    conv_sed_ocn(io_Fe2_56Fe,is_Fe3PO42_56Fe)    = 3.0
     conv_sed_ocn(io_Fe2,is_Fe3Si2O4)             = 3.0
     conv_sed_ocn(io_SiO2,is_Fe3Si2O4)            = 2.0
     conv_sed_ocn(io_Fe2_56Fe,is_Fe3Si2O4_56Fe)   = 3.0

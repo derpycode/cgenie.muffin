@@ -23,7 +23,7 @@ MODULE gem_cmn
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
   INTEGER,PARAMETER::n_atm =  21
   INTEGER,PARAMETER::n_ocn = 109
-  INTEGER,PARAMETER::n_sed = 109
+  INTEGER,PARAMETER::n_sed = 111
 
 
   ! ****************************************************************************************************************************** !
@@ -279,6 +279,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_FeCO3                             = 88    ! 
   INTEGER,PARAMETER::is_FeCO3_13C                         = 89    !
   INTEGER,PARAMETER::is_FeCO3_56Fe                        = 90    !
+  INTEGER,PARAMETER::is_Fe3PO42                           = 110   !
+  INTEGER,PARAMETER::is_Fe3PO42_56Fe                      = 111   !
   INTEGER,PARAMETER::is_FeS2                              = 91    ! 
   INTEGER,PARAMETER::is_FeS2_34S                          = 92    !
   INTEGER,PARAMETER::is_FeS2_56Fe                         = 93    !

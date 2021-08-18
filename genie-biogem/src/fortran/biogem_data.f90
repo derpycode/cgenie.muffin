@@ -302,6 +302,7 @@ CONTAINS
        print*,'Activity coefficient for H+                         : ',par_bio_remin_gammaH
        print*,'Activity coefficient for OH-                        : ',par_bio_remin_gammaOH
        print*,'Activity coefficient for SiO2                       : ',par_bio_remin_gammaSiO2
+       print*,'Activity coefficient for PO4                        : ',par_bio_remin_gammaPO4
        print*,'I -> IO3 oxidation option                           : ',trim(opt_bio_remin_oxidize_ItoIO3)
        print*,'IO3 -> I reduction option                           : ',trim(opt_bio_remin_reduce_IO3toI)
        print*,'(oxidation) lifetime for I (yrs)                    : ',par_bio_remin_Ilifetime
@@ -404,10 +405,14 @@ CONTAINS
        print*,'Rate law power for FeCO3 precipitation              : ',par_bio_FeCO3precip_exp
        print*,'Ohmega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
        print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
+       print*,'Scale factor for Fe3PO42 precipitation              : ',par_bio_Fe3PO42precip_sf
+       print*,'Rate law power for Fe3PO42 precipitation            : ',par_bio_Fe3PO42precip_exp
+       print*,'Thermodynamic const for Fe3PO42 precipitation       : ',par_bio_Fe3PO42precip_eq
+       print*,'Fe fractionation factor for Fe3PO42 precipitation   : ',par_d56Fe_Fe3PO42_alpha
        print*,'Scale factor for Fe3Si2O4 precipitation             : ',par_bio_Fe3Si2O4precip_sf
        print*,'Rate law power for Fe3Si2O4 precipitation           : ',par_bio_Fe3Si2O4precip_exp
        print*,'Ohmega constant for Fe3Si2O4 precipitation          : ',par_bio_Fe3Si2O4precip_abioticohm_cte
-       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_FeCO3_alpha
+       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_Fe3Si2O4_alpha ! 08.12.2021: YK changed from par_d56Fe_FeCO3_alpha to par_d56Fe_Fe3Si2O4_alpha
        print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte

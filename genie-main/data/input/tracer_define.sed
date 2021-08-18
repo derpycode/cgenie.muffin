@@ -64,6 +64,8 @@
  FeCO3            88  88  06  'Fe carbonate'                         'wt%'     0.00     100.00
  FeCO3_13C        89  88  11  'd13C of FeCO3'                        'o/oo'   -9.99E+2    9.99E+2
  FeCO3_56Fe       90  88  22  'd56Fe of FeCO3'                       'o/oo'   -9.99E+2    9.99E+2
+ Fe3PO42         110 110  06  'Fe phosphate'                         'wt%'     0.00     100.00
+ Fe3PO42_56Fe    111 110  22  'd56Fe of Fe3PO42'                     'o/oo'   -9.99E+2    9.99E+2
  FeS2             91  91  06  'Fe pyrite'                            'wt%'     0.00     100.00
  FeS2_34S         92  91  15  'd13C of FeS2'                         'o/oo'   -9.99E+2    9.99E+2
  FeS2_56Fe        93  91  22  'd56Fe of FeS2'                        'o/oo'   -9.99E+2    9.99E+2
