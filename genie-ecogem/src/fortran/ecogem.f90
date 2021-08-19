@@ -750,7 +750,7 @@ subroutine ecogem(          &
   dum_egbg_sfcdiss(io_O2  ,:,:,:) = - 138.0 / 106.0 * nutrient_flux(iDIC ,:,:,:) / 1.0e3 / conv_m3_kg
   ! Photosynthesis-related changes in Alkalinity (REQUIRES MACRONUTRIENT UPTAKE FLUX - Ideally nitrate uptake flux)
   if (useNO3) then
-     !dum_egbg_sfcdiss(io_O2 ,:,:,:) = - (5.0/4.0) * nutrient_flux(iNO3 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NO3 uptake: H+ + NO3- → PON +(5/4)O2 + 1/2H2O - Fanny/Chris Jul21
+     dum_egbg_sfcdiss(io_O2 ,:,:,:) = - (5.0/4.0) * nutrient_flux(iNO3 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NO3 uptake: H+ + NO3- → PON +(5/4)O2 + 1/2H2O - Fanny/Chris Jul21
      dum_egbg_sfcdiss(io_ALK ,:,:,:) = - 1.0 * nutrient_flux(iNO3 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
      !dum_egbg_sfcdiss(io_O2 ,:,:,:) = (3.0/4.0) * n2_flux(:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for N2 uptake: N2 + 3H2 + (3/4)O2 → PON + (3/2)H2O - Fanny/Chris Jul21
   elseif (usePO4) then
@@ -763,7 +763,7 @@ subroutine ecogem(          &
      STOP
   endif
   if (useNH4) then
-     !dum_egbg_sfcdiss(io_O2 ,:,:,:) = (3.0/4.0) * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NH4 uptake: NH4+ + (3/4)O2 → PON + H+ + 3/2H2O - Fanny/Chris Jul21
+     dum_egbg_sfcdiss(io_O2 ,:,:,:) = (3.0/4.0) * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NH4 uptake: NH4+ + (3/4)O2 → PON + H+ + 3/2H2O - Fanny/Chris Jul21
      dum_egbg_sfcdiss(io_ALK ,:,:,:) = 1.0 * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - Fanny/Chris Jul21
   endif
 
