@@ -54,7 +54,8 @@ MODULE atchem_lib
   logical::par_atm_slabON                                      ! box model for terrestrial biosphere
   logical::par_atm_slabsave                                    ! crude saving of box terrestrial biosphere
   logical::par_atm_slab_restart                                ! restart from a previous run 
-  NAMELIST /ini_atchem_nml/par_atm_slabON,par_atm_slabsave,par_atm_slab_restart
+  logical::par_atm_slab_hetero                                 ! do heterogeneous calculation  
+  NAMELIST /ini_atchem_nml/par_atm_slabON,par_atm_slabsave,par_atm_slab_restart,par_atm_slab_hetero
   real::par_atm_slab_Fnpp0                                      ! NPP const (PgC yr-1)
   real::par_atm_slab_B                                          ! NPP pCO2 dependence 
   real::par_atm_slab_pCO2ref                                    ! NPP reference pCO2 (ppm)
@@ -156,6 +157,7 @@ MODULE atchem_lib
   !
   real,dimension(n_atm,n_i,n_j)::atm_slabbiosphere             ! 
   real,dimension(n_i,n_j)::slab_frac_vegi                      ! YK added 02.08.2021
+  integer,dimension(n_i,n_j)::slab_landmask                    ! YK added 08.20.2021
   real::slab_time_cnt                                          ! YK added 02.08.2021
   real::slab_time_cnt2                                         ! YK added 02.08.2021
   integer::utest                                               ! YK added 02.12.2021

@@ -56,9 +56,11 @@ SUBROUTINE initialise_atchem( &
   
   ! ---- YK added 02.08.2021 -----
   if (par_atm_slabON) then 
-     slab_frac_vegi(:,:) = 0.0 
-     slab_time_cnt = 0.0
-     slab_time_cnt2 = 0.0
+     
+     call sub_init_slabbiosphere_box()
+     
+     if ( par_atm_slab_hetero) call sub_init_slabbiosphere_hetero()
+     
      if (par_atm_slabsave) then 
         call system ('mkdir -p '//trim(adjustl(par_outdir_name))//'/tem/')
         utest = 100

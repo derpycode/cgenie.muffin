@@ -6953,6 +6953,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>restart from a previous run</description>
                     </param>
+                    <param name="par_atm_slab_hetero">
+			<value datatype="boolean">.false.</value>
+                        <description>do heterogeneous calculation</description>
+                    </param>
                     <param name="par_atm_slab_Fnpp0">
 			<value datatype="real">72.0</value>
                         <description>NPP const (PgC yr-1)</description>

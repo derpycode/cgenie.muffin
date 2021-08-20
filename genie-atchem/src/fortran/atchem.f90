@@ -176,6 +176,7 @@ end subroutine atchem_climate
 ! RESTART AtChem (save data)
 SUBROUTINE atchem_save_rst(dum_genie_clock)
   USE atchem_lib
+  USE atchem_data
   use atchem_data_netCDF
   IMPLICIT NONE
   ! ---------------------------------------------------------- !
@@ -185,7 +186,7 @@ SUBROUTINE atchem_save_rst(dum_genie_clock)
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
-  integer::l
+  integer::l,i,j
   integer::loc_iou 
   real::loc_yr                                                 ! 
   CHARACTER(len=255)::loc_filename
@@ -213,6 +214,12 @@ SUBROUTINE atchem_save_rst(dum_genie_clock)
           & (atm(conv_iselected_ia(l),:,:),l=1,n_l_atm)
      close(unit=out)
   end IF
+  ! 
+  ! ---- YK added 08.13.2021 -----
+  IF ( par_atm_slabON ) THEN
+    call sub_save_terrbio()
+  ENDIF 
+  ! 
   ! ---------------------------------------------------------- !
   ! END
   ! ---------------------------------------------------------- !

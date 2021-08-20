@@ -81,6 +81,7 @@ CONTAINS
        print*,'time duration assuming steady state                 : ',par_atm_slab_ss_dtyr
        print*,'tau (yr) as function of vegi amount (slope)         : ',par_atm_slab_dtaudvegi
        print*,'tau (yr) as function of vegi amount (intercept)     : ',par_atm_slab_tau0
+       print*,'do heterogeneous calculation                        : ',par_atm_slab_hetero
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
        print*,'--- RUN CONTROL ------------------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing
@@ -308,6 +309,181 @@ CONTAINS
     END DO
   END SUBROUTINE sub_init_slabbiosphere
   ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CONFIGURE AND INITIALIZE SLAB BIOSPHERE BOX model (YK added 08.20.2021)
+  SUBROUTINE sub_init_slabbiosphere_box()
+    USE genie_global,only:ilandmask1_atm ! YK added 
+    ! local variables
+    INTEGER::i,j
+    INTEGER::loc_ip,loc_ig
+    integer,dimension(n_i,n_j)::loc_iceland 
+    ! initialize global arrays
+    slab_frac_vegi(:,:) = 0.0 
+    slab_landmask(:,:) = 0 
+    slab_time_cnt = 0.0
+    slab_time_cnt2 = 0.0
+    
+    slab_landmask(:,:) = ilandmask1_atm(:,:)
+    
+    ! tentative way of searching for Antarctica and Greenland
+    loc_iceland = 0
+    do i=1,n_i ! marking pole regions
+       if (slab_landmask(i,1)==1)   loc_iceland(i,1)=1 
+       if (slab_landmask(i,n_j)==1) loc_iceland(i,n_j)=1
+    enddo 
+    
+    ! marking regions connected to poles
+    do j=2,n_j-1 
+       do i=1,n_i 
+          
+          if (slab_landmask(i,j)==0) cycle
+          
+          loc_ig = i-1
+          loc_ip = i+1
+          if (i==1) loc_ig = n_i
+          if (i==n_i) loc_ip = 1
+          
+          if (loc_iceland(i,j) == 0) then 
+             if (loc_iceland(loc_ig,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(loc_ip,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j-1)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j+1)==1) loc_iceland(i,j)=1
+          endif 
+       enddo  
+       do i=n_i,1,-1 
+          
+          if (slab_landmask(i,j)==0) cycle
+          
+          loc_ig = i-1
+          loc_ip = i+1
+          if (i==1) loc_ig = n_i
+          if (i==n_i) loc_ip = 1
+          
+          if (loc_iceland(i,j) == 0) then 
+             if (loc_iceland(loc_ig,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(loc_ip,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j-1)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j+1)==1) loc_iceland(i,j)=1
+          endif 
+       enddo 
+    enddo 
+    
+    do j=n_j-1,2,-1 
+       do i=1,n_i 
+          
+          if (slab_landmask(i,j)==0) cycle
+          
+          loc_ig = i-1
+          loc_ip = i+1
+          if (i==1) loc_ig = n_i
+          if (i==n_i) loc_ip = 1
+          
+          if (loc_iceland(i,j) == 0) then 
+             if (loc_iceland(loc_ig,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(loc_ip,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j-1)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j+1)==1) loc_iceland(i,j)=1
+          endif 
+       enddo  
+       do i=n_i,1,-1 
+          
+          if (slab_landmask(i,j)==0) cycle
+          
+          loc_ig = i-1
+          loc_ip = i+1
+          if (i==1) loc_ig = n_i
+          if (i==n_i) loc_ip = 1
+          
+          if (loc_iceland(i,j) == 0) then 
+             if (loc_iceland(loc_ig,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(loc_ip,j)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j-1)==1) loc_iceland(i,j)=1
+             if (loc_iceland(i,j+1)==1) loc_iceland(i,j)=1
+          endif 
+       enddo 
+    enddo 
+    
+    ! modify landmask used for slab where Antarctica and Greenland are excluded
+    
+    do i=1,n_i
+       do j=1,n_j 
+          if (loc_iceland(i,j)==1) slab_landmask(i,j)=0
+       enddo
+    enddo 
+    
+    ! open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/chk.res',action='write',status='unknown')
+    ! do j = 1,n_j
+       ! write(utest,*) slab_landmask(:,j)
+    ! enddo 
+    ! close(utest) 
+    ! stop
+    
+    
+  END SUBROUTINE sub_init_slabbiosphere_box
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CONFIGURE AND INITIALIZE SLAB BIOSPHERE
+  SUBROUTINE sub_init_slabbiosphere_hetero()
+    ! local variables
+    INTEGER::i,j
+    real::loc_tot,loc_frac,loc_standard
+    ! initialize global arrays
+    atm_slabbiosphere(:,:,:)  = 0.0
+    ! set <atm> array
+    ! NOTE: units of (mol)
+    DO i=1,n_i
+       DO j=1,n_j
+          IF (atm_select(ia_pCO2)) THEN
+             atm_slabbiosphere(ia_pCO2,i,j) = par_atm_slabbiosphere_C*slab_landmask(i,j)/sum(slab_landmask)
+          end if
+          IF (atm_select(ia_pCO2_13C)) THEN
+             loc_tot  = atm_slabbiosphere(ia_pCO2,i,j)
+             loc_standard = const_standards(atm_type(ia_pCO2_13C))
+             loc_frac = fun_calc_isotope_fraction(par_atm_slabbiosphere_C_d13C,loc_standard)
+             atm_slabbiosphere(ia_pCO2_13C,i,j) = loc_frac*loc_tot
+          end if
+       END DO
+    END DO
+  END SUBROUTINE sub_init_slabbiosphere_hetero
+  ! ****************************************************************************************************************************** !
+  
+  
+  ! *****************************************************************************************************************************!
+  SUBROUTINE sub_save_terrbio()
+    use genie_util, only: check_unit
+    ! ---------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! ---------------------------------------------------------- !
+    integer::i,j                                               ! 
+    CHARACTER(len=255)::loc_filename
+    integer utest
+    ! ---------------------------------------------------------- !
+    utest = 100
+    call check_unit(utest)
+    loc_filename = TRIM(par_outdir_name)//'tem/SLABBIOS_pCO2.res'
+    OPEN(unit=utest,status='replace',file=loc_filename,action='write')
+    do j=1,n_j
+       WRITE(utest,*) (atm_slabbiosphere(ia_pCO2,i,j),i=1,n_i)
+    enddo
+    close(utest)
+    loc_filename = TRIM(par_outdir_name)//'tem/SLABBIOS_pCO2_13C.res'
+    OPEN(unit=utest,status='replace',file=loc_filename,action='write')
+    do j=1,n_j
+       WRITE(utest,*) (atm_slabbiosphere(ia_pCO2_13C,i,j),i=1,n_i)
+    enddo
+    close(utest)
+    loc_filename = TRIM(par_outdir_name)//'/tem/SLABBIOS_frac_vegi.res'
+    OPEN(unit=utest,status='replace',file=loc_filename,action='write')
+    do j=1,n_j
+       WRITE(utest,*) (slab_frac_vegi(i,j),i=1,n_i)
+    enddo
+    close(utest)
+  END SUBROUTINE sub_save_terrbio
+  ! *****************************************************************************************************************************!
 
 
 END MODULE atchem_data

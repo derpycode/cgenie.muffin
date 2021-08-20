@@ -9,7 +9,6 @@ MODULE atchem_box
 
 
   USE atchem_lib
-  USE genie_global,only:tstar_atm,landice_slicemask_lic,frac_sic ! YK added 
   IMPLICIT NONE
   SAVE
 
@@ -74,11 +73,17 @@ CONTAINS
     real::loc_Fnpp,loc_Fresp
     real::loc_Rnpp,loc_Rresp
     
+    real::loc_Fnpp_int,loc_Fresp_int
+    real::loc_litter_int,loc_vegi_int
+    real::loc_SLT_int,loc_CO2_int
+    
     real::loc_Fnpp0
+    real::loc_Fnpp0_m2
     real::loc_B
     real::loc_CO2ref
     
     real::loc_decay
+    real::loc_tau
     real::loc_resp_G
     real::resp_kT
     real::loc_Tref
@@ -97,9 +102,15 @@ CONTAINS
     
     real::landmask(n_i,n_j)                                    ! 
     
-    ! logical::checkstuff = .true.
-    logical::checkstuff = .false.
+    integer::i,j
     
+    ! logical::checkstuff = .true.
+    logical::checkstuff = .false.                        ! 
+    
+    logical::landonly 
+    
+    landonly = .false.
+    if (par_atm_slab_hetero) landonly = .true.
     
     if (checkstuff) print *, ' <<<< now in sub_calc_terrbio >>>> '
     
@@ -115,11 +126,20 @@ CONTAINS
     ! in this initial attempt, landmask is not used; 
     ! one probably have to referred to *.k1 data as done in rokgem 
     ! (and additionally creating subroutines to read data as when initializing rokgem) 
-    landmask = 1.0 
+    landmask = slab_landmask
+    
+    ! open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/chk.res',action='write',status='unknown')
+    ! do i = 1,n_i
+       ! write(utest,*) landmask(i,:)
+    ! enddo 
+    ! close(utest) 
+    ! stop
+    
     ! resp and production paramter values 
     ! production
     loc_CO2ref = par_atm_slab_pCO2ref !365. ! ppm (Arora & Matthews 2008)
     loc_Fnpp0 = par_atm_slab_Fnpp0* 1e15 / 12. ! 72.0 * 1e15 / 12. ! Pg C yr-1 converted to mol yr-1
+    loc_Fnpp0_m2 = loc_Fnpp0/ sum(phys_atm(ipa_A,:,:)*landmask(:,:)) ! divided by totla land surface area mol /m2 /yr 
     loc_B = par_atm_slab_B ! 0.71
     ! resp
     loc_decay = 1.0/par_atm_slab_tau ! 1./8.3 ! yr-1 Turnover of vegitation to litter (SOM)
@@ -134,99 +154,162 @@ CONTAINS
     ! *** PUT TEMP INTO LOCAL ARRAY
     ! NOTE: extract temps to local array this way to please intel compilers
     loc_SLT(:,:) = dum_T(:,:)
-    loc_CO22(:,:) = 1.0E+06*atm(ia_PCO2,:,:) ! *** CONVERT pCO2 FROM ATM TO PPM
+    loc_CO22(:,:) = 1.0E+06*atm(ia_PCO2,:,:) ! *** CONVERT pCO2 FROM ATM TO PPM 
     loc_litter2(:,:) = atm_slabbiosphere(ia_pCO2,:,:)*(1.- slab_frac_vegi(:,:)) ! mol
     loc_vegi2(:,:) = atm_slabbiosphere(ia_pCO2,:,:)*slab_frac_vegi(:,:) ! mol
-       
-    loc_avSLT = sum(loc_SLT)/real(n_i*n_j)
-    loc_CO2 = sum(loc_CO22)/real(n_i*n_j)   
-    loc_litter = sum(loc_litter2)!/real(n_i*n_j)   
-    loc_vegi = sum(loc_vegi2)!/real(n_i*n_j)   
     
-    if ( atm_select(ia_pCO2_13C) ) then 
-       loc_Ratm = sum(atm(ia_pCO2_13C,:,:))/sum(atm(ia_pCO2,:,:))
-       loc_Rterr = sum(atm_slabbiosphere(ia_pCO2_13C,:,:))/sum(atm_slabbiosphere(ia_pCO2,:,:))
-    endif 
+
+    if (.not. landonly) then  ! averaging over the world (but removing seaice area)
+       loc_avSLT = sum(dum_T*landmask)/sum(landmask )
+       loc_CO2 = sum(loc_CO22*landmask)/sum(landmask )   
+       loc_litter = sum(loc_litter2)!/real(n_i*n_j)   
+       loc_vegi = sum(loc_vegi2)!/real(n_i*n_j)   
     
-    ! print *,loc_CO2,loc_avSLT
-    ! print *, size(tstar_atm),sum(tstar_atm)
-    ! print *, sum(landice_slicemask_lic)
-    ! print *, sum(frac_sic ),real(size(tstar_atm*(1.-frac_sic ))),sum(1.-frac_sic )
-    
-    ! ice-free surface temperature?
-    loc_avSLT = sum(tstar_atm*(1.-frac_sic ))/sum(1.-frac_sic )
-    
-    ! ice-free land surface temperature?
-    ! loc_avSLT = sum(tstar_atm*(1.- landice_slicemask_lic ))/sum(1.- landice_slicemask_lic )
-    
-    
-    ! initially reaching steady state
-    if ((.not.par_atm_slab_restart) .and. (slab_time_cnt <= slab_ss_dtyr) .and. (slab_time_cnt2 <=slab_ss_dtyr) ) then 
-    ! if (1.0 == 2.0) then 
-    ! *** CALCULATE TERRESTRIAL NPP BASED ON CO2 ***
-       loc_Fnpp  = dum_dtyr*(loc_Fnpp0*(1. + loc_B*LOG(loc_CO2/loc_CO2ref)))
-       loc_vegi_new = loc_Fnpp/(loc_decay*dum_dtyr)
-       
-       ! when using V vs lambda relationship
-       if ( (par_atm_slab_dtaudvegi /= 0.0) .and.  (par_atm_slab_tau0 /= 0.0)) then 
-          ! loc_decay = (loc_vegi*12./1e15)*0.023 + 6.64 ! yr
-          ! loc_decay = 1./loc_decay                     ! yr-1
-          ! loc_vegi_new = 6.64/(1./loc_Fnpp - 12./1e15*0.023)
-          loc_vegi_new = par_atm_slab_tau0/(1./(loc_Fnpp/dum_dtyr) - 12./1e15*par_atm_slab_dtaudvegi)
-          loc_decay = (loc_vegi_new*12./1e15)*par_atm_slab_dtaudvegi + par_atm_slab_tau0 ! yr
-          loc_decay = 1./loc_decay                     ! yr-1
+       if ( atm_select(ia_pCO2_13C) ) then 
+          loc_Ratm = sum(atm(ia_pCO2_13C,:,:))/sum(atm(ia_pCO2,:,:))
+          loc_Rterr = sum(atm_slabbiosphere(ia_pCO2_13C,:,:))/sum(atm_slabbiosphere(ia_pCO2,:,:))
        endif 
-       
-       loc_litter_new = loc_vegi_new *loc_decay*dum_dtyr &
-            & /(dum_dtyr*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1))
-       loc_Fresp = dum_dtyr*loc_litter_new*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1)
-       ! print *, 'steady state calc.'
-       ! print *, loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
-       ! print *, loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
-       ! print *, loc_vegi*12./1e15, loc_litter*12./1e15,(loc_litter + loc_vegi)*12./1e15
-    else 
+    
+    
+       ! initially reaching steady state
+       if ((.not.par_atm_slab_restart) .and. (slab_time_cnt <= slab_ss_dtyr) .and. (slab_time_cnt2 <=slab_ss_dtyr) ) then 
        ! *** CALCULATE TERRESTRIAL NPP BASED ON CO2 ***
-       loc_Fnpp  = dum_dtyr*(loc_Fnpp0*(1 + loc_B*LOG(loc_CO2/loc_CO2ref)))
+          loc_Fnpp  = dum_dtyr*(loc_Fnpp0*(1. + loc_B*LOG(loc_CO2/loc_CO2ref)))
+          loc_vegi_new = loc_Fnpp/(loc_decay*dum_dtyr)
        
-       ! *** CALCULATE SOIL RESPIRATION BASED ON GLOBAL AVERAGE LAND TEMPERATURE ***
-       loc_Fresp = dum_dtyr*loc_litter*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1)
+          ! when using V vs lambda relationship
+          if ( (par_atm_slab_dtaudvegi /= 0.0) .and.  (par_atm_slab_tau0 /= 0.0)) then
+             loc_vegi_new = par_atm_slab_tau0/(1./(loc_Fnpp/dum_dtyr) - 12./1e15*par_atm_slab_dtaudvegi)
+             loc_decay = (loc_vegi_new*12./1e15)*par_atm_slab_dtaudvegi + par_atm_slab_tau0 ! yr
+             loc_decay = 1./loc_decay                     ! yr-1
+          endif 
        
-       ! when using V vs lambda relationship
-       if ( (par_atm_slab_dtaudvegi /= 0.0) .and.  (par_atm_slab_tau0 /= 0.0)) then 
-          ! loc_decay = (loc_vegi*12./1e15)*0.023 + 6.64 ! yr
-          loc_decay = (loc_vegi*12./1e15)*par_atm_slab_dtaudvegi + par_atm_slab_tau0 ! yr
-          loc_decay = 1./loc_decay                     ! yr-1
+          loc_litter_new = loc_vegi_new *loc_decay*dum_dtyr &
+               & /(dum_dtyr*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1))
+          loc_Fresp = dum_dtyr*loc_litter_new*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1)
+       else 
+          ! *** CALCULATE TERRESTRIAL NPP BASED ON CO2 ***
+          loc_Fnpp  = dum_dtyr*(loc_Fnpp0*(1 + loc_B*LOG(loc_CO2/loc_CO2ref)))
+        
+          ! *** CALCULATE SOIL RESPIRATION BASED ON GLOBAL AVERAGE LAND TEMPERATURE ***
+          loc_Fresp = dum_dtyr*loc_litter*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1)
+       
+          ! when using V vs lambda relationship
+          if ( (par_atm_slab_dtaudvegi /= 0.0) .and.  (par_atm_slab_tau0 /= 0.0)) then 
+             loc_decay = (loc_vegi*12./1e15)*par_atm_slab_dtaudvegi + par_atm_slab_tau0 ! yr
+             loc_decay = 1./loc_decay                     ! yr-1
+          endif 
+
+          loc_vegi_new = loc_vegi + (loc_Fnpp - loc_vegi*loc_decay*dum_dtyr)
+          loc_litter_new = loc_litter + (loc_vegi*loc_decay*dum_dtyr - loc_Fresp)
+       endif 
+    
+       slab_frac_vegi(:,:) = loc_vegi_new/(loc_vegi_new + loc_litter_new)
+    
+       if (any(slab_frac_vegi < 0.) .or. any(slab_frac_vegi > 1.)) then 
+          print *, 'error in sub_calc_terrbio'
+          stop
        endif 
 
-       loc_vegi_new = loc_vegi + (loc_Fnpp - loc_vegi*loc_decay*dum_dtyr)
-       loc_litter_new = loc_litter + (loc_vegi*loc_decay*dum_dtyr - loc_Fresp)
-       ! print *, 'dynamic calc.'
-       ! print *, loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
-       ! print *, loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
-       ! print *, loc_vegi*12./1e15, loc_litter*12./1e15,(loc_litter + loc_vegi)*12./1e15
-    endif 
-    
-    slab_frac_vegi(:,:) = loc_vegi_new/(loc_vegi_new + loc_litter_new)
-    
-    if (any(slab_frac_vegi < 0.) .or. any(slab_frac_vegi > 1.)) then 
-        print *, 'error in sub_calc_terrbio'
-        stop
-    endif 
+       ! *** EXCHANGE CO2 ***
+       ! NOTE: atm_slabbiosphere in units of mol
+       ! bulk CO2
+       dum_fatm(ia_pCO2,:,:) = dum_fatm(ia_pCO2,:,:) + loc_Fresp/real(n_i*n_j) - loc_Fnpp/real(n_i*n_j)
+       ! distribute evenly
+       atm_slabbiosphere(ia_pCO2,:,:) = &
+          & atm_slabbiosphere(ia_pCO2,:,:) - loc_Fresp/real(n_i*n_j)  + loc_Fnpp/real(n_i*n_j) 
+       ! d13C
+       if ( atm_select(ia_pCO2_13C) ) then 
+          dum_fatm(ia_pCO2_13C,:,:) = &
+             & dum_fatm(ia_pCO2_13C,:,:) + loc_Rterr*loc_Fresp/real(n_i*n_j) - loc_Ratm*loc_Fnpp/real(n_i*n_j)
+       ! distribute evenly
+          atm_slabbiosphere(ia_pCO2_13C,:,:) = &
+             & atm_slabbiosphere(ia_pCO2_13C,:,:) - loc_Rterr*loc_Fresp/real(n_i*n_j) + loc_Ratm*loc_Fnpp/real(n_i*n_j) 
+       endif 
+       
+       
+    else ! explicitly on land    
+       slab_frac_vegi = 0.0
+       loc_Fnpp_int   = 0.0
+       loc_Fresp_int  = 0.0
+       loc_litter_int = 0.0
+       loc_vegi_int   = 0.0
+       loc_CO2_int    = 0.0
+       loc_SLT_int    = 0.0
+       ! print *,runoff_land
+       ! print *,size(ilandmask1_atm)
+       ! print *,n_i,n_j
+       do i=1,n_i
+          do j=1,n_j 
+             if (landmask(i,j) .eq. 0) cycle
+                loc_avSLT = loc_SLT(i,j)
+                loc_CO2 = loc_CO22(i,j)   
+                loc_litter = loc_litter2(i,j)   
+                loc_vegi = loc_vegi2(i,j)   
+                loc_Fnpp0 = loc_Fnpp0_m2 * phys_atm(ipa_A,i,j) ! mol yr-1
 
-    ! *** EXCHANGE CO2 ***
-    ! NOTE: atm_slabbiosphere in units of mol
-    ! bulk CO2
-    dum_fatm(ia_pCO2,:,:) = dum_fatm(ia_pCO2,:,:) + loc_Fresp/real(n_i*n_j) - loc_Fnpp/real(n_i*n_j)
-    ! distribute evenly
-    atm_slabbiosphere(ia_pCO2,:,:) = &
-         & atm_slabbiosphere(ia_pCO2,:,:) - loc_Fresp/real(n_i*n_j)  + loc_Fnpp/real(n_i*n_j) 
-    ! d13C
-    if ( atm_select(ia_pCO2_13C) ) then 
-       dum_fatm(ia_pCO2_13C,:,:) = &
-            & dum_fatm(ia_pCO2_13C,:,:) + loc_Rterr*loc_Fresp/real(n_i*n_j) - loc_Ratm*loc_Fnpp/real(n_i*n_j)
-    ! distribute evenly
-       atm_slabbiosphere(ia_pCO2_13C,:,:) = &
-            & atm_slabbiosphere(ia_pCO2_13C,:,:) - loc_Rterr*loc_Fresp/real(n_i*n_j) + loc_Ratm*loc_Fnpp/real(n_i*n_j) 
+                if ( atm_select(ia_pCO2_13C) ) then 
+                   loc_Ratm = atm(ia_pCO2_13C,i,j)/atm(ia_pCO2,i,j)
+                   loc_Rterr = atm_slabbiosphere(ia_pCO2_13C,i,j)/atm_slabbiosphere(ia_pCO2,i,j)
+                endif     
+               
+                ! *** CALCULATE TERRESTRIAL NPP BASED ON CO2 ***
+                loc_Fnpp  = dum_dtyr*(loc_Fnpp0*(1 + loc_B*LOG(loc_CO2/loc_CO2ref)))
+ 
+                ! *** CALCULATE SOIL RESPIRATION BASED ON GLOBAL AVERAGE LAND TEMPERATURE ***
+                loc_Fresp = dum_dtyr*loc_litter*loc_resp_G*resp_kT**((loc_avSLT - loc_Tref)*0.1)
+ 
+                ! when using V vs lambda relationship
+                if ( (par_atm_slab_dtaudvegi /= 0.0) .and.  (par_atm_slab_tau0 /= 0.0)) then 
+                   loc_tau = (sum(loc_vegi2)*12./1e15)*par_atm_slab_dtaudvegi + par_atm_slab_tau0 ! yr
+                   loc_decay = 1./loc_tau                     ! yr-1
+                endif 
+ 
+                loc_vegi_new = loc_vegi + (loc_Fnpp - loc_vegi*loc_decay*dum_dtyr)
+                loc_litter_new = loc_litter + (loc_vegi*loc_decay*dum_dtyr - loc_Fresp)
+             
+                slab_frac_vegi(i,j) = loc_vegi_new/(loc_vegi_new + loc_litter_new)
+             
+                if (slab_frac_vegi(i,j) < 0. .or. slab_frac_vegi(i,j) > 1.) then 
+                   print *, 'error in sub_calc_terrbio',i,j
+                   stop
+                endif 
+                 
+                loc_Fnpp_int   = loc_Fnpp_int   + loc_Fnpp
+                loc_Fresp_int  = loc_Fresp_int  + loc_Fresp
+                loc_litter_int = loc_litter_int + loc_litter_new
+                loc_vegi_int   = loc_vegi_int   + loc_vegi_new
+                
+                loc_CO2_int    = loc_CO2_int    + loc_CO2
+                loc_SLT_int    = loc_SLT_int    + loc_avSLT
+ 
+                ! *** EXCHANGE CO2 ***
+                ! NOTE: atm_slabbiosphere in units of mol
+                ! bulk CO2
+                dum_fatm(ia_pCO2,i,j) = dum_fatm(ia_pCO2,i,j) + loc_Fresp - loc_Fnpp
+                ! distribute unevenly
+                atm_slabbiosphere(ia_pCO2,i,j) = &
+                   & atm_slabbiosphere(ia_pCO2,i,j) - loc_Fresp  + loc_Fnpp 
+                ! d13C
+                if ( atm_select(ia_pCO2_13C) ) then 
+                   dum_fatm(ia_pCO2_13C,i,j) = &
+                      & dum_fatm(ia_pCO2_13C,i,j) + loc_Rterr*loc_Fresp - loc_Ratm*loc_Fnpp
+                ! distribute evenly
+                   atm_slabbiosphere(ia_pCO2_13C,i,j) = &
+                      & atm_slabbiosphere(ia_pCO2_13C,i,j) - loc_Rterr*loc_Fresp + loc_Ratm*loc_Fnpp 
+                endif 
+           
+          enddo 
+       enddo
+       ! because the output uses left-hand side variables ...
+       loc_Fnpp       =   loc_Fnpp_int   
+       loc_Fresp      =   loc_Fresp_int  
+       loc_litter_new =   loc_litter_int 
+       loc_vegi_new   =   loc_vegi_int   
+       
+       loc_CO2        =   loc_CO2_int/sum(landmask)
+       loc_avSLT      =   loc_SLT_int/sum(landmask)
+       
     endif 
 
     if (par_atm_slabsave) then 
@@ -316,7 +399,7 @@ CONTAINS
 
   END SUBROUTINE sub_calc_terrbio
   ! ****************************************************************************************************************************** !
-
+  
   ! *****************************************************************************************************************************!
   ! OXIDIZE CH4 -- DEFAULT (ORIGINAL) SCHEME
   SUBROUTINE sub_calc_oxidize_CH4_default(dum_i,dum_j,dum_dtyr)
