@@ -115,7 +115,7 @@ CONTAINS
        end if
        phys_sed(ips_mix_k0,dum_i,dum_j) = par_sed_mix_k(par_n_sed_mix)
     else
-       phys_sed(ips_mix_k0,dum_i,dum_j) = par_sed_mix_k_sur_min
+       phys_sed(ips_mix_k0,dum_i,dum_j) = 0.0
     end if
 
     IF (ctrl_misc_debug3) print*,'(c) calculate new sedimenting material to be added to the sediment top layer'
