@@ -7096,7 +7096,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Bioturbate sediment stack?</description>
                     </param>
                     <param name="ctrl_sed_bioturb_Archer">
-			<value datatype="boolean">.true.</value>
+			<value datatype="boolean">.false.</value>
                         <description>Use Archer et al. [2002] bioturbation scheme?</description>
                     </param>
                     <param name="par_n_sed_mix">
