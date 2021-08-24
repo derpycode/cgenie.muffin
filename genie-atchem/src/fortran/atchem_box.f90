@@ -98,7 +98,6 @@ CONTAINS
     
     real::slab_save_dtyr
     real::slab_ss_dtyr
-    real::loc_time
     
     real::landmask(n_i,n_j)                                    ! 
     
@@ -311,28 +310,30 @@ CONTAINS
        loc_avSLT      =   loc_SLT_int/sum(landmask)
        
     endif 
+    
+    ! integrating avSLT 
+    slab_int_avSLT = slab_int_avSLT + loc_avSLT*dum_dtyr
 
     if (par_atm_slabsave) then 
        slab_time_cnt = slab_time_cnt + dum_dtyr
        if (slab_time_cnt > slab_save_dtyr) then 
            if (checkstuff) print *, ' --- slab saving --- '
-           loc_time = slab_time_cnt2 + 0.5*slab_time_cnt 
            slab_time_cnt2 = slab_time_cnt2 + slab_time_cnt
            ! print *,'!!! saving vertual box biosphere in atmchem !!!',slab_time_cnt2
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLX.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_avSLT,loc_CO2, & 
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2,loc_CO2, & 
               & loc_Fnpp/dum_dtyr, loc_Fresp/dum_dtyr, (loc_Fresp - loc_Fnpp)/dum_dtyr
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLXg.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_avSLT, loc_CO2, &
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2, loc_CO2, &
               & loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOl.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_avSLT, loc_CO2, &
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2, loc_CO2, &
               & loc_vegi_new, loc_litter_new, loc_litter_new + loc_vegi_new
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOlg.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, loc_avSLT, loc_CO2, &
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2, loc_CO2, &
               & loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
            close(utest)
            ! slab_time_cnt = slab_time_cnt - slab_save_dtyr

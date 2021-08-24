@@ -82,6 +82,7 @@ CONTAINS
        print*,'tau (yr) as function of vegi amount (slope)         : ',par_atm_slab_dtaudvegi
        print*,'tau (yr) as function of vegi amount (intercept)     : ',par_atm_slab_tau0
        print*,'do heterogeneous calculation                        : ',par_atm_slab_hetero
+       print*,'include Antarctica and Greenland on land mask       : ',par_atm_slab_inclPolar
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
        print*,'--- RUN CONTROL ------------------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing
@@ -317,15 +318,30 @@ CONTAINS
     USE genie_global,only:ilandmask1_atm ! YK added 
     ! local variables
     INTEGER::i,j
-    INTEGER::loc_ip,loc_ig
+    INTEGER::loc_ip,loc_ig,loc_k1
     integer,dimension(n_i,n_j)::loc_iceland 
     ! initialize global arrays
     slab_frac_vegi(:,:) = 0.0 
     slab_landmask(:,:) = 0 
     slab_time_cnt = 0.0
     slab_time_cnt2 = 0.0
+    slab_int_avSLT = 0.0
     
-    slab_landmask(:,:) = ilandmask1_atm(:,:)
+    slab_landmask(:,:) = ilandmask1_atm(:,:) !  initialise_embm.F
+    
+    ! the following also works to get landmask for slab 
+    ! but only if n_i and n_j in atm == n_i and n_j of ocean
+    ! in this case, n_k for ocean has to be defined in atchem_lib.f90
+    ! and passes goldstein_k1 as dum_k1 in initialise_atchem.f90 and genie_ini_wrapper.f90 
+    
+    ! DO i=1,n_i
+       ! DO j=1,n_j
+          ! loc_k1 = goldstein_k1(i,j)
+          ! IF (n_k < loc_k1) THEN
+             ! slab_landmask(i,j) = 1
+          ! end IF
+       ! end DO
+    ! end DO
     
     ! tentative way of searching for Antarctica and Greenland
     loc_iceland = 0
@@ -337,14 +353,14 @@ CONTAINS
     ! marking regions connected to poles
     do j=2,n_j-1 
        do i=1,n_i 
-          
+       
           if (slab_landmask(i,j)==0) cycle
-          
+       
           loc_ig = i-1
           loc_ip = i+1
           if (i==1) loc_ig = n_i
           if (i==n_i) loc_ip = 1
-          
+       
           if (loc_iceland(i,j) == 0) then 
              if (loc_iceland(loc_ig,j)==1) loc_iceland(i,j)=1
              if (loc_iceland(loc_ip,j)==1) loc_iceland(i,j)=1
@@ -353,14 +369,14 @@ CONTAINS
           endif 
        enddo  
        do i=n_i,1,-1 
-          
+       
           if (slab_landmask(i,j)==0) cycle
-          
+        
           loc_ig = i-1
           loc_ip = i+1
           if (i==1) loc_ig = n_i
           if (i==n_i) loc_ip = 1
-          
+         
           if (loc_iceland(i,j) == 0) then 
              if (loc_iceland(loc_ig,j)==1) loc_iceland(i,j)=1
              if (loc_iceland(loc_ip,j)==1) loc_iceland(i,j)=1
@@ -372,7 +388,7 @@ CONTAINS
     
     do j=n_j-1,2,-1 
        do i=1,n_i 
-          
+       
           if (slab_landmask(i,j)==0) cycle
           
           loc_ig = i-1
@@ -403,15 +419,18 @@ CONTAINS
              if (loc_iceland(i,j+1)==1) loc_iceland(i,j)=1
           endif 
        enddo 
-    enddo 
+    enddo
     
     ! modify landmask used for slab where Antarctica and Greenland are excluded
     
-    do i=1,n_i
-       do j=1,n_j 
-          if (loc_iceland(i,j)==1) slab_landmask(i,j)=0
-       enddo
-    enddo 
+    IF (.not. par_atm_slab_inclPolar) THEN
+       do i=1,n_i
+          do j=1,n_j 
+             if (loc_iceland(i,j)==1) slab_landmask(i,j)=0
+          enddo
+       enddo 
+    ENDIF 
+    
     
     ! open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/chk.res',action='write',status='unknown')
     ! do j = 1,n_j

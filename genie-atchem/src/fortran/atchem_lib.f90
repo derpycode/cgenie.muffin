@@ -55,7 +55,8 @@ MODULE atchem_lib
   logical::par_atm_slabsave                                    ! crude saving of box terrestrial biosphere
   logical::par_atm_slab_restart                                ! restart from a previous run 
   logical::par_atm_slab_hetero                                 ! do heterogeneous calculation  
-  NAMELIST /ini_atchem_nml/par_atm_slabON,par_atm_slabsave,par_atm_slab_restart,par_atm_slab_hetero
+  logical::par_atm_slab_inclPolar                                  ! include Antarctica and Greenland on land mask
+  NAMELIST /ini_atchem_nml/par_atm_slabON,par_atm_slabsave,par_atm_slab_restart,par_atm_slab_hetero,par_atm_slab_inclPolar
   real::par_atm_slab_Fnpp0                                      ! NPP const (PgC yr-1)
   real::par_atm_slab_B                                          ! NPP pCO2 dependence 
   real::par_atm_slab_pCO2ref                                    ! NPP reference pCO2 (ppm)
@@ -160,6 +161,7 @@ MODULE atchem_lib
   integer,dimension(n_i,n_j)::slab_landmask                    ! YK added 08.20.2021
   real::slab_time_cnt                                          ! YK added 02.08.2021
   real::slab_time_cnt2                                         ! YK added 02.08.2021
+  real::slab_int_avSLT                                         ! YK added 08.23.2021
   integer::utest                                               ! YK added 02.12.2021
   ! netCDF and netCDF restart parameters
   CHARACTER(len=31)::string_rstid                              ! 
