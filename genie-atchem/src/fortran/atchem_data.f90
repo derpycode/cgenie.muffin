@@ -318,7 +318,7 @@ CONTAINS
     USE genie_global,only:ilandmask1_atm ! YK added 
     ! local variables
     INTEGER::i,j
-    INTEGER::loc_ip,loc_ig,loc_k1
+    INTEGER::loc_ip,loc_ig
     integer,dimension(n_i,n_j)::loc_iceland 
     ! initialize global arrays
     slab_frac_vegi(:,:) = 0.0 
@@ -328,20 +328,6 @@ CONTAINS
     slab_int_avSLT = 0.0
     
     slab_landmask(:,:) = ilandmask1_atm(:,:) !  initialise_embm.F
-    
-    ! the following also works to get landmask for slab 
-    ! but only if n_i and n_j in atm == n_i and n_j of ocean
-    ! in this case, n_k for ocean has to be defined in atchem_lib.f90
-    ! and passes goldstein_k1 as dum_k1 in initialise_atchem.f90 and genie_ini_wrapper.f90 
-    
-    ! DO i=1,n_i
-       ! DO j=1,n_j
-          ! loc_k1 = goldstein_k1(i,j)
-          ! IF (n_k < loc_k1) THEN
-             ! slab_landmask(i,j) = 1
-          ! end IF
-       ! end DO
-    ! end DO
     
     ! tentative way of searching for Antarctica and Greenland
     loc_iceland = 0
@@ -479,9 +465,7 @@ CONTAINS
     ! ---------------------------------------------------------- !
     integer::i,j                                               ! 
     CHARACTER(len=255)::loc_filename
-    integer utest
     ! ---------------------------------------------------------- !
-    utest = 100
     call check_unit(utest)
     loc_filename = TRIM(par_outdir_name)//'tem/SLABBIOS_pCO2.res'
     OPEN(unit=utest,status='replace',file=loc_filename,action='write')
@@ -502,6 +486,38 @@ CONTAINS
     enddo
     close(utest)
   END SUBROUTINE sub_save_terrbio
+  ! *****************************************************************************************************************************!
+  
+  
+  ! *****************************************************************************************************************************!
+  SUBROUTINE sub_load_terrbio()
+    use genie_util, only: check_unit
+    ! ---------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! ---------------------------------------------------------- !
+    integer::i,j                                               ! 
+    CHARACTER(len=255)::loc_filename
+    ! ---------------------------------------------------------- !
+    call check_unit(utest)
+    loc_filename = TRIM(par_rstdir_name)//'tem/SLABBIOS_pCO2.res'
+    OPEN(unit=utest,status='old',file=loc_filename,action='read')
+    do j=1,n_j
+       read(utest,*) (atm_slabbiosphere(ia_pCO2,i,j),i=1,n_i)
+    enddo
+    close(utest)
+    loc_filename = TRIM(par_rstdir_name)//'tem/SLABBIOS_pCO2_13C.res'
+    OPEN(unit=utest,status='old',file=loc_filename,action='read')
+    do j=1,n_j
+       read(utest,*) (atm_slabbiosphere(ia_pCO2_13C,i,j),i=1,n_i)
+    enddo
+    close(utest)
+    loc_filename = TRIM(par_rstdir_name)//'/tem/SLABBIOS_frac_vegi.res'
+    OPEN(unit=utest,status='old',file=loc_filename,action='read')
+    do j=1,n_j
+       read(utest,*) (slab_frac_vegi(i,j),i=1,n_i)
+    enddo
+    close(utest)
+  END SUBROUTINE sub_load_terrbio
   ! *****************************************************************************************************************************!
 
 

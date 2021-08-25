@@ -91,6 +91,9 @@ SUBROUTINE initialise_atchem( &
         close(utest)
         atm_slabbiosphere(ia_pCO2,:,:) = dum_slab(6)/real(n_i*n_j)
         slab_frac_vegi(:,:) = dum_slab(4)/dum_slab(6)
+        
+        if ( par_atm_slab_hetero ) call sub_load_terrbio()
+        
      endif 
   endif 
   ! ----- End addition -----
