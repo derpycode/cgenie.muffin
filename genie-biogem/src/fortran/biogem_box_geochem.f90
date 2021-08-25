@@ -2048,7 +2048,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2,loc_IO3
-    real::loc_IO3_reduction
+    real::loc_IO3_reduction,loc_SO4_reduction
     real,dimension(n_ocn,n_k)::loc_bio_remin
     real::loc_f
     ! -------------------------------------------------------- !
@@ -2083,17 +2083,17 @@ CONTAINS
                 loc_IO3_reduction = 0.0
              endif
           case ('remin')
-             ! NOTE: use SO4 reduction (H2S production) rate to scale the rate of IO3 reduction (via par_bio_remin_SO4toIO3)
+             ! NOTE: use SO4 reduction (H2S production) (rate) to scale (via par_bio_remin_SO4toIO3) (the rate of) IO3 reduction
              !       becasue SO4 reduction is [O2] sensitive, no need for addiitonal [O2] inhibition term
              ! NOTE: because [IO3] is so low relative to electron acceptor requirement,
              !       => don't both with either a [IO3] dependence or limitaion (meaning that IO3 reduction can do to completion)
-                loc_SO4_reduction = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_H2S)),dum_i,dum_j,k) + &
-                     & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_H2S)),dum_i,dum_j,k)
+             loc_SO4_reduction = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_H2S)),dum_i,dum_j,k) + &
+                  & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_H2S)),dum_i,dum_j,k)
              loc_IO3_reduction = dum_dtyr*par_bio_remin_SO4toIO3*loc_SO4_reduction
           case default
              loc_IO3_reduction = 0.0
           end select
-          ! but don't reduce too much IO-
+          ! but don't reduce too much IO-!
           loc_IO3_reduction = min(loc_IO3_reduction,loc_f*loc_IO3)
           ! calculate tracer remin changes
           loc_bio_remin(io_IO3,k) = -loc_IO3_reduction
