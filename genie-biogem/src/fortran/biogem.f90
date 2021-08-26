@@ -1750,7 +1750,8 @@ subroutine biogem(        &
                    & '*** WATER COLUMN REMINERALIZATION - I OXIDATION ***'
               ! *** WATER COLUMN REMINERALIZATION - I OXIDATION ***
               if (ocn_select(io_O2) .AND. ocn_select(io_I)) then
-                 call sub_calc_bio_remin_oxidize_I(i,j,loc_k1,loc_dtyr)
+!!$                 call sub_calc_bio_remin_oxidize_I(i,j,loc_k1,loc_dtyr)
+                 call sub_box_oxidize_ItoIO3(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -1798,15 +1799,9 @@ subroutine biogem(        &
               call sub_box_misc_geochem(i,j,loc_k1,loc_dtyr)
               ! *** IO3 reduction ***
               if (ocn_select(io_IO3)) then
-                 call sub_calc_bio_remin_reduce_IO3(i,j,loc_k1,loc_dtyr)
+!!$                 call sub_calc_bio_remin_reduce_IO3(i,j,loc_k1,loc_dtyr)
+                 call sub_box_reduce_IO3toI(i,j,loc_k1,loc_dtyr)
               end If
-              ! *** iron reduction/oxidation ***
-!!$              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2)) then
-!!$                 call sub_box_oxidize_Fe2(i,j,loc_k1,loc_dtyr)
-!!$              end if
-!!$              if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_H2S)) then
-!!$                 call sub_box_reduce_Fe(i,j,loc_k1,loc_dtyr)
-!!$              end if
               if (ocn_select(io_Fe2) .AND. ocn_select(io_Fe) .AND. ocn_select(io_O2) .AND. ocn_select(io_H2S)) then
                  call sub_box_iron_redox(i,j,loc_k1,loc_dtyr)
               end if
