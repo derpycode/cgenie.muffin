@@ -10,9 +10,9 @@ ea_36=y
 # *** BIOLOGICAL NEW PRODUCTION *************************************
 #
 # biological scheme ID string
-bg_par_bio_prodopt="bio_PFe"
+bg_par_bio_prodopt="2N1T_PFe_Tdep"
 # biological uptake time-scale
-bg_par_bio_tau=60.0
+bg_par_bio_mu1=60.0
 # [PO4] M-M half-sat value (mol kg-1)
 bg_par_bio_c0_PO4=0.10E-06
 # [Fe] M-M half-sat value (mol kg-1)
