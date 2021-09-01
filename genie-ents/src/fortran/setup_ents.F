@@ -412,6 +412,7 @@ cccccccccccccc CHANGES FOR NETCDF
         else
 cccccccccccccccccccccccc
         filename=indir_name(1:lenin)//trim(ents_restart_file)
+        filename=trim(rstdir_name)//'/'//trim(ents_restart_file) ! YK added 08.25.2021
 
         open(1,file=trim(filename))
         call in_ents_ascii(1,land_snow_lnd)
