@@ -74,7 +74,11 @@ MODEXT=mod
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
 ### DEFAULT ###
-NETCDF_DIR=/usr/local
+# NETCDF_DIR=/usr/local
+NETCDFC_DIR=$(EBROOTNETCDFMINCPLUSPLUS4)
+NETCDFF_DIR=$(EBROOTNETCDFMINFORTRAN)
+NETCDF_DIR=$(EBROOTNETCDF)
+
 ### domino ###
 #NETCDF_DIR=/share/apps
 ### eevee ###
