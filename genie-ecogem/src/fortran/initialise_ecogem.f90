@@ -325,6 +325,7 @@ SUBROUTINE initialise_ecogem(    &
   open(301,File=TRIM(par_outdir_name)//"/Plankton_params.txt"       ,Status="Replace",Action="Write")
   open(302,File=TRIM(par_outdir_name)//"/Plankton_params_nohead.dat",Status="Replace",Action="Write")
   open(303,File=TRIM(par_outdir_name)//"/Plankton_grazing.dat"      ,Status="Replace",Action="Write")
+  open(304,File=TRIM(par_outdir_name)//"/N2fixation.dat"            ,Status="Replace",Action="Write")
   !open(304,File=TRIM(par_outdir_name)//"/ecogem_properties.dat"      ,Status="Replace",Action="Write")
 
   ! make wet mask for ocean cells

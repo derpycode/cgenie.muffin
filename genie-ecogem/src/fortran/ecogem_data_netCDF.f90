@@ -563,14 +563,17 @@ CONTAINS
        endif
     end do   
 
-    ! Quick NF rate diagnosis - Fanny
-    !do i=1,n_i
-    !  do j=1,n_j
-    !    globaln2fix = globaln2fix + totaln2fix(i,j)*ocn_grid_vol(i,j,n_k) !mmol N2 d-1
-    !  end do
-    !end do
-   !!! TEST Fanny
-   !write(*,*) "N2Fix =", globaln2fix
+    ! Quick NF rate diagnostic - Fanny Aug21
+    if ((Nfix(jp).gt.0.0)) then
+       do i=1,n_i
+         do j=1,n_j
+           globaln2fix = globaln2fix + totaln2fix(i,j)*ocn_grid_vol(i,j,n_k) !mmol N2 d-1
+         end do
+       end do
+       OPEN(304,File=TRIM(par_outdir_name)//"/N2fixation.dat",position='append',Status="old",Action="Write")
+       WRITE(304,"(E15.6)",ADVANCE = "YES"), globaln2fix !mmol N2 d-1
+       CLOSE(304)
+    endif
 
     ! temperature limitation status
     loc_ij(:,:) = int_gamma_timeslice(iomax+1,1,:,:,n_k)
