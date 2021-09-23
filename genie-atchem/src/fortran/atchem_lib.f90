@@ -162,6 +162,11 @@ MODULE atchem_lib
   real::slab_time_cnt                                          ! YK added 02.08.2021
   real::slab_time_cnt2                                         ! YK added 02.08.2021
   real::slab_int_avSLT                                         ! YK added 08.23.2021
+  real::slab_int_t                                             ! YK added 09.20.2021 integrate time
+  real::slab_int_vegiC                                         ! YK added 09.20.2021 integrate inventory (vegi and soil C)
+  real::slab_int_soilC                                         ! YK added 09.20.2021 integrate inventory (vegi and soil C)
+  real::slab_int_resp                                          ! YK added 09.20.2021 integrate respiration and productivity
+  real::slab_int_prod                                          ! YK added 09.20.2021 integrate respiration and productivity
   integer::utest                                               ! YK added 02.12.2021
   ! netCDF and netCDF restart parameters
   CHARACTER(len=31)::string_rstid                              ! 

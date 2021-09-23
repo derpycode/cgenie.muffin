@@ -326,6 +326,11 @@ CONTAINS
     slab_time_cnt = 0.0
     slab_time_cnt2 = 0.0
     slab_int_avSLT = 0.0
+    slab_int_t = 0.0
+    slab_int_vegiC = 0.0
+    slab_int_soilC = 0.0
+    slab_int_resp = 0.0
+    slab_int_prod = 0.0
     
     slab_landmask(:,:) = ilandmask1_atm(:,:) !  initialise_embm.F
     

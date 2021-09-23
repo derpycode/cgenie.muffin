@@ -313,6 +313,11 @@ CONTAINS
     
     ! integrating avSLT 
     slab_int_avSLT = slab_int_avSLT + loc_avSLT*dum_dtyr
+    slab_int_t = slab_int_t + dum_dtyr
+    slab_int_soilC = slab_int_soilC + loc_litter_new*dum_dtyr
+    slab_int_vegiC = slab_int_vegiC + loc_vegi_new*dum_dtyr
+    slab_int_resp = slab_int_resp + loc_Fresp
+    slab_int_prod = slab_int_prod + loc_Fnpp
 
     if (par_atm_slabsave) then 
        slab_time_cnt = slab_time_cnt + dum_dtyr
@@ -321,23 +326,31 @@ CONTAINS
            slab_time_cnt2 = slab_time_cnt2 + slab_time_cnt
            ! print *,'!!! saving vertual box biosphere in atmchem !!!',slab_time_cnt2
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLX.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2,loc_CO2, & 
-              & loc_Fnpp/dum_dtyr, loc_Fresp/dum_dtyr, (loc_Fresp - loc_Fnpp)/dum_dtyr
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_int_t,loc_CO2, & 
+              ! & loc_Fnpp/dum_dtyr, loc_Fresp/dum_dtyr, (loc_Fresp - loc_Fnpp)/dum_dtyr
+              & slab_int_prod/slab_int_t, slab_int_resp/slab_int_t, (slab_int_resp - slab_int_prod)/slab_int_t
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terFLXg.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2, loc_CO2, &
-              & loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_int_t, loc_CO2, &
+              ! & loc_Fnpp/dum_dtyr*12./1e15, loc_Fresp/dum_dtyr*12./1e15, (loc_Fresp - loc_Fnpp)/dum_dtyr*12./1e15
+              & slab_int_prod/slab_int_t*12./1e15, slab_int_resp/slab_int_t*12./1e15, (slab_int_resp - slab_int_prod)/slab_int_t*12./1e15
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOl.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2, loc_CO2, &
-              & loc_vegi_new, loc_litter_new, loc_litter_new + loc_vegi_new
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_int_t, loc_CO2, &
+              & slab_int_vegiC/slab_int_t, slab_int_soilC/slab_int_t, (slab_int_soilC + slab_int_vegiC)/slab_int_t
            close(utest)
            open(unit=utest,file=trim(adjustl(par_outdir_name))//'/tem/terPOOlg.res',action='write',status='old',position='append')
-           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_time_cnt2, loc_CO2, &
-              & loc_vegi_new*12./1e15, loc_litter_new*12./1e15,(loc_litter_new + loc_vegi_new)*12./1e15
+           write(utest,*) slab_time_cnt2, slab_int_avSLT/slab_int_t, loc_CO2, &
+              & slab_int_vegiC/slab_int_t*12./1e15, slab_int_soilC/slab_int_t*12./1e15,(slab_int_soilC + slab_int_vegiC)*12./1e15/slab_int_t
            close(utest)
            ! slab_time_cnt = slab_time_cnt - slab_save_dtyr
            slab_time_cnt = 0. 
+           slab_int_avSLT = 0.
+           slab_int_t = 0.
+           slab_int_soilC = 0.
+           slab_int_vegiC = 0.
+           slab_int_resp = 0.
+           slab_int_prod = 0.
            if (checkstuff) print *, ' --- slab saved --- '
        endif 
     endif 
