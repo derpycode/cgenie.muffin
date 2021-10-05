@@ -261,14 +261,14 @@ c albedo
       enddo
 
 c initialise land-atmosphere fluxes
-      do j=1,jmax
-         do i=1,imax
-            do k=1,ntrac_atm
-               sfcatm_lnd(k,i,j) = 0.0
-               sfxatm_lnd(k,i,j) = 0.0
-            enddo
-         enddo
-      enddo
+c      do j=1,jmax
+c         do i=1,imax
+c            do k=1,ntrac_atm
+c               sfcatm_lnd(k,i,j) = 0.0
+c               sfxatm_lnd(k,i,j) = 0.0
+c            enddo
+c         enddo
+c      enddo
 
       print*,' <<< Initialisation complete'
       print*,'======================================================='

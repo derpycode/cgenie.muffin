@@ -757,7 +757,14 @@ MODULE genie_global
   REAL,DIMENSION(0:ilon1_ocn,0:ilat1_ocn)::go_psi
   real,dimension(ilon1_ocn,ilat1_ocn,inl1_ocn)::go_diffv
   real,dimension(ilon1_ocn,ilat1_ocn,inl1_ocn)::go_dzrho
-
+  real,dimension(ilon1_lnd,ilat1_lnd)::el_Cveg
+  real,dimension(ilon1_lnd,ilat1_lnd)::el_Csoil
+  real,dimension(ilon1_lnd,ilat1_lnd)::el_Cveg_13C
+  real,dimension(ilon1_lnd,ilat1_lnd)::el_Csoil_13C
+  real,dimension(ilon1_lnd,ilat1_lnd)::el_Cveg_14C
+  real,dimension(ilon1_lnd,ilat1_lnd)::el_Csoil_14C
+  real,dimension(ilon1_lnd,ilat1_lnd)::albs_lnd
+  real,dimension(ilon1_lnd,ilat1_lnd)::el_fv
 ! *********************************
 
 ! genie-ents variables
@@ -815,6 +822,7 @@ MODULE genie_global
   real el_respveg(ilon1_ocn,ilat1_ocn)      ! vegetation respiration (kgC/m2/yr)
   real el_respsoil(ilon1_ocn,ilat1_ocn)     ! soil respiration (kgC/m2/yr) 
   real el_photo(ilon1_ocn,ilat1_ocn)         ! photosynthesis (kgC/m2/yr)
+
 
 ! *********************************
 

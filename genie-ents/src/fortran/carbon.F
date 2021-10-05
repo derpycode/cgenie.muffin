@@ -18,22 +18,56 @@ cmsw
       real tlnd(imax,jmax)
       real qlnd(imax,jmax)
 
+c SKT Add isotopes
+      real loc_delta_photo
+      real loc_alpha_13C,loc_alpha_14C
+      real loc_r13C,loc_r14C
+      real loc_R13C_atm,loc_R14C_atm
+      real loc_r13C_Cbio,loc_r14C_Cbio
       real k1v,k1s,k1a
+      real k1v_13C,k1s_13C,k1a_13C
+      real k1v_14C,k1s_14C,k1a_14C
       real,dimension(maxi,maxj),intent(in)::torog_atm
-      real,dimension(maxi,maxj)::dum_co2_out
+      real,dimension(3:5,maxi,maxj)::dum_co2_out
       real,dimension(maxi,maxj),intent(in)::landice_slicemask_lic
 
 c land-atmosphere carbon exchange fluxes
-      real,intent(inout),dimension(maxi,maxj)::sfxatm_lnd
+      real,intent(inout),dimension(3:5,maxi,maxj)::sfxatm_lnd
 
       integer i,j
+ 
+c Debugging
+c     real,dimension(maxi,maxj)::test
 
 cmsw Work out CO2 conc according to atchem (ppmv)
 
 c The following statement assumes spatially uniform pCO2 in the atmosphere
 c TODO: compute global average pCO2
-      pco2ld=dum_co2_out(1,1)*rmtp
-      
+c SKT Add isotope values
+      pco2ld=dum_co2_out(3,1,1)*rmtp
+      pco2_13C=dum_co2_out(4,1,1)*rmtp
+      pco2_14C=dum_co2_out(5,1,1)*rmtp
+      loc_r13C=pco2_13C/pco2ld
+      loc_r14C=pco2_14C/pco2ld
+
+c SKT Constant photosynthetic carbon isotope discrimination from Farquhar (1989)
+c SKT This is from epsilon from CO2 to Cbio
+      loc_delta_photo=20.1
+c SKT CO2-dependent fractionation from Schubert and Jahren 2012
+c      loc_delta_photo=(28.26*0.35*(pco2ld+15))/(28.26+0.35*(pco2ld+15))
+c Calculate alpha, ratio R, and fractional abundance, r
+c 13C
+      loc_alpha_13C = 1+loc_delta_photo/1000.0
+      loc_R13C_atm=loc_r13C/(1-loc_r13C)
+      loc_r13C_Cbio=((1/loc_alpha_13C)*loc_R13C_atm)/
+     &         (1.0 + (1/loc_alpha_13C)*loc_R13C_atm)
+
+c 14C
+      loc_alpha_14C = 1+2.0*loc_delta_photo/1000.0
+      loc_R14C_atm=loc_r14C/(1-loc_r14C)
+      loc_r14C_Cbio=((1/loc_alpha_14C)*loc_R14C_atm)/
+     &         (1.0 + (1/loc_alpha_14C)*loc_R14C_atm)
+     
 cmsw Start land_pts loop
 
       do i=1,imax
@@ -55,43 +89,89 @@ cmsw Calculate photosynthesis (kgC/m2/yr)
             call photosynthesis(Cveg(i,j),tair(i,j),
      &                          pco2ld,qlnd(i,j),bcap(i,j),
      &                          fv(i,j),photo(i,j))
+ 
+            photo_13C(i,j)=loc_r13C_Cbio*photo(i,j)
+            photo_14C(i,j)=loc_r14C_Cbio*photo(i,j)          
 
 cmsw Calculate plant respiration (kgC/m2/yr)
 
             call veg_resp(Cveg(i,j),tair(i,j),respveg(i,j))
-
+            respveg_13C(i,j)=loc_r13C_Cbio*respveg(i,j)
+            respveg_14C(i,j)=loc_r14C_Cbio*respveg(i,j)
 
 cmsw Calculate leaf turnover (kgC/m2/yr)
 
             call leaf_litter(Cveg(i,j),photo(i,j),
      &                       respveg(i,j),
      &                       epsv(i,j),leaf(i,j))
+            leaf_13C(i,j)=loc_r13C_Cbio*leaf(i,j)
+            leaf_14C(i,j)=loc_r14C_Cbio*leaf(i,j)
+
 
 cmsw Calculate soil respiration (kgC/m2/yr) using land temp.
 
-            call soil_resp(Csoil(i,j),tlnd(i,j),respsoil(i,j))
+            call soil_resp(Csoil(i,j),tlnd(i,j),respsoil(i,j)) 
+            respsoil_13C(i,j)=loc_r13C_Cbio*respsoil(i,j)
+            respsoil_14C(i,j)=loc_r14C_Cbio*respsoil(i,j)
+
 
 cmsw vegetation carbon ODE
 
             k1v=dtland*(photo(i,j)-respveg(i,j)-leaf(i,j))
+            k1v_13C=dtland*(photo_13C(i,j)-respveg_13C(i,j)-
+     &          leaf_13C(i,j))
+            k1v_14C=dtland*(photo_14C(i,j)-respveg_14C(i,j)-
+     &          leaf_14C(i,j))
+
 
 cmsw soil carbon ODE
 
             k1s=dtland*(leaf(i,j)-respsoil(i,j))
+            k1s_13C=dtland*(leaf_13C(i,j)-respsoil_13C(i,j))
+            k1s_14C=dtland*(leaf_14C(i,j)-respsoil_14C(i,j))
+
 
 cmsw atmospheric carbon ODE
 
             k1a=dtland*(-photo(i,j)+respveg(i,j)+respsoil(i,j))
+            k1a_13C=dtland*(-photo_13C(i,j)+respveg_13C(i,j)
+     &         +respsoil_13C(i,j))
+            k1a_14C=dtland*(-photo_14C(i,j)+respveg_14C(i,j)
+     &         +respsoil_14C(i,j))
+
+
+c SKT Find initial isotope inventories
+           Cveg_13C(i,j)=loc_r13C_Cbio*Cveg(i,j)
+           Csoil_13C(i,j)=loc_r13C_Cbio*Csoil(i,j)
+           Cveg_14C(i,j)=loc_r14C_Cbio*Cveg(i,j)
+           Csoil_14C(i,j)=loc_r14C_Cbio*Csoil(i,j)
 
 cmsw Euler method update (kg/m2)
 
             Cveg(i,j)=Cveg(i,j)+k1v
             Csoil(i,j)=Csoil(i,j)+k1s
 
+c SKT update isotopes
+            
+            Cveg_13C(i,j)=Cveg_13C(i,j)+k1v_13C
+            Csoil_13C(i,j)=Csoil_13C(i,j)+k1s_13C
+            Cveg_14C(i,j)=Cveg_14C(i,j)+k1v_14C
+            Csoil_14C(i,j)=Csoil_14C(i,j)+k1s_14C
+          
+
             if (atchem_update) then
 cmsw Calculate CO2 fluxes for atchem coupler (mol/m2/s)
-               sfxatm_lnd(i,j) = (-photo(i,j)+respveg(i,j)+
+               sfxatm_lnd(3,i,j) = (-photo(i,j)+respveg(i,j)+
      &              respsoil(i,j))*rmu*rsyr
+               sfxatm_lnd(4,i,j) = (-photo_13C(i,j)+
+     &              respveg_13C(i,j)+
+     &              respsoil_13C(i,j))*rmu*rsyr
+c               sfxatm_lnd(5,i,j) = (-photo_14C(i,j)+
+c     &              respveg_14C(i,j)+
+c     &              respsoil_14C(i,j))*rmu*rsyr
+
+
+
             endif
 
 cmsw If not a land point don't calculate

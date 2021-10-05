@@ -6,4 +6,4 @@
 1                                   seasonswitch (0=ann. av. 1=seasonal fields)
 n                                   include emissions (y or n)
 0                                   Use(=1) or don't use(=0) a DIFFERENT land restart file
-/esdata/env/e306/genie_output/ebgogssl_5k/ents/spn.sland     DIFFERENT restart dump input file relative to executable location
+/home/russula/cgenie_output/070221.worjh2.PO4.ENTS.SPIN/ents/rst.sland     DIFFERENT restart dump input file relative to executable location

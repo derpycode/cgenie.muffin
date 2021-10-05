@@ -1,4 +1,4 @@
-! ******************************************************************************************************************************** !
+!******************************************************************************************************************************** !
 ! biogem_data_netCDF.f90
 ! BioGEochemical Model
 ! DATA LOADING/SAVING ROUTINES
@@ -1664,7 +1664,7 @@ CONTAINS
     !       local variables
     !-----------------------------------------------------------------------
     INTEGER::l,i,j,ia,io,is
-    integer::ib,id,ip,ic
+    integer::ib,id,ip,ic,iel
     integer::loc_k1
     integer::loc_iou,loc_ntrec
     CHARACTER(len=255)::loc_unitsname,loc_longname
@@ -1829,6 +1829,73 @@ CONTAINS
                & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf_ALL)
        END DO
     end if
+    !---------------------------------------------------------------
+    !       ENTS SAVING (SKT)
+    !---------------------------------------------------------------
+    If (ctrl_data_save_slice_ents .AND. flag_ents) then
+       loc_ij(:,:) = const_real_zero
+       DO iel=1,n_ents
+          DO i=1,n_i
+             DO j=1,n_j
+                SELECT CASE (iel)
+                CASE (iel_Csoil,iel_Cveg,iel_photo,iel_leaf,iel_respsoil,iel_respveg, &
+                     & iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd)
+                   loc_ij(i,j) = int_ents_timeslice(iel,i,j)/int_t_timeslice
+                CASE (iel_Cveg_13C)
+                   loc_tot = int_ents_timeslice(iel_Cveg,i,j)/int_t_timeslice
+                   loc_frac = int_ents_timeslice(iel,i,j)/int_t_timeslice
+                   loc_ij(i,j) = fun_calc_isotope_delta( &
+                            & loc_tot, & 
+                            & loc_frac, &
+                            & const_standards(11), & 
+                            & .false., & 
+                            & const_nulliso &
+                            & )
+                CASE (iel_Csoil_13C)
+                   loc_tot = int_ents_timeslice(iel_Csoil,i,j)/int_t_timeslice
+                   loc_frac = int_ents_timeslice(iel,i,j)/int_t_timeslice
+                   loc_ij(i,j) = fun_calc_isotope_delta( &
+                            & loc_tot, &
+                            & loc_frac, &
+                            & const_standards(11), &
+                            & .false., &
+                            & const_nulliso &
+                            & )
+                CASE (iel_Cveg_14C)
+                   loc_tot = int_ents_timeslice(iel_Cveg,i,j)/int_t_timeslice
+                   loc_frac = int_ents_timeslice(iel,i,j)/int_t_timeslice
+                   loc_ij(i,j) = fun_calc_isotope_delta( &
+                            & loc_tot, &
+                            & loc_frac, &
+                            & const_standards(12), &
+                            & .false., &
+                            & const_nulliso &
+                            & )
+                CASE (iel_Csoil_14C)
+                   loc_tot = int_ents_timeslice(iel_Csoil,i,j)/int_t_timeslice
+                   loc_frac = int_ents_timeslice(iel,i,j)/int_t_timeslice
+                   loc_ij(i,j) = fun_calc_isotope_delta( &
+                            & loc_tot, &
+                            & loc_frac, &
+                            & const_standards(12), &
+                            & .false., &
+                            & const_nulliso &
+                            & )
+                END SELECT 
+             END DO
+          END DO
+          SELECT CASE (iel)
+          CASE (iel_Csoil,iel_Cveg,iel_photo,iel_leaf,iel_respsoil,iel_respveg, &
+                   & iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd, & 
+                   & iel_Cveg_13C,iel_Csoil_13C,iel_Cveg_14C,iel_Csoil_14C)   
+             call sub_adddef_netcdf(loc_iou,3,'ents_'//trim(string_ents(iel)), &
+                      & 'ents output - '//trim(string_ents(iel)),' ',const_real_zero,const_real_zero)
+             call sub_putvar2d('ents_'//trim(string_ents(iel)),loc_iou, &
+                      & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf_ALL) 
+          END SELECT
+       END DO
+    end if
+
     !----------------------------------------------------------------
     !              <diag_*>
     !       save diagnostics data

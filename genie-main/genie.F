@@ -85,6 +85,7 @@ c     *** BIOGEM model - START
          call initialise_biogem_wrapper
          call biogem_climate_wrapper
          call biogem_tracercoupling_wrapper
+         call biogem_ents_wrapper
       endif
 c     ==================================================================
 c     *** ATCHEM model - START
@@ -137,6 +138,7 @@ c     *** BIOGEM model - headers and initialization run-time reporting
       if (flag_biogem) then
          call biogem_climate_wrapper
          call diag_biogem_wrapper
+         call biogem_ents_wrapper
       endif
 c     ==================================================================
 c     
@@ -555,6 +557,7 @@ ccc THIS MOSTLY FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM
                   call biogem_wrapper
                   call biogem_tracercoupling_wrapper
                   call biogem_climate_wrapper 
+                  call biogem_ents_wrapper
                   if (debug_loop.gt.2) PRINT*,'<<<'
                   if (mod(koverall,conv_kocn_korb*kocn_loop).eq.0)
      &                 call diag_biogem_rec_orb_wrapper

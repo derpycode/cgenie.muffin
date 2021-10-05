@@ -87,20 +87,37 @@ cmsw carbon reservoirs
       REAL 
      & Cveg(maxients,maxjents),        ! Veg carbon reservoir present (kgC/m2)
      & Csoil(maxients,maxjents),       ! Soil carbon reservoir present (kgC/m2)
+     & Cveg_13C(maxients,maxjents),    ! Veg carbon 13C (o/oo)
+     & Csoil_13C(maxients,maxjents),   ! Soil carbon 13C (o/oo)
+     & Cveg_14C(maxients,maxjents),    ! Veg carbon 14C (o/oo)
+     & Csoil_14C(maxients,maxjents),   ! Soil carbon 14C (o/oo)
      & fv(maxients,maxjents),          ! Fractional vegetation cover (/gridbox)
      & epsv(maxients,maxjents),        ! Vegetation shelf shading fraction (/gridbox)
-     & pco2ld                  ! atmospheric pCO2 (ppmv)
+     & pco2ld,                         ! atmospheric pCO2 (ppmv)
+     & pco2_13C,                       ! atmospheric pCO2 13C (o/oo)
+     & pco2_14C                        ! atmospheric pCO2 14C (o/oo)
       
-      COMMON /landCreservoirs/ Cveg,Csoil,fv,epsv,
-     & pco2ld
+      COMMON /landCreservoirs/ Cveg,Csoil,Cveg_13C,Csoil_13C,
+     & Cveg_14C,Csoil_14C,fv,epsv,pco2ld,pco2_13C,pco2_14C
 
       REAL
      & leaf(maxients,maxjents),         ! leaf litter (kgC/m2/yr) 
      & respveg(maxients,maxjents),      ! vegetation respiration (kgC/m2/yr)
      & respsoil(maxients,maxjents),     ! soil respiration (kgC/m2/yr) 
-     & photo(maxients,maxjents)         ! photosynthesis (kgC/m2/yr)
+     & photo(maxients,maxjents),        ! photosynthesis (kgC/m2/yr)
+     & leaf_13C(maxients,maxjents),     ! leaf litte - 13C (kgC/m2/yr)
+     & respveg_13C(maxients,maxjents),  ! vegetation respiration - 13C (kgC/m2/yr)
+     & respsoil_13C(maxients,maxjents), ! soil respiration - 13C (kgC/m2/yr)
+     & photo_13C(maxients,maxjents),    ! photosynthesis - 13C (kgC/m2/yr)
+     & leaf_14C(maxients,maxjents),     ! leaf litter - 14C (kgC/m2/yr)
+     & respveg_14C(maxients,maxjents),  ! vegetation respiration - 14C  (kgC/m2/yr)
+     & respsoil_14C(maxients,maxjents), ! soil respiration - 14C (kgC/m2/yr)
+     & photo_14C(maxients,maxjents)     ! photosynthesis - 14C (kgC/m2/yr)
 
-      COMMON /components/ leaf,respveg,respsoil,photo
+
+      COMMON /components/ leaf,respveg,respsoil,photo,
+     & leaf_13C,respveg_13C,respsoil_13C,photo_13C,
+     & leaf_14C,respveg_14C,respsoil_14C,photo_14C
 
 cmsw Arrays used to calculate .sland.avg files
 cmsw Used in annav_diags (these arrays only used 

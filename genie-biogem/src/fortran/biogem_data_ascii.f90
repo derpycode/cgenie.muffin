@@ -22,7 +22,7 @@ CONTAINS
   SUBROUTINE sub_init_data_save_runtime()
     USE genie_util, ONLY:check_unit,check_iostat
     ! local variables
-    INTEGER::l,io,ia,is,ic,ios,idm2D
+    INTEGER::l,io,ia,iel,is,ic,ios,idm2D
     integer::ib,id
     CHARACTER(len=255)::loc_filename
     CHARACTER(len=255)::loc_string
@@ -112,6 +112,39 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)
           end SELECT
        END DO
+    END IF
+    ! ents output
+    IF (ctrl_data_save_sig_ents) THEN
+       IF (flag_ents) THEN
+           DO iel=1,n_ents
+               loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ents_'//TRIM(string_ents(iel)),string_results_ext &
+               & )
+              SELECT CASE (iel)
+              CASE (iel_Csoil,iel_Cveg)
+                 loc_string =  '% time (yr) /  '//TRIM(string_ents(iel))//' (mol) / global ' //TRIM(string_ents(iel))//' (Gt C)'
+              CASE (iel_photo,iel_respveg,iel_respsoil,iel_leaf)
+                 loc_string = '% time (yr) /  '//TRIM(string_ents(iel))//' (mol yr-1) / global ' //TRIM(string_ents(iel))//' (Gt C yr-1)'
+              CASE (iel_Cveg_13C,iel_Cveg_14C,iel_Csoil_13C,iel_Csoil_14C)
+                 loc_string =  '% time (yr) /  '//TRIM(string_ents(iel))//' (mol) / global ' //TRIM(string_ents(iel))//' (o/oo)'
+              CASE (iel_temp_lnd)
+                 loc_string = '% time (yr) /  '//TRIM(string_ents(iel))//' (degrees C)'
+              CASE (iel_moisture_lnd)
+                 loc_string = '% time (yr) /  '//TRIM(string_ents(iel))//'(Soil bucket capacity - m)'
+              CASE (iel_fv)
+                 loc_string = '% time (yr) /  '//TRIM(string_ents(iel))//' (/gridbox)'
+              CASE default
+                 loc_string = '% time (yr) /  '//TRIM(string_ents(iel))//' (ents)'
+              end SELECT
+              call check_unit(out,__LINE__,__FILE__)
+              OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+              call check_iostat(ios,__LINE__,__FILE__)
+              write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+              call check_iostat(ios,__LINE__,__FILE__)
+              CLOSE(unit=out,iostat=ios)
+              call check_iostat(ios,__LINE__,__FILE__)
+           END DO
+       END IF
     END IF
     ! export flux
     IF (ctrl_data_save_sig_fexport) THEN
@@ -1110,7 +1143,7 @@ CONTAINS
     ! dummy arguments
     REAL,INTENT(in)::dum_yr_save,dum_t
     ! local variables
-    INTEGER::l,io,ia,is,ic,ios,idm2D,k
+    INTEGER::l,io,ia,iel,is,ic,ios,idm2D,k
     integer::ib,id
     REAL::loc_t
     real::loc_opsi_scale
@@ -1415,6 +1448,101 @@ CONTAINS
              CLOSE(unit=out,iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
           end SELECT
+       END DO
+    END IF
+
+    ! *** <sig_ents_*> ***                                                                                                                          
+    ! write ENTS data
+    IF (ctrl_data_save_sig_ents) THEN
+       DO iel=1,n_ents
+               loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','ents_'//TRIM(string_ents(iel)),string_results_ext &
+               & )
+               SELECT CASE (iel)
+               CASE (iel_Cveg,iel_Csoil,iel_photo,iel_respveg,iel_respsoil,iel_leaf)
+                  loc_sig = int_ents_sig(iel)/int_t_sig
+                  call check_unit(out,__LINE__,__FILE__)
+                  OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  WRITE(unit=out,fmt='(f12.3,e20.12,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_sig/0.012, &
+                     & loc_sig/1e12
+                call check_iostat(ios,__LINE__,__FILE__)
+                CLOSE(unit=out,iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+               CASE (iel_Cveg_13C)
+                  loc_tot = int_ents_sig(iel_Cveg)/int_t_sig
+                  loc_frac = int_ents_sig(iel)/int_t_sig
+                  loc_standard = const_standards(11)
+                  loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
+                  call check_unit(out,__LINE__,__FILE__)
+                  OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  WRITE(unit=out,fmt='(f12.3,e20.12,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_frac/0.012, &
+                     & loc_sig
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  CLOSE(unit=out,iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+               CASE (iel_Cveg_14C)
+                  loc_tot = int_ents_sig(iel_Cveg)/int_t_sig
+                  loc_frac = int_ents_sig(iel)/int_t_sig
+                  loc_standard = const_standards(12)
+                  loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
+                  call check_unit(out,__LINE__,__FILE__)
+                  OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  WRITE(unit=out,fmt='(f12.3,e20.12,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_frac/0.012, &
+                     & loc_sig
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  CLOSE(unit=out,iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+               CASE (iel_Csoil_13C)
+                  loc_tot = int_ents_sig(iel_Csoil)/int_t_sig
+                  loc_frac = int_ents_sig(iel)/int_t_sig
+                  loc_standard = const_standards(11)
+                  loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
+                  call check_unit(out,__LINE__,__FILE__)
+                  OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  WRITE(unit=out,fmt='(f12.3,e20.12,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_frac/0.012, &
+                     & loc_sig
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  CLOSE(unit=out,iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+               CASE (iel_Csoil_14C)
+                  loc_tot = int_ents_sig(iel_Csoil)/int_t_sig
+                  loc_frac = int_ents_sig(iel)/int_t_sig
+                  loc_standard = const_standards(12)
+                  loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_nulliso)
+                  call check_unit(out,__LINE__,__FILE__)
+                  OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  WRITE(unit=out,fmt='(f12.3,e20.12,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_frac/0.012, &
+                     & loc_sig
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  CLOSE(unit=out,iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+               CASE (iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd)
+                  loc_sig = int_ents_sig(iel)/int_t_sig
+                  call check_unit(out,__LINE__,__FILE__)
+                  OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  WRITE(unit=out,fmt='(f12.3,e20.12)',iostat=ios) &
+                     & loc_t, &
+                     & loc_sig
+                  call check_iostat(ios,__LINE__,__FILE__)
+                  CLOSE(unit=out,iostat=ios)
+                  call check_iostat(ios,__LINE__,__FILE__)
+               END SELECT
        END DO
     END IF
 

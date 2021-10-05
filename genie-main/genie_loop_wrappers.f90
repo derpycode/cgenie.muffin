@@ -373,8 +373,14 @@ contains
          land_moisture_lnd, &                     ! input
          intrac_atm_max, &
          genie_sfcatm_lnd, &
-         genie_sfxatm_lnd &
-         )
+         genie_sfxatm_lnd, &
+         el_Cveg, &
+         el_Csoil, &
+         el_Cveg_13C, &
+         el_Csoil_13C, &
+         el_Cveg_14C, &
+         el_Csoil_14C, &
+         el_fv)
   end subroutine ents_wrapper
 
   !!
@@ -678,10 +684,31 @@ contains
          & genie_solar_constant,                             & ! input/output
          & go_diffv,                                         & ! input
          & go_dzrho,                                         & ! input
-         & go_rho                                            & ! input 
-         )
+         & go_rho                                            & ! input
+         ) 
   end subroutine biogem_climate_wrapper
   !!
+  subroutine biogem_ents_wrapper
+    implicit none
+    call biogem_ents(                                        &
+         & el_Cveg,                                          &
+         & el_Csoil,                                         &
+         & el_Cveg_13C,                                      &
+         & el_Csoil_13C,                                     &
+         & el_Cveg_14C,                                      &
+         & el_Csoil_14C,                                     &
+         & land_temp_lnd,                                    &
+         & land_moisture_lnd,                                &
+         & albs_atm,                                         &
+         & el_fv,                                            &
+         & el_photo,                                         &
+         & el_respveg,                                       &
+         & el_respsoil,                                      &
+         & el_leaf                                           &
+         )
+    end subroutine biogem_ents_wrapper
+
+ !!
   subroutine biogem_climate_sol_wrapper
     implicit none
     call biogem_climate_sol(                                 &

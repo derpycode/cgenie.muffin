@@ -25,7 +25,14 @@
      :     land_moisture_lnd,                !< land moisture content
      :     ntrac_atm,                        !< number of atmospheric tracer
      :     sfcatm_lnd,                       !< atmospheric tracer concentrations
-     :     sfxatm_lnd                        !< land-atmosphere exchange fluxes
+     :     sfxatm_lnd,                       !< land-atmosphere exchange fluxes
+     :     el_Cveg,
+     :     el_Csoil,
+     :     el_Cveg_13C,
+     :     el_Csoil_13C,
+     :     el_Cveg_14C,
+     :     el_Csoil_14C,
+     :     el_fv
      :     )
      
 #include "genie_ents.cmn"
@@ -91,6 +98,16 @@ c land temperature
 
 c land moisture content
       real,dimension(maxi,maxj),intent(inout)::land_moisture_lnd
+
+c carbon stocks SKT
+      real,dimension(maxi,maxj),intent(inout)::el_Cveg
+      real,dimension(maxi,maxj),intent(inout)::el_Csoil
+      real,dimension(maxi,maxj),intent(inout)::el_Cveg_13C
+      real,dimension(maxi,maxj),intent(inout)::el_Csoil_13C
+      real,dimension(maxi,maxj),intent(inout)::el_Cveg_14C
+      real,dimension(maxi,maxj),intent(inout)::el_Csoil_14C
+      real,dimension(maxi,maxj),intent(inout)::el_fv
+            
 
 c atmospheric tracer concentrations and land-atmosphere fluxes
       integer,intent(in)::ntrac_atm
@@ -181,12 +198,13 @@ c          itv = mod(istep+nyear-1,nyear)
          if(mod(istep+istot,msimpleland).eq.0)then
 c Note, the index for the atmospheric pCO2 tracer is 3
 c TODO: define this index globally
+c SKT: added tracers 4 & 5 for isotopes
             if (atchem_fert) then
-               call carbon(torog_atm,sfcatm_lnd(3,:,:),
-     &              landice_slicemask_lic,sfxatm_lnd(3,:,:))
+               call carbon(torog_atm,sfcatm_lnd(3:5,:,:),
+     &              landice_slicemask_lic,sfxatm_lnd(3:5,:,:))
             else
                call carbon(torog_atm,dum_co2_out,landice_slicemask_lic
-     &              ,sfxatm_lnd(3,:,:))
+     &              ,sfxatm_lnd(3:5,:,:))
          endif
          endif
          
@@ -356,6 +374,13 @@ c roughness length
      &                   ,kind(land_temp_lnd))
                   land_moisture_lnd(i,j)=real(tqld(2,i,j)
      &                   ,kind(land_moisture_lnd))
+                  el_Cveg(i,j)=real(Cveg(i,j))
+                  el_Csoil(i,j)=real(Csoil(i,j))
+                  el_Cveg_13C(i,j)=real(Cveg_13C(i,j))
+                  el_Csoil_13C(i,j)=real(Csoil_13C(i,j))
+                  el_Cveg_14C(i,j)=real(Cveg_14C(i,j))
+                  el_Csoil_14C(i,j)=real(Csoil_14C(i,j))
+                  el_fv(i,j)=real(fv(i,j))
                enddo
             enddo
 

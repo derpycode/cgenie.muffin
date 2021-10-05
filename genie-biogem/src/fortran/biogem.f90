@@ -1,4 +1,3 @@
-
 ! ******************************************************************************************************************************** !
 ! BIOGEM LOOP SUBROUTINE
 subroutine biogem(        &
@@ -2283,8 +2282,7 @@ subroutine biogem_climate( &
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_diffv              ! vertical diffusivity
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_dzrho              ! density gradient
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_rho_go             ! density from goldstein
-
-  ! LOCAL VARIABLES
+! LOCAL VARIABLES
   INTEGER::i,j,k
   integer::loc_k1                                                ! local topography
   real::loc_tau_scale,loc_diff_scale,loc_dzrho_scale             ! dimensional scaling factors
@@ -2390,6 +2388,70 @@ subroutine biogem_climate( &
 end subroutine biogem_climate
 ! ******************************************************************************************************************************** !
 
+! ******************************************************************************************************************************** !
+! ENTS update (SKT)
+subroutine biogem_ents( &
+     & dum_Cveg,                &
+     & dum_Csoil,               &
+     & dum_Cveg_13C,            &
+     & dum_Csoil_13C,           &
+     & dum_Cveg_14C,            &
+     & dum_Csoil_14C,           &
+     & dum_temp_lnd,            &
+     & dum_moisture_lnd,        &
+     & dum_albs_lnd,            &
+     & dum_fv,                  &
+     & dum_photo,               &
+     & dum_respveg,             &
+     & dum_respsoil,            &
+     & dum_leaf                 & 
+     & )
+  USE biogem_lib
+  USE biogem_box
+  IMPLICIT NONE
+  ! DUMMY ARGUMENTS                                                                                                                                               
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Cveg                   ! Vegetation C (kg/m2)                        
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Csoil                  ! Soil C (kg/m2)
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Cveg_13C               ! Vegetation C 13C (kg/m2)                                                                                                
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Csoil_13C              ! Soil C 13C (kg/m2)                        
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Cveg_14C               ! Vegetation C 14C (kg/m2)                                                                                                
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Csoil_14C              ! Soil C 14C (kg/m2)                                                                                                    
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_temp_lnd               ! ENTS Land Temp                                                                                                  
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_moisture_lnd           ! ENTS Land Moisture                                                                                              
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_lnd               ! ENTS Albedo                                                                                                     
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fv                     ! ENTS Vegetation fraction                                                                                        
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_photo                  ! Photosynthesis (kg/m2/yr)                                                                                             
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_respveg                ! Vegetation respiration (kg/m2/yr)                                                                                     
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_respsoil               ! Soil respiration (kg/m2/yr)                                                                                           
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_leaf                   ! Leaf litter (kg/m2/yr)             
+! LOCAL VARIABLES                                                                                                                                                
+  INTEGER::i,j
+! Copy ENTS data
+  DO i=1,n_i
+     DO j=1,n_j                                 
+         ! Cveg and Csoil - ENTS                                                                                                                                                        
+        ents(iel_Cveg,i,j) = dum_Cveg(i,j)
+        ents(iel_Csoil,i,j) = dum_Csoil(i,j)
+        ents(iel_Cveg_13C,i,j) = dum_Cveg_13C(i,j)
+        ents(iel_Csoil_13C,i,j) = dum_Csoil_13C(i,j)
+        ents(iel_Cveg_14C,i,j) = dum_Cveg_14C(i,j)
+        ents(iel_Csoil_14C,i,j) = dum_Csoil_14C(i,j)
+        ! Land temp and moisture - ENTS                                                                                                                                                 
+        ents(iel_temp_lnd,i,j) = dum_temp_lnd(i,j)
+        ents(iel_moisture_lnd,i,j) = dum_moisture_lnd(i,j)
+        ! Albedo                                                                                                                                                                        
+        ents(iel_albs_lnd,i,j) = dum_albs_lnd(i,j)
+        ! Fraction vegetation                                                                                                                                                           
+        ents(iel_fv,i,j) = dum_fv(i,j)
+        ! Photosynthesis - ENTS                                                                                                                
+        ents(iel_photo,i,j) = dum_photo(i,j)
+        ents(iel_respveg,i,j) = dum_respveg(i,j)
+        ents(iel_respsoil,i,j) = dum_respsoil(i,j)
+        ents(iel_leaf,i,j)  = dum_leaf(i,j)
+     end DO
+  end DO
+
+end subroutine biogem_ents
 
 ! ******************************************************************************************************************************** !
 ! BIOGEM LOOP SUBROUTINE - CLIMATE STATE UPDATE
@@ -3125,6 +3187,8 @@ SUBROUTINE diag_biogem_timeslice( &
            int_sfcatm1_timeslice(:,:,:)      = int_sfcatm1_timeslice(:,:,:)     + loc_dtyr*dum_sfcatm1(:,:,:)
            int_focnatm_timeslice(:,:,:)      = int_focnatm_timeslice(:,:,:)     + loc_dtyr*locij_focnatm(:,:,:)
            int_phys_ocnatm_timeslice(:,:,:)  = int_phys_ocnatm_timeslice(:,:,:) + loc_dtyr*phys_ocnatm(:,:,:)
+           ! update time slice data - ents interface
+           int_ents_timeslice(:,:,:)         = int_ents_timeslice(:,:,:)        + loc_dtyr*ents(:,:,:)
            ! update time slice data - ocean-sediment interface
            int_sfcsed1_timeslice(:,:,:)  = int_sfcsed1_timeslice(:,:,:) + loc_dtyr*dum_sfcsed1(:,:,:)
            int_focnsed_timeslice(:,:,:)  = int_focnsed_timeslice(:,:,:) + locij_focnsed(:,:,:)
@@ -3315,7 +3379,7 @@ SUBROUTINE diag_biogem_timeseries( &
   logical,INTENT(IN)::dum_forcesave                              ! force data saving?
   logical,intent(in)::dum_gemlite                                ! in GEMlite phase of cycle?
   ! local variables
-  INTEGER::i,j,k,l,io,ia,is,ic
+  INTEGER::i,j,k,l,io,ia,is,ic,iel
   integer::ib,id,i2D                                             ! counting variables
   integer::loc_k1                                                !
   real::loc_t,loc_dts,loc_dtyr                                   !
@@ -3334,7 +3398,7 @@ SUBROUTINE diag_biogem_timeseries( &
   real::loc_ocnsed_tot_A,loc_ocnsed_tot_A_ben                    !
   real::loc_ocnsed_rtot_A,loc_ocnsed_rtot_A_ben                  !
   real::loc_tot_A,loc_tot_EP                                     !
-  real::loc_sig                                                  !
+  real::loc_sig                                                  !    
   REAL,DIMENSION(2)::loc_opsia_minmax,loc_opsip_minmax           !
   real::loc_opsi_scale                                           !
 
@@ -3778,6 +3842,35 @@ SUBROUTINE diag_biogem_timeseries( &
                  int_misc_3D_sig(l,:,:,:) = int_misc_3D_sig(l,:,:,:) + loc_dtyr*ocn(io,:,:,:)
               end DO
            end if
+           ! ENTS data (SKT)
+           IF (ctrl_data_save_sig_ents) THEN
+              DO iel=1,n_ents
+                 SELECT CASE (iel)
+                 CASE (iel_Csoil,iel_Cveg,iel_Cveg_13C,iel_Csoil_13C, &
+                         & iel_Cveg_14C,iel_Csoil_14C,iel_photo,iel_leaf, &
+                         & iel_respsoil,iel_respveg)
+                      int_ents_sig(iel) = int_ents_sig(iel) + &
+                         & loc_dtyr*SUM((phys_ocnatm(ipoa_A,:,:)*ents(iel,:,:)))
+                 CASE (iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd)
+                      loc_sig = 0.0
+                      loc_tot_A = 0.0
+                      DO i=1,n_i
+                         DO j=1,n_j
+                            loc_k1 = goldstein_k1(i,j)
+                            IF (n_k < loc_k1) THEN
+                              loc_sig = loc_sig + phys_ocnatm(ipoa_A,i,j)*ents(iel,i,j)
+                               loc_tot_A = loc_tot_A + phys_ocnatm(ipoa_A,i,j)
+                            end IF
+                         end DO
+                      end DO
+                      IF (loc_tot_A > const_real_nullsmall) then
+                         int_ents_sig(iel) = int_ents_sig(iel) + loc_dtyr*loc_sig/loc_tot_A
+                      ELSE
+                         int_ents_sig(iel) = 0.0
+                      END IF
+                 END SELECT
+              END DO
+           END IF 
            ! ### ADD ADDITIONAL TIME-SERIES UPDATES HERE ######################################################################### !
            !
            ! ##################################################################################################################### !

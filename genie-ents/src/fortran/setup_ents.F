@@ -240,6 +240,16 @@ cmsw Units kgC/m2
          enddo
       enddo
 
+c SKT initialize isotope arrays
+c      do i=1,imax
+c         do j=1,jmax
+c            Cveg_13C(i,j) = 0.0
+c            Csoil_13C(i,j) = 0.0
+c            Cveg_14C(i,j) = 0.0
+c            Csoil_14C(i,j) = 0.0
+c         enddo
+c     enddo
+
 cmsw Land surface albedo paramaters
 
       asnow=0.8
@@ -411,7 +421,7 @@ cccccccccccccc CHANGES FOR NETCDF
         call in_ents_netcdf(ents_filenetin,iniday,land_snow_lnd)
         else
 cccccccccccccccccccccccc
-        filename=indir_name(1:lenin)//trim(ents_restart_file)
+        filename=trim(ents_dirnetout)//'/'//trim(ents_restart_file)
 
         open(1,file=trim(filename))
         call in_ents_ascii(1,land_snow_lnd)

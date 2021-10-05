@@ -612,6 +612,7 @@ MODULE biogem_lib
   LOGICAL::ctrl_data_save_slice_diag                             ! time-slice data save: biogeochemical diagnostics?
   LOGICAL::ctrl_data_save_slice_diag_redox_old                   ! redox back-compatability
   LOGICAL::ctrl_data_save_slice_sur                              ! time-slice data save: surface properties
+  LOGICAL::ctrl_data_save_slice_ents                             ! time_slice data save: ENTS (SKT)
   NAMELIST /ini_biogem_nml/ &
        & ctrl_data_save_slice_ocnatm,ctrl_data_save_slice_ocn,ctrl_data_save_slice_ocnsed, &
        & ctrl_data_save_slice_fairsea, &
@@ -619,7 +620,8 @@ MODULE biogem_lib
        & ctrl_data_save_slice_bio,ctrl_data_save_slice_carb,ctrl_data_save_slice_carbconst, &
        & ctrl_data_save_slice_phys_atm,ctrl_data_save_slice_phys_ocn,ctrl_data_save_slice_misc,ctrl_data_save_slice_diag, &
        & ctrl_data_save_slice_diag_redox_old, &
-       & ctrl_data_save_slice_sur
+       & ctrl_data_save_slice_sur, & 
+       & ctrl_data_save_slice_ents
   real::par_data_save_slice_dt                                   ! Integration interval (yr)
   NAMELIST /ini_biogem_nml/par_data_save_slice_dt
   CHARACTER(len=127)::par_infile_slice_name                      !
@@ -644,12 +646,14 @@ MODULE biogem_lib
   LOGICAL::ctrl_data_save_sig_misc                               ! time-series data save: Miscellaneous properties?
   LOGICAL::ctrl_data_save_sig_diag                               ! time-series data save: biogeochemical diagnostics?
   LOGICAL::ctrl_data_save_sig_diag_redox_old                     ! redox back-compatability
+  LOGICAL::ctrl_data_save_sig_ents                               ! time-series data save: ENTS (SKT)
   NAMELIST /ini_biogem_nml/ &
        & ctrl_data_save_sig_ocnatm,ctrl_data_save_sig_ocn,ctrl_data_save_sig_fexport,ctrl_data_save_sig_ocnsed, &
        & ctrl_data_save_sig_fairsea, &
        & ctrl_data_save_sig_focnatm,ctrl_data_save_sig_focnsed,ctrl_data_save_sig_fsedocn, &
        & ctrl_data_save_sig_ocn_sur,ctrl_data_save_sig_carb_sur,ctrl_data_save_sig_misc,ctrl_data_save_sig_diag, &
-       & ctrl_data_save_sig_diag_redox_old
+       & ctrl_data_save_sig_diag_redox_old, &
+       & ctrl_data_save_sig_ents
   real::par_data_save_sig_dt                                     ! Integration interval (yr)
   NAMELIST /ini_biogem_nml/par_data_save_sig_dt
   CHARACTER(len=127)::par_infile_sig_name                        !
@@ -762,9 +766,12 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_i = ilon1_ocn                           !
   INTEGER,PARAMETER::n_j = ilat1_ocn                           !
   INTEGER,PARAMETER::n_k = inl1_ocn                            !
+  INTEGER,PARAMETER::l_i = ilon1_lnd                           !
+  INTEGER,PARAMETER::l_j = ilon1_lnd
   ! misc arrays dimensions
   INTEGER,PARAMETER::n_phys_ocn                           = 24 ! number of ocean box physical descriptors
   INTEGER,PARAMETER::n_phys_ocnatm                        = 26 ! number of ocean-atmosphere interface physical descriptors
+  INTEGER,PARAMETER::n_ents                               = 17
   INTEGER,PARAMETER::n_data_max     = 32767                    ! (maximum) number of (time series) data points (2^15 - 1)
   ! options arrays dimensions
   INTEGER,PARAMETER::n_opt_misc                           = 14 ! miscellaneous
@@ -838,7 +845,25 @@ MODULE biogem_lib
   INTEGER,PARAMETER::ipoa_mld_k                           = 26   ! k value of MDL (m below surface)
   INTEGER,PARAMETER::ipoa_evap                            = 20   ! evap
   INTEGER,PARAMETER::ipoa_pptn                            = 21   ! pptn
-  INTEGER,PARAMETER::ipoa_seaice_dV                       = 22   ! change in sea-ice volumn
+  INTEGER,PARAMETER::ipoa_seaice_dV                       = 22   ! change in sea-ice volume
+  ! ents indices (SKT)
+  INTEGER,PARAMETER::iel_lat                             = 01
+  INTEGER,PARAMETER::iel_lon                             = 02
+  INTEGER,PARAMETER::iel_mask_lnd                        = 03
+  INTEGER,PARAMETER::iel_temp_lnd                        = 04
+  INTEGER,PARAMETER::iel_moisture_lnd                    = 05
+  INTEGER,PARAMETER::iel_albs_lnd                        = 06
+  INTEGER,PARAMETER::iel_fv                              = 07
+  INTEGER,PARAMETER::iel_photo                           = 08
+  INTEGER,PARAMETER::iel_respveg                         = 09
+  INTEGER,PARAMETER::iel_respsoil                        = 10
+  INTEGER,PARAMETER::iel_Cveg                            = 11
+  INTEGER,PARAMETER::iel_Csoil                           = 12
+  INTEGER,PARAMETER::iel_Cveg_13C                        = 13
+  INTEGER,PARAMETER::iel_Csoil_13C                       = 14
+  INTEGER,PARAMETER::iel_Cveg_14C                        = 15
+  INTEGER,PARAMETER::iel_Csoil_14C                       = 16
+  INTEGER,PARAMETER::iel_leaf                            = 17
   ! options - misc
   integer,parameter::iopt_misc_O2_equil                   = 07   ! force O2 equilibrium of ocean with atmosphere
   integer,parameter::iopt_misc_debugij                    = 10   ! debug - explicit reporting of (i,j) location in main loop
@@ -979,6 +1004,25 @@ MODULE biogem_lib
        & 'v               ', &
        & 'usurf           ', &
        & 'MLD_k           ' /)
+  ! ents (SKT) 
+  CHARACTER(len=16),DIMENSION(n_ents),PARAMETER::string_ents = (/ &
+       & 'lat             ', &
+       & 'lon             ', & 
+       & 'mask_lnd        ', &
+       & 'temp_lnd        ', &
+       & 'moisture_lnd    ', &
+       & 'albs_lnd        ', &
+       & 'fv              ', &
+       & 'photo           ', &
+       & 'respveg         ', &
+       & 'respsoil        ', &
+       & 'Cveg            ', &
+       & 'Csoil           ', &
+       & 'Cveg_13C        ', &
+       & 'Csoil_13C       ', &
+       & 'Cveg_14C        ', &
+       & 'Csoil_14C       ', &
+       & 'leaf            ' /)
   ! diagnostics - biology
   CHARACTER(len=14),DIMENSION(n_diag_bio),PARAMETER::string_diag_bio = (/ &
        & 'dPO4          ', &
@@ -1193,6 +1237,8 @@ MODULE biogem_lib
   ! 'physics'
   REAL,DIMENSION(n_phys_ocn,n_i,n_j,n_k)::phys_ocn               !
   REAL,DIMENSION(n_phys_ocnatm,n_i,n_j)::phys_ocnatm             !
+  ! ents (SKT)
+  REAL,DIMENSION(n_ents,n_i,n_j)::ents 
   ! aqueous carbonate system
   REAL,DIMENSION(n_carb,n_i,n_j,n_k)::carb                       !
   REAL,DIMENSION(n_carbconst,n_i,n_j,n_k)::carbconst             !
@@ -1252,6 +1298,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm)::int_diag_airsea_sig                     ! air-sea gas exchange diagnostics
   REAL,DIMENSION(n_atm)::int_diag_forcing_sig                    ! forcing diagnostics
   REAL,DIMENSION(n_diag_misc_2D)::int_diag_misc_2D_sig           !
+  REAL,DIMENSION(n_ents)::int_ents_sig                           ! ents diagnostics
   ! misc
   real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
   real::int_misc_ocn_fxsw_sig,int_misc_opn_fxsw_sig              !
@@ -1277,6 +1324,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_carb,n_i,n_j,n_k)::int_carb_timeslice         !
   REAL,DIMENSION(n_carbconst,n_i,n_j,n_k)::int_carbconst_timeslice   !
   REAL,DIMENSION(n_carbisor,n_i,n_j,n_k)::int_carbisor_timeslice !
+  REAL,DIMENSION(n_ents,n_i,n_j)::int_ents_timeslice   ! 
   !  integrated time slice storage arrays - ocean-atmosphere interface
   REAL,DIMENSION(n_atm,n_i,n_j)::int_sfcatm1_timeslice           !
   REAL,DIMENSION(n_atm,n_i,n_j)::int_focnatm_timeslice           !

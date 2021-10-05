@@ -1543,6 +1543,8 @@ CONTAINS
     int_sfcatm1_timeslice(:,:,:)     = 0.0
     int_focnatm_timeslice(:,:,:)     = 0.0
     int_phys_ocnatm_timeslice(:,:,:) = 0.0
+    ! initialize time-slice data - ents
+    int_ents_timeslice(:,:,:)        = 0.0
     ! initialize time-slice data - ocn-sed
     int_sfcsed1_timeslice(:,:,:) = 0.0
     int_focnsed_timeslice(:,:,:) = 0.0
@@ -1582,6 +1584,7 @@ CONTAINS
     int_ocn_tot_M_sur_sig   = 0.0
     int_ocn_tot_V_sig       = 0.0
     int_ocn_sig(:)          = 0.0
+    int_ents_sig(:)         = 0.0
     int_fexport_sig(:)      = 0.0
     int_fracdom_sig(:)      = 0.0
     int_ocnatm_sig(:)       = 0.0
@@ -1825,6 +1828,28 @@ CONTAINS
     end if
   END SUBROUTINE sub_init_phys_ocnatm
   ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !    
+ SUBROUTINE sub_init_ents()
+  ! local variables
+  INTEGER::i,j
+    integer::loc_len
+    CHARACTER(len=255)::loc_filename
+    ! zero array                                                                                                                                                                        
+    ents(:,:,:) = 0.0
+    ! set alt dir path string length                                                                                                                                                    
+    loc_len = LEN_TRIM(par_pindir_name)
+    ! initialize array values                                                                                                                                                           
+   ! DO i=1,n_i
+    !   DO j=1,n_j
+     !     ents(iel_lat,i,j) = (180.0/const_pi)*ASIN(goldstein_s(j))
+      !    ents(iel_lon,i,j) = (360.0/n_i)*(real(i)-0.5) + par_grid_lon_offset
+       !   IF (n_k >= goldstein_k1(i,j)) THEN
+        !  ents(iel_mask_lnd,i,j) = 1.0
+         ! END IF
+       !END DO
+    !END DO
+  END SUBROUTINE sub_init_ents 
 
 
   ! vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv !
