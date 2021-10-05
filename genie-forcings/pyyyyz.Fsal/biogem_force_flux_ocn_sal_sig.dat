@@ -3,3 +3,7 @@
 999999999.0  1.0
 -END-OF-DATA-
 
+3.49E4 PSU yr-1 <--> 1 m3 yr-1
+=> 1.101360240000000e+12 = 1 m3 s-1 == 1.0E-6 Sv
+=> scale unit PSU forcing by 1.1E18 to give 1.0 Sv
+

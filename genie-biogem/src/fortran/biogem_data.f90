@@ -3673,8 +3673,10 @@ CONTAINS
   !        3 == 3D (uniform across entire ocean volumne)
   !        2 == 2D (uniform across surface)
   !        0 == forcing at a point
+  !       -1 == SURFACE (spatially explicit on ocean surface -- needs 2D file '_BSUR')
   !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       -3 == LEVEL (spatially explicit on any depth surface -- needs 2D file '_LVL')
+  !       -4 == SURFACE + BENTHIC
   !       ELSE, 3D spatially explicit forcing (needs a pair of 3D files '_I' and '_II')
   SUBROUTINE sub_init_force_restore_ocn()
     ! local variables
@@ -4027,6 +4029,7 @@ CONTAINS
   !       -1 == SURFACE (spatially explicit @ surface -- needs 2D file '_SUR')
   !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       -3 == LEVEL (spatially explicit on any depth surface -- needs 2D file '_LVL')
+  !       -4 == SURFACE + BENTHIC
   !       ELSE, 3D spatially explicit forcing (needs a pair of 3D files '_I' and '_II')
   SUBROUTINE sub_init_force_flux_ocn()
     ! local variables
@@ -4073,6 +4076,15 @@ CONTAINS
                 DO j=1,n_j
                    if (goldstein_k1(i,j) <= n_k) then
                       loc_ijk(:,:,force_ocn_point_k(io)) = 0.0
+                   end if
+                end DO
+             end DO
+          elseif (force_ocn_uniform(io) == -4) then
+             loc_ijk(:,:,n_k) = 0.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(:,:,goldstein_k1(i,j)) = 0.0
                    end if
                 end DO
              end DO
@@ -4132,6 +4144,25 @@ CONTAINS
                 DO j=1,n_j
                    if (goldstein_k1(i,j) <= n_k) then
                       loc_ijk(i,j,force_ocn_point_k(io)) = loc_ij(i,j)
+                   end if
+                end do
+             end DO
+          elseif (force_ocn_uniform(io) == -4) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_ocn_'//TRIM(string_ocn(io))//'_SUR'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,n_k) = loc_ij(i,j)
+                   end if
+                end do
+             end DO
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_ocn_'//TRIM(string_ocn(io))//'_BEN'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,goldstein_k1(i,j)) = loc_ij(i,j)
                    end if
                 end do
              end DO
