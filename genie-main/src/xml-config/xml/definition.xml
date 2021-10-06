@@ -1883,13 +1883,13 @@
 			<value datatype="real">0.397789</value>
                         <description>sine of obliquity</description>
                     </param>
-                    <param name="par_orbit_oscgam">
-			<value datatype="real">99999</value>
+                    <param name="par_orbit_osclonperi">
+			<value datatype="real">102.499952</value>
                         <description>longitude of perihelion (in degrees)</description>
                     </param>
                     <param name="par_orbit_osctau0">
 			<value datatype="real">-0.5</value>
-                        <description>really no-one knows what this is ...</description>
+                        <description>time (days from calendar yr start) of perihelion</description>
                     </param>
                     <param name="orbit_radfor">
 			<value datatype="string">n</value>
@@ -3001,7 +3001,7 @@
                     </param>
                     <param name="ents_restart_file">
                         <value
-                            datatype="string">spn.sland</value>
+                            datatype="string">rst.sland</value>
                         <description>ASCII output restart filename</description>
                     </param>
                     <param name="dosc">
@@ -3021,7 +3021,7 @@
 		      <description>Simulation start year</description>
 		    </param>
             <param name="opt_timeseries_output">
-              <value datatype="boolean">.FALSE.</value>
+              <value datatype="boolean">.TRUE.</value>
               <description>save timeseries output (.FALSE./.TRUE.)</description>
             </param>
             <param name="opt_append_data">
@@ -5351,6 +5351,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>time-slice data save: Atmospheric physical properties (2D)?</description>
                     </param>
+                    <param name="ctrl_data_save_slice_ents">
+                        <value datatype="boolean">.false.</value>
+                        <description>time-slice data save: ENTS (2D)?</description>
+                    </param>
                     <param name="ctrl_data_save_slice_phys_ocn">
 			<value datatype="boolean">.false.</value>
                         <description>time-slice data save: Ocean physical properties (3D)?</description>
@@ -5399,6 +5403,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_data_save_sig_ocn">
 			<value datatype="boolean">.true.</value>
                         <description>time-series data save: Oceanic composition?</description>
+                    </param>
+                    <param name="ctrl_data_save_sig_ents">
+                        <value datatype="boolean">.false.</value>
+                        <description>time-series data save: ENTS?</description>
                     </param>
                     <param name="ctrl_data_save_sig_fexport">
 			<value datatype="boolean">.true.</value>
