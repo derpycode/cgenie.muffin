@@ -263,7 +263,7 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
       real orbitall_vect(en_ntimes_max,5)
       real par_orbit_osce
       real par_orbit_oscsob
-      real par_orbit_oscgam
+      real par_orbit_osclonperi
       real par_orbit_osctau0      
 
       common/orbit_vary/
@@ -277,7 +277,7 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
      
       COMMON /embm_orbits/
      & par_orbit_osce,par_orbit_oscsob,
-     & par_orbit_oscgam,par_orbit_osctau0
+     & par_orbit_osclonperi,par_orbit_osctau0
 
 c pbh co2 times series 
       character*200 filenameco2

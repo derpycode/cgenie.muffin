@@ -26,6 +26,7 @@ c
       real zw, zw1, zv, zm
       integer i
 
+
 c SG (16/02/2K7) orbital variables
       integer iistep
       integer time_1,time_2
@@ -47,29 +48,23 @@ c pbh initialise osctau0 for angular time of year.
 c value of osctau0=-0.5 (=> osctau1=0.0) reproduces old orbital calculation
 ccc      osctau0=-0.5
 c ajr namelist replacements
+c SKT updated namelist replacements to use longitude of perihleion rather than gamma
+c     and calculate gamma below 
+c SKT osctau1 = 0.0 does not make sense; this should be 2.5 for the time of perihelion
+c     (from start of calendar year)
       osce=par_orbit_osce
       oscsob=par_orbit_oscsob
       osctau0=par_orbit_osctau0
-      zw=par_orbit_oscgam
+      zw=par_orbit_osclonperi
 
-c skt calculate oscgam (mean longitude) from par_orbit_oscgam                                                                            
-      if (zw.eq.99999) then
-      oscgam=1.352631
-      else
+
+c skt calculate oscgam (gamma) from par_orbit_osclonperi (longitude of perihelion)
+c     gamma = pi - longitude of perihelion (rad) and must be nonnegative, so first add 180                                                                            
       zw1=180.+zw
       if (zw1.gt.360.0) then
       zw1=zw1-360.0
       end if
-      zv=pi/180.*(360.-zw1)
-      zm=zv
-      do i=1,10
-         zm=zv
-     :      - (2.0*osce - 0.25*osce*osce*osce)
-     :      *sin(zm)- 1.25*osce*osce*sin(2.*zm)
-     :      - 13./12.*osce*osce*osce*sin(3.*zm)
-      enddo
-      oscgam=0.5*(zv+zm)
-      end if
+      oscgam=pi/180.*(360.-zw1)
 
 c pbh this if statement removed so that transient orbital forcing can be used without ents
 c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
@@ -158,6 +153,7 @@ c     open(1,file='oscsun.dat')
 
       rpi = 1.0/pi
 
+c SKT terms for solar insolation calculations
       tv = osce*osce
       osce1 = osce * (2.0 - 0.25*tv)
       osce2 = 1.25 * tv 
@@ -166,15 +162,32 @@ c     open(1,file='oscsun.dat')
       oscryr = 2.0*pi/float(nyear)
 
 c pbh
+c SKT osctau1 is the time of perihelion and does not equal 0!
       osctau1 = osctau0 + 0.5
  
       do istep=1,nyear
 
 c pbh Dan's offset for angular time of year
 c         osct = float(mod(istep-1,nyear)+1)*oscryr
+c SKT osct = mean anomaly (i.e. fraction of orbital period elapsed since
+c     perihelion)
          osct = (float(mod(istep-1,nyear)+1) - 
      &          (nyear*osctau1/gn_daysperyear))*oscryr
 
+c SKT for each latitude, calculate the following:
+c     oscv = true anomaly calculated from eccentricity and mean anomaly
+c          (i.e. the angular distance of the earth round its orbit from perihelion)
+c     oscsolf = insolation at the top of the atmosphere
+c             (but without multiplying by the solar constant)
+c     oscsind = sine of solar declination in terms of gamma
+c     oscss = sin( solar declination) * sin(latitude)
+c     oscccc = cos(solar declination)
+c     osctt = tan(latitude)*tan(solar declination)
+c     oscday = hour angle of sunset (the angle through which earth
+c            has rotated between local solar noon and sunset)
+c     solfor(j,istep) = incoming solar radiation at each latitude 
+c                     (takes TOA insolation and multiples by the 
+c                     mean cos(solar zenith angle))         
          do j=1,jmax
             oscv = osct + osce1*sin(osct) + osce2*sin(2.0*osct) 
      &           + osce3*sin(3.0*osct)
@@ -182,7 +195,9 @@ c         osct = float(mod(istep-1,nyear)+1)*oscryr
             oscsind = oscsob*sin(oscv-oscgam)
 
             oscss = oscsind * s(j)
+
             osccc = sqrt(1.0 - oscsind**2) * c(j)
+
             osctt = min(1.0,max(-1.0,oscss/osccc))
             
             oscday = acos(- osctt)
