@@ -175,6 +175,13 @@ CONTAINS
     conv_sed_ocn(io_Os,is_POM_Os)                = 1.0
     conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)    = 1.0
     conv_sed_ocn(io_Os_188Os,is_POM_Os_188Os)    = 1.0
+    ! add planktic/bentic isotope tracers to pass sed-ocn tracer combination checks
+    conv_sed_ocn(io_DIC_13C,is_foram_p_13C)         = 1.0
+    conv_sed_ocn(io_DIC_14C,is_foram_p_14C)         = 1.0
+    conv_sed_ocn(io_O2_18O,is_foram_p_18O)          = 1.0
+    conv_sed_ocn(io_DIC_13C,is_foram_b_13C)         = 1.0
+    conv_sed_ocn(io_DIC_14C,is_foram_b_14C)         = 1.0
+    conv_sed_ocn(io_O2_18O,is_foram_b_18O)          = 1.0    
     ! ############################################################################################################################ !
     ! DISSOLVED-PARTICULATE
     ! (compositional) relational operator for converting between DOM and POM

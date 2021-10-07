@@ -144,7 +144,6 @@ c SG read in namelist
          close(59)
       end if
       
-
 c SG > : read GOIN file
 c      open(unit=855,file='goin_ENTS',status='old')
 
@@ -185,9 +184,6 @@ c        This 'if' checks for a terminal slash symbol
      & print*,'ents_out_name = ',trim(ents_out_name)
       if (debug_init)
      & print*,'ents_restart_file = ',trim(ents_restart_file)
-
-
-c      close (855)      
       
       if (debug_init)
      & print*, 'lin = ',dum_lin

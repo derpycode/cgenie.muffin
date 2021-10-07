@@ -15,14 +15,6 @@ c     ******************************************************************
 
       implicit none
 
-ccc   why is there here?
-ccc   var_ents.cmn is already included in initialise_entf.F
-c     ! >>> CHECK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
-c     SG.gt.This is (hopefully!) a temp measure for ENTS
-ccc#include "../genie-ents/src/fortran/var_ents.cmn"
-c     SG <
-c     ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
-
       print*
       print*,'*******************************************************'
       print '("  *** Welcome to cGENIE -- version:",I5)',genie_version
