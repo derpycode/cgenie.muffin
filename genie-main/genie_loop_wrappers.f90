@@ -410,9 +410,9 @@ contains
   end subroutine cpl_flux_lndatm_wrapper
 
   !!
-  subroutine cpl_comp_lndEMBM_wrapper
+  subroutine cpl_comp_EMBMlnd_wrapper
     implicit none
-    call cpl_comp_EMBM(         &
+    call cpl_comp_EMBMlnd(         &
          & intrac_atm_max,      & ! input
          & ilon1_atm,ilat1_atm, & ! input
          & ilon1_lnd,ilat1_lnd, & ! input
@@ -420,7 +420,7 @@ contains
          & surf_qstar_atm,      & ! input (surface specific humidity)
          & genie_sfcatm_lnd     & ! input/output
          & )
-  end subroutine cpl_comp_lndEMBM_wrapper
+  end subroutine cpl_comp_EMBMlnd_wrapper
 
   !!
   subroutine cpl_flux_ocnsed_wrapper
@@ -1031,18 +1031,18 @@ contains
          & )
   end subroutine cpl_comp_EMBMatm_wrapper
 
-  !!
-  subroutine cpl_comp_EMBM_wrapper
-    implicit none
-    call cpl_comp_EMBM(         &
-         & intrac_atm_max,      &                                       ! input
-         & ilon1_atm,ilat1_atm, &                                       ! input
-         & ilon1_ocn,ilat1_ocn, &                                       ! input
-         & tstar_atm,           &                                       ! input (surface temperature)
-         & surf_qstar_atm,      &                                       ! input (surface specific humidity)
-         & genie_sfcatm1        &                                       ! input/output
-         & )
-  end subroutine cpl_comp_EMBM_wrapper
+!!$  !!
+!!$  subroutine cpl_comp_EMBM_wrapper
+!!$    implicit none
+!!$    call cpl_comp_EMBM(         &
+!!$         & intrac_atm_max,      &                                       ! input
+!!$         & ilon1_atm,ilat1_atm, &                                       ! input
+!!$         & ilon1_ocn,ilat1_ocn, &                                       ! input
+!!$         & tstar_atm,           &                                       ! input (surface temperature)
+!!$         & surf_qstar_atm,      &                                       ! input (surface specific humidity)
+!!$         & genie_sfcatm1        &                                       ! input/output
+!!$         & )
+!!$  end subroutine cpl_comp_EMBM_wrapper
 
   !!
   subroutine cpl_comp_atmlnd_wrapper

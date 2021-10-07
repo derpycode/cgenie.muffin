@@ -26,7 +26,7 @@
 	$(OBJ_FLAG) $<
 
 OBJS =	in_ents_ascii.$(OBJ_EXT) out_ents.$(OBJ_EXT) \
-       setup_ents.$(OBJ_EXT) initialise_ents.$(OBJ_EXT) \
+       setup_ents.$(OBJ_EXT) initialise_ents.$(OBJ_EXT) end_ents.$(OBJ_EXT)  \
 	screen_diags.$(OBJ_EXT) carbon.$(OBJ_EXT) carbt_diags.$(OBJ_EXT) \
 	sealevel.$(OBJ_EXT) physt_diags.$(OBJ_EXT) annav_diags.$(OBJ_EXT) \
 	ents.$(OBJ_EXT) entsdiagosc.$(OBJ_EXT) ConvertFunc.$(OBJ_EXT) \
@@ -34,7 +34,7 @@ OBJS =	in_ents_ascii.$(OBJ_EXT) out_ents.$(OBJ_EXT) \
 	netcdf_ts_ents.$(OBJ_EXT) in_ents_netcdf.$(OBJ_EXT)
 
 FBJS = in_ents_ascii.F out_ents.F setup_ents.F \
-       initialise_ents.F screen_diags.F carbon.F \
+       initialise_ents.F end_ents.F screen_diags.F carbon.F \
        carbt_diags.F sealevel.F physt_diags.F \
        annav_diags.F ents.F entsdiagosc.F \
        ConvertFunc.F netcdf_db_ents.F netcdf_ents.F \
@@ -73,6 +73,7 @@ in_ents_ascii.$(OBJ_EXT): in_ents_ascii.F $(CMN)
 out_ents.$(OBJ_EXT): out_ents.F $(CMN)
 setup_ents.$(OBJ_EXT): setup_ents.F $(CMN)
 initialise_ents.$(OBJ_EXT): initialise_ents.F $(CMN)
+end_ents.$(OBJ_EXT): end_ents.F $(CMN)
 screen_diags.$(OBJ_EXT): screen_diags.F
 carbon.$(OBJ_EXT): carbon.F
 carbt_diags.$(OBJ_EXT): carbt_diags.F

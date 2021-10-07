@@ -21,15 +21,15 @@ SUBROUTINE cpl_comp_atmgem(     &
   integer,intent(in)::dum_n_i_ocn,dum_n_j_ocn
   real,dimension(dum_n_atm,dum_n_i_ocn,dum_n_j_ocn),intent(inout)::dum_genie_atm1 !
   ! local variables
-  integer::l,ia
+!!$  integer::l,ia
   ! \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ !
   ! ANY DIFFERENCE BETWEEN OCEAN AND ATMOSPHERE GRIDS WILL HAVE TO BE TAKEN INTO ACCOUNT HERE
   ! create time-averaged tracer array
   ! NOTE: currently, the GENIE arrays are defiend with the max number of atm tracers (not selected number)
-  DO l=1,n_l_atm
-     ia = conv_iselected_ia(l)
-     !!!dum_genie_atm(l,:,:) = atm(ia,:,:)
-  end do
+!!$  DO l=1,n_l_atm
+!!$     ia = conv_iselected_ia(l)
+!!$     dum_genie_atm(l,:,:) = atm(ia,:,:)
+!!$  end do
   dum_genie_atm1(:,:,:) = dum_genie_atm1(:,:,:) + dum_dts*atm(:,:,:)/conv_yr_s
   ! /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ !
 end SUBROUTINE cpl_comp_atmgem
@@ -89,7 +89,7 @@ SUBROUTINE cpl_comp_atmocn(     &
   ! ANY DIFFERENCE BETWEEN OCEAN AND ATMOSPHERE GRIDS WILL HAVE TO BE TAKEN INTO ACCOUNT HERE
   ! NOTE: currently no summation done!
   ! NOTE: OLD: do not copy the first 2 tracers (SAT and humidity) as these values are set directly by the EMBM
-  ! NOTE: now ... copy them to ensure that atm temeprsture is available in atchem
+  ! NOTE: now ... copy them to ensure that atm temperature is available in atchem
 !!!  dum_sfcatm1(3:dum_n_atm,:,:) = dum_sfcatm(3:dum_n_atm,:,:)
   dum_sfcatm1(1:dum_n_atm,:,:) = dum_sfcatm(1:dum_n_atm,:,:)
   ! /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ !
@@ -98,8 +98,8 @@ end SUBROUTINE cpl_comp_atmocn
 
 
 ! ******************************************************************************************************************************** !
-! COUPLE EMBM TRACERS
-SUBROUTINE cpl_comp_EMBMatm(       &
+! COUPLE EMBM (T,q) TRACERS (to atm)
+SUBROUTINE cpl_comp_EMBMatm(    &
      & dum_n_atm,               &
      & dum_n_i_atm,dum_n_j_atm, &
      & dum_t,                   &
@@ -111,7 +111,7 @@ SUBROUTINE cpl_comp_EMBMatm(       &
   integer,intent(in)::dum_n_i_atm,dum_n_j_atm
   real,dimension(dum_n_i_atm,dum_n_j_atm),intent(in)::dum_t
   real,dimension(dum_n_i_atm,dum_n_j_atm),intent(in)::dum_q
-  real,dimension(dum_n_atm,dum_n_i_atm,dum_n_j_atm),intent(inout)::dum_sfcatm ! atmosphere-surface tracer composition; ocn grid
+  real,dimension(dum_n_atm,dum_n_i_atm,dum_n_j_atm),intent(inout)::dum_sfcatm ! atmosphere-surface tracer composition; atm grid
   ! \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ !
   ! ANY DIFFERENCE BETWEEN OCEAN AND ATMOSPHERE GRIDS WILL HAVE TO BE TAKEN INTO ACCOUNT HERE
   ! NOTE: currently no summation done!
@@ -124,11 +124,12 @@ end SUBROUTINE cpl_comp_EMBMatm
 
 
 ! ******************************************************************************************************************************** !
-! COUPLE EMBM TRACERS (OLD)
-SUBROUTINE cpl_comp_EMBM(       &
+! COUPLE EMBM (T,q) TRACERS (to land!!!)
+! NOTE: really this (or a f77 version) should be in genie-ents ...
+SUBROUTINE cpl_comp_EMBMlnd(       &
      & dum_n_atm,               &
      & dum_n_i_atm,dum_n_j_atm, &
-     & dum_n_i_ocn,dum_n_j_ocn, &
+     & dum_n_i_lnd,dum_n_j_lnd, &
      & dum_t,                   &
      & dum_q,                   &
      & dum_sfcatm1)
@@ -136,18 +137,18 @@ SUBROUTINE cpl_comp_EMBM(       &
   ! dummy arguments
   integer,intent(in)::dum_n_atm
   integer,intent(in)::dum_n_i_atm,dum_n_j_atm
-  integer,intent(in)::dum_n_i_ocn,dum_n_j_ocn
+  integer,intent(in)::dum_n_i_lnd,dum_n_j_lnd
   real,dimension(dum_n_i_atm,dum_n_j_atm),intent(in)::dum_t
   real,dimension(dum_n_i_atm,dum_n_j_atm),intent(in)::dum_q
-  real,dimension(dum_n_atm,dum_n_i_ocn,dum_n_j_ocn),intent(inout)::dum_sfcatm1 ! atmosphere-surface tracer composition; ocn grid
+  real,dimension(dum_n_atm,dum_n_i_lnd,dum_n_j_lnd),intent(inout)::dum_sfcatm1 ! atmosphere-surface tracer composition; lnd grid
   ! \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ !
-  ! ANY DIFFERENCE BETWEEN OCEAN AND ATMOSPHERE GRIDS WILL HAVE TO BE TAKEN INTO ACCOUNT HERE
+  ! ANY DIFFERENCE BETWEEN LAND AND ATMOSPHERE GRIDS WILL HAVE TO BE TAKEN INTO ACCOUNT HERE
   ! NOTE: currently no summation done!
   ! NOTE: temperature is degrees C
   dum_sfcatm1(1,:,:) = dum_t(:,:)
   dum_sfcatm1(2,:,:) = dum_q(:,:)
   ! /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ !
-end SUBROUTINE cpl_comp_EMBM
+end SUBROUTINE cpl_comp_EMBMlnd
 ! ******************************************************************************************************************************** !
 
 

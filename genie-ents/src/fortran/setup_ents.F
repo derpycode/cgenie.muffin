@@ -150,8 +150,11 @@ cmsw  Some conversion factors
  
 cmsw intial values of global carbon reservoirs (GtC)
    
-      print*,' '
-      print*,'ENTS (land) option used'
+      if (debug_init)
+     & print*,' '
+      
+      if (debug_init)
+     & print*,'ENTS (land) option used'
 
 cmsw Read parameters from goin_ents (cm/cmv) or goin_bioents (cbm/cbms)
 cmsw Read in parameters for pptn scheme
@@ -180,11 +183,15 @@ c      print*,'filenamelice ',trim(filenamelice)
 
 cmsw Precip parameters
 
-      print*, 'rmax'
+      if (debug_init)
+     & print*, 'rmax'
 c      read(5,*)dum_rmax,timepptn
-      print*,dum_rmax
-       print*,'daysperyear ',gn_daysperyear
-       print*,'ents_nyear ',real(ents_nyear)
+      if (debug_init)
+     & print*,dum_rmax
+      if (debug_init)
+     & print*,'daysperyear ',gn_daysperyear
+      if (debug_init)
+     & print*,'ents_nyear ',real(ents_nyear)
 
 cmsw Open goin file and read in restart if required
 
@@ -194,25 +201,31 @@ c      open(66,file='../genie-ents/config/ents_config.par')
 cmsw Calculate length of timestep (yrs)
 
       read(66,*) msimpleland 
-      print*,'ENTS called every',msimpleland,'ocean timesteps'
+      if (debug_init)
+     & print*,'ENTS called every',msimpleland,'ocean timesteps'
       
-      print*,msimpleland,ents_nyear
-      print*,dtland,real(msimpleland),ents_nyear
-      print*,real(msimpleland)/real(ents_nyear)
+      if (debug_init)
+     & print*,msimpleland,ents_nyear
+      if (debug_init)
+     & print*,dtland,real(msimpleland),ents_nyear
+      if (debug_init)
+     & print*,real(msimpleland)/real(ents_nyear)
       
       dtland=(real(msimpleland)/real(ents_nyear))
       
-      print*,'hello?'
-      
-      print*,'dtland =',dtland,'yr'
+      if (debug_init)
+     & print*,'dtland =',dtland,'yr'
 
 cmsw Print out initial sizes of global carbon reservoirs
 
-      print*,'Initial carbon reservoir sizes are...'
+      if (debug_init)
+     & print*,'Initial carbon reservoir sizes are...'
       read(66,*)Cveg_ini
-      print*,'Cveg_ini =',Cveg_ini,'(GtC)'
+      if (debug_init)
+     & print*,'Cveg_ini =',Cveg_ini,'(GtC)'
       read(66,*)Csoil_ini
-      print*,'Csoil_ini =',Csoil_ini,'(GtC)'
+      if (debug_init)
+     & print*,'Csoil_ini =',Csoil_ini,'(GtC)'
 
       rland_pts=1./land_pts_ents
 
@@ -287,34 +300,43 @@ cmsw Prescribe surface albedo over ice sheets to be 0.8
          enddo
       enddo
 
-      print*,'dum_syr ',dum_syr
+      if (debug_init)
+     & print*,'dum_syr ',dum_syr
 
 cmsw Switches for different pptn scheme and orography
 
-      print*,'THIS OPTION IS NO LONGER IN USE HERE - orography'//
+      if (debug_init)
+     & print*,'THIS OPTION IS NO LONGER IN USE HERE - orography'//
      & 'functionality has been moved to genie-embm'
       read(66,*)tv
-      print*,tv
+      if (debug_init)
+     & print*,tv
 
 cmsw Switch for snow albedo feedback
 
-      print*,'Use snow scheme? 1=Y 0=N'
+      if (debug_init)
+     & print*,'Use snow scheme? 1=Y 0=N'
       read(66,*)snowswitch
-      print*,snowswitch
+      if (debug_init)
+     & print*,snowswitch
 
 cmsw Switch for offline model
 
-      print*,'THIS OPTION IS NO LONGER IN USE HERE - offline'//
+      if (debug_init)
+     & print*,'THIS OPTION IS NO LONGER IN USE HERE - offline'//
      & 'functionality has been moved to genie-embm'
 c     read(66,*)offlineswitch
-      print*,tv
+      if (debug_init)
+     & print*,tv
 
 cmsw Switch for seasonal fields
 
-      print*,'THIS OPTION IS NO LONGER IN USE HERE - seasonal forcing'//
-     & 'functionality has been moved to genie-embm'
+      if (debug_init)
+     & print*,'THIS OPTION IS NO LONGER IN USE HERE - seasonal forcing'
+     & //'functionality has been moved to genie-embm'
       read(66,*)tv
-      print*,tv
+      if (debug_init)
+     & print*,tv
 
 cmsw Initialise roughness length calculation
 
@@ -323,13 +345,19 @@ cmsw Initialise roughness length calculation
 cmsw setup initial land temperature,
 cmsw bucket size and set ca over land
 
-      print*,'Initial land temp and water'
-      print*,dum_tq(1,1,1),min(k8,k9+(k10*Csoil(1,1)))
-      print*,'Initial total water on land is'
-      print*,min(k8,(k9+(k10*Csoil(1,1))))*asurfrea*land_pts_ents
+      if (debug_init)
+     & print*,'Initial land temp and water'
+      if (debug_init)
+     & print*,dum_tq(1,1,1),min(k8,k9+(k10*Csoil(1,1)))
+      if (debug_init)
+     & print*,'Initial total water on land is'
+      if (debug_init)
+     & print*,min(k8,(k9+(k10*Csoil(1,1))))*asurfrea*land_pts_ents
      1          *1.e-12,'(*10^12 m^3)'
-      print*,'Initial roughness length is'
-      print*,z0_ini,'m'
+      if (debug_init)
+     & print*,'Initial roughness length is'
+      if (debug_init)
+     & print*,z0_ini,'m'
       
 
       do i=1,imax
@@ -404,8 +432,10 @@ cmsw New temperature response function
 cmsw Emissions option
 
       read(66,'(a1)') include_emissions
-      print*,'Force model with an emissions timeseries?'
-      print*,include_emissions
+      if (debug_init)
+     & print*,'Force model with an emissions timeseries?'
+      if (debug_init)
+     & print*,include_emissions
 
 cmsw Continue run
 c SG > if then loop is changed so that an alternative sland file is
@@ -432,19 +462,23 @@ c SG > This option has not been tested!!!
 c SG It will be incorporated later. Do NOT comment it out.
 
         read(66,*) isdump
-        print*,'Continue run from different .sland file? (0=N 1=Y)'
+        if (debug_init)
+     & print*,'Continue run from different .sland file? (0=N 1=Y)'
      1   ,isdump
         read(66,'(a35)') dumpfl
         if(isdump.eq.1) then
-          print*,'Different land restart file name is'
+          if (debug_init)
+     & print*,'Different land restart file name is'
           print*,dumpfl 
           open(1,file=trim(dumpfl),status='old')
-          print*,'ENTS restart file is ',dumpfl
+          if (debug_init)
+     & print*,'ENTS restart file is ',dumpfl
           call in_ents_ascii(1,land_snow_lnd)
           close(1)
         else
 c         print*,'ENTS restart file is ',trim(lin),'.sland'
-          print*,'ENTS restart file is ', filename
+          if (debug_init)
+     & print*,'ENTS restart file is ', filename
         endif
       close(66)
 c SG <
@@ -459,12 +493,18 @@ cmsw Read fixed vegetation carbon, soil carbon and vegetation fraction
       read(66,*)((Csoil(i,j),i=1,imax),j=1,jmax)
       read(66,*)((fvfv(i,j),i=1,imax),j=1,jmax)
       close(66)
-      print*,'NOTE: FIXED VEGETATION OPTION USED, NO TERRESTRIAL CARBON'
-      print*,'CYCLE'
-      print*,'Vegetation carbon,'
-      print*,'soil carbon and vegetation fraction overwritten.'
-      print*,'Only physical quantities will be used in restart such as'
-      print*,'snow cover and land water.'
+      if (debug_init)
+     & print*,'NOTE: FIXED VEGETATION OPTION USED, NO TERRESTRIAL CARBON'
+      if (debug_init)
+     & print*,'CYCLE'
+      if (debug_init)
+     & print*,'Vegetation carbon,'
+      if (debug_init)
+     & print*,'soil carbon and vegetation fraction overwritten.'
+      if (debug_init)
+     & print*,'Only physical quantities will be used in restart such as'
+      if (debug_init)
+     & print*,'snow cover and land water.'
 
 cmsw Change fixed vegetation, soil carbon, vegetation fraction and 
 cmsw photosynthesis to zero for evap calculation if land ice i.e.
@@ -495,16 +535,20 @@ cmsw initial roughness length
 cmsw Initialise sealevel module
 
       open(66,file=condir_name(1:lencon)//'sealevel_config.par')
-      print*,' '
-      print*,'SEALEVEL MODULE INITIALIZATION'
+      if (debug_init)
+     & print*,' '
+      if (debug_init)
+     & print*,'SEALEVEL MODULE INITIALIZATION'
 
 cmsw For change in sea level need a reference average
 cmsw ocean density
    
-      print*,'Reference average ocean density used'
+      if (debug_init)
+     & print*,'Reference average ocean density used'
      &      ,' for change in sea-level calculation'
       read(66,*)rhoref
-      print*,rhoref
+      if (debug_init)
+     & print*,rhoref
 
 #ifdef icemelt
       print*,'GREENLAND ICE SHEET MELT OPTION USED'
@@ -514,10 +558,12 @@ cmsw the annual average air temperature over Greenland at
 cmsw the begging of the run. Must be preindustrial air temp.
 cmsw for parameterisation to work properly.
 
-      print*,'Annual average temp over Greenland at beginning of run'
+      if (debug_init)
+     & print*,'Annual average temp over Greenland at beginning of run'
      &      ,' for change in sea level calculation'
       read(66,*)glairtini
-      print*,glairtini
+      if (debug_init)
+     & print*,glairtini
 
 cmsw Switch for adding Greenland freshwater melt to the ocean
 
@@ -527,9 +573,11 @@ cmsw Switch for adding Greenland freshwater melt to the ocean
 
 cmsw Restart icemelt?
 
-      print*,'Restart from previous Greenland melt run? 1=Y 0=N'
+      if (debug_init)
+     & print*,'Restart from previous Greenland melt run? 1=Y 0=N'
       read(66,*)isdump
-      print*,isdump
+      if (debug_init)
+     & print*,isdump
 
 cmsw Initialize variables for Greenland melt
 

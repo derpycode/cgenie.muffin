@@ -68,3 +68,7 @@ c MAF : These 'opt_' variables are defined here because they appear in
 c MAF : genie-main/src/xml-config/xml/definition.xml
       logical opt_timeseries_output,opt_append_data
       common /ents_ctrl/opt_timeseries_output,opt_append_data
+
+      logical debug_init,debug_end,debug_loop
+      common /ents_ctrl/debug_init,debug_end,debug_loop
+      

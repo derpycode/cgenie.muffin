@@ -15,9 +15,11 @@ c     ******************************************************************
 
       implicit none
 
+ccc   why is there here?
+ccc   var_ents.cmn is already included in initialise_entf.F
 c     ! >>> CHECK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
 c     SG.gt.This is (hopefully!) a temp measure for ENTS
-#include "../genie-ents/src/fortran/var_ents.cmn"
+ccc#include "../genie-ents/src/fortran/var_ents.cmn"
 c     SG <
 c     ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
 
@@ -91,8 +93,8 @@ c     ==================================================================
 c     *** ATCHEM model - START
       if (flag_atchem) then
          call initialise_atchem_wrapper
+         call cpl_comp_EMBMatm_wrapper
          call cpl_comp_atmocn_wrapper
-         call cpl_comp_EMBM_wrapper
       endif
 c     ==================================================================
 c     *** SEDGEM model - START
@@ -446,6 +448,9 @@ c     *** ENTS land model
                if(mod(koverall,klnd_loop).eq.0) then
                   if (debug_loop.gt.2) PRINT*,'>>> ENTS @ ',
      &                 koverall,klnd_loop
+ccc THIS FIXES THE INITIAL LACK-OF-TRACER VALUE PROBLEM
+                  if (koverall.eq.klnd_loop)
+     &                 call cpl_comp_atmlnd_wrapper
                   call ents_wrapper
                   call cpl_flux_lndatm_wrapper
                   if (debug_loop.gt.2) PRINT*,'<<<'
@@ -482,50 +487,6 @@ c            as fluxes passed from ROKGEM are re-set ...
                endif
             endif
 c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-c$$$  c$$$!$omp parallel private(nthreads,thread_id)
-c$$$  
-c$$$  c$$$            call omp_set_num_threads(4)
-c$$$  c$$$            nthreads = omp_get_max_threads()
-c$$$  c$$$            print*,'* # MAX THREADS: ',nthreads
-c$$$  c$$$            nthreads = omp_get_num_threads()
-c$$$  c$$$            print*,'* # ACTUAL THREADS: ',nthreads
-c$$$  
-c$$$  c$$$!$OMP SECTIONS
-c$$$  c$$$!$OMP SECTION
-c$$$  
-c$$$  c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-c$$$  c     *** GOLDSTEIN ocean model
-c$$$  if (flag_goldsteinocean) then
-c$$$  if(mod(koverall,kocn_loop).eq.0) then
-c$$$  if (debug_loop.gt.2) PRINT*,'>m> GOLDSTEIN @ ',
-c$$$  &                 koverall,kocn_loop
-c$$$  call goldstein_wrapper
-c$$$  if (debug_loop.gt.2) PRINT*,'<m< GOLDSTEIN'
-c$$$  endif
-c$$$  endif
-c$$$  c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-c$$$  
-c$$$  c$$$!$OMP SECTION
-c$$$  
-c$$$  c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-c$$$  c     *** BIOGEM model - UPDATE
-c$$$  if (flag_biogem) then
-c$$$  if (mod(koverall,conv_kocn_kbiogem*kocn_loop).eq.0)
-c$$$  &              then
-c$$$  if (debug_loop.gt.2) PRINT*,'>m> BIOGEM @ ',
-c$$$  &                 koverall,conv_kocn_kbiogem*kocn_loop
-c$$$  call biogem_forcing_wrapper
-c$$$  call biogem_wrapper
-c$$$  if (debug_loop.gt.2) PRINT*,'<m< BIOGEM'
-c$$$  endif
-c$$$  endif
-c$$$  c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-c$$$  
-c$$$  c$$$!$OMP END SECTIONS
-c$$$  c$$$!$omp end parallel
-
-c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 c     *** ECOGEM model - UPDATE
             if (flag_ecogem) then
                if (mod(koverall,conv_kocn_kecogem*kocn_loop).eq.0)
@@ -549,7 +510,7 @@ c           => force t-series save
      &              then
                   if (debug_loop.gt.2) PRINT*,'>>> BIOGEM @ ',
      &                 koverall,conv_kocn_kbiogem*kocn_loop
-ccc THIS MOSTLY FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM
+ccc THIS FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM
                   if (koverall.eq.(conv_kocn_kbiogem*kocn_loop)) 
      &                 call biogem_climate_sol_wrapper
                   if (flag_ecogem) call diag_biogem_ecogem_wrapper ! extract ECOGEM diagnostics
@@ -585,8 +546,6 @@ c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 c     *** ATCHEM model - UPDATE
 c     NOTE: for now, continue NOT to update <atm> with SAT
 c           (subroutine: atchem_climate_wrapper)
-c     NOTE: diabled call to cpl_comp_lndEMBM_wrapper, as duplicate of
-c           cpl_comp_EMBM_wrapper?
 c           (call to atchem_climate_wrapper)
             if (flag_atchem) then
                if (mod(koverall,conv_kocn_katchem*kocn_loop).eq.0) 
@@ -597,10 +556,8 @@ c           (call to atchem_climate_wrapper)
 ccc                  call atchem_climate_wrapper 
                   if (debug_loop.gt.2) PRINT*,'<<<'
                   call cpl_comp_EMBMatm_wrapper
-ccc                  call cpl_comp_EMBM_wrapper
                   call cpl_comp_atmocn_wrapper
                   call cpl_comp_atmlnd_wrapper
-ccc                  call cpl_comp_lndEMBM_wrapper
 c     test for the end of the 1st part of cycle
 c     create annual averages of <atm> (for later transfer to GEMlite)
                   if(istep_gem.eq.(gem_notyr)) then
@@ -950,9 +907,9 @@ c     *** GOLDSTEIN sea-ice - END
          call end_seaice
       endif
 c     ==================================================================
-c     *** GEM model - END
-      if (flag_atchem.or.flag_biogem.or.flag_sedgem.or.flag_rokgem) then
-ccc   
+c     *** land-surface scheme - END
+      if (flag_ents) then
+         call end_ents
       endif
 c     ==================================================================
 c     *** GOLDlite model - END

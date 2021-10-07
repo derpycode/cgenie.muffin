@@ -108,6 +108,7 @@ c SG > namelist declaration for ENTS goin variables
       NAMELIST /ents_control/opt_append_data
       NAMELIST /ents_control/par_output_years_file_0d
       NAMELIST /ents_control/par_output_years_file_2d
+      NAMELIST /ents_control/debug_init,debug_end,debug_loop
 
 c Local variables
       integer i,j,k
@@ -148,14 +149,14 @@ c SG > : read GOIN file
 c      open(unit=855,file='goin_ENTS',status='old')
 
 c     Input directory name
-c      read(855,'(a)')indir_name
       lenin = lnsig1(indir_name)
       if (indir_name(lenin:lenin).ne.'/') then
 c        This 'if' checks for a terminal slash symbol
          lenin = lenin + 1
          indir_name(lenin:lenin) = '/'
       end if
-      print*,'Input dir. name ',indir_name(1:lenin)
+      if (debug_init)
+     & print*,'Input dir. name ',indir_name(1:lenin)
 
 c     Output directory name
 c      read(855,'(a)')outdir_name
@@ -165,32 +166,37 @@ c        This 'if' checks for a terminal slash symbol
          lenout = lenout + 1
          outdir_name(lenout:lenout+1) = '/'
       end if
-      print*,'Output dir. name ',outdir_name(1:lenout)
+      if (debug_init)
+     & print*,'Output dir. name ',outdir_name(1:lenout)
       
 c     Config directory name
-c      read(855,'(a)')condir_name
       lencon = lnsig1(condir_name)
       if (condir_name(lencon:lencon).ne.'/') then
 c        This 'if' checks for a terminal slash symbol
          lencon = lencon + 1
          condir_name(lencon:lencon+1) = '/'
       end if
-      print*,'Config dir. name ',condir_name(1:lencon)
+      if (debug_init)
+     & print*,'Config dir. name ',condir_name(1:lencon)
 
-c      read (855,*),en_npstp
-      print*,'npstp ',ents_npstp
-c      read(855,*) ents_out_name
-      print*,'ents_out_name = ',trim(ents_out_name)
-      print*,'ents_restart_file = ',trim(ents_restart_file)
+      if (debug_init)
+     & print*,'npstp ',ents_npstp
+      if (debug_init)
+     & print*,'ents_out_name = ',trim(ents_out_name)
+      if (debug_init)
+     & print*,'ents_restart_file = ',trim(ents_restart_file)
 
 
 c      close (855)      
       
-      print*, 'lin = ',dum_lin
-      print*,dum_rsc,dum_syr,ents_nyear
-      print*,'rmax dphi ', dum_rmax,dum_dphi
-c      print*,'ilat1_ocn: ',ilat1_ocn
-      print*, 'Seasonality enabled: ',dosc
+      if (debug_init)
+     & print*, 'lin = ',dum_lin
+      if (debug_init)
+     & print*,dum_rsc,dum_syr,ents_nyear
+      if (debug_init)
+     & print*,'rmax dphi ', dum_rmax,dum_dphi
+      if (debug_init)
+     & print*, 'Seasonality enabled: ',dosc
 
 c SG Transfer variables to common variables within ents
        ents_kmax = dum_kmax

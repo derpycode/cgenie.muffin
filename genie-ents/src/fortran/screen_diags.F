@@ -14,26 +14,36 @@ c      include '../genie-cgoldstein/var.cmn'
 
       integer iamin,iamax,jamin,jamax
 
-      print*
+      if (debug_loop) 
+     & print*
 
       call aminmaxl(imax,jmax,ents_kmax,ents_k1(:,:),tqld(1,:,:),
      1                 amin,amax,iamin,iamax,jamin,jamax)
-      print*,'min land T ',amin,' at ',iamin,jamin
-      print*,'max land T ',amax,' at ',iamax,jamax
+      if (debug_loop) 
+     & print*,'min land T ',amin,' at ',iamin,jamin
+      if (debug_loop) 
+     & print*,'max land T ',amax,' at ',iamax,jamax
 
       call aminmaxl(imax,jmax,ents_kmax,ents_k1(:,:),tqld(2,:,:),
      1                 amin,amax,iamin,iamax,jamin,jamax)
-      print*,'min land q ',amin,' at ',iamin,jamin
-      print*,'max land q ',amax,' at ',iamax,jamax
+      if (debug_loop) 
+     & print*,'min land q ',amin,' at ',iamin,jamin
+      if (debug_loop) 
+     & print*,'max land q ',amax,' at ',iamax,jamax
 
       call slnd_h2o_invent(tot_h2o)
-      print*,'Total water on land is ',tot_h2o,'(*10^12 m^3)'
+      if (debug_loop) 
+     & print*,'Total water on land is ',tot_h2o,'(*10^12 m^3)'
 
       call slnd_c_invent(tot_c,tot_v,tot_s,tot_a)
-      print*,'Total carbon is ',tot_c,'(GtC)'
-      print*,tot_v,'(GtC) veg'
-      print*,tot_s,'(GtC) soil'
-      print*,tot_a,'(GtC) atm'
+      if (debug_loop) 
+     & print*,'Total carbon is ',tot_c,'(GtC)'
+      if (debug_loop) 
+     & print*,tot_v,'(GtC) veg'
+      if (debug_loop) 
+     & print*,tot_s,'(GtC) soil'
+      if (debug_loop) 
+     & print*,tot_a,'(GtC) atm'
       
       end
 

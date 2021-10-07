@@ -3037,6 +3037,19 @@
 		      <value datatype="string">ents_output_years_2d.dat</value>
 		      <description>file containing years for 2D output to be generated (to screen and file)</description>
 		    </param>
+<!-- MISC CONTROLS  -->
+                    <param name="debug_init">
+			<value datatype="boolean">.false.</value>
+                        <description></description>
+                    </param>
+                    <param name="debug_end">
+			<value datatype="boolean">.false.</value>
+                        <description></description>
+                    </param>
+                    <param name="debug_loop">
+			<value datatype="boolean">.false.</value>
+                        <description></description>
+                    </param>
                 </namelist>
             </file>
         </model>
