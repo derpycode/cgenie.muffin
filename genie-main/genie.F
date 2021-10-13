@@ -80,6 +80,7 @@ c     *** ECOGEM model - START
          call initialise_ecogem_wrapper
       endif
 c     ==================================================================
+      print*, 'ici000'
 c     *** BIOGEM model - START
       if (flag_biogem) then
          call initialise_biogem_wrapper
@@ -122,6 +123,7 @@ c     ******************************************************************
       print*,' *** Initialisation complete: simulation starting ...'
       print*,'*******************************************************'
 
+      print*,"ICa0I"
 c     ==================================================================
 c     Initialize loop counters
       istep_atm=0
@@ -144,6 +146,7 @@ c     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
 c     ! *** MAIN TIME-STEPPING LOOP START **************************** !
 c     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
 c     
+      write (*,*) "ICI"
 c     NOTE: koverall is in hours
       do koverall=1,koverall_total
 c     increment the clock which accumulates total time
@@ -258,6 +261,7 @@ c     ******************************************************************
          endif
 c     ******************************************************************
 c     
+      write (*,*) "ICI2"
 c     test for being within 1st part of cycle
          if((istep_gem.le.gem_notyr).or.(.not.flag_gemlite)) then
 c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -393,6 +397,7 @@ c     *** PLASIM atmosphere model
                endif
             endif
 c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+      write (*,*) "ICI3"
 c     *** c-GOLDSTEIN sea-ice model
             if (flag_goldsteinseaice) then
                if(mod(koverall,ksic_loop).eq.0) then

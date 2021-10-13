@@ -166,14 +166,19 @@ c     open(1,file='oscsun.dat')
       oscryr = 2.0*pi/float(nyear)
 
 c pbh
-      osctau1 = osctau0 + 0.5
+      osctau0 = -zm * 180. * rpi 
+c       osctau0 = 180.3
+c      osctau1 = osctau0 + 0.5
+      osctau1 = osctau0 + 0.5 + 80.
  
       do istep=1,nyear
 
 c pbh Dan's offset for angular time of year
-c         osct = float(mod(istep-1,nyear)+1)*oscryr
+c        osct = float(mod(istep-1,nyear)+1)*oscryr - zm
          osct = (float(mod(istep-1,nyear)+1) - 
      &          (nyear*osctau1/gn_daysperyear))*oscryr
+
+
 
          do j=1,jmax
             oscv = osct + osce1*sin(osct) + osce2*sin(2.0*osct) 
