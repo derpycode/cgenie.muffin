@@ -392,9 +392,9 @@ MODULE biogem_lib
   real::par_bio_remin_cO2_ItoIO3
   real::par_bio_remin_cIO3_IO3toI
   NAMELIST /ini_biogem_nml/par_bio_remin_cO2_IO3toI,par_bio_remin_cO2_ItoIO3,par_bio_remin_cIO3_IO3toI
-  real::par_bio_remin_O2toI
-  real::par_bio_remin_SO4toIO3
-  NAMELIST /ini_biogem_nml/par_bio_remin_O2toI,par_bio_remin_SO4toIO3
+  real::par_bio_remin_O2toI,par_bio_remin_O2toIlifetime
+  real::par_bio_remin_SO4toIO3,par_bio_remin_SO4toIO3lifetime
+  NAMELIST /ini_biogem_nml/par_bio_remin_O2toI,par_bio_remin_O2toIlifetime,par_bio_remin_SO4toIO3,par_bio_remin_SO4toIO3lifetime
   ! ECOGEM coupling
   LOGICAL::ctrl_bio_remin_ecogemMLD                              ! dilute tracers across the mixed layer
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_ecogemMLD

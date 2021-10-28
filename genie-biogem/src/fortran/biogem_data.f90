@@ -311,7 +311,9 @@ CONTAINS
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
        print*,'scaling between rate of O2 consumption and I- ox    : ',par_bio_remin_O2toI
+       print*,'scaling between O2 consumption and I- ox lifetime   : ',par_bio_remin_O2toIlifetime
        print*,'scaling between rate of SO42- and IO3- reduction    : ',par_bio_remin_SO4toIO3
+       print*,'scaling between SO42- and IO3- reduction lifetime   : ',par_bio_remin_SO4toIO3lifetime
        print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)

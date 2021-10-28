@@ -101,8 +101,11 @@ CONTAINS
           case default
              loc_NH4_oxidation = min(loc_NH4_oxidation,loc_f*loc_NH4,loc_f*0.5*loc_O2)
           end select
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/ocn(io_NH4,dum_i,dum_j,k)
+          ! isotopic fractionation
+          ! NOTE: currently, becasue the reaction has already been limited by factor loc_f,
+          !       Rayleigh fractionation will *ALWAYS* occur
+          ! calculate isotopic ratio (loc_NH4 is already tested for being > 0)
+          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/loc_NH4
           if (loc_NH4_oxidation > loc_NH4) then
              ! complete NH4 oxidation (no N fractionation)
              loc_bio_remin(io_NH4,k) = -loc_NH4
@@ -187,7 +190,7 @@ CONTAINS
     ! 2NH4+ + 2O2 -> N2O + 2H+ + 3H2O
     ! (2NH4+ + 3O2 -> 2NO2- + 4H+ + 2H2O)
     DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_NH4 = ocn(io_NH4,dum_i,dum_j,k)
        if ((loc_O2 > const_real_nullsmall) .AND. (loc_NH4 > const_real_nullsmall)) then
           ! calculate potential NH4 oxidation
@@ -195,14 +198,17 @@ CONTAINS
                & (loc_NH4/(loc_NH4 + par_bio_remin_cNH4_NH4toNO2))*(loc_O2/(loc_O2 + par_bio_remin_cO2_NH4toNO2))
           ! cap NH4 oxidation and O2 consumption
           loc_NH4_oxidation = min(loc_NH4_oxidation,loc_f*loc_NH4,loc_f*loc_O2)
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/ocn(io_NH4,dum_i,dum_j,k)
           ! calculate fraction to be transformed into N2O (if selected) rather than NO2
           if (ocn_select(io_N2O)) then
              loc_N2Ofrac = par_bio_remin_fracN2O
           else
              loc_N2Ofrac = 0.0
           end if
+          ! isotopic fractionation
+          ! NOTE: currently, becasue the reaction has already been limited by factor loc_f,
+          !       Rayleigh fractionation will *ALWAYS* occur
+          ! calculate isotopic ratio (loc_NH4 is already tested for being > 0)
+          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/loc_NH4
           if (loc_NH4_oxidation > loc_NH4) then
              ! complete NH4 oxidation (no N fractionation)
              loc_bio_remin(io_NH4,k) = -(1.0 - loc_N2Ofrac)*loc_NH4
@@ -296,8 +302,11 @@ CONTAINS
                & (loc_NO2/(loc_NO2 + par_bio_remin_cNO2_NO2toNO3))*(loc_O2/(loc_O2 + par_bio_remin_cO2_NO2toNO3))
           ! cap NO2 oxidation and O2 consumption
           loc_NO2_oxidation = min(loc_NO2_oxidation,loc_f*loc_NO2,loc_f*2.0*loc_O2)
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/ocn(io_NO2,dum_i,dum_j,k)
+          ! isotopic fractionation
+          ! NOTE: currently, becasue the reaction has already been limited by factor loc_f,
+          !       Rayleigh fractionation will *ALWAYS* occur
+          ! calculate isotopic ratio (loc_NO2 is already tested for being > 0)
+          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/loc_NO2
           if (loc_NO2_oxidation > loc_NO2) then
              ! complete NO2 oxidation (no N fractionation)
              loc_bio_remin(io_NO2,k) = -loc_NO2
@@ -373,8 +382,11 @@ CONTAINS
                & (loc_NO2/(loc_NO2 + par_bio_remin_cNO2_NO2toN2O))*(1.0 - loc_O2/(loc_O2 + par_bio_remin_cO2_NO2toN2O))
           ! cap NO2 reduction
           loc_NO2_reduction = min(loc_NO2_reduction,loc_f*loc_NO2)
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/ocn(io_NO2,dum_i,dum_j,k)
+          ! isotopic fractionation
+          ! NOTE: currently, becasue the reaction has already been limited by factor loc_f,
+          !       Rayleigh fractionation will *ALWAYS* occur
+          ! calculate isotopic ratio (loc_NO2 is already tested for being > 0)
+          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/loc_NO2
           if (loc_NO2_reduction > loc_NO2) then
              ! complete NO2 reduction (no N fractionation)
              loc_bio_remin(io_NO2,k) = -loc_NO2
@@ -2009,12 +2021,8 @@ CONTAINS
              !       oxidation half saturation for oxygen (2.0E-05 mol kg-1) replaced by par_bio_remin_cO2_ItoIO3
              loc_I_oxidation = dum_dtyr*par_bio_remin_kItoIO3*loc_I*(loc_O2/(par_bio_remin_cO2_ItoIO3 + loc_O2))
           case ('lifetime')
-             ! NOTE: 
-             if (par_bio_remin_Ilifetime > dum_dtyr) then
-                loc_I_oxidation = min((dum_dtyr/par_bio_remin_Ilifetime)*loc_I,(2.0/3.0)*loc_O2)
-             else
-                loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
-             end if
+             ! NOTE: revised lifetime code
+             loc_I_oxidation = (dum_dtyr/par_bio_remin_Ilifetime)*loc_I  
           case ('reminO2')
              ! NOTE: in the absence of explicit NH4+ and NH4+ oxidation,
              !       one can scale NH4+ oxidation with DON remin following Martin et al. [2019]
@@ -2027,6 +2035,20 @@ CONTAINS
                 loc_O2_consumption = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k) + &
                      & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k)
                 loc_I_oxidation = -1.0*par_bio_remin_O2toI*loc_O2_consumption
+             else
+                loc_I_oxidation = 0.0
+             end if
+          case ('reminO2lifetime')
+             ! an attempt to recreate a I- 'lifetime'
+             if (ctrl_bio_remin_redox_save) then
+                loc_O2_consumption = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k) + &
+                     & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k)
+                ! NOTE: only calculate lifetime if there is some O2 consumption (non zero negative flux)
+                if (loc_O2_consumption < const_real_nullsmallneg) then
+                   loc_I_oxidation = (dum_dtyr/(-1.0*par_bio_remin_O2toIlifetime/loc_O2_consumption))*loc_I
+                else
+                   loc_I_oxidation = 0.0
+                end if
              else
                 loc_I_oxidation = 0.0
              end if
@@ -2122,9 +2144,28 @@ CONTAINS
              ! NOTE: remember that the O2 change is negative upon OM oxidation ...
              ! NOTE: no need for dum_dtyr, because diag_redox is per time-step
              ! NOTE: ctrl_bio_remin_redox_save must be .TRUE.
-             loc_SO4_consumption = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k) + &
-                  & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
-             loc_IO3_reduction = -1.0*par_bio_remin_SO4toIO3*loc_SO4_consumption
+             if (ctrl_bio_remin_redox_save) then
+                loc_SO4_consumption = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k) + &
+                     & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
+                loc_IO3_reduction = -1.0*par_bio_remin_SO4toIO3*loc_SO4_consumption
+             else
+                loc_IO3_reduction = 0.0
+             end if
+          case ('reminSO4lifetime')
+             ! an attempt to recreate a IO3- 'lifetime'
+             if (ctrl_bio_remin_redox_save) then
+                loc_SO4_consumption = diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k) + &
+                     & diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
+                loc_IO3_reduction = -1.0*par_bio_remin_SO4toIO3*loc_SO4_consumption
+                ! NOTE: only calculate lifetime if there is some SO4 consumption (non zero negative flux)
+                if (loc_SO4_consumption < const_real_nullsmallneg) then
+                   loc_IO3_reduction = (dum_dtyr/(-1.0*par_bio_remin_SO4toIO3lifetime/loc_SO4_consumption))*loc_IO3
+                else
+                   loc_IO3_reduction = 0.0
+                end if
+             else
+                loc_IO3_reduction = 0.0
+             end if
           case default
              loc_IO3_reduction = 0.0
           end select
