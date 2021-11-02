@@ -5133,11 +5133,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Reference [IO3-] value @ default C:I ratio</description>
                     </param>
                     <param name="opt_bio_remin_oxidize_ItoIO3">
-			<value datatype="string">DEFAULT</value>
+			<value datatype="string">NONE</value>
                         <description>I -> IO3 oxidation option</description>
                     </param>
                     <param name="opt_bio_remin_reduce_IO3toI">
-			<value datatype="string">DEFAULT</value>
+			<value datatype="string">NONE</value>
                         <description>IO3 -> I reduction option</description>
                     </param>
                     <param name="par_bio_remin_Ilifetime">
