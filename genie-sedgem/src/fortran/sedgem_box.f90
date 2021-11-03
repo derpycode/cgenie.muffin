@@ -74,7 +74,9 @@ CONTAINS
     real::loc_r_sed_por                                        ! thickness ratio due to porosity differences (stack / surface layer)
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
-    real::loc_fPOC,loc_sed_pres_fracC,loc_sed_pres_fracP       ! 
+    real::loc_fPOC,loc_fFe
+    real::loc_sed_pres_fracC,loc_sed_pres_fracP                ! 
+    real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
@@ -236,10 +238,11 @@ CONTAINS
           loc_C2P_rain = const_real_nullhigh
        end if
        if (ctrl_sed_diagen_fracC2Ppres_wallmann2010) then
-          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
+          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - &
+               & loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
        else
           loc_C2P_remin = loc_C2P_rain
-       end if 
+       end if
        if (loc_C2P_remin < const_real_nullsmall) loc_C2P_remin = loc_C2P_rain
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
@@ -254,7 +257,7 @@ CONTAINS
                & (sed_type(sed_dep(is)) == par_sed_type_POM) &
                & ) then
              if (sed_type(is) == par_sed_type_scavenged) then
-                loc_dis_sed(is) = 0.0
+                loc_dis_sed(is) = 0.0 
              else
                 loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
@@ -344,6 +347,45 @@ CONTAINS
        ! set fractional flux of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = (1.0 - par_sed_diagen_fracCpres_ox)*loc_new_sed(is_POC)
     end select
+    
+    ! calculate crude Fe2+ return
+    if (sed_select(is_POM_FeOOH)) then
+       select case (par_sed_diagen_POM_FeOOH_opt)
+       case ('ding')
+          ! From Ding et al. [2019]:
+          ! F(Fe) = 1.0E-4.98 * ([O2])^-1.71
+          ! where F(Fe) is in mol m−2 Myr−1 and [O2] as mol L−1
+          ! Apply this equation, but ...
+          ! (1) cap maximum F(Fe) at the flux of FeOOH to the sediments
+          ! (2) cap maximum F(Fe) at the Corg flux that is remineralized
+          !     (assuming that we can loosly equate FeOOH reduced to POC oxidized)
+          ! convert units (kg-1 -> l-1)
+          loc_O2 = dum_sfcsumocn(io_O2)/conv_kg_l
+          ! calculate Fe flux as mol m−2 Myr−1
+          loc_fFe = 10.0**(-4.98) * loc_O2**(-1.71)
+          ! ensure greater than zero and convert units to mol cm-2 yr-1
+          loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
+          ! match units of Corg flux (cm3 cm-2 per time step) to (mol C cm-2 yr-1)
+          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)
+          ! cap Fe flux at the oxidation flux of POC (assuming FeOOH <-> O2 equivalents and 106:-106 C:O2)
+          loc_fFe = min(loc_fFe,loc_fPOC)
+          ! now work out what loc_dis_sed(is_POM_FeOOH) is and cap at loc_new_sed(is_POM_FeOOH) 
+          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),conv_det_mol_cm3*loc_fFe)
+       case ('dale')
+          loc_dis_sed(is_POM_FeOOH) = 0.0
+       case default
+          loc_dis_sed(is_POM_FeOOH) = 0.0
+       end select
+       if (sed_select(is_POM_FeOOH_56Fe)) then          
+          if (loc_new_sed(is_POM_FeOOH) > const_rns) then
+             loc_dis_sed(is_POM_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_POM_FeOOH)*loc_new_sed(is_POM_FeOOH_56Fe)/loc_new_sed(is_POM_FeOOH)
+          else
+             loc_dis_sed(is_POM_FeOOH_56Fe) = 0.0
+          end if
+       end if
+    end if
+
 !!$    ! error-catching of negative dissolution: return rain flux back to ocean
 !!$    If (loc_dis_sed(is_POC) < -const_real_nullsmall) then
 !!$       CALL sub_report_error( &
@@ -506,7 +548,7 @@ CONTAINS
 !!$            & /),.FALSE. &
 !!$            & )
 !!$    end if
-    
+
     IF (ctrl_misc_debug4) print*,'*** diagenesis - calculate total solids dissolved ***'
     ! *** diagenesis - calculate total solids dissolved ***
     ! calculate volume of removed material (as SOILD matter. i.e., zero porosity), in units of cm3 (cm-2)
@@ -529,7 +571,7 @@ CONTAINS
     END IF
     ! set OMEN output data array values
     sed_diag(idiag_OMEN_bur,dum_i,dum_j) = (loc_new_sed_vol - loc_dis_sed_vol)
-   
+
     IF (ctrl_misc_debug3) print*,'(d) update sediment stack'
     ! *** (d) update sediment stack
     !         add the new sediment to the top sediment layer, and deduct the calculated dissolved material
@@ -1365,7 +1407,9 @@ CONTAINS
     ! (sediment stack / surface layer)
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
-    real::loc_fPOC,loc_sed_pres_fracC,loc_sed_pres_fracP       ! 
+    real::loc_fPOC,loc_fFe
+    real::loc_sed_pres_fracC,loc_sed_pres_fracP                ! 
+    real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
@@ -1518,7 +1562,7 @@ CONTAINS
                & (sed_type(sed_dep(is)) == par_sed_type_POM) &
                & ) then
              if (sed_type(is) == par_sed_type_scavenged) then
-                loc_dis_sed(is) = 0.0
+                loc_dis_sed(is) = 0.0 
              else
                 loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
@@ -1602,6 +1646,45 @@ CONTAINS
           end if
        end DO
     end select
+
+    ! calculate crude Fe2+ return
+    if (sed_select(is_POM_FeOOH)) then
+       select case (par_sed_diagen_POM_FeOOH_opt)
+       case ('ding')
+          ! From Ding et al. [2019]:
+          ! F(Fe) = 1.0E-4.98 * ([O2])^-1.71
+          ! where F(Fe) is in mol m−2 Myr−1 and [O2] as mol L−1
+          ! Apply this equation, but ...
+          ! (1) cap maximum F(Fe) at the flux of FeOOH to the sediments
+          ! (2) cap maximum F(Fe) at the Corg flux that is remineralized
+          !     (assuming that we can loosly equate FeOOH reduced to POC oxidized)
+          ! convert units (kg-1 -> l-1)
+          loc_O2 = dum_sfcsumocn(io_O2)/conv_kg_l
+          ! calculate Fe flux as mol m−2 Myr−1
+          loc_fFe = 10.0**(-4.98) * loc_O2**(-1.71)
+          ! ensure greater than zero and convert units to mol cm-2 yr-1
+          loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
+          ! match units of Corg flux (cm3 cm-2 per time step) to (mol C cm-2 yr-1)
+          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)
+          ! cap Fe flux at the oxidation flux of POC (assuming FeOOH <-> O2 equivalents and 106:-106 C:O2)
+          loc_fFe = min(loc_fFe,loc_fPOC)
+          ! now work out what loc_dis_sed(is_POM_FeOOH) is and cap at loc_new_sed(is_POM_FeOOH) 
+          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),conv_det_mol_cm3*loc_fFe)
+       case ('dale')
+          loc_dis_sed(is_POM_FeOOH) = 0.0
+       case default
+          loc_dis_sed(is_POM_FeOOH) = 0.0
+       end select
+       if (sed_select(is_POM_FeOOH_56Fe)) then          
+          if (loc_new_sed(is_POM_FeOOH) > const_rns) then
+             loc_dis_sed(is_POM_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_POM_FeOOH)*loc_new_sed(is_POM_FeOOH_56Fe)/loc_new_sed(is_POM_FeOOH)
+          else
+             loc_dis_sed(is_POM_FeOOH_56Fe) = 0.0
+          end if
+       end if
+    end if
+    
     ! *** diagenesis - CaCO3 dissolution ***
     select case (par_sed_diagen_CaCO3opt)
     case ('ALL')

@@ -78,6 +78,7 @@ CONTAINS
        print*,'CaCO3 diagenesis scheme                             : ',par_sed_diagen_CaCO3opt
        print*,'opal diagenesis scheme                              : ',par_sed_diagen_opalopt
        print*,'Corg diagenesis scheme                              : ',par_sed_diagen_Corgopt
+       print*,'POM_FeOOH diagenesis option                         : ',par_sed_diagen_POM_FeOOH_opt
        ! --- DIAGENESIS SCHEME: CONTROL ------------------------------------------------------------------------------------------ !
        print*,'--- DIAGENESIS SCHEME: CONTROL ---------------------'
        print*,'Bioturbate sediment stack?                          : ',ctrl_sed_bioturb

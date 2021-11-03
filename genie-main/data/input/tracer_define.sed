@@ -16,8 +16,8 @@
  POFe             10  10  03  'particulate organic iron (POFe)'      'wt%'     0.00     100.002
  POFe_56Fe        94  10  22  'd56Fe of POC incorporated iron'       'o/oo'   -9.99E+2    9.99E+2
  POI              79  79  03  'particulate organic iodine (POI)'     'wt%'     0.00     100.00
- POBa             80  80  03  'particulate organic iodine (POI)'     'wt%'     0.00     100.00
- POBa_138Ba       81  80  23  'd114Cd of POC incorporated cadmium'   'o/oo'   -9.99E+2    9.99E+2
+ POBa             80  80  03  'particulate organic barium (POBa)'    'wt%'     0.00     100.00
+ POBa_138Ba       81  80  23  '138Ba of POC incorporated barium'    'o/oo'   -9.99E+2    9.99E+2
  POM_231Pa        11  03  07  'POM scavenged 231Pa'                  'wt%'     0.00     100.00
  POM_230Th        12  03  07  'POM scavenged 230Th'                  'wt%'     0.00     100.00
  POM_Fe           13  03  07  'POM scavenged Fe'                     'wt%'     0.00     100.00

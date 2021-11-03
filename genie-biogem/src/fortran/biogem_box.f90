@@ -3322,13 +3322,13 @@ CONTAINS
                             loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
                          end select
                       end if
-                   endif
+                   endif                   
                    ! calculate the ratio of particulate tracer between layers
                    loc_bio_part_POC_ratio = 1.0 - &
                         & ( &
                         &   (1.0 - loc_bio_part_TMP(is2l(is_POC_frac2),kk+1))*loc_bio_remin_POC_frac1 + &
                         &   loc_bio_part_TMP(is2l(is_POC_frac2),kk+1)*loc_bio_remin_POC_frac2 &
-                        & )
+                        & )                   
                    ! calculate change in partitioning between different fractions
                    l = is2l(is_POC_frac2)
                    if (loc_bio_part_TMP(l,kk+1) > const_real_nullsmall) then
@@ -3759,8 +3759,6 @@ CONTAINS
                    end if
                 end if
                 
-                
-                
                 ! *** Scavenge PO4 from water column onto FeOOH ***
                 ! NOTE: look for both 'free' and POM-associated forms
                 ! if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
@@ -3784,8 +3782,6 @@ CONTAINS
                       ! end if
                   ! end if
                 ! end if
-                
-                
 
              end If
           end do
@@ -3811,6 +3807,7 @@ CONTAINS
                 end SELECT
              end do
           end if
+          
           ! record particulate fluxes at base of each layer (units of: mol per time-step)
           ! NOTE: implicitly includes sedimentation flux (kk=dum_k1)
           ! NOTE: to be correct, the flux for par_sed_type_frac needs to be flux-weighted when summed ...

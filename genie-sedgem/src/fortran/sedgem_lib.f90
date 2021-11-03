@@ -54,6 +54,8 @@ MODULE sedgem_lib
   character(len=63)::par_sed_diagen_opalopt                      ! opal diagenesis scheme
   character(len=63)::par_sed_diagen_Corgopt                      ! Corg diagenesis scheme
   NAMELIST /ini_sedgem_nml/par_sed_diagen_CaCO3opt,par_sed_diagen_opalopt,par_sed_diagen_Corgopt
+  character(len=63)::par_sed_diagen_POM_FeOOH_opt                ! POM_FeOOH diagenesis option
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_POM_FeOOH_opt
   ! ------------------- DIAGENESIS SCHEME: CONTROL ------------------------------------------------------------------------------- !
   LOGICAL::ctrl_sed_bioturb                                      ! Bioturbate sediment stack?
   logical::ctrl_sed_bioturb_Archer                               ! Use Archer et al. [2002] bioturbation scheme?
