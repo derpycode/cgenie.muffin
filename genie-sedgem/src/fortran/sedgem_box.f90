@@ -366,13 +366,21 @@ CONTAINS
           ! ensure greater than zero and convert units to mol cm-2 yr-1
           loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
           ! match units of Corg flux (cm3 cm-2 per time step) to (mol C cm-2 yr-1)
-          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)
+          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)/dum_dtyr
           ! cap Fe flux at the oxidation flux of POC (assuming FeOOH <-> O2 equivalents and 106:-106 C:O2)
           loc_fFe = min(loc_fFe,loc_fPOC)
           ! now work out what loc_dis_sed(is_POM_FeOOH) is and cap at loc_new_sed(is_POM_FeOOH) 
-          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),conv_det_mol_cm3*loc_fFe)
+          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),dum_dtyr*conv_det_mol_cm3*loc_fFe)
        case ('dale')
-          loc_dis_sed(is_POM_FeOOH) = 0.0
+          ! convert units (mol kg-1 -> uM) and cap at > zero
+          loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
+          ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
+          loc_fPOC = 1.0E3*1.0E4*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
+          ! calculate Fe flux (umol m-2 d-1)
+          loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
+          ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step) and cap at loc_new_sed(is_POM_FeOOH) 
+          loc_dis_sed(is_POM_FeOOH) = &
+               & min(loc_new_sed(is_POM_FeOOH),conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d*dum_dtyr)
        case default
           loc_dis_sed(is_POM_FeOOH) = 0.0
        end select
@@ -1665,13 +1673,21 @@ CONTAINS
           ! ensure greater than zero and convert units to mol cm-2 yr-1
           loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
           ! match units of Corg flux (cm3 cm-2 per time step) to (mol C cm-2 yr-1)
-          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)
+          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)/dum_dtyr
           ! cap Fe flux at the oxidation flux of POC (assuming FeOOH <-> O2 equivalents and 106:-106 C:O2)
           loc_fFe = min(loc_fFe,loc_fPOC)
           ! now work out what loc_dis_sed(is_POM_FeOOH) is and cap at loc_new_sed(is_POM_FeOOH) 
-          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),conv_det_mol_cm3*loc_fFe)
+          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),dum_dtyr*conv_det_mol_cm3*loc_fFe)
        case ('dale')
-          loc_dis_sed(is_POM_FeOOH) = 0.0
+          ! convert units (mol kg-1 -> uM) and cap at > zero
+          loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
+          ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
+          loc_fPOC = 1.0E3*1.0E4*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
+          ! calculate Fe flux (umol m-2 d-1)
+          loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
+          ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step) and cap at loc_new_sed(is_POM_FeOOH) 
+          loc_dis_sed(is_POM_FeOOH) = &
+               & min(loc_new_sed(is_POM_FeOOH),conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d*dum_dtyr)
        case default
           loc_dis_sed(is_POM_FeOOH) = 0.0
        end select
