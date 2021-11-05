@@ -3758,30 +3758,6 @@ CONTAINS
                       end if
                    end if
                 end if
-                
-                ! *** Scavenge PO4 from water column onto FeOOH ***
-                ! NOTE: look for both 'free' and POM-associated forms
-                ! if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
-                   ! if (sed_select(is_FeOOH)) then
-                      ! if (dum_vocn%mk(io2l(io_PO4),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_FeOOH),kk)>const_rns) then
-                         ! call sub_box_scav_PO4_FeOOH(              &
-                              ! & dum_vocn%mk(io2l(io_PO4),kk),      &
-                              ! & dum_i,dum_j,kk,                    &
-                              ! & loc_bio_part_TMP(:,kk),            &
-                              ! & loc_bio_remin(:,kk)                &
-                              ! & )
-                      ! end if
-                   ! elseif (sed_select(is_POM_FeOOH)) then
-                      ! if (dum_vocn%mk(io2l(io_PO4),kk)>const_rns .AND. loc_bio_part_TMP(is2l(is_POM_FeOOH),kk)>const_rns) then
-                         ! call sub_box_scav_PO4_POM_FeOOH(                     &
-                              ! & dum_vocn%mk(io2l(io_PO4),kk),                 &
-                              ! & dum_i,dum_j,kk,                               &
-                              ! & loc_bio_part_TMP(:,kk),                       &
-                              ! & loc_bio_remin(:,kk)                           &
-                              ! & )
-                      ! end if
-                  ! end if
-                ! end if
 
              end If
           end do

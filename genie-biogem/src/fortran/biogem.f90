@@ -78,8 +78,6 @@ subroutine biogem(        &
   real::loc_M
   real,dimension(1:n_l_ocn)::loc_vocn                            !
   real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                !
-!!$  CHARACTER(len=31)::loc_string     !
-!!!integer::nthreads,thread_id
 
   loc_debug_ij = .FALSE.
 

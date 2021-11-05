@@ -105,7 +105,8 @@ CONTAINS
        print*,'Apply Wallmann [2010] C:P remin parameterization?   : ',ctrl_sed_diagen_fracC2Ppres_wallmann2010
        print*,'C:P remin C/P offset                                : ',par_sed_diagen_fracC2Ppres_off
        print*,'C:P remin [O2] threshold (mol kg-1)                 : ',par_sed_diagen_fracC2Ppres_c0_O2 
-       print*,'Return of PO4 to ocean in Dunne 2007 scheme?        : ',ctrl_sed_dunne2007_remin_POP      
+       print*,'Return of PO4 to ocean in Dunne 2007 scheme?        : ',ctrl_sed_dunne2007_remin_POP
+       print*,'Cap Fe2+ dissolution at POM_FeOOH rain flux?        : ',ctrl_sed_diagen_POM_FeOOH_cap
        ! --- DIAGENESIS SCHEME: HUELSE 2017 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: HUELSE 2017 -----------------'
        print*,'Corg rate constant parameterization scheme          : ',par_sed_huelse2017_kscheme

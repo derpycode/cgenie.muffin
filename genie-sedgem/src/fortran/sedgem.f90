@@ -419,6 +419,7 @@ SUBROUTINE sedgem(          &
               end do
            end DO
         end if
+        
      end do
   end do
 
@@ -628,7 +629,7 @@ SUBROUTINE sedgem(          &
         end if
      end DO
   end DO
-
+     
   ! *** UPDATE INTERFACE ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE INTERFACE ***'
   ! update update sed->ocn interface
