@@ -2995,6 +2995,30 @@ CONTAINS
           par_data_save_slice_n=int(conv_kocn_ksedgem/par_data_TM_avg_n)
        end if
     end if
+    
+    ! *** redox-requiring schemes ***
+    if (.NOT. ctrl_bio_remin_redox_save) THEN
+       SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
+       case ('reminO2','reminO2lifetime')
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You need ctrl_bio_remin_redox_save to be .true. ...', &
+               & '... making this change for you.', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_bio_remin_redox_save = .true.
+       end select
+       SELECT CASE (opt_bio_remin_reduce_IO3toI)
+       case ('reminSO4','reminSO4lifetime')
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You need ctrl_bio_remin_redox_save to be .true. ...', &
+               & '... making this change for you.', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_bio_remin_redox_save = .true.
+       end select
+    end if
 
   END SUBROUTINE sub_check_par_biogem
   ! ****************************************************************************************************************************** !
