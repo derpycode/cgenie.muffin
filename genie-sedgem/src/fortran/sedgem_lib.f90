@@ -6,7 +6,7 @@
 
 
 MODULE sedgem_lib
-  
+
 
   use genie_control
   USE gem_cmn
@@ -502,7 +502,7 @@ MODULE sedgem_lib
   REAL::par_sed_FeO_fdis                 ! forced dussolution flux of Fe from the sediments
   REAL::par_sed_diagen_fPOCmax           ! max POC rain flux in carbonate dissolution (umol cm-2 yr-1)
   ! opal diagenesis
-  !!!REAL::par_sed_opal_KSi0                ! base opal dissolution rate constant (intercept at zero opal rain rate)
+!!!REAL::par_sed_opal_KSi0                ! base opal dissolution rate constant (intercept at zero opal rain rate)
   REAL::par_sed_opal_Sitoopalmax         ! asymptotic [Si] %refrac/%opal ratio max limite sediments  
   ! ash tracing
   logical::par_sed_ashevent              ! ash event?
@@ -725,58 +725,41 @@ CONTAINS
   END function fun_sed_coretop
   ! ****************************************************************************************************************************** !
 
-    ! ****************************************************************************************************************************** !
-     ! CALCULATE SEDIMENT Corg concentration in mol cm-3 and mol %- FROM POC FLUX (FOR BOTH FRACTIONS) - NEEDED FOR HUELSEETAL2016
-    function fun_sed_calcCorgwt(dum_FPOC, loc_sed_w, dum_por,dum_den)
-        ! -------------------------------------------------------- !
-        ! RESULT VARIABLE
-        ! -------------------------------------------------------- !
-        real::fun_sed_calcCorgwt
-        ! -------------------------------------------------------- !
-        ! -------------------------------------------------------- !
-        ! DUMMY ARGUMENTS
-        ! -------------------------------------------------------- !
-        real,INTENT(in)::dum_FPOC                                  ! POC flux as timestep is yr (cm^3 cm-2 yr-1)
-        real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1] (Middelburg et al., Deep Sea Res. 1, 1997)
-        real,INTENT(in)::dum_por                                   ! sediment porosity (cm3 cm-3)
-        real,INTENT(in)::dum_den                                   ! sediment density (g cm-3)
-        ! -------------------------------------------------------- !
-        ! -------------------------------------------------------- !
-        ! DEFINE LOCAL VARIABLES
-        ! -------------------------------------------------------- !
-        real::fun_sed_calcCorg
 
-        ! mass fraction of Corg is equal to % of total mass per unit volume ...
-        ! but taken at the bottom boundary level, also equal to the % of the burial fraction
-        ! wt% Corg = FCorg/(FCorg + Fdet)*100.0
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE SEDIMENT Corg concentration in mol cm-3 and mol %- FROM POC FLUX (FOR BOTH FRACTIONS) - NEEDED FOR HUELSEETAL2016
+  function fun_sed_calcCorgwt(dum_FPOC, loc_sed_w, dum_por,dum_den)
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    real::fun_sed_calcCorgwt
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    real,INTENT(in)::dum_FPOC                                  ! POC flux as timestep is yr (cm^3 cm-2 yr-1)
+    real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1] (Middelburg et al., Deep Sea Res. 1, 1997)
+    real,INTENT(in)::dum_por                                   ! sediment porosity (cm3 cm-3)
+    real,INTENT(in)::dum_den                                   ! sediment density (g cm-3)
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::fun_sed_calcCorg
+    ! mass fraction of Corg is equal to % of total mass per unit volume ...
+    ! but taken at the bottom boundary level, also equal to the % of the burial fraction
+    ! wt% Corg = FCorg/(FCorg + Fdet)*100.0
+    ! C = (1-por)*Corg/Sed_accumulation units: conv_POC_cm3_mol* cm3 cm-2 / (cm3 cm-2) = mol cm-3
+    ! Note: units of concentration must be changed from (cm2 cm-3) to (mol cm-3)
+    fun_sed_calcCorg = conv_POC_cm3_mol*(1-dum_por)*dum_FPOC/loc_sed_w
+    ! calculate wt%: g/g = mol cm-3 * g/mol * cm3/g
+    fun_sed_calcCorgwt = 100*fun_sed_calcCorg*12/dum_den
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end function fun_sed_calcCorgwt
+  ! ****************************************************************************************************************************** !
 
-        !        print*, ' '
-        !        print*, '----------- IN fun_sed_calcCorgwt --------------'
-        !        print*, ' '
-
-        ! C = (1-por)*Corg/Sed_accumulation units: conv_POC_cm3_mol* cm3 cm-2 / (cm3 cm-2) = mol cm-3
-        ! Note: units of concentration must be changed from (cm2 cm-3) to (mol cm-3)
-        fun_sed_calcCorg = conv_POC_cm3_mol*(1-dum_por)*dum_FPOC/loc_sed_w
-
-        ! calculate wt%: g/g = mol cm-3 * g/mol * cm3/g
-        fun_sed_calcCorgwt = 100*fun_sed_calcCorg*12/dum_den
-
-
-!!!!!!!!! DH 28.50.2016: was before
-!        ! assume all buried sediment is detrital to a first approximation
-!        ! (burial velocity) x (solids as a fraction of total volume) x (density)
-!        ! NOTE: units of (g cm-2 yr-1) -> *1/12 -> (mol cm-2 yr-1) ! DH: 1/12 is wrong for detrital!
-!        loc_sed_Fdet = loc_sed_w*(1.0 - dum_por)*dum_den/12.0
-!        ! calculate Corg wt%
-!        ! NOTE: 100% scale
-!here 100*mass_POC/fun_calc_sed_mass (or sum(densityCaCO3*totalmasCaCO3+densitydetrital*totalmasdetirtal+densityPOC*totalmassPOC))
-!        fun_sed_calcCorgwt = 100.0*dum_FPOC/(dum_FPOC+loc_sed_Fdet)
-
-        ! -------------------------------------------------------- !
-        ! END
-        ! -------------------------------------------------------- !
-    end function fun_sed_calcCorgwt
-   
 
 END MODULE sedgem_lib
 

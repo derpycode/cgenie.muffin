@@ -360,24 +360,24 @@ CONTAINS
           ! (2) cap maximum F(Fe) at the Corg flux that is remineralized
           !     (assuming that we can loosly equate FeOOH reduced to POC oxidized)
           ! convert units (kg-1 -> l-1) and cap at 6.25μmol/L (as per the limits considered in Ding et al. [2019])
-          loc_O2 = max(6.25E-6,dum_sfcsumocn(io_O2)/conv_kg_l)
+          loc_O2 = max(6.25E-6,dum_sfcsumocn(io_O2)/conv_l_kg)
           ! calculate Fe flux as mol m−2 Myr−1
           loc_fFe = 10.0**(-4.98) * loc_O2**(-1.71)
           ! ensure greater than zero and convert units to mol cm-2 yr-1
           loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
-          ! match units of Corg flux (cm3 cm-2 per time step) to (mol C cm-2 yr-1)
-          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)/dum_dtyr
-          ! convert units
+          ! convert units to cm3 cm-2 per time-step
           loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*loc_fFe
        case ('dale')
           ! convert units (mol kg-1 -> uM) and cap at > zero
           loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
           ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
-          loc_fPOC = 1.0E3*1.0E4*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
+          loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
           ! calculate Fe flux (umol m-2 d-1)
           loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
           ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step)
-          loc_dis_sed(is_POM_FeOOH) = conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d*dum_dtyr
+          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
+       case ('ALL')
+          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
        case default
           loc_dis_sed(is_POM_FeOOH) = 0.0
        end select
@@ -1648,25 +1648,25 @@ CONTAINS
           ! (1) cap maximum F(Fe) at the flux of FeOOH to the sediments
           ! (2) cap maximum F(Fe) at the Corg flux that is remineralized
           !     (assuming that we can loosly equate FeOOH reduced to POC oxidized)
-          ! convert units (kg-1 -> l-1)
-          loc_O2 = dum_sfcsumocn(io_O2)/conv_kg_l
+          ! convert units (kg-1 -> l-1) and cap at 6.25μmol/L (as per the limits considered in Ding et al. [2019])
+          loc_O2 = max(6.25E-6,dum_sfcsumocn(io_O2)/conv_l_kg)
           ! calculate Fe flux as mol m−2 Myr−1
           loc_fFe = 10.0**(-4.98) * loc_O2**(-1.71)
           ! ensure greater than zero and convert units to mol cm-2 yr-1
           loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
-          ! match units of Corg flux (cm3 cm-2 per time step) to (mol C cm-2 yr-1)
-          loc_fPOC = conv_POC_cm3_mol*loc_dis_sed(is_POC)/dum_dtyr
-          ! convert units
+          ! convert units to cm3 cm-2 per time-step
           loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*loc_fFe
        case ('dale')
           ! convert units (mol kg-1 -> uM) and cap at > zero
           loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
           ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
-          loc_fPOC = 1.0E3*1.0E4*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
+          loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
           ! calculate Fe flux (umol m-2 d-1)
           loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
           ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step)
-          loc_dis_sed(is_POM_FeOOH) = conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d*dum_dtyr
+          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
+       case ('ALL')
+          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
        case default
           loc_dis_sed(is_POM_FeOOH) = 0.0
        end select

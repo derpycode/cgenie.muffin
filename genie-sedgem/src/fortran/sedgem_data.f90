@@ -714,28 +714,50 @@ CONTAINS
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        ! criterion for particulate organic matter (POM), elemental components, and particle-reactive scavenged elements
-       if ((sed_dep(is) == is_POC .AND. sed_type(is) < 10) .OR. (sed_type(is) == par_sed_type_POM)) then
+       if ( &
+            (is == is_POC) &
+            & .OR. &
+            & (sed_type(is) == par_sed_type_POM) &
+            & ) then
           conv_sed_mol_cm3(is) = conv_POC_mol_cm3
           conv_sed_cm3_g(is)   = conv_POC_cm3_g
-       end if
-       ! criterion for carbonate, elemental components, and particle-reactive scavenged elements
-       if ((sed_dep(is) == is_CaCO3 .AND. sed_type(is) < 10) .OR. (sed_type(is) == par_sed_type_CaCO3)) then
+          ! criterion for carbonate, elemental components, and particle-reactive scavenged elements
+       elseif ( &
+            & (is == is_CaCO3) &
+            & .OR. &
+            & (sed_type(is) == par_sed_type_CaCO3) &
+            & ) then
           conv_sed_mol_cm3(is) = conv_cal_mol_cm3
           conv_sed_cm3_g(is)   = conv_cal_cm3_g
-       end if
-       ! criterion for opal, elemental components, and particle-reactive scavenged elements
-       if ((sed_dep(is) == is_opal .AND. sed_type(is) < 10) .OR. (sed_type(is) == par_sed_type_opal)) then
+          ! criterion for opal, elemental components, and particle-reactive scavenged elements
+       elseif ( &
+            & (is == is_opal) &
+            & .OR. &
+            & (sed_type(is) == par_sed_type_opal) &
+            & ) then
           conv_sed_mol_cm3(is) = conv_opal_mol_cm3
           conv_sed_cm3_g(is)   = conv_opal_cm3_g
-       end if
-       ! detrital and refractory material
-       if ((sed_dep(is) == is_det .AND. sed_type(is) < 10) .OR. (sed_type(is) == par_sed_type_abio)) then
+          ! detrital and refractory material
+       elseif ( &
+            & (is == is_det) &
+            & .OR. &
+            & (sed_type(is) == par_sed_type_abio) &
+            & .OR. &
+            & (sed_type(is) == par_sed_type_det) &
+            & .OR. &
+            & (sed_type(is) == par_sed_type_scavenged) &
+            & ) then
           conv_sed_mol_cm3(is) = conv_det_mol_cm3
           conv_sed_cm3_g(is)   = conv_det_cm3_g
+          ! 'dependent' components (isotopes and 'age')
+       elseif ( &
+            & (sed_type(is) > 10) &
+            & .OR. &
+            & (sed_type(is) == par_sed_type_age) &
+            & ) then
+          conv_sed_mol_cm3(is) = conv_sed_mol_cm3(sed_dep(is))
+          conv_sed_cm3_g(is)   = conv_sed_cm3_g(sed_dep(is))
        end if
-       ! 'dependent' components (isotopes and 'age')
-       conv_sed_mol_cm3(is) = conv_sed_mol_cm3(sed_dep(is))
-       conv_sed_cm3_g(is)   = conv_sed_cm3_g(sed_dep(is))
        ! reciprocal conversion
        if(conv_sed_mol_cm3(is) > const_real_nullsmall) conv_sed_cm3_mol(is) = 1.0/conv_sed_mol_cm3(is)
        if(conv_sed_cm3_g(is) > const_real_nullsmall)   conv_sed_g_cm3(is)   = 1.0/conv_sed_cm3_g(is)
