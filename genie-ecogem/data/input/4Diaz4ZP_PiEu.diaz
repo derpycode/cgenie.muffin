@@ -1,0 +1,45 @@
+
+ 01                 02  03	  04	05	06 07
+ \/                 \/  \/	  \/	\/	\/ \/
+
+-START-OF-DATA-
+ Diazotroph 	    f   na  
+ Diazotroph	    t   Eukaryote
+ Diazotroph         t   Diatom
+ Diazotroph         f   na
+ Picoplankton       f   na
+ Picoplankton       f   na
+ Eukaryote          f   na
+ Eukaryote	    f   na
+ Zooplankton        f   na
+ Zooplankton        f   na
+ Zooplankton        f   na
+ Zooplankton        f   na
+-END-OF-DATA-
+
+ /\                 /\ /\	/\	/\	/\
+ 01                 02 03	04	05	06
+
+DATA FORMAT AND ORDER
+---------------------
+COLUMN #01: functional type (dummy argument same as .eco file)
+COLUMN #02: Symbiotic functionality (for UCYNA and DDAs)
+COLUMN #03: Host type 
+COLUMN #04: Biosynthetic cost of N2 fixation
+COLUMN #05: Geometric cost of N2 fixation
+COLUMN #06: Light cost of N2 fixation (factor changing the PI slope relative to ??)
+COLUMN #07: N:P ratio for diazotrophs
+COLUMN #08: Fe requirement for nitrogen fixation (factor relative to ??)
+
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+                                 Eukaryote
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+                                 Zooplankton
+                                 Mixotroph
