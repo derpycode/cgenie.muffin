@@ -1420,9 +1420,9 @@ CONTAINS
           end if
        end if
        ! calculate precipitation
-       ! NOTE: assume loc_PO4 is always greater than zero
-       if (loc_Fe2 > const_rns) then
-          ! calculate Ion Activity Product (IAP)
+       ! NOTE: remove an assumption of non-zero loc_PO4 
+       if (loc_Fe2 > const_rns .AND. loc_PO4 > const_rns) then
+          ! calculate Ion Activity Product (IAP) (not used when using Dijkstra et al. (2018) scheme: TODO parameterization choice facilitation?) 
           ! NOTE: gamma parameters are activity coefficients
           loc_IAP = (par_bio_remin_gammaPO4*loc_HPO4)**2.0*(par_bio_remin_gammaFe2*loc_Fe2)**3.0/(par_bio_remin_gammaFe2*loc_H)**2.0
           ! calculate vivianite precipitation based on IAP. Vivianite precipitates at very high supersaturation (very unlikely to 
