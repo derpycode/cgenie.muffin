@@ -239,6 +239,7 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_POM_Fe_56Fe                       = 75    ! 
   INTEGER,PARAMETER::is_POM_FeOOH                         = 103    !  
   INTEGER,PARAMETER::is_POM_FeOOH_56Fe                    = 104    ! 
+  INTEGER,PARAMETER::is_POM_FeOOH_PO4                     = 108   !
   INTEGER,PARAMETER::is_POM_Nd                            = 47    ! 
   INTEGER,PARAMETER::is_POM_Nd_144Nd                      = 48    ! 
   INTEGER,PARAMETER::is_POM_MoS2                          = 58    ! 
@@ -251,7 +252,6 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_POM_Os                            = 97    ! 
   INTEGER,PARAMETER::is_POM_Os_187Os                      = 98    !  
   INTEGER,PARAMETER::is_POM_Os_188Os                      = 99    !  
-  INTEGER,PARAMETER::is_PO4_POM_FeOOH                     = 108   !
   INTEGER,PARAMETER::is_CaCO3                             = 14    ! 
   INTEGER,PARAMETER::is_CaCO3_13C                         = 15    ! 
   INTEGER,PARAMETER::is_CaCO3_14C                         = 16    ! 
@@ -263,8 +263,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_LiCO3_7Li                         = 46    !
   INTEGER,PARAMETER::is_CaCO3_231Pa                       = 19    ! 
   INTEGER,PARAMETER::is_CaCO3_230Th                       = 20    !  
-  INTEGER,PARAMETER::is_CaCO3_Fe                          = 21    !  
-  INTEGER,PARAMETER::is_CaCO3_Fe_56Fe                     = 76  !  
+  INTEGER,PARAMETER::is_CaCO3_FeOOH                       = 21    !  
+  INTEGER,PARAMETER::is_CaCO3_FeOOH_56Fe                  = 76  !  
   INTEGER,PARAMETER::is_CaCO3_Nd                          = 49    ! 
   INTEGER,PARAMETER::is_CaCO3_Nd_144Nd                    = 50    !  
   INTEGER,PARAMETER::is_CaCO3_MoS2                        = 61    ! 
@@ -286,7 +286,7 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_FeS2_56Fe                         = 93    !
   INTEGER,PARAMETER::is_FeOOH                             = 95    ! 
   INTEGER,PARAMETER::is_FeOOH_56Fe                        = 96    !
-  INTEGER,PARAMETER::is_PO4_FeOOH                         = 109   !
+  INTEGER,PARAMETER::is_FeOOH_PO4                         = 109   !
   INTEGER,PARAMETER::is_Fe3Si2O4                          = 105   ! 
   INTEGER,PARAMETER::is_Fe3Si2O4_56Fe                     = 106   !
   INTEGER,PARAMETER::is_Fe3Si2O4_30Si                     = 107   !
@@ -295,8 +295,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_detLi_7Li                         = 56    !  
   INTEGER,PARAMETER::is_det_231Pa                         = 23    ! 
   INTEGER,PARAMETER::is_det_230Th                         = 24    ! 
-  INTEGER,PARAMETER::is_det_Fe                            = 25    ! 
-  INTEGER,PARAMETER::is_det_Fe_56Fe                       = 77    ! 
+  INTEGER,PARAMETER::is_det_FeOOH                         = 25    ! 
+  INTEGER,PARAMETER::is_det_FeOOH_56Fe                    = 77    ! 
   INTEGER,PARAMETER::is_det_Nd                            = 51    ! 
   INTEGER,PARAMETER::is_det_Nd_144Nd                      = 52    !  
   INTEGER,PARAMETER::is_det_MoS2                          = 64    ! 
@@ -307,8 +307,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_EMPTY                             = 28    ! 
   INTEGER,PARAMETER::is_opal_231Pa                        = 29    ! 
   INTEGER,PARAMETER::is_opal_230Th                        = 30    ! 
-  INTEGER,PARAMETER::is_opal_Fe                           = 31    ! 
-  INTEGER,PARAMETER::is_opal_Fe_56Fe                      = 78    ! 
+  INTEGER,PARAMETER::is_opal_FeOOH                        = 31    ! 
+  INTEGER,PARAMETER::is_opal_FeOOH_56Fe                   = 78    ! 
   INTEGER,PARAMETER::is_opal_Nd                           = 53    ! 
   INTEGER,PARAMETER::is_opal_Nd_144Nd                     = 54    ! 
   INTEGER,PARAMETER::is_opal_MoS2                         = 67    ! 

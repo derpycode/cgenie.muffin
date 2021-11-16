@@ -886,14 +886,14 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     INTEGER::k
-    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_FeOOH,loc_dPO4,loc_PO4_FeOOH
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_FeOOH,loc_dPO4,loc_FeOOH_PO4
     real::loc_f,loc_Kd
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
     loc_PO4_ads = 0.0
     loc_PO4 = 0.0
-    loc_PO4_FeOOH = 0.0
+    loc_FeOOH_PO4 = 0.0
     loc_FeOOH = 0.0
     loc_dPO4 = 0.0 
     ! maximum fraction consumed in any given geochemical reaction
@@ -907,8 +907,8 @@ CONTAINS
        loc_PO4(k) = ocn(io_PO4,dum_i,dum_j,k)
        loc_FeOOH(k) = bio_part(is_FeOOH,dum_i,dum_j,k)
        loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_FeOOH(k)*1e6 *1e-6
-       loc_PO4_FeOOH(k) = bio_part(is_PO4_FeOOH,dum_i,dum_j,k)
-       loc_dPO4(k) = loc_PO4_ads(k) - loc_PO4_FeOOH(k)
+       loc_FeOOH_PO4(k) = bio_part(is_FeOOH_PO4,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_FeOOH_PO4(k)
        if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
     enddo 
     ! -------------------------------------------------------- !
@@ -917,7 +917,7 @@ CONTAINS
     ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
     bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
     ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
-    bio_part(is_PO4_FeOOH,dum_i,dum_j,:) = bio_part(is_PO4_FeOOH,dum_i,dum_j,:) + loc_dPO4(:)
+    bio_part(is_FeOOH_PO4,dum_i,dum_j,:) = bio_part(is_FeOOH_PO4,dum_i,dum_j,:) + loc_dPO4(:)
     ! -------------------------------------------------------- !
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !
@@ -942,14 +942,14 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     INTEGER::k
-    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_POM_FeOOH,loc_dPO4,loc_PO4_POM_FeOOH
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_POM_FeOOH,loc_dPO4,loc_POM_FeOOH_PO4
     real::loc_f,loc_Kd
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
     loc_PO4_ads = 0.0 
     loc_PO4 = 0.0
-    loc_PO4_POM_FeOOH = 0.0
+    loc_POM_FeOOH_PO4 = 0.0
     loc_POM_FeOOH = 0.0
     loc_dPO4 = 0.0
     ! maximum fraction consumed in any given geochemical reaction
@@ -964,8 +964,8 @@ CONTAINS
        loc_POM_FeOOH(k) = bio_part(is_POM_FeOOH,dum_i,dum_j,k)
        ! loc_PO4_ads(k) = ocn_ads_POM_FeOOH_dPO4(dum_i,dum_j,k)
        loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_POM_FeOOH(k)*1e6 *1e-6
-       loc_PO4_POM_FeOOH(k) = bio_part(is_PO4_POM_FeOOH,dum_i,dum_j,k)
-       loc_dPO4(k) = loc_PO4_ads(k) - loc_PO4_POM_FeOOH(k)
+       loc_POM_FeOOH_PO4(k) = bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_POM_FeOOH_PO4(k)
        if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
     enddo 
     ! -------------------------------------------------------- !
@@ -974,7 +974,7 @@ CONTAINS
     ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
     bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
     ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
-    bio_part(is_PO4_POM_FeOOH,dum_i,dum_j,:) = bio_part(is_PO4_POM_FeOOH,dum_i,dum_j,:) + loc_dPO4(:)
+    bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,:) = bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,:) + loc_dPO4(:)
     ! -------------------------------------------------------- !
     ! DIAGNOSTICS
     ! -------------------------------------------------------- !

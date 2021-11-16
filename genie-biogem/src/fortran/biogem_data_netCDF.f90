@@ -1869,18 +1869,26 @@ CONTAINS
             & trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('misc_sur_fpartFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        ! total scavenged Fe loss
-       ! NOTE: new calculation of loc_ij(:,:)
        loc_unitsname = 'umol Fe m-2 yr-1'
        loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
             & ( &
-            &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k)   + &
-            &   int_bio_settle_timeslice(is_CaCO3_Fe,:,:,n_k) + &
-            &   int_bio_settle_timeslice(is_opal_Fe,:,:,n_k) + &
-            &   int_bio_settle_timeslice(is_det_Fe,:,:,n_k) &
+            &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k) &
             & )
-       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged iron loss from surface', &
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged Fe loss from surface', &
             & trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('misc_sur_fscavFetot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! total scavenged FeOOH loss
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
+            & ( &
+            &   int_bio_settle_timeslice(is_POM_FeOOH,:,:,n_k)   + &
+            &   int_bio_settle_timeslice(is_CaCO3_FeOOH,:,:,n_k) + &
+            &   int_bio_settle_timeslice(is_opal_FeOOH,:,:,n_k)  + &
+            &   int_bio_settle_timeslice(is_det_FeOOH,:,:,n_k)     &
+            & )
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFeOOHtot','Total scavenged FeOOH loss from surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fscavFeOOHtot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        ! solubility (%)
        ! NOTE: new calculation of loc_ij(:,:)
        loc_unitsname = '%'
