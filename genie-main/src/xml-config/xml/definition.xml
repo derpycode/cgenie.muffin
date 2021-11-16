@@ -4677,7 +4677,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Catch mis-behaving rapidly-oxidizing species going less than 0.0?</description>
                     </param>
                     <param name="opt_bio_remin_oxidize_NH4toNO3">
-			<value datatype="string">Fanny</value>
+			<value datatype="string">Monteiro</value>
                         <description>NH4 -> NO3 oxidation option</description>
                     </param>
                     <param name="opt_bio_remin_oxidize_H2StoSO4">
@@ -5153,11 +5153,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Reference [IO3-] value @ default C:I ratio</description>
                     </param>
                     <param name="opt_bio_remin_oxidize_ItoIO3">
-			<value datatype="string">DEFAULT</value>
+			<value datatype="string">NONE</value>
                         <description>I -> IO3 oxidation option</description>
                     </param>
                     <param name="opt_bio_remin_reduce_IO3toI">
-			<value datatype="string">DEFAULT</value>
+			<value datatype="string">NONE</value>
                         <description>IO3 -> I reduction option</description>
                     </param>
                     <param name="par_bio_remin_Ilifetime">
@@ -5183,6 +5183,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_cIO3_IO3toI">
 			<value datatype="real">100.0E-9</value>
                         <description>IO3 half-saturation for IO3 -> I (mol kg-1) [MADE UP DEFAULT]</description>
+                    </param>
+                    <param name="par_bio_remin_O2toI">
+			<value datatype="real">1.0E-4</value>
+                        <description>scaling between rate of O2 consumption and I- oxidation [MADE UP (order of magnitude correct) DEFAULT]</description>
+                    </param>
+                    <param name="par_bio_remin_O2toIlifetime">
+			<value datatype="real">1.0E-6</value>
+                        <description>scaling between rate of O2 consumption and I- oxidation ... but to create a 'lifetime' [MADE UP (order of magnitude correct) DEFAULT]</description>
+                    </param>
+                    <param name="par_bio_remin_SO4toIO3">
+			<value datatype="real">2.0E-2</value>
+                        <description>scaling between rate of SO42- and IO3- reduction [MADE UP (order of magnitude correct) DEFAULT]</description>
+                    </param>
+                    <param name="par_bio_remin_SO4toIO3lifetime">
+			<value datatype="real">5.0E-7</value>
+                        <description>scaling between rate of SO42- and IO3- reduction ... but to create a 'lifetime' [MADE UP (order of magnitude correct) DEFAULT]</description>
                     </param>
 <!-- ABIOTIC PRECIPITATION  -->
                     <param name="par_bio_CaCO3precip_sf">

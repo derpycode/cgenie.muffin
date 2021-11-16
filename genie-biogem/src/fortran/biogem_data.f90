@@ -311,6 +311,10 @@ CONTAINS
        print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
+       print*,'scaling between rate of O2 consumption and I- ox    : ',par_bio_remin_O2toI
+       print*,'scaling between O2 consumption and I- ox lifetime   : ',par_bio_remin_O2toIlifetime
+       print*,'scaling between rate of SO42- and IO3- reduction    : ',par_bio_remin_SO4toIO3
+       print*,'scaling between SO42- and IO3- reduction lifetime   : ',par_bio_remin_SO4toIO3lifetime
        print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
@@ -2402,17 +2406,19 @@ CONTAINS
     ! check first-order consistency between biologial option, and selected dissolved and sedimentary tracers
     ! NOTE: only the existence of inconsistency will be highlighted, not exactly what the problem is ...
     SELECT CASE (par_bio_prodopt)
-    CASE (                        &
-         & '1N1T_PO4restore',     &
-         & '1N1T_PO4restoreLL',   &
-         & '1N1T_PO4MM',          &
-         & '1N1T_PO4MM_Tdep',     &
-         & '2N1T_PO4MM_SiO2',     &
-         & '2N2T_PN_Tdep',        &
-         & '3N2T_PNFe_Tdep',      &
-         & 'bio_PFe',             &
-         & 'bio_PFeSi',           &
-         & 'bio_PFeSi_Ridgwell02' &
+    CASE (                         &
+         & '1N1T_PO4restore',      &
+         & '1N1T_PO4restoreLL',    &
+         & '1N1T_PO4MM',           &
+         & '1N1T_PO4MM_Tdep',      &
+         & '2N1T_PO4MM_SiO2',      &
+         & '2N2T_PN_Tdep',         &
+         & '2N1T_PFe_Tdep',        &
+         & '3N2T_PNFe_Tdep',       &
+         & 'bio_PFe',              &
+         & 'bio_PFeSi',            &
+         & 'bio_PFeSi_Ridgwell02', &
+         & 'bio_PNFe'              &
          & )
        IF (.NOT. ocn_select(io_PO4)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_POP)) loc_flag = .TRUE.
@@ -2427,10 +2433,11 @@ CONTAINS
        IF (.NOT. sed_select(is_opal)) loc_flag = .TRUE.
     end select
     SELECT CASE (par_bio_prodopt)
-    case (                    &
+    case (                     &
          & '2N2T_PO4MM_NO3',   &
          & '2N2T_PN_Tdep',     &
-         & '3N2T_PNFe_Tdep'    &
+         & '3N2T_PNFe_Tdep',   &
+         & 'bio_PNFe'          &
          & )
        IF (.NOT. ocn_select(io_NO3)) loc_flag = .TRUE.
        IF (.NOT. ocn_select(io_N2)) loc_flag = .TRUE.
@@ -2439,7 +2446,9 @@ CONTAINS
     end select
     SELECT CASE (par_bio_prodopt)
     case (                    &
-         & '3N2T_PNFe_Tdep'   &
+         & '2N1T_PFe_Tdep',   &
+         & '3N2T_PNFe_Tdep',  &
+         & 'bio_PNFe'         &
          & )
        if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
           IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
@@ -2999,6 +3008,30 @@ CONTAINS
                & )
           par_data_save_slice_n=int(conv_kocn_ksedgem/par_data_TM_avg_n)
        end if
+    end if
+    
+    ! *** redox-requiring schemes ***
+    if (.NOT. ctrl_bio_remin_redox_save) THEN
+       SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
+       case ('reminO2','reminO2lifetime')
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You need ctrl_bio_remin_redox_save to be .true. ...', &
+               & '... making this change for you.', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_bio_remin_redox_save = .true.
+       end select
+       SELECT CASE (opt_bio_remin_reduce_IO3toI)
+       case ('reminSO4','reminSO4lifetime')
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You need ctrl_bio_remin_redox_save to be .true. ...', &
+               & '... making this change for you.', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_bio_remin_redox_save = .true.
+       end select
     end if
 
   END SUBROUTINE sub_check_par_biogem
