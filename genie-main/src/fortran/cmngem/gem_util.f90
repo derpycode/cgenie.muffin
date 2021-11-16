@@ -92,21 +92,9 @@ CONTAINS
     conv_sed_ocn(io_SiO2,is_opal)                = 1.0
     conv_sed_ocn(io_SiO2_30Si,is_opal_30Si)      = 1.0
     conv_sed_ocn(io_Fe,is_POM_Fe)                = 1.0
-    conv_sed_ocn(io_Fe,is_CaCO3_Fe)              = 1.0
-    conv_sed_ocn(io_Fe,is_opal_Fe)               = 1.0
-    conv_sed_ocn(io_Fe,is_det_Fe)                = 1.0
     conv_sed_ocn(io_Fe_56Fe,is_POM_Fe_56Fe)      = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_CaCO3_Fe_56Fe)    = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_opal_Fe_56Fe)     = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_det_Fe_56Fe)      = 1.0
     conv_sed_ocn(io_TDFe,is_POM_Fe)              = 1.0
-    conv_sed_ocn(io_TDFe,is_CaCO3_Fe)            = 1.0
-    conv_sed_ocn(io_TDFe,is_opal_Fe)             = 1.0
-    conv_sed_ocn(io_TDFe,is_det_Fe)              = 1.0
     conv_sed_ocn(io_TDFe_56Fe,is_POM_Fe_56Fe)    = 1.0
-    conv_sed_ocn(io_TDFe_56Fe,is_CaCO3_Fe_56Fe)  = 1.0
-    conv_sed_ocn(io_TDFe_56Fe,is_opal_Fe_56Fe)   = 1.0
-    conv_sed_ocn(io_TDFe_56Fe,is_det_Fe_56Fe)    = 1.0
     conv_sed_ocn(io_231Pa,is_POM_231Pa)          = 1.0
     conv_sed_ocn(io_231Pa,is_CaCO3_231Pa)        = 1.0
     conv_sed_ocn(io_231Pa,is_opal_231Pa)         = 1.0
@@ -155,6 +143,9 @@ CONTAINS
     conv_sed_ocn(io_Fe2,is_FeCO3)                = 1.0
     conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)        = 1.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeCO3_56Fe)      = 1.0
+    conv_sed_ocn(io_PO4,is_Fe3PO42)              = 2.0
+    conv_sed_ocn(io_Fe2,is_Fe3PO42)              = 3.0
+    conv_sed_ocn(io_Fe2_56Fe,is_Fe3PO42_56Fe)    = 3.0
     conv_sed_ocn(io_Fe2,is_Fe3Si2O4)             = 3.0
     conv_sed_ocn(io_SiO2,is_Fe3Si2O4)            = 2.0
     conv_sed_ocn(io_Fe2_56Fe,is_Fe3Si2O4_56Fe)   = 3.0
@@ -169,12 +160,23 @@ CONTAINS
     conv_sed_ocn(io_SO4_34S,is_FeS2_34S)         = 1.0/4.0
     conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)       = 0.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)       = 1.0
-    conv_sed_ocn(io_Fe,is_FeOOH)                 = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)       = 1.0
-    conv_sed_ocn(io_O2,is_FeOOH)                 = 0.0
-    conv_sed_ocn(io_Fe,is_POM_FeOOH)             = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0 
-    conv_sed_ocn(io_O2,is_POM_FeOOH)             = 0.0
+    conv_sed_ocn(io_Fe2,is_FeOOH)                = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_FeOOH_56Fe)      = 1.0
+    conv_sed_ocn(io_O2,is_FeOOH)                 = 1.0
+    conv_sed_ocn(io_Fe2,is_POM_FeOOH)            = 1.0
+    conv_sed_ocn(io_Fe2,is_CaCO3_FeOOH)          = 1.0
+    conv_sed_ocn(io_Fe2,is_opal_FeOOH)           = 1.0
+    conv_sed_ocn(io_Fe2,is_det_FeOOH)            = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_POM_FeOOH_56Fe)  = 1.0 
+    conv_sed_ocn(io_Fe2_56Fe,is_CaCO3_FeOOH_56Fe)= 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_opal_FeOOH_56Fe) = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_det_FeOOH_56Fe)  = 1.0
+    conv_sed_ocn(io_O2,is_POM_FeOOH)             = 1.0/4.0
+    conv_sed_ocn(io_O2,is_CaCO3_FeOOH)           = 1.0/4.0
+    conv_sed_ocn(io_O2,is_opal_FeOOH)            = 1.0/4.0
+    conv_sed_ocn(io_O2,is_det_FeOOH)             = 1.0/4.0
+    conv_sed_ocn(io_PO4,is_POM_FeOOH_PO4)        = 1.0
+    conv_sed_ocn(io_PO4,is_FeOOH_PO4)            = 1.0
     conv_sed_ocn(io_Os,is_POM_Os)                = 1.0
     conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)    = 1.0
     conv_sed_ocn(io_Os_188Os,is_POM_Os_188Os)    = 1.0
@@ -291,6 +293,41 @@ CONTAINS
     fun_find_str_i = i
     ! -------------------------------------------------------- !
   END FUNCTION fun_find_str_i
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! FIND INDEX OF STRING (in a vector)
+  FUNCTION fun_find_int_i(dum_int,dum_data)
+    ! common blocks
+    IMPLICIT NONE
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    INTEGER::fun_find_int_i
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    integer,INTENT(in)::dum_int
+    integer,DIMENSION(:),INTENT(in)::dum_data
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::i,loc_imax
+    ! -------------------------------------------------------- !
+    ! FIND i
+    ! -------------------------------------------------------- !
+    loc_imax = size(dum_data)
+    i = 0
+    do i=1,loc_imax
+       if (dum_int == dum_data(i)) exit 
+    end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+    fun_find_int_i = i
+    ! -------------------------------------------------------- !
+  END FUNCTION fun_find_int_i
   ! ****************************************************************************************************************************** !
 
 
@@ -951,6 +988,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012ocn = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012ocn = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012ocn', &
@@ -992,6 +1030,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012sed = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012sed = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012sed', &

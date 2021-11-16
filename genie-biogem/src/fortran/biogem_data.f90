@@ -302,6 +302,7 @@ CONTAINS
        print*,'Activity coefficient for H+                         : ',par_bio_remin_gammaH
        print*,'Activity coefficient for OH-                        : ',par_bio_remin_gammaOH
        print*,'Activity coefficient for SiO2                       : ',par_bio_remin_gammaSiO2
+       print*,'Activity coefficient for PO4                        : ',par_bio_remin_gammaPO4
        print*,'I -> IO3 oxidation option                           : ',trim(opt_bio_remin_oxidize_ItoIO3)
        print*,'IO3 -> I reduction option                           : ',trim(opt_bio_remin_reduce_IO3toI)
        print*,'(oxidation) lifetime for I (yrs)                    : ',par_bio_remin_Ilifetime
@@ -404,10 +405,14 @@ CONTAINS
        print*,'Rate law power for FeCO3 precipitation              : ',par_bio_FeCO3precip_exp
        print*,'Ohmega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
        print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
+       print*,'Scale factor for Fe3PO42 precipitation              : ',par_bio_Fe3PO42precip_sf
+       print*,'Rate law power for Fe3PO42 precipitation            : ',par_bio_Fe3PO42precip_exp
+       print*,'Thermodynamic const for Fe3PO42 precipitation       : ',par_bio_Fe3PO42precip_eq
+       print*,'Fe fractionation factor for Fe3PO42 precipitation   : ',par_d56Fe_Fe3PO42_alpha
        print*,'Scale factor for Fe3Si2O4 precipitation             : ',par_bio_Fe3Si2O4precip_sf
        print*,'Rate law power for Fe3Si2O4 precipitation           : ',par_bio_Fe3Si2O4precip_exp
        print*,'Ohmega constant for Fe3Si2O4 precipitation          : ',par_bio_Fe3Si2O4precip_abioticohm_cte
-       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_FeCO3_alpha
+       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_Fe3Si2O4_alpha ! 08.12.2021: YK changed from par_d56Fe_FeCO3_alpha to par_d56Fe_Fe3Si2O4_alpha
        print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte
@@ -428,6 +433,7 @@ CONTAINS
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
        print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
+       print*,'Ads constant for PO4 adsorption on (POM-)FeOOH      : ',par_bio_Kd_PO4_FeOOH                                     ! 
        ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -963,11 +969,21 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     CHARACTER(len=255)::loc_filename                           ! filename string
+    integer::loc_len
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    ! set alt dir path string length
+    loc_len = LEN_TRIM(par_pindir_name)
     ! -------------------------------------------------------- !
     ! LOAD 2D FIELD
     ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! load geothermal 2D field
-    loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    ! -------------------------------------------------------- ! load BIOGEM virtual grid
+    if (loc_len > 0) then
+       loc_filename = TRIM(par_pindir_name)//TRIM(par_force_Vgrid_file)
+    else
+       loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    end if
     CALL sub_load_data_ij_INT(loc_filename,n_i,n_j,force_Vgrid(:,:))
     ! -------------------------------------------------------- !
     ! END
@@ -1672,7 +1688,6 @@ CONTAINS
     int_diag_airsea_timeslice(:,:,:)    = 0.0
     int_diag_redox_timeslice(:,:,:,:)   = 0.0
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
-    !
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeslice
   ! ****************************************************************************************************************************** !
@@ -1736,7 +1751,6 @@ CONTAINS
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
-    !
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeseries
   ! ****************************************************************************************************************************** !
@@ -3659,8 +3673,10 @@ CONTAINS
   !        3 == 3D (uniform across entire ocean volumne)
   !        2 == 2D (uniform across surface)
   !        0 == forcing at a point
+  !       -1 == SURFACE (spatially explicit on ocean surface -- needs 2D file '_BSUR')
   !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       -3 == LEVEL (spatially explicit on any depth surface -- needs 2D file '_LVL')
+  !       -4 == SURFACE + BENTHIC
   !       ELSE, 3D spatially explicit forcing (needs a pair of 3D files '_I' and '_II')
   SUBROUTINE sub_init_force_restore_ocn()
     ! local variables
@@ -4013,6 +4029,7 @@ CONTAINS
   !       -1 == SURFACE (spatially explicit @ surface -- needs 2D file '_SUR')
   !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       -3 == LEVEL (spatially explicit on any depth surface -- needs 2D file '_LVL')
+  !       -4 == SURFACE + BENTHIC
   !       ELSE, 3D spatially explicit forcing (needs a pair of 3D files '_I' and '_II')
   SUBROUTINE sub_init_force_flux_ocn()
     ! local variables
@@ -4059,6 +4076,15 @@ CONTAINS
                 DO j=1,n_j
                    if (goldstein_k1(i,j) <= n_k) then
                       loc_ijk(:,:,force_ocn_point_k(io)) = 0.0
+                   end if
+                end DO
+             end DO
+          elseif (force_ocn_uniform(io) == -4) then
+             loc_ijk(:,:,n_k) = 0.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(:,:,goldstein_k1(i,j)) = 0.0
                    end if
                 end DO
              end DO
@@ -4118,6 +4144,25 @@ CONTAINS
                 DO j=1,n_j
                    if (goldstein_k1(i,j) <= n_k) then
                       loc_ijk(i,j,force_ocn_point_k(io)) = loc_ij(i,j)
+                   end if
+                end do
+             end DO
+          elseif (force_ocn_uniform(io) == -4) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_ocn_'//TRIM(string_ocn(io))//'_SUR'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,n_k) = loc_ij(i,j)
+                   end if
+                end do
+             end DO
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_ocn_'//TRIM(string_ocn(io))//'_BEN'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,goldstein_k1(i,j)) = loc_ij(i,j)
                    end if
                 end do
              end DO
@@ -4273,6 +4318,7 @@ CONTAINS
   !        2 == 2D (uniform across surface)
   !        0 == forcing at a point
   !       -1 == SURFACE (spatially explicit across surface -- needs 2D file '_SUR')
+  !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       ELSE, 2D spatially explicit forcing (needs a pair of 2D files '_I' and '_II')
   SUBROUTINE sub_init_force_flux_sed()
     ! local variables
@@ -4295,6 +4341,10 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 0.0
           elseif (force_sed_uniform(is) == -1) then
              loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -2) then
+             loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -5) then
+             loc_ij(:,:) = 0.0
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_I'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
@@ -4314,6 +4364,12 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 1.0
           elseif (force_sed_uniform(is) == -1) then
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_SUR'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -2) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -5) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_II'//TRIM(string_data_ext)

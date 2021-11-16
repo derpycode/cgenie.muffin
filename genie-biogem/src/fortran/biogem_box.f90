@@ -397,7 +397,7 @@ CONTAINS
     real::loc_192Os,loc_188Os,loc_187Os
     real::loc_R,loc_r18O
     real::loc_PO4,loc_Cd,loc_FeT,loc_SiO2,loc_N,loc_IO3
-    real::loc_FeT_56Fe,loc_r56Fe
+    real::loc_scav_Fe,loc_FeT_56Fe,loc_r56Fe
     real::loc_kPO4,loc_kPO4_sp,loc_kPO4_nsp,loc_kN
     real::loc_kFe,loc_kFe_sp,loc_kFe_nsp
     real::loc_kSiO2,loc_kSiO2_sp,loc_kSiO2_nsp
@@ -868,8 +868,8 @@ CONTAINS
        ! prescribed POC flux
        ! NOTE: force_restore_docn_nuts has been assigned a negative sign (in the forcing update of the main biogem subroutine) ...
        ! NOTE: allow depletion of PO4 < 0.0 so as to force export production to the prescribed value
-       ! NOTE: correct for DOM (given that force_restore_docn_nuts has been devied from a prescribed particulate flux)
-       loc_dPO4 = -force_restore_docn_nuts(io_PO4)/(1.0 - loc_bio_red_DOMtotal)
+       ! NOTE: DO NOT correct for DOM here
+       loc_dPO4 = -force_restore_docn_nuts(io_PO4)
     CASE ( &
          & '2N2T_PN_Tdep' &
          & )
@@ -914,7 +914,6 @@ CONTAINS
        else
           loc_frac_N2fix = 0.0
        end if
-
     CASE ( &
          & '3N2T_PNFe_Tdep' &
          & )
@@ -1023,6 +1022,11 @@ CONTAINS
        loc_bio_red_RDOMfrac = 1.0 - loc_bio_red_DOMfrac
        loc_bio_red_DOMtotal = 1.0
     end if
+    ! now correct fixed POC export scheme for (total) DOM production
+    SELECT CASE (par_bio_prodopt)
+    CASE ('bio_POCflux')
+       if ((1.0 - loc_bio_red_DOMtotal) > const_rns) loc_dPO4 = loc_dPO4/(1.0 - loc_bio_red_DOMtotal)
+    end select
 
     ! *** ADJUST PARTICULATE COMPOSITION 'REDFIELD' RATIOS *********************************************************************** !
     !
@@ -1857,27 +1861,41 @@ CONTAINS
     ! calculate scavenging of Fe from water column by newly formed particulates
     ! NOTE: need to calculate the effective residence time of particulates in the surface later(s)
     !       => employ sinking velocity for scavenging
-    ! NOTE: FOR NOW ... KEEP OLD STYLE SUBROUTINE -- TO UTILIZE THE NEW ONE, BIO_PART AND BIO_REMIN
-    !       MUST BE REFORMULATED IN THE COMPACT TRACER NOTATION
     if (ocn_select(io_Fe)) then
        SELECT CASE (trim(opt_geochem_Fe))
        CASE ('OLD')
           DO k=n_k,loc_k_mld,-1
              if (ocn(io_Fe,dum_i,dum_j,k) > const_real_nullsmall) then
-                call sub_calc_scav_Fe(                                                      &
+                loc_scav_Fe = fun_box_scav_Fe(                                              &
                      & dum_dt,                                                              &
                      & phys_ocn(ipo_Dbot,dum_i,dum_j,k)/par_bio_remin_sinkingrate_reaction, &
                      & ocn(io_Fe,dum_i,dum_j,k),                                            &
-                     & bio_part(:,dum_i,dum_j,k),                                           &
-                     & bio_remin(:,dum_i,dum_j,k)                                           &
+                     & bio_part(is_POC,dum_i,dum_j,k)                                       &
                      & )
+                bio_part(is_POM_Fe,dum_i,dum_j,k) = bio_part(is_POM_Fe,dum_i,dum_j,k) + loc_scav_Fe
+                bio_remin(io_Fe,dum_i,dum_j,k)    = bio_remin(io_Fe,dum_i,dum_j,k) - loc_scav_Fe
+                If (ocn_select(io_Fe_56Fe)) then
+                   loc_r56Fe = ocn(io_Fe_56Fe,dum_i,dum_j,k)/ocn(io_Fe,dum_i,dum_j,k) 
+                   bio_part(is_POM_Fe_56Fe,dum_i,dum_j,k) = bio_part(is_POM_Fe_56Fe,dum_i,dum_j,k) + &
+                        & loc_r56Fe*loc_scav_Fe
+                   bio_remin(io_Fe_56Fe,dum_i,dum_j,k) = bio_remin(io_Fe_56Fe,dum_i,dum_j,k) - &
+                        & loc_r56Fe*loc_scav_Fe
+                end if
+!!$    ! OLD CODE           
+!!$                call sub_calc_scav_Fe(                                                      &
+!!$                     & dum_dt,                                                              &
+!!$                     & phys_ocn(ipo_Dbot,dum_i,dum_j,k)/par_bio_remin_sinkingrate_reaction, &
+!!$                     & ocn(io_Fe,dum_i,dum_j,k),                                            &
+!!$                     & bio_part(:,dum_i,dum_j,k),                                           &
+!!$                     & bio_remin(:,dum_i,dum_j,k)                                           &
+!!$                     & )
              end if
           end DO
        case default
           ! DO NOTHING
        end SELECT
     end if
-
+    
     ! *** WRITE DATA ***
     ! set modification of tracer concentrations
     ! NOTE: depletion of dissolved species as a result of biological productivity is implimented as negative remineralization
@@ -2888,12 +2906,14 @@ CONTAINS
        diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,:) = 0.0
        diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,:) = 0.0
        diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_FeOOH_dPO4,dum_i,dum_j,:) = 0.0 ! YK added 01.19.2021
     end if
     if (ocn_select(io_H2S) .AND. ocn_select(io_Fe2) .AND. sed_select(is_POM_FeOOH)) then
-       diag_react(idiag_react_FeOOH_dFe2,dum_i,dum_j,:) = 0.0
-       diag_react(idiag_react_FeOOH_dH2S,dum_i,dum_j,:) = 0.0
-       diag_react(idiag_react_FeOOH_dSO4,dum_i,dum_j,:) = 0.0
-       diag_react(idiag_react_FeOOH_dALK,dum_i,dum_j,:) = 0.0
+       diag_react(idiag_react_POMFeOOH_dFe2,dum_i,dum_j,:) = 0.0 !  ^ 
+       diag_react(idiag_react_POMFeOOH_dH2S,dum_i,dum_j,:) = 0.0 !  |  YK modified 12.28.2020 
+       diag_react(idiag_react_POMFeOOH_dSO4,dum_i,dum_j,:) = 0.0 !  |
+       diag_react(idiag_react_POMFeOOH_dALK,dum_i,dum_j,:) = 0.0 !  v
+       diag_react(idiag_react_POMFeOOH_dPO4,dum_i,dum_j,:) = 0.0 ! YK added 12.28.2020
     end if
     ! pre-calculate size reciprocal
     loc_size0=1.0/par_bio_remin_POC_size0 ! JDW
@@ -2929,9 +2949,20 @@ CONTAINS
     ! -------------------------------------------------------- ! test for possibilty of precip in water column
     ! if so: assume particules could be present at any/every depth in the local water column
     ! if not: assume particulates present only in surface layer
+    ! NOTE: check for a benthic (or sub-benthic) part6icle flux forcing (i.e. other than surface)
+    !       and be sure to also then search the full water column for particles
+    ! NOTE: used maxval with FINDLOC becasue the returned variable is a vector
+    ! NOTE: FINDLOC is 2008 FORTRAN and not friendly to old compilers ...
     if (sed_select(is_Fe3Si2O4) .OR. sed_select(is_FeCO3) .OR. sed_select(is_FeS2) .OR. sed_select(is_FeOOH)) then
        loc_klim = loc_k1
+!!$    elseif (maxval(FINDLOC(force_sed_uniform(:),-2)) > 0) then
+    elseif (fun_find_int_i(-2,force_sed_uniform(:)) > 0) then
+       loc_klim = loc_k1
+!!$    elseif (maxval(FINDLOC(force_sed_uniform(:),-5)) > 0) then
+    elseif (fun_find_int_i(-5,force_sed_uniform(:)) > 0) then
+       loc_klim = loc_k1       
     end if
+    ! -------------------------------------------------------- !
     ! local remin transformation arrays
     loc_conv_ls_lo(:,:)   = 0.0
     !
@@ -2939,7 +2970,7 @@ CONTAINS
        loc_diag_redox(:,:)  = 0.0
        loc_diag_precip(:,:) = 0.0
     end if
-
+    
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ! *** k WATER-COLUMN LOOP START ***
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -2947,13 +2978,15 @@ CONTAINS
     DO k=n_k,loc_klim,-1
        ! find some particulates in the water column
        ! NOTE: save total mineral load (seperately from total particulate load)
+       ! NOTE: allow for non-zero negative sediment concentrations (which can arise from a negatve particle flux)
+       !       to be detected ...
        loc_part_tot = 0.0
        if (sed_select(is_CaCO3)) loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_CaCO3),k)
        if (sed_select(is_opal))  loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_opal),k)
        if (sed_select(is_det))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_det),k)
        loc_part_tot_mineral = loc_part_tot
        if (sed_select(is_POC))   loc_part_tot = loc_part_tot + loc_bio_part_OLD(is2l(is_POC),k)
-       If (loc_part_tot  > const_real_nullsmall) then
+       If (abs(loc_part_tot)  > const_real_nullsmall) then
           ! if the identified particulate material is already residing in the bottom-most ocean layer, flag as sediment flux
           If (k == loc_k1) then
              loc_bio_remin_min_k = loc_k1 - 1
@@ -3130,7 +3163,7 @@ CONTAINS
              ! if (sed_select(is_xxx)) then
              ! end if
              ! ################################################################################################################### !
-          end If
+          end if
 
           ! >>>>>>>>>>>>>>>>>>>>>>>>>
           ! *** kk SUB-LOOP START ***
@@ -3303,13 +3336,13 @@ CONTAINS
                             loc_bio_remin_POC_frac2 = (1.0 - EXP(-loc_bio_remin_dD/par_bio_remin_POC_eL2))
                          end select
                       end if
-                   endif
+                   endif                   
                    ! calculate the ratio of particulate tracer between layers
                    loc_bio_part_POC_ratio = 1.0 - &
                         & ( &
                         &   (1.0 - loc_bio_part_TMP(is2l(is_POC_frac2),kk+1))*loc_bio_remin_POC_frac1 + &
                         &   loc_bio_part_TMP(is2l(is_POC_frac2),kk+1)*loc_bio_remin_POC_frac2 &
-                        & )
+                        & )                   
                    ! calculate change in partitioning between different fractions
                    l = is2l(is_POC_frac2)
                    if (loc_bio_part_TMP(l,kk+1) > const_real_nullsmall) then
@@ -3764,6 +3797,7 @@ CONTAINS
                 end SELECT
              end do
           end if
+          
           ! record particulate fluxes at base of each layer (units of: mol per time-step)
           ! NOTE: implicitly includes sedimentation flux (kk=dum_k1)
           ! NOTE: to be correct, the flux for par_sed_type_frac needs to be flux-weighted when summed ...
@@ -4009,7 +4043,7 @@ CONTAINS
     ! -------------------------------------------------------- !
   end SUBROUTINE sub_box_react_POMFeOOH_H2S
   ! ****************************************************************************************************************************** !
-
+  
 
   ! ****************************************************************************************************************************** !
   ! SCAVENGING
@@ -4103,96 +4137,6 @@ CONTAINS
     ! END
     ! -------------------------------------------------------- !
   end function fun_box_scav_Fe
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! Calculate Fe scavenging
-  ! *** OLD TRACER NOTATION ***
-  ! NOTE: not upgraded for either is_FeOOH nor 56Fe
-  SUBROUTINE sub_calc_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_bio_part,dum_bio_remin)
-    ! dummy arguments
-    REAL,INTENT(in)::dum_dtyr
-    REAL,INTENT(in)::dum_dt_scav
-    REAL,INTENT(in)::dum_ocn_Fe
-    real,dimension(n_sed),INTENT(inout)::dum_bio_part
-    real,dimension(n_ocn),INTENT(inout)::dum_bio_remin
-    ! local variables
-    real::loc_scav_Fe_k_POC,loc_scav_Fe_k_CaCO3,loc_scav_Fe_k_opal,loc_scav_Fe_k_det
-    real::loc_scav_Fe_k_tot
-    real::loc_scav_dFe_tot
-    real::loc_part_den_POC,loc_part_den_CaCO3,loc_part_den_opal,loc_part_den_det
-    real::loc_part_den_tot
-
-    ! *** Calculate Fe scavenging ***
-    ! NOTE: residence time in each ocean layer must be estimated for the Parekh et al. [2005] model,
-    !       with dum_bio_part passed in units of mol kg-1 for a specific cell
-    !       BUT the mass this represents is actually spread across multiple cells during each time step
-    !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
-    !       => normalize by the fraction of time spent in that cell during the time-step
-    !          = residence time / time-step
-    !            (could also be: cell thickness / (time-step x local velocity))
-    !       -> note that ultimately, dum_dtyr/dum_dtyr cancel out leaving the residence time dum_dtyr
-    !          (this could then be simplified, but it is easier(?) to see how things pan out with the effective
-    !           particle concentration adjusted up-front by dum_dt_scav/dum_dtyr)
-    ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
-    if (sed_select(is_POM_Fe)) then
-       loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is_POC)/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_POC = 0.0
-    end if
-    if (sed_select(is_CaCO3_Fe)) then
-       loc_part_den_CaCO3 = (conv_g_mg*conv_cal_mol_g*dum_bio_part(is_CaCO3)/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_CaCO3 = 0.0
-    end if
-    if (sed_select(is_opal_Fe)) then
-       loc_part_den_opal  = (conv_g_mg*conv_opal_mol_g*dum_bio_part(is_opal)/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_opal  = 0.0
-    end if
-    if (sed_select(is_det_Fe)) then
-       loc_part_den_det   = (conv_g_mg*conv_det_mol_g*dum_bio_part(is_det)/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_det   = 0.0
-    end if
-    loc_part_den_tot = loc_part_den_POC + loc_part_den_CaCO3 + loc_part_den_opal + loc_part_den_det
-    if (loc_part_den_tot > const_real_nullsmall) then
-       if (ctrl_bio_Fe_fixedKscav) then
-          ! calculate scavenging following Dutkiewicz et al. [2005]
-          ! net scavenging rate
-          loc_scav_Fe_k_tot = par_scav_Fe_ks
-          ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC = (loc_part_den_POC/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_CaCO3 = (loc_part_den_CaCO3/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_opal = (loc_part_den_opal/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_det = (loc_part_den_det/loc_part_den_tot)*loc_scav_Fe_k_tot
-          ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       else
-          ! calculate scavenging following Parekh et al. [2005]
-          ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC   = par_scav_Fe_sf_POC*par_scav_Fe_k0*loc_part_den_POC**par_scav_Fe_exp
-          loc_scav_Fe_k_CaCO3 = par_scav_Fe_sf_CaCO3*par_scav_Fe_k0*loc_part_den_CaCO3**par_scav_Fe_exp
-          loc_scav_Fe_k_opal  = par_scav_Fe_sf_opal*par_scav_Fe_k0*loc_part_den_opal**par_scav_Fe_exp
-          loc_scav_Fe_k_det   = par_scav_Fe_sf_det*par_scav_Fe_k0*loc_part_den_det**par_scav_Fe_exp
-          ! net scavenging rate
-          loc_scav_Fe_k_tot = loc_scav_Fe_k_POC + loc_scav_Fe_k_CaCO3 + loc_scav_Fe_k_opal + loc_scav_Fe_k_det
-          ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       end if
-       ! calculate Fe scavenged by particulates
-       ! and update local remineralization array to take into account the removal of Fe from solution
-       if (loc_scav_Fe_k_tot > const_real_nullsmall) then
-          dum_bio_part(is_POM_Fe)   = dum_bio_part(is_POM_Fe) + (loc_scav_Fe_k_POC/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          dum_bio_part(is_CaCO3_Fe) = dum_bio_part(is_CaCO3_Fe) + (loc_scav_Fe_k_CaCO3/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          dum_bio_part(is_opal_Fe)  = dum_bio_part(is_opal_Fe) + (loc_scav_Fe_k_opal/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          dum_bio_part(is_det_Fe)   = dum_bio_part(is_det_Fe) + (loc_scav_Fe_k_det/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          dum_bio_remin(io_Fe) = dum_bio_remin(io_Fe) - loc_scav_dFe_tot
-       end if
-    end if
-
-  end SUBROUTINE sub_calc_scav_Fe
   ! ****************************************************************************************************************************** !
 
 
@@ -5156,130 +5100,6 @@ CONTAINS
        END DO
     END DO
   END SUBROUTINE sub_biogem_copy_ocntotsTS
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! USED!
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! Calculate Fe scavenging
-  ! *** NEW TRACER NOTATION -- NOT USED YET ... ***
-  ! NOTE: pass in [TDFe] rather than [Fe] if using new Fe scheme
-  ! NOTE: allow remin array for [Fe] to be written to, but correct later (to [TDFe]) outside of subroutine
-  SUBROUTINE sub_box_scav_Fe(dum_dtyr,dum_dt_scav,dum_ocn_Fe,dum_bio_part,dum_bio_remin)
-    ! -------------------------------------------------------- !
-    ! DUMMY ARGUMENTS
-    ! -------------------------------------------------------- !
-    REAL,INTENT(in)::dum_dtyr
-    REAL,INTENT(in)::dum_dt_scav
-    REAL,INTENT(in)::dum_ocn_Fe
-    real,dimension(n_l_sed),INTENT(inout)::dum_bio_part
-    real,dimension(n_l_ocn),INTENT(inout)::dum_bio_remin
-    ! -------------------------------------------------------- !
-    ! DEFINE LOCAL VARIABLES
-    ! -------------------------------------------------------- !
-    real::loc_scav_Fe_k_POC,loc_scav_Fe_k_CaCO3,loc_scav_Fe_k_opal,loc_scav_Fe_k_det
-    real::loc_scav_Fe_k_tot
-    real::loc_scav_dFe_tot
-    real::loc_part_den_POC,loc_part_den_CaCO3,loc_part_den_opal,loc_part_den_det
-    real::loc_part_den_tot
-    ! -------------------------------------------------------- !
-    ! CALCULATE Fe SCAVENGING
-    ! -------------------------------------------------------- !
-    ! NOTE: residence time in each ocean layer must be estimated for the Parekh et al. [2005] model,
-    !       with dum_bio_part passed in units of mol kg-1 for a specific cell
-    !       BUT the mass this represents is actually spread across multiple cells during each time step
-    !       i.e., in any cell, this density of material in effect exists only for a fraction of that time-step
-    !       => normalize by the fraction of time spent in that cell during the time-step
-    !          = residence time / time-step
-    !            (could also be: cell thickness / (time-step x local velocity))
-    ! NOTE: Dutkiewicz et al. [2005] scavenging rate par_scav_Fe_Ks has been converted to units of (yr-1)
-    if (sed_select(is_POM_Fe)) then
-       loc_part_den_POC = (conv_g_mg*conv_POC_mol_g*dum_bio_part(is2l(is_POC))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_POC = 0.0
-    end if
-    if (sed_select(is_CaCO3_Fe)) then
-       loc_part_den_CaCO3 = (conv_g_mg*conv_cal_mol_g*dum_bio_part(is2l(is_CaCO3))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_CaCO3 = 0.0
-    end if
-    if (sed_select(is_opal_Fe)) then
-       loc_part_den_opal  = (conv_g_mg*conv_opal_mol_g*dum_bio_part(is2l(is_opal))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_opal  = 0.0
-    end if
-    if (sed_select(is_det_Fe)) then
-       loc_part_den_det   = (conv_g_mg*conv_det_mol_g*dum_bio_part(is2l(is_det))/conv_kg_l) * dum_dt_scav/dum_dtyr
-    else
-       loc_part_den_det   = 0.0
-    end if
-    !
-    loc_part_den_tot = loc_part_den_POC + loc_part_den_CaCO3 + loc_part_den_opal + loc_part_den_det
-    !
-    if (loc_part_den_tot > const_real_nullsmall) then
-       if (ctrl_bio_Fe_fixedKscav) then
-          ! -------------------------------------------------- !
-          ! calculate scavenging following Dutkiewicz et al. [2005]
-          ! -------------------------------------------------- !
-          ! -------------------------------------------------- ! net scavenging rate
-          loc_scav_Fe_k_tot = par_scav_Fe_ks
-          ! -------------------------------------------------- ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC = (loc_part_den_POC/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_CaCO3 = (loc_part_den_CaCO3/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_opal = (loc_part_den_opal/loc_part_den_tot)*loc_scav_Fe_k_tot
-          loc_scav_Fe_k_det = (loc_part_den_det/loc_part_den_tot)*loc_scav_Fe_k_tot
-          ! -------------------------------------------------- ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       else
-          ! -------------------------------------------------- !
-          ! calculate scavenging following Parekh et al. [2005]
-          ! -------------------------------------------------- !
-          ! -------------------------------------------------- ! particle-specific scavenging rates
-          loc_scav_Fe_k_POC   = par_scav_Fe_sf_POC*par_scav_Fe_k0*loc_part_den_POC**par_scav_Fe_exp
-          loc_scav_Fe_k_CaCO3 = par_scav_Fe_sf_CaCO3*par_scav_Fe_k0*loc_part_den_CaCO3**par_scav_Fe_exp
-          loc_scav_Fe_k_opal  = par_scav_Fe_sf_opal*par_scav_Fe_k0*loc_part_den_opal**par_scav_Fe_exp
-          loc_scav_Fe_k_det   = par_scav_Fe_sf_det*par_scav_Fe_k0*loc_part_den_det**par_scav_Fe_exp
-          ! -------------------------------------------------- ! net scavenging rate
-          loc_scav_Fe_k_tot = loc_scav_Fe_k_POC + loc_scav_Fe_k_CaCO3 + loc_scav_Fe_k_opal + loc_scav_Fe_k_det
-          ! -------------------------------------------------- ! calculate total Fe scavenged
-          loc_scav_dFe_tot = dum_dtyr*loc_scav_Fe_k_tot*dum_ocn_Fe
-       end if
-       ! ----------------------------------------------------- !
-       ! calculate Fe scavenged by particulates
-       ! ----------------------------------------------------- !
-       ! and update local remineralization array to take into account the removal of Fe from solution
-       if (loc_scav_Fe_k_tot > const_real_nullsmall) then
-          if (sed_select(is_POM_Fe)) then
-             dum_bio_part(is2l(is_POM_Fe)) = &
-                  & dum_bio_part(is2l(is_POM_Fe)) + (loc_scav_Fe_k_POC/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_CaCO3_Fe)) then
-             dum_bio_part(is2l(is_CaCO3_Fe)) = &
-                  & dum_bio_part(is2l(is_CaCO3_Fe)) + (loc_scav_Fe_k_CaCO3/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_opal_Fe)) then
-             dum_bio_part(is2l(is_opal_Fe))  = &
-                  & dum_bio_part(is2l(is_opal_Fe)) + (loc_scav_Fe_k_opal/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          if (sed_select(is_det_Fe)) then
-             dum_bio_part(is2l(is_det_Fe))   = &
-                  & dum_bio_part(is2l(is_det_Fe)) + (loc_scav_Fe_k_det/loc_scav_Fe_k_tot)*loc_scav_dFe_tot
-          end if
-          ! -------------------------------------------------- ! write removal of [Fe] to remin array
-          dum_bio_remin(io2l(io_Fe)) = dum_bio_remin(io2l(io_Fe)) - loc_scav_dFe_tot
-       end if
-       ! ----------------------------------------------------- ! 56Fe
-!!!
-       ! ----------------------------------------------------- !
-    end if
-    ! -------------------------------------------------------- !
-    ! END
-    ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_scav_Fe
   ! ****************************************************************************************************************************** !
 
 

@@ -875,6 +875,119 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! CALCULATE PO4 adsorption on FeOOH (YK 12.15.2020)
+  SUBROUTINE sub_calc_ads_PO4_FeOOH(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_FeOOH,loc_dPO4,loc_FeOOH_PO4
+    real::loc_f,loc_Kd
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_PO4_ads = 0.0
+    loc_PO4 = 0.0
+    loc_FeOOH_PO4 = 0.0
+    loc_FeOOH = 0.0
+    loc_dPO4 = 0.0 
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! ads coefficient
+    loc_Kd = par_bio_Kd_PO4_FeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE PO4 ads on FeOOH 
+    ! -------------------------------------------------------- !
+    DO k=n_k,dum_k1,-1
+       loc_PO4(k) = ocn(io_PO4,dum_i,dum_j,k)
+       loc_FeOOH(k) = bio_part(is_FeOOH,dum_i,dum_j,k)
+       loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_FeOOH(k)*1e6 *1e-6
+       loc_FeOOH_PO4(k) = bio_part(is_FeOOH_PO4,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_FeOOH_PO4(k)
+       if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
+    enddo 
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    bio_part(is_FeOOH_PO4,dum_i,dum_j,:) = bio_part(is_FeOOH_PO4,dum_i,dum_j,:) + loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_FeOOH_dPO4,dum_i,dum_j,:) = loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_ads_PO4_FeOOH
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE PO4 adsorption on POM assoc. FeOOH (YK 12.13.2020)
+  SUBROUTINE sub_calc_ads_PO4_POM_FeOOH(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_POM_FeOOH,loc_dPO4,loc_POM_FeOOH_PO4
+    real::loc_f,loc_Kd
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_PO4_ads = 0.0 
+    loc_PO4 = 0.0
+    loc_POM_FeOOH_PO4 = 0.0
+    loc_POM_FeOOH = 0.0
+    loc_dPO4 = 0.0
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! ads coefficient
+    loc_Kd = par_bio_Kd_PO4_FeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE PO4 ads on FeOOH 
+    ! -------------------------------------------------------- !
+    DO k=n_k,dum_k1,-1
+       loc_PO4(k) = ocn(io_PO4,dum_i,dum_j,k)
+       loc_POM_FeOOH(k) = bio_part(is_POM_FeOOH,dum_i,dum_j,k)
+       ! loc_PO4_ads(k) = ocn_ads_POM_FeOOH_dPO4(dum_i,dum_j,k)
+       loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_POM_FeOOH(k)*1e6 *1e-6
+       loc_POM_FeOOH_PO4(k) = bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_POM_FeOOH_PO4(k)
+       if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
+    enddo 
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,:) = bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,:) + loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_POMFeOOH_dPO4,dum_i,dum_j,:) = loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_ads_PO4_POM_FeOOH
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! CALCULATE AQUATIC IRONSULPHIDE FORMATION
   SUBROUTINE sub_calc_form_FeS(dum_i,dum_j,dum_k1)
     ! -------------------------------------------------------- !
@@ -1246,6 +1359,139 @@ CONTAINS
     ! END
     ! -------------------------------------------------------- !
   end SUBROUTINE sub_calc_precip_FeCO3
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE ABIOTIC Fe3(PO4)2 precipitation (added by YK | 08.11.2021)
+  SUBROUTINE sub_calc_precip_Fe3PO42(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k,l,io,is
+    integer::loc_i,loc_tot_i
+    real,dimension(n_ocn,n_k)::loc_bio_uptake
+    real,dimension(n_sed,n_k)::loc_bio_part
+    real,dimension(1:3)::loc_Fe2spec
+    real::loc_IAP
+    real::loc_delta_Fe3PO42,loc_PO4,loc_Fe2,loc_OH,loc_H2S,loc_Fe3PO42_precipitation
+    real::loc_HPO4,loc_H
+    real::loc_R,loc_r56Fe,loc_R_56Fe
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_uptake(io,:) = 0.0
+    end do
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       loc_bio_part(is,:) = 0.0
+    end DO
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! CALCULATE VIVIANITE PRECIPITATION
+    ! -------------------------------------------------------- !
+    ! 3Fe2+ + 2HPO42- + 8H2O -> Fe3(PO4)2*8H2O + 2H+ (pK ~= 11; Al-Borno and Tomson, 1994, GCA)
+    
+    DO k=n_k,dum_k1,-1
+       ! set local species concentrations
+       loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
+       loc_PO4 = ocn(io_PO4,dum_i,dum_j,k)
+       loc_HPO4 = carbalk(ica_HPO4,dum_i,dum_j,n_k)
+       loc_OH  = 10.0**(-(14.0-carb(ic_pHsws,dum_i,dum_j,n_k)))
+       loc_H = carb(ic_H,dum_i,dum_j,n_k)
+       loc_H2S = ocn(io_H2S,dum_i,dum_j,k)    
+       ! modify local Fe2 avialability
+       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because FeCO3 precipitates
+       !       from free Fe2+, so we need to find the available free Fe2+ pool
+       if (.NOT. ctrl_bio_FeS2precip_explicit) then
+          if ( loc_Fe2>const_rns .AND. loc_H2S>const_rns ) then
+             loc_Fe2spec = fun_box_calc_spec_Fe2(loc_Fe2,loc_H2S,par_bio_FeS_abioticohm_cte)
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
+          end if
+       end if
+       ! calculate precipitation
+       ! NOTE: remove an assumption of non-zero loc_PO4 
+       if (loc_Fe2 > const_rns .AND. loc_PO4 > const_rns) then
+          ! calculate Ion Activity Product (IAP) (not used when using Dijkstra et al. (2018) scheme: TODO parameterization choice facilitation?) 
+          ! NOTE: gamma parameters are activity coefficients
+          loc_IAP = (par_bio_remin_gammaPO4*loc_HPO4)**2.0*(par_bio_remin_gammaFe2*loc_Fe2)**3.0/(par_bio_remin_gammaFe2*loc_H)**2.0
+          ! calculate vivianite precipitation based on IAP. Vivianite precipitates at very high supersaturation (very unlikely to 
+          ! occur in the ocean). REFERENCE: 
+          if (loc_IAP > const_rns) then 
+             ! Derry (2015) scheme 
+             if (loc_IAP/par_bio_Fe3PO42precip_eq >= 1.0) then 
+                loc_Fe3PO42_precipitation = dum_dtyr*par_bio_Fe3PO42precip_sf &
+                   & *exp(loc_IAP/par_bio_Fe3PO42precip_eq-1.0)**par_bio_Fe3PO42precip_exp
+             else 
+                loc_Fe3PO42_precipitation = 0.0
+             endif 
+             ! Dijkstra et al. (2018) scheme 
+             loc_Fe3PO42_precipitation = dum_dtyr * 0.025e-3 * loc_Fe2 * loc_PO4
+                
+          else
+             loc_Fe3PO42_precipitation = 0.0 
+          end if
+          ! cap Fe3PO42 rpecip at maximum of available Fe2+, PO4
+          ! NOTE: always allow all PO4 to be 'used' in a single time-step 
+          loc_Fe3PO42_precipitation = MIN(loc_Fe3PO42_precipitation,loc_f*loc_Fe2,loc_PO4)
+          ! bulk tracer conversion
+          loc_bio_part(is_Fe3PO42,k) = loc_Fe3PO42_precipitation
+          ! calculate isotopic fractionation -- 56Fe
+          ! NOTE: we already know that loc_Fe2 is non-zero, and to have got this far, io_Fe2 must also be non-zero
+          ! NOTE: loc_Fe2 may differ from ocn(io_Fe2,dum_i,dum_j,k) and hence the isotopic ratio of the Fe reservoir
+          !       needs to be calculated w.r.t. the latter
+          if (sed_select(is_Fe3PO42_56Fe)) then
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_bio_part(is_Fe3PO42_56Fe,k) = &
+                  & par_d56Fe_Fe3PO42_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe3PO42_alpha*loc_R_56Fe)*loc_bio_part(is_Fe3PO42,k)
+          end if
+       end if
+       ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          loc_tot_i = conv_sed_ocn_i(0,is)
+          do loc_i=1,loc_tot_i
+             io = conv_sed_ocn_i(loc_i,is)
+             loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+          end do
+       end DO
+    end DO
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
+    end do
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
+    end DO
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_Fe3PO42,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_precip(idiag_precip_Fe3PO42_dFe,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    diag_precip(idiag_precip_Fe3PO42_dPO4,dum_i,dum_j,:) = loc_bio_uptake(io_PO4,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_precip_Fe3PO42
   ! ****************************************************************************************************************************** !
 
 

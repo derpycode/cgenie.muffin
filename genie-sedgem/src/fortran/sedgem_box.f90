@@ -74,10 +74,13 @@ CONTAINS
     real::loc_r_sed_por                                        ! thickness ratio due to porosity differences (stack / surface layer)
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
-    real::loc_fPOC,loc_sed_pres_fracC,loc_sed_pres_fracP       ! 
+    real::loc_fPOC,loc_fFe
+    real::loc_sed_pres_fracC,loc_sed_pres_fracP                ! 
+    real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
+    real::loc_C2P_rain,loc_C2P_remin
     REAL,DIMENSION(n_sed)::loc_new_sed                         ! new (sedimenting) top layer material
     REAL,DIMENSION(n_sed)::loc_dis_sed                         ! remineralized top layer material
     REAL,DIMENSION(n_sed)::loc_exe_sed                         ! top layer material to be exchanged with stack
@@ -114,7 +117,7 @@ CONTAINS
        end if
        phys_sed(ips_mix_k0,dum_i,dum_j) = par_sed_mix_k(par_n_sed_mix)
     else
-       phys_sed(ips_mix_k0,dum_i,dum_j) = par_sed_mix_k_sur_min
+       phys_sed(ips_mix_k0,dum_i,dum_j) = 0.0
     end if
 
     IF (ctrl_misc_debug3) print*,'(c) calculate new sedimenting material to be added to the sediment top layer'
@@ -140,13 +143,13 @@ CONTAINS
     IF (loc_new_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
             & 'sedgem_box','sub_update_sed','sediment input < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'WARNING', &
             & (/real(dum_i), real(dum_j), loc_new_sed_vol, &
             & loc_new_sed(is_POC),   &
             & loc_new_sed(is_CaCO3), &
             & loc_new_sed(is_opal),  &
             & loc_new_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
 
@@ -223,11 +226,29 @@ CONTAINS
        ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
+       ! allow scaling factor modification of value and cap at 100% (loc_sed_pres_fracC=1.0)
+       loc_sed_pres_fracC = min(1.0,par_sed_diagen_fracCpres_scale*loc_sed_pres_fracC)
+       ! pre-calculate C/P rain and remin, following Wallmann [2010]
+       ! NOTE: assume that A in the Wallmann [2010] equation is the rain or Redfield ratio
+       !       par_sed_diagen_fracC2Ppres_off then has a value of 11.0
+       !       (this is simply rearranging a little the published equation)
+       if (loc_new_sed(is_POP) > const_rns) then
+          loc_C2P_rain = loc_new_sed(is_POC)/loc_new_sed(is_POP)
+       else
+          loc_C2P_rain = const_real_nullhigh
+       end if
+       if (ctrl_sed_diagen_fracC2Ppres_wallmann2010) then
+          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - &
+               & loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
+       else
+          loc_C2P_remin = loc_C2P_rain
+       end if
+       if (loc_C2P_remin < const_real_nullsmall) loc_C2P_remin = loc_C2P_rain
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
-       ! NOTE: apply par_sed_diagen_fracC2Ppres_ox to determine whether P is preferentially remineralized or not
-       !       (a value of zero will ensure that 100% of P is returned)
+       ! NOTE: apply the Wallmann [2010] C:P partitioning to the remineralized flux
+       !       cap the P remin flux at the total rain flux
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           if ( &
@@ -236,15 +257,17 @@ CONTAINS
                & (sed_type(sed_dep(is)) == par_sed_type_POM) &
                & ) then
              if (sed_type(is) == par_sed_type_scavenged) then
-                loc_dis_sed(is) = 0.0
+                loc_dis_sed(is) = 0.0 
              else
+                loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
                 case (is_POP)
-                   loc_sed_dis_frac = 1.0 - par_sed_diagen_fracC2Ppres_ox*loc_sed_pres_fracC
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is_POC)/loc_C2P_remin
+                   if (loc_dis_sed(is) > loc_new_sed(is)) loc_dis_sed(is) = loc_new_sed(is)
+                   if (ctrl_sed_dunne2007_remin_POP)      loc_dis_sed(is) = loc_new_sed(is)                   
                 case default
-                   loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
                 end select
-                loc_dis_sed(is)  = loc_sed_dis_frac*loc_new_sed(is)
              end if
           end if
        end DO
@@ -324,24 +347,53 @@ CONTAINS
        ! set fractional flux of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = (1.0 - par_sed_diagen_fracCpres_ox)*loc_new_sed(is_POC)
     end select
-    ! error-catching of negative dissoluiton: return rain flux back to ocean
-    If (loc_dis_sed(is_POC) < -const_real_nullsmall) then
-       CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_POC) < 0.0 cm3', &
-            & 'CONTINUING: set loc_dis_sed = loc_new_sed', &
-            & (/real(dum_i), real(dum_j), loc_dis_sed(is_POC), loc_new_sed(is_POC) &
-            & /),.FALSE. &
-            & )
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          if ( &
-               & (sed_dep(is) == is_POC) .OR. &
-               & (sed_type(is) == par_sed_type_POM) .OR. &
-               & (sed_type(sed_dep(is)) == par_sed_type_POM) &
-               & ) then
-             loc_dis_sed(is) = loc_new_sed(is)
+    
+    ! add empirical Fe2+ return
+    if (sed_select(is_POM_FeOOH)) then
+       select case (par_sed_diagen_POM_FeOOH_opt)
+       case ('ding')
+          ! From Ding et al. [2019]:
+          ! F(Fe) = 1.0E-4.98 * ([O2])^-1.71
+          ! where F(Fe) is in mol m−2 Myr−1 and [O2] as mol L−1
+          ! Apply this equation, but ...
+          ! (1) cap maximum F(Fe) at the flux of FeOOH to the sediments
+          ! (2) cap maximum F(Fe) at the Corg flux that is remineralized
+          !     (assuming that we can loosly equate FeOOH reduced to POC oxidized)
+          ! convert units (kg-1 -> l-1) and cap at 6.25μmol/L (as per the limits considered in Ding et al. [2019])
+          loc_O2 = max(6.25E-6,dum_sfcsumocn(io_O2)/conv_l_kg)
+          ! calculate Fe flux as mol m−2 Myr−1
+          loc_fFe = 10.0**(-4.98) * loc_O2**(-1.71)
+          ! ensure greater than zero and convert units to mol cm-2 yr-1
+          loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
+          ! convert units to cm3 cm-2 per time-step
+          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*loc_fFe
+       case ('dale')
+          ! convert units (mol kg-1 -> uM) and cap at > zero
+          loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
+          ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
+          loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
+          ! calculate Fe flux (umol m-2 d-1)
+          loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
+          ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step)
+          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
+       case ('ALL')
+          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
+       case default
+          loc_dis_sed(is_POM_FeOOH) = 0.0
+       end select
+       ! cap at loc_new_sed(is_POM_FeOOH) if requested
+       if (ctrl_sed_diagen_POM_FeOOH_cap) then
+          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),loc_dis_sed(is_POM_FeOOH))
+       end if
+       ! isotopes
+       if (sed_select(is_POM_FeOOH_56Fe)) then          
+          if (loc_new_sed(is_POM_FeOOH) > const_rns) then
+             loc_dis_sed(is_POM_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_POM_FeOOH)*loc_new_sed(is_POM_FeOOH_56Fe)/loc_new_sed(is_POM_FeOOH)
+          else
+             loc_dis_sed(is_POM_FeOOH_56Fe) = 0.0
           end if
-       end DO
+       end if
     end if
 
     IF (ctrl_misc_debug4) print*,'*** diagenesis - CaCO3 dissolution ***'
@@ -401,25 +453,25 @@ CONTAINS
           end if
        end DO
     end select
-    ! error-catching of negative dissolution: return rain flux back to ocean
-    If (loc_dis_sed(is_CaCO3) < -const_real_nullsmall) then
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          if ( &
-               & (sed_dep(is) == is_CaCO3) .OR. &
-               & (sed_type(is) == par_sed_type_CaCO3) .OR. &
-               & (sed_type(sed_dep(is)) == par_sed_type_CaCO3) &
-               & ) then
-             loc_dis_sed(is) = loc_new_sed(is)
-          end if
-       end DO
-       CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_CaCO3) < 0.0 cm3', &
-            & 'CONTINUING', &
-            & (/real(dum_i), real(dum_j), loc_dis_sed(is_CaCO3) &
-            & /),.FALSE. &
-            & )
-    end if
+!!$    ! error-catching of negative dissolution: return rain flux back to ocean
+!!$    If (loc_dis_sed(is_CaCO3) < -const_real_nullsmall) then
+!!$       DO l=1,n_l_sed
+!!$          is = conv_iselected_is(l)
+!!$          if ( &
+!!$               & (sed_dep(is) == is_CaCO3) .OR. &
+!!$               & (sed_type(is) == par_sed_type_CaCO3) .OR. &
+!!$               & (sed_type(sed_dep(is)) == par_sed_type_CaCO3) &
+!!$               & ) then
+!!$             loc_dis_sed(is) = loc_new_sed(is)
+!!$          end if
+!!$       end DO
+!!$       CALL sub_report_error( &
+!!$            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_CaCO3) < 0.0 cm3', &
+!!$            & 'CONTINUING', &
+!!$            & (/real(dum_i), real(dum_j), loc_dis_sed(is_CaCO3) &
+!!$            & /),.FALSE. &
+!!$            & )
+!!$    end if
 
     IF (ctrl_misc_debug4) print*,'*** diagenesis - opal dissolution ***'
     ! *** diagenesis - opal dissolution ***
@@ -467,26 +519,26 @@ CONTAINS
           end if
        end DO
     end select
-    ! default and error-catching of negative dissoluiton: return rain flux back to ocean
-    If (loc_dis_sed(is_opal) < -const_real_nullsmall) then
-       DO l=1,n_l_sed
-          is = conv_iselected_is(l)
-          if ( &
-               & (sed_dep(is) == is_opal) .OR. &
-               & (sed_type(is) == par_sed_type_opal) .OR. &
-               & (sed_type(sed_dep(is)) == par_sed_type_opal) &
-               & ) then
-             loc_dis_sed(is) = loc_new_sed(is)
-          end if
-       end DO
-       CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_opal) < 0.0 cm3', &
-            & 'CONTINUING', &
-            & (/real(dum_i), real(dum_j), loc_dis_sed(is_opal) &
-            & /),.FALSE. &
-            & )
-    end if
-    
+!!$    ! default and error-catching of negative dissoluiton: return rain flux back to ocean
+!!$    If (loc_dis_sed(is_opal) < -const_real_nullsmall) then
+!!$       DO l=1,n_l_sed
+!!$          is = conv_iselected_is(l)
+!!$          if ( &
+!!$               & (sed_dep(is) == is_opal) .OR. &
+!!$               & (sed_type(is) == par_sed_type_opal) .OR. &
+!!$               & (sed_type(sed_dep(is)) == par_sed_type_opal) &
+!!$               & ) then
+!!$             loc_dis_sed(is) = loc_new_sed(is)
+!!$          end if
+!!$       end DO
+!!$       CALL sub_report_error( &
+!!$            & 'sedgem_box','sub_update_sed','loc_dis_sed(is_opal) < 0.0 cm3', &
+!!$            & 'CONTINUING', &
+!!$            & (/real(dum_i), real(dum_j), loc_dis_sed(is_opal) &
+!!$            & /),.FALSE. &
+!!$            & )
+!!$    end if
+
     IF (ctrl_misc_debug4) print*,'*** diagenesis - calculate total solids dissolved ***'
     ! *** diagenesis - calculate total solids dissolved ***
     ! calculate volume of removed material (as SOILD matter. i.e., zero porosity), in units of cm3 (cm-2)
@@ -498,18 +550,18 @@ CONTAINS
     IF (loc_dis_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
             & 'sedgem_box','sub_update_sed','sediment dissolution < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'CONTINUING', &
             & (/real(dum_i), real(dum_j), loc_dis_sed_vol, &
             & loc_dis_sed(is_POC),   &
             & loc_dis_sed(is_CaCO3), &
             & loc_dis_sed(is_opal),  &
             & loc_dis_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
     ! set OMEN output data array values
     sed_diag(idiag_OMEN_bur,dum_i,dum_j) = (loc_new_sed_vol - loc_dis_sed_vol)
-   
+
     IF (ctrl_misc_debug3) print*,'(d) update sediment stack'
     ! *** (d) update sediment stack
     !         add the new sediment to the top sediment layer, and deduct the calculated dissolved material
@@ -1345,10 +1397,13 @@ CONTAINS
     ! (sediment stack / surface layer)
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
-    real::loc_fPOC,loc_sed_pres_fracC,loc_sed_pres_fracP       ! 
+    real::loc_fPOC,loc_fFe
+    real::loc_sed_pres_fracC,loc_sed_pres_fracP                ! 
+    real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
+    real::loc_C2P_rain,loc_C2P_remin
     REAL,DIMENSION(n_sed)::loc_new_sed                         ! new (sedimenting) top layer material
     REAL,DIMENSION(n_sed)::loc_dis_sed                         ! remineralized top layer material
     REAL,DIMENSION(n_sed)::loc_exe_sed                         ! top layer material to be exchanged with stack
@@ -1390,13 +1445,13 @@ CONTAINS
     IF (loc_new_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
             & 'sedgem_box','sub_update_sed_mud','sediment input < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'WARNING', &
             & (/real(dum_i), real(dum_j), loc_new_sed_vol, &
             & loc_new_sed(is_POC),   &
             & loc_new_sed(is_CaCO3), &
             & loc_new_sed(is_opal),  &
             & loc_new_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
 
@@ -1467,6 +1522,23 @@ CONTAINS
        ! NOTE: loc_sed_pres_fracC is the fraction of Corg rain, that is preserved and buried
        loc_fPOC = (1000.0*conv_POC_cm3_mol)*(10000.0*loc_new_sed(is_POC))/(conv_yr_d*dum_dtyr)
        loc_sed_pres_fracC = (0.013 + 0.53*loc_fPOC**2/(7.0 + loc_fPOC)**2)
+       ! allow scaling factor modification of value and cap at 100% (loc_sed_pres_fracC=1.0)
+       loc_sed_pres_fracC = min(1.0,par_sed_diagen_fracCpres_scale*loc_sed_pres_fracC)
+       ! pre-calculate C/P rain and remin, following Wallmann [2010]
+       ! NOTE: assume that A in the Wallmann [2010] equation is the rain or Redfield ratio
+       !       par_sed_diagen_fracC2Ppres_off then has a value of 11.0
+       !       (this is simply rearranging a little the published equation)
+       if (loc_new_sed(is_POP) > const_rns) then
+          loc_C2P_rain = loc_new_sed(is_POC)/loc_new_sed(is_POP)
+       else
+          loc_C2P_rain = const_real_nullhigh
+       end if
+       if (ctrl_sed_diagen_fracC2Ppres_wallmann2010) then
+          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
+       else
+          loc_C2P_remin = loc_C2P_rain
+       end if
+       if (loc_C2P_remin < const_real_nullsmall) loc_C2P_remin = loc_C2P_rain
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
@@ -1480,15 +1552,17 @@ CONTAINS
                & (sed_type(sed_dep(is)) == par_sed_type_POM) &
                & ) then
              if (sed_type(is) == par_sed_type_scavenged) then
-                loc_dis_sed(is) = 0.0
+                loc_dis_sed(is) = 0.0 
              else
+                loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
                 select case (is)
                 case (is_POP)
-                   loc_sed_dis_frac = 1.0 - par_sed_diagen_fracC2Ppres_ox*loc_sed_pres_fracC
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is_POC)/loc_C2P_remin
+                   if (loc_dis_sed(is) > loc_new_sed(is)) loc_dis_sed(is) = loc_new_sed(is)
+                   if (ctrl_sed_dunne2007_remin_POP)      loc_dis_sed(is) = loc_new_sed(is)
                 case default
-                   loc_sed_dis_frac = 1.0 - loc_sed_pres_fracC
+                   loc_dis_sed(is) = loc_sed_dis_frac*loc_new_sed(is)
                 end select
-                loc_dis_sed(is)  = loc_sed_dis_frac*loc_new_sed(is)
              end if
           end if
        end DO
@@ -1562,6 +1636,55 @@ CONTAINS
           end if
        end DO
     end select
+
+    ! add empirical Fe2+ return
+    if (sed_select(is_POM_FeOOH)) then
+       select case (par_sed_diagen_POM_FeOOH_opt)
+       case ('ding')
+          ! From Ding et al. [2019]:
+          ! F(Fe) = 1.0E-4.98 * ([O2])^-1.71
+          ! where F(Fe) is in mol m−2 Myr−1 and [O2] as mol L−1
+          ! Apply this equation, but ...
+          ! (1) cap maximum F(Fe) at the flux of FeOOH to the sediments
+          ! (2) cap maximum F(Fe) at the Corg flux that is remineralized
+          !     (assuming that we can loosly equate FeOOH reduced to POC oxidized)
+          ! convert units (kg-1 -> l-1) and cap at 6.25μmol/L (as per the limits considered in Ding et al. [2019])
+          loc_O2 = max(6.25E-6,dum_sfcsumocn(io_O2)/conv_l_kg)
+          ! calculate Fe flux as mol m−2 Myr−1
+          loc_fFe = 10.0**(-4.98) * loc_O2**(-1.71)
+          ! ensure greater than zero and convert units to mol cm-2 yr-1
+          loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
+          ! convert units to cm3 cm-2 per time-step
+          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*loc_fFe
+       case ('dale')
+          ! convert units (mol kg-1 -> uM) and cap at > zero
+          loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
+          ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
+          loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
+          ! calculate Fe flux (umol m-2 d-1)
+          loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
+          ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step)
+          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
+       case ('ALL')
+          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
+       case default
+          loc_dis_sed(is_POM_FeOOH) = 0.0
+       end select
+       ! cap at loc_new_sed(is_POM_FeOOH) if requested
+       if (ctrl_sed_diagen_POM_FeOOH_cap) then
+          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),loc_dis_sed(is_POM_FeOOH))
+       end if
+       ! isotopes
+       if (sed_select(is_POM_FeOOH_56Fe)) then          
+          if (loc_new_sed(is_POM_FeOOH) > const_rns) then
+             loc_dis_sed(is_POM_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_POM_FeOOH)*loc_new_sed(is_POM_FeOOH_56Fe)/loc_new_sed(is_POM_FeOOH)
+          else
+             loc_dis_sed(is_POM_FeOOH_56Fe) = 0.0
+          end if
+       end if
+    end if
+    
     ! *** diagenesis - CaCO3 dissolution ***
     select case (par_sed_diagen_CaCO3opt)
     case ('ALL')
@@ -1618,14 +1741,14 @@ CONTAINS
     ! catch negative sediment dissolution
     IF (loc_dis_sed_vol < -const_real_nullsmall) THEN
        CALL sub_report_error( &
-            & 'sedgem_box','sub_update_sed','sediment dissolution < 0.0 cm3', &
-            & 'STOPPING', &
+            & 'sedgem_box','sub_update_sed_mud','sediment dissolution < 0.0 cm3', &
+            & 'CONTINUING', &
             & (/real(dum_i), real(dum_j), loc_dis_sed_vol, &
             & loc_dis_sed(is_POC),   &
             & loc_dis_sed(is_CaCO3), &
             & loc_dis_sed(is_opal),  &
             & loc_dis_sed(is_det)    &
-            & /),.TRUE. &
+            & /),.FALSE. &
             & )
     END IF
     ! set OMEN output data array values

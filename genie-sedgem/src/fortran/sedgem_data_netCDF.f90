@@ -39,9 +39,9 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_lonm,loc_id_latm,loc_id_lon_e,loc_id_lat_e
     integer::loc_id_zt,loc_id_zt_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
-    integer,dimension(1:4)::loc_it_3
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
+    integer,dimension(1:3)::loc_it_3
     character(127)::loc_title,loc_timunit
     character(7)::loc_string_year
     real::loc_c0,loc_c1
@@ -72,10 +72,10 @@ CONTAINS
     loc_title = 'SEDGEM restart @ year '//loc_string_year
     call sub_putglobal(loc_iou,dum_name,loc_title,string_ncrunid,loc_timunit)
     ! -------------------------------------------------------- ! define dimensions
-    call sub_defdim ('lon',loc_iou,n_i,loc_id_lonm)
-    call sub_defdim ('lat',loc_iou,n_j,loc_id_latm)
-    call sub_defdim ('lon_edges',loc_iou,n_i+1,loc_id_lon_e)
-    call sub_defdim ('lat_edges',loc_iou,n_j+1,loc_id_lat_e)
+    call sub_defdim('lon',loc_iou,n_i,loc_id_lonm)
+    call sub_defdim('lat',loc_iou,n_j,loc_id_latm)
+    call sub_defdim('lon_edges',loc_iou,n_i+1,loc_id_lon_e)
+    call sub_defdim('lat_edges',loc_iou,n_j+1,loc_id_lat_e)
     call sub_defdim('zt',loc_iou,n_sed_tot,loc_id_zt)
     call sub_defdim('zt_edges',loc_iou,n_sed_tot+1,loc_id_zt_e)
     ! -------------------------------------------------------- ! define 1d data (t)
@@ -222,8 +222,8 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_latm,loc_id_lat_e
     integer::loc_id_zt,loc_id_zt_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
     character(127)::loc_title,loc_timunit
     character(127)::loc_string,loc_string_longname
     character(7)::loc_string_year

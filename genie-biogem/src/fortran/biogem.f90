@@ -78,8 +78,6 @@ subroutine biogem(        &
   real::loc_M
   real,dimension(1:n_l_ocn)::loc_vocn                            !
   real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                !
-!!$  CHARACTER(len=31)::loc_string     !
-!!!integer::nthreads,thread_id
 
   loc_debug_ij = .FALSE.
 
@@ -701,6 +699,7 @@ subroutine biogem(        &
      !  !$omp parallel private(nthreads, tid)
      !  ! Obtain thread number
      !  tid = OMP_get_thread_num()
+     ! 
 
      do n=1,n_vocn
 
@@ -715,6 +714,10 @@ subroutine biogem(        &
         call sub_box_remin_part(loc_dtyr,vocn(n),vphys_ocn(n),vbio_part(n),vbio_remin(n))
 
      end do
+     
+     
+     ! ****************************************************************************************************************************
+     
 
      ! [temp code in retaining primary use of <bio_remin>] ************************************************************************
      bio_part(:,:,:,:) = fun_lib_conv_vsedTOsed(vbio_part(:))
@@ -1004,12 +1007,18 @@ subroutine biogem(        &
                  end if
               end if
               ! SEDIMENT TRACERS #1
-              ! NOTE: currently, fluxes are valid at the ocean surface only
-              ! NOTE: addition is made directly to particulate sedimentary tracer array (scaled by time-step and cell mass)
+              ! NOTE: the default is that fluxes are valid at the ocean surface only
+              !       but force_sed_uniform(is) == -2 provides for the particles being released in the benthic ocean layer instead
               DO l=1,n_l_sed
                  is = conv_iselected_is(l)
                  IF (force_flux_sed_select(is)) THEN
-                    locijk_fpart(is,i,j,n_k) = locijk_fpart(is,i,j,n_k) + force_flux_sed(is,i,j)
+                    if (force_sed_uniform(is) == -2) then
+                       locijk_fpart(is,i,j,loc_k1) = locijk_fpart(is,i,j,loc_k1) + force_flux_sed(is,i,j)
+                    elseif (force_sed_uniform(is) == -5) then
+                       locijk_fpart(is,i,j,min(n_k,loc_k1+1)) = locijk_fpart(is,i,j,min(n_k,loc_k1+1)) + force_flux_sed(is,i,j)
+                    else
+                       locijk_fpart(is,i,j,n_k) = locijk_fpart(is,i,j,n_k) + force_flux_sed(is,i,j)
+                    end if
                  END IF
               END DO
               ! SEDIMENT TRACERS #2
@@ -1032,7 +1041,7 @@ subroutine biogem(        &
                  !
                  ! ############################################################################################################### !
               end SELECT
-              !
+              ! GEOTHERMAL INPUT
               ! NOTE: create units equivalent of (degrees C yr-1) :o)
               !       i.e. W m-2 times seconds-in-a-year times area divided by heat capacity (J K-1 g-1) ...
               if (ctrl_force_Fgeothermal2D) then
@@ -1774,6 +1783,19 @@ subroutine biogem(        &
               if (sed_select(is_FeOOH)) then
                  call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
               end if
+              
+              !---- YK added 12.13.2020
+              ! *** PO4 adsorption ***
+              if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
+                 if (sed_select(is_FeOOH)) then
+                    call sub_calc_ads_PO4_FeOOH(i,j,loc_k1,loc_dtyr)
+                 end if
+                 if (sed_select(is_POM_FeOOH)) then
+                    call sub_calc_ads_PO4_POM_FeOOH(i,j,loc_k1,loc_dtyr)
+                 end if
+              endif 
+              ! ---- end 
+              
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
                  if (ctrl_bio_FeS2precip_explicit) then
@@ -1786,6 +1808,10 @@ subroutine biogem(        &
               ! *** Fe-CO3 precip ***
               if (sed_select(is_FeCO3)) then
                  call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)
+              end if
+              ! *** Fe-PO4 precip ***
+              if (sed_select(is_Fe3PO42)) then
+                 call sub_calc_precip_Fe3PO42(i,j,loc_k1,loc_dtyr)
               end if
               ! *** Greenalite precip ***
               if (sed_select(is_Fe3Si2O4)) then
@@ -1946,7 +1972,8 @@ subroutine biogem(        &
      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
      ! *** (i,j) GRID PT LOOP END *** !
      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
-
+     
+        
      ! *** CALCULATE TRACER ANOMOLY ***
      ! NOTE: also, for now, vectorize <ocn>
      IF (ctrl_debug_lvl1) print*, '*** CALCULATE TRACER ANOMOLY ***'
@@ -2007,7 +2034,7 @@ subroutine biogem(        &
           & dum_sfxsumrok1,      &
           & .false.,             &
           & .true.               &
-          & )
+          & )     
      CALL end_biogem()
      STOP
   end If

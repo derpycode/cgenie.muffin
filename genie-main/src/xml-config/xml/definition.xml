@@ -899,7 +899,7 @@
                         </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="107">
+                   <paramArray name="sed_select" dimension="1" extent="109">
                         <description>tracer selection</description>
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -1326,6 +1326,22 @@
                             <description></description>
                         </param>
                         <param name="sed_select(107)" index="107">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(108)" index="108">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(109)" index="109">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(110)" index="110">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(111)" index="111">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
@@ -4496,6 +4512,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">1.13</value>
                         <description>Activity coefficient for aqueous SiO2</description>
                     </param>
+                     <param name="par_bio_remin_gammaPO4">
+                        <value datatype="real">0.0529</value>
+                        <description>Activity coefficient for aqueous PO4 as HPO42-; Pierrot and Millero, 2017, Aquatic geochemistry</description>
+                    </param>
                     <param name="ctrl_bio_remin_POC_fixed">
 			<value datatype="boolean">.true.</value>
                         <description>fixed-profile POM remineralization?</description>
@@ -5209,6 +5229,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.9997</value>
                         <description>fractionation factor d56/54 Fe in FeCO3 precipitation</description>
                     </param>
+                    <param name="par_bio_Fe3PO42precip_sf">
+			<value datatype="real">8.19936E-11</value>
+                        <description>kinetic factor for Fe3PO42 precipitation in M yr-1 [Derry 2015]</description>
+                    </param>
+                    <param name="par_bio_Fe3PO42precip_exp">
+			<value datatype="real">1.3</value>
+                        <description>Rate law power for Fe3PO42 precipitation</description>
+                    </param>
+                    <param name="par_bio_Fe3PO42precip_eq">
+			<value datatype="real">1.0e-11</value>
+                        <description>Thermodynamic const for Fe3PO42 precipitation</description>
+                    </param>
+                    <param name="par_d56Fe_Fe3PO42_alpha">
+			<value datatype="real">1.0</value>
+                        <description>fractionation factor d56/54 Fe in Fe3PO42 precipitation</description>
+                    </param>
                     <param name="par_bio_Fe3Si2O4precip_sf">
 			<value datatype="real">6.133e-09</value>
                         <description>kinetic factor for Fe3Si2O4 precipitation in M yr-1 [Rasmussen et al. 2019]</description>
@@ -5304,6 +5340,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="ctrl_bio_FeS2precip_explicit">
 			<value datatype="boolean">.false.</value>
                         <description>Explicit FeS2 precip stiochiometry?</description>
+                    </param>
+                    <param name="par_bio_Kd_PO4_FeOOH">
+			<value datatype="real">0.0</value>
+                        <description>Ads constant for PO4 adsorption on (POM-)FeOOH</description>
                     </param>
 <!-- I/O DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
@@ -7086,6 +7126,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">none</value>
                         <description>organic matter diagenesis scheme</description>
                     </param>
+                    <param name="par_sed_diagen_POM_FeOOH_opt">
+			<value datatype="string">none</value>
+                        <description>POM_FeOOH diagenesis option</description>
+                    </param>
 <!-- DIAGENESIS SCHEME: CONTROL  -->
                     <param name="ctrl_sed_bioturb">
 			<value datatype="boolean">.true.</value>
@@ -7105,7 +7149,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="par_sed_mix_k_sur_min">
 			<value datatype="real">0.0001</value>
-                        <description>maximum surface bioturbation mixing rate (cm2 yr-1)</description>
+                        <description>minimum surface bioturbation mixing rate (cm2 yr-1)</description>
                     </param>
                     <param name="ctrl_sed_noerosion">
 			<value datatype="boolean">.false.</value>
@@ -7164,9 +7208,29 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			            <value datatype="real">1.0</value>
                         <description>Fraction of P relative to C buried -- euxinic</description>
                     </param>
-                    <param name="ctrl_sed_huelse2017_remin_POP">
+                    <param name="par_sed_diagen_fracCpres_scale">
+			<value datatype="real">1.0</value>
+                        <description>Fractional POC burial scaling (Dunne scheme)</description>
+                    </param>
+                    <param name="ctrl_sed_diagen_fracC2Ppres_wallmann2010">
 			<value datatype="boolean">.false.</value>
-                        <description>Force complete return of PO4 to ocean in HUELSE 2017 scheme</description>
+                        <description>Apply Wallmann [2010] C:P remin parameterization?</description>
+                    </param>
+                    <param name="par_sed_diagen_fracC2Ppres_off">
+			<value datatype="real">11.0</value>
+                        <description>C:P remin C/P offset</description>
+                    </param>
+                    <param name="par_sed_diagen_fracC2Ppres_c0_O2">
+			<value datatype="real">32.0E-6</value>
+                        <description>C:P remin [O2] threshold (mol kg-1)</description>
+                    </param>
+                    <param name="ctrl_sed_dunne2007_remin_POP">
+			<value datatype="boolean">.false.</value>
+                        <description>Force complete return of PO4 to ocean in Dunne 2007 scheme?</description>
+                    </param>
+                    <param name="ctrl_sed_diagen_POM_FeOOH_cap">
+			<value datatype="boolean">.false.</value>
+                        <description>Cap Fe2+ dissolution at POM_FeOOH rain flux?</description>
                     </param>
 <!-- DIAGENESIS SCHEME: HUELSE 2017  -->
                     <param name="par_sed_huelse2017_kscheme">
@@ -7189,7 +7253,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Simulate ocean Porg loss with buried sulf-OM?</description>
                     </param>
-					<param name="par_sed_huelse2017_sim_P_loss_pres_fracC">
+		    <param name="par_sed_huelse2017_sim_P_loss_pres_fracC">
 			<value datatype="boolean">.false.</value>
                         <description>Simulate ocean Porg loss related to Corg burial</description>
                     </param>
@@ -7212,6 +7276,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_huelse2017_k2_anoxic">
 			<value datatype="real">0.001</value>
                         <description>refractory Corg deg. rate order compared to labile</description>
+                    </param>
+                    <param name="ctrl_sed_huelse2017_remin_POP">
+			<value datatype="boolean">.false.</value>
+                        <description>Force complete return of PO4 to ocean in HUELSE 2017 scheme</description>
                     </param>
 <!-- DIAGENESIS SCHEME: ARCHER 1991  -->
                     <param name="par_sed_archer1991_dissc">
@@ -8098,6 +8166,22 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 				<value datatype="real">0.0</value>
                         <description>global quartz d30Si (o/oo) </description>
                     </param>
+                    <param name="par_weather_kerogen_fracP">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen P (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracALK">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen ALK (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracS">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen S (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracS_d34S">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen S d34S (o/oo)</description>
+                    </param>
                     <param name="opt_calibrate_T_0D">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>calibrate temperature fields to data</description>
@@ -8127,19 +8211,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">999.0</value>
                         <description>imposed maximum silicate weathering enhancement</description>
                     </param>
-                    <param name="par_weather_fCaCO3_enh_n">
+                    <param name="par_weather_CaCO3_enh_n">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaCO3 weathering scale factor</description>
                     </param>
-                    <param name="par_weather_fCaSiO3_enh_n">
+                    <param name="par_weather_CaSiO3_enh_n">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaSiO3 weathering scale factor</description>
                     </param>
-                    <param name="par_weather_fCaCO3_enh_nt">
+                    <param name="par_weather_CaCO3_enh_nt">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaCO3 weathering total inventory -- as years x enhancement factor</description>
                     </param>
-                    <param name="par_weather_fCaSiO3_enh_nt">
+                    <param name="par_weather_CaSiO3_enh_nt">
 			<value datatype="real">0.0</value>
                         <description>enhanced CaSiO3 weathering total inventory -- as years x enhancement factor</description>
                     </param>
@@ -8154,6 +8238,58 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_CaSiO3_7Li_epsilon_DT">
                         <value datatype="real">-0.15</value>
                           <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaCO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix bulk carbonate weathering</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaSiO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix bulk silicate  weathering</description>
+                    </param>
+                    <param name="opt_weather_fixed_Li">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Li fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Sr">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Sr fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Os">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Os fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenC">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen C fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenP">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen P fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenS">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen S fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_FeS2">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated FeS2 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaSO4">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated CaSO4 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_FeCO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated FeCO3 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Ca5PO43">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Ca5PO43 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_SiO2">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated SiO2 fluxes</description>
                     </param>
                       <!-- *** 2D WEATHERING PARAMETERS ********************************* -->
                     <param name="par_lith_data">

@@ -336,6 +336,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaOH
   real::par_bio_remin_gammaSiO2                                  ! Activity coefficient for aqueous SiO2
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaSiO2
+  real::par_bio_remin_gammaPO4                                   ! Activity coefficient for aqueous PO43-
+  NAMELIST /ini_biogem_nml/par_bio_remin_gammaPO4
   ! JDW size-dependent POC remineralisation
   real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m) (for implicit exponential scheme)
   real::par_bio_remin_POC_w0                                     ! sinking speed of smallest ecogem size class (m day-1) (for explicit scheme)
@@ -561,6 +563,12 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte
   real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
+  real::par_bio_Fe3PO42precip_sf                                 ! Scale factor for Fe3PO42 precipitation
+  real::par_bio_Fe3PO42precip_exp                                ! Rate law power for Fe3PO42 precipitation
+  real::par_bio_Fe3PO42precip_eq                                 ! Thermodynamic const for Fe3PO42 precipitation
+  NAMELIST /ini_biogem_nml/par_bio_Fe3PO42precip_sf,par_bio_Fe3PO42precip_exp,par_bio_Fe3PO42precip_eq
+  real::par_d56Fe_Fe3PO42_alpha                                  ! 56/54Fe fractionation between Fe2 and Fe3PO42 (not known currently: 2020)
+  namelist /ini_biogem_nml/par_d56Fe_Fe3PO42_alpha
   real::par_d56Fe_Fe3Si2O4_alpha                                 ! 56/54Fe fractionation between Fe2 and greenalite
   namelist /ini_biogem_nml/par_d56Fe_Fe3Si2O4_alpha
   real::par_bio_Fe3Si2O4precip_cSi                               ! Assumed SiO2 concentration for a diatom-free ocean
@@ -598,6 +606,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte
   LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
   NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
+  real::par_bio_Kd_PO4_FeOOH                                     ! first order constant for PO4 adsorption on FeOOH (and POM associated FeOOH)
+  NAMELIST /ini_biogem_nml/par_bio_Kd_PO4_FeOOH
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            !
   CHARACTER(len=255)::par_indir_name                             !
@@ -791,9 +801,9 @@ MODULE biogem_lib
   INTEGER,PARAMETER::n_opt_select                         = 05 ! (tracer) selections
   INTEGER,PARAMETER::n_diag_bio                           = 23 !
   INTEGER,PARAMETER::n_diag_geochem_old                   = 10 !
-  INTEGER,PARAMETER::n_diag_precip                        = 07 !
-  INTEGER,PARAMETER::n_diag_react                         = 09 !
-  INTEGER,PARAMETER::n_diag_iron                          = 09 !
+  INTEGER,PARAMETER::n_diag_precip                        = 09 ! 
+  INTEGER,PARAMETER::n_diag_react                         = 11 !! YK modified 12.28.2020 (overwriting _DEV_tracers where n_diag_react = 09; 03.19.2021)
+  INTEGER,PARAMETER::n_diag_iron                          = 09 ! As in _DEV_tracers (03.19.2021)
   INTEGER,PARAMETER::n_diag_misc_2D                       = 09 !
   INTEGER::n_diag_redox                                   =  0 !
 
@@ -914,6 +924,8 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_precip_FeCO3_dDIC             = 05    !
   INTEGER,PARAMETER::idiag_precip_FeOOH_dFe              = 06    !
   INTEGER,PARAMETER::idiag_precip_Fe3SiO4_dFe            = 07    !
+  INTEGER,PARAMETER::idiag_precip_Fe3PO42_dFe            = 08    !
+  INTEGER,PARAMETER::idiag_precip_Fe3PO42_dPO4           = 09    !
   ! diagnostics - geochemistry -- iron speciation
   INTEGER,PARAMETER::idiag_iron_Fe3                      = 01    !
   INTEGER,PARAMETER::idiag_iron_Fe3L                     = 02    !
@@ -930,10 +942,12 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_react_FeOOH_dH2S              = 03    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dSO4              = 04    !
   INTEGER,PARAMETER::idiag_react_FeOOH_dALK              = 05    !
-  INTEGER,PARAMETER::idiag_react_POMFeOOH_dFe2           = 06    !
-  INTEGER,PARAMETER::idiag_react_POMFeOOH_dH2S           = 07    !
-  INTEGER,PARAMETER::idiag_react_POMFeOOH_dSO4           = 08    !
-  INTEGER,PARAMETER::idiag_react_POMFeOOH_dALK           = 09    !
+  INTEGER,PARAMETER::idiag_react_FeOOH_dPO4              = 06    !! YK added 01.19.2021 
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dFe2           = 07    ! ^
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dH2S           = 08    ! |  YK modified number 01.19.2021
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dSO4           = 09    ! |
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dALK           = 10    ! v
+  INTEGER,PARAMETER::idiag_react_POMFeOOH_dPO4           = 11    !! YK added 12.28.2020
   ! diagnostics - misc - 2D
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2                 = 01    !
   INTEGER,PARAMETER::idiag_misc_2D_FpCO2_13C             = 02    !
@@ -1038,14 +1052,16 @@ MODULE biogem_lib
        & 'dCH4_AOM      ', &
        & 'H2StoPOMS_dH2S'/)
   ! diagnostics - geochemistry -- precip
-  CHARACTER(len=18),DIMENSION(n_diag_precip),PARAMETER::string_diag_precip = (/ &
-       & 'precip_FeS2_dFe   ', &
-       & 'precip_FeS2_dH2S  ', &
-       & 'precip_FeS2_dSO4  ', &
-       & 'precip_FeCO3_dFe  ', &
-       & 'precip_FeCO3_dDIC ', &
-       & 'precip_FeOOH_dFe  ', &
-       & 'precip_Fe3SiO4_dFe'/)
+  CHARACTER(len=20),DIMENSION(n_diag_precip),PARAMETER::string_diag_precip = (/ &
+       & 'precip_FeS2_dFe     ', &
+       & 'precip_FeS2_dH2S    ', &
+       & 'precip_FeS2_dSO4    ', &
+       & 'precip_FeCO3_dFe    ', &
+       & 'precip_FeCO3_dDIC   ', &
+       & 'precip_FeOOH_dFe    ', &
+       & 'precip_Fe3SiO4_dFe  ', &
+       & 'precip_Fe3PO42_dFe  ', &
+       & 'precip_Fe3PO42_dPO4 ' /)
   ! diagnostics - geochemistry -- Fe speciation
   CHARACTER(len=18),DIMENSION(n_diag_iron),PARAMETER::string_diag_iron = (/ &
        & 'iron_Fe3          ', &
@@ -1064,10 +1080,12 @@ MODULE biogem_lib
        & 'react_FeOOH_dH2S    ', &
        & 'react_FeOOH_dSO4    ', &
        & 'react_FeOOH_dALK    ', &
+       & 'react_FeOOH_dPO4    ', &! YK added 01.19.2021
        & 'react_POMFeOOH_dFe2 ', &
        & 'react_POMFeOOH_dH2S ', &
        & 'react_POMFeOOH_dSO4 ', &
-       & 'react_POMFeOOH_dALK ' /)
+       & 'react_POMFeOOH_dALK ', &
+       & 'react_POMFeOOH_dPO4 ' /)  ! YK added 12.28.2020
   ! diagnostics - misc - 2D
   CHARACTER(len=14),DIMENSION(n_diag_misc_2D),PARAMETER::string_diag_misc_2D = (/ &
        & 'FpCO2         ', &
@@ -1092,7 +1110,9 @@ MODULE biogem_lib
        & is_FeCO3, &
        & is_FeCO3, &
        & is_FeOOH, &
-       & is_Fe3Si2O4 /)
+       & is_Fe3Si2O4, &
+       & is_Fe3PO42, &
+       & is_Fe3PO42 /)
   ! diagnostics - geochemistry -- solid-solute reactions
   integer,PARAMETER,DIMENSION(n_diag_react)::is_diag_react = (/ &
        & is_POM_S, &
@@ -1100,10 +1120,12 @@ MODULE biogem_lib
        & is_FeOOH, &
        & is_FeOOH, &
        & is_FeOOH, &
+       & is_FeOOH, &! YK added 01.19.2021
        & is_POM_FeOOH, &
        & is_POM_FeOOH, &
        & is_POM_FeOOH, &
-       & is_POM_FeOOH /)
+       & is_POM_FeOOH, & 
+       & is_POM_FeOOH /) ! YK added 12.28.2020
 
   ! *** miscellaneous ***
   ! changes in T or S required to trigger re-calculation of carbonate dissociation constants and Schmidt number
@@ -1294,7 +1316,7 @@ MODULE biogem_lib
   ! redox
   real,DIMENSION(:),ALLOCATABLE::int_diag_redox_sig              ! redox diagnostics time-series
   ! ### ADD ADDITIONAL TIME-SERIES ARRAY DEFINITIONS HERE ######################################################################## !
-  !
+  
   ! ############################################################################################################################## !
 
   ! *** integrated (time-averaged) time-slice arrays ***
