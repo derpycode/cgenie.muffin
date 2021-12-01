@@ -382,7 +382,7 @@ CONTAINS
           ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
           loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
           ! calculate Fe flux (cm3 cm-2 per time step)
-          loc_fFe = loc_new_sed(is_POM_FeOOH)*tanh(loc_fPOC/loc_O2)
+          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)*tanh(loc_fPOC/loc_O2)
        case ('ALL')
           loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
        case default
@@ -1678,7 +1678,7 @@ CONTAINS
           ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
           loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
           ! calculate Fe flux (cm3 cm-2 per time step)
-          loc_fFe = loc_new_sed(is_POM_FeOOH)*tanh(loc_fPOC/loc_O2)
+          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)*tanh(loc_fPOC/loc_O2)
        case ('ALL')
           loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
        case default
