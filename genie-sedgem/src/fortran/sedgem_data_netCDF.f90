@@ -1354,7 +1354,7 @@ CONTAINS
           DO j=1,n_j
              SELECT CASE (sed_type(is))
              CASE (par_sed_type_bio,par_sed_type_abio, &
-               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det)
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det,par_sed_type_scavenged)
                 loc_ij(i,j) = sed_fsed(is,i,j)/dum_dtyr
                 loc_unitsname = 'mol cm-2 yr-1'
              case (n_itype_min:n_itype_max)
@@ -1371,7 +1371,7 @@ CONTAINS
        end do
        SELECT CASE (sed_type(is))
           CASE (par_sed_type_bio,par_sed_type_abio, &
-               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det,par_sed_type_scavenged, &
                & n_itype_min:n_itype_max, &
                & par_sed_type_frac)
             call sub_adddef_netcdf(ntrec_siou,3,'fsed_'//trim(string_sed(is)), &
