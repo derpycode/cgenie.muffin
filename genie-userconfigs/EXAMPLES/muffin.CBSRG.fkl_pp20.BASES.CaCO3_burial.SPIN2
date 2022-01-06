@@ -28,7 +28,7 @@ bg_opt_bio_CaCO3toPOCrainratio='FIXED'
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
 # NOTE: the current calibrated Eocene value is 0.200,
 #       whereas the modern uniform equivalent is closer to 0.100
-bg_par_bio_red_POC_CaCO3=0.200
+bg_par_bio_red_POC_CaCO3=0.150
 #
 # *** REMINERALIZATION **********************************************
 #
