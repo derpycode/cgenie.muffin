@@ -1323,8 +1323,16 @@ CONTAINS
     REAL,DIMENSION(n_i,n_j)::loc_mask_reef,loc_mask_muds       ! local reef, shallow sediment masks (copy)
     REAL,DIMENSION(n_i,n_j)::loc_mask_dsea                     ! local deep-sea sediment mask (derived variable)
     real::loc_tot,loc_frac,loc_standard,loc_sig                ! 
-    REAL,DIMENSION(n_i,n_j)::loc_CaCO3_d13C,loc_POC_d13C       ! 
-
+    REAL,DIMENSION(n_i,n_j)::loc_CaCO3_d13C,loc_POC_d13C       !
+    real::loc_deep_FCaCO3,loc_mud_FCaCO3,loc_reef_FCaCO3
+    real::loc_deep_FCaCO3_d13C,loc_mud_FCaCO3_d13C,loc_reef_FCaCO3_d13C
+    real::loc_deep_FPOC,loc_mud_FPOC,loc_reef_FPOC
+    real::loc_deep_FPOC_d13C,loc_mud_FPOC_d13C,loc_reef_FPOC_d13C
+    real::loc_deep_FPOP,loc_mud_FPOP,loc_reef_FPOP
+    real::loc_tot_FCaCO3,loc_tot_FPOC,loc_tot_FPOP
+    real::loc_tot_FCaCO3_d13C,loc_tot_FPOC_d13C
+    real::loc_gamma,loc_Foutgassing,loc_Fkerogen
+    
     ! *** INITIALIZE LOCAL VARIABLES ***
     ! averaging time-step
     loc_dt = 2.0*dum_dtyr
@@ -1374,7 +1382,23 @@ CONTAINS
           end if
        end do
     end do
-
+    ! summary component values
+    loc_deep_FCaCO3      = 0.0
+    loc_mud_FCaCO3       = 0.0
+    loc_reef_FCaCO3      = 0.0
+    loc_deep_FCaCO3_d13C = 0.0
+    loc_mud_FCaCO3_d13C  = 0.0
+    loc_reef_FCaCO3_d13C = 0.0
+    loc_deep_FPOC        = 0.0
+    loc_mud_FPOC         = 0.0
+    loc_reef_FPOC        = 0.0
+    loc_deep_FPOC_d13C   = 0.0
+    loc_mud_FPOC_d13C    = 0.0
+    loc_reef_FPOC_d13C   = 0.0
+    loc_deep_FPOP        = 0.0
+    loc_mud_FPOP         = 0.0
+    loc_reef_FPOP        = 0.0
+    
     ! *** SAVE GLOBAL SUMMARY DATA ***
     ! set filename
     IF (ctrl_timeseries_output) THEN
@@ -1434,6 +1458,8 @@ CONTAINS
          & ' Mean wt% POC              :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_deep_FPOC = loc_tot1_sedgrid - loc_tot2_sedgrid
     ! POC d13C (weighted by area and POC sedimentation rate)
     if (sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)) > const_real_nullsmall) then
        loc_sed_d13C_mean = &
@@ -1445,6 +1471,8 @@ CONTAINS
     write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
          & ' Mean weighted d13C POC    :',loc_sed_d13C_mean,'o/oo'
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_deep_FPOC_d13C = loc_sed_d13C_mean
     ! POP
     loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POP,:,:))
     loc_tot2_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fdis(is_POP,:,:))
@@ -1464,7 +1492,9 @@ CONTAINS
             & ' Total POP pres            :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1   ', &
             & '                 =  ',loc_pres_sedgrid,' %'
        call check_iostat(ios  ,__LINE__,__FILE__)
-       Write(unit=out,fmt=*) '---------------------------------'    
+       Write(unit=out,fmt=*) '---------------------------------'
+       ! SAVE ! 
+       loc_deep_FPOP = loc_tot1_sedgrid - loc_tot2_sedgrid 
     end if
     ! CaCO3
     loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:))
@@ -1493,6 +1523,8 @@ CONTAINS
          & ' Mean wt% CaCO3            :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_deep_FCaCO3 = loc_tot1_sedgrid - loc_tot2_sedgrid 
     ! CaCO3 d13C (weighted by area and CaCO3 sedimentation rate)
     if (sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:)) > const_real_nullsmall) then
        loc_sed_d13C_mean = &
@@ -1504,6 +1536,8 @@ CONTAINS
     write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
          & ' Mean weighted d13C CaCO3  :',loc_sed_d13C_mean,'o/oo'
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_deep_FCaCO3_d13C = loc_sed_d13C_mean
     ! CaCO3:POC
     loc_tot1_sedgrid = SUM(loc_mask_dsea(:,:)*loc_fsed(is_POC,:,:))
     loc_tot2_sedgrid = SUM(loc_mask_dsea(:,:)*loc_fsed(is_CaCO3,:,:))
@@ -1602,6 +1636,8 @@ CONTAINS
          & ' Mean wt% CaCO3            :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_reef_FCaCO3 = loc_tot1_sedgrid
     ! d13C (weighted by area and CaCO3 sedimentation rate)
     if (sum(loc_mask_reef(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:)) > const_real_nullsmall) then
        loc_sed_d13C_mean = &
@@ -1613,6 +1649,8 @@ CONTAINS
     write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
          & ' Mean weighted d13C CaCO3  :',loc_sed_d13C_mean,'o/oo'
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_reef_FCaCO3_d13C = loc_sed_d13C_mean
     ! Li
     if (sed_select(is_LiCO3) .AND. sed_select(is_detLi)) then
        loc_tot1_sedgrid = sum(loc_mask_reef(:,:)*loc_area(:,:)*loc_fsed(is_LiCO3,:,:))
@@ -1648,6 +1686,8 @@ CONTAINS
             & ' Mean wt% POC              :',loc_mean_sedgrid,' %'
        call check_iostat(ios,__LINE__,__FILE__)
        Write(unit=out,fmt=*) '---------------------------------'
+       ! SAVE !
+       loc_reef_FPOC = loc_tot1_sedgrid
        ! d13C (weighted by area and POC sedimentation rate)
        if (sum(loc_mask_reef(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)) > const_real_nullsmall) then
           loc_sed_d13C_mean = &
@@ -1659,6 +1699,8 @@ CONTAINS
        write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
             & ' Mean weighted d13C CaCO3  :',loc_sed_d13C_mean,'o/oo'
        Write(unit=out,fmt=*) '---------------------------------'
+       ! SAVE !
+       loc_reef_FPOC_d13C = loc_sed_d13C_mean
     end if
     ! Sr
     IF (sed_select(is_SrCO3_87Sr) .AND. sed_select(is_SrCO3_88Sr)) THEN
@@ -1757,8 +1799,10 @@ CONTAINS
          & ' Mean wt% POC              :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_mud_FPOC = loc_tot1_sedgrid - loc_tot2_sedgrid
     ! POC d13C (weighted by area and POC sedimentation rate)
-    if (sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)) > const_real_nullsmall) then
+    if (sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)) > const_real_nullsmall) then
        loc_sed_d13C_mean = &
             & sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:)*loc_POC_d13C(:,:))/ &
             & sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_POC,:,:))
@@ -1767,7 +1811,9 @@ CONTAINS
     end if
     write(unit=out,fmt='(A28,f6.2,A5)',iostat=ios) &
          & ' Mean weighted d13C POC    :',loc_sed_d13C_mean,'o/oo'
-    Write(unit=out,fmt=*) '---------------------------------'    
+    Write(unit=out,fmt=*) '---------------------------------' 
+    ! SAVE !
+    loc_mud_FPOC_d13C = loc_sed_d13C_mean
     ! POP
     loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_POP,:,:))
     loc_tot2_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fdis(is_POP,:,:))
@@ -1787,7 +1833,9 @@ CONTAINS
             & ' Total POP pres            :',loc_tot1_sedgrid - loc_tot2_sedgrid,' mol yr-1   ', &
             & '                   =  ',loc_pres_sedgrid,' %'
        call check_iostat(ios,__LINE__,__FILE__)
-       Write(unit=out,fmt=*) '---------------------------------'    
+       Write(unit=out,fmt=*) '---------------------------------'  
+       ! SAVE !
+       loc_mud_FPOP = loc_tot1_sedgrid - loc_tot2_sedgrid  
     end if
     ! CaCO3
     loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:))
@@ -1816,6 +1864,8 @@ CONTAINS
          & ' Mean wt% CaCO3            :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt=*) '---------------------------------'
+    ! SAVE !
+    loc_mud_FCaCO3 = loc_tot1_sedgrid - loc_tot2_sedgrid
     ! CaCO3:POC
     loc_tot1_sedgrid = SUM(loc_mask_muds(:,:)*(sed_fsed(is_POC,:,:) + sed_fsed_OLD(is_POC,:,:)))
     loc_tot2_sedgrid = SUM(loc_mask_muds(:,:)*(sed_fsed(is_CaCO3,:,:) + sed_fsed_OLD(is_CaCO3,:,:)))
@@ -1904,6 +1954,75 @@ CONTAINS
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt=*) '---------------------------------'
 
+    ! WEATHERING PARAMETER CALCULATIONS
+    loc_tot_FCaCO3 = loc_deep_FCaCO3+loc_mud_FCaCO3+loc_reef_FCaCO3
+    loc_tot_FPOC   = loc_deep_FPOC+loc_mud_FPOC+loc_reef_FPOC
+    loc_tot_FPOP   = loc_deep_FPOP+loc_mud_FPOP+loc_reef_FPOP
+    if (loc_tot_FCaCO3 > const_real_nullsmall) then
+       loc_tot_FCaCO3_d13C = &
+            & (loc_deep_FCaCO3_d13C*loc_deep_FCaCO3+loc_mud_FCaCO3_d13C*loc_mud_FCaCO3+loc_reef_FCaCO3_d13C*loc_reef_FCaCO3)/ &
+            & loc_tot_FCaCO3
+    else
+       loc_tot_FCaCO3_d13C = 0.0
+    end if
+    if (loc_tot_FPOC > const_real_nullsmall) then
+       loc_tot_FPOC_d13C = &
+            & (loc_deep_FPOC_d13C*loc_deep_FPOC+loc_mud_FPOC_d13C*loc_mud_FPOC+loc_reef_FPOC_d13C*loc_reef_FPOC)/ &
+            & loc_tot_FPOC
+    else
+       loc_tot_FPOC_d13C = 0.0
+    end if
+    if (abs((loc_tot_FPOC_d13C-loc_tot_FCaCO3_d13C)) > const_real_nullsmall) then
+       loc_gamma = (-6.0-loc_tot_FCaCO3_d13C)/(loc_tot_FPOC_d13C-loc_tot_FCaCO3_d13C)
+    else
+       loc_gamma = 0.0
+    end if
+    loc_Foutgassing = (2.0/5.0)*loc_tot_FCaCO3/(1.0-loc_gamma)
+    loc_Fkerogen    = loc_tot_FPOC - loc_gamma*(2.0/5.0)*loc_tot_FCaCO3/(1.0-loc_gamma)
+    Write(unit=out,fmt=*) ' '
+    Write(unit=out,fmt=*) '--- DERIVED PARAMETER VALUES ----'
+    Write(unit=out,fmt=*) ' '
+    Write(unit=out,fmt=*) '---------------------------------'
+    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+         & ' Global CaCO3 burial       :',loc_tot_FCaCO3,' mol yr-1'
+    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+         & ' 2/5 silicate weathering   =',(2.0/5.0)*loc_tot_FCaCO3,' mol yr-1'
+    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+         & ' 3/5 carbonate weathering  =',(3.0/5.0)*loc_tot_FCaCO3,' mol yr-1'
+    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+         & ' Global POC burial         :',loc_tot_FPOC,' mol yr-1'
+    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+         & ' Global POP burial         :',loc_tot_FPOP,' mol yr-1'
+    Write(unit=out,fmt=*) '---------------------------------'
+    write(unit=out,fmt='(A28,e14.6,A5)',iostat=ios) &
+         & ' Global CaCO3 d13C         :',loc_tot_FCaCO3_d13C,' o/oo'
+    write(unit=out,fmt='(A28,e14.6,A5)',iostat=ios) &
+         & ' Global POC d13C           :',loc_tot_FPOC_d13C,' o/oo'
+    write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
+         & ' gamma (@ -6 outgassing)   =',loc_gamma
+    Write(unit=out,fmt=*) '---------------------------------'
+    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+         & ' CO2 outgassing            =',loc_Foutgassing,' mol yr-1'
+    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
+         & ' kerogen weathering        =',loc_Fkerogen,' mol yr-1'
+    Write(unit=out,fmt=*) '---------------------------------'
+    if (loc_tot_FCaCO3 > const_real_nullsmall) then
+       write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
+            & ' kerogen C/silicate ratio  =',loc_Fkerogen/((2.0/5.0)*loc_tot_FCaCO3)
+    end if
+    if (loc_tot_FCaCO3 > const_real_nullsmall) then
+       write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
+            & ' kerogen P/silicate ratio  =',loc_tot_FPOP/((2.0/5.0)*loc_tot_FCaCO3)
+    end if
+    if (loc_Fkerogen > const_real_nullsmall) then
+       write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
+            & ' kerogen P/C ratio         =',loc_tot_FPOP/loc_Fkerogen
+    end if
+    if (loc_Fkerogen > const_real_nullsmall) then
+       write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
+            & ' kerogen ALK/C ratio       =',-16.0*loc_tot_FPOP/loc_Fkerogen
+    end if
+    
     ! FOOTER
     Write(unit=out,fmt=*) ' '
     Write(unit=out,fmt=*) '================================='
