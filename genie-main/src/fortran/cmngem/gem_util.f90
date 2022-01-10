@@ -1203,6 +1203,80 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! LINEARILY INTERPOLATE IN 2 DIMENSIONAL SPACE
+  FUNCTION fun_interp_2Dvec(a,b,vec_a,vec_b,array)
+    IMPLICIT NONE
+    ! result variable
+    REAL::fun_interp_2Dvec
+    ! dummy arguments
+    REAL,INTENT(in)::a
+    REAL,INTENT(in)::b
+    REAL,INTENT(in),DIMENSION(:)::vec_a
+    REAL,INTENT(in),DIMENSION(:)::vec_b
+    REAL,INTENT(in),DIMENSION(size(vec_a),size(vec_b))::array
+    ! local variables
+    integer::n,n_max
+    REAL::a1,a2
+    REAL::b1,b2
+    INTEGER::i_a1,i_a2
+    INTEGER::i_b1,i_b2
+
+    ! *** calculate grid points enclosing the passes point coordinates ***
+    ! find dimension pair; indices and values -- a
+    n_max = size(vec_a)
+    if (a < vec_a(1)) then
+       i_a1 = 1
+       i_a2 = 2
+    elseif (a >= vec_a(n_max)) then
+       i_a1 = n_max-1
+       i_a2 = n_max
+    else
+       DO n = 2,n_max
+          if (vec_a(n) >= a) then
+             i_a1 = n-1
+             i_a2 = n
+             exit
+          end if
+       end do
+    end if
+    a1 = vec_a(i_a1)
+    a2 = vec_a(i_a2)
+    ! find dimension pair; indices and values -- b
+    n_max = size(vec_b)
+    if (b < vec_b(1)) then
+       i_b1 = 1
+       i_b2 = 2
+    elseif (b >= vec_b(n_max)) then
+       i_b1 = n_max-1
+       i_b2 = n_max
+    else
+       DO n = 2,n_max
+          if (vec_b(n) >= b) then
+             i_b1 = n-1
+             i_b2 = n
+             exit
+          end if
+       end do
+    end if
+    b1 = vec_b(i_b1)
+    b2 = vec_b(i_b2)
+
+    ! *** return function value ***
+    ! interpolate
+    ! NOTE: see 'Applied Numerical Methods with Software' by Nakamura for details of 1-D and 2-D interpolation
+    fun_interp_2Dvec = (1.0 / ((a2-a1)*(b2-b1)) ) * &
+         & (                                        &
+         &   (a-a1)*(b-b1) * array(i_a2,i_b2) +     &
+         &   (a-a1)*(b2-b) * array(i_a2,i_b1) +     &
+         &   (a2-a)*(b-b1) * array(i_a1,i_b2) +     &
+         &   (a2-a)*(b2-b) * array(i_a1,i_b1)       &
+         & )
+
+  END FUNCTION fun_interp_2Dvec
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! LINEARILY INTERPOLATE IN 4 DIMENSIONAL SPACE
   FUNCTION fun_interp_4Dvec(a,b,c,d,vec_a,vec_b,vec_c,vec_d,array)
     IMPLICIT NONE
