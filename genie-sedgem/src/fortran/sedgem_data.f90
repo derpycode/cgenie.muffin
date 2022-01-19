@@ -2022,6 +2022,7 @@ CONTAINS
        write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
             & ' kerogen ALK/C ratio       =',-16.0*loc_tot_FPOP/loc_Fkerogen
     end if
+    Write(unit=out,fmt=*) '---------------------------------'
     
     ! FOOTER
     Write(unit=out,fmt=*) ' '
