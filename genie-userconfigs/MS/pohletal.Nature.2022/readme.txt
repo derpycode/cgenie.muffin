@@ -18,6 +18,7 @@ Alexandre POHL1,2*, Andy RIDGWELL1*, Richard G. STOCKEY3, Christophe THOMAZO2, A
 18/06/2020 -- added files
 15/12/2021 -- updated readme.txt and added files for series E to H
 19/01/2022 -- edited to reflect new genie-userconfigs directory
+20/01/2022 -- added modern oxygenation experiments
 ################################################################
 
 Provided are the configuration files necessary to run: 
@@ -29,6 +30,10 @@ Provided are the configuration files necessary to run:
     F] 460 Ma and 440 Ma like series #1 but using Torsvik's BugPlates continental reconstructions
     G] Drake world simulations shown in Extended Data Fig. 10
     H] Ridge world simulations shown in Extended Data Fig. 10
+    I] present-day oxygenation experiment shown in Extended Data Figure 1:
+       1st experiment -- present-day ocean circulation and marine productivity of Cao et al. [2009], as shown in panel (b)
+       2nd experiment -- present-day ocean circulation of Cao et al. [2009] but with ecological model used in the Phanerozoic experiment, as shown in panel (c)
+    J] present-day ocean circulation (Cao et al. [2009]) ventillation age tracer experiment (not shown in paper)
 
 All experiments are run from: $HOME/cgenie.muffin/genie-main
 (unless a different installation directory has been used)
@@ -205,6 +210,15 @@ Remark 2: Drake- and ridge- world configurations are just the ones provided in t
 ./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.10.0X.SPIN 60000
 ./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.12.0X.SPIN 60000
 ./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.16.0X.SPIN 60000
+
+################ I] modern oxygenation #########
+
+./runmuffin.sh muffin.CB.p_worjh2.BASES MS/pohletal.Nature.2022 muffin.CB.p_worjh2.BASES.caoetal.SPIN 10000
+./runmuffin.sh muffin.CBE.p_worjh2.BASES MS/pohletal.Nature.2022 muffin.CBE.p_worjh2.BASES.wardetal.SPIN 10000
+
+################ J] modern ventillation age ####
+
+./runmuffin.sh muffin.C.p_worjh2.r MS/pohletal.Nature.2022 muffin.C.p_worjh2.r.age.SPIN 10000
 
 ################################################################
 ################################################################
