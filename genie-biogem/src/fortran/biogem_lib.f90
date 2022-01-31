@@ -397,6 +397,8 @@ MODULE biogem_lib
   real::par_bio_remin_O2toI,par_bio_remin_O2toIlifetime
   real::par_bio_remin_SO4toIO3,par_bio_remin_SO4toIO3lifetime
   NAMELIST /ini_biogem_nml/par_bio_remin_O2toI,par_bio_remin_O2toIlifetime,par_bio_remin_SO4toIO3,par_bio_remin_SO4toIO3lifetime
+  LOGICAL::ctrl_bio_remin_iodine_POConly                         ! (exclude DOC from iodine redox calculation)
+  NAMELIST /ini_biogem_nml/ctrl_bio_remin_iodine_POConly
   ! ECOGEM coupling
   LOGICAL::ctrl_bio_remin_ecogemMLD                              ! dilute tracers across the mixed layer
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_ecogemMLD
