@@ -579,63 +579,50 @@ subroutine biogem(        &
                  if (ctrl_force_sed_closed_P) then
                     ! special case of partial closure -- calculate theoretical PO4 remin flux required for closure
                     ! set weathering equal to imbalance in P return
+                    ! NOTE: in this and subsequence 'closures', the solid flux passed to SEDGEM is not actually modified
+                    !       (and so it is possible to both close the ocean budget AND preserve everything in the sediments)
                     DO l=1,n_l_ocn
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
-                    ! set sed tracer -> POP
-                    ls = is2l(is_POP)
-                    loc_tot_i = conv_ls_lo_i(0,ls)
-                    do loc_i=1,loc_tot_i
-                       lo = conv_ls_lo_i(loc_i,ls)
-                       if (lo == io2l(io_PO4)) then
-                          loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
-                          dum_sfxsumrok1(l2io(lo),i,j) = dum_sfxsumrok1(l2io(lo),i,j) + &
-                               &  (loc_remin - locij_fsedocn(l2io(lo),i,j))
-                          if (ctrl_bio_red_ALKwithPOC) then
-                             ! do nothing -- ALK with POC
-                          else
-                             dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
-                                  & conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
-                          end if
-                       end if
-                    end do
+                    ! POP --> PO4
+                    loc_remin = loc_conv_ls_lo(io2l(io_PO4),is2l(is_POP))*bio_settle(is_POP,i,j,loc_k1)
+                    dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
+                         &  (loc_remin - locij_fsedocn(io_PO4,i,j))
+                    if (ctrl_bio_red_ALKwithPOC) then
+                       ! do nothing -- ALK with POC
+                    else
+                       dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
+                            & conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
+                    end if
+                    ! POP --> POM_FeOOH_PO4
+                    ! NOTE: add entire reminerized POM_FeOOH_PO4 flux
+                    loc_remin = loc_conv_ls_lo(io2l(io_PO4),is2l(is_POM_FeOOH_PO4))*bio_settle(is_POM_FeOOH_PO4,i,j,loc_k1)
+                    dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
+                         & loc_remin
                  end if
                  if (ctrl_force_sed_closed_C) then
                     ! special case of partial closure -- calculate theoretical DIC remin flux required for closure
                     ! set weathering equal to imbalance in DIC return
+                    ! NOTE: this is not going to work if you have CaCO3 dissolution contributing to a DIC flux from SEDGEM
                     DO l=1,n_l_ocn
                        loc_vocn(l) = ocn(l2io(l),i,j,loc_k1)
                     end DO
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
-                    ! set sed tracer -> POC
-                    ls = is2l(is_POC)
-                    loc_tot_i = conv_ls_lo_i(0,ls)
-                    do loc_i=1,loc_tot_i
-                       lo = conv_ls_lo_i(loc_i,ls)
-                       if (lo == io2l(io_DIC)) then
-                          loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
-                          dum_sfxsumrok1(l2io(lo),i,j) = dum_sfxsumrok1(l2io(lo),i,j) + &
-                               &  (loc_remin - locij_fsedocn(l2io(lo),i,j))
-                          if (ctrl_bio_red_ALKwithPOC) then
-                             dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
-                                  & conv_sed_ocn(io_ALK,is_POC)*(loc_remin - locij_fsedocn(l2io(lo),i,j))
-                          else
-                             ! do nothing -- ALK with POP
-                          end if
-                       end if
-                    end do
-                    ! set sed tracer -> 13POC
-                    ls = is2l(is_POC_13C)
-                    loc_tot_i = conv_ls_lo_i(0,ls)
-                    do loc_i=1,loc_tot_i
-                       lo = conv_ls_lo_i(loc_i,ls)
-                       if (lo == io2l(io_DIC_13C)) then
-                          loc_remin = loc_conv_ls_lo(lo,ls)*bio_settle(l2is(ls),i,j,loc_k1)
-                          dum_sfxsumrok1(l2io(lo),i,j) = dum_sfxsumrok1(l2io(lo),i,j) + &
-                               &  (loc_remin - locij_fsedocn(l2io(lo),i,j))
-                       end if
-                    end do
+                    ! POC --> DIC
+                    loc_remin = loc_conv_ls_lo(io2l(io_DIC),is2l(is_POC))*bio_settle(is_POC,i,j,loc_k1)
+                    dum_sfxsumrok1(io_DIC,i,j) = dum_sfxsumrok1(io_DIC,i,j) + &
+                         & (loc_remin - locij_fsedocn(io_DIC,i,j))
+                    if (ctrl_bio_red_ALKwithPOC) then
+                       dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
+                            & conv_sed_ocn(io_ALK,is_POC)*(loc_remin - locij_fsedocn(io_DIC,i,j))
+                    else
+                       ! do nothing -- ALK with POP
+                    end if
+                    ! 13POC --> DIC 13C
+                    loc_remin = loc_conv_ls_lo(io2l(io_DIC_13C),is2l(is_POC_13C))*bio_settle(is_POC_13C,i,j,loc_k1)
+                    dum_sfxsumrok1(io_DIC_13C,i,j) = dum_sfxsumrok1(io_DIC_13C,i,j) + &
+                         &  (loc_remin - locij_fsedocn(io_DIC_13C,i,j))
                  end if
               end if ! [(ctrl_force_sed_closedsystem)]
               ! convert fluxes to remin (mol kg-1) (per time-step)
