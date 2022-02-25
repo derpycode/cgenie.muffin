@@ -4042,9 +4042,17 @@
                     </param>
                     <param name="ctrl_force_sed_closed_P">
 			<value datatype="boolean">.false.</value>
-                        <description>Balance the P cycle (with weathering)?</description>
+                        <description>Balance the P cycle (with (i,j)-matching ocean return)?</description>
                     </param>
                     <param name="ctrl_force_sed_closed_C">
+			<value datatype="boolean">.false.</value>
+                        <description>Balance the C cycle (with (i,j)-matching ocean return)?</description>
+                    </param>
+                    <param name="ctrl_force_sed_closed_P_weather">
+			<value datatype="boolean">.false.</value>
+                        <description>Balance the P cycle (with weathering)?</description>
+                    </param>
+                    <param name="ctrl_force_sed_closed_C_weather">
 			<value datatype="boolean">.false.</value>
                         <description>Balance the C cycle (with weathering)?</description>
                     </param>

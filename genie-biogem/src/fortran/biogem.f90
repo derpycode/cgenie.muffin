@@ -600,6 +600,12 @@ subroutine biogem(        &
                     loc_remin = loc_conv_ls_lo(io2l(io_PO4),is2l(is_POM_FeOOH_PO4))*bio_settle(is_POM_FeOOH_PO4,i,j,loc_k1)
                     dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
                          & loc_remin
+                 elseif (ctrl_force_sed_closed_P_weather) then
+                    io = io_PO4
+                    if (loc_fweather_tot(io) > const_real_nullsmall) &
+                         & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j) 
+                    if (.NOT. ctrl_bio_red_ALKwithPOC) &  
+                         dum_sfxsumrok1(io_ALK,i,j) = conv_sed_ocn(io_ALK,is_POP)*dum_sfxsumrok1(io,i,j)            
                  end if
                  if (ctrl_force_sed_closed_C) then
                     ! special case of partial closure -- calculate theoretical DIC remin flux required for closure
@@ -623,6 +629,15 @@ subroutine biogem(        &
                     loc_remin = loc_conv_ls_lo(io2l(io_DIC_13C),is2l(is_POC_13C))*bio_settle(is_POC_13C,i,j,loc_k1)
                     dum_sfxsumrok1(io_DIC_13C,i,j) = dum_sfxsumrok1(io_DIC_13C,i,j) + &
                          &  (loc_remin - locij_fsedocn(io_DIC_13C,i,j))
+                 elseif (ctrl_force_sed_closed_C_weather) then
+                    io = io_DIC
+                    if (loc_fweather_tot(io) > const_real_nullsmall) &
+                         & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)                    
+                    if (ctrl_bio_red_ALKwithPOC) & 
+                         dum_sfxsumrok1(io_ALK,i,j) = conv_sed_ocn(io_ALK,is_POC)*dum_sfxsumrok1(io,i,j)                    
+                    io = io_DIC_13C
+                    if (loc_fweather_tot(io) > const_real_nullsmall) &
+                         & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j) 
                  end if
               end if ! [(ctrl_force_sed_closedsystem)]
               ! convert fluxes to remin (mol kg-1) (per time-step)

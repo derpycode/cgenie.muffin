@@ -65,9 +65,12 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closedsystem
   logical::ctrl_force_sed_closedsystem_SUR                              ! Set dissolution flux = rain flux (at surface)?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closedsystem_SUR
-  logical::ctrl_force_sed_closed_P                                      ! Balance the P cycle (with weathering)?
-  logical::ctrl_force_sed_closed_C                                      ! Balance the C cycle (with weathering)?
+  logical::ctrl_force_sed_closed_P                                      ! Balance the P cycle (with (i,j)-matching ocean return)?
+  logical::ctrl_force_sed_closed_C                                      ! Balance the C cycle (with (i,j)-matching ocean return)?
+  logical::ctrl_force_sed_closed_P_weather                              ! Balance the P cycle (with weathering)?
+  logical::ctrl_force_sed_closed_C_weather                              ! Balance the C cycle (with weathering)?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_closed_P,ctrl_force_sed_closed_C
+  NAMELIST /ini_biogem_nml/ctrl_force_sed_closed_P_weather,ctrl_force_sed_closed_C_weather
   logical::ctrl_force_sed_reflective_POM                                ! Set reflective boundary condition for POM?
   NAMELIST /ini_biogem_nml/ctrl_force_sed_reflective_POM
   logical::ctrl_force_GOLDSTEInTS                                       ! Allow temperature / salinity forcing of climate?
