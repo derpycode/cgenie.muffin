@@ -207,7 +207,12 @@ subroutine biogem(        &
      ! DO
      DO i=1,n_i
         DO j=1,n_j
+           ! set local grid point depth level ...
+           ! ... remember to accommodate the stupid virtual grid :(
            loc_k1 = goldstein_k1(i,j)
+           if (ctrl_force_Vgrid) then
+              loc_k1 = max(loc_k1,force_Vgrid(i,j))
+           end if           
            IF (n_k >= loc_k1) THEN
               loc_k_icefree = (1.0 - phys_ocnatm(ipoa_seaice,i,j))
               ! Aeolian solubilities
@@ -372,7 +377,7 @@ subroutine biogem(        &
      else
         phys_ocnatm(ipoa_solFe,:,:) = par_det_Fe_sol_2D(:,:)
      end if
-
+     
      ! ****************************************************************************************************************************
      ! ****************************************************************************************************************************
      ! ****************************************************************************************************************************
@@ -603,9 +608,9 @@ subroutine biogem(        &
                  elseif (ctrl_force_sed_closed_P_weather) then
                     io = io_PO4
                     if (loc_fweather_tot(io) > const_real_nullsmall) &
-                         & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j) 
+                         & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)
                     if (.NOT. ctrl_bio_red_ALKwithPOC) &  
-                         dum_sfxsumrok1(io_ALK,i,j) = conv_sed_ocn(io_ALK,is_POP)*dum_sfxsumrok1(io,i,j)            
+                         dum_sfxsumrok1(io_ALK,i,j) = conv_sed_ocn(io_ALK,is_POP)*dum_sfxsumrok1(io,i,j)
                  end if
                  if (ctrl_force_sed_closed_C) then
                     ! special case of partial closure -- calculate theoretical DIC remin flux required for closure

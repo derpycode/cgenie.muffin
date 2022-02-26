@@ -2116,7 +2116,7 @@
                     </param>
                     <param name="opt_freeze">
 			<value datatype="boolean">.true.</value>
-                        <description></description>
+                        <description>Calculate freezing point from salinity, otherwise disable seaice formation</description>
                     </param>
                     <param name="opt_delf2x_cesm">
 			<value datatype="boolean">.false.</value>
