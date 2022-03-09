@@ -64,9 +64,8 @@ sg_par_sed_fdet=0.180
 # add POC preservation and burial a-la Dunne et al. [2005]
 sg_par_sed_diagen_Corgopt='dunne2007'
 # scale POC burial
-# NOTE: becasue the configuration has deep-sea only sediment grid points,
-#       scale POC preservation to achieve a more 'reasonable' global burial rate
-sg_par_sed_diagen_fracCpres_scale=10.0
+# NOTE: becasue the configuration includes a 'shelf', try no-scaling of POC preservation
+sg_par_sed_diagen_fracCpres_scale=1.0
 # add variable C:P remin a-la Wallmann [2010]
 # NOTE: the default behaviour is for POP preservation to be in the same proportion as POC preservation and burial
 sg_ctrl_sed_diagen_fracC2Ppres_wallmann2010=.true.
