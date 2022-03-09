@@ -1,0 +1,152 @@
+# *******************************************************************
+# *** EXAMPLE *******************************************************
+# *******************************************************************
+#
+# *** CLIMATE *******************************************************
+#
+# set climate feedback (climate responding to changing pCO2)
+ea_36=y
+#
+# *** BIOLOGICAL NEW PRODUCTION *************************************
+#
+# biological scheme ID string
+bg_par_bio_prodopt='1N1T_PO4MM'
+# maximum rate of conversion of dissolved PO4 into organic matter by phytoplankton (mol kg-1 yr-1)
+bg_par_bio_k0_PO4=8.9876e-006
+# [PO4] M-M half-sat value (mol kg-1)
+bg_par_bio_c0_PO4=8.9369e-007
+#
+# *** ORGANIC MATTER EXPORT RATIOS **********************************
+#
+# production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# *** INORGANIC MATTER EXPORT RATIOS ********************************
+#
+# set fixed CaCO3:POC export rain ratio
+bg_opt_bio_CaCO3toPOCrainratio='FIXED'
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+# NOTE: the current calibrated Eocene value is 0.200,
+#       whereas the modern uniform equivalent is closer to 0.100
+bg_par_bio_red_POC_CaCO3=0.150
+#
+# *** REMINERALIZATION **********************************************
+#
+# DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=0.5
+# initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=0.0557
+# depth of remineralization or particulate organic matter
+bg_par_bio_remin_POC_eL1=589.9451
+# remineralization length #2 for POC
+bg_par_bio_remin_POC_eL2=1000000.0
+# initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.45
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1.8905e+003
+# remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+#
+# *** SEDIMENTS *****************************************************
+#
+# max cut-off depth for neritic (non deep sea) sediment grid points
+# NOTE: sediment grid points shallower that this and not defined as reefal cells, are assumed to be 'mud'
+sg_par_sed_Dmax_neritic=175.0
+# sediment diagenesis option
+# NOTE: "ridgwell2001lookup" is the the simplest/fastest option
+sg_par_sed_diagen_CaCO3opt="ridgwell2001lookup"
+# bioturbation
+# NOTE: turn ON bioturbation to capture carbonate compensation dynamics
+sg_ctrl_sed_bioturb=.TRUE.
+# force an invarient surface bioturbation mixing rate 
+# (otherwise bioturbation becomes a function of [O2] and F(POC) following Archer et al. [2002])
+sg_par_sed_mix_k_sur_max=0.15
+sg_par_sed_mix_k_sur_min=0.15
+# generic paleo detrital flux (g cm-2 kyr-1)
+# NOTE: set to zero when applying a dust field (unless an additional detrital flux is required)
+sg_par_sed_fdet=0.180
+# add POC preservation and burial a-la Dunne et al. [2005]
+sg_par_sed_diagen_Corgopt='dunne2007'
+# scale POC burial
+# NOTE: becasue the configuration has deep-sea only sediment grid points,
+#       scale POC preservation to achieve a more 'reasonable' global burial rate
+sg_par_sed_diagen_fracCpres_scale=10.0
+# add variable C:P remin a-la Wallmann [2010]
+# NOTE: the default behaviour is for POP preservation to be in the same proportion as POC preservation and burial
+sg_ctrl_sed_diagen_fracC2Ppres_wallmann2010=.true.
+#
+# *** WEATHERING ****************************************************
+#
+# NOTE: the closed system spinup has 0.932794E+13 mol CaCO3 yr-1 of global burial
+#       splitting in a 2:3 ratio between silicate:carbonate weathering gives:
+#       0.933690E+13 * 2/5 = 3.734760000000000e+12 silicate weathering
+#       0.933690E+13 * 3/5 = 5.602140000000000e+12 carbonate weathering
+#       and 0.382897E+13 mol yr-1 of POC burial
+# NOTE: following the calculation in Secion 21.9
+#       gamma = (-6.0 - 2.66)/(-24.37 - 2.66) = 0.320
+#       => total CO2 outgassing balancing silicate weathering and part of Corg burial, is: 3.734760000000000e+12/(1-0.32) = 5.492294117647060e+12
+#          and kerogen weathering = POC burial - 0.32*CO2 outgassing = 0.382305E+13 - 0.32*5.492294117647060e+12 = 2.065515882352941e+12
+#          or a ratio of 2.065515882352941e+12/3.734760000000000e+12 = 5.530518379636017e-01 with silicate weathering
+# NOTE: POP burial = 0.554573E+11
+#       => kerogen POC : POP weathering ratio = 0.554573E+11/2.065515882352941e+12 = 2.684912784927395e-02
+# set an 'OPEN' system
+bg_ctrl_force_sed_closedsystem=.FALSE.
+# set CaCO3_weathering-temperature feedback
+rg_opt_weather_T_Ca=.true.
+# set CaSiO3_weathering-temperature feedback
+rg_opt_weather_T_Si=.true.
+# weathering reference mean global land air surface temperature (C)
+rg_par_ref_T0=12.03
+# global carbonate weathering rate (mol Ca2+ yr-1)
+rg_par_weather_CaCO3=5.602140000000000e+12
+# global silicate weathering rate (mol Ca2+ yr-1)
+rg_par_weather_CaSiO3=3.734760000000000e+12
+# CO2 outgassing rate (mol C yr-1)
+rg_par_outgas_CO2=5.492294117647060e+12
+# set isotopic values of CO2 outgassing and carbonate weathering
+# NOTE: d13C of CaCO3 weathering == d13C of CaCO3 burial
+rg_par_outgas_CO2_d13C=-6.0
+rg_par_weather_CaCO3_d13C=2.66
+# kerogen POC weathering ratio and isotopic composiiton
+rg_par_weather_CaSiO3_fracC=5.530518379636017e-01
+rg_par_weather_CaSiO3_fracC_d13C=-24.37
+# kerogen POP weathering
+# NOTE: also account for implicitly associated ALK which is by default, -16 * the PO4 flux
+rg_par_weather_kerogen_fracP=2.684912784927395e-02
+rg_par_weather_kerogen_fracALK=-4.295860455883832e-01
+#
+# *** GEOCHEM ACCELERATION ******************************************
+#
+# NOTE: geochem acceleration requires: ma_flag_gemlite=.TRUE.
+# re-partition CO2 between ocean and atmosphere
+gl_ctrl_update_pCO2=.true.
+# for NO (~0:1) acceleration
+# (or configure the base-config with ma_flag_gemlite=.FALSE.)
+ma_gem_notyr_min=9999999
+ma_gem_notyr_max=9999999
+ma_gem_yr_min=1
+ma_gem_yr_max=1
+#### for e.g. 10:1 acceleration
+###ma_gem_notyr_min=10
+###ma_gem_notyr_max=10
+###ma_gem_yr_min=90
+###ma_gem_yr_max=90
+#
+# *** DATA SAVING ***************************************************
+#
+# Preformed diagnostics option == BASIC + biology + tracer + proxy
+bg_par_data_save_level=11
+# force time-slice save at run end only
+bg_par_infile_slice_name='save_timeslice_NONE.dat'
+#
+# *** FORCINGS ******************************************************
+#
+# (NO forcing ... ideally, the system should not drift ...)
+#
+# *** MISC **********************************************************
+#
+#
+# *******************************************************************
+# *** END ***********************************************************
+# *******************************************************************
+#
