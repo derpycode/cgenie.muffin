@@ -7172,12 +7172,12 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>maximum layer depth for bioturbation</description>
                     </param>
                     <param name="par_sed_mix_k_sur_max">
-			<value datatype="real">0.2500</value>
-                        <description>maximum surface bioturbation mixing rate (cm2 yr-1)</description>
+			<value datatype="real">0.15</value>
+                        <description>maximum surface bioturbation mixing rate (cm2 yr-1) (original default/Archer value == 0.2500)</description>
                     </param>
                     <param name="par_sed_mix_k_sur_min">
-			<value datatype="real">0.0001</value>
-                        <description>minimum surface bioturbation mixing rate (cm2 yr-1)</description>
+			<value datatype="real">0.15</value>
+                        <description>minimum surface bioturbation mixing rate (cm2 yr-1) (original default/Archer value == 0.0001)</description>
                     </param>
                     <param name="ctrl_sed_noerosion">
 			<value datatype="boolean">.false.</value>

@@ -2396,6 +2396,13 @@ CONTAINS
     ! ############################################################################################################################ !
 
     ! *** calculate bioturbational mixing profie ***
+    ! NOTE: parameters: par_sed_mix_k_sur_min and par_sed_mix_k_sur_max let you define limits to the surface bioturbation rate
+    !       which is calculated as variable loc_mix_k_sur
+    ! NOTE: par_sed_mix_k_sur_max is used to scale the fixed profile of the basic SEDGEM scheme
+    !       and has now been assigned a default value of 0.15 (as has par_sed_mix_k_sur_min)
+    !       The original default (Archer) values were:
+    !       par_sed_mix_k_sur_max = 0.2500
+    !       par_sed_mix_k_sur_min = 0.0001
     ! calculate local variables
     ! NOTE: convert Corg rain rate from (mol cm-2) to (umol cm-2 yr-1)
     loc_fPOC = conv_mol_umol*dum_fPOC/dum_dtyr
