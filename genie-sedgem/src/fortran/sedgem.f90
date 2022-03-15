@@ -136,9 +136,11 @@ SUBROUTINE sedgem(          &
 
   ! *** UPDATE CARBONATE CHEMSITRY ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE CARBONATE CHEMSITRY ***'
+  ! NOTE: do not update carbonate chemsitry if it is not 'needed' -- i.e. mud cells when OMENSED is not used
+  !       (should help with carbonate chemsitry stability in some cases)
   DO i=1,n_i
      DO j=1,n_j
-        IF (sed_mask(i,j)) then
+        IF ( sed_mask(i,j) .AND. ( (.NOT. sed_mask_muds(i,j)) .OR. (par_sed_diagen_Corgopt=='huelse2016') ) ) then
            call sub_calc_carbconst(        &
                 & phys_sed(ips_D,i,j),     &
                 & dum_sfcsumocn(io_T,i,j), &
