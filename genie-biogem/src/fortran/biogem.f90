@@ -610,7 +610,8 @@ subroutine biogem(        &
                     if (loc_fweather_tot(io) > const_real_nullsmall) &
                          & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)
                     if (.NOT. ctrl_bio_red_ALKwithPOC) &  
-                         dum_sfxsumrok1(io_ALK,i,j) = conv_sed_ocn(io_ALK,is_POP)*dum_sfxsumrok1(io,i,j)
+                         dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
+                         & conv_sed_ocn(io_ALK,is_POP)*dum_sfxsumrok1(io,i,j)
                  end if
                  if (ctrl_force_sed_closed_C) then
                     ! special case of partial closure -- calculate theoretical DIC remin flux required for closure
@@ -639,7 +640,8 @@ subroutine biogem(        &
                     if (loc_fweather_tot(io) > const_real_nullsmall) &
                          & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)                    
                     if (ctrl_bio_red_ALKwithPOC) & 
-                         dum_sfxsumrok1(io_ALK,i,j) = conv_sed_ocn(io_ALK,is_POC)*dum_sfxsumrok1(io,i,j)                    
+                         dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
+                         & conv_sed_ocn(io_ALK,is_POC)*dum_sfxsumrok1(io,i,j)                 
                     io = io_DIC_13C
                     if (loc_fweather_tot(io) > const_real_nullsmall) &
                          & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j) 
