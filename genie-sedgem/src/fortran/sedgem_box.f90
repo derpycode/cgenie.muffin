@@ -232,18 +232,25 @@ CONTAINS
        ! NOTE: assume that A in the Wallmann [2010] equation is the rain or Redfield ratio
        !       par_sed_diagen_fracC2Ppres_off then has a value of 11.0
        !       (this is simply rearranging a little the published equation)
-       if (loc_new_sed(is_POP) > const_rns) then
+       ! NOTE: deal with [O2] < 0.0 ...
+       ! NOTE: loc_new_sed(is_POP) and loc_new_sed(is_POC) should rarely be zero and never negative ...
+       !       assign a generic Redfield ratio (106.0) if so
+       if (dum_sfcsumocn(io_O2) > const_rns) then
+          loc_O2 = dum_sfcsumocn(io_O2)
+       else
+          loc_O2 = 0.0
+       end if
+       if ((loc_new_sed(is_POC) > const_rns) .AND. (loc_new_sed(is_POP) > const_rns)) then
           loc_C2P_rain = loc_new_sed(is_POC)/loc_new_sed(is_POP)
        else
-          loc_C2P_rain = const_real_nullhigh
+          loc_C2P_rain = 106.0
        end if
        if (ctrl_sed_diagen_fracC2Ppres_wallmann2010) then
           loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - &
-               & loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
+               & loc_C2P_rain*exp(-loc_O2/par_sed_diagen_fracC2Ppres_c0_O2)
        else
           loc_C2P_remin = loc_C2P_rain
-       end if
-       if (loc_C2P_remin < const_real_nullsmall) loc_C2P_remin = loc_C2P_rain
+       end if      
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
@@ -1535,17 +1542,25 @@ CONTAINS
        ! NOTE: assume that A in the Wallmann [2010] equation is the rain or Redfield ratio
        !       par_sed_diagen_fracC2Ppres_off then has a value of 11.0
        !       (this is simply rearranging a little the published equation)
-       if (loc_new_sed(is_POP) > const_rns) then
+       ! NOTE: deal with [O2] < 0.0 ...
+       ! NOTE: loc_new_sed(is_POP) and loc_new_sed(is_POC) should rarely be zero and never negative ...
+       !       assign a generic Redfield ratio (106.0) if so
+       if (dum_sfcsumocn(io_O2) > const_rns) then
+          loc_O2 = dum_sfcsumocn(io_O2)
+       else
+          loc_O2 = 0.0
+       end if
+       if ((loc_new_sed(is_POC) > const_rns) .AND. (loc_new_sed(is_POP) > const_rns)) then
           loc_C2P_rain = loc_new_sed(is_POC)/loc_new_sed(is_POP)
        else
-          loc_C2P_rain = const_real_nullhigh
+          loc_C2P_rain = 106.0
        end if
        if (ctrl_sed_diagen_fracC2Ppres_wallmann2010) then
-          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - loc_C2P_rain*exp(-dum_sfcsumocn(io_O2)/par_sed_diagen_fracC2Ppres_c0_O2)
+          loc_C2P_remin = (loc_C2P_rain + par_sed_diagen_fracC2Ppres_off) - &
+               & loc_C2P_rain*exp(-loc_O2/par_sed_diagen_fracC2Ppres_c0_O2)
        else
           loc_C2P_remin = loc_C2P_rain
        end if
-       if (loc_C2P_remin < const_real_nullsmall) loc_C2P_remin = loc_C2P_rain
        ! calculate the return rain flux back to ocean
        ! NOTE: apply estimated fractional preservation
        ! NOTE: particle-reactive elements (e.g., 231Pa) remain in the sediments
