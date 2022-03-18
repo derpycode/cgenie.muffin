@@ -75,7 +75,8 @@ CONTAINS
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
     real::loc_fPOC,loc_fFe
-    real::loc_sed_pres_fracC,loc_sed_pres_fracP                ! 
+    real::loc_new_sed_Fe,loc_dis_sed_Fe                        ! 
+    real::loc_sed_pres_fracC,loc_sed_pres_fracP  
     real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
@@ -356,7 +357,11 @@ CONTAINS
     end select
     
     ! add empirical Fe2+ return
+    ! NOTE: assume that at least is_POM_FeOOH is selected (other carriers may be too)
     if (sed_select(is_POM_FeOOH)) then
+       ! calculate FeOOH total flux
+       loc_new_sed_Fe = &
+            & loc_new_sed(is_POM_FeOOH) + loc_new_sed(is_CaCO3_FeOOH) + loc_new_sed(is_opal_FeOOH) + loc_new_sed(is_det_FeOOH)
        select case (par_sed_diagen_POM_FeOOH_opt)
        case ('ding')
           ! From Ding et al. [2019]:
@@ -373,7 +378,7 @@ CONTAINS
           ! ensure greater than zero and convert units to mol cm-2 yr-1
           loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
           ! convert units to cm3 cm-2 per time-step
-          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*loc_fFe
+          loc_dis_sed_Fe = dum_dtyr*conv_det_mol_cm3*loc_fFe
        case ('dale')
           ! convert units (mol kg-1 -> uM) and cap at > zero
           loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
@@ -382,30 +387,49 @@ CONTAINS
           ! calculate Fe flux (umol m-2 d-1)
           loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
           ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step)
-          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
+          loc_dis_sed_Fe = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
        case ('seb')
           ! convert units (mol kg-1 -> uM) and cap at > zero
           loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
           ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
           loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
           ! calculate Fe flux (cm3 cm-2 per time step)
-          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)*tanh(loc_fPOC/loc_O2)
+          loc_dis_sed_Fe = loc_new_sed_Fe*tanh(loc_fPOC/loc_O2)
        case ('ALL')
-          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
+          loc_dis_sed_Fe = loc_new_sed_Fe
        case default
-          loc_dis_sed(is_POM_FeOOH) = 0.0
+          loc_dis_sed_Fe = 0.0
        end select
-       ! cap at loc_new_sed(is_POM_FeOOH) if requested
-       if (ctrl_sed_diagen_POM_FeOOH_cap) then
-          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),loc_dis_sed(is_POM_FeOOH))
+       ! cap at total FeOOH input flux, if requested
+       ! NOTE: partition in proportion to the different FeOOH scavening phases
+       ! NOTE: retaining original ctrl_sed_diagen_POM_FeOOH_cap parameter name
+       ! NOTE: loc_dis_sed (and hence is_POM_FeOOH dissolution flux) is initialized as zero
+       if (ctrl_sed_diagen_POM_FeOOH_cap .AND. (loc_new_sed_Fe > const_rns)) then
+          loc_dis_sed(is_POM_FeOOH)   = min(loc_new_sed(is_POM_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_POM_FeOOH)/loc_new_sed_Fe)
+          loc_dis_sed(is_CaCO3_FeOOH) = min(loc_new_sed(is_CaCO3_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_CaCO3_FeOOH)/loc_new_sed_Fe)
+          loc_dis_sed(is_opal_FeOOH)  = min(loc_new_sed(is_opal_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_opal_FeOOH)/loc_new_sed_Fe)
+          loc_dis_sed(is_det_FeOOH)   = min(loc_new_sed(is_det_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_det_FeOOH)/loc_new_sed_Fe)
        end if
        ! isotopes
-       if (sed_select(is_POM_FeOOH_56Fe)) then          
+       ! NOTE: no fractionation (currently)!
+       ! NOTE: loc_dis_sed (and hence is_POM_FeOOH_56Fe dissolution flux) is initialized as zero
+       ! NOTE: assume that at least is_POM_FeOOH_56Fe is selected (other carriers may be too)
+       if (sed_select(is_POM_FeOOH_56Fe)) then
           if (loc_new_sed(is_POM_FeOOH) > const_rns) then
              loc_dis_sed(is_POM_FeOOH_56Fe) = &
                   & loc_dis_sed(is_POM_FeOOH)*loc_new_sed(is_POM_FeOOH_56Fe)/loc_new_sed(is_POM_FeOOH)
-          else
-             loc_dis_sed(is_POM_FeOOH_56Fe) = 0.0
+          end if
+          if (loc_new_sed(is_CaCO3_FeOOH) > const_rns) then
+             loc_dis_sed(is_CaCO3_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_CaCO3_FeOOH)*loc_new_sed(is_CaCO3_FeOOH_56Fe)/loc_new_sed(is_CaCO3_FeOOH)
+          end if
+          if (loc_new_sed(is_opal_FeOOH) > const_rns) then
+             loc_dis_sed(is_opal_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_opal_FeOOH)*loc_new_sed(is_opal_FeOOH_56Fe)/loc_new_sed(is_opal_FeOOH)
+          end if
+          if (loc_new_sed(is_det_FeOOH) > const_rns) then
+             loc_dis_sed(is_det_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_det_FeOOH)*loc_new_sed(is_det_FeOOH_56Fe)/loc_new_sed(is_det_FeOOH)
           end if
        end if
     end if
@@ -1412,6 +1436,7 @@ CONTAINS
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
     real::loc_fPOC,loc_fFe
+    real::loc_dis_sed_Fe,loc_new_sed_Fe
     real::loc_sed_pres_fracC,loc_sed_pres_fracP                ! 
     real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
@@ -1658,9 +1683,13 @@ CONTAINS
           end if
        end DO
     end select
-
+    
     ! add empirical Fe2+ return
+    ! NOTE: assume that at least is_POM_FeOOH is selected (other carriers may be too)
     if (sed_select(is_POM_FeOOH)) then
+       ! calculate FeOOH total flux
+       loc_new_sed_Fe = &
+            & loc_new_sed(is_POM_FeOOH) + loc_new_sed(is_CaCO3_FeOOH) + loc_new_sed(is_opal_FeOOH) + loc_new_sed(is_det_FeOOH)
        select case (par_sed_diagen_POM_FeOOH_opt)
        case ('ding')
           ! From Ding et al. [2019]:
@@ -1677,7 +1706,7 @@ CONTAINS
           ! ensure greater than zero and convert units to mol cm-2 yr-1
           loc_fFe = max(0.0,1.0E-4*loc_fFe/1.0E6)
           ! convert units to cm3 cm-2 per time-step
-          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*loc_fFe
+          loc_dis_sed_Fe = dum_dtyr*conv_det_mol_cm3*loc_fFe
        case ('dale')
           ! convert units (mol kg-1 -> uM) and cap at > zero
           loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
@@ -1686,30 +1715,49 @@ CONTAINS
           ! calculate Fe flux (umol m-2 d-1)
           loc_fFe = 170.0*tanh(loc_fPOC/loc_O2)
           ! convert units (umol m-2 d-1) -> (cm3 cm-2 per time step)
-          loc_dis_sed(is_POM_FeOOH) = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
+          loc_dis_sed_Fe = dum_dtyr*conv_det_mol_cm3*1.0E-6*1.0E-4*loc_fFe*conv_yr_d
        case ('seb')
           ! convert units (mol kg-1 -> uM) and cap at > zero
           loc_O2 = max(const_rns,1.0E6*dum_sfcsumocn(io_O2))
           ! convert units of Corg flux (cm3 cm-2 per time step) to (mmol m-2 d-1)
           loc_fPOC = 1.0E4*1.0E3*conv_POC_cm3_mol*loc_dis_sed(is_POC)/(conv_yr_d*dum_dtyr)
           ! calculate Fe flux (cm3 cm-2 per time step)
-          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)*tanh(loc_fPOC/loc_O2)
+          loc_dis_sed_Fe = loc_new_sed_Fe*tanh(loc_fPOC/loc_O2)
        case ('ALL')
-          loc_dis_sed(is_POM_FeOOH) = loc_new_sed(is_POM_FeOOH)
+          loc_dis_sed_Fe = loc_new_sed_Fe
        case default
-          loc_dis_sed(is_POM_FeOOH) = 0.0
+          loc_dis_sed_Fe = 0.0
        end select
-       ! cap at loc_new_sed(is_POM_FeOOH) if requested
-       if (ctrl_sed_diagen_POM_FeOOH_cap) then
-          loc_dis_sed(is_POM_FeOOH) = min(loc_new_sed(is_POM_FeOOH),loc_dis_sed(is_POM_FeOOH))
+       ! cap at total FeOOH input flux, if requested
+       ! NOTE: partition in proportion to the different FeOOH scavening phases
+       ! NOTE: retaining original ctrl_sed_diagen_POM_FeOOH_cap parameter name
+       ! NOTE: loc_dis_sed (and hence is_POM_FeOOH dissolution flux) is initialized as zero
+       if (ctrl_sed_diagen_POM_FeOOH_cap .AND. (loc_new_sed_Fe > const_rns)) then
+          loc_dis_sed(is_POM_FeOOH)   = min(loc_new_sed(is_POM_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_POM_FeOOH)/loc_new_sed_Fe)
+          loc_dis_sed(is_CaCO3_FeOOH) = min(loc_new_sed(is_CaCO3_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_CaCO3_FeOOH)/loc_new_sed_Fe)
+          loc_dis_sed(is_opal_FeOOH)  = min(loc_new_sed(is_opal_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_opal_FeOOH)/loc_new_sed_Fe)
+          loc_dis_sed(is_det_FeOOH)   = min(loc_new_sed(is_det_FeOOH),loc_dis_sed_Fe*loc_new_sed(is_det_FeOOH)/loc_new_sed_Fe)
        end if
        ! isotopes
-       if (sed_select(is_POM_FeOOH_56Fe)) then          
+       ! NOTE: no fractionation (currently)!
+       ! NOTE: loc_dis_sed (and hence is_POM_FeOOH_56Fe dissolution flux) is initialized as zero
+       ! NOTE: assume that at least is_POM_FeOOH_56Fe is selected (other carriers may be too)
+       if (sed_select(is_POM_FeOOH_56Fe)) then
           if (loc_new_sed(is_POM_FeOOH) > const_rns) then
              loc_dis_sed(is_POM_FeOOH_56Fe) = &
                   & loc_dis_sed(is_POM_FeOOH)*loc_new_sed(is_POM_FeOOH_56Fe)/loc_new_sed(is_POM_FeOOH)
-          else
-             loc_dis_sed(is_POM_FeOOH_56Fe) = 0.0
+          end if
+          if (loc_new_sed(is_CaCO3_FeOOH) > const_rns) then
+             loc_dis_sed(is_CaCO3_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_CaCO3_FeOOH)*loc_new_sed(is_CaCO3_FeOOH_56Fe)/loc_new_sed(is_CaCO3_FeOOH)
+          end if
+          if (loc_new_sed(is_opal_FeOOH) > const_rns) then
+             loc_dis_sed(is_opal_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_opal_FeOOH)*loc_new_sed(is_opal_FeOOH_56Fe)/loc_new_sed(is_opal_FeOOH)
+          end if
+          if (loc_new_sed(is_det_FeOOH) > const_rns) then
+             loc_dis_sed(is_det_FeOOH_56Fe) = &
+                  & loc_dis_sed(is_det_FeOOH)*loc_new_sed(is_det_FeOOH_56Fe)/loc_new_sed(is_det_FeOOH)
           end if
        end if
     end if

@@ -4782,8 +4782,8 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Half-saturation for denitrification (mol kg-1) [Boudreau, 1996]</description>
                     </param>
                     <param name="par_bio_remin_c0_FeOOH">
-                        <value datatype="real">10.0e-6</value>
-                        <description>Half-saturation for FeOOH reduction (mol kg-1) [RANDOM DEFAULT]</description>
+                        <value datatype="real">1.0e-2</value>
+                        <description>Half-saturation for FeOOH reduction (mol kg-1) (baseline value from: van de Velde et al. [2021])</description>
                     </param>
                     <param name="par_bio_remin_c0_SO4">
                         <value datatype="real">500.0E-6</value>
@@ -4798,8 +4798,8 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Nitrate inhibition constant (mol kg-1) [Boudreau, 1996]</description>
                     </param>
                     <param name="par_bio_remin_ci_FeOOH">
-                        <value datatype="real">10.0e-6</value>
-                        <description>FeOOH reduction inhibition constant (mol kg-1) [RANDOM DEFAULT]</description>
+                        <value datatype="real">1.0e-2</value>
+                        <description>FeOOH reduction inhibition constant (mol kg-1) (baseline value from: van de Velde et al. [2021])</description>
                     </param>
                     <param name="par_bio_remin_ci_SO4">
                         <value datatype="real">1.0E-3</value>
@@ -5303,11 +5303,11 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="par_bio_remin_kFetoFe2">
 			<value datatype="real">2.3e+06</value>
-                        <description>kinetic constant for Fe reduction using sulphide in M^(-1/2) yr-1</description>
+                        <description>kinetic constant for Fe reduction using sulphide in M^(-1/2) yr-1 (from: van de Velde et al. [2021])</description>
                     </param>
                     <param name="par_bio_remin_kFeOOHtoFe2">
-			<value datatype="real">1.6e+04</value>
-                        <description>kinetic constant for FeOOH reduction using sulphide in M^(-1/2) yr-1</description>
+			<value datatype="real">1.7e+04</value>
+                        <description>kinetic constant for FeOOH reduction using sulphide in M^(-1/2) yr-1 (baseline value from: van de Velde et al. [2021])</description>
                     </param>
                     <param name="par_d34S_Fered_alpha">
 			<value datatype="real">0.9982</value>
@@ -5348,10 +5348,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                      <param name="par_bio_FeS_part_abioticohm_cte">
 			<value datatype="real">2e-6</value>
                         <description>Ohmega constant for nanoparticulate FeS formation</description>
-                    </param>
+                    </param>	
                     <param name="par_bio_FeS2precip_k">
-			<value datatype="real">3250.43</value>
-                        <description>kinetic constant for FeS2 precipitation in M-1 yr-1</description>
+			<value datatype="real">3.25e+03</value>
+                        <description>kinetic constant for FeS2 precipitation in M-1 yr-1 (baseline value from: van de Velde et al. [2021] (and Rickard))</description>
                     </param>
                     <param name="par_k_lim_pyr">
 			<value datatype="real">0.0</value>
