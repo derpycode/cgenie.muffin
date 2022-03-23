@@ -279,7 +279,17 @@ CONTAINS
              end if
           end if
        end DO
-       ! set flux fraction of POC available for CaCO3 diagenesis
+       ! now ... go and replace preservation (burial) fields if requested :o)
+       ! NOTE; convert units from mol cm-2 yr-1 -> cm3 cm-2 per time-step
+       if (ctrl_sed_Pcorg) then
+          loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
+               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
+       end if
+       if (ctrl_sed_Pporg) then
+          loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
+               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_porg(dum_i,dum_j),loc_new_sed(is_POP))
+       end if
+       ! finally, set flux fraction of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = loc_dis_sed(is_POC)
     case ('huelse2016')
        ! Huelse et al. [2016]
@@ -1613,6 +1623,16 @@ CONTAINS
              end if
           end if
        end DO
+       ! now ... go and replace preservation (burial) fields if requested :o)
+       ! NOTE; convert units from mol cm-2 yr-1 -> cm3 cm-2 per time-step
+       if (ctrl_sed_Pcorg) then
+          loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
+               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
+       end if
+       if (ctrl_sed_Pporg) then
+          loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
+               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_porg(dum_i,dum_j),loc_new_sed(is_POP))  
+       end if
     case ('huelse2016')
        ! Huelse et al. [2016]
        ! NOTE: 'new sed' is not adjusted within sub_huelseetal2016_main and eneds modifying externally

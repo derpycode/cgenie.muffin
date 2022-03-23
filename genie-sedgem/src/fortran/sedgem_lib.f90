@@ -240,14 +240,16 @@ MODULE sedgem_lib
   real::par_sed_ohmegamin                                        ! forced minimum saturation (calcite ohmega) anywhere
   real::par_sed_ohmegamin_flux                                   ! imposed sed->ocn flux (mol Ca cm-2 per time-step) for saturation
   NAMELIST /ini_sedgem_nml/par_sed_ohmegamin,par_sed_ohmegamin_flux
-  logical::ctrl_sed_Fdet,ctrl_sed_Fcaco3,ctrl_sed_Fopal          ! alt sedimentation fields
+  logical::ctrl_sed_Fdet,ctrl_sed_Fcaco3,ctrl_sed_Fopal          ! apply alt sedimentation fields?
   NAMELIST /ini_sedgem_nml/ctrl_sed_Fdet,ctrl_sed_Fcaco3,ctrl_sed_Fopal
-  logical::ctrl_force_sed_closedsystem_CaCO3                            ! Set dissolution flux = rain flux for CaCO3 ONLY?
+  logical::ctrl_sed_Pcorg,ctrl_sed_Pporg                         ! apply alt preservation (burial) fields?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_Pcorg,ctrl_sed_Pporg
+  logical::ctrl_force_sed_closedsystem_CaCO3                     ! Set dissolution flux = rain flux for CaCO3 ONLY?
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_CaCO3
-  logical::ctrl_force_sed_closedsystem_opal                            ! Set dissolution flux = rain flux for opal ONLY?
+  logical::ctrl_force_sed_closedsystem_opal                      ! Set dissolution flux = rain flux for opal ONLY?
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_opal
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
-  CHARACTER(len=255)::par_pindir_name                           ! 
+  CHARACTER(len=255)::par_pindir_name                            ! 
   CHARACTER(len=255)::par_indir_name                             ! 
   CHARACTER(len=255)::par_outdir_name                            ! 
   CHARACTER(len=255)::par_rstdir_name                            ! 
@@ -264,6 +266,8 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_output_years_file_0d,par_output_years_file_2d
   CHARACTER(len=127)::par_sed_Fdet_name,par_sed_Fcaco3_name,par_sed_Fopal_name ! alt sedimentation field file names
   NAMELIST /ini_sedgem_nml/par_sed_Fdet_name,par_sed_Fcaco3_name,par_sed_Fopal_name
+  CHARACTER(len=127)::par_sed_Pcorg_name,par_sed_Pporg_name      ! alt preservation (burial) field file names
+  NAMELIST /ini_sedgem_nml/par_sed_Pcorg_name,par_sed_Pporg_name
   ! ------------------- I/O: MISC ------------------------------------------------------------------------------------------------ !
   logical::ctrl_append_data                                      ! append data to output files on restart
   logical::ctrl_timeseries_output                                ! save timeseries output
@@ -459,6 +463,8 @@ MODULE sedgem_lib
   REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Fsed_det                ! alt detrital burial flux field
   REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Fsed_caco3              ! alt caco3 burial flux field
   REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Fsed_opal               ! alt opal burial flux field
+  REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Psed_corg               ! alt Corg preservation (burial) flux field
+  REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Psed_porg               ! alt Porg preservation (burial) flux field
   REAL,ALLOCATABLE,DIMENSION(:,:,:)::sed_diag                  ! sediment diagnostics
   ! allocatable sedcoe arrays
   REAL,ALLOCATABLE,DIMENSION(:,:,:)::sedcore                   ! sedcore sediment layer stack (num sedcores x layers x variables)

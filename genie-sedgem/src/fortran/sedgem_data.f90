@@ -202,6 +202,8 @@ CONTAINS
        print*,'Impose alt detrital burial flux forcing?            : ',ctrl_sed_Fdet
        print*,'Impose alt CaCO3 burial flux forcing?               : ',ctrl_sed_Fcaco3
        print*,'Impose alt opal burial flux forcing?                : ',ctrl_sed_Fopal
+       print*,'Impose alt Corg preservation (burial) flux?         : ',ctrl_sed_Pcorg
+       print*,'Impose alt Porg preservation (burial) flux?         : ',ctrl_sed_Pporg
        print*,'Set dissolution flux = rain flux for CaCO3 only?    : ',ctrl_force_sed_closedsystem_CaCO3
        print*,'Set dissolution flux = rain flux for opal only?     : ',ctrl_force_sed_closedsystem_opal
        ! --- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------ !
@@ -222,6 +224,8 @@ CONTAINS
        print*,'Alt detrital burial flux forcing filename           : ',trim(par_sed_Fdet_name)
        print*,'Alt CaCO3 burial flux forcing filename              : ',trim(par_sed_Fcaco3_name)
        print*,'Alt opal burial flux forcing filename               : ',trim(par_sed_Fopal_name)
+       print*,'Alt Corg preservation (burial) flux filename        : ',trim(par_sed_Pcorg_name)
+       print*,'Alt Porg preservation (burial) flux filename        : ',trim(par_sed_Pporg_name)
        ! --- I/O: MISC ----------------------------------------------------------------------------------------------------------- !
        print*,'--- I/O: MISC --------------------------------------'
        print*,'save timeseries output                              : ',ctrl_timeseries_output
@@ -699,8 +703,11 @@ CONTAINS
   SUBROUTINE sub_init_sed()
     ! local variables
     INTEGER::l,is,n                      ! grid and tracer index counters
+    integer::loc_len
     CHARACTER(len=255)::loc_filename
-    real,DIMENSION(n_i,n_j)::loc_ij      !  
+    real,DIMENSION(n_i,n_j)::loc_ij      !                ! 
+    ! set alt dir path string length
+    loc_len = LEN_TRIM(par_pindir_name)
     ! set default array values
     conv_sed_mol_cm3(:)      = 1.0       ! 
     conv_sed_cm3_mol(:)      = 1.0       ! 
@@ -838,7 +845,11 @@ CONTAINS
     end IF
     ! load alternative detrital flux field
     if (ctrl_sed_Fdet) then
-       loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fdet_name)
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sed_Fdet_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fdet_name)
+       endif
        CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
     else
        loc_ij(:,:) = 0.0
@@ -846,7 +857,11 @@ CONTAINS
     sed_Fsed_det = loc_ij
     ! load alternative CaCO3 flux field
     if (ctrl_sed_Fcaco3) then
-       loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fcaco3_name)
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sed_Fcaco3_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fcaco3_name)
+       endif
        CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
     else
        loc_ij(:,:) = 0.0
@@ -854,7 +869,11 @@ CONTAINS
     sed_Fsed_caco3 = loc_ij
     ! load alternative opal flux field
     if (ctrl_sed_Fopal) then
-       loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fopal_name)
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sed_Fopal_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fopal_name)
+       endif
        CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
     else
        loc_ij(:,:) = 0.0
@@ -862,12 +881,40 @@ CONTAINS
     sed_Fsed_opal = loc_ij
     ! load alternative hydrothermal input mask
     if (ctrl_sed_Fhydr2D) then
-       loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fhydr2D_name)
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sed_Fhydr2D_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Fhydr2D_name)
+       endif
        CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
     else
        loc_ij(:,:) = 0.0
     endif
     sed_mask_hydr = loc_ij
+    ! load alternative Corg preservation (burial) field (mol cm-2 yr-1)
+    if (ctrl_sed_Pcorg) then
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sed_Pcorg_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Pcorg_name)
+       endif
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+    else
+       loc_ij(:,:) = 0.0
+    endif
+    sed_Psed_corg = loc_ij
+    ! load alternative Porg preservation (burial) field (mol cm-2 yr-1)
+    if (ctrl_sed_Pporg) then
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sed_Pporg_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Pporg_name)
+       endif
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+    else
+       loc_ij(:,:) = 0.0
+    endif
+    sed_Psed_porg = loc_ij
     ! initialize diagnostics data array
     sed_diag(:,:,:) = 0.0
   END SUBROUTINE sub_init_sed
