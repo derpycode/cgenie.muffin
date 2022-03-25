@@ -366,6 +366,29 @@ CONTAINS
        loc_sed_diagen_fCorg = (1.0 - par_sed_diagen_fracCpres_ox)*loc_new_sed(is_POC)
     end select
     
+    ! enable replacement of Corg preservation (burial) fields
+    ! NOTE: convert units from mol cm-2 yr-1 (from netCDF output) -> cm3 cm-2 per time-step
+    if (ctrl_sed_Pcorg) then
+       loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
+            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
+       ! re-set flux fraction of POC available for CaCO3 diagenesis
+       loc_sed_diagen_fCorg = loc_dis_sed(is_POC)
+    end if
+    ! enable replacement of Porg preservation (burial) fields, either directly or via a specified C/P rain ratio
+    ! NOTE: convert units from mol cm-2 yr-1 (from netCDF output) -> cm3 cm-2 per time-step
+    if (ctrl_sed_Pporg) then
+       loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
+            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_porg(dum_i,dum_j),loc_new_sed(is_POP))  
+    elseif (ctrl_sed_Prr) then
+       if (sed_Psed_rr(dum_i,dum_j) > const_rns) then
+          loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
+               & (loc_new_sed(is_POC) - loc_dis_sed(is_POC))/sed_Psed_rr(dum_i,dum_j)
+          if (loc_dis_sed(is_POP) < const_rns) loc_dis_sed(is_POP) = 0.0
+       else
+          loc_dis_sed(is_POP) = 0.0
+       end if
+    end if
+    
     ! add empirical Fe2+ return
     ! NOTE: assume that at least is_POM_FeOOH is selected (other carriers may be too)
     if (sed_select(is_POM_FeOOH)) then
@@ -1623,16 +1646,6 @@ CONTAINS
              end if
           end if
        end DO
-       ! now ... go and replace preservation (burial) fields if requested :o)
-       ! NOTE; convert units from mol cm-2 yr-1 -> cm3 cm-2 per time-step
-       if (ctrl_sed_Pcorg) then
-          loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
-               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
-       end if
-       if (ctrl_sed_Pporg) then
-          loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
-               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_porg(dum_i,dum_j),loc_new_sed(is_POP))  
-       end if
     case ('huelse2016')
        ! Huelse et al. [2016]
        ! NOTE: 'new sed' is not adjusted within sub_huelseetal2016_main and eneds modifying externally
@@ -1704,6 +1717,27 @@ CONTAINS
        end DO
     end select
     
+    ! enable replacement of Corg preservation (burial) fields
+    ! NOTE: convert units from mol cm-2 yr-1 (from netCDF output) -> cm3 cm-2 per time-step
+    if (ctrl_sed_Pcorg) then
+       loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
+            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
+    end if
+    ! enable replacement of Porg preservation (burial) fields, either directly or via a specified C/P rain ratio
+    ! NOTE: convert units from mol cm-2 yr-1 (from netCDF output) -> cm3 cm-2 per time-step
+    if (ctrl_sed_Pporg) then
+       loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
+            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_porg(dum_i,dum_j),loc_new_sed(is_POP))  
+    elseif (ctrl_sed_Prr) then
+       if (sed_Psed_rr(dum_i,dum_j) > const_rns) then
+          loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
+               & (loc_new_sed(is_POC) - loc_dis_sed(is_POC))/sed_Psed_rr(dum_i,dum_j)
+          if (loc_dis_sed(is_POP) < const_rns) loc_dis_sed(is_POP) = 0.0
+       else
+          loc_dis_sed(is_POP) = 0.0
+       end if
+    end if
+       
     ! add empirical Fe2+ return
     ! NOTE: assume that at least is_POM_FeOOH is selected (other carriers may be too)
     if (sed_select(is_POM_FeOOH)) then

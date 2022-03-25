@@ -1458,7 +1458,7 @@ CONTAINS
        CASE (par_sed_type_bio,par_sed_type_abio, &
                & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det)
           call sub_adddef_netcdf(ntrec_siou,3,'fpres_'//trim(string_sed(is)), &
-               & 'sediment burial (preservation) flux - '//trim(string_sed(is)), &
+               & 'sediment burial (% preservation) - '//trim(string_sed(is)), &
                & trim(loc_unitsname),sed_mima(is2l(is),1),sed_mima(is2l(is),2))
           call sub_putvar2d('fpres_'//trim(string_sed(is)),ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
        end SELECT
@@ -1472,8 +1472,6 @@ CONTAINS
           DO j=1,n_j
              IF (sed_fsed(is_det,i,j) > 0.0) THEN
                 loc_ij(i,j) = log10(sed_fsed(is_det,i,j)/dum_dtyr)
-             else
-                loc_ij(i,j) = const_real_null
              end if
           end do
        end do
@@ -1495,6 +1493,43 @@ CONTAINS
        call sub_adddef_netcdf(ntrec_siou,3,'fsed_CaCO3toPOC', &
             & 'sediment rain flux - CaCO3 to POC rain ratio',trim(loc_unitsname),loc_c0,loc_c0)
        call sub_putvar2d('fsed_CaCO3toPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+    end if
+    ! POP:POC Redfield rain ratio data
+    IF (sed_select(is_POC) .AND. sed_select(is_POP)) THEN
+       loc_unitsname = 'n/a'
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             if (sed_fsed(is_POP,i,j) > const_real_nullsmall) then
+                loc_ij(i,j) = sed_fsed(is_POC,i,j)/sed_fsed(is_POP,i,j)
+             end if
+          END DO
+       END DO
+       call sub_adddef_netcdf(ntrec_siou,3,'fsed_POPtoPOC', &
+            & 'sediment rain flux - POP to POC (C/P) Redfield ratio',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('fsed_POPtoPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             if (loc_sed_burial(is_POP,i,j) > const_real_nullsmall) then
+                loc_ij(i,j) = loc_sed_burial(is_POC,i,j)/loc_sed_burial(is_POP,i,j)
+             end if
+          END DO
+       END DO
+       call sub_adddef_netcdf(ntrec_siou,3,'fburial_POPtoPOC', &
+            & 'sediment burial flux - POP to POC (C/P) Redfield ratio',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('fburial_POPtoPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             if (sed_fdis(is_POP,i,j) > const_real_nullsmall) then
+                loc_ij(i,j) = sed_fdis(is_POC,i,j)/sed_fdis(is_POP,i,j)
+             end if
+          END DO
+       END DO
+       call sub_adddef_netcdf(ntrec_siou,3,'fdis_POPtoPOC', &
+            & 'sediment dissolution flux - POP to POC (C/P) Redfield ratio',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('fdis_POPtoPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
     end if
     ! diagnostics
     IF (sed_select(is_POC) .AND. par_sed_diagen_Corgopt == 'huelse2016') THEN

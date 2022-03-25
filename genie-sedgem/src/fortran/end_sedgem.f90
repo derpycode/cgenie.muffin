@@ -110,6 +110,8 @@ SUBROUTINE end_sedgem( &
   call check_iostat(dealloc_error,__LINE__,__FILE__)
   DEALLOCATE(sed_Psed_porg,STAT=dealloc_error)
   call check_iostat(dealloc_error,__LINE__,__FILE__)
+  DEALLOCATE(sed_Psed_rr,STAT=dealloc_error)
+  call check_iostat(dealloc_error,__LINE__,__FILE__)
   DEALLOCATE(sed_diag,STAT=dealloc_error)
   call check_iostat(dealloc_error,__LINE__,__FILE__)
   ! ---------------------------------------------------------- ! deallocate arrays -- lookup tables

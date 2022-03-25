@@ -204,6 +204,7 @@ CONTAINS
        print*,'Impose alt opal burial flux forcing?                : ',ctrl_sed_Fopal
        print*,'Impose alt Corg preservation (burial) flux?         : ',ctrl_sed_Pcorg
        print*,'Impose alt Porg preservation (burial) flux?         : ',ctrl_sed_Pporg
+       print*,'Impose alt preservation (burial) rain ratio?        : ',ctrl_sed_Prr
        print*,'Set dissolution flux = rain flux for CaCO3 only?    : ',ctrl_force_sed_closedsystem_CaCO3
        print*,'Set dissolution flux = rain flux for opal only?     : ',ctrl_force_sed_closedsystem_opal
        ! --- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------ !
@@ -226,6 +227,7 @@ CONTAINS
        print*,'Alt opal burial flux forcing filename               : ',trim(par_sed_Fopal_name)
        print*,'Alt Corg preservation (burial) flux filename        : ',trim(par_sed_Pcorg_name)
        print*,'Alt Porg preservation (burial) flux filename        : ',trim(par_sed_Pporg_name)
+       print*,'Alt preservation (burial)rain ratio filename        : ',trim(par_sed_Prr_name)
        ! --- I/O: MISC ----------------------------------------------------------------------------------------------------------- !
        print*,'--- I/O: MISC --------------------------------------'
        print*,'save timeseries output                              : ',ctrl_timeseries_output
@@ -915,6 +917,18 @@ CONTAINS
        loc_ij(:,:) = 0.0
     endif
     sed_Psed_porg = loc_ij
+    ! load alternative Porg preservation (burial) rain ratio (C/P) field
+    if (ctrl_sed_Prr) then
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sed_Prr_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sed_Prr_name)
+       endif
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+    else
+       loc_ij(:,:) = 0.0
+    endif
+    sed_Psed_rr = loc_ij
     ! initialize diagnostics data array
     sed_diag(:,:,:) = 0.0
   END SUBROUTINE sub_init_sed
@@ -1541,7 +1555,14 @@ CONTAINS
        call check_iostat(ios  ,__LINE__,__FILE__)
        Write(unit=out,fmt=*) '---------------------------------'
        ! SAVE ! 
-       loc_deep_FPOP = loc_tot1_sedgrid - loc_tot2_sedgrid 
+       loc_deep_FPOP = loc_tot1_sedgrid - loc_tot2_sedgrid
+       ! C/P
+       if (loc_deep_FPOP > const_real_nullsmall) then
+          write(unit=out,fmt='(A28,f6.2)',iostat=ios) &
+               & ' C/P of Corg burial        :',loc_deep_FPOC/loc_deep_FPOP
+          call check_iostat(ios,__LINE__,__FILE__)
+          Write(unit=out,fmt=*) '---------------------------------'
+       end if
     end if
     ! CaCO3
     loc_tot1_sedgrid = sum(loc_mask_dsea(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:))
@@ -1883,6 +1904,13 @@ CONTAINS
        Write(unit=out,fmt=*) '---------------------------------'  
        ! SAVE !
        loc_mud_FPOP = loc_tot1_sedgrid - loc_tot2_sedgrid  
+       ! C/P
+       if (loc_mud_FPOP > const_real_nullsmall) then
+          write(unit=out,fmt='(A28,f6.2)',iostat=ios) &
+               & ' C/P of Corg burial        :',loc_mud_FPOC/loc_mud_FPOP
+          call check_iostat(ios,__LINE__,__FILE__)
+          Write(unit=out,fmt=*) '---------------------------------'
+       end if
     end if
     ! CaCO3
     loc_tot1_sedgrid = sum(loc_mask_muds(:,:)*loc_area(:,:)*loc_fsed(is_CaCO3,:,:))

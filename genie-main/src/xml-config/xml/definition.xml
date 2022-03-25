@@ -7624,6 +7624,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="boolean">.false.</value>
                         <description>Use alt Porg preservation (burial) field?</description>
                     </param>
+                    <param name="ctrl_sed_Prr">
+                        <value datatype="boolean">.false.</value>
+                        <description>Use alt preservation (burial) rain ratio field?</description>
+                    </param>
 <!-- I/O: DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
 			<value datatype="string"></value>
@@ -7692,6 +7696,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_Pporg_name">
                         <value datatype="string">hello_world</value>
                         <description>Alt Porg preservation (burial) field file name</description>
+                    </param>
+                    <param name="par_sed_Prr_name">
+                        <value datatype="string">hello_world</value>
+                        <description>Alt preservation (burial) rain ratio (C/P) field file name</description>
                     </param>
                     <param name="ctrl_force_sed_closedsystem_CaCO3">
 			<value datatype="boolean">.false.</value>
