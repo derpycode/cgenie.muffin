@@ -594,6 +594,10 @@ MODULE biogem_lib
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
   real::par_k_lim_pyr                                            ! MM type limiting factor for FeS2 precipitation
   namelist /ini_biogem_nml/par_k_lim_pyr
+  LOGICAL::ctrl_bio_CaSO4precip_explicit                         ! Does CaSO4 precipitation consume Ca2+ ?
+  real::par_bio_CaSO4_part_abioticohm_cte                        ! Ohmega constant for CaSO4 formation
+  real::par_bio_CaSO4precip_k                                    ! k-value for CaSO4 precipitation (M-1 yr-1)
+  NAMELIST /ini_biogem_nml/par_bio_CaSO4_part_abioticohm_cte,par_bio_CaSO4precip_k,ctrl_bio_CaSO4precip_explicit
   real::par_bio_remin_kFe2toFe                                   ! k-value Fe oxidation
   real::par_d56Fe_Fe2ox_alpha                                    ! 56/54Fe fractionation for iron re-oxidation
   NAMELIST /ini_biogem_nml/par_bio_remin_kFe2toFe,par_d56Fe_Fe2ox_alpha
@@ -934,6 +938,8 @@ MODULE biogem_lib
   INTEGER,PARAMETER::idiag_precip_Fe3SiO4_dFe            = 07    !
   INTEGER,PARAMETER::idiag_precip_Fe3PO42_dFe            = 08    !
   INTEGER,PARAMETER::idiag_precip_Fe3PO42_dPO4           = 09    !
+  INTEGER,PARAMETER::idiag_precip_CaSO4_dCa              = 10    !
+  INTEGER,PARAMETER::idiag_precip_CaSO4_dSO4             = 11    !
   ! diagnostics - geochemistry -- iron speciation
   INTEGER,PARAMETER::idiag_iron_Fe3                      = 01    !
   INTEGER,PARAMETER::idiag_iron_Fe3L                     = 02    !

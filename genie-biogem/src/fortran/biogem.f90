@@ -1813,6 +1813,9 @@ subroutine biogem(        &
               if (sed_select(is_FeS2)) then
                  call sub_calc_precip_FeS2(i,j,loc_k1,loc_dtyr)
               end if
+              if (sed_select(is_CaSO4)) then
+                 call sub_calc_precip_CaSO4(i,j,loc_k1,loc_dtyr)
+              end if
               ! *** Fe-CO3 precip ***
               if (sed_select(is_FeCO3)) then
                  call sub_calc_precip_FeCO3(i,j,loc_k1,loc_dtyr)

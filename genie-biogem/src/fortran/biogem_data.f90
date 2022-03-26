@@ -431,6 +431,9 @@ CONTAINS
        print*,'Rate law power for FeS formation                    : ',par_bio_FeS_exp
        print*,'pyrite precip stiochiometry                         : ',ctrl_bio_FeS2precip_explicit
        print*,'Ohnega constant for FeS formation                   : ',par_bio_FeS_abioticohm_cte
+       print*,'Does CaSO4 precipitation consume Ca?                : ',ctrl_bio_CaSO4precip_explicit
+       print*,'kinetic constant for CaSO4 precipitation            : ',par_bio_CaSO4precip_k 
+       print*,'Ohmega constant for CaSO4 formation                 : ',par_bio_CaSO4_part_abioticohm_cte
        print*,'kinetic constant for Fe2 oxidation                  : ',par_bio_remin_kFe2toFe
        print*,'Fe fractionation factor for Fe2 re-oxidation        : ',par_d56Fe_Fe2ox_alpha
        print*,'Fe fractionation factor for FeOOH precipitation     : ',par_d56Fe_FeOOH_alpha
@@ -1235,6 +1238,19 @@ CONTAINS
        conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)      = 0.0
        conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)      = 1.0
     end if
+    if (ctrl_bio_CaSO4precip_explicit) then
+       ! explicit reaction (the default defined in gem_util) consumes Ca
+       conv_sed_ocn(io_Ca,is_CaSO4)                 = 1.0
+       conv_sed_ocn(io_SO4,is_CaSO4)                = 1.0
+       conv_sed_ocn(io_SO4_34S,is_CaSO4_34S)        = 1.0
+       conv_sed_ocn(io_Ca_44Ca,is_CaSO4_44Ca)       = 1.0
+   else
+       ! alt reaction only affects SO4 (because easier)
+       conv_sed_ocn(io_Ca,is_CaSO4)                 = 0.0
+       conv_sed_ocn(io_SO4,is_CaSO4)                = 1.0
+       conv_sed_ocn(io_SO4_34S,is_CaSO4_34S)        = 1.0
+       conv_sed_ocn(io_Ca_44Ca,is_CaSO4_44Ca)       = 0.0
+   end if
     ! -------------------------------------------------------- !
     ! UPDATE REDFIELD RELATIONSHIPS
     ! -------------------------------------------------------- !

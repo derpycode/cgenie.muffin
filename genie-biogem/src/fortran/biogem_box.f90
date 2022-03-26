@@ -2991,7 +2991,8 @@ CONTAINS
     !       and be sure to also then search the full water column for particles
     ! NOTE: used maxval with FINDLOC becasue the returned variable is a vector
     ! NOTE: FINDLOC is 2008 FORTRAN and not friendly to old compilers ...
-    if (sed_select(is_Fe3Si2O4) .OR. sed_select(is_FeCO3) .OR. sed_select(is_FeS2) .OR. sed_select(is_FeOOH)) then
+    if (sed_select(is_Fe3Si2O4) .OR. sed_select(is_FeCO3) .OR. sed_select(is_FeS2) .OR. sed_select(is_FeOOH) &
+       & .OR. sed_select(is_CaSO4) ) then
        loc_klim = loc_k1
 !!$    elseif (maxval(FINDLOC(force_sed_uniform(:),-2)) > 0) then
     elseif (fun_find_int_i(-2,force_sed_uniform(:)) > 0) then

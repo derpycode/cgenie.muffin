@@ -75,6 +75,9 @@
  Fe3Si2O4        105 105  06  'greenalite'                           'wt%'     0.00     100.00
  Fe3Si2O4_56Fe   106 105  22  '56Fe of greenalite'                   'o/oo'   -9.99E+2    9.99E+2
  Fe3Si2O4_30Si   107 105  16  '30Si of greenalite'                   'o/oo'   -9.99E+2    9.99E+2
+ CaSO4           112 112  06  'gypsum'                               'wt%'     0.00     100.00
+ CaSO4_34S       113 112  15  'd34S of CaSO4'                        'o/oo'   -9.99E+2    9.99E+2
+ CaSO4_44Ca      114 112  20  'd44Ca of CaSO4'                       'o/oo'   -9.99E+2    9.99E+2
  det              22  22  02  'detrital (refractory) material'       'wt%'     0.00     100.00
  detLi            55  55  06  'CAN BE REASSIGNED'                    'wt%'     0.00     100.00
  detLi_7Li        56  55  18  'CAN BE REASSIGNED'                    'o/oo'   -9.99E+2    9.99E+2

@@ -1272,6 +1272,128 @@ CONTAINS
   end SUBROUTINE sub_calc_precip_FeS2
   ! ****************************************************************************************************************************** !
 
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE ABIOTIC GYPSUM PRECIPITATION
+  ! NOTE: const_rns == const_real_nullsmall
+  SUBROUTINE sub_calc_precip_CaSO4(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k,l,io,is
+    real,dimension(n_ocn,n_k)::loc_bio_uptake
+    real,dimension(n_sed,n_k)::loc_bio_part
+    real::loc_Ca,loc_SO4,loc_IPCaSO4
+    real::loc_r34S,loc_r44Ca
+    real::loc_CaSO4_precipitation
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_CaSO4_precipitation = 0.0
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_uptake(io,:) = 0.0
+    end do
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       loc_bio_part(is,:) = 0.0
+    end DO
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! CALCULATE GYPSUM PRECIPITATION
+    ! -------------------------------------------------------- !
+    ! water column loop
+    ! look for co-existing Ca and SO4. 
+    ! Ca2+ + SO42- -> CaSO4
+    ! NOTE: par_bio_CaSO4precip_k units are (M-1 yr-1)
+    DO k=n_k,dum_k1,-1
+       ! set local concentrations
+       loc_Ca = ocn(io_Ca,dum_i,dum_j,k)
+       loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
+       ! check for Ca and SO4 being greater than zero, 
+       ! and loc_FeS greater than a critical threshold (par_bio_FeS_part_abioticohm_cte)
+       if ( loc_Ca>const_rns .AND. loc_SO4>const_rns ) then
+          ! calculate ion product and check if degree of supersaturation is reached
+          loc_IPCaSO4 = loc_Ca*loc_SO4
+          if (loc_IPCaSO4>par_bio_CaSO4_part_abioticohm_cte) then
+            loc_CaSO4_precipitation = dum_dtyr*par_bio_CaSO4precip_k*loc_Ca*loc_SO4
+          end if 
+          ! cap at maximum of available Ca, SO4
+          loc_CaSO4_precipitation = MIN(loc_CaSO4_precipitation,loc_f*loc_Ca,loc_f*loc_SO4)
+          ! bulk tracer conversion
+          loc_bio_part(is_CaSO4,k) = loc_CaSO4_precipitation
+          ! calculate isotopic fractionation -- 34S
+          ! NOTE: we already know that loc_SO4 is non-zero
+          ! NOTE: no 34S fractionation assumed in the formation of gypsum
+          if (ocn_select(io_SO4_34S)) then
+             loc_r34S = ocn(io_SO4_34S,dum_i,dum_j,k)/ocn(io_SO4,dum_i,dum_j,k)
+             loc_bio_part(is_CaSO4_34S,k) = loc_r34S*loc_bio_part(is_CaSO4,k)
+          end if
+          ! calculate isotopic fractionation -- 44Ca
+          ! only if CaSO4 is excplicit (and takes into account gypsum)
+          ! NOTE: we already know that loc_Ca is non-zero
+          ! NOTE: no 44Ca fractionation assumed in the formation of gypsum
+          if (ctrl_bio_CaSO4precip_explicit) then
+             if (ocn_select(io_Ca_44Ca)) then
+                loc_r44Ca = ocn(io_Ca_44Ca,dum_i,dum_j,k)/ocn(io_Ca,dum_i,dum_j,k)
+                loc_bio_part(is_CaSO4_44Ca,k) = loc_r44Ca*loc_bio_part(is_CaSO4,k)
+             end if
+          end if 
+          ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
+          ! Ca only when CaSO4 is explicit
+          if (ctrl_bio_CaSO4precip_explicit) then
+             loc_bio_uptake(io_Ca,k) = loc_bio_uptake(io_Ca,k) + loc_bio_part(is_CaSO4,k)
+             loc_bio_uptake(io_Ca_44Ca,k) = loc_bio_uptake(io_Ca_44Ca,k) + loc_bio_part(is_CaSO4_44Ca,k)
+          end if
+
+          loc_bio_uptake(io_SO4,k) = loc_bio_uptake(io_SO4,k) + loc_bio_part(is_CaSO4,k)
+          loc_bio_uptake(io_SO4_34S,k) = loc_bio_uptake(io_SO4_34S,k) + loc_bio_part(is_CaSO4_34S,k)
+
+          !DO l=1,n_l_sed
+          !   is = conv_iselected_is(l)
+          !   loc_tot_i = conv_sed_ocn_i(0,is)
+          !   do loc_i=1,loc_tot_i
+          !      io = conv_sed_ocn_i(loc_i,is)
+          !      loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+          !   end do
+          !end DO
+       end if
+    end DO
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
+    end do
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
+    end DO
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_CaSO4,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    if (ctrl_bio_CaSO4precip_explicit) then
+       diag_precip(idiag_precip_CaSO4_dCa,dum_i,dum_j,:)  = loc_bio_uptake(io_Ca,:)
+    end if
+    diag_precip(idiag_precip_CaSO4_dSO4,dum_i,dum_j,:) = loc_bio_uptake(io_SO4,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_precip_CaSO4
+  ! ****************************************************************************************************************************** !
+
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ABIOTIC FeCO3 precipitation
@@ -1791,7 +1913,8 @@ CONTAINS
     ! -------------------------------------------------------- !
     integer::l,io,k!,id
     real::loc_O2,loc_SO4,loc_r34S
-    real::loc_SO4_reduction
+    real::loc_dic,loc_r13C,loc_r14C
+    real::loc_O2_correction
     real,dimension(n_ocn,n_k)::loc_bio_remin
     real::loc_f
     ! -------------------------------------------------------- !
@@ -1809,26 +1932,54 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! look for some negative O2 and positive SO4 and see if it can be 'reacted' ... :o)
     ! SO4 + 2H -> H2S + 2O2
+    ! if no positive SO4, grab some DIC and do something similar
+    ! CO2 + 2H2O -> CH4 + 2O2
     DO k=n_k,dum_k1,-1
        loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_SO4 = ocn(io_SO4,dum_i,dum_j,k)
+       loc_dic = ocn(io_DIC,dum_i,dum_j,k)
        if ( (loc_O2 < -const_rns) .AND. (loc_SO4 > const_rns) ) then
           ! calculate SO4 'reduction'
-          loc_SO4_reduction = (1.0/2.0)*abs(loc_O2)
+          loc_O2_correction = (1.0/2.0)*abs(loc_O2)
           ! cap SO4 'reduction' & negative O2 consumption
-          loc_SO4_reduction = min(loc_SO4_reduction,loc_f*loc_SO4,loc_f*(2.0/1.0)*abs(loc_O2))
+          loc_O2_correction = min(loc_O2_correction,loc_f*loc_SO4,loc_f*(2.0/1.0)*abs(loc_O2))
           ! bulk tracer conversion
-          loc_bio_remin(io_H2S,k) = loc_SO4_reduction
-          loc_bio_remin(io_SO4,k) = -loc_SO4_reduction
-          loc_bio_remin(io_O2,k)  = 2.0*loc_SO4_reduction
-          loc_bio_remin(io_ALK,k) = 2.0*loc_SO4_reduction
+          loc_bio_remin(io_H2S,k) = loc_O2_correction
+          loc_bio_remin(io_SO4,k) = -loc_O2_correction
+          loc_bio_remin(io_O2,k)  = 2.0*loc_O2_correction
+          loc_bio_remin(io_ALK,k) = 2.0*loc_O2_correction
           ! calculate isotopic fractionation -- 34S
           ! NOTE: we already know that loc_SO4 is non-zero
           if (ocn_select(io_H2S_34S) .AND. ocn_select(io_SO4_34S)) then
              loc_r34S  = ocn(io_SO4_34S,dum_i,dum_j,k)/loc_SO4
              ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO S FRACTIONATION ########################################################## !
-             loc_bio_remin(io_H2S_34S,k) = loc_r34S*loc_SO4_reduction
-             loc_bio_remin(io_SO4_34S,k) = -loc_r34S*loc_SO4_reduction
+             loc_bio_remin(io_H2S_34S,k) = loc_r34S*loc_O2_correction
+             loc_bio_remin(io_SO4_34S,k) = -loc_r34S*loc_O2_correction
+             ! ################################################################################################################### !
+          end if
+       elseif ( (loc_O2 < -const_rns) .AND. (loc_dic > const_rns) ) then
+          ! calculate CO2 'reduction' (i.e. transfer electrons from CO2 to CH4 to get rid of negative oxygen)
+          loc_O2_correction = (1.0/2.0)*abs(loc_O2)
+          ! cap SO4 'reduction' & negative O2 consumption
+          loc_O2_correction = min(loc_O2_correction,loc_f*loc_dic,loc_f*(2.0/1.0)*abs(loc_O2))
+          ! bulk tracer conversion
+          loc_bio_remin(io_ch4,k) = loc_O2_correction
+          loc_bio_remin(io_dic,k) = -loc_O2_correction
+          loc_bio_remin(io_O2,k)  = 2.0*loc_O2_correction
+          ! calculate isotopic fractionation -- 13C/14C
+          ! NOTE: we already know that loc_dic is non-zero
+          if (ocn_select(io_ch4_13C) .AND. ocn_select(io_dic_13c)) then
+             loc_r13C = ocn(io_dic_13C,dum_i,dum_j,k)/ocn(io_dic,dum_i,dum_j,k)
+             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO C FRACTIONATION ########################################################## !
+             loc_bio_remin(io_ch4_13c,k) = loc_r13C*loc_O2_correction
+             loc_bio_remin(io_dic_13c,k) = -loc_r13c*loc_O2_correction
+             ! ################################################################################################################### !
+          end if
+          if (ocn_select(io_ch4_14C) .AND. ocn_select(io_dic_14c)) then
+             loc_r14C = ocn(io_dic_14C,dum_i,dum_j,k)/ocn(io_dic,dum_i,dum_j,k)
+             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO C FRACTIONATION ########################################################## !
+             loc_bio_remin(io_ch4_14c,k) = loc_r14C*loc_O2_correction
+             loc_bio_remin(io_dic_14c,k) = -loc_r14c*loc_O2_correction
              ! ################################################################################################################### !
           end if
        end if

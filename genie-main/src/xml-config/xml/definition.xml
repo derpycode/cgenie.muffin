@@ -899,7 +899,7 @@
                         </param>
                   </paramArray>
 <!-- sed_select -->
-                   <paramArray name="sed_select" dimension="1" extent="109">
+                   <paramArray name="sed_select" dimension="1" extent="114">
                         <description>tracer selection</description>
                         <param name="sed_select(1)" index="1">
                             <value datatype="boolean">.false.</value>
@@ -1342,6 +1342,18 @@
                             <description></description>
                         </param>
                         <param name="sed_select(111)" index="111">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(112)" index="112">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(113)" index="113">
+                            <value datatype="boolean">.false.</value>
+                            <description></description>
+                        </param>
+                        <param name="sed_select(114)" index="114">
                             <value datatype="boolean">.false.</value>
                             <description></description>
                         </param>
@@ -5369,6 +5381,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Explicit FeS2 precip stiochiometry?</description>
                     </param>
+                    <param name="ctrl_bio_CaSO4precip_explicit">
+			<value datatype="boolean">.false.</value>
+                        <description>Does CaSO4 precipitation consume Ca2+?</description>
+                    </param>
+                    <param name="par_bio_CaSO4precip_k">
+			<value datatype="real">1.0</value>
+                        <description>kinetic constant for CaSO4 precipitation in M-1 yr-1</description>
+                    </param>
+                     <param name="par_bio_CaSO4_part_abioticohm_cte">
+			<value datatype="real">2.8e-4</value>
+                        <description>Ohmega constant for CaSO4 formation (assuming this is in M^2)</description>
+                    </param>       
                     <param name="par_bio_Kd_PO4_FeOOH">
 			<value datatype="real">0.0</value>
                         <description>Ads constant for PO4 adsorption on (POM-)FeOOH</description>

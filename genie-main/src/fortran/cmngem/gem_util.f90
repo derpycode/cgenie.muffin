@@ -160,6 +160,10 @@ CONTAINS
     conv_sed_ocn(io_SO4_34S,is_FeS2_34S)         = 1.0/4.0
     conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)       = 0.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)       = 1.0
+    conv_sed_ocn(io_Ca,is_CaSO4)                 = 1.0
+    conv_sed_ocn(io_SO4,is_CaSO4)                = 1.0
+    conv_sed_ocn(io_SO4_34S,is_CaSO4_34S)        = 1.0
+    conv_sed_ocn(io_Ca_44Ca,is_CaSO4_44Ca)       = 1.0
     conv_sed_ocn(io_Fe2,is_FeOOH)                = 1.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeOOH_56Fe)      = 1.0
     conv_sed_ocn(io_O2,is_FeOOH)                 = 1.0
