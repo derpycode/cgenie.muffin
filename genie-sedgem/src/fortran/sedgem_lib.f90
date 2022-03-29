@@ -98,14 +98,20 @@ MODULE sedgem_lib
   REAL::par_sed_diagen_fracC2Ppres_c0_O2                         ! C:P remin [O2] threshold (mol kg-1)
   NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_off,par_sed_diagen_fracC2Ppres_c0_O2
   LOGICAL::ctrl_sed_dunne2007_remin_POP                          ! Force return of PO4 to ocean in Dunne 2007 scheme
-  NAMELIST /ini_sedgem_nml/ctrl_sed_dunne2007_remin_POP  
+  NAMELIST /ini_sedgem_nml/ctrl_sed_dunne2007_remin_POP
+  LOGICAL::ctrl_sed_conv_sed_ocn_old                             ! Retain original (biological production) 'Redfield' remin
+  NAMELIST /ini_sedgem_nml/ctrl_sed_conv_sed_ocn_old
+  REAL::par_sed_diagen_O2thresh                                  ! [O2] threshold for switching redox transformtion arrays
+  REAL::par_sed_diagen_NO3thresh                                 ! [NO3] threshold for switching redox transformtion arrays
+  REAL::par_sed_diagen_SO4thresh                                 ! [SO4] threshold for switching redox transformtion arrays
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_O2thresh,par_sed_diagen_NO3thresh,par_sed_diagen_SO4thresh
   ! ------------------- DIAGENESIS SCHEME: ORGANIC MATTER HUELSE 2017 ------------------------------------------------------------ !
   character(len=63)::par_sed_huelse2017_kscheme                  ! Corg k parametrisation scheme ID string
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_kscheme
   logical::par_sed_huelse2017_redox                              ! Corg degradation rates redox dependent?
   logical::par_sed_huelse2017_P_cycle                            ! Include explicit P-cycle in OMEN-SED?
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_redox,par_sed_huelse2017_P_cycle
-  logical::par_sed_huelse2017_remove_impl_sulALK                 ! Remove implicit Alk associated with buried sulf-OM? / no permanent ALk gain?
+  logical::par_sed_huelse2017_remove_impl_sulALK                 ! Remove implicit Alk associated with buried sulf-OM?
   logical::par_sed_huelse2017_sim_P_loss                         ! Simulate ocean Porg loss with buried sulf-OM?
   logical::par_sed_huelse2017_sim_P_loss_pres_fracC              ! Simulate ocean Porg loss related to Corg burial?
   logical::par_sed_huelse2017_sim_P_regeneration                 ! Simulate increased P-regeneration under anoxia?

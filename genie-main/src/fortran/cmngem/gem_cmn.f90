@@ -471,7 +471,7 @@ MODULE gem_cmn
   ! tracer conversion - indices for non-zero transformation ratio values
   ! NOTE: the zero index place in the array is used in algorithms identifying null relationships (or something)
   integer,DIMENSION(0:n_ocn,0:n_atm)::conv_atm_ocn_i
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! 
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! (all possibilities)
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_O                  ! tracer conversion array for oxic conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_Fe                 ! tracer conversion array for FeOOH-reduction

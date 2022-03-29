@@ -47,7 +47,8 @@ CONTAINS
        & dum_dtyr,           &
        & dum_i,dum_j,        &
        & dum_D,              &
-       & dum_sfcsumocn       &
+       & dum_sfcsumocn,      &
+       & dum_conv_sed_ocn    &
        & )
     IMPLICIT NONE
     ! dummy arguments
@@ -55,6 +56,7 @@ CONTAINS
     integer,INTENT(in)::dum_i,dum_j                            ! grid point (i,j)
     REAL,INTENT(in)::dum_D                                     ! depth
     real,DIMENSION(n_ocn),intent(in)::dum_sfcsumocn            ! ocean composition interface array
+    real,DIMENSION(n_ocn,n_sed),intent(in)::dum_conv_sed_ocn   ! (redox-dependent) sed -> ocn conversion
     ! local variables
     INTEGER::l,is,io                                           ! tracer index counters
     INTEGER::n                                                 ! 
@@ -830,7 +832,7 @@ CONTAINS
        loc_tot_i = conv_sed_ocn_i(0,is)
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
-          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
+          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
        end do
     end DO
 
@@ -961,7 +963,8 @@ CONTAINS
        & dum_dtyr,                &
        & dum_i,dum_j,             &
        & dum_D,                   &
-       & dum_sfcsumocn            &
+       & dum_sfcsumocn,           &
+       & dum_conv_sed_ocn         &
        & )
     IMPLICIT NONE
     ! dummy arguments
@@ -969,9 +972,10 @@ CONTAINS
     integer,INTENT(in)::dum_i,dum_j                              ! grid point (i,j)
     REAL,INTENT(in)::dum_D                                       ! depth
     real,DIMENSION(n_ocn),intent(in)::dum_sfcsumocn              ! ocean composition interface array
+    real,DIMENSION(n_ocn,n_sed),intent(in)::dum_conv_sed_ocn   ! (redox-dependent) sed -> ocn conversion
     ! local variables
     INTEGER::l,is,io                                         ! tracer index counters
-    INTEGER::n                                                 ! 
+    INTEGER::n                                               ! 
     integer::loc_i,loc_tot_i                                 ! array index conversion variables
     INTEGER::loc_n_sed_stack_top                             ! sediment stack top (incomplete) layer number
     INTEGER::loc_n_sedcore_stack_top                         ! sediment core stack top (complete layers only)
@@ -1014,7 +1018,7 @@ CONTAINS
           loc_tot_i = conv_sed_ocn_i(0,is)
           do loc_i=1,loc_tot_i
              io = conv_sed_ocn_i(loc_i,is)
-             sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + conv_sed_ocn(io,is)*sed_fsed(is,dum_i,dum_j)
+             sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_sed_ocn(io,is)*sed_fsed(is,dum_i,dum_j)
           end do
           sed_fsed(is,dum_i,dum_j) = 0.0
        end if
@@ -1200,7 +1204,7 @@ CONTAINS
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
           sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + &
-               & conv_sed_ocn(io,is)*(sed_fdis(is,dum_i,dum_j)-sed_fsed(is,dum_i,dum_j))
+               & dum_conv_sed_ocn(io,is)*(sed_fdis(is,dum_i,dum_j)-sed_fsed(is,dum_i,dum_j))
        end do
     end DO
 
@@ -1440,15 +1444,17 @@ CONTAINS
   SUBROUTINE sub_update_sed_mud( &
        & dum_dtyr,               &
        & dum_i,dum_j,            &
-       & dum_D,              &
-       & dum_sfcsumocn           &
+       & dum_D,                  &
+       & dum_sfcsumocn,          &
+       & dum_conv_sed_ocn        &
        & )
     IMPLICIT NONE
     ! dummy arguments
     REAL,INTENT(in)::dum_dtyr                                    ! time-step
     integer,INTENT(in)::dum_i,dum_j                              ! grid point (i,j)
-    REAL,INTENT(in)::dum_D                                     ! depth
-    real,DIMENSION(n_ocn),intent(in)::dum_sfcsumocn            ! ocean composition interface array
+    REAL,INTENT(in)::dum_D                                       ! depth
+    real,DIMENSION(n_ocn),intent(in)::dum_sfcsumocn              ! ocean composition interface array
+    real,DIMENSION(n_ocn,n_sed),intent(in)::dum_conv_sed_ocn   ! (redox-dependent) sed -> ocn conversion
     ! local variables
     INTEGER::l,is,io                                             ! tracer index counters
     INTEGER::n                                                 ! 
@@ -1914,7 +1920,7 @@ CONTAINS
           loc_tot_i = conv_sed_ocn_i(0,is)
           do loc_i=1,loc_tot_i
              io = conv_sed_ocn_i(loc_i,is)
-             sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) - conv_sed_ocn(io,is)*loc_fsed(is)
+             sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) - dum_conv_sed_ocn(io,is)*loc_fsed(is)
           end do
        end DO
        !
@@ -2091,7 +2097,7 @@ CONTAINS
        loc_tot_i = conv_sed_ocn_i(0,is)
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
-          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
+          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
        end do
     end DO
 
