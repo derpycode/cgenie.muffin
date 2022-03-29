@@ -384,6 +384,35 @@ CONTAINS
           end SELECT
        END DO
     END IF
+    ! estimted sediment burial flux
+    IF (ctrl_data_save_sig_fsedocn .AND. ctrl_data_save_sig_ocnsed) THEN
+       ! estimated POC burial (correct for CaCO3 dissolution contribution to DIC flux)
+       if (ocn_select(io_DIC) .AND. ocn_select(io_Ca) .AND. sed_select(is_POC)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_fsed_POC',string_results_ext)
+          loc_string = '% time (yr) / global POC burial flux (mol yr-1) / global POC burial flux density (mol m-2 yr-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       ! estimated POP burial
+       if (ocn_select(io_PO4) .AND. sed_select(is_POP)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_fsed_POP',string_results_ext)
+          loc_string = '% time (yr) / global POP burial flux (mol yr-1) / global POP burial flux density (mol m-2 yr-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+    end if
     ! miscellaneous
     IF (ctrl_data_save_sig_misc) THEN
        if (flag_gemlite) then
@@ -1894,6 +1923,45 @@ CONTAINS
        END DO
     END IF
 
+    ! *** <sig_misc_fsed_*> ***
+    ! write estimted sediment burial flux data
+    ! NOTE: write data both as the total flux, and as the equivalent mean flux density
+    ! NOTE: the surface ocean area is used as a proxy for the ocean bottom area
+    IF (ctrl_data_save_sig_fsedocn .AND. ctrl_data_save_sig_ocnsed) THEN
+       ! estimated POC burial (correct for CaCO3 dissolution contribution to DIC flux)
+       if (ocn_select(io_DIC) .AND. ocn_select(io_Ca) .AND. sed_select(is_POC)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_fsed_POC',string_results_ext)
+          loc_sig = (int_focnsed_sig(is_POC) - (int_fsedocn_sig(io_DIC) - int_fsedocn_sig(io_Ca)))/int_t_sig
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,2e15.7)',iostat=ios) &
+               & loc_t, &
+               & loc_sig, &
+               & loc_sig/loc_ocn_tot_A
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       ! estimated POP burial
+       if (ocn_select(io_PO4) .AND. sed_select(is_POP)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_fsed_POP',string_results_ext)
+          loc_sig = (int_focnsed_sig(is_POP) - int_fsedocn_sig(io_PO4))/int_t_sig
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          WRITE(unit=out,fmt='(f12.3,2e15.7)',iostat=ios) &
+               & loc_t, &
+               & loc_sig, &
+               & loc_sig/loc_ocn_tot_A
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if          
+    end if
+        
     ! *** <sig_misc_*> ***
     ! write miscellaneous data (if requested)
     IF (ctrl_data_save_sig_misc) THEN

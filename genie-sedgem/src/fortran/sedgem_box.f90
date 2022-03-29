@@ -281,16 +281,6 @@ CONTAINS
              end if
           end if
        end DO
-       ! now ... go and replace preservation (burial) fields if requested :o)
-       ! NOTE; convert units from mol cm-2 yr-1 -> cm3 cm-2 per time-step
-       if (ctrl_sed_Pcorg) then
-          loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
-               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
-       end if
-       if (ctrl_sed_Pporg) then
-          loc_dis_sed(is_POP) = loc_new_sed(is_POP) - &
-               & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_porg(dum_i,dum_j),loc_new_sed(is_POP))
-       end if
        ! finally, set flux fraction of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = loc_dis_sed(is_POC)
     case ('huelse2016')
@@ -372,7 +362,13 @@ CONTAINS
     ! NOTE: convert units from mol cm-2 yr-1 (from netCDF output) -> cm3 cm-2 per time-step
     if (ctrl_sed_Pcorg) then
        loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
-            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
+            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))
+       ! 13C
+       if (loc_new_sed(is_POC) > const_rns) then
+          loc_dis_sed(is_POC_13C) = (loc_dis_sed(is_POC)/loc_new_sed(is_POC))*loc_new_sed(is_POC_13C)
+       else
+          loc_dis_sed(is_POC_13C) = 0.0
+       end if
        ! re-set flux fraction of POC available for CaCO3 diagenesis
        loc_sed_diagen_fCorg = loc_dis_sed(is_POC)
     end if
@@ -1727,7 +1723,13 @@ CONTAINS
     ! NOTE: convert units from mol cm-2 yr-1 (from netCDF output) -> cm3 cm-2 per time-step
     if (ctrl_sed_Pcorg) then
        loc_dis_sed(is_POC) = loc_new_sed(is_POC) - &
-            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))  
+            & min(dum_dtyr*conv_POC_mol_cm3*sed_Psed_corg(dum_i,dum_j),loc_new_sed(is_POC))
+       ! 13C
+       if (loc_new_sed(is_POC) > const_rns) then
+          loc_dis_sed(is_POC_13C) = (loc_dis_sed(is_POC)/loc_new_sed(is_POC))*loc_new_sed(is_POC_13C)
+       else
+          loc_dis_sed(is_POC_13C) = 0.0
+       end if
     end if
     ! enable replacement of Porg preservation (burial) fields, either directly or via a specified C/P rain ratio
     ! NOTE: convert units from mol cm-2 yr-1 (from netCDF output) -> cm3 cm-2 per time-step
