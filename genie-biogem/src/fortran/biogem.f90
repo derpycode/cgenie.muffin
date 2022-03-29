@@ -1785,9 +1785,9 @@ subroutine biogem(        &
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
                    & '*** OCEAN ABIOTIC PRECIPITATION ***'
               ! *** OCEAN ABIOTIC PRECIPITATION ***
-              ! *** Ca-CO3 precip ***
+              ! *** CaCO3 precip ***
               if (ctrl_bio_CaCO3precip .AND. sed_select(is_CaCO3)) then
-                 call sub_calc_bio_uptake_abio(i,j,loc_k1,loc_dtyr)
+                 call sub_calc_precip_CaCO3(i,j,loc_k1,loc_dtyr)
               end if
               ! *** Fe-oxyhydroxide precip ***
               if (sed_select(is_FeOOH)) then

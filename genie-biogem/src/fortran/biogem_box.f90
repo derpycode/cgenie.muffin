@@ -2073,8 +2073,8 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! CALCULATE ABIOTIC TRACER UPTAKE AT THE SURFACE OCEAN
-  SUBROUTINE sub_calc_bio_uptake_abio(dum_i,dum_j,dum_k1,dum_dt)
+  ! CALCULATE ABIOTIC CaCO3 PRECIP
+  SUBROUTINE sub_calc_precip_CaCO3(dum_i,dum_j,dum_k1,dum_dt)
     ! dummy arguments
     INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
     real,intent(in)::dum_dt
@@ -2107,7 +2107,7 @@ CONTAINS
     end if
 
     ! *** CALCULATE CaCO3 PRECIPITATION ***
-    DO k=n_k,dum_k1,-1
+    DO k=n_k,loc_kmax,-1
        ! re-calculate carbonate dissociation constants
        CALL sub_calc_carbconst(                 &
             & phys_ocn(ipo_Dmid,dum_i,dum_j,k), &
@@ -2156,6 +2156,7 @@ CONTAINS
        else
           loc_bio_part(is_CaCO3,k) = 0.0
        end if
+       ! d13C
        if (sed_select(is_CaCO3_13C)) then
           ! re-calculate carbonate system isotopic properties
           if (ocn_select(io_DIC_13C)) then
@@ -2174,6 +2175,23 @@ CONTAINS
           loc_alpha = 1.0 + loc_delta_CaCO3/1000.0
           loc_R = carbisor(ici_HCO3_r13C,dum_i,dum_j,k)/(1.0 - carbisor(ici_HCO3_r13C,dum_i,dum_j,k))
           loc_bio_part(is_CaCO3_13C,k) = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_bio_part(is_CaCO3,k)
+       end if
+       ! d14C
+       if (sed_select(is_CaCO3_14C)) then
+          ! re-calculate carbonate system isotopic properties
+          if (ocn_select(io_DIC_14C)) then
+             call sub_calc_carb_r14C(           &
+                  & ocn(io_T,dum_i,dum_j,k),       &
+                  & ocn(io_DIC,dum_i,dum_j,k),     &
+                  & ocn(io_DIC_14C,dum_i,dum_j,k), &
+                  & carb(:,dum_i,dum_j,k),         &
+                  & carbisor(:,dum_i,dum_j,k)      &
+                  & )
+          end IF
+          ! calculate 14C/C fractionation between DIC and CaCO3
+          loc_alpha = 1.0 + 2.0*loc_delta_CaCO3/1000.0
+          loc_R = carbisor(ici_HCO3_r14C,dum_i,dum_j,n_k)/(1.0 - carbisor(ici_HCO3_r14C,dum_i,dum_j,n_k))
+          loc_bio_part(is_CaCO3_14C,k) = (loc_alpha*loc_R/(1.0 + loc_alpha*loc_R))*loc_bio_part(is_CaCO3,k)
        end if
        ! Li
        if (ocn_select(io_Li) .AND. ocn_select(io_Ca)) then
@@ -2218,7 +2236,7 @@ CONTAINS
        bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
     end DO
 
-  end SUBROUTINE sub_calc_bio_uptake_abio
+  end SUBROUTINE sub_calc_precip_CaCO3
   ! ****************************************************************************************************************************** !
 
 
@@ -2985,7 +3003,13 @@ CONTAINS
     !       and be sure to also then search the full water column for particles
     ! NOTE: used maxval with FINDLOC becasue the returned variable is a vector
     ! NOTE: FINDLOC is 2008 FORTRAN and not friendly to old compilers ...
-    if (sed_select(is_Fe3Si2O4) .OR. sed_select(is_FeCO3) .OR. sed_select(is_FeS2) .OR. sed_select(is_FeOOH)) then
+    if ( &
+         & (sed_select(is_CaCO3) .AND. ctrl_bio_CaCO3precip) .OR. &
+         & sed_select(is_Fe3Si2O4) .OR. &
+         & sed_select(is_FeCO3) .OR. &
+         & sed_select(is_FeS2) .OR. &
+         & sed_select(is_FeOOH) &
+         & ) then
        loc_klim = loc_k1
 !!$    elseif (maxval(FINDLOC(force_sed_uniform(:),-2)) > 0) then
     elseif (fun_find_int_i(-2,force_sed_uniform(:)) > 0) then
