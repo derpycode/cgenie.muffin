@@ -89,6 +89,7 @@ CONTAINS
        print*,'    routes to                                       : ',max_drain_cells
        !--- WEATHERING PARAMETERS -------------------------------------------------------------------------------------------------- !
        print*,'--- WEATHERING PARAMETERS ---'
+       print*,'close system (populate unit weathering fluxes)?     : ',ctrl_force_sed_closedsystem 
        print*,'short circuit atmosphere                            : ',opt_short_circuit_atm   
        print*,'scale (global) weathering with runoff               : ',opt_weather_runoff                   
        print*,'weathering scheme ID string                         : ',trim(par_weathopt)               

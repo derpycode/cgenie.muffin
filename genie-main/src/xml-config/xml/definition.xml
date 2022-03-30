@@ -7887,6 +7887,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>maximum number of ocean cells a single land cell routes to</description>
                     </param>
                       <!-- *** WEATHERING PARAMETERS *********************************** -->
+		  <param name="ctrl_force_sed_closedsystem">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>close system (populate unit weathering fluxes)?</description>
+                    </param>
 		  <param name="opt_short_circuit_atm">
 			<value datatype="boolean">.TRUE.</value>
 	                  <description>short circuit atmosphere by not taking CO2 directly, instead have less DIC put into ocean.</description>
