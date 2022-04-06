@@ -711,6 +711,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/opt_append_data
   real::par_data_save_ben_Dmin                                   ! minimum depth for 'benthic' average
   NAMELIST /ini_biogem_nml/par_data_save_ben_Dmin
+  real::par_data_save_opsi_Dmin                                  ! minimum depth for opsi min/max identification (m) 
+  NAMELIST /ini_biogem_nml/par_data_save_opsi_Dmin
   integer::par_t_sig_count_N,par_t_sig_count_S                   ! time-step point for snap-shot (time-series) solar forcing data
   NAMELIST /ini_biogem_nml/par_t_sig_count_N,par_t_sig_count_S
   integer::par_sig_j_N,par_sig_j_S                               ! generic N and S, j values (for time-series data saving)
@@ -1299,6 +1301,7 @@ MODULE biogem_lib
   REAL::int_misc_seaice_sig                                      !
   real::int_misc_seaice_sig_th,int_misc_seaice_sig_vol           !
   real::int_misc_opsi_min_sig,int_misc_opsi_max_sig              !
+  real::int_misc_opsid_min_sig,int_misc_opsid_max_sig            !
   real::int_misc_opsia_min_sig,int_misc_opsia_max_sig            !
   real::int_misc_SLT_sig                                         !
   real::int_misc_det_Fe_tot_sig,int_misc_det_Fe_dis_sig          !

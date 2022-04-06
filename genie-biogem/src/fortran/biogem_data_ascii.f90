@@ -445,10 +445,13 @@ CONTAINS
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opsi',string_results_ext)
        select case (fname_topo)
        case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
-          loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv) / '// &
-               & 'Atlantic min overturning (Sv) / Atlantic max overturning (Sv)'
+          loc_string = '% time (yr) / global min opsi (Sv) [full k grid] / global max opsi (Sv) [full k grid] / '// &
+               & 'ATL min opsi (Sv) [lower 50% of k grid] / ATL max opsi (Sv) [lower 50% of k grid]'// &
+               & 'global min opsi (Sv) [below  m] / global max opsi (Sv) [below  m]'
        case default
-          loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv)'
+          loc_string = '% time (yr) / global min opsi (Sv) [full k grid] / global max opsi (Sv) [full k grid] / '// &
+               & 'global min opsi (Sv) [> '// fun_conv_num_char_n(4,int(par_data_save_opsi_Dmin)) //' m] / '// &
+               & 'global max opsi (Sv) [> '// fun_conv_num_char_n(4,int(par_data_save_opsi_Dmin)) //' m]'
        end select
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
@@ -2001,17 +2004,21 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        select case (fname_topo)
        case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
-          WRITE(unit=out,fmt='(f12.3,4f9.3)',iostat=ios)          &
+          WRITE(unit=out,fmt='(f12.3,6f9.3)',iostat=ios)          &
                & loc_t,                                           &
                & loc_opsi_scale*int_misc_opsi_min_sig/int_t_sig,  &
                & loc_opsi_scale*int_misc_opsi_max_sig/int_t_sig,  &
                & loc_opsi_scale*int_misc_opsia_min_sig/int_t_sig, &
-               & loc_opsi_scale*int_misc_opsia_max_sig/int_t_sig
+               & loc_opsi_scale*int_misc_opsia_max_sig/int_t_sig, &
+               & loc_opsi_scale*int_misc_opsid_min_sig/int_t_sig, &
+               & loc_opsi_scale*int_misc_opsid_max_sig/int_t_sig
        case default
-          WRITE(unit=out,fmt='(f12.3,2f9.3)',iostat=ios)          &
+          WRITE(unit=out,fmt='(f12.3,4f9.3)',iostat=ios)          &
                & loc_t,                                           &
                & loc_opsi_scale*int_misc_opsi_min_sig/int_t_sig,  &
-               & loc_opsi_scale*int_misc_opsi_max_sig/int_t_sig
+               & loc_opsi_scale*int_misc_opsi_max_sig/int_t_sig,  &
+               & loc_opsi_scale*int_misc_opsid_min_sig/int_t_sig, &
+               & loc_opsi_scale*int_misc_opsid_max_sig/int_t_sig
        end select
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
@@ -3996,10 +4003,11 @@ CONTAINS
     REAL::loc_omina,loc_omaxa
     REAL,DIMENSION(n_j,n_k)::loc_ou,loc_zu
     REAL,DIMENSION(0:n_j,0:n_k)::loc_opsi,loc_opsia,loc_opsip,loc_zpsi
-    ! Calculate meridional overturning streamfunction opsi on C grid only
+    ! initialize arrays
     loc_opsi(:,:)  = 0.0
     loc_opsia(:,:) = 0.0
     loc_opsip(:,:) = 0.0
+    ! Calculate global meridional overturning streamfunction opsi (on C grid only)
     DO j=1,n_j-1
        DO k=1,n_k-1
           loc_ou(j,k) = 0.0

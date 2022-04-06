@@ -3644,7 +3644,7 @@ SUBROUTINE diag_biogem_timeseries( &
   ! local variables
   INTEGER::i,j,k,l,io,ia,is,ic
   integer::ib,id,i2D                                             ! counting variables
-  integer::loc_k1                                                !
+  integer::loc_k1,loc_opsi_maxk                                  !
   real::loc_t,loc_dts,loc_dtyr                                   !
   real::loc_yr,loc_yr_save                                       !
   REAL,DIMENSION(0:n_j,0:n_k)::loc_opsi,loc_zpsi                 !
@@ -3663,7 +3663,7 @@ SUBROUTINE diag_biogem_timeseries( &
   real::loc_tot_A,loc_tot_EP                                     !
   real::loc_sig                                                  !
   REAL,DIMENSION(2)::loc_opsia_minmax,loc_opsip_minmax           !
-  real::loc_opsi_scale                                           !
+  real::loc_opsi_scale,loc_opsi_D                                !
 
   ! *** TIME-SERIES DATA UPDATE ***
   IF (ctrl_debug_lvl1) print*, '*** RUN-TIME DATA UPDATE ***'
@@ -3681,6 +3681,22 @@ SUBROUTINE diag_biogem_timeseries( &
   ! update status of 'end'
   par_misc_t_endseries = .false.
 
+  ! find lagest k value deeper than a specifed depth
+  ! NOTE: upper depth layer edges are the MOC centers
+  !       top of layer k = SUM(goldstein_dsc*goldstein_dz(k+1:n_k)), so need to account for k = n_k (depth = 0.0)
+  ! NOTE: par_data_save_opsi_minD is a prescribed minimum depth for determining the min and max values
+  ! set default minimum depth level (surface)
+  loc_opsi_maxk = n_k
+  ! work from bottom up to sub-surface
+  DO k=0,n_k-1
+     loc_opsi_D = SUM(goldstein_dsc*goldstein_dz(k+1:n_k))
+     if (loc_opsi_D < par_data_save_opsi_Dmin) then
+        loc_opsi_maxk = k-1
+        exit
+     end if
+  end DO
+  if (k < 0) loc_opsi_maxk = 0
+  
   if_save1: if(par_data_save_sig_i > 0) then
      if_save2: IF ( &
           & ((loc_t - (par_data_save_sig(par_data_save_sig_i) + par_data_save_sig_dt/2.0)) < -conv_s_yr) &
@@ -3939,11 +3955,14 @@ SUBROUTINE diag_biogem_timeseries( &
               int_misc_seaice_sig_vol = int_misc_seaice_sig_vol + &
                    & loc_dtyr*SUM(phys_ocnatm(ipoa_seaice_th,:,:)*phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_seaice,:,:))
               ! overturning streamfunction
+              ! NOTE: loc_opsi dim == (0:n_j,0:n_k)
               CALL sub_calc_psi( &
                    & phys_ocn(ipo_gu:ipo_gw,:,:,:),loc_opsi,loc_opsia,loc_opsip,loc_zpsi,loc_opsia_minmax,loc_opsip_minmax &
                    & )
-              int_misc_opsi_min_sig = int_misc_opsi_min_sig + loc_dtyr*minval(loc_opsi(:,:))
-              int_misc_opsi_max_sig = int_misc_opsi_max_sig + loc_dtyr*maxval(loc_opsi(:,:))
+              int_misc_opsi_min_sig  = int_misc_opsi_min_sig + loc_dtyr*minval(loc_opsi(:,:))
+              int_misc_opsi_max_sig  = int_misc_opsi_max_sig + loc_dtyr*maxval(loc_opsi(:,:))
+              int_misc_opsid_min_sig = int_misc_opsid_min_sig + loc_dtyr*minval(loc_opsi(:,0:loc_opsi_maxk))
+              int_misc_opsid_max_sig = int_misc_opsid_max_sig + loc_dtyr*maxval(loc_opsi(:,0:loc_opsi_maxk))
               int_misc_opsia_min_sig = int_misc_opsia_min_sig + loc_dtyr*loc_opsia_minmax(1)
               int_misc_opsia_max_sig = int_misc_opsia_max_sig + loc_dtyr*loc_opsia_minmax(2)
               ! calculate current mean surface land (air) temperature SLT (degrees C)

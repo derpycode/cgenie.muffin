@@ -508,6 +508,7 @@ CONTAINS
        print*,'Save time-series data in ASCII format?              : ',ctrl_data_save_sig_ascii
        print*,'append data to output files on restart              : ',opt_append_data
        print*,'Minimum depth for benthic average (m)               : ',par_data_save_ben_Dmin
+       print*,'Minimum depth for opsi min/max identification (m)   : ',par_data_save_opsi_Dmin
        print*,'Time-step for snap-shot saving (N)                  : ',par_t_sig_count_N
        print*,'Time-step for snap-shot saving (S)                  : ',par_t_sig_count_S
        print*,'Generic N j value (for time-series data saving)     : ',par_sig_j_N
@@ -1733,6 +1734,8 @@ CONTAINS
     int_misc_seaice_sig_vol = 0.0
     int_misc_opsi_min_sig   = 0.0
     int_misc_opsi_max_sig   = 0.0
+    int_misc_opsid_min_sig  = 0.0
+    int_misc_opsid_max_sig  = 0.0
     int_misc_opsia_min_sig  = 0.0
     int_misc_opsia_max_sig  = 0.0
     int_misc_SLT_sig        = 0.0
@@ -1880,6 +1883,7 @@ CONTAINS
     ! NOTE: initialize basic grid structure values for the (i,j,k) grid, not just ocean-only points
     ! NOTE: depth in in unit of m BELOW sealevel (i.e., a +ve scale)
     ! NOTE: set default rho
+    ! NOTE: depth layer edges are the MOC centers
     DO i=1,n_i
        DO j=1,n_j
           DO k=1,n_k

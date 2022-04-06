@@ -5607,6 +5607,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">2000.0</value>
                         <description>Minimum depth for benthic average (m)</description>
                     </param>
+                    <param name="par_data_save_opsi_Dmin">
+			<value datatype="real">1000.0</value>
+                        <description>Minimum depth for opsi min/max identification (m)</description>
+                    </param>                    
                     <param name="par_t_sig_count_N">
 			<value datatype="integer">1</value>
                         <description>Integration count for snap-shot savin -- 12 is approx June 21 for 24 BIOGEM time-steps per year</description>
