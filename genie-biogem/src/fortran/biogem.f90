@@ -3777,7 +3777,7 @@ SUBROUTINE diag_biogem_timeseries( &
                        end do
                        locij_mask_ben(i,j) = 1.0
                     else
-                       locij_mask_ben(i,j) = 0.0
+                       locij_mask_ben(i,j)  = 0.0
                        locij_ocn_ben(:,i,j) = 0.0
                     end if
                  end IF
