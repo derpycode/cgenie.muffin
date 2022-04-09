@@ -2142,7 +2142,6 @@ CONTAINS
        END DO
     ENDIF
 
-
     ! calibrations
     IF (calibrate_weath) THEN
        SELECT case (par_weathopt)
@@ -2256,11 +2255,14 @@ CONTAINS
 
     IF (tstep_count.eq.output_tsteps_0d(output_counter_0d)) THEN
 
-       outputs = (/sum(landmask(:,:)*loc_SLT(:,:))/nlandcells,maxval(landmask(:,:)*loc_SLT(:,:)),minval(landmask(:,:)*loc_SLT(:,:)), &
-            & sum(landmask(:,:)*loc_runoff(:,:))/nlandcells*conv_yr_s,maxval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s,minval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s, &
+       outputs = (/sum(landmask(:,:)*loc_SLT(:,:))/nlandcells, &
+            & maxval(landmask(:,:)*loc_SLT(:,:)),minval(landmask(:,:)*loc_SLT(:,:)), &
+            & sum(landmask(:,:)*loc_runoff(:,:))/nlandcells*conv_yr_s, &
+            & maxval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s,minval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s, &
             & sum(landmask(:,:)*loc_P(:,:))/nlandcells,maxval(landmask(:,:)*loc_P(:,:)),minval(landmask(:,:)*loc_P(:,:)), &
             & sum(landmask(:,:)*loc_CO2(:,:))/nlandcells,maxval(landmask(:,:)*loc_CO2(:,:)),minval(landmask(:,:)*loc_CO2(:,:)), &
-            & sum(loc_weather_ratio_CaCO3(:,:)*landmask(:,:))/nlandcells,sum(loc_weather_ratio_CaSiO3(:,:)*landmask(:,:))/nlandcells, &
+            & sum(loc_weather_ratio_CaCO3(:,:)*landmask(:,:))/nlandcells, &
+            & sum(loc_weather_ratio_CaSiO3(:,:)*landmask(:,:))/nlandcells, &
             & sum(weather_fCaCO3_2D(:,:))/1.0E12,sum(weather_fCaSiO3_2D(:,:))/1.0E12, &
             & sum(loc_force_flux_weather_a_land(ia_PCO2,:,:))/1.0E12, &
             & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &

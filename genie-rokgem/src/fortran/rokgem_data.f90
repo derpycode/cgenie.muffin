@@ -551,7 +551,7 @@ CONTAINS
 
     INTEGER                                 :: alloc_stat, i, ios
 
-    n_outputs = 38
+    n_outputs = 35
     ALLOCATE(time_series_names(n_outputs),stat=alloc_stat)
     call check_iostat(alloc_stat,__LINE__,__FILE__)
     ALLOCATE(output_descriptions(n_outputs),stat=alloc_stat)
@@ -869,7 +869,6 @@ CONTAINS
     ! time series
     DO i=1,dum_n_outputs    
        loc_num_format = 'f14.6'
-
        call check_unit(20,__LINE__,__FILE__)
        open(20,file=TRIM(par_outdir_name)//'rokgem_series_'//TRIM(dum_time_series_names(i))//string_results_ext, &
             & action='write',POSITION='APPEND',form='formatted',iostat=ios)
