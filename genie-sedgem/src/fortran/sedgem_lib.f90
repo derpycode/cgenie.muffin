@@ -267,8 +267,10 @@ MODULE sedgem_lib
   CHARACTER(len=127)::par_sed_topo_D_name                        ! Sediment water depth grid name
   CHARACTER(len=127)::par_sed_reef_mask_name                     ! Shallow water sediment (coral reef) mask name
   CHARACTER(len=127)::par_sedcore_save_mask_name                 ! Sediment core save mask name
+  NAMELIST /ini_sedgem_nml/par_sed_topo_D_name,par_sed_reef_mask_name,par_sedcore_save_mask_name
+  CHARACTER(len=127)::par_sedcore_save_list_name                 ! Sediment core save list name
   CHARACTER(len=127)::par_sed_mix_k_name                         ! Biodiffusion profile name
-  NAMELIST /ini_sedgem_nml/par_sed_topo_D_name,par_sed_reef_mask_name,par_sedcore_save_mask_name,par_sed_mix_k_name  
+  NAMELIST /ini_sedgem_nml/par_sedcore_save_list_name,par_sed_mix_k_name  
   CHARACTER(len=127)::par_output_years_file_0d                   ! file containing years for 0D output (to summary file)
   CHARACTER(len=127)::par_output_years_file_2d                   ! file containing years for 2D output (to netcdf/ascii)
   NAMELIST /ini_sedgem_nml/par_output_years_file_0d,par_output_years_file_2d

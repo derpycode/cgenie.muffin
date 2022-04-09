@@ -7685,6 +7685,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">sedgem_save_mask.36x36</value>
                         <description>Sediment core save mask name</description>
                     </param>
+                    <param name="par_sedcore_save_list_name">
+			<value datatype="string"></value>
+                        <description>Sediment core save list name</description>
+                    </param>
                     <param name="par_sed_mix_k_name">
 			<value datatype="string">sedgem_sed_mix_k.dat</value>
                         <description>Biodiffusion profile name</description>

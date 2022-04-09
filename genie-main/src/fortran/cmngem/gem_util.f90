@@ -529,6 +529,9 @@ CONTAINS
        ELSEIF (ios > 0) THEN
           PRINT*,'File <'//trim(dum_filename)//'>: Problem with data format'
           STOP
+       elseif (LEN_TRIM(loc_data) < 1) then
+          loc_n = n
+          EXIT          
        else
           n=n+1
        END IF
@@ -583,6 +586,38 @@ CONTAINS
     ! END
     ! -------------------------------------------------------- !
   END subroutine sub_load_data_npt
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD IN (i,j,depth) LOCATION DATA
+  SUBROUTINE sub_load_data_nptd(dum_filename,dum_n,dum_data,dum_datad)
+    ! common blocks
+    IMPLICIT NONE
+    ! dummy variables
+    CHARACTER(len=*),INTENT(in)::dum_filename
+    integer,intent(in)::dum_n
+    integer,INTENT(inout),DIMENSION(dum_n,2)::dum_data
+    REAL,INTENT(inout),DIMENSION(dum_n)::dum_datad
+    ! local variables
+    INTEGER::n
+    integer::ios
+    ! read data
+    OPEN(unit=in,status='old',file=TRIM(dum_filename),action='read',IOSTAT=ios)
+    If (ios /= 0) then
+       CALL sub_report_error( &
+            & 'gem_util','sub_load_data_ij', &
+            & 'File <'//trim(dum_filename)//'> does not exist', &
+            & 'STOPPING', &
+            & (/const_real_zero/),.true. &
+            & )
+    else
+       DO n=1,dum_n,1
+          READ(unit=in,fmt=*) dum_data(n,1),dum_data(n,2),dum_datad(n)
+       ENDDO
+    end if
+    CLOSE(in)
+  END SUBROUTINE sub_load_data_nptd
   ! ****************************************************************************************************************************** !
 
 

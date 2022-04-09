@@ -222,6 +222,7 @@ CONTAINS
        print*,'Sediment water depth grid name                      : ',trim(par_sed_topo_D_name)
        print*,'Shallow water sediment (coral reef) mask name       : ',trim(par_sed_reef_mask_name)
        print*,'Sediment core save mask name                        : ',trim(par_sedcore_save_mask_name)
+       print*,'Sediment core save list name                        : ',trim(par_sedcore_save_list_name)
        print*,'Biodiffusion profile name                           : ',trim(par_sed_mix_k_name)
        print*,'File containing output years for 0D data            : ',trim(par_output_years_file_0d)
        print*,'File containing output years for 2D data            : ',trim(par_output_years_file_2d)
@@ -466,9 +467,11 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     INTEGER::i,j,n
-    integer::loc_len
+    integer::loc_len,loc_nmax
     CHARACTER(len=255)::loc_filename
     REAL,DIMENSION(n_i,n_j)::loc_ij
+    integer,ALLOCATABLE,DIMENSION(:,:)::loc_vij                ! (i,j) vector
+    REAL,ALLOCATABLE,DIMENSION(:)::loc_vd                      ! depth vector
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- !
@@ -481,11 +484,44 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- ! load sediment core save mask
     if (loc_len > 0) then
-    loc_filename = TRIM(par_pindir_name)//TRIM(par_sedcore_save_mask_name)
+       loc_filename = TRIM(par_pindir_name)//TRIM(par_sedcore_save_mask_name)
     else
-    loc_filename = TRIM(par_indir_name)//TRIM(par_sedcore_save_mask_name)
+       loc_filename = TRIM(par_indir_name)//TRIM(par_sedcore_save_mask_name)
     endif
     CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+    ! -------------------------------------------------------- ! load alt sediment core save data (if filename exists)
+    if (LEN_TRIM(par_sedcore_save_list_name) > 0) then
+       ! accommodate alt paleo data directory structure
+       if (loc_len > 0) then
+          loc_filename = TRIM(par_pindir_name)//TRIM(par_sedcore_save_list_name)
+       else
+          loc_filename = TRIM(par_indir_name)//TRIM(par_sedcore_save_list_name)
+       endif
+       ! remove any 2D file defined sedcores
+       loc_ij(:,:) = 0.0
+       ! determine number of data elements
+       loc_nmax = fun_calc_data_n(loc_filename)
+       ! allocate local vectors
+       ALLOCATE(loc_vij(1:loc_nmax,2),STAT=alloc_error)
+       call check_iostat(alloc_error,__LINE__,__FILE__)
+       ALLOCATE(loc_vd(1:loc_nmax),STAT=alloc_error)
+       call check_iostat(alloc_error,__LINE__,__FILE__)
+       ! read file
+       call sub_load_data_nptd(loc_filename,loc_nmax,loc_vij,loc_vd)
+       ! populate 2D sedcore mask file
+       DO n=1,loc_nmax
+          loc_ij(loc_vij(n,1),loc_vij(n,2)) = 1.0
+       end do
+       ! modify SEDGEM sediment ocean depth
+       DO n=1,loc_nmax
+          phys_sed(ips_D,loc_vij(n,1),loc_vij(n,2)) = loc_vd(n)
+       end do      
+       ! deallocate local vectors
+       DEALLOCATE(loc_vij,STAT=dealloc_error)
+       call check_iostat(dealloc_error,__LINE__,__FILE__)
+       DEALLOCATE(loc_vd,STAT=dealloc_error)
+       call check_iostat(dealloc_error,__LINE__,__FILE__)
+    end if
     ! -------------------------------------------------------- ! set sediment save mask & count number of sedcores
     nv_sedcore = 0
     DO i=1,n_i
