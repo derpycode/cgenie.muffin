@@ -82,6 +82,15 @@ subroutine biogem(        &
   loc_debug_ij = .FALSE.
 
   ! *** RESET GLOBAL ARRAYS ***
+  ! reset cumulative forcing arrays
+  DO l=3,n_l_atm
+     ia = conv_iselected_ia(l)
+     diag_forcing_atm(ia) = 0.0
+  end do
+  DO l=1,n_l_ocn
+     io = conv_iselected_io(l)
+     diag_forcing_ocn(io) = 0.0
+  end do
   ! reset remin array
   DO l=1,n_l_ocn
      io = conv_iselected_io(l)
@@ -97,8 +106,8 @@ subroutine biogem(        &
   ! NOTE: only bother initializing for selected tracers
   DO l=3,n_l_atm
      ia = conv_iselected_ia(l)
-     locij_fatm(:,:,:)    = 0.0
-     locij_focnatm(:,:,:) = 0.0
+     locij_fatm(ia,:,:)    = 0.0
+     locij_focnatm(ia,:,:) = 0.0
   end do
   DO l=1,n_l_ocn
      io = conv_iselected_io(l)
@@ -995,6 +1004,8 @@ subroutine biogem(        &
                     locij_fatm(ia,i,j) = locij_fatm(ia,i,j) + force_flux_atm(ia,i,j)
                     ! record (atmopsheric) flux forcing
                     diag_forcing(ia,i,j) = force_flux_atm(ia,i,j)
+                       ! record total flux forcing
+                       diag_forcing_atm(ia) = diag_forcing_atm(ia) + force_flux_atm(ia,i,j)
                  END IF
               END DO
               ! OCEAN TRACERS
@@ -1003,6 +1014,8 @@ subroutine biogem(        &
                  IF (force_flux_ocn_select(io)) THEN
                     DO k=loc_k1,n_k
                        locijk_focn(io,i,j,k) = locijk_focn(io,i,j,k) + force_flux_locn(l,i,j,k)
+                       ! record total flux forcing
+                       diag_forcing_ocn(io) = diag_forcing_ocn(io) + force_flux_locn(l,i,j,k)
                     END DO
                  END IF
               END DO
@@ -4115,6 +4128,15 @@ SUBROUTINE diag_biogem_timeseries( &
               DO l=1,n_l_atm
                  ia = conv_iselected_ia(l)
                  int_diag_forcing_sig(ia) = int_diag_forcing_sig(ia) + loc_dtyr*SUM(diag_forcing(ia,:,:))
+              END DO
+              ! total flux forcings
+              DO l=1,n_l_atm
+                 ia = conv_iselected_ia(l)
+                 int_diag_forcing_atm_sig(ia) = int_diag_forcing_atm_sig(ia) + loc_dtyr*diag_forcing_atm(ia)
+              END DO
+              DO l=1,n_l_ocn
+                 io = conv_iselected_io(l)
+                 int_diag_forcing_ocn_sig(io) = int_diag_forcing_ocn_sig(io) + loc_dtyr*diag_forcing_ocn(io)
               END DO
            end if
            ! high resolution 3D tracer data

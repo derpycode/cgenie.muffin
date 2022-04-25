@@ -1013,6 +1013,67 @@ CONTAINS
           end if
        END DO
     END IF
+    ! forcing flux (alt method)
+    IF (ctrl_data_save_sig_diag) THEN
+       ! atmosphere
+       DO l=3,n_l_atm
+          ia = conv_iselected_ia(l)
+          if (force_flux_atm_select(ia)) then
+             loc_filename=fun_data_timeseries_filename( &
+                  & loc_t,par_outdir_name, &
+                  & trim(par_outfile_name)//'_series_diag','fluxforcing_atm_'//TRIM(string_atm(ia)),string_results_ext &
+                  & )
+             SELECT CASE (atm_type(ia))
+             CASE (0,1)
+                loc_string = '% time (yr) / global '//TRIM(string_atm(ia))//' flux (mol yr-1) '// &
+                     & ' NOTE: annual average atmospheric flux forcing.'
+             CASE (n_itype_min:n_itype_max)
+                loc_string = '% time (yr) / global '//TRIM(string_atm(ia))//' flux (mol yr-1) / global '// &
+                     & TRIM(string_atm(ia))//' (o/oo)'//&
+                     & ' NOTE: annual average atmospheric flux forcing.'
+             end SELECT
+             SELECT CASE (atm_type(ia))
+             CASE (0,1,n_itype_min:n_itype_max)
+                call check_unit(out,__LINE__,__FILE__)
+                OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+                write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+                call check_iostat(ios,__LINE__,__FILE__)
+                CLOSE(unit=out,iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+             end SELECT
+          end if
+       END DO
+       ! ocean
+       DO l=3,n_l_ocn
+          io = conv_iselected_io(l)
+          if (force_flux_ocn_select(io)) then
+             loc_filename=fun_data_timeseries_filename( &
+                  & loc_t,par_outdir_name, &
+                  & trim(par_outfile_name)//'_series_diag','fluxforcing_ocn_'//TRIM(string_ocn(io)),string_results_ext &
+                  & )
+             SELECT CASE (ocn_type(io))
+             CASE (0,1)
+                loc_string = '% time (yr) / global '//TRIM(string_ocn(io))//' flux (mol yr-1) '// &
+                     & ' NOTE: annual average oceanic flux forcing.'
+             CASE (n_itype_min:n_itype_max)
+                loc_string = '% time (yr) / global '//TRIM(string_ocn(io))//' flux (mol yr-1) / global '// &
+                     & TRIM(string_ocn(io))//' (o/oo)'//&
+                     & ' NOTE: annual average oceanic flux forcing.'
+             end SELECT
+             SELECT CASE (ocn_type(io))
+             CASE (0,1,n_itype_min:n_itype_max)
+                call check_unit(out,__LINE__,__FILE__)
+                OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+                write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+                call check_iostat(ios,__LINE__,__FILE__)
+                CLOSE(unit=out,iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+             end SELECT
+          end if
+       END DO
+    END IF
     ! age tracers
     IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) THEN
        loc_filename=fun_data_timeseries_filename(loc_t, &
@@ -2801,7 +2862,7 @@ CONTAINS
        end DO
     END IF
     ! forcing flux
-    ! NOTE: the oringal calculation was of the the flux imposed from the ocean (but not subtracted from the ocean) but less any
+    ! NOTE: the original calculation was of the the flux imposed from the ocean (but not subtracted from the ocean) but less any
     !       transfer from the ocean to the atm via air-sea gas exchange, i.e.
     !       loc_sig = int_focnatm_sig(ia)/int_t_sig - int_diag_airsea_sig(ia)/int_t_sig
     !       loc_tot  = int_focnatm_sig(atm_dep(ia))/int_t_sig - int_diag_airsea_sig(atm_dep(ia))/int_t_sig
@@ -2845,6 +2906,85 @@ CONTAINS
           end if
        END DO
     end IF
+    ! forcing flux
+    IF (ctrl_data_save_sig_diag) THEN
+       ! atmosphere
+       DO l=3,n_l_atm
+          ia = conv_iselected_ia(l)
+          if (force_flux_atm_select(ia)) then
+             loc_filename=fun_data_timeseries_filename( &
+                  & dum_t,par_outdir_name, &
+                  & trim(par_outfile_name)//'_series_diag','fluxforcing_atm_'//TRIM(string_atm(ia)),string_results_ext &
+                  & )
+             SELECT CASE (atm_type(ia))
+             CASE (0,1)
+                loc_sig = int_diag_forcing_atm_sig(ia)/int_t_sig
+                call check_unit(out,__LINE__,__FILE__)
+                OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+                WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_sig
+                call check_iostat(ios,__LINE__,__FILE__)
+                CLOSE(unit=out,iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+             case (n_itype_min:n_itype_max)
+                loc_tot = int_diag_forcing_atm_sig(atm_dep(ia))/int_t_sig
+                loc_frac = int_diag_forcing_atm_sig(ia)/int_t_sig
+                loc_standard = const_standards(atm_type(ia))
+                loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.TRUE.,const_nulliso)
+                call check_unit(out,__LINE__,__FILE__)
+                OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+                WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_frac, &
+                     & loc_sig
+                call check_iostat(ios,__LINE__,__FILE__)
+                CLOSE(unit=out,iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+             end SELECT
+          end if
+       END DO
+       ! ocean
+       DO l=3,n_l_ocn
+          io = conv_iselected_io(l)
+          if (force_flux_ocn_select(io)) then
+             loc_filename=fun_data_timeseries_filename( &
+                  & dum_t,par_outdir_name, &
+                  & trim(par_outfile_name)//'_series_diag','fluxforcing_ocn_'//TRIM(string_ocn(io)),string_results_ext &
+                  & )
+             SELECT CASE (ocn_type(io))
+             CASE (0,1)
+                loc_sig = int_diag_forcing_ocn_sig(io)/int_t_sig
+                call check_unit(out,__LINE__,__FILE__)
+                OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+                WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_sig
+                call check_iostat(ios,__LINE__,__FILE__)
+                CLOSE(unit=out,iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+             case (n_itype_min:n_itype_max)
+                loc_tot = int_diag_forcing_ocn_sig(atm_dep(io))/int_t_sig
+                loc_frac = int_diag_forcing_ocn_sig(io)/int_t_sig
+                loc_standard = const_standards(ocn_type(io))
+                loc_sig = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.TRUE.,const_nulliso)
+                call check_unit(out,__LINE__,__FILE__)
+                OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+                WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+                     & loc_t, &
+                     & loc_frac, &
+                     & loc_sig
+                call check_iostat(ios,__LINE__,__FILE__)
+                CLOSE(unit=out,iostat=ios)
+                call check_iostat(ios,__LINE__,__FILE__)
+             end SELECT
+          end if    
+       END DO
+    END IF
     ! age tracers
     IF (ctrl_force_ocn_age .OR. ctrl_force_ocn_age1) THEN
        loc_filename=fun_data_timeseries_filename( &

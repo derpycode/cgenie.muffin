@@ -1358,6 +1358,7 @@ CONTAINS
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
        !       BUT, it is going to be implicitly assumed to be oxidized during remin under oxic conditions
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_O(io_Fe,is_POFe)  = 1.0
           conv_sed_ocn_O(io_Fe2,is_POFe) = 0.0
@@ -1454,6 +1455,7 @@ CONTAINS
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
        !       BUT, it is going to be implicitly assumed to be oxidized during remin under denitrifying conditions
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_N(io_Fe,is_POFe)  = 1.0
           conv_sed_ocn_N(io_Fe2,is_POFe) = 0.0
@@ -1558,6 +1560,7 @@ CONTAINS
        end if
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_S(io_Fe,is_POFe)  = 0.0
           conv_sed_ocn_S(io_Fe2,is_POFe) = 1.0
@@ -1606,6 +1609,7 @@ CONTAINS
        conv_sed_ocn_meth(io_DIC_13C,is_POC_13C) = 1.0 - conv_sed_ocn_meth(io_CH4_13C,is_POC_13C)
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_meth(io_Fe,is_POFe)  = 0.0
           conv_sed_ocn_meth(io_Fe2,is_POFe) = 1.0
@@ -1756,6 +1760,8 @@ CONTAINS
     int_diag_airsea_sig(:)  = 0.0
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
+    int_diag_forcing_atm_sig(:) = 0.0
+    int_diag_forcing_ocn_sig(:) = 0.0
     int_diag_redox_sig(:)   = 0.0
     int_diag_ecogem_part    = 0.0
     int_diag_ecogem_remin   = 0.0
@@ -1862,6 +1868,9 @@ CONTAINS
     diag_airsea(:,:,:)        = 0.0
     diag_ecogem_part(:,:,:)   = 0.0
     diag_ecogem_remin(:,:,:)  = 0.0
+    diag_forcing(:,:,:)       = 0.0
+    diag_forcing_atm(:)       = 0.0
+    diag_forcing_ocn(:)       = 0.0
   END SUBROUTINE sub_init_diag
   ! ****************************************************************************************************************************** !
 

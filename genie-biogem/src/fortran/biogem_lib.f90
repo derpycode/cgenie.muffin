@@ -1271,6 +1271,8 @@ MODULE biogem_lib
 !!!  REAL,DIMENSION(n_ocn,n_i,n_j)::diag_weather                    ! weathering diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::diag_airsea                     ! air-sea gas exchange diagnostics
   REAL,DIMENSION(n_atm,n_i,n_j)::diag_forcing                    ! atmospheric forcing diagnostics
+  REAL,DIMENSION(n_atm)::diag_forcing_atm                        ! atmospheric total forcing diagnostics
+  REAL,DIMENSION(n_ocn)::diag_forcing_ocn                        ! oceanic total forcing diagnostics
   REAL,DIMENSION(n_diag_misc_2D,n_i,n_j)::diag_misc_2D           !
   REAL,DIMENSION(0:n_i,0:n_j)::diag_misc_psi                     !
   real,DIMENSION(:,:,:,:),ALLOCATABLE::diag_redox                ! redox diagnostics
@@ -1315,6 +1317,8 @@ MODULE biogem_lib
   REAL,DIMENSION(n_ocn)::int_diag_weather_sig                    ! weathering diagnostics
   REAL,DIMENSION(n_atm)::int_diag_airsea_sig                     ! air-sea gas exchange diagnostics
   REAL,DIMENSION(n_atm)::int_diag_forcing_sig                    ! forcing diagnostics
+  REAL,DIMENSION(n_atm)::int_diag_forcing_atm_sig                ! forcing diagnostics
+  REAL,DIMENSION(n_ocn)::int_diag_forcing_ocn_sig                ! forcing diagnostics
   REAL,DIMENSION(n_diag_misc_2D)::int_diag_misc_2D_sig           !
   ! misc
   real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
