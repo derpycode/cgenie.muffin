@@ -805,6 +805,9 @@ subroutine biogem(        &
                        call sub_adj_carbconst(   &
                             & ocn(io_Ca,i,j,k),  &
                             & ocn(io_Mg,i,j,k),  &
+                            & ocn(io_S,i,j,k), &
+                            & ocn(io_T,i,j,k),&
+                            & phys_ocn(ipo_Dmid,i,j,k), &
                             & carbconst(:,i,j,k) &
                             & )
                     end if
@@ -3277,6 +3280,9 @@ SUBROUTINE diag_biogem_timeslice( &
                           call sub_adj_carbconst(   &
                                & ocn(io_Ca,i,j,k),  &
                                & ocn(io_Mg,i,j,k),  &
+                               & ocn(io_S,i,j,k), &
+                               & ocn(io_T,i,j,k),&
+                               & phys_ocn(ipo_Dmid,i,j,k), &
                                & carbconst(:,i,j,k) &
                                & )
                        end if

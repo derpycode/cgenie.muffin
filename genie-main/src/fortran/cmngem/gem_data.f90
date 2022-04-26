@@ -36,7 +36,9 @@ CONTAINS
     end if
     ! set and report namelist data
     par_carbconstset_name = trim(par_carbconstset_name)//'/'
+    par_adj_carbconst_option = trim(par_adj_carbconst_option)
     par_gem_indir_name = trim(par_gem_indir_name)//'/'
+ 
 if (ctrl_debug_init > 0) then
     ! --- TRACER SELECTION  ------------------------------------------------------------------------------------------------------ !
     ! NOTE: reported at end of initialise_gem when tracer name information is available
@@ -73,6 +75,391 @@ end if
   END SUBROUTINE sub_load_goin_gem
   ! ****************************************************************************************************************************** !
 
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - K1
+  SUBROUTINE sub_load_gem_MyAMI_lookup_K1()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data -- CaCO3
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_k1( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI K1 look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_K1.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_k1(a,b,d,e)
+                !print*, a,b,d,e,lookup_gem_MyAMI_k1(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_K1
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - K2
+  SUBROUTINE sub_load_gem_MyAMI_lookup_K2()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data -- CaCO3
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_k2( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI K1 look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_K2.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_k2(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_K2
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - Kcal
+  SUBROUTINE sub_load_gem_MyAMI_lookup_Kcal()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data -- CaCO3
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_kcal( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI Kcal look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_KspC.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_kcal(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_Kcal
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - Karg
+  SUBROUTINE sub_load_gem_MyAMI_lookup_Karg()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data -- CaCO3
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_karg( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI Karg look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_KspA.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_karg(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_Karg
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - Kw
+  SUBROUTINE sub_load_gem_MyAMI_lookup_Kw()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data -- CaCO3
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_kW( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI Kw look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_Kw.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_kW(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_Kw
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - K
+  SUBROUTINE sub_load_gem_MyAMI_lookup_K0()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_k( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI K0 look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_K0.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_k(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_K0
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - Kb
+  SUBROUTINE sub_load_gem_MyAMI_lookup_Kb()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_kb( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI K0 look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_Kb.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_kb(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_Kb
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD CARBONATE CONSTANT LOOK-UP TABLES - KSO4
+  SUBROUTINE sub_load_gem_MyAMI_lookup_KSO4()
+    USE gem_util, ONLY: sub_report_error
+    !USE genie_util, ONLY: check_unit, check_iostat
+    ! local variables
+    INTEGER::a,b,d,e
+    CHARACTER(len=255)::loc_filename
+    INTEGER::ios ! for file checks
+    ! allocate size of look-up tables and load data
+    ! NOTE: check for problems allocating array space
+    ALLOCATE(lookup_gem_MyAMI_kSO4( &
+         & lookup_i_Ca_min:lookup_i_Ca_max, &
+         & lookup_i_Mg_min:lookup_i_Mg_max, &
+         & lookup_i_sal_min:lookup_i_sal_max, &
+         & lookup_i_temp_min:lookup_i_temp_max &
+         & ),STAT=error)
+
+     IF (error /= 0) THEN
+        CALL sub_report_error( &
+             & 'initialize_gem','initialise_gem', &
+             & 'Could not allocate space for MyAMI K0 look-up table array', &
+             & 'STOPPING', &
+             & (/const_real_zero/),.TRUE. &
+             & )
+     ENDIF
+    ! *** read in look-up data ***
+    loc_filename = '../../cgenie.muffin/genie-main/data/input/MyAMI_lookup_KSO4.dat'
+    !call check_unit(in,__LINE__,__FILE__)
+    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+    ! read in data
+    DO a = lookup_i_Ca_min,lookup_i_Ca_max,1
+       DO b = lookup_i_Mg_min,lookup_i_Mg_max,1
+          DO d = lookup_i_sal_min,lookup_i_sal_max,1
+             DO e = lookup_i_temp_min,lookup_i_temp_max,1
+                READ(unit=in,FMT='(D23.16)',iostat=ios) lookup_gem_MyAMI_kSO4(a,b,d,e)
+                !call check_iostat(ios,__LINE__,__FILE__)
+             END DO
+          END DO
+       END DO
+    END DO
+    ! close file pipe
+    CLOSE(unit=in,iostat=ios)
+    !call check_iostat(ios,__LINE__,__FILE__)
+  END SUBROUTINE sub_load_gem_MyAMI_lookup_KSO4
+  ! ****************************************************************************************************************************** !
 
   ! ****************************************************************************************************************************** !
   ! DEFINE SCHMIDT NUMBER COEFFICIENTS

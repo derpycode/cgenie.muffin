@@ -1351,6 +1351,10 @@
                         <value datatype="string">Mehrbach</value>
                         <description>carbonate dissociation constants set</description>
                     </param>
+                    <param name="par_adj_carbconst_option">
+                        <value datatype="string">TyrrellZeebe2004</value>
+                        <description>carbonate dissociation constants set</description>
+                    </param>
                     <param name="par_carbchem_pH_tolerance">
                         <value datatype="real">0.001</value>
                         <description>pH solution tolerance</description>
