@@ -29,22 +29,40 @@ MODULE gem_carbchem
   ! NOTE: parameter values for the effect of pressure on Ksp for aragonite are from Millero [1979]
   ! NOTE: parameter values for the effect of pressure on KHS are from Millero [1983]
   ! NOTE: parameter values for the effect of pressure on KHN4 are from Millero [1995]
-  ! NOTE: all pressure correction choices follow Lewis and Wallace [1998] ('CO2SYS.EXE' program) whereever possible
-  ! NOTE: parameter values were updated according to table 7 in Orr [2015]
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2CO3    = (/ -2.550E+1, +1.271E-1, +0.000E+0, -3.080E+0, -8.770E-2 /)
+  ! NOTE: all pressure correction choices follow Lewis and Wallace [1998] ('CO2SYS.EXE' program) whereever possible,
+  !       including correcting the noted typos
+  ! NOTE: This table differs from Orr [2015] (Table 7), particularly in the sign of b1 (final column)
+  !       (the reasons for some of the corrections in Orr [2015] are not given and do not appear in Lewis and Wallace [1998])
+  ! NOTE: carbchem_dpNH4 a1 and a2 corrected on 22/05/17
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2CO3    = (/ -2.550E+1, +1.271E-1, +0.000E+0, -3.080E+0, +8.770E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpHCO3     = (/ -1.582E+1, -2.190E-2, +0.000E+0, +1.130E+0, -1.475E-1 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpBO3H3    = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2O      = (/ -2.002E+1, +1.119E-1, -1.409E-3, -5.130E+0, -7.940E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2O      = (/ -2.002E+1, +1.119E-1, -1.409E-3, -5.130E+0, +7.940E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHSO4     = (/ -1.803E+1, +4.660E-2, +3.160E-4, -4.530E+0, +9.000E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHF       = (/ -9.780E+0, -9.000E-3, -9.420E-4, -3.910E+0, +5.400E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3cal = (/ -4.876E+1, +5.304E-1, +0.000E+0, -1.176E+1, +3.692E-1 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3arg = (/ -4.596E+1, +5.304E-1, +0.000E+0, -1.176E+1, +3.692E-1 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH3PO4    = (/ -1.451E+1, +1.211E-1, -3.210E-4, -2.670E+0, +4.270E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2PO4    = (/ -2.312E+1, +1.758E-1, -2.647E-3, -5.150E+0, +9.000E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHPO4     = (/ -2.657E+1, +2.020E-1, -3.042E-3, -4.080E+0, +7.140E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.107E+1, +9.000E-3, -9.420E-4, +2.890E+0, +5.400E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+0, +8.890E-2, -9.050E-4, -5.030E+0, +8.140E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH4SiO4   = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHSO4     = (/ -1.803E+1, +4.660E-2, -3.160E-4, -4.530E+0, -9.000E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHF       = (/ -9.780E+0, -9.000E-3, -9.420E-4, -3.910E+0, -5.400E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH3PO4    = (/ -1.451E+1, +1.211E-1, -3.210E-4, -2.670E+0, -4.270E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2PO4    = (/ -2.312E+1, +1.758E-1, -2.647E-3, -5.150E+0, -9.000E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHPO4     = (/ -2.657E+1, +2.020E-1, -3.042E-3, -4.080E+0, -7.140E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3cal = (/ -4.876E+1, +5.304E-1, +0.000E+0, -1.176E+1, -3.692E-1 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3arg = (/ -4.596E+1, +5.304E-1, +0.000E+0, -1.176E+1, -3.692E-1 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.107E+1, +9.000E-3, -9.420E-4, +2.890E+0, -5.400E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+0, +8.890E-2, -9.050E-4, -5.030E+0, -8.140E-2 /)
+!!$  ! Alternative -- strictly following Orr [2015]
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2CO3    = (/ -2.550E+1, +1.271E-1, +0.000E+0, -3.080E+0, -8.770E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHCO3     = (/ -1.582E+1, -2.190E-2, +0.000E+0, +1.130E+0, -1.475E-1 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpBO3H3    = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2O      = (/ -2.002E+1, +1.119E-1, -1.409E-3, -5.130E+0, -7.940E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHSO4     = (/ -1.803E+1, +4.660E-2, -3.160E-4, -4.530E+0, -9.000E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHF       = (/ -9.780E+0, -9.000E-3, -9.420E-4, -3.910E+0, -5.400E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3cal = (/ -4.876E+1, +5.304E-1, +0.000E+0, -1.176E+1, -3.692E-1 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpCaCO3arg = (/ -4.596E+1, +5.304E-1, +0.000E+0, -1.176E+1, -3.692E-1 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH3PO4    = (/ -1.451E+1, +1.211E-1, -3.210E-4, -2.670E+0, -4.270E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2PO4    = (/ -2.312E+1, +1.758E-1, -2.647E-3, -5.150E+0, -9.000E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpHPO4     = (/ -2.657E+1, +2.020E-1, -3.042E-3, -4.080E+0, -7.140E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.480E+1, +2.000E-3, -4.000E-4, +2.890E+0, -5.400E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+0, +8.890E-2, -9.050E-4, -5.030E+0, -8.140E-2 /)
+!!$  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH4SiO4   = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
 
 
 CONTAINS
@@ -306,36 +324,36 @@ CONTAINS
     if (dum_Ca > const_real_nullsmall) loc_ratio = dum_Mg/dum_Ca
     select case ((par_adj_carbconst_option))
     case ('TyrrellZeebe2004')
-      ! (1a) adjust Ksp
-      !      NOTE: following Tyrrell and Zeebe [2004]
-      dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) - loc_alpha*(const_conc_MgtoCa - loc_ratio)
-      ! (1b) adjust K1 and K2
-      dum_carbconst(icc_k1) = (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
-      dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
+       ! (1a) adjust Ksp
+       !      NOTE: following Tyrrell and Zeebe [2004]
+       dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) - loc_alpha*(const_conc_MgtoCa - loc_ratio)
+       ! (1b) adjust K1 and K2
+       dum_carbconst(icc_k1) = (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
+       dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
     case ('Hain2015')
-    ! initialize local variables
-      if (dum_temp <  (par_carbchem_Tmin + const_zeroC))  then
-         loc_T = par_carbchem_Tmin + const_zeroC
-      elseif (dum_temp > (par_carbchem_Tmax + const_zeroC)) then
-         loc_T = par_carbchem_Tmax + const_zeroC
-      else
-         loc_T = dum_temp
-      endif
-      if (dum_sal < par_carbchem_Smin) then
-         loc_S = par_carbchem_Smin
-      elseif (dum_sal > par_carbchem_Smax) then
-         loc_S = par_carbchem_Smax
-      else
-         loc_S = dum_sal
-      endif
-      loc_alpha = 3.655E-8
-      loc_ratio = 1.0
-      loc_SO4tot = fun_calc_SO4tot(dum_sal)
-      loc_Ftot   = fun_calc_Ftot(dum_sal)
-      loc_P        = dum_D/10.0
-      loc_TC       = dum_temp - const_zeroC
-      loc_rRtimesT = 1.0/(const_R*dum_temp)
-      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
+       ! initialize local variables
+       if (dum_temp <  (par_carbchem_Tmin + const_zeroC))  then
+          loc_T = par_carbchem_Tmin + const_zeroC
+       elseif (dum_temp > (par_carbchem_Tmax + const_zeroC)) then
+          loc_T = par_carbchem_Tmax + const_zeroC
+       else
+          loc_T = dum_temp
+       endif
+       if (dum_sal < par_carbchem_Smin) then
+          loc_S = par_carbchem_Smin
+       elseif (dum_sal > par_carbchem_Smax) then
+          loc_S = par_carbchem_Smax
+       else
+          loc_S = dum_sal
+       endif
+       loc_alpha = 3.655E-8
+       loc_ratio = 1.0
+       loc_SO4tot = fun_calc_SO4tot(dum_sal)
+       loc_Ftot   = fun_calc_Ftot(dum_sal)
+       loc_P        = dum_D/10.0
+       loc_TC       = dum_temp - const_zeroC
+       loc_rRtimesT = 1.0/(const_R*dum_temp)
+       dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -343,13 +361,13 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
-      loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
-      loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
-      ! (1a) adjust Ks via a look-up table based on MyAMI (downloaded 10/01/2021)
-      !      NOTE: following Hain et al. [2015,2018]
-      ! Ks in the look-up tables are on the total pH scale,so convert to SWS scale for cGENIE
-      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
+       loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
+       loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
+       loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
+       ! (1a) adjust Ks via a look-up table based on MyAMI (downloaded 10/01/2021)
+       !      NOTE: following Hain et al. [2015,2018]
+       ! Ks in the look-up tables are on the total pH scale,so convert to SWS scale for cGENIE
+       dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -357,11 +375,11 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_kHSO4) = dum_carbconst(icc_kHSO4) * &
+       dum_carbconst(icc_kHSO4) = dum_carbconst(icc_kHSO4) * &
             & exp(loc_conv_freetoSWS + & 
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHSO4) &
             & )
-      dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
+       dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -369,10 +387,10 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) * &
+       dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) * &
             & exp(fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3cal) &
             & )
-      dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
+       dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -380,10 +398,10 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_karg) = dum_carbconst(icc_karg) * &
+       dum_carbconst(icc_karg) = dum_carbconst(icc_karg) * &
             & exp(fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3arg) &
             & )
-      dum_carbconst(icc_QCO2) = fun_interp_4D(                                                  &
+       dum_carbconst(icc_QCO2) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -391,7 +409,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
+       dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -399,11 +417,11 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_k1) = 10**(log10(dum_carbconst(icc_k1))) * &
+       dum_carbconst(icc_k1) = 10**(log10(dum_carbconst(icc_k1))) * &
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
             & )
-      dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
+       dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -411,13 +429,13 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_k2) = dum_carbconst(icc_k2) * &
+       dum_carbconst(icc_k2) = dum_carbconst(icc_k2) * &
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
-      dum_carbconst(icc_k) = &
-         & dum_carbconst(icc_k1)/dum_carbconst(icc_k2)
-      dum_carbconst(icc_kW) = fun_interp_4D(                                                  &
+       dum_carbconst(icc_k) = &
+            & dum_carbconst(icc_k1)/dum_carbconst(icc_k2)
+       dum_carbconst(icc_kW) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kW,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -425,11 +443,11 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_kW) = dum_carbconst(icc_kW) * &
+       dum_carbconst(icc_kW) = dum_carbconst(icc_kW) * &
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2O) &
             & )
-      dum_carbconst(icc_kB) = fun_interp_4D(                                                  &
+       dum_carbconst(icc_kB) = fun_interp_4D(                                                  &
             & lookup_gem_MyAMI_kb,dum_Ca,dum_Mg,loc_S,loc_T, &
             & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
             & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
@@ -437,7 +455,7 @@ CONTAINS
             & lookup_i_sal_min,lookup_i_sal_max,                               &
             & lookup_i_temp_min,lookup_i_temp_max                              &
             & )
-      dum_carbconst(icc_kB) = dum_carbconst(icc_kB) * &
+       dum_carbconst(icc_kB) = dum_carbconst(icc_kB) * &
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpBO3H3) &
             & )
