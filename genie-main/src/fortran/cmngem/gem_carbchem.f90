@@ -34,6 +34,7 @@ MODULE gem_carbchem
   ! NOTE: This table differs from Orr [2015] (Table 7) which contains sign typos compared to the Discussion version of the paper
   ! NOTE: carbchem_dpNH4 a1 and a2 corrected on 22/05/17
   !       (list also re-ordered for convenience to align with Orr [2015])
+  ! NOTE: signs of carbchem_dpH2S a1 and b0 coefficients corrected on 22/05/18
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2CO3    = (/ -2.550E+1, +1.271E-1, +0.000E+0, -3.080E+0, +8.770E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpHCO3     = (/ -1.582E+1, -2.190E-2, +0.000E+0, +1.130E+0, -1.475E-1 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpBO3H3    = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
@@ -45,7 +46,7 @@ MODULE gem_carbchem
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH3PO4    = (/ -1.451E+1, +1.211E-1, -3.210E-4, -2.670E+0, +4.270E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2PO4    = (/ -2.312E+1, +1.758E-1, -2.647E-3, -5.150E+0, +9.000E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpHPO4     = (/ -2.657E+1, +2.020E-1, -3.042E-3, -4.080E+0, +7.140E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.107E+1, +9.000E-3, -9.420E-4, +2.890E+0, +5.400E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.107E+1, -9.000E-3, -9.420E-4, -2.890E+0, +5.400E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+0, +8.890E-2, -9.050E-4, -5.030E+0, +8.140E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH4SiO4   = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
 
@@ -283,6 +284,7 @@ CONTAINS
          & )
   END SUBROUTINE sub_calc_carbconst
   ! ****************************************************************************************************************************** !
+
 
   ! ****************************************************************************************************************************** !
   ! ADJUST CARBONATE EQUILIBRIUM CONSTANTS
