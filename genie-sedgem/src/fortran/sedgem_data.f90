@@ -1137,42 +1137,42 @@ CONTAINS
   ! ********************************************************************************************************************************
 
 
-  ! ****************************************************************************************************************************** !
-  ! INITIALIZE SEDIMENT DATA SAVING
-  ! NOTE: this mask sets the grid point locations where synthetic sediment 'cores' will saved, specified in the mask file by;
-  !       1.0 = 'save here'
-  !       0.0 = 'don't save here'
-  !       (other values are not valid, or rather, could give rather unpredictable results ...)
-  SUBROUTINE sub_init_sedgem_save_sed_data()
-    ! local variables
-    INTEGER::i,j
-    integer::loc_len
-    CHARACTER(len=255)::loc_filename
-    REAL,DIMENSION(n_i,n_j)::loc_ij             ! 
-    ! set alt dir path string length
-    loc_len = LEN_TRIM(par_pindir_name)
-    ! initialize variables
-    loc_ij(:,:) = 0.0
-    sed_save_mask(:,:) = .FALSE.
-    ! load sediment sediment save mask
-       if (loc_len > 0) then
-    loc_filename = TRIM(par_pindir_name)//TRIM(par_sedcore_save_mask_name)
-       else
-    loc_filename = TRIM(par_indir_name)//TRIM(par_sedcore_save_mask_name)           
-       endif
-    CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
-    ! set sediment save mask
-    DO i=1,n_i
-       DO j=1,n_j
-          if (loc_ij(i,j) < const_real_nullsmall) then
-             sed_save_mask(i,j) = .FALSE.
-          else
-             sed_save_mask(i,j) = .TRUE.
-          end if
-       end do
-    end do
-  end SUBROUTINE sub_init_sedgem_save_sed_data
-  ! ****************************************************************************************************************************** !
+!!$  ! ****************************************************************************************************************************** !
+!!$  ! INITIALIZE SEDIMENT DATA SAVING
+!!$  ! NOTE: this mask sets the grid point locations where synthetic sediment 'cores' will saved, specified in the mask file by;
+!!$  !       1.0 = 'save here'
+!!$  !       0.0 = 'don't save here'
+!!$  !       (other values are not valid, or rather, could give rather unpredictable results ...)
+!!$  SUBROUTINE sub_init_sedgem_save_sed_data()
+!!$    ! local variables
+!!$    INTEGER::i,j
+!!$    integer::loc_len
+!!$    CHARACTER(len=255)::loc_filename
+!!$    REAL,DIMENSION(n_i,n_j)::loc_ij             ! 
+!!$    ! set alt dir path string length
+!!$    loc_len = LEN_TRIM(par_pindir_name)
+!!$    ! initialize variables
+!!$    loc_ij(:,:) = 0.0
+!!$    sed_save_mask(:,:) = .FALSE.
+!!$    ! load sediment sediment save mask
+!!$    if (loc_len > 0) then
+!!$       loc_filename = TRIM(par_pindir_name)//TRIM(par_sedcore_save_mask_name)
+!!$    else
+!!$       loc_filename = TRIM(par_indir_name)//TRIM(par_sedcore_save_mask_name)           
+!!$    endif
+!!$    CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+!!$    ! set sediment save mask
+!!$    DO i=1,n_i
+!!$       DO j=1,n_j
+!!$          if (loc_ij(i,j) < const_real_nullsmall) then
+!!$             sed_save_mask(i,j) = .FALSE.
+!!$          else
+!!$             sed_save_mask(i,j) = .TRUE.
+!!$          end if
+!!$       end do
+!!$    end do
+!!$  end SUBROUTINE sub_init_sedgem_save_sed_data
+!!$  ! ****************************************************************************************************************************** !
 
 
   ! ****************************************************************************************************************************** !
