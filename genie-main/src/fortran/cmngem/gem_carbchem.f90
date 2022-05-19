@@ -19,6 +19,12 @@ MODULE gem_carbchem
 
   ! ****************************************************************************************************************************** !
   ! DEFINE COEFFICIENTS FOR PRESSURE CORRECTION OF DISSOCIATION CONSTANTS
+  ! for reference, the equation (gem_util.f90) is:
+  ! fun_corr_p = &
+  !    & ( &
+  !    &   -(dum_dp(1) + dum_dp(2)*dum_TC + dum_dp(3)*dum_TC*dum_TC) + &
+  !    &   (5.0E-4*(dum_dp(4) + dum_dp(5)*dum_TC))*dum_P &
+  !    & )*dum_P*dum_rRtimesT
   ! NOTE: parameter values for the effect of pressure on K1 and K2 are from Millero [1995]
   ! NOTE: parameter values for the effect of pressure on KB are from Millero [1979, 1995] (but without the salinity dependence)
   ! NOTE: parameter values for the effect of pressure on KW are from Millero [1983]
@@ -35,6 +41,7 @@ MODULE gem_carbchem
   ! NOTE: carbchem_dpNH4 a1 and a2 corrected on 22/05/17
   !       (list also re-ordered for convenience to align with Orr [2015])
   ! NOTE: signs of carbchem_dpH2S a1 and b0 coefficients corrected on 22/05/18
+  ! NOTE: corrected power for a0 ... (22/05/19)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2CO3    = (/ -2.550E+1, +1.271E-1, +0.000E+0, -3.080E+0, +8.770E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpHCO3     = (/ -1.582E+1, -2.190E-2, +0.000E+0, +1.130E+0, -1.475E-1 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpBO3H3    = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
@@ -47,7 +54,7 @@ MODULE gem_carbchem
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2PO4    = (/ -2.312E+1, +1.758E-1, -2.647E-3, -5.150E+0, +9.000E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpHPO4     = (/ -2.657E+1, +2.020E-1, -3.042E-3, -4.080E+0, +7.140E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH2S      = (/ -1.107E+1, -9.000E-3, -9.420E-4, -2.890E+0, +5.400E-2 /)
-  REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+0, +8.890E-2, -9.050E-4, -5.030E+0, +8.140E-2 /)
+  REAL,PARAMETER,DIMENSION(5)::carbchem_dpNH4      = (/ -2.643E+1, +8.890E-2, -9.050E-4, -5.030E+0, +8.140E-2 /)
   REAL,PARAMETER,DIMENSION(5)::carbchem_dpH4SiO4   = (/ -2.948E+1, +1.622E-1, +2.608E-3, -2.840E+0, +0.000E+0 /)
 
 
@@ -1375,6 +1382,7 @@ CONTAINS
   END FUNCTION fun_calc_lnk2_Roy
   ! ****************************************************************************************************************************** !
 
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE ln(K1) DISSOCIATION CONSTANT
   FUNCTION fun_calc_lnk1_Luecker(dum_rT,dum_T_ln,dum_S,dum_S_p20)
@@ -1388,6 +1396,7 @@ CONTAINS
          & + 0.011555*dum_S - 0.0001152*dum_S_p20))
   END FUNCTION fun_calc_lnk1_Luecker
   ! ****************************************************************************************************************************** !
+
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ln(K2) DISSOCIATION CONSTANT
