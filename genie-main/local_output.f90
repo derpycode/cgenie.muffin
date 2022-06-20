@@ -22,23 +22,23 @@ module local_output
 
 contains
 
-  !----------------------------------------------------------------------
-  !>
-  !> Internal subroutine: openInput
-  !>
-  !> opens output file, returns handle to output file
-  !> 
-  !----------------------------------------------------------------------
-  subroutine openInput(filename,ID)
-
-    character(len=*),intent(in) :: filename
-
-    integer :: ID
-
-    call message("Opening input file in read-only mode!",3)
-    call openNetCDFRead(filename,ID)
-
-  end subroutine openInput
+!!$  !----------------------------------------------------------------------
+!!$  !>
+!!$  !> Internal subroutine: openInput
+!!$  !>
+!!$  !> opens output file, returns handle to output file
+!!$  !> 
+!!$  !----------------------------------------------------------------------
+!!$  subroutine openInput(filename,ID)
+!!$
+!!$    character(len=*),intent(in) :: filename
+!!$
+!!$    integer :: ID
+!!$
+!!$    call message("Opening input file in read-only mode!",3)
+!!$    call openNetCDFRead(filename,ID)
+!!$
+!!$  end subroutine openInput
 
   !----------------------------------------------------------------------
   !>

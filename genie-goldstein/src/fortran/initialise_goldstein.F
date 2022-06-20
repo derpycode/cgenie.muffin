@@ -450,6 +450,8 @@ crma note igcm orders latitude north-to-south!
       endif
       if (debug_init) print*,'GOLDSTEIN latitudes: velocity; tracers'
       if (debug_init) print*,'j, 180/pi*asin(sv(j)), 180/pi*asin(s(j))'
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do j=1,jmax
          ds(j) = sv(j) - sv(j-1)
          rds(j) = 1.0/ds(j)
@@ -536,6 +538,8 @@ c tv5 is the depth of the k+1th density level from the top
          endif
       enddo
 
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do k=kmax,1,-1
          if(k.gt.1)zro(k-1) = zro(k) - dza(k-1)
          zw(k-1) = zw(k) - dz(k)
@@ -1081,11 +1085,12 @@ c seabed depth h
          enddo
       enddo   
 
-      do 120 j=1,jmax
-         do 120 i=1,imax
+      do j=1,jmax
+         do i=1,imax
             ku(1,i,j) = max(k1(i,j),k1(i+1,j))
             ku(2,i,j) = max(k1(i,j),k1(i,j+1))
-  120 continue
+         enddo
+      enddo   
       tv2 = 0
 
 c set up drag and diffusion values
@@ -1215,15 +1220,16 @@ c use integer wetpoint indicator
 c (1+sign(1,kmax-k1(i,j)))/2
 c mk is largest of surrounding wet k1 values if i,j is wet, else 0
 c
-      do 130 j=1,jmax
-         do 130 i=1,imax
+      do j=1,jmax
+         do i=1,imax
             mk(i,j) = max(k1(i,j)*(1+sign(1,kmax-k1(i,j)))/2,
      1                k1(i+1,j)*(1+sign(1,kmax-k1(i+1,j)))/2,
      1                k1(i-1,j)*(1+sign(1,kmax-k1(i-1,j)))/2,
      1                k1(i,j+1)*(1+sign(1,kmax-k1(i,j+1)))/2,
      1                k1(i,j-1)*(1+sign(1,kmax-k1(i,j-1)))/2)
             mk(i,j) = mk(i,j) * (1+sign(1,kmax-k1(i,j)))/2
-  130 continue
+         enddo
+      enddo
 
 c initialize bp, only strictly needed at k=k1
 
@@ -1247,8 +1253,8 @@ c For non-trivial coasts essential to avoid adding J term at non-Psi points.
 c Hence first condition ensures (i,j) is a wet Psi point, 2nd that bottom
 c is not flat.
 c
-      do 140 j=1,jmax
-         do 140 i=1,imax
+      do j=1,jmax
+         do i=1,imax
             if( (max(k1(i,j),k1(i+1,j),k1(i,j+1),k1(i+1,j+1)).le.kmax)
      1          .and. (k1(i,j).ne.k1(i,j+1).or.k1(i,j).ne.k1(i+1,j)
      1                       .or.k1(i,j).ne.k1(i+1,j+1)))then
@@ -1256,7 +1262,8 @@ c
             else
                getj(i,j) = .false.  
             endif
-  140 continue
+         enddo
+      enddo
 
 c read island geometry file or write out for manual editing
 c setting wet to zero and 1 on 1st landmass, 2 on 2nd landmass (1st island)
@@ -1907,7 +1914,7 @@ c
                ilandmask2(i,j)=0
                ilandmask3(i,j)=0
             endif
-         enddo
+         end do
       end do  
 c
       if (debug_init) print*,'* Depth : depth, depth1 *'
@@ -1923,6 +1930,8 @@ c AY (17/03/04) : extra ocean.cmn arguments for netCDF writing
       end do      
 c
 c AY (09/03/04) : write this information out
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do l=0,kmax
          if(l.gt.0) then
             if (debug_init) write(*,112) l,depth(l),depth1(l+1)

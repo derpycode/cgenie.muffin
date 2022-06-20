@@ -16,17 +16,21 @@
       n = imax
       m = jmax + 1
 
-      do 710 i=1,n*m
-         do 710 j=1,2*n+3
+      do i=1,n*m
+         do j=1,2*n+3
             gap(i,j)=0
- 710  continue
+         end do
+      end do  
 
 c Set equation at Psi points, assuming periodic b.c. in i.
 c Cannot solve at both i=0 and i=imax as periodicity => would
 c have singular matrix. At dry points equation is trivial.
+c NOTE: gfortran compiler will multiply flag as:
+c     'Array reference ... out of bounds' ... but all OK
+c     (I think ...)
 
-      do 650 i=1,imax
-         do 650 j=0,jmax
+      do i=1,imax
+         do j=0,jmax
             k=i + j*n
             if(max(k1(i,j),k1(i+1,j),k1(i,j+1),k1(i+1,j+1)).le.kmax)then
                tv = (s(j+1)*rh(1,i,j+1) - s(j)*rh(1,i,j))
@@ -61,7 +65,8 @@ c for periodic boundary in i
             else
                gap(k,n+2) = 1 
             endif
- 650  continue
+         end do
+      end do  
 
 * *
 * now invert the thing
@@ -71,7 +76,7 @@ c for periodic boundary in i
          do 725 j=i+1,im
             rat=gap(j,n+2-j+i)/gap(i,n+2)
             ratm(j,j-i)=rat
-            if(rat.ne.0)then
+            if(abs(rat) .gt. 1E-20)then
                do 730 k=n+2-j+i,2*n+3-j+i
                   gap(j,k)=gap(j,k) - rat*gap(i,k+j-i)
  730           continue
