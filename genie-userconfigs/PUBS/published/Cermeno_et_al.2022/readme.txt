@@ -81,7 +81,7 @@ To double mean ocean [PO4] compared to modern [PO4] simulations:
 # =========== Muffingen files =========== #
 
 First clone muffingen.
-Set the MATLAB working dirctory to be the muffingenconfig subdirectory of this current directory, and >> addpath to where you have cloned muffingen.
+Set the MATLAB working dirctory to be the muffingenconfigs subdirectory of this current directory, and >> addpath to where you have cloned muffingen.
 Then run muffingen using the files provided.
 
 For instance, for 0 Ma, you pass the name of the corresponding configuration file (M2020_merge_Haq60_0_1deg):
