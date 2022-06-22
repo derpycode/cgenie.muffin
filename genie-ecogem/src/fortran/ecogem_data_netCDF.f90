@@ -525,12 +525,31 @@ CONTAINS
              call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
           endif
           ! Write plankton export rate - Fanny/Maria - Aug19
-          if (io.le.iomax) then
+          if (eco_export_verbose.and.io.le.iomax) then
              loc_ij(:,:) = int_export_timeslice(io,jp,:,:,n_k)
              write (shrtstrng, "(A8,A,A1,I3.3)") "_Export_",trim(adjustl(quotastrng(io))),'_',jp   
              write (longstrng, "(A,A17,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Export - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
              call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
              call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
+          endif
+          ! Write plankton uptake fluxes in each size class
+          if (eco_uptake_fluxes.and.io.le.iomax) then
+             if (autotrophy(jp).gt.0.0) then
+          	   ! Autotrophic uptake
+               loc_ij(:,:) = int_AP_timeslice(io,jp,:,:,n_k)
+               write (shrtstrng, "(A12,A,A1,I3.3)") "_AutoUptake_",trim(adjustl(quotastrng(io))),'_',jp   
+               write (longstrng, "(A,A29,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Autotrophic Uptake - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))  
+            endif
+            if (heterotrophy(jp).gt.0.0) then
+          	   ! Heterotrophic uptake
+               loc_ij(:,:) = int_HP_timeslice(io,jp,:,:,n_k)
+               write (shrtstrng, "(A14,A,A1,I3.3)") "_HeteroUptake_",trim(adjustl(quotastrng(io))),'_',jp   
+               write (longstrng, "(A,A31,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Heterotrophic Uptake - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:)) 
+             endif 
           endif
        end do
        ! Write community total biomasses and inorganic resource fluxes
@@ -552,13 +571,13 @@ CONTAINS
     call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
     call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
     ! Zoo food limitation status - Maria May 2019
-    DO jp=1,npmax
-       loc_ij(:,:) = int_zoogamma_timeslice(jp,:,:,n_k)
-       write (shrtstrng, "(A12,I3.3)") "_Gamma_Food_",jp
-       write (longstrng, "(A37,I3.3)") 'Zooplankton food limitation - Popn. #',jp
-       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
-       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
-    end do
+!BAW: zoolimit should be optional    DO jp=1,npmax
+!BAW: zoolimit should be optional       loc_ij(:,:) = int_zoogamma_timeslice(jp,:,:,n_k)
+!BAW: zoolimit should be optional       write (shrtstrng, "(A12,I3.3)") "_Gamma_Food_",jp
+!BAW: zoolimit should be optional       write (longstrng, "(A37,I3.3)") 'Zooplankton food limitation - Popn. #',jp
+!BAW: zoolimit should be optional       call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
+!BAW: zoolimit should be optional       call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+!BAW: zoolimit should be optional    end do
 
     DO ii=1,iimax
        ! Create description strings

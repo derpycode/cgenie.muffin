@@ -882,8 +882,14 @@ CONTAINS
     int_uptake_timeslice(:,:,:,:,:)   = 0.0
     int_gamma_timeslice(:,:,:,:,:)    = 0.0
     int_nutrient_timeslice(:,:,:,:)   = 0.0
-    int_zoogamma_timeslice(:,:,:,:)   = 0.0
-    int_export_timeslice(:,:,:,:,:)   = 0.0  !Fanny/Maria - Aug19
+!BAW: zoolimit should be optional    int_zoogamma_timeslice(:,:,:,:)   = 0.0
+    if (eco_export_verbose) then
+      int_export_timeslice(:,:,:,:,:)   = 0.0  !Fanny/Maria - Aug19
+    end if
+    if (eco_uptake_fluxes) then
+      int_AP_timeslice(:,:,:,:,:)   = 0.0  
+      int_HP_timeslice(:,:,:,:,:)   = 0.0  
+    end if
 
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
     !

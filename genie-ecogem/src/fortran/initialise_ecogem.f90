@@ -136,8 +136,8 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(phys_limit(iomax+2,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-  ALLOCATE(zoo_limit(npmax,n_i,n_j,n_k),STAT=alloc_error)
-  call check_iostat(alloc_error,__LINE__,__FILE__)
+!BAW: zoolimit should be optional  ALLOCATE(zoo_limit(npmax,n_i,n_j,n_k),STAT=alloc_error)
+!BAW: zoolimit should be optional  call check_iostat(alloc_error,__LINE__,__FILE__)
   !ckc ISOTOPES
   ALLOCATE(nutiso(iimaxiso,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -146,6 +146,10 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(up_flux_iso(iomaxiso,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(export_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(AP_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    ! Auto flux per plankton type
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(HP_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    ! Hetero flux per plankton type
   call check_iostat(alloc_error,__LINE__,__FILE__)
 
   ! ecogem time-slice arrays
@@ -157,9 +161,13 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(int_nutrient_timeslice(iimax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
-  ALLOCATE(int_zoogamma_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
-  call check_iostat(alloc_error,__LINE__,__FILE__)
+!BAW: zoolimit should be optional  ALLOCATE(int_zoogamma_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+!BAW: zoolimit should be optional  call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(int_export_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_AP_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !autotrophic flux per plankton type
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_HP_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !heterotrophic flux per plankton type
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Time-series storage arrays
   if (n_tser.gt.0) then

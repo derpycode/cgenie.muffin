@@ -349,7 +349,7 @@ CONTAINS
   SUBROUTINE grazing(          &
        &                  biomass,  &
        &                  gamma_T,  &
-	   &                  zoolimit,  &
+!BAW: zoolimit should be optional &                  zoolimit,  &
        &                  GrazingMat &
        &                 )
 
@@ -360,7 +360,7 @@ CONTAINS
     real,                                  intent(in)  :: gamma_T
     real,dimension(iomax+iChl,npmax)      ,intent(in)  :: biomass
     real,dimension(iomax+iChl,npmax,npmax),intent(out) :: GrazingMat
-    real,dimension(npmax,npmax),intent(out)            :: zoolimit
+!BAW: zoolimit should be optional     real,dimension(npmax,npmax),intent(out)            :: zoolimit
     ! ---------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
@@ -431,7 +431,7 @@ CONTAINS
              if (biomass(iCarb,jprey).gt.0.0.and.food2.gt.0.0) then ! if any prey food available
                 GrazingMat(iCarb,jpred,jprey) = tmp1 * gamma_T * graz(jpred)   &                        ! total grazing rate
                      &             * (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! * switching
-                zoolimit(jpred,jprey) = tmp1 *(gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! food limitation calulation for zooplankton - Maria May 2019
+!BAW: zoolimit should be optional zoolimit(jpred,jprey) = tmp1 *(gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! food limitation calulation for zooplankton - Maria May 2019
                 ! other organic elements (+ chlorophyll) are grazed in stoichiometric relation to carbon
                 do io=2,iomax+iChl
                    if (biomass(iCarb,jprey).gt.0.0) then
