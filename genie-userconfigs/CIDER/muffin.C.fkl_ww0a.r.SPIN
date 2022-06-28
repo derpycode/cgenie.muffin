@@ -16,7 +16,7 @@ bg_par_bio_prodopt='NONE'
 #
 # *** DATA SAVING ***************************************************
 #
-# Set BASIC save level (12)
+# Set BASIC save level (2)
 # (assume default time-series and time-slice save intervals)
 bg_par_data_save_level=2
 # *** optional changes to align with PALEO recommendations **********
