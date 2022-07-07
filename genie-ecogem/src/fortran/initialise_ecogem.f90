@@ -179,6 +179,12 @@ SUBROUTINE initialise_ecogem(    &
      call check_iostat(alloc_error,__LINE__,__FILE__)
      ALLOCATE(gamma_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(export_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(autotrophic_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(heterotrophic_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
      ALLOCATE(time_tser(48),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
   endif

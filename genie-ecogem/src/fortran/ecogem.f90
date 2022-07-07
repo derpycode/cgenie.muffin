@@ -716,10 +716,17 @@ subroutine ecogem(          &
      tstep=int((dum_genie_clock/dum_dts/1000.0)-48.*(ceiling((dum_genie_clock/dum_dts/1000.0)/48.)-1))
      time_tser(tstep)           = dum_genie_clock/dum_dts/1000.0
      do i_tser=1,n_tser
-        nutrient_tser(:,i_tser,tstep) =      nutrient(:,tser_i(i_tser),tser_j(i_tser),n_k)
-        plankton_tser(:,:,i_tser,tstep) =    plankton(:,:,tser_i(i_tser),tser_j(i_tser),n_k)
-        uptake_tser(:,:,i_tser,tstep) = uptake_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k) * pday
-        gamma_tser(:,:,i_tser,tstep) =  phys_limit(:,:,tser_i(i_tser),tser_j(i_tser),n_k)        ! mmol m^-3 d^-1
+        nutrient_tser(:,i_tser,tstep)        =     nutrient(:,tser_i(i_tser),tser_j(i_tser),n_k)
+        plankton_tser(:,:,i_tser,tstep)      =     plankton(:,:,tser_i(i_tser),tser_j(i_tser),n_k)
+        uptake_tser(:,:,i_tser,tstep)        =  uptake_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k) * pday
+        gamma_tser(:,:,i_tser,tstep)         =   phys_limit(:,:,tser_i(i_tser),tser_j(i_tser),n_k) 
+        if (eco_export_verbose) then
+           export_tser(:,:,i_tser,tstep)     =  export_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k)        
+        endif
+        if (eco_uptake_fluxes) then        
+          autotrophic_tser(:,:,i_tser,tstep)   =    AP_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k)       
+          heterotrophic_tser(:,:,i_tser,tstep) =    HP_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k)           
+        endif 
      enddo
   endif
 

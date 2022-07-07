@@ -851,6 +851,31 @@ CONTAINS
              call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io)),loc_c0,loc_c0)
              call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
           endif
+          ! Write plankton export rate - Fanny/Maria - Aug19
+          if (eco_export_verbose.and.io.le.iomax) then
+             loc_ij(:) = export_tser(io,jp,k,:)
+             write (shrtstrng, "(A8,A,A1,I3.3)") "_Export_",trim(adjustl(quotastrng(io))),'_',jp   
+             write (longstrng, "(A,A17,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Export - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+             call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+             call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
+          endif
+          ! Write plankton uptake fluxes in each size class
+          if (eco_uptake_fluxes.and.io.le.iomax) then
+             if (autotrophy(jp).gt.0.0) then
+               loc_ij(:) =autotrophic_tser(io,jp,k,:)
+               write (shrtstrng, "(A12,A,A1,I3.3)") "_AutoUptake_",trim(adjustl(quotastrng(io))),'_',jp   
+               write (longstrng, "(A,A29,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Autotrophic Uptake - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
+             endif
+             if (heterotrophy(jp).gt.0.0) then
+               loc_ij(:) =heterotrophic_tser(io,jp,k,:)
+               write (shrtstrng, "(A14,A,A1,I3.3)") "_HeteroUptake_",trim(adjustl(quotastrng(io))),'_',jp   
+               write (longstrng, "(A,A31,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Heterotrophic Uptake - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,1,'ecoTS'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               call sub_putvar1d('ecoTS'//shrtstrng,loc_iou,48,loc_ntrec,48 ,loc_ij(:),loc_c1,loc_c0)
+             endif
+          endif
        end do
        ! Write community total biomasses and inorganic resource fluxes
        write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 

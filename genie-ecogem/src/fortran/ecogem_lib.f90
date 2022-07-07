@@ -346,6 +346,10 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::plankton_tser ! plankton biomass array (npmax,iomax,nsite,48)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::uptake_tser   ! inorganic nutrient uptake flux for each plankton (iomax,npmax,nsite,48)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::gamma_tser    ! limiting factors (iomax,npmax,nsite,48)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::export_tser    ! limiting factors (iomax,npmax,nsite,48)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::autotrophic_tser    ! limiting factors (iomax,npmax,nsite,48)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::heterotrophic_tser    ! limiting factors (iomax,npmax,nsite,48)
+  
   REAL             ,ALLOCATABLE,DIMENSION(:)      ::time_tser     ! timestep # (48)
 
   ! ############################################################################################################################## !
