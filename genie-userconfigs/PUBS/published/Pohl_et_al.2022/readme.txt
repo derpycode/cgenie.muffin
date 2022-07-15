@@ -20,6 +20,7 @@ Alexandre POHL1,2*, Andy RIDGWELL1*, Richard G. STOCKEY3, Christophe THOMAZO2, A
 19/01/2022 -- edited to reflect new genie-userconfigs directory
 20/01/2022 -- added modern oxygenation experiments
 12/07/2022 -- copied to new directory
+15/07/2022 -- corrected/updated user-config path
 ################################################################
 
 Provided are the configuration files necessary to run: 
@@ -47,179 +48,179 @@ Remark 2: Drake- and ridge- world configurations are just the ones provided in t
 
 ################ A] series #1 ################
 
-./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.0__rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.20_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.40_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.60_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.80_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.100rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.120rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.140rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.160rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.180rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.200rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.220rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.240rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.260rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.280rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.300rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.320rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.340rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.360rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.380rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.400rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.420rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.440rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.460rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.480rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.500rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.520rdP1_.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.540rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.0__rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.20_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.40_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.60_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.80_rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.100rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.120rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.140rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.160rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.180rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.200rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.220rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.240rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.260rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.280rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.300rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.320rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.340rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.360rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.380rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.400rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.420rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.440rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.460rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.480rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.500rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.520rdP1_.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.540rdP1_.PO4.8P8Z.Tdep.SPIN 20000
 
 ################ B] series #2 ################
 
-./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.0__rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.20_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.40_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.60_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.80_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.100rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.120rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.140rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.160rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.180rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.200rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.220rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.240rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.260rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.280rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.300rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.320rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.340rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.360rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.380rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.400rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.420rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.440rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.460rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.480rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.500rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.520rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
-./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.540rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.0__rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.20_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.40_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.60_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.80_rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.100rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.120rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.140rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.160rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.180rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.200rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.220rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.240rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.260rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.280rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.300rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.320rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.340rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.360rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.380rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.400rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.420rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.440rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.460rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.480rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.500rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.520rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
+./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.540rdP1_.PO4.8P8Z.Tdep.detr.SPIN 20000
 
 ################ C] no T-dep ################
 
-./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.0__rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.20_rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.40_rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.60_rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.80_rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.100rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.120rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.140rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.160rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.180rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.200rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.220rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.240rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.260rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.280rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.300rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.320rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.340rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.360rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.380rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.400rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.420rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.440rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.460rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.480rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.500rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.520rdP1_.PO4.8P8Z.SPIN 20000
-./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.540rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.0__rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.20_rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.40_rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.60_rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.80_rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.100rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.120rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.140rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.160rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.180rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.200rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.220rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.240rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.260rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.280rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.300rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.320rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.340rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.360rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.380rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.400rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.420rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.440rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.460rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.480rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.500rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.520rdP1_.PO4.8P8Z.SPIN 20000
+./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.540rdP1_.PO4.8P8Z.SPIN 20000
 
 ################ D] flat bottom ################
 
-./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.0__rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
-./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.20_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
-./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.40_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
-./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.60_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
-./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.80_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
-./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.100rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
-./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.120rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
-./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.140rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.0__rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.20_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.40_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.60_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.80_rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.100rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.120rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
+./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.140rdP1_.PO4.8P8Z.Tdep_fb.SPIN 20000
 
 ################ E] 1120 ppm ################
 
-./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.0__rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.20_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.40_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.60_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.80_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.100rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.120rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.140rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.160rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.180rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.200rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.220rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.240rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.260rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.280rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.300rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.320rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.340rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.360rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.380rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.400rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.420rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.440rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.460rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.480rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.500rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.520rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
-./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.540rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.0__rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.0__rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.20_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.20_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.40_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.40_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.60_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.60_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.80_rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.80_rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.100rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.100rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.120rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.120rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.140rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.140rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.160rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.160rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.180rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.180rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.200rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.200rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.220rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.220rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.240rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.240rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.260rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.260rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.280rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.280rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.300rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.300rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.320rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.320rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.340rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.340rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.360rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.360rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.380rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.380rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.400rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.400rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.420rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.420rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.440rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.440rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.460rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.460rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.480rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.480rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.500rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.500rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.520rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.520rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
+./runmuffin.sh muffin.AP.540rdP1_.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.540rdP1_.PO4.8P8Z.Tdep.1120ppm.SPIN 20000
 
 ################ F] BugPlates ################
 
-./runmuffin.sh muffin.AP.440bug__.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.440bug__.PO4.8P8Z.Tdep.SPIN 20000
-./runmuffin.sh muffin.AP.460bug__.eb_go_gs_ac_eg.PO4.SPIN MS/pohletal.Nature.2022 AP.460bug__.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.440bug__.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.440bug__.PO4.8P8Z.Tdep.SPIN 20000
+./runmuffin.sh muffin.AP.460bug__.eb_go_gs_ac_eg.PO4.SPIN PUBS/published/Pohl_et_al.2022 AP.460bug__.PO4.8P8Z.Tdep.SPIN 20000
 
 ################ G] Drake world ################
 
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.4.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.4.5X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.5.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.5.5X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.6.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.7.5X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.8.25X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.8.5X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.9.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.9.75X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.10.75X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.11.25X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.12.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_dw_hi.BASES.16.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.4.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.4.5X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.5.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.5.5X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.6.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.7.5X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.8.25X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.8.5X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.9.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.9.75X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.10.75X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.11.25X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.12.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_dw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_dw_hi.BASES.16.0X.SPIN 60000
 
 ################ H] Ridge world ################
 
-./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.4.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.5.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.6.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.8.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.10.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.12.0X.SPIN 60000
-./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr MS/pohletal.Nature.2022 muffin.CB.eg_rw_hi.BASES.16.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_rw_hi.BASES.4.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_rw_hi.BASES.5.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_rw_hi.BASES.6.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_rw_hi.BASES.8.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_rw_hi.BASES.10.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_rw_hi.BASES.12.0X.SPIN 60000
+./runmuffin.sh muffin.CB.eg_rw_hi.BASES_agetr PUBS/published/Pohl_et_al.2022 muffin.CB.eg_rw_hi.BASES.16.0X.SPIN 60000
 
 ################ I] modern oxygenation #########
 
-./runmuffin.sh muffin.CB.p_worjh2.BASES MS/pohletal.Nature.2022 muffin.CB.p_worjh2.BASES.caoetal.SPIN 10000
-./runmuffin.sh muffin.CBE.p_worjh2.BASES MS/pohletal.Nature.2022 muffin.CBE.p_worjh2.BASES.wardetal.SPIN 10000
+./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Pohl_et_al.2022 muffin.CB.p_worjh2.BASES.caoetal.SPIN 10000
+./runmuffin.sh muffin.CBE.p_worjh2.BASES PUBS/published/Pohl_et_al.2022 muffin.CBE.p_worjh2.BASES.wardetal.SPIN 10000
 
 ################ J] modern ventillation age ####
 
-./runmuffin.sh muffin.C.p_worjh2.r MS/pohletal.Nature.2022 muffin.C.p_worjh2.r.age.SPIN 10000
+./runmuffin.sh muffin.C.p_worjh2.r PUBS/published/Pohl_et_al.2022 muffin.C.p_worjh2.r.age.SPIN 10000
 
 ################################################################
 ################################################################
