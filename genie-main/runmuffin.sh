@@ -48,8 +48,8 @@ if [ -z "$3" ]; then
   else
     RUNID="$3"
 fi
-if [ $(expr length "$3") -gt 127 ] ; then
-    echo "Usage: '$3' 3rd parameter must be less than 128 characters in length"
+if [ $(expr length "$3") -gt 63 ] ; then
+    echo "Usage: '$3' 3rd parameter must be less than 64 characters in length"
     exit 65
 fi
 GOIN=$GOINDIR/$RUNID
@@ -63,8 +63,8 @@ fi
 # [5] restart path (optional)
 if [ -n "$5" ]; then
   RESTARTPATH=$OUTPUTDIR/"$5"
-    if [ $(expr length "$5") -gt 127 ] ; then
-        echo "Usage: '$5' 5th parameter must be less than 128 characters in length"
+    if [ $(expr length "$5") -gt 63 ] ; then
+        echo "Usage: '$5' 5th parameter must be less than 64 characters in length"
         exit 65
     fi
 fi

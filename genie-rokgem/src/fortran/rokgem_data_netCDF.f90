@@ -23,31 +23,31 @@ CONTAINS
 
 
   SUBROUTINE rokgem_netcdf(dum_temp,dum_CO2,dum_runoff,dum_photo,dum_respveg,dum_loc_P,&
-                          & dum_force_flux_weather_a_land,dum_force_flux_weather_o_land,&
-                          & dum_force_flux_weather_o_ocean)
+       & dum_force_flux_weather_a_land,dum_force_flux_weather_o_land,&
+       & dum_force_flux_weather_o_ocean)
 
-       ! dummy variables
-       !(NOTE: output for temp, runoff and productivity is that used in rokgem calculations, so may have been calibrated if option set)
-       REAL,INTENT(in)                 :: dum_temp(n_i,n_j)                                        ! temperature (originally from atmosphere composition interface array - subject to calibration)
-       REAL,INTENT(in)                 :: dum_CO2(n_i,n_j)                                         ! CO2 (from atmosphere composition interface array)
-       REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)                                      ! runoff (originally from EMBM - subject to calibration)
-       REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                                       ! photosythesis from land veg module (ENTS)
-       REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)                                     ! vegetation respiration from land veg module (ENTS) (subject to calibration)
-       REAL,INTENT(in)                 :: dum_loc_P(n_i,n_j)                                       ! Productivity as calculated for rokgem from ENTS inputs
-       REAL,INTENT(in)                 :: dum_force_flux_weather_a_land(n_atm,n_i,n_j)             ! fluxes shared over land (atmosphere variables)
-       REAL,INTENT(in)                 :: dum_force_flux_weather_o_land(n_ocn,n_i,n_j)             ! fluxes shared over land (ocean variables)
-       REAL,INTENT(in)                 :: dum_force_flux_weather_o_ocean(n_ocn,n_i,n_j)            ! fluxes into coastal positions in ocean (ocean variables)     
+    ! dummy variables
+    !(NOTE: output for temp, runoff and productivity is that used in rokgem calculations, so may have been calibrated if option set)
+    REAL,INTENT(in)                 :: dum_temp(n_i,n_j)                                        ! temperature (originally from atmosphere composition interface array - subject to calibration)
+    REAL,INTENT(in)                 :: dum_CO2(n_i,n_j)                                         ! CO2 (from atmosphere composition interface array)
+    REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)                                      ! runoff (originally from EMBM - subject to calibration)
+    REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                                       ! photosythesis from land veg module (ENTS)
+    REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)                                     ! vegetation respiration from land veg module (ENTS) (subject to calibration)
+    REAL,INTENT(in)                 :: dum_loc_P(n_i,n_j)                                       ! Productivity as calculated for rokgem from ENTS inputs
+    REAL,INTENT(in)                 :: dum_force_flux_weather_a_land(n_atm,n_i,n_j)             ! fluxes shared over land (atmosphere variables)
+    REAL,INTENT(in)                 :: dum_force_flux_weather_o_land(n_ocn,n_i,n_j)             ! fluxes shared over land (ocean variables)
+    REAL,INTENT(in)                 :: dum_force_flux_weather_o_ocean(n_ocn,n_i,n_j)            ! fluxes into coastal positions in ocean (ocean variables)     
 
-           ! re-open netcdf file
-           call sub_save_netcdf(output_years_2d(output_counter_2d))
-           CALL sub_save_netcdf_2d_rg(dum_temp,dum_CO2,dum_runoff,dum_photo,dum_respveg,dum_loc_P, &                      
-                    & dum_force_flux_weather_a_land,dum_force_flux_weather_o_land,dum_force_flux_weather_o_ocean)
+    ! re-open netcdf file
+    call sub_save_netcdf(output_years_2d(output_counter_2d))
+    CALL sub_save_netcdf_2d_rg(dum_temp,dum_CO2,dum_runoff,dum_photo,dum_respveg,dum_loc_P, &                      
+         & dum_force_flux_weather_a_land,dum_force_flux_weather_o_land,dum_force_flux_weather_o_ocean)
 
-           ! close netcdf file and update record number
-           call sub_closefile(ncout2d_iou_rg)
-           ncout2d_ntrec_rg = ncout2d_ntrec_rg + 1
+    ! close netcdf file and update record number
+    call sub_closefile(ncout2d_iou_rg)
+    ncout2d_ntrec_rg = ncout2d_ntrec_rg + 1
 
-   END SUBROUTINE rokgem_netcdf
+  END SUBROUTINE rokgem_netcdf
 
 
   ! ****************************************************************************************************************************** !
@@ -74,20 +74,20 @@ CONTAINS
   !       dum_mask = topography mask for printing 
 
   SUBROUTINE sub_save_netcdf_2d_rg(dum_temp,dum_CO2,dum_runoff,dum_photo,dum_respveg,dum_loc_P,&
-                                  & dum_force_flux_weather_a_land,dum_force_flux_weather_o_land,&
-                                  & dum_force_flux_weather_o_ocean)
+       & dum_force_flux_weather_a_land,dum_force_flux_weather_o_land,&
+       & dum_force_flux_weather_o_ocean)
 
-       ! dummy variables
-       !(NOTE: output for temp, runoff and productivity is that used in rokgem calculations, so may have been calibrated if option set)
-       REAL,INTENT(in)                 :: dum_temp(n_i,n_j)                                        ! temperature (originally from atmosphere composition interface array - subject to calibration)
-       REAL,INTENT(in)                 :: dum_CO2(n_i,n_j)                                         ! CO2 (from atmosphere composition interface array)
-       REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)                                      ! runoff (originally from EMBM - subject to calibration)
-       REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                                       ! photosythesis from land veg module (ENTS)
-       REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)                                     ! vegetation respiration from land veg module (ENTS) (subject to calibration)
-       REAL,INTENT(in)                 :: dum_loc_P(n_i,n_j)                                       ! Productivity as calculated for rokgem from ENTS inputs
-       REAL,INTENT(in)                 :: dum_force_flux_weather_a_land(n_atm,n_i,n_j)             ! fluxes shared over land (atmosphere variables)
-       REAL,INTENT(in)                 :: dum_force_flux_weather_o_land(n_ocn,n_i,n_j)             ! fluxes shared over land (ocean variables)
-       REAL,INTENT(in)                 :: dum_force_flux_weather_o_ocean(n_ocn,n_i,n_j)            ! fluxes into coastal positions in ocean (ocean variables)     
+    ! dummy variables
+    !(NOTE: output for temp, runoff and productivity is that used in rokgem calculations, so may have been calibrated if option set)
+    REAL,INTENT(in)                 :: dum_temp(n_i,n_j)                                        ! temperature (originally from atmosphere composition interface array - subject to calibration)
+    REAL,INTENT(in)                 :: dum_CO2(n_i,n_j)                                         ! CO2 (from atmosphere composition interface array)
+    REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)                                      ! runoff (originally from EMBM - subject to calibration)
+    REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                                       ! photosythesis from land veg module (ENTS)
+    REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)                                     ! vegetation respiration from land veg module (ENTS) (subject to calibration)
+    REAL,INTENT(in)                 :: dum_loc_P(n_i,n_j)                                       ! Productivity as calculated for rokgem from ENTS inputs
+    REAL,INTENT(in)                 :: dum_force_flux_weather_a_land(n_atm,n_i,n_j)             ! fluxes shared over land (atmosphere variables)
+    REAL,INTENT(in)                 :: dum_force_flux_weather_o_land(n_ocn,n_i,n_j)             ! fluxes shared over land (ocean variables)
+    REAL,INTENT(in)                 :: dum_force_flux_weather_o_ocean(n_ocn,n_i,n_j)            ! fluxes into coastal positions in ocean (ocean variables)     
 
     !-----------------------------------------------------------------------
     !       DEFINE LOCAL VARIABLES
@@ -104,8 +104,8 @@ CONTAINS
     loc_mask_surf(:,:) = 1.0
     loc_mask_ocean(:,:) = 0.0
     where ( landmask(:,:) .eq. 0 )
-          loc_mask_surf = 0.0
-          loc_mask_ocean = 1.0
+       loc_mask_surf = 0.0
+       loc_mask_ocean = 1.0
     endwhere
     !-----------------------------------------------------------------------
 
@@ -191,6 +191,18 @@ CONTAINS
     call sub_adddef_netcdf(loc_iou,3,'DIC_14C_land','DIC_14C weathering flux - land',trim(loc_unitsname),const_real_zero, &
          & const_real_zero)
     call sub_putvar2d('DIC_14C_land',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+    ! Osmium
+    loc_unitsname = 'mol Os / yr'
+    loc_ij(:,:) = dum_force_flux_weather_o_land(io_Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_land','Os weathering flux - land',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_land',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+    ! Osmium 187Os/188Os
+    loc_unitsname = '187Os/188Os'
+    loc_ij(:,:) = dum_force_flux_weather_o_land(io_Os_187Os,:,:)/dum_force_flux_weather_o_land(io_Os_188Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_187Os_188Os_land',' weathering flux 187Os/188Os - land',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_187Os_188Os_land',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
 
     ! weathering flux to ocean - ocean
     ! Alkalinity
@@ -207,7 +219,7 @@ CONTAINS
     ! Ca
     loc_unitsname = 'mol Ca / yr'
     loc_ij(:,:) = dum_force_flux_weather_o_ocean(io_Ca,:,:)
-    call sub_adddef_netcdf(loc_iou,3,'Ca_ocean','Ca weathering flux -ocean',trim(loc_unitsname),const_real_zero,const_real_zero)
+    call sub_adddef_netcdf(loc_iou,3,'Ca_ocean','Ca weathering flux - ocean',trim(loc_unitsname),const_real_zero,const_real_zero)
     call sub_putvar2d('Ca_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
     ! Alkalinity
     loc_unitsname = 'mol DIC_13C / yr'
@@ -221,6 +233,18 @@ CONTAINS
     call sub_adddef_netcdf(loc_iou,3,'DIC_14C_ocean','DIC_14C weathering flux - ocean',trim(loc_unitsname),const_real_zero, &
          & const_real_zero)
     call sub_putvar2d('DIC_14C_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
+    ! Osmium
+    loc_unitsname = 'mol Os / yr'
+    loc_ij(:,:) = dum_force_flux_weather_o_ocean(io_Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_ocean','Os weathering flux - ocean',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
+    ! Osmium 187Os/188Os
+    loc_unitsname = '187Os/188Os'
+    loc_ij(:,:) = dum_force_flux_weather_o_ocean(io_Os_187Os,:,:)/dum_force_flux_weather_o_ocean(io_Os_188Os,:,:)
+    call sub_adddef_netcdf(loc_iou,3,'Os_187Os_188Os_ocean',' weathering flux 187Os/188Os - ocean',trim(loc_unitsname),const_real_zero, &
+         & const_real_zero)
+    call sub_putvar2d('Os_187Os_188Os_ocean',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_ocean)
 
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
     !
@@ -417,7 +441,7 @@ CONTAINS
     call sub_putvarIs  ('year', loc_iou, loc_ntrec, nint(dum_yr), loc_c1, loc_c0)
     ! 
     if(.not. loc_defined) then
-       
+
        call sub_putvar1d ('lon', loc_iou, n_i, loc_ntrec, n_i, &
             & phys_rok(ipr_lon,:,1), loc_c1, loc_c0)
        call edge_maker (1, loc_lon_e, phys_rok(ipr_lon,:,1), &
@@ -430,7 +454,7 @@ CONTAINS
             & phys_rok(ipr_lone,:,1), phys_rok(ipr_dlon,:,1), n_i)
        call sub_putvar1d ('xu_edges', loc_iou, n_i+1, loc_ntrec, n_i+1, &
             & loc_xu_e, loc_c1, loc_c0)
-       
+
        call sub_putvar1d ('lat', loc_iou, n_j, loc_ntrec, n_j, &
             & phys_rok(ipr_lat,1,:), loc_c1, loc_c0)
        call edge_maker (1, loc_lat_e, phys_rok(ipr_lat,1,:), &
@@ -443,7 +467,7 @@ CONTAINS
             & phys_rok(ipr_latn,1,:), phys_rok(ipr_dlat,1,:), n_j)
        call sub_putvar1d ('yu_edges', loc_iou, n_j+1, loc_ntrec, n_j+1, &
             & loc_yu_e, loc_c1, loc_c0)
-      
+
        !-----------------------------------------------------------------------
        !       write 2d data (x,y)
        !-----------------------------------------------------------------------
@@ -452,13 +476,13 @@ CONTAINS
           loc_mask_surf = 0.0
        endwhere
        call sub_putvar2d ('grid_mask', loc_iou, n_i, n_j, loc_ntrec, &
-          & loc_mask_surf(:,:), loc_mask_surf)
+            & loc_mask_surf(:,:), loc_mask_surf)
 
     end if
     !-----------------------------------------------------------------------
 
-       ncout2d_ntrec_rg = loc_ntrec
-       ncout2d_iou_rg = loc_iou
+    ncout2d_ntrec_rg = loc_ntrec
+    ncout2d_iou_rg = loc_iou
 
     ! 
     call sub_sync(loc_iou)
