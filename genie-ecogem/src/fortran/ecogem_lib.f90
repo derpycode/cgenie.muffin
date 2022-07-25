@@ -122,9 +122,11 @@ MODULE ecogem_lib
   logical::ctrl_PARseaicelimit    ! PAR attenutation by sea-ice cover?
   NAMELIST /ini_ecogem_nml/ctrl_PARseaicelimit
   ! Diazotroph paramters
-  real :: NFbiocost          ! Biosynthetic cost of nitrogen fixation
+  real :: NPdiaz		  ! N:P elemental ratio of diazotrophs (mol:mol)
+  real :: Fediaz	          ! Iron requirement of diazotrophs relative to other phytoplankton
+  real :: NFbiocost	          ! Biosynthetic cost of nitrogen fixation
   real :: NFgeocost               ! Geometric cost of nitrogen fixation
-  namelist/ini_ecogem_nml/NFbiocost,NFgeocost
+  namelist/ini_ecogem_nml/NPdiaz,Fediaz,NFbiocost,NFgeocost
   ! Grazing parameters
   real :: ass_eff                   !      maximum assimilation efficiency
   integer :: ns                     !      prey switching exponent
@@ -150,9 +152,6 @@ MODULE ecogem_lib
   ! Mixotrophy parameters
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff
-  ! Diazotroph parameters
-  real :: par_bio_NPdiaz          ! N:P elemental ratio of diazotrophs (mol:mol)
-  namelist/ini_biogem_nml/par_bio_NPdiaz
   ! Temperature dependence
   real ::  temp_A,temp_T0   !
   namelist/ini_ecogem_nml/temp_A,temp_T0

@@ -453,7 +453,7 @@ subroutine ecogem(          &
                     dbiomassdt(io,:) = dbiomassdt(io,:) + up_inorg(ii ,:) * BioC(:)
                  enddo
                  ! Scale N dbiomass for diazotrophs with phosphorus - Fanny Apr21
-                 dbiomassdt(iNitr,:) = merge(dbiomassdt(iPhos,:)*40.0,dbiomassdt(iNitr,:),pft.eq.'diazotroph')
+                 dbiomassdt(iNitr,:) = merge(dbiomassdt(iPhos,:)*NPdiaz,dbiomassdt(iNitr,:),pft.eq.'diazotroph')
                  ! CHLOROPHYLL A SYNTHESIS
                  if (chlquota) dbiomassdt(iChlo,:) = chlsynth(:)
                  do io=1,iomax+iChl

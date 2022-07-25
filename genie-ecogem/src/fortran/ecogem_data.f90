@@ -509,9 +509,9 @@ CONTAINS
        affinity(iFe,:) = affinFe_a * volume(:) ** affinFe_b * autotrophy(:)
        kexc(iIron,:)   =  kexcFe_a * volume(:) **  kexcFe_b
        ! Diazotrophs have higher Fe demands - Fanny Jun20 - Add parameters - Apr21
-       qmin(iIron,:)   = merge(qmin(iIron,:)*10.0,qmin(iIron,:),pft.eq.'diazotroph')
-       qmax(iIron,:)   = merge(qmax(iIron,:)*10.0,qmax(iIron,:),pft.eq.'diazotroph')
-       affinity(iFe,:) = merge(affinity(iFe,:)/10.0,affinity(iFe,:),pft.eq.'diazotroph')
+       qmin(iIron,:)   = merge(qmin(iIron,:)*Fediaz,qmin(iIron,:),pft.eq.'diazotroph')
+       qmax(iIron,:)   = merge(qmax(iIron,:)*Fediaz,qmax(iIron,:),pft.eq.'diazotroph')
+       affinity(iFe,:) = merge(affinity(iFe,:)/Fediaz,affinity(iFe,:),pft.eq.'diazotroph')
     endif
     !-----------------------------------------------------------------------------------------
     if (squota) then ! silicon parameters

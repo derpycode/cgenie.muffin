@@ -8683,6 +8683,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 	                  <description>PAR attenutation by sea-ice cover?</description>
                     </param>
 <!-- Diazotroph parameters -->
+                    <param name="NPdiaz">
+			<value datatype="real">40.0</value>
+	                  <description>N:P elemental ratio of diazotrophs (mol:mol) (Monteiro et al., 2010)</description>
+                    </param>
+                    <param name="Fediaz">
+			<value datatype="real">10.0</value>
+	                  <description>Iron requirement of diazotrophs relative to other phytoplankton</description>
+                    </param>
                     <param name="NFbiocost">
 			<value datatype="real">1.5</value>
 	                  <description>Biosynthetic cost of nitrogen fixation</description>

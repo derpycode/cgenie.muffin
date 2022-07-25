@@ -296,7 +296,7 @@ CONTAINS
              if (useNO2)  VCN(:) = VCN(:) + up_inorg(iNO2,:)
              if (useNH4)  VCN(:) = VCN(:) + up_inorg(iNH4,:)
              ! Scaling VCN for diazotrophs (PO4 uptake times diazo N:P ratio) - Fanny Apr21
-             VCN(:) = merge(up_inorg(iPO4,:)*40.0,VCN(:),pft.eq.'diazotroph')
+             VCN(:) = merge(up_inorg(iPO4,:)*NPdiaz,VCN(:),pft.eq.'diazotroph')
           elseif (pquota) then
              VCN(:) = up_inorg(iPO4,:) * 16.0
            else
