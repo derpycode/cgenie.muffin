@@ -1,4 +1,4 @@
-
+ 
  01                 02    03
  \/                 \/    \/
 
@@ -9,7 +9,7 @@
  Picoplankton       0.6    1
  Picoplankton       2.00   1
  Eukaryote         20.00   1
- Eukaryote	  200.00   1
+ Eukaryote        200.00   1
  Zooplankton        6.00   1
  Zooplankton       20.00   1 
  Zooplankton      200.00   1
@@ -31,11 +31,11 @@ INFO: TRACER ASSIGNMENT RULES
 Plankton functional type one of: Prochlorococcus
                                  Synechococcus
                                  Picoeukaryote
-				 Picoplankton
+		                 Picoplankton
                                  Diatom
                                  Coccolithophore
                                  Diazotroph
- 				 Eukaryote
+ 			         Eukaryote
                                  Phytoplankton
                                  Zooplankton
                                  Mixotroph

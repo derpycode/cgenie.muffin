@@ -1,0 +1,114 @@
+
+ 01                 02    03
+ \/                 \/    \/
+
+-START-OF-DATA-
+ Diatom             2.00   1
+ Diatom             4.00   1
+ Diatom             6.00   1
+ Diatom            10.00   1
+ Diatom            16.00   1
+ Diatom            20.00   1
+ Diatom            60.00   1
+ Diatom            80.00   1
+ Diatom           100.00   1
+ Diatom           120.00   1
+ Diatom           160.00   1
+ Diatom           200.00   1
+ Picoplankton       2.00   1
+ Picoplankton       3.00   1
+ Picoplankton       4.00   1
+ Picoplankton       5.00   1
+ Picoplankton       6.00   1
+ Picoplankton       7.00   1
+ Picoplankton       8.00   1
+ Picoplankton       9.00   1
+ Picoplankton      10.00   1
+ Picoplankton      11.00   1
+ Picoplankton      12.00   1
+ Picoplankton      14.00   1
+ Picoplankton      15.00   1
+ Picoplankton      16.00   1
+ Picoplankton      18.00   1
+ Picoplankton      20.00   1
+ Eukaryote         60.00   1
+ Eukaryote         65.00   1
+ Eukaryote         70.00   1
+ Eukaryote         80.00   1
+ Eukaryote         90.00   1
+ Eukaryote        100.00   1
+ Eukaryote        110.00   1
+ Eukaryote        120.00   1
+ Eukaryote        130.00   1
+ Eukaryote        140.00   1
+ Eukaryote        150.00   1
+ Eukaryote        160.00   1
+ Eukaryote        170.00   1
+ Eukaryote        180.00   1
+ Eukaryote        190.00   1
+ Eukaryote        200.00   1
+ Zooplankton       20.00   1
+ Zooplankton       30.00   1
+ Zooplankton       40.00   1
+ Zooplankton       50.00   1  
+ Zooplankton       60.00   1
+ Zooplankton       70.00   1
+ Zooplankton       80.00   1
+ Zooplankton       90.00   1 
+ Zooplankton      100.00   1
+ Zooplankton      110.00   1
+ Zooplankton      120.00   1
+ Zooplankton      140.00   1
+ Zooplankton      150.00   1
+ Zooplankton      160.00   1
+ Zooplankton      180.00   1  
+ Zooplankton      200.00   1
+ Zooplankton      600.00   1
+ Zooplankton      650.00   1
+ Zooplankton      700.00   1 
+ Zooplankton      800.00   1
+ Zooplankton      900.00   1  
+ Zooplankton     1000.00   1
+ Zooplankton     1100.00   1
+ Zooplankton     1200.00   1
+ Zooplankton     1300.00   1
+ Zooplankton     1400.00   1
+ Zooplankton     1500.00   1  
+ Zooplankton     1600.00   1
+ Zooplankton     1700.00   1
+ Zooplankton     1800.00   1
+ Zooplankton     1900.00   1 
+ Zooplankton     2000.00   1
+-END-OF-DATA-
+
+
+ 
+
+
+ /\                 /\    /\
+ 01                 02    03
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: plankton functional type name
+COLUMN #02: plankton diameter (micrometers)
+COLUMN #03: number of randomised replicates
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+			   Picoplankton
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+ 			   Eukaryote
+                                 Phytoplankton
+                                 Zooplankton
+                                 Mixotroph
+
+
+
+

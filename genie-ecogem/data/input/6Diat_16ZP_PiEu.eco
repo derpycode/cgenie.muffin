@@ -1,0 +1,76 @@
+
+ 01                 02    03
+ \/                 \/    \/
+
+-START-OF-DATA-
+ Diatom             2.00   1
+ Diatom             6.00   1
+ Diatom            20.00   1
+ Diatom            60.00   1
+ Diatom           100.00   1
+ Diatom           200.00   1
+ Picoplankton       2.00   1
+ Picoplankton       4.00   1
+ Picoplankton       6.00   1
+ Picoplankton       8.00   1
+ Picoplankton      10.00   1
+ Picoplankton      12.00   1
+ Picoplankton      16.00   1
+ Picoplankton      20.00   1
+ Eukaryote         60.00   1
+ Eukaryote         80.00   1
+ Eukaryote        100.00   1
+ Eukaryote        120.00   1
+ Eukaryote        140.00   1
+ Eukaryote        160.00   1
+ Eukaryote        180.00   1
+ Eukaryote        200.00   1
+ Zooplankton       20.00   1
+ Zooplankton       40.00   1  
+ Zooplankton       60.00   1
+ Zooplankton       80.00   1 
+ Zooplankton      100.00   1
+ Zooplankton      120.00   1
+ Zooplankton      160.00   1  
+ Zooplankton      200.00   1
+ Zooplankton      600.00   1
+ Zooplankton      800.00   1 
+ Zooplankton     1000.00   1
+ Zooplankton     1200.00   1
+ Zooplankton     1400.00   1  
+ Zooplankton     1600.00   1
+ Zooplankton     1800.00   1 
+ Zooplankton     2000.00   1
+-END-OF-DATA-
+
+
+ 
+
+
+ /\                 /\    /\
+ 01                 02    03
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: plankton functional type name
+COLUMN #02: plankton diameter (micrometers)
+COLUMN #03: number of randomised replicates
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+			   Picoplankton
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+ 			   Eukaryote
+                                 Phytoplankton
+                                 Zooplankton
+                                 Mixotroph
+
+
+
+
