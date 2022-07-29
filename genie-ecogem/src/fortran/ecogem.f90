@@ -748,15 +748,18 @@ subroutine ecogem(          &
   ! based on the stoichiometry defined in biogem for remineralisation 
   ! ---------------------------------------------------------- !
   ! O2 production from DIC uptake 
-  ! estimated without O2 contribution from P and N - Fanny/Andy Sep21 
-  dum_egbg_sfcdiss(io_O2  ,:,:,:) = - (138.0 -2.0 -5.0/4.0*16) / 106.0 * nutrient_flux(iDIC ,:,:,:) / 1.0e3 / conv_m3_kg
+  ! estimated by removing O2 contribution for P and N uptake from DIC correction - Fanny/Andy/Chris Jul22 
+  dum_egbg_sfcdiss(io_O2  ,:,:,:) = - 138.0/ 106.0 * nutrient_flux(iDIC ,:,:,:) / 1.0e3 / conv_m3_kg
   ! Photosynthesis-related changes in O2 and Alkalinity (REQUIRES MACRONUTRIENT UPTAKE FLUX - Ideally nitrate uptake flux)
+  if (usePO4) then
+     dum_egbg_sfcdiss(io_O2 ,:,:,:) = dum_egbg_sfcdiss(io_O2,:,:,:) + (2.0/106.0 * nutrient_flux(iDIC ,:,:,:) - 2.0 * nutrient_flux(iPO4,:,:,:)) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for PO4 uptake
+  endif
   if (useNO3) then
-     dum_egbg_sfcdiss(io_O2 ,:,:,:) = dum_egbg_sfcdiss(io_O2,:,:,:) - (5.0/4.0) * nutrient_flux(iNO3,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NO3 uptake: H+ + NO3- → PON +(5/4)O2 + 1/2H2O - Fanny/Chris Jul21
+     dum_egbg_sfcdiss(io_O2 ,:,:,:) = dum_egbg_sfcdiss(io_O2,:,:,:) + (-5.0/4.0*16/106.0* nutrient_flux(iDIC ,:,:,:) - (5.0/4.0) * nutrient_flux(iNO3,:,:,:)) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NO3 uptake: H+ + NO3- → PON +(5/4)O2 + 1/2H2O
      dum_egbg_sfcdiss(io_ALK ,:,:,:) = 1.0 * nutrient_flux(iNO3 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
      if (useNH4) then
-        dum_egbg_sfcdiss(io_O2 ,:,:,:) = dum_egbg_sfcdiss(io_O2 ,:,:,:) + (3.0/4.0) * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NH4 uptake: NH4+ + (3/4)O2 → PON + H+ + 3/2H2O - Fanny/Chris Jul21
-        dum_egbg_sfcdiss(io_ALK ,:,:,:) = dum_egbg_sfcdiss(io_ALK ,:,:,:) - 1.0 * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - Fanny/Chris Jul21
+        dum_egbg_sfcdiss(io_O2 ,:,:,:) = dum_egbg_sfcdiss(io_O2 ,:,:,:) + (3.0/4.0) * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for NH4 uptake: NH4+ + (3/4)O2 → PON + H+ + 3/2H2O
+        dum_egbg_sfcdiss(io_ALK ,:,:,:) = dum_egbg_sfcdiss(io_ALK ,:,:,:) - 1.0 * nutrient_flux(iNH4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
      endif
   elseif (usePO4) then
      dum_egbg_sfcdiss(io_ALK ,:,:,:) = -16.0 * nutrient_flux(iPO4 ,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
@@ -766,9 +769,6 @@ subroutine ecogem(          &
      print*,"Stopped in SUBROUTINE t_limitation (ecogem)."
      print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
      STOP
-  endif
-  if (usePO4) then
-     dum_egbg_sfcdiss(io_O2 ,:,:,:) = dum_egbg_sfcdiss(io_O2,:,:,:) - 2.0 * nutrient_flux(iPO4,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} - O2 correction for PO4 uptake - Fanny/Andy Sep21
   endif
 
   ! CaCO3 production
