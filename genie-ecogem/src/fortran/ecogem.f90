@@ -59,7 +59,7 @@ subroutine ecogem(          &
   REAL,DIMENSION(iimaxiso,npmax)           ::up_inorgiso !ckc isotopes
   REAL,DIMENSION(iomax+iChl,npmax,npmax)   ::GrazMat
   REAL,DIMENSION(npmax)                    ::VLlimit,chlsynth
-  REAL                                     ::gamma_T,totPP
+  REAL                                     ::gamma_TP,gamma_TK,totPP
   REAL                                     ::mld,totchl,k_tot
   INTEGER                                  ::imld
 !BAW: zoolimit should be optional  REAL,DIMENSION(npmax)                    ::Totzoolimit
@@ -151,7 +151,8 @@ subroutine ecogem(          &
   up_inorg(:,:)           = 0.0
   up_inorgiso(:,:)        = 0.0 !ckc isotopes
   ! t_limitation outputs
-  gamma_T                 = 0.0
+  gamma_TP                 = 0.0
+  gamma_TK                 = 0.0
   ! photosynthesis outputs
   chlsynth(:)             = 0.0
   totPP                   = 0.0
@@ -329,7 +330,8 @@ subroutine ecogem(          &
                  qreg_h(:,:) = 0.0 ! (iomax,npmax)
                  quota(:,:) = 0.0 ! (iomax,npmax)
                  VLlimit(:) = 0.0 ! (npmax)
-                 gamma_T = 0.0 !
+                 gamma_TP = 0.0 !
+                 gamma_TK = 0.0 !
                  PP(:) = 0.0 ! (npmax)
                  chlsynth(:) = 0.0 ! (npmax)
                  totPP = 0.0 !
@@ -344,14 +346,14 @@ subroutine ecogem(          &
 
                  call quota_limitation(quota,limit,VLlimit,qreg,qreg_h)
 
-                 call t_limitation(templocal,gamma_T)
+                 call t_limitation(templocal,gamma_TP,gamma_TK)
 
-                 call nutrient_uptake(qreg(:,:),loc_nuts(:),gamma_T,up_inorg(:,:))
+                 call nutrient_uptake(qreg(:,:),loc_nuts(:),gamma_TK,up_inorg(:,:))
 
-                 call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_T,up_inorg(iDIC,:),chlsynth,totPP)
+                 call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_TP,up_inorg(iDIC,:),chlsynth,totPP)
 
-!BAW: zoolimit should be optional                 call grazing(loc_biomass,gamma_T,zoolimit(:,:),GrazMat(:,:,:))
-				call grazing(loc_biomass,gamma_T,GrazMat(:,:,:))
+!BAW: zoolimit should be optional                 call grazing(loc_biomass,gamma_TK,zoolimit(:,:),GrazMat(:,:,:))
+				call grazing(loc_biomass,gamma_TK,GrazMat(:,:,:))
 
                  !ckc isotopes uptake, from nutrient uptake, nutrient concentration and fractionation
                  if (c13trace) then
@@ -368,7 +370,7 @@ subroutine ecogem(          &
                  ! Stoopid calcification related moratlity
                  !mortality(:)   = mortality(:) + mortality(:) * calcify(:) / omega(i,j,k) ! Coccolithophores and Forams only
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                 ! mortality(:) = mortality(:)  * gamma_T ! temp adjusted?
+                 ! mortality(:) = mortality(:)  * gamma_TK ! temp adjusted?
 
                  ! calculate respiration
                  respiration(:) = respir(:) !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
@@ -657,7 +659,7 @@ subroutine ecogem(          &
                     phys_limit(io,:,i,j,k)    = limit(io,:)
                  enddo
                  phys_limit(iomax+1,:,i,j,k) = 0.0
-                 phys_limit(iomax+1,1,i,j,k) = gamma_T
+                 phys_limit(iomax+1,1,i,j,k) = gamma_TK
                  phys_limit(iomax+2,:,i,j,k) = 0.0
 !BAW: zoolimit should be optional                 zoo_limit(:,i,j,k) = Totzoolimit(:)
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

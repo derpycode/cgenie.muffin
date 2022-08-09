@@ -141,8 +141,8 @@ MODULE ecogem_lib
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff
   ! Temperature dependence
-  real ::  temp_A,temp_T0   !
-  namelist/ini_ecogem_nml/temp_A,temp_T0
+  real ::  temp_A,temp_P,temp_K,temp_T0   !
+  namelist/ini_ecogem_nml/temp_A,temp_P,temp_K,temp_T0
   ! maximum temperature
   real ::  temp_max
   namelist/ini_ecogem_nml/temp_max
