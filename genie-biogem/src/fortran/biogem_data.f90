@@ -310,8 +310,9 @@ CONTAINS
        print*,'(oxidation) lifetime for I (yrs)                    : ',par_bio_remin_Ilifetime
        print*,'Oxidation rate constant for I -> IO3                : ',par_bio_remin_kItoIO3
        print*,'Reduction rate constant for IO3 -> I                : ',par_bio_remin_kIO3toI
-       print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
+       print*,'O2 inhibition for IO3 -> I                          : ',par_bio_remin_iO2_IO3toI
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
+       print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
        print*,'scaling between rate of O2 consumption and I- ox    : ',par_bio_remin_O2toI
        print*,'scaling between O2 consumption and I- ox lifetime   : ',par_bio_remin_O2toIlifetime

@@ -2380,9 +2380,9 @@ CONTAINS
           ! calculate IO3 reduction
           SELECT CASE (opt_bio_remin_reduce_IO3toI)
           case ('inhibition')
-             ! NOTE: (par_bio_remin_cO2_IO3toI/(par_bio_remin_cO2_IO3toI + loc_O2)) -> provides high [O2] inhibition
+             ! NOTE: (par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2)) -> provides high [O2] inhibition
              loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
-                  & (loc_IO3/(loc_IO3 + par_bio_remin_cIO3_IO3toI))*(par_bio_remin_cO2_IO3toI/(par_bio_remin_cO2_IO3toI + loc_O2))
+                  & (par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2))
           case ('threshold')
              if (loc_O2 < par_bio_remin_cO2_IO3toI) then
                 loc_IO3_reduction = loc_IO3
