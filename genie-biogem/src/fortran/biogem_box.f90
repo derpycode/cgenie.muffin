@@ -869,7 +869,9 @@ CONTAINS
        ! NOTE: force_restore_docn_nuts has been assigned a negative sign (in the forcing update of the main biogem subroutine) ...
        ! NOTE: allow depletion of PO4 < 0.0 so as to force export production to the prescribed value
        ! NOTE: correct for DOM (given that force_restore_docn_nuts has been devied from a prescribed particulate flux)
-       loc_dPO4 = -force_restore_docn_nuts(io_PO4)/(1.0 - loc_bio_red_DOMtotal)
+       ! NOTE: assume par_bio_red_DOMfrac for the DOM fraction 
+       !       (loc_bio_red_DOMtotal has not been set to a non-zero value yet becasue the code that did it was moved back ...)
+       loc_dPO4 = -force_restore_docn_nuts(io_PO4)/(1.0 - par_bio_red_DOMfrac)
     CASE ( &
          & '2N2T_PN_Tdep' &
          & )
