@@ -78,8 +78,8 @@ c compute true and mean anomaly of spring equinox
       if (zw1.gt.360.0) then
       zw1=zw1-360.0
       end if
-      zv=pi/180.*(360.-zw1)  
-      zm=zv
+      zv=pi/180.*(360.-zw1) 
+!     zm=zv
 
 
 !     zm = zv - 2 * ((osce/2 + (osce * osce * osce) /8) *
@@ -90,12 +90,12 @@ c compute true and mean anomaly of spring equinox
 !    :    sin(3 * zv))
 !      write (*,*) 'zm computed berger way =',zm
 
-     do i=1,10
+      do i=1,10
         zm=zv                  ! zm : mean anomaly of spring equ
-    :      - (2.0*osce - 0.25*osce*osce*osce)
-    :      *sin(zm)- 1.25*osce*osce*sin(2.*zm)
-    :      - 13./12.*osce*osce*osce*sin(3.*zm)
-     enddo
+     :      - (2.0*osce - 0.25*osce*osce*osce)
+     :      *sin(zm)- 1.25*osce*osce*sin(2.*zm)
+     :      - 13./12.*osce*osce*osce*sin(3.*zm)
+      enddo
 !     write (*,*) 'zm computed his way =',zm
 
 !      oscgam=0.5*(zv+zm)     ! COMMENTED OUT BY MC. 
