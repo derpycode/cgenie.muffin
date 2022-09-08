@@ -13,6 +13,8 @@ c          vernal point is set to occur at fall equinoxe
 c          that is, by definition, spring equinox has Earth longitude 180d 
 c          (after Berger 1978)
 c          spring equinox set to occur on day 80 of the year
+c          In the user config file, oscgam is specified in degrees
+c          In this routine, it is converted in radians
 
 c  zw  = angle between gamma and perihelion
 c  zw1 = angle between spring equi and per
@@ -63,10 +65,17 @@ c ajr namelist replacements
       osce=par_orbit_osce
       oscsob=par_orbit_oscsob
       osctau0=par_orbit_osctau0                    ! discarded !!!!! 
-      oscgam = mod(par_orbit_oscgam, 2.*pi) 
+
+      rpi = 1.0/pi          ! moved from below by MC
+
+c     since there seems to be much ambiguity in the user config files
+c     let's decide once and for all: oscgam will be in degrees
+c     with the convention that oscgam = 0 is perihelie at autumn equinox
+c     the most widesperad convention
+
+      oscgam = mod(par_orbit_oscgam , 360.)  * pi / 180. 
 
 c compute true and mean anomaly of spring equinox 
-      rpi = 1.0/pi          ! moved from below by MC
 
 c mc : moved from below as already used to compute zm
       tv = osce*osce
@@ -80,17 +89,12 @@ c           branched off, but this seems wrong to me
 c           and causes excessive insolation when eccentricity increases
       oscryr = 2.0*pi/float(nyear)
 
-      if (zw.eq.99999) then
-      oscgam=1.352631
-      else
-      zw = oscgam*180.*rpi   
-      zw1=180.+zw            
+c      if (zw.eq.99999) then
+c      oscgam=1.352631
 
-      if (zw1.gt.360.0) then
-      zw1=zw1-360.0
-      end if
-      zv=pi/180.*(360.-zw1) 
-!     zm=zv
+      zw = oscgam
+      zw1= mod( pi + zw, 2 * pi )
+      zv=( ( 2. * pi) -zw1 ) 
 
 
 !     zm = zv - 2 * ((osce/2 + (osce * osce * osce) /8) *
@@ -113,7 +117,6 @@ c           and causes excessive insolation when eccentricity increases
 !                             ! not sure who did this. Overwritten
 !                             ! oscgam was used below to compute Sun
 !                             ! declination
-      end if
 
 c pbh this if statement removed so that transient orbital forcing can be used without ents
 c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
