@@ -8,18 +8,16 @@ c oscsind = sin of declination (not an input)
 c oscsob = sin of obliquity (input)
 c osce = eccentricity (input)
 c oscgam = mean longitude of perihelion, counted in heliocentric
-
-c          coordinnated, after passage at vernal point
+c          coordinnates, after passage at vernal point
 c          vernal point is set to occur at fall equinoxe 
 c          that is, by definition, spring equinox has Earth longitude 180d 
 c          (after Berger 1978)
-c          spring equinox set to occur on day 80. 
+c          spring equinox set to occur on day 80 of the year
 
 c  zw  = angle between gamma and perihelion
 c  zw1 = angle between spring equi and per
 c  zv  = true anomaly of spring equi
-c  zm  = mean anomaly of vernal point  (time since perihelion to 
-c        reach vernal point)
+c  zm  = mean anomaly of spring equinoxe
 c  osct = mean anomaly  at time step
 c  oscv = true anomaly  at time step
 c  osctau0 : time of perihelion since vernal equinox
@@ -64,11 +62,24 @@ ccc      osctau0=-0.5
 c ajr namelist replacements
       osce=par_orbit_osce
       oscsob=par_orbit_oscsob
-      osctau0=par_orbit_osctau0
-      oscgam = par_orbit_oscgam
+      osctau0=par_orbit_osctau0                    ! discarded !!!!! 
+      oscgam = mod(par_orbit_oscgam, 2.*pi) 
 
 c compute true and mean anomaly of spring equinox 
       rpi = 1.0/pi          ! moved from below by MC
+
+c mc : moved from below as already used to compute zm
+      tv = osce*osce
+      osce1 = osce * (2.0 - 0.25*tv)
+      osce2 = 1.25 * tv 
+      osce3 = osce*tv * 13./12.
+      osce4 = ((1.0  )/(1.0 - tv))**2 
+c           osce4 = ((1.0 - 0.5 *tv) / (1.0 - tv ) **2
+c            was used until commit 13b3f00 at wich point UCLouvain
+c           branched off, but this seems wrong to me
+c           and causes excessive insolation when eccentricity increases
+      oscryr = 2.0*pi/float(nyear)
+
       if (zw.eq.99999) then
       oscgam=1.352631
       else
@@ -89,16 +100,16 @@ c compute true and mean anomaly of spring equinox
 !    :    (sqrt ( 1 - osce * osce ))) * 
 !    :    sin(3 * zv))
 !      write (*,*) 'zm computed berger way =',zm
+!      the above lines are commented out but have been used to check 
+!      consistency with Berger's routines (mcr)
 
       do i=1,10
-        zm=zv                  ! zm : mean anomaly of spring equ
-     :      - (2.0*osce - 0.25*osce*osce*osce)
-     :      *sin(zm)- 1.25*osce*osce*sin(2.*zm)
-     :      - 13./12.*osce*osce*osce*sin(3.*zm)
+        zm=zv - osce1 * sin(zm)- osce2 * sin(2.*zm) - osce3 * sin(3.*zm)
       enddo
+
 !     write (*,*) 'zm computed his way =',zm
 
-!      oscgam=0.5*(zv+zm)     ! COMMENTED OUT BY MC. 
+!      oscgam=0.5*(zv+zm)     ! COMMENTED OUT BY mcr.
 !                             ! not sure who did this. Overwritten
 !                             ! oscgam was used below to compute Sun
 !                             ! declination
@@ -189,17 +200,13 @@ c SG < end of orbit modifications
 
 c     open(1,file='oscsun.dat')
 
-      tv = osce*osce
-      osce1 = osce * (2.0 - 0.25*tv)
-      osce2 = 1.25 * tv 
-      osce3 = osce*tv * 13./12.
-      osce4 = ((1.0 + 0.5*tv)/(1.0 - tv))**2 
-      oscryr = 2.0*pi/float(nyear)
-
 c pbh
+c mcr
+!     tau0 is mean anomaly (degrees) of spring equinox
+!     tau1 is mean anomaly of start of year (80 mean days befaure the
+!     spring equinox) 
+
       osctau0 = -zm * 180. * rpi 
-c       osctau0 = 180.3
-c      osctau1 = osctau0 + 0.5
       osctau1 = osctau0 + 0.5 + 80.
  
       do istep=1,nyear
@@ -211,19 +218,15 @@ c        osct = float(mod(istep-1,nyear)+1)*oscryr - zm
 
 ! DO LOOP MOVED BELOW BY MC
 c
-c           oscv = true anomaly (real angle) of times step
-            oscv = osct + osce1*sin(osct) + osce2*sin(2.0*osct) 
+         oscv = osct + osce1*sin(osct) + osce2*sin(2.0*osct) 
      &           + osce3*sin(3.0*osct)
-! correction of oscsolf by MC
-c           oscsolf = osce4*(1.0 + osce*cos(oscv))**2 ! commented by mc
-c           this was used until commit 13b3f00 at wich point UCLouvain
-c           branched off, but this seems wrong to me
-c           and causes excessive insolation when eccentricity increases
+         oscsolf = osce4*(1.0 + osce*cos(oscv))**2
+
 c           oscsind = sin obl * sin ( longitude earth ) = 
 c                     mean anomaly - mean anomaly of vernal point
 
-            oscsolf = 1.0 / ((1.0-osce*osce)/(1.0 + osce*cos(oscv)))**2
-            oscsind = oscsob*sin(oscv-zv)      ! changed oscgam into zm
+c           oscsolf = 1.0 / ((1.0-osce*osce)/(1.0 + osce*cos(oscv)))**2
+         oscsind = oscsob*sin(oscv-zv)      ! changed oscgam into zv
 
 c           in the previous code oscgam was "re-set" to zm+zv/2
 c           that is, the average between the mean and the true anomaly
