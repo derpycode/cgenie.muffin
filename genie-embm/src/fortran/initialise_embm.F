@@ -1716,14 +1716,13 @@ c AR (14/10/08) -- also re-order time(!)
           open(unit=729,file=indir_name(1:lenin)//trim(filenameorbit),
      $ iostat=ios)
           do i=1,norbit
-             read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
+             read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,4)
           enddo
           close(729)
           do i=1,norbit
             orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
             orbitobl_vect(norbit-i+1) = orbitall_vect(i,3)
-            orbitpre_vect(norbit-i+1) = orbitall_vect(i,4)
-            orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
+            orbitlonperi_vect(norbit-i+1) = orbitall_vect(i,4)
           enddo
         else
           print*,''

@@ -23,7 +23,7 @@ c
       real rpi, osce, oscsob, oscgam, tv, osce1, osce2, osce3, osce4
       real oscryr, osct, oscv, oscsolf, oscsind, oscss, osccc, osctt 
       real oscday
-      real zw, zw1, zv, zm
+      real zw, zw1, zv, dn
       integer i
 
 
@@ -54,31 +54,25 @@ c SKT osctau1 = 0.0 does not make sense; this should be 2.5 for the time of peri
 c     (from start of calendar year)
       osce=par_orbit_osce
       oscsob=par_orbit_oscsob
-      osctau0=par_orbit_osctau0
       zw=par_orbit_osclonperi
-
-
-c skt calculate oscgam (gamma) from par_orbit_osclonperi (longitude of perihelion)
-c     gamma = pi - longitude of perihelion (rad) and must be nonnegative, so first add 180                                                                            
-      zw1=180.+zw
-      if (zw1.gt.360.0) then
-      zw1=zw1-360.0
-      end if
-      oscgam=pi/180.*(360.-zw1)
+      
 
 c pbh this if statement removed so that transient orbital forcing can be used without ents
 c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
+c PV (05/10/2022) adjust the orbits file to take in the longitude of perihelion (anti-clockwise angle
+c     between the vernal equinox and perihelion from heliocentric perspective), rather than 
+c     the mean longitude converted  from heliocentric to geocentric perspective
 
       if ((orbit_radfor.eq.'y').or.(orbit_radfor.eq.'Y')) then
    
       if (t_orbit.eq.2) then
         osce=orbitecc_vect(1)
         oscsob=orbitobl_vect(1)
-        oscgam=orbitpre_vect(1)
-        osctau0=orbittau_vect(1)
+        zw=orbitlonperi_vect(1)
+        
         print*,'orbitvars:',iistep
         print*,'orbitosce,oscsob:',osce,oscsob
-        print*,'orbitoscgam,orbitosctau0',oscgam,osctau0
+        print*,'orbitlonperi',zw
       endif
 
       if (t_orbit.eq.1) then
@@ -91,59 +85,72 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
           oscsob=(1-time_frac)*orbitobl_vect(time_1)+
      &                time_frac*orbitobl_vect(time_2)
 
-          if (abs(orbitpre_vect(time_1)-
-     &        orbitpre_vect(time_2)).gt.pi) then
+          if (abs(orbitlonperi_vect(time_1)-
+     &        orbitlonperi_vect(time_2)).gt.pi) then
 
-            if (orbitpre_vect(time_1).gt.orbitpre_vect(time_2)) then
-              oscgam=mod((1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*(orbitpre_vect(time_2)+2*pi),2*pi)
+            if (orbitlonperi_vect(time_1)
+     &          .gt.orbitlonperi_vect(time_2)) then
+              zw=mod((1-time_frac)*orbitlonperi_vect(time_1)+
+     &                time_frac*(orbitlonperi_vect(time_2)+2*pi),2*pi)
             else
-              oscgam=mod((1-time_frac)*(orbitpre_vect(time_1)+2*pi)+
-     &                time_frac*(orbitpre_vect(time_2)),2*pi)
+              zw=mod((1-time_frac)*(orbitlonperi_vect(time_1)+2*pi)+
+     &                time_frac*(orbitlonperi_vect(time_2)),2*pi)
             endif
   
           else
-          oscgam=(1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*orbitpre_vect(time_2)
+          zw=(1-time_frac)*orbitlonperi_vect(time_1)+
+     &                time_frac*orbitlonperi_vect(time_2)
           endif
 
-          if (abs(orbittau_vect(time_1)-
-     &        orbittau_vect(time_2)).gt.gn_daysperyear/2.0) then
-
-            if (orbittau_vect(time_1).gt.orbittau_vect(time_2)) then
-              osctau0=mod((1-time_frac)*orbittau_vect(time_1)+
-     &                time_frac*(orbittau_vect(time_2)+
-     &                gn_daysperyear),gn_daysperyear)
-            else
-              osctau0=mod((1-time_frac)*
-     &                (orbittau_vect(time_1)+gn_daysperyear)+
-     &                time_frac*(orbittau_vect(time_2)),gn_daysperyear)
-            endif
-
-
-          else
-          osctau0=(1-time_frac)*orbittau_vect(time_1)+
-     &                time_frac*orbittau_vect(time_2)
-          endif
 
         else 
           if (time_frac.ne.0) print*,'Time out of bounds for orbit'
           osce=orbitecc_vect(norbit)
           oscsob=orbitobl_vect(norbit)
-          oscgam=orbitpre_vect(norbit)
-          osctau0=orbittau_vect(norbit)
+          zw=orbitlonperi_vect(norbit)
         endif
 
       if (mod(iistep-1,10000).eq.0) then
          if (debug_loop) then
             print*,'orbitvars:',iistep,time_1,time_frac
             print*,'orbitosce,oscsob:',osce,oscsob
-            print*,'orbitoscgam,orbitosctau0',oscgam,osctau0
+            print*,'orbitlonperi',zw
          endif
       endif
 
       endif
+      
+c skt calculate oscgam (gamma) from par_orbit_osclonperi (longitude of perihelion)
+c     gamma = pi - longitude of perihelion (rad) and must be nonnegative, so first add 180
+c PV (05/10/2022)  zw is the anti-clockwise angle between the vernal equinox and perihelion). The steps
+c    below are needed to convert heliocentric to geocentric perspective (convert to zv)
+      zw1=pi+zw
+      if (zw1.gt.2*pi) then
+         zw1=zw1-(2*pi)
+      end if
+      zv=(2*pi)-zw1
+ 
+c PV (05/10/2022) convert the true geocentric longitude of perihelion to the mean longitude (oscgam)
+      oscgam = zv
+      do i=1,10
+         oscgam =zv
+     &      - (2.0*osce - 0.25*osce*osce*osce)
+     &      *sin(oscgam)- 1.25*osce*osce*sin(2.*oscgam)
+     &      - 13./12.*osce*osce*osce*sin(3.*oscgam)
+      enddo
+c PV (05/10/2022) convert mean longitude from radians to days (days between perihelion and vernal equinox)
+      dn = oscgam*gn_daysperyear/(2*pi)
+c PV (05/10/2022) cGENIE starts at Jan 1st, not the vernal equinox on March 21, so substract 79.265 days from
+c     dn so that the first timestep always occurs ~80 days from the vernal equinox
+      dn = dn - 79.265
+c PV (05/10/2022) calculate the date of perihelion from Jan. 1st and make sure the days fall within 0-365.25 range
+      osctau0 = -dn
+      if (osctau0 < 0) then
+	     osctau0 = gn_daysperyear+osctau0
       endif
+      
+      endif
+      
 c pbh conditionality on ents_radfor has been removed
 c      endif
 
@@ -158,7 +165,9 @@ c SKT terms for solar insolation calculations
       osce1 = osce * (2.0 - 0.25*tv)
       osce2 = 1.25 * tv 
       osce3 = osce*tv * 13./12.
-      osce4 = ((1.0 + 0.5*tv)/(1.0 - tv))**2 
+c PV (05/10/2022) correcton for osce4 for consistency with other codes
+c      old osce4 = ((1.0 + 0.5*tv)/(1.0 - tv))**2 
+      osce4 = ((1.0)/(1.0 - tv))**2 
       oscryr = 2.0*pi/float(nyear)
 
 c pbh
@@ -171,15 +180,20 @@ c pbh Dan's offset for angular time of year
 c         osct = float(mod(istep-1,nyear)+1)*oscryr
 c SKT osct = mean anomaly (i.e. fraction of orbital period elapsed since
 c     perihelion)
-         osct = (float(mod(istep-1,nyear)+1) - 
+	     osct = (float(mod(istep-1,nyear)+1) - 
      &          (nyear*osctau1/gn_daysperyear))*oscryr
-
-c SKT for each latitude, calculate the following:
 c     oscv = true anomaly calculated from eccentricity and mean anomaly
 c          (i.e. the angular distance of the earth round its orbit from perihelion)
+	     oscv = osct + osce1*sin(osct) + osce2*sin(2.0*osct) 
+     &           + osce3*sin(3.0*osct)
 c     oscsolf = insolation at the top of the atmosphere
 c             (but without multiplying by the solar constant)
-c     oscsind = sine of solar declination in terms of gamma
+	     oscsolf = osce4*(1.0 + osce*cos(oscv))**2
+c     PV (05/10/2022) oscsind = sine of solar declination in terms of the angle 
+c       between the vernal equinox and earth, i.e. substract the geocentric (true) 
+c       longitude of perihelion(zv) from the true anomaly (angle perihelion-Earth)
+	     oscsind = sin(oscsob)*sin(oscv-zv)
+c SKT for each latitude, calculate the following:
 c     oscss = sin( solar declination) * sin(latitude)
 c     oscccc = cos(solar declination)
 c     osctt = tan(latitude)*tan(solar declination)
@@ -187,21 +201,12 @@ c     oscday = hour angle of sunset (the angle through which earth
 c            has rotated between local solar noon and sunset)
 c     solfor(j,istep) = incoming solar radiation at each latitude 
 c                     (takes TOA insolation and multiples by the 
-c                     mean cos(solar zenith angle))         
+c                     mean cos(solar zenith angle))                   
          do j=1,jmax
-            oscv = osct + osce1*sin(osct) + osce2*sin(2.0*osct) 
-     &           + osce3*sin(3.0*osct)
-            oscsolf = osce4*(1.0 + osce*cos(oscv))**2
-            oscsind = oscsob*sin(oscv-oscgam)
-
             oscss = oscsind * s(j)
-
             osccc = sqrt(1.0 - oscsind**2) * c(j)
-
             osctt = min(1.0,max(-1.0,oscss/osccc))
-            
             oscday = acos(- osctt)
-
             solfor(j,istep) = solconst*oscsolf*rpi*
      &                       (oscss*oscday + osccc*sin(oscday))
 c SG > ENTS albedo scheme mod

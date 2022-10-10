@@ -252,25 +252,25 @@ c SG (15/02/2K7) : added ENTS albedo scheme flag
 
 c SG (16/02/2K7) : added orbital parameters for albedo calculation
       integer en_ntimes_max
-      parameter (en_ntimes_max=2000)
+      parameter (en_ntimes_max=5000)
 
       character*200 filenameorbit
       integer t_orbit,norbit,orbitsteps
       real orbitecc_vect(en_ntimes_max)
       real orbitobl_vect(en_ntimes_max)
-      real orbitpre_vect(en_ntimes_max)
+      real orbitlonperi_vect(en_ntimes_max)
       real orbittau_vect(en_ntimes_max)
       real orbitall_vect(en_ntimes_max,5)
       real par_orbit_osce
       real par_orbit_oscsob
       real par_orbit_osclonperi
-      real par_orbit_osctau0      
+      real par_orbit_osctau0
 
       common/orbit_vary/
      &                  orbitecc_vect,
      &                  orbitobl_vect,
-     &                  orbitpre_vect,
-     &                  orbittau_vect,
+     &                  orbitlonperi_vect,
+     &   	         orbittau_vect,
      &                  orbitall_vect,
      &                  t_orbit,norbit,orbitsteps,
      &                  filenameorbit
