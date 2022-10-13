@@ -120,10 +120,14 @@ c     the mean longitude converted  from heliocentric to geocentric perspective
 
       endif
       
+      endif
+      
 c skt calculate oscgam (gamma) from par_orbit_osclonperi (longitude of perihelion)
 c     gamma = pi - longitude of perihelion (rad) and must be nonnegative, so first add 180
 c PV (05/10/2022)  zw is the anti-clockwise angle between the vernal equinox and perihelion). The steps
 c    below are needed to convert heliocentric to geocentric perspective (convert to zv)
+c PV (13/10/2022) moved downward so the fixed orbital parameters and those in orbits file are
+c     all subjected to the same calculations
       zw1=pi+zw
       if (zw1.gt.2*pi) then
          zw1=zw1-(2*pi)
@@ -147,8 +151,6 @@ c PV (05/10/2022) calculate the date of perihelion from Jan. 1st and make sure t
       osctau0 = -dn
       if (osctau0 < 0) then
 	     osctau0 = gn_daysperyear+osctau0
-      endif
-      
       endif
       
 c pbh conditionality on ents_radfor has been removed
