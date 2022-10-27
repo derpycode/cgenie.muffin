@@ -450,6 +450,8 @@ crma note igcm orders latitude north-to-south!
       endif
       if (debug_init) print*,'GOLDSTEIN latitudes: velocity; tracers'
       if (debug_init) print*,'j, 180/pi*asin(sv(j)), 180/pi*asin(s(j))'
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do j=1,jmax
          ds(j) = sv(j) - sv(j-1)
          rds(j) = 1.0/ds(j)
@@ -536,6 +538,8 @@ c tv5 is the depth of the k+1th density level from the top
          endif
       enddo
 
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do k=kmax,1,-1
          if(k.gt.1)zro(k-1) = zro(k) - dza(k-1)
          zw(k-1) = zw(k) - dz(k)
@@ -1910,7 +1914,7 @@ c
                ilandmask2(i,j)=0
                ilandmask3(i,j)=0
             endif
-         enddo
+         end do
       end do  
 c
       if (debug_init) print*,'* Depth : depth, depth1 *'
@@ -1926,6 +1930,8 @@ c AY (17/03/04) : extra ocean.cmn arguments for netCDF writing
       end do      
 c
 c AY (09/03/04) : write this information out
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do l=0,kmax
          if(l.gt.0) then
             if (debug_init) write(*,112) l,depth(l),depth1(l+1)

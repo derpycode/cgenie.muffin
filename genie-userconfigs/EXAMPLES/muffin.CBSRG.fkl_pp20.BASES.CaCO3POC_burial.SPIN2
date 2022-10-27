@@ -28,7 +28,7 @@ bg_opt_bio_CaCO3toPOCrainratio='FIXED'
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
 # NOTE: the current calibrated Eocene value is 0.200,
 #       whereas the modern uniform equivalent is closer to 0.100
-bg_par_bio_red_POC_CaCO3=0.200
+bg_par_bio_red_POC_CaCO3=0.150
 #
 # *** REMINERALIZATION **********************************************
 #
@@ -76,16 +76,16 @@ sg_ctrl_sed_dunne2007_remin_POP=.true.
 #
 # *** WEATHERING ****************************************************
 #
-# NOTE: the closed system spinup has 0.206013E+14 mol CaCO3 yr-1 of global burial
+# NOTE: the closed system spinup has 0.932794E+13 mol CaCO3 yr-1 of global burial
 #       splitting in a 2:3 ratio between silicate:carbonate weathering gives:
-#       0.206013E+14 * 2/5 = 8.240520000000000e+12 silicate weathering
-#       0.206013E+14 * 3/5 = 1.236078000000000e+13 carbonate weathering
-#       and 0.371907E+13 mol yr-1 of POC burial
+#       0.932794E+13 * 2/5 = 3.731176000000000e+12 silicate weathering
+#       0.932794E+13 * 3/5 = 5.596764000000000e+12 carbonate weathering
+#       and 0.382897E+13 mol yr-1 of POC burial
 # NOTE: following the calculation in Secion 21.9
-#       gamma = (-6.0 - 2.65)/(-24.40 - 2.65) = 0.32
-#       => CO2 outgassing must be enhanced by 0.32 x POC burial = 1.190102400000000e+12
-#       => kerogen weathering = 0.68 x POC burial = 2.528967600000000e+12
-#          or a ratio of 2.528967600000000e+12/8.240520000000000e+12 = 0.307 with silicate weathering
+#       gamma = (-6.0 - 2.65)/(-24.40 - 2.65) = 0.320
+#       => total CO2 outgassing balancing silicate weathering and part of Corg burial, is: 3.731176000000000e+12/(1-0.32) = 5.487023529411766e+12
+#          and kerogen weathering = POC burial - 0.32*CO2 outgassing = 0.371997E+13 - 0.32*5.487023529411766e+12 = 1.964122470588235e+12
+#          or a ratio of 1.964122470588235e+12/3.731176000000000e+12 = 5.264084220600248e-01 with silicate weathering
 # set an 'OPEN' system
 bg_ctrl_force_sed_closedsystem=.FALSE.
 # set CaCO3_weathering-temperature feedback
@@ -95,17 +95,17 @@ rg_opt_weather_T_Si=.true.
 # weathering reference mean global land air surface temperature (C)
 rg_par_ref_T0=12.03
 # global carbonate weathering rate (mol Ca2+ yr-1)
-rg_par_weather_CaCO3=1.236078000000000e+13
+rg_par_weather_CaCO3=5.596764000000000e+12
 # global silicate weathering rate (mol Ca2+ yr-1)
-rg_par_weather_CaSiO3=8.240520000000000e+12
+rg_par_weather_CaSiO3=3.731176000000000e+12
 # CO2 outgassing rate (mol C yr-1)
-rg_par_outgas_CO2=9.430622400000000e+12
+rg_par_outgas_CO2=5.487023529411766e+12
 # set isotopic values of CO2 outgassing and carbonate weathering
 # NOTE: d13C of CaCO3 weathering == d13C of CaCO3 burial
 rg_par_outgas_CO2_d13C=-6.0
 rg_par_weather_CaCO3_d13C=2.65
 # kerogen weathering ratio and isotopic composiiton
-rg_par_weather_CaSiO3_fracC=0.307
+rg_par_weather_CaSiO3_fracC=5.264084220600248e-01
 rg_par_weather_CaSiO3_fracC_d13C=-24.40
 #
 # *** GEOCHEM ACCELERATION ******************************************

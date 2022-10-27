@@ -362,6 +362,16 @@ ifeq ($(F77),gfortran)
     FFLAGS += -g -ffpe-trap=zero,overflow,invalid -Wall
     BOUNDS_FLAGS += -fbounds-check
   endif
+  ifeq ($(BUILD),TEST)
+    FFLAGS += -g -ffpe-trap=zero,overflow,invalid -O0 -Wall -fbounds-check
+    FFLAGS += -Wextra
+    FFLAGS += -Wno-unused-parameter # turn off unused parameter checking (turned on by -Wextra)
+    FFLAGS += -pedantic
+    FFLAGS += -fbacktrace
+    #FFLAGS += -fconserve-stack
+    FFLAGS += -fstack-check
+    FFLAGS += -fno-automatic
+  endif
 endif
 
 # === GNU 'gfortran' compiler for Win32 ===

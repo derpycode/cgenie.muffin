@@ -76,7 +76,7 @@ c crash barrier added 111099
 
       do i=1,8     
          do l=1,lmax
-            if (vol(i) .ne. 0.0) then
+            if (vol(i) .gt. 1e-20) then
                sum(i + 8*(l-1)) = sum(i + 8*(l-1))/vol(i)
             end if
          enddo
