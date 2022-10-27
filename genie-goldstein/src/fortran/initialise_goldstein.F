@@ -1085,12 +1085,12 @@ c seabed depth h
          enddo
       enddo   
 
-      do j=1,jmax
-         do i=1,imax
+      do 120 j=1,jmax
+         do 121 i=1,imax
             ku(1,i,j) = max(k1(i,j),k1(i+1,j))
             ku(2,i,j) = max(k1(i,j),k1(i,j+1))
-         enddo
-      enddo   
+  121 continue
+  120 continue
       tv2 = 0
 
 c set up drag and diffusion values
@@ -1220,16 +1220,16 @@ c use integer wetpoint indicator
 c (1+sign(1,kmax-k1(i,j)))/2
 c mk is largest of surrounding wet k1 values if i,j is wet, else 0
 c
-      do j=1,jmax
-         do i=1,imax
+      do 130 j=1,jmax
+         do 131 i=1,imax
             mk(i,j) = max(k1(i,j)*(1+sign(1,kmax-k1(i,j)))/2,
      1                k1(i+1,j)*(1+sign(1,kmax-k1(i+1,j)))/2,
      1                k1(i-1,j)*(1+sign(1,kmax-k1(i-1,j)))/2,
      1                k1(i,j+1)*(1+sign(1,kmax-k1(i,j+1)))/2,
      1                k1(i,j-1)*(1+sign(1,kmax-k1(i,j-1)))/2)
             mk(i,j) = mk(i,j) * (1+sign(1,kmax-k1(i,j)))/2
-         enddo
-      enddo
+  131 continue
+  130 continue
 
 c initialize bp, only strictly needed at k=k1
 
@@ -1253,8 +1253,8 @@ c For non-trivial coasts essential to avoid adding J term at non-Psi points.
 c Hence first condition ensures (i,j) is a wet Psi point, 2nd that bottom
 c is not flat.
 c
-      do j=1,jmax
-         do i=1,imax
+      do 140 j=1,jmax
+         do 141 i=1,imax
             if( (max(k1(i,j),k1(i+1,j),k1(i,j+1),k1(i+1,j+1)).le.kmax)
      1          .and. (k1(i,j).ne.k1(i,j+1).or.k1(i,j).ne.k1(i+1,j)
      1                       .or.k1(i,j).ne.k1(i+1,j+1)))then
@@ -1262,8 +1262,8 @@ c
             else
                getj(i,j) = .false.  
             endif
-         enddo
-      enddo
+  141 continue
+  140 continue
 
 c read island geometry file or write out for manual editing
 c setting wet to zero and 1 on 1st landmass, 2 on 2nd landmass (1st island)
