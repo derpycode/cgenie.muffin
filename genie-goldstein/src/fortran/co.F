@@ -36,7 +36,7 @@ c don't comment out the call without ensuring icosd is initialised
       endif
 
       do 210 j=1,jmax
-         do 210 i=1,imax
+         do 211 i=1,imax
 
 c initialize the index array k and mixed region sizes dzm
 c wet points only
@@ -158,6 +158,7 @@ c KICO 18/09/07
             mldpk(1,i,j)=k(m+1)
 c wet points only
         endif
+ 211  continue
  210  continue
 
       end
@@ -206,7 +207,7 @@ c    +       , icosd(maxi,maxj)
       maxpass = kmax
 
       do 10 j=1,jmax
-         do 10 i=1,imax
+         do 11 i=1,imax
             if(k1(i,j).le.kmax)then
 
                icosd(i,j) = 0
@@ -259,6 +260,7 @@ c KICO 18/09/07
  5             continue
 c              if(icosd(i,j).gt.0)print*,'coshuff',i,j,icosd(i,j),ipass
             endif
+ 11   continue
  10   continue
 
       end
