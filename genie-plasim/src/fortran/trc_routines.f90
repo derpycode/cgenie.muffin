@@ -23,7 +23,7 @@
 !MIC$* private(i,j)
 
       DO 2000 j=1,jm
-      DO 2000 i=1,im
+      DO 2001 i=1,im
 ! k=1 and k=km
       Pmax(i,j, 1) = max(Qmax(i,j,  2),Qmax(i,j, 1))
       Pmin(i,j, 1) = min(Qmin(i,j,  2),Qmin(i,j, 1))
@@ -34,6 +34,7 @@
       Pmin(i,j,  2) = min(Qmin(i,j,  3),Pmin(i,j, 1))
       Pmax(i,j,km1) = max(Qmax(i,j,km2),Pmax(i,j,km))
       Pmin(i,j,km1) = min(Qmin(i,j,km2),Pmin(i,j,km))
+2001  continue
 2000  continue
  
 !MIC$ do all autoscope
@@ -41,10 +42,12 @@
 !MIC$* private(i,j,k)
 
       DO 3000 k=3,km2
-      DO 3000 j=1,jm
-      DO 3000 i=1,im
+      DO 3001 j=1,jm
+      DO 3002 i=1,im
       Pmax(i,j,k) = max(Qmax(i,j,k-1),Qmax(i,j,k),Qmax(i,j,k+1))
       Pmin(i,j,k) = min(Qmin(i,j,k-1),Qmin(i,j,k),Qmin(i,j,k+1))
+3002  continue
+3001  continue
 3000  continue
       return
       end
@@ -169,7 +172,7 @@
 1000  delq(i,k) = P(i,j,k+1) - P(i,j,k)
  
       DO 1220 k=2,km1
-      DO 1220 I=1,IMR
+      DO 1221 I=1,IMR
       c1 = (delp(i,j,k-1)+0.5*delp(i,j,k))/A6(i,k+1)
       c2 = (delp(i,j,k+1)+0.5*delp(i,j,k))/A6(i,k)
       tmp = delp(i,j,k)*(c1*delq(i,k) + c2*delq(i,k-1)) &
@@ -177,6 +180,7 @@
       Qmax = max(P(i,j,k-1),P(i,j,k),P(i,j,k+1)) - P(i,j,k)
       Qmin = P(i,j,k) - min(P(i,j,k-1),P(i,j,k),P(i,j,k+1))
       DC(i,k) = sign(min(abs(tmp),Qmax,Qmin), tmp)
+1221  CONTINUE
 1220  CONTINUE
  
 !****6***0*********0*********0*********0*********0*********0**********72
@@ -187,13 +191,14 @@
 ! Interior.
  
       DO 12 k=3,km1
-      DO 12 i=1,IMR
+      DO 13 i=1,IMR
       c1 = delq(i,k-1)*delp(i,j,k-1) / A6(i,k)
       A1 = A6(i,k-1) / (A6(i,k) + delp(i,j,k-1))
       A2 = A6(i,k+1) / (A6(i,k) + delp(i,j,k))
       AL(i,k) = P(i,j,k-1) + c1 + 2./(A6(i,k-1)+A6(i,k+1)) *  &
                 ( delp(i,j,k  )*(c1*(A1 - A2)+A2*DC(i,k-1)) - &
                                 delp(i,j,k-1)*A1*DC(i,k  ) )
+13    CONTINUE
 12    CONTINUE
  
 ! Area preserving cubic with 2nd deriv. = 0 at the boundaries
@@ -223,8 +228,8 @@
       d2 = delp(i,j,km1)
       qm = (d2*P(i,j,km)+d1*P(i,j,km1)) / (d1+d2)
       dp = 2.*(P(i,j,km1)-P(i,j,km)) / (d1+d2)
-	c1 = 4.*(AL(i,km1)-qm-d2*dp) / (d2*(2.*d2*d2+d1*(d2+3.*d1)))
-	c3 = dp - 0.5*c1*(d2*(5.*d1+d2)-3.*d1**2)
+      c1 = 4.*(AL(i,km1)-qm-d2*dp) / (d2*(2.*d2*d2+d1*(d2+3.*d1)))
+      c3 = dp - 0.5*c1*(d2*(5.*d1+d2)-3.*d1**2)
       AL(i,km) = qm - 0.25*c1*d1*d2*(d2+3.*d1)
       AR(i,km) = d1*(2.*c1*d1**2-c3) + AL(i,km)
       DC(i,km) = AR(i,km) -  P(i,j,km)
@@ -238,15 +243,17 @@
 15    continue
 
       do 20 k=1,km1
-      do 20 i=1,IMR
+      do 21 i=1,IMR
       AR(i,k) = AL(i,k+1)
+21    continue
 20    continue
  
 ! f(s) = AL + s*[(AR-AL) + A6*(1-s)]         ( 0 <= s  <= 1 )
  
       do 30 k=1,NL
-      do 30 i=1,IMR
+      do 31 i=1,IMR
       A6(i,k) = 3.*(P(i,j,k)+P(i,j,k) - (AL(i,k)+AR(i,k)))
+31    continue
 30    continue
  
 ! Top
@@ -264,7 +271,7 @@
       endif
  
       DO 140 k=2,NL
-      DO 140 i=1,IMR
+      DO 141 i=1,IMR
       IF(WZ(i,j,k-1).GT.0.) then
              CM = WZ(i,j,k-1) / delp(i,j,k-1)
       DC(i,k) = P(i,j,k-1)
@@ -276,12 +283,14 @@
       fz(i,j,k) = AL(i,k)+0.5*CP*(AL(i,k)-AR(i,k)- &
                           A6(i,k)*(1.+R23*CP))
       endif
+141   continue
 140   continue
  
       DO 250 k=2,NL
-      DO 250 i=1,IMR
+      DO 251 i=1,IMR
       fz(i,j,k) = WZ(i,j,k-1) * (fz(i,j,k) - DC(i,k))
       DC(i,k) = WZ(i,j,k-1) * DC(i,k)
+251   continue
 250   continue
 
       do 350 i=1,IMR

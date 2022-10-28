@@ -25,7 +25,7 @@
       parameter(TFREEZE=271.25)         ! Freezing point (K)
       parameter(PLARAD=6.371E6)         ! Earth radius (m)
       real*8 PI
-      parameter(PI = 3.14159265359D0)   ! PI
+      parameter(PI = 3.14159265359)   ! PI
 !
 !     namelist parameter
 !

@@ -74,14 +74,14 @@ SUBROUTINE initialise_ecogem(    &
   CALL sub_init_timeseries()
 
   if (ctrl_debug_eco_init) then
-     write(*,*),' ---------------------------------------------------'
-     write(*,*),'- Plankton population specifications from input file'
+     write(*,*) ' ---------------------------------------------------'
+     write(*,*) '- Plankton population specifications from input file'
      print '(a32,i5)','- number of plankton:          ',npmax
      print '(a37)','   PFT                diameter      n'
      do jp=1,npmax
-        write(*,'(a3,a16,a4,F7.1,a2,i5)'),'     ',pft(jp),"  ",diameter(jp),"  ",random_n(jp)
+        write(*,'(a3,a16,a4,F7.1,a2,i5)') '     ',pft(jp),"  ",diameter(jp),"  ",random_n(jp)
      enddo
-     write(*,*),' ---------------------------------------------------'
+     write(*,*) ' ---------------------------------------------------'
   endif
   ! calculate other indices dependent on goin information
   !order and indices for nutrient elements (unused elements to zero)

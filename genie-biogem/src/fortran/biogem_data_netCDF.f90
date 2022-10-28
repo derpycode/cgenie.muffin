@@ -3684,8 +3684,15 @@ CONTAINS
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
+    loc_mask(:,:)      = const_real_one
+    loc_tmp_jk(:,:)    = 0.0
+    loc_mask_surf(:,:) = 0.0
+    loc_tmp_ij(:,:)    = 0.0
+    !-----------------------------------------------------------------------
+    !       SET LOCAL VARIABLES
+    !-----------------------------------------------------------------------
     loc_ntrec = ncout2d_ntrec
-    loc_iou = ncout2d_iou
+    loc_iou   = ncout2d_iou
     loc_scale = goldstein_dsc*goldstein_usc*const_rEarth*1.0E-6
     !-----------------------------------------------------------------------
     !       WRITE MOC
@@ -3694,7 +3701,6 @@ CONTAINS
     ! global
     loc_tmp_jk(:,:) = loc_scale*int_opsi_timeslice(:,:)/int_t_timeslice
     loc_tmp_jk(:,n_k:0:-1) = loc_tmp_jk(:,0:n_k:1)
-    loc_mask = const_real_one
     where(abs(loc_tmp_jk) < const_real_nullsmall)
        loc_mask = const_real_zero
     endwhere
