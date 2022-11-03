@@ -14,8 +14,8 @@ bg_par_bio_prodopt='NONE'
 #
 # *** DATA SAVING ***************************************************
 #
-# Preformed diagnostics option == BASIC + biology + tracer + proxy
-bg_par_data_save_level=11
+# OCEAN ACIDIFICATION & FOSSIL FUEL GAMES
+bg_par_data_save_level=10
 # force time-slice save at run end only
 bg_par_infile_slice_name='save_timeslice_NONE.dat'
 #
