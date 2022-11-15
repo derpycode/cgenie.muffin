@@ -10,25 +10,16 @@ ea_36=y
 # *** BIOLOGICAL NEW PRODUCTION *************************************
 #
 # biological scheme ID string
-bg_par_bio_prodopt="bio_PFe"
-# [PO4] M-M half-sat value (mol kg-1)
-bg_par_bio_c0_PO4=0.10E-06
-# [Fe] M-M half-sat value (mol kg-1)
-bg_par_bio_c0_Fe=0.10E-09
-# biological uptake time-scale
-bg_par_bio_tau=63.3827
+# NOTE: with ECOGEM, no BIOGEM biological scheme must be selected
+bg_par_bio_prodopt="NONE"
 #
 # *** ORGANIC MATTER EXPORT RATIOS **********************************
 #
-# production fraction of dissolved organic matter
-bg_par_bio_red_DOMfrac=0.66
+# [dealt with by ECOGEM]
 #
 # *** INORGANIC MATTER EXPORT RATIOS ********************************
 #
-# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
-bg_par_bio_red_POC_CaCO3=0.0485
-# exponent for modifier of CaCO3:POC export ratio
-bg_par_bio_red_POC_CaCO3_pP=0.7440
+# [dealt with by ECOGEM]
 #
 # *** REMINERALIZATION **********************************************
 #
@@ -74,10 +65,47 @@ bg_par_bio_FetoC_K=103684.0
 #[FeT] dependent Fe:C ratio [Ridgwell, 2001] -- constant
 bg_par_bio_FetoC_C=0.0
 #
+# *** ECOGEM ********************************************************
+#
+# specify ecosystem structure definition file
+eg_par_ecogem_plankton_file='8P8Z.eco'
+# include cellular quota: N
+eg_useNO3                   =.false.
+eg_nquota                   =.false.
+# include cellular quota: PO4
+eg_usePO4                   =.true.
+eg_pquota                   =.true.
+# include cellular quota: Fe
+eg_useFe                    =.true.
+eg_fquota                   =.true.
+# include cellular quota: Chlorophyll
+eg_chlquota                 =.true.
+# d13C fractionaton based on d13C of DIC?
+eg_useDIC_13C               =.true.
+# P and Fe quota parameters (tuned values)
+eg_qminP_a     =   3.33e-3
+eg_qminFe_a    =   1.00e-6
+eg_qmaxFe_a    =   4.00e-6
+# Prey switching exponent (Holling 2 or 3 [= ns+1])
+eg_ns=2
+# Carbon respiration rate - intercept
+eg_respir_a=0.0
+# DOM (ca. POM) partitioning parameters
+eg_beta_mort_a =   0.8 # Maximum fraction to DOM as ESD --> zero
+eg_beta_mort_b =   0.4 # Minimum fraction to DOM as ESD --> infinity 
+eg_beta_mort_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
+eg_beta_graz_a =   0.8 # Maximum fraction to DOM as ESD --> zero
+eg_beta_graz_b =   0.4 # Minimum fraction to DOM as ESD --> infinity
+eg_beta_graz_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
+# exponent for modifier of CaCO3:POC export ratio
+eg_par_bio_red_POC_CaCO3_pP  = 0.7440 # exponent for modifier of CaCO3:POC export ratio
+# underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+eg_par_bio_red_POC_CaCO3     = 0.0285 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
+#
 # *** DATA SAVING ***************************************************
 #
-# Preformed diagnostics option == BASIC + biology + tracer + proxy
-bg_par_data_save_level=11
+# BASIC + biology + tracer + proxy diagnostics
+bg_par_data_save_level=7
 # force time-slice save at run end only
 bg_par_infile_slice_name='save_timeslice_NONE.dat'
 #
@@ -90,6 +118,14 @@ bg_par_atm_force_scale_val_4=-6.5
 #
 # *** MISC **********************************************************
 #
+# kraus-turner mixed layer scheme on (1) or off (0)
+go_imld = 1
+# set mixed layer to be only diagnosed (for ECOGEM)
+go_ctrl_diagmld=.true.
+# add seaice attenuation of PAR
+eg_ctrl_PARseaicelimit=.true.
+# relative partitioning of C into DOM
+eg_par_beta_POCtoDOC=0.75
 #
 # *******************************************************************
 # *** END ***********************************************************
