@@ -1,10 +1,10 @@
 # *******************************************************************
-# *** USERCONFIG.MODERN.ECOGEM.PO4Fe.SPIN ***************************
+# *** muffin.CB.worjh2.BASESFeTDTL.Albani.SPIN **********************
 # *******************************************************************
 #
 # *** CLIMATE *******************************************************
 #
-# set climate feedback (climate responding to changing pCO2)
+# (climate responding to changing pCO2)
 ea_36=y
 #
 # *** BIOLOGICAL NEW PRODUCTION *************************************
@@ -23,10 +23,15 @@ bg_par_bio_prodopt="NONE"
 #
 # *** REMINERALIZATION **********************************************
 #
+# *** recommended ***************************************************
+# set 'instantaneous' water column remineralziation
+bg_par_bio_remin_sinkingrate_physical=9.9E9
+bg_par_bio_remin_sinkingrate_reaction=125.0
+# *** common settings ***********************************************
 # DOC lifetime (yrs)
-bg_par_bio_remin_DOMlifetime=1.0
+bg_par_bio_remin_DOMlifetime=0.5
 # initial fractional abundance of POC component #2
-bg_par_bio_remin_POC_frac2=0.055
+bg_par_bio_remin_POC_frac2=0.0557
 # depth of remineralization or particulate organic matter
 bg_par_bio_remin_POC_eL1=589.9451
 # remineralization length #2 for POC
@@ -37,21 +42,18 @@ bg_par_bio_remin_CaCO3_frac2=0.45
 bg_par_bio_remin_CaCO3_eL1=1.8905e+003
 # remineralization length #2 for CaCO3
 bg_par_bio_remin_CaCO3_eL2=1000000.0
-# *** optional changes to align with PALEO recommendations **********
-# set 'instantaneous' water column remineralziation
-bg_par_bio_remin_sinkingrate_physical=9.9E9
-bg_par_bio_remin_sinkingrate_reaction=125.0
 #
 # *** IRON CYCLING **************************************************
 #
 # iron tracer scheme
+# NOTE: the base-config requires TFe and TL tracers
 bg_opt_geochem_Fe='hybrid'
-# aeolian Fe solubility
-bg_par_det_Fe_sol=0.002014275
-# modifier of the scavenging rate of dissolved Fe
-bg_par_scav_Fe_sf_POC=0.344104
 # exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
 bg_par_det_Fe_sol_exp=0.500
+# aeolian Fe solubility
+bg_par_det_Fe_sol=0.002441
+# modifier of the scavenging rate of dissolved Fe
+bg_par_scav_Fe_sf_POC=0.225
 # no scavenged regeneration
 bg_par_scav_fremin=0.0
 # return POFe
@@ -101,9 +103,6 @@ eg_beta_mort_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
 eg_beta_graz_a =   0.8 # Maximum fraction to DOM as ESD --> zero
 eg_beta_graz_b =   0.4 # Minimum fraction to DOM as ESD --> infinity
 eg_beta_graz_c = 100.0 # Size at 50:50 partition (default = 100 µm^3)
-# ???
-eg_nsubtime=25
-eg_n_keco=1
 # exponent for modifier of CaCO3:POC export ratio
 eg_par_bio_red_POC_CaCO3_pP  = 0.7440 # exponent for modifier of CaCO3:POC export ratio
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
@@ -111,13 +110,14 @@ eg_par_bio_red_POC_CaCO3     = 0.0285 # underlying export CaCO3 as a proportion 
 #
 # *** DATA SAVING ***************************************************
 #
-# Basic + biology diagnostics save option
-bg_par_data_save_level=3
+# BASIC + biology + tracer + proxy diagnostics
+bg_par_data_save_level=7
+# force time-slice save at run end only
+bg_par_infile_slice_name='save_timeslice_NONE.dat'
 #
 # *** FORCINGS ******************************************************
 #
-# specify forcings -- dust field and restoring of atmopsheric pCO2 and d13C
-bg_par_forcing_name="worlg4.RpCO2_Rp13CO2.FeMahowald2006"
+bg_par_forcing_name="worjh2.RpCO2_Rp13CO2.Albani.0ka"
 bg_par_atm_force_scale_val_3=278.0E-06
 bg_par_atm_force_scale_val_4=-6.5
 #
@@ -125,13 +125,14 @@ bg_par_atm_force_scale_val_4=-6.5
 #
 # kraus-turner mixed layer scheme on (1) or off (0)
 go_imld = 1
-# *** optional changes to align with PALEO recommendations **********
 # set mixed layer to be only diagnosed (for ECOGEM)
 go_ctrl_diagmld=.true.
 # add seaice attenuation of PAR
 eg_ctrl_PARseaicelimit=.true.
 # relative partitioning of C into DOM
 eg_par_beta_POCtoDOC=0.75
+#
+# *** recommended ***************************************************
 # maximum time-scale to geochemical reaction completion (days)
 bg_par_bio_geochem_tau=90.0
 # extend solubility and geochem constant T range (leave S range as default)
@@ -143,4 +144,3 @@ gm_par_carbchem_Tmax = 45.0
 # *******************************************************************
 # *** END ***********************************************************
 # *******************************************************************
-#
