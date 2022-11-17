@@ -6,24 +6,26 @@
 LATEST == v0.9.33
 
 ***************************************************************
-*** /PUBS/manuscript ******************************************
+*** /PUBS/manuscript/ *****************************************
 *** (releases associated with manuscripts) ********************
 ***************************************************************
 
 ***************************************************************
-*** /PUBS/submitted *******************************************
+*** /PUBS/submitted/ ******************************************
 *** (releases associated with submitted papers) ***************
 ***************************************************************
-v0.9.32 --  /Keane_et_al.ClimateDynamics.2022   DOI: 10.5281/zenodo.6987451 -- Keane at al. submitted to Climate Dynamics
-v0.9.33     /Wu_et_al.SciAdv.2022               DOI: 10.5281/zenodo.7268917 -- Wu et al. (revised for Sci. Adv.)
+v0.9.32 --  Keane_et_al.ClimateDynamics.2022    DOI: 10.5281/zenodo.6987451 -- Keane at al. submitted to Climate Dynamics
+v0.9.33 --  Wu_et_al.SciAdv.2022                DOI: 10.5281/zenodo.7268917 -- Wu et al. (revised for Sci. Adv.)
+v0.9.34 --  
+v0.9.35 --  Pohl_et_al.SciAdv.2022
 ***************************************************************
-*** /PUBS/published (published papers) ************************
+*** /PUBS/published/ (published papers) ***********************
 *** (releases associated with accepted/published papers) ******
 ***************************************************************
-v0.9.31 --  /Pohl_et_al.2022                    DOI: 10.5281/zenodo.6823664 --  Pohl et al. [2022] (Nature)
-v0.9.30 --  /Cermeno_et_al.2022                 DOI: 10.5281/zenodo.6676435 --  Cermeño et al. [2022] (Nature)
+v0.9.31 --  Pohl_et_al.2022                     DOI: 10.5281/zenodo.6823664 --  Pohl et al. [2022] (Nature)
+v0.9.30 --  Cermeno_et_al.2022                  DOI: 10.5281/zenodo.6676435 --  Cermeño et al. [2022] (Nature)
 ***************************************************************
-*** /MS (old directory structure) *****************************
+*** /MS/ (old directory structure) ****************************
 ***************************************************************
 v0.9.29 --  Pohl et al.             [revised for Nature]    DOI: 10.5281/zenodo.5885685
 v0.9.28 --  Pohl et al.             [submitted to Nature]   DOI: 10.5281/zenodo.5500719
