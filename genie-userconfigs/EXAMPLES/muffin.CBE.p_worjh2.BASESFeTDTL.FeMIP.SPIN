@@ -77,9 +77,9 @@ eg_nquota                   =.false.
 # include cellular quota: PO4
 eg_usePO4                   =.true.
 eg_pquota                   =.true.
-# include cellular quota: Fe -- note, no Fe limitation enabled
-eg_useFe                    =.FALSE.
-eg_fquota                   =.FALSE.
+# include cellular quota: Fe
+eg_useFe                    =.true.
+eg_fquota                   =.true.
 # include cellular quota: Chlorophyll
 eg_chlquota                 =.true.
 # d13C fractionaton based on d13C of DIC?
