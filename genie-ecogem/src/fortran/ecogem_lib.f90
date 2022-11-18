@@ -157,6 +157,8 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/nsubtime!
   CHARACTER(len=127)::par_ecogem_plankton_file
   NAMELIST /ini_ecogem_nml/par_ecogem_plankton_file
+  CHARACTER(len=127)::par_ecogem_timeseries_file
+  NAMELIST /ini_ecogem_nml/par_ecogem_timeseries_file
   ! JDW force T fields
   logical::ctrl_force_T
   namelist /ini_ecogem_nml/ctrl_force_T
