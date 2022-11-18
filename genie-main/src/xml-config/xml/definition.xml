@@ -8844,7 +8844,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>output restart filename</description>
                     </param>
                     <param name="ctrl_ncrst">
-			<value datatype="boolean">.false.</value>
+			<value datatype="boolean">.true.</value>
                         <description>Restart in netCDF format?</description>
                     </param>
                     <param name="par_ncrst_name">
