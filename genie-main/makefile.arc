@@ -324,7 +324,12 @@ ifeq ($(F77),gfortran)
   #       => error (-fallow-argument-mismatch turns this is a warning)
   #          (cannot then have -pedantic)
   #       [error occurs in outm_netcdf.F]
-  FFLAGS += -fallow-argument-mismatch
+  # first get gfortran major version number -- add flag if version == 10 (will worry later when version 11 comes out ...)
+  FVER=$(shell gfortran -dumpversion)
+###  ifeq ($(shell [ $(gfortran -dumpversion) -gt 8 ]),1)
+  ifeq ($(FVER),10)
+    FFLAGS += -fallow-argument-mismatch
+  endif
   # NOTE: Arrays larger than limit set by ‘-fmax-stack-var-size=’, are moved from stack to static storage. 
   #       This makes the procedure unsafe when called recursively, or concurrently from multiple threads. 
   #       Consider increasing the ‘-fmax-stack-var-size=’ limit (or use ‘-frecursive’, which implies unlimited ‘-fmax-stack-var-size’) - 
