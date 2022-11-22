@@ -71,14 +71,6 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 bg_ctrl_bio_remin_thresh = .true.
 #F denitrification O2 threshold (40E-6, Naafs etal 2019)
 bg_par_bio_remin_cthresh_O2=38.111E-06
-# T-dependent remineralisation
-bg_ctrl_bio_remin_POC_fixed=.false.
-bg_par_bio_remin_sinkingrate=125.0
-bg_par_bio_remin_POC_K1=9.0E11
-bg_par_bio_remin_POC_Ea1=54000.0
-bg_par_bio_remin_POC_K2=1.0E14
-bg_par_bio_remin_POC_Ea2=80000.0
-bg_par_bio_remin_POC_frac2=0.008
 #
 # *** IRON CYCLING **************************************************
 #
@@ -115,7 +107,7 @@ bg_par_data_save_level=8
 #
 # *** FORCINGS ******************************************************
 #
-bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2.RCP6p0.Albani.0ka"
+bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2.SSP5-8p5-Meinhausen.Albani.2500yr"
 #
 # *** MISC **********************************************************
 #

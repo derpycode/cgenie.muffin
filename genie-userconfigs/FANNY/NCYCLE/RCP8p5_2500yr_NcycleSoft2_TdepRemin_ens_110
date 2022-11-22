@@ -115,7 +115,7 @@ bg_par_data_save_level=8
 #
 # *** FORCINGS ******************************************************
 #
-bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2.RCP6p0.Albani.0ka"
+bg_par_forcing_name="pyyyyz.RpCO2_Rp13CO2.RCP8p5-Meinhausen.Albani.2500yr"
 #
 # *** MISC **********************************************************
 #
