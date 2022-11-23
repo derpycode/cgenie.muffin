@@ -1174,7 +1174,7 @@
       parameter(zcexp=0.18)
 
 
-!!$      real d91,d92,d93,d94 !for genie runoff
+      real d91,d92,d93,d94 !for genie runoff
 
 !
       real zuroff(NLON,NLAT)
@@ -1532,7 +1532,7 @@
       call ntomin(jstep,nmin,nhour,nday,nmonth,nyear)
 !
       if(nperpetual > 0) then
-       nmonth=int((nperpetual-1)/30.+1)
+       nmonth=(nperpetual-1)/30.+1
        nday=nperpetual-nmonth*30
       endif
 !
@@ -1571,7 +1571,7 @@
       call ntomin(jstep,nmin,nhour,nday,nmonth,nyear)
 !
       if(nperpetual > 0) then
-       nmonth=int((nperpetual-1)/30.+1)
+       nmonth=(nperpetual-1)/30.+1
        nday=nperpetual-nmonth*30
       endif
 !

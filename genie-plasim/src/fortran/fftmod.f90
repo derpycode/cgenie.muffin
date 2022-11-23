@@ -174,8 +174,8 @@
       implicit none
       integer n,ja,jb,jc,i
       real a,trigs,c,c1,s1,c2,s2,a1,b1,a2,b2,a3,b3
-      real SIN60
-      parameter(SIN60 = 0.866025403784438)
+      real*8 SIN60
+      parameter(SIN60 = 0.866025403784438D0)
       dimension a(n),c(n),trigs(n)
 
       ja = 1              !  1
@@ -575,7 +575,7 @@
       real a,c,trigs,sin60,c1,s1,c2,s2,hbpc,hbmc,sbmc,sbpc
       integer n,lot,la,ia,ib,ic,j,l
       dimension a(n,lot),c(n,lot),trigs(n)
-      parameter(SIN60 = 0.866025403784438)
+      parameter(SIN60 = 0.866025403784438D0)
 
       ib = 2 * (n/3) + 1
 
@@ -632,7 +632,7 @@
       real a1m5p2p6,a1m5m2p6
       integer n,lot,la
       integer i,i0,i1,i2,i3,i4,i5,i6,i7
-      parameter(SQRT2 = 1.414213562373095)
+      parameter(SQRT2 = 1.414213562373095D0)
       dimension a(n*lot),c(n*lot)
       la = n / 8
 

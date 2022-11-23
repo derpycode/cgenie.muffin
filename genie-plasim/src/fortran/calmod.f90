@@ -270,7 +270,7 @@
       kmon  = idall / n_days_per_month + 1
       kday  = mod(idall,n_days_per_month) + 1
       istp  = mod(kstep,ktspd)
-      kmin  = (istp * nint(solar_day)) / (ktspd * 60)
+      kmin  = (istp * solar_day) / (ktspd * 60)
       khou  = kmin / 60
       kmin  = mod(kmin,60)
 
@@ -293,7 +293,7 @@
       integer, intent(IN ) :: kmin  ! current minute of simulation
 
       kstep = ktspd * (kyea * n_days_per_year + (kmon-1) * n_days_per_month + kday - 1) &
-            +(ktspd * (khou *  60 + kmin) * 60) / nint(solar_day)
+            +(ktspd * (khou *  60 + kmin) * 60) / solar_day
 
       return
       end subroutine cal2step30

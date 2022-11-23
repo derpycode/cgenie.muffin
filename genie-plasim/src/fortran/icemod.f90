@@ -48,7 +48,7 @@
                                    ! (0 = none, 1 = heat-budget, 2 = newtonian)
       integer :: ncpl_ice_ocean = 1! coupling intervall ice - ocean
 ! PBH
-      integer :: nflukoavg  = 115200 !timesteps for averaging flux correction
+      integer :: nflukoavg  = 115200	!timesteps for averaging flux correction
 
       integer :: nperpetual_ice = 0! perpetual climate conditions (day)
       integer :: nprint = 0        ! debug print out

@@ -1282,7 +1282,7 @@
 
       if (rotspd /= 1.0) then
          solar_day = solar_day / rotspd
-         n_days_per_year = nint(real(n_days_per_year) * rotspd)
+         n_days_per_year = n_days_per_year * rotspd
          n_days_per_month = n_days_per_year / 12
          siderial_day =(n_days_per_year*solar_day)/(n_days_per_year+1.0)
       endif
@@ -1302,7 +1302,7 @@
       if (mpstep > 0) then             ! timestep given in [min]
          ntspd = nint(solar_day) / (mpstep * 60)
       endif
-      mpstep = nint(solar_day)  / (ntspd * 60)
+      mpstep = solar_day  / (ntspd * 60)
 ! PBH I don't want multiple writes per day, so namelist vaiable is now nafter (no timesteps betwenne writes)
 !      if (nwpd > 0 .and. nwpd <= ntspd) then
 !         nafter = ntspd / nwpd

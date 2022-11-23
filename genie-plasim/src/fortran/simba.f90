@@ -19,27 +19,27 @@ real, parameter :: q10       = 2.0              ! q10 value for resp
 
 !	ENTS namelist parameters
 
-real::k7=0.461
-real::k8=0.45
-real::k9=0.15
-real::k10=0.02
-real::k11a=309.15
-real::k11b=283.15
-real::k12=268.25
-real::k13=29.0
-real::k14=145.0
-real::k16=11.5
-real::k17=0.35
-real::k18=1.3985e-7 !converted from yr-1 to s-1
-real::k20=54830.0
-real::k24=6.9123e-9 !converted from yr-1 to s-1
-real::k26=4.2117e-9 !converted from yr-1 to s-1
-real::k29=4.0188e-9 !converted from yr-1 to s-1
-real::k31=308.56
-real::k32=227.13
-real::kz=0.0452
-real::tadj=0.0    !shift temperature response curve
-real::qthresh=0.1 !moisture response threshold (default ENTS value 0.5)
+real	::	k7=0.461
+real	::	k8=0.45
+real	::	k9=0.15
+real	::	k10=0.02
+real	::	k11a=309.15
+real	::	k11b=283.15
+real	::	k12=268.25
+real	::	k13=29.0
+real	::	k14=145.0
+real	::	k16=11.5
+real	::	k17=0.35
+real	::	k18=1.3985e-7	!converted from yr-1 to s-1
+real	::	k20=54830.0
+real	::	k24=6.9123e-9	!converted from yr-1 to s-1
+real	::	k26=4.2117e-9	!converted from yr-1 to s-1
+real	::	k29=4.0188e-9	!converted from yr-1 to s-1
+real	::	k31=308.56
+real	::	k32=227.13
+real	::	kz=0.0452
+real    ::      tadj=0.0    !shift temperature response curve
+real    ::      qthresh=0.1 !moisture response threshold (default ENTS value 0.5)
 
 !     * SIMBA parameters for land surface clean up redundancy!!!
 
@@ -101,13 +101,13 @@ end module vegmod
 !========!
 
 subroutine vegini
-  use vegmod
-  implicit none
+use vegmod
+implicit none
 
-  namelist/entspar/k7,k8,k9,k10,k11a,k11b,k12,k13 &
-       & ,k20,k24,k29,k31,kz,tadj
+      namelist/entspar/k7,k8,k9,k10,k11a,k11b,k12,k13 &
+     &		,k20,k24,k29,k31,kz,tadj
 
-  namelist/entsplasim/ qthresh,k14,k16,k17,k18,k26,k32
+      namelist/entsplasim/ qthresh,k14,k16,k17,k18,k26,k32
 
 if(mypid == NROOT) then
 
@@ -166,11 +166,11 @@ use vegmod
 implicit none
 
 !some variables for ents THESE SHOULD BE INTTRODUCED AS NAMELIST/MODULE PARAMETERS!!!!!!!!!!!
-real f1 !co2 limitation on photosynthesis
-real f2 !water stress limitation on photosynthesis
-real f3a,f3b !temperature limitation on photosynthesis
-real f4 !vegetation respiration
-real epsilon !self shading
+real f1		!co2 limitation on photosynthesis
+real f2 	!water stress limitation on photosynthesis
+real f3a,f3b 	!temperature limitation on photosynthesis
+real f4 	!vegetation respiration
+real epsilon 	!self shading
 real rk19
 real k25
 real k30
@@ -258,11 +258,11 @@ do jhor = 1 , NHOR
 
 ! net primary prodcution
     dnpp(jhor) = dgpp(jhor)-f4
-    dnpp(jhor) = pgrow(jhor)*dnpp(jhor)*zglacfree !retain puma limitation of growth under ice (or with pgrow mask)
-    dnogrow(jhor)  = (1.0-pgrow(jhor))*dnpp(jhor) !limitation imposed by pgrow mask
+    dnpp(jhor) = pgrow(jhor)*dnpp(jhor)*zglacfree		!retain puma limitation of growth under ice (or with pgrow mask)
+    dnogrow(jhor)  = (1.0-pgrow(jhor))*dnpp(jhor)		!limitation imposed by pgrow mask
 
 ! leaf litter
-    epsilon = 1.0/(1.0+exp(k16-dcveg(jhor))) !self-shading
+    epsilon = 1.0/(1.0+exp(k16-dcveg(jhor)))			!self-shading
     dlitter(jhor)=k26*dcveg(jhor)+epsilon*dnpp(jhor)
 
 ! soil respiration
@@ -296,7 +296,7 @@ do jhor = 1 , NHOR
 !    dvrhs(jhor) = pgs(jhor) * min(1.0,max(0.0,dwatc(jhor)/(zwmax(jhor)*vws_crit)))
 ! use ents formulation for soil saturation (beta)
     dvrhs(jhor) =  pgs(jhor)*min((dwatc(jhor)/zwmax(jhor))**4,1.0)
-    if (dsnow(jhor) > 1.0e-3) then !! PBH only if snow depth > 1 mm
+    if (dsnow(jhor) > 1.0e-3) then				!! PBH only if snow depth > 1 mm
       dvalb(jhor)=(alpha_snow-alpha_veg_snow)*exp(-k7*dcveg(jhor))+alpha_veg_snow
       dvrhs(jhor)=1.0
     endif
@@ -313,9 +313,9 @@ do jhor = 1 , NHOR
 
 ! discretization of vegetation state
     if (rnbiocats >= 2.0) then
-      ibiomass      = nint(zforest(jhor) * rnbiocats)
+      ibiomass      = zforest(jhor) * rnbiocats
       zforest(jhor) = min(1.0, real(ibiomass)/(rnbiocats-1.0))
-      ibiomass      = nint(dvsoil(jhor) * rnbiocats)
+      ibiomass      = dvsoil(jhor) * rnbiocats
       dvsoil(jhor)  = min(1.0, real(ibiomass)/(rnbiocats-1.0))
     endif
 
