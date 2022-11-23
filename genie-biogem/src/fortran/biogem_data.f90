@@ -508,6 +508,7 @@ CONTAINS
        print*,'                                                    : ',n_orb_pts_nmax
        print*,'                                                    : ',trim(par_infile_orb_pts_loc_name)
        print*,'                                                    : ',trim(par_infile_orb_pts_var_name)
+       print*,'Align netCDF filenames with experiment name?        : ',ctrl_ncout_expid_name
        ! --- TRACER AUDITING AND DEBUGGING OPTIONS ------------------------------------------------------------------------------- !
        print*,'--- TRACER AUDITING AND DEBUGGING OPTIONS ----------'
        print*,'Audit tracer inventory?                             : ',ctrl_audit

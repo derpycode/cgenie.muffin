@@ -124,6 +124,9 @@ MODULE genie_control
 ! ======================================================================
 ! Miscellaneous control variables
 
+      ! experiment name(!)
+      CHARACTER(len=255)::expid_name
+      
       ! used in for netcdf output in various places
       integer, parameter :: BUFSIZ = 1024  !< to hold character strings
       integer, parameter :: nfiles=4

@@ -15,7 +15,8 @@ c
 c
 c     Define members of the top-level control namelist
 c
-      namelist/genie_control_nml/koverall_total,
+      namelist/genie_control_nml/expid_name,
+     :      koverall_total,
      :      katm_loop,
      :      ksic_loop,
      :      kocn_loop,

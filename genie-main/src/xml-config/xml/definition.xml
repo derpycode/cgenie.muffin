@@ -179,6 +179,10 @@
             <!-- namelist outdir="$OUTDIR" -->
             <file name="data_genie">
                 <namelist name="GENIE_CONTROL_NML">
+                    <param name="expid_name">
+			<value datatype="string"></value>
+                        <description>experiment name(!)</description>
+                    </param>
                     <param name="koverall_total">
                         <value datatype="integer">720</value>
                         <description>Total number of timesteps. For IGCM, where dt is usually 1
@@ -5333,6 +5337,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_outfile_name">
 			<value datatype="string">biogem</value>
                         <description>output restart filename</description>
+                    </param>
+                    <param name="ctrl_ncout_expid_name">
+			<value datatype="boolean">.false.</value>
+                        <description>Align netCDF filenames with experiment name?</description>
                     </param>
 <!-- DATA SAVING: TIME-SLICES  -->
                     <param name="ctrl_data_save_slice_ocnatm">

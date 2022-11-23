@@ -160,6 +160,7 @@ cp -f $CONFIGPATH/$MODELID".config" $CONFIGPATH/$CONFIGNAME
 # Set the experiment run name
 #echo EXPID=$MODELID.$RUNID >> $CONFIGPATH/$CONFIGNAME
 echo EXPID=$RUNID >> $CONFIGPATH/$CONFIGNAME
+echo ma_expid_name=$RUNID >> $CONFIGPATH/$CONFIGNAME
 #
 # (4) SET MODEL TIME-STEPPING
 # ---------------------------
