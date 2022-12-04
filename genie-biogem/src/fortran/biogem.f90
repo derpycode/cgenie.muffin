@@ -3231,7 +3231,8 @@ SUBROUTINE diag_biogem_timeslice( &
            else
               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + dum_sfxsumrok1(:,:,:)
            end if
-           int_diag_airsea_timeslice(:,:,:)    = int_diag_airsea_timeslice(:,:,:)    + diag_airsea(:,:,:)
+           ! int_diag_airsea_timeslice(:,:,:)    = int_diag_airsea_timeslice(:,:,:)    + diag_airsea(:,:,:)
+           int_diag_airsea_timeslice(:,:,:)    = int_diag_airsea_timeslice(:,:,:)    + loc_dtyr*diag_airsea(:,:,:) ! YK corrected 10.25.2022
            ! eceogem
            if (flag_ecogem) then
               int_diag_ecogem_part(:,:,:)  = int_diag_ecogem_part(:,:,:)  + loc_dtyr*diag_ecogem_part(:,:,:)
@@ -3860,7 +3861,12 @@ SUBROUTINE diag_biogem_timeseries( &
               end DO
            end if
            ! ### ADD ADDITIONAL TIME-SERIES UPDATES HERE ######################################################################### !
-           !
+           !           
+           ! YK added (09/14/2021)
+           int_misc_bio_POC_sig = int_misc_bio_POC_sig + &
+                & loc_dtyr*SUM(phys_ocn(ipo_M,:,:,:)*bio_part(is_POC,:,:,:))*loc_ocn_rtot_M
+           int_misc_bio_CaCO3_sig = int_misc_bio_CaCO3_sig + &
+                & loc_dtyr*SUM(phys_ocn(ipo_M,:,:,:)*bio_part(is_CaCO3,:,:,:))*loc_ocn_rtot_M
            ! ##################################################################################################################### !
 
         end if if_save3

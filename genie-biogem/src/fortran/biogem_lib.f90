@@ -1275,6 +1275,8 @@ MODULE biogem_lib
   real,DIMENSION(:),ALLOCATABLE::int_diag_redox_sig              ! redox diagnostics time-series
   ! ### ADD ADDITIONAL TIME-SERIES ARRAY DEFINITIONS HERE ######################################################################## !
   !
+  real::int_misc_bio_POC_sig                                     ! YK added (09/14/2021)
+  real::int_misc_bio_CaCO3_sig                                   ! YK added (09/14/2021)
   ! ############################################################################################################################## !
 
   ! *** integrated (time-averaged) time-slice arrays ***

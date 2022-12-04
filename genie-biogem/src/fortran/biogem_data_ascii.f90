@@ -1099,6 +1099,35 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
     END IF
+    
+    
+    ! an attempt to track POC & PIC inventory (YK, 09/14/2021)
+       if (sed_select(is_POC)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_bio_POC',string_results_ext)
+          loc_string = '% time (yr) / POC (mol) / POC (mol kg-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       
+       if (sed_select(is_CaCO3)) then
+          loc_filename=fun_data_timeseries_filename( &
+               & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_bio_CaCO3',string_results_ext)
+          loc_string = '% time (yr) / CaCO3 (mol) / CaCO3 (mol kg-1)'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+    
   END SUBROUTINE sub_init_data_save_runtime
   ! ****************************************************************************************************************************** !
 
@@ -2773,6 +2802,37 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
     END IF
+    
+    ! POC inventory recording attempt (YK, 09/14/2021)
+       loc_filename=fun_data_timeseries_filename( &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_bio_POC',string_results_ext)
+       loc_sig = int_misc_bio_POC_sig/int_t_sig
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)       
+       WRITE(unit=out,fmt='(f12.3,e20.12,4e14.6)',iostat=ios) &
+            & loc_t,                                          &
+            & loc_ocn_tot_M*loc_sig,                          &
+            & loc_sig                                         
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       
+       loc_filename=fun_data_timeseries_filename( &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_bio_CaCO3',string_results_ext)
+       loc_sig = int_misc_bio_CaCO3_sig/int_t_sig
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)       
+       WRITE(unit=out,fmt='(f12.3,e20.12,4e14.6)',iostat=ios) &
+            & loc_t,                                          &
+            & loc_ocn_tot_M*loc_sig,                          &
+            & loc_sig                                         
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+    
+    
   END SUBROUTINE sub_data_save_runtime
   ! ****************************************************************************************************************************** !
 

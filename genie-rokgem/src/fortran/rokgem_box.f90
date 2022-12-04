@@ -326,9 +326,11 @@ CONTAINS
     ! Local counting variables
     INTEGER                         :: i, j, k, row, col, lon, lat
     REAL                            :: tot
+    REAL                            :: chk
 
     dum_output_coast(:,:) = 0.0
     tot = 0.0
+    chk = 0.0
 
     ! dump weathering flux to relevant point on coast
 
@@ -342,17 +344,21 @@ CONTAINS
              ! ignore ocean cells denoted by 0...
              IF ((lon.NE.0).AND.(lat.NE.0)) THEN
                 dum_output_coast(lon,lat) = dum_output_coast(lon,lat) + dum_input_array(i,j)
+                chk = chk + dum_input_array(i,j)
              ENDIF
              ! ...unless the lithology map has land in the genie ocean - then dump weathering flux 
              ! straight into that ocean cell. Currently not used as land output is truncated to the genie landmask.
              ! if land output isn't truncated, get approx 1.5 times more flux.
              IF ((dum_input_array(i,j).NE.0).AND.(lon.EQ.0).AND.(lat.EQ.0)) THEN
                 dum_output_coast(i,j) = dum_output_coast(i,j) + dum_input_array(i,j)  
+                chk = chk + dum_input_array(i,j)
              ENDIF
           END DO
        END DO
     ENDIF
-
+    
+    if (sum(dum_output_coast(:,:))/=chk) print*,sum(dum_output_coast(:,:)),chk
+    
     ! INTERMEDIATE (level2) and DETAILED (level 3)-----------------------------------------------------
     ! Ignore ocean cells denoted by 0 at start of line in detailed routing file; 
     ! also check that the cell is covered by the genie landmask (this is now done in Mathematica).
@@ -399,7 +405,8 @@ CONTAINS
              runoff_calib = sum(dum_input_array(:,:))/sum(dum_output_coast(:,:))
           ENDIF
           IF ( routing_scheme.eq.3 ) THEN
-             runoff_calib = sum(dum_input_array(:,nrows_antarctica+1:n_j))/sum(dum_output_coast(:,:))
+             ! runoff_calib = sum(dum_input_array(:,nrows_antarctica+1:n_j))/sum(dum_output_coast(:,:))
+             runoff_calib = sum(dum_input_array(:,:))/sum(dum_output_coast(:,:))
           ENDIF
        ENDIF
        dum_output_coast(:,:) = dum_output_coast(:,:)*runoff_calib
@@ -1184,9 +1191,17 @@ CONTAINS
     END DO
     ! route it into the coastal ocean cells (to pass to biogem in coupled model) and save the output to file
     DO k=3,n_ocn
+       ! if (k==io_DIC) print*
+       ! if (k==io_DIC) print*,'before'
+       ! if (k==io_DIC) print*,sum(loc_force_flux_weather_o_land(k,:,:))
+       ! if (k==io_DIC) print*,sum(loc_force_flux_weather_o_ocean(k,:,:))
        CALL sub_coastal_output(  loc_force_flux_weather_o_land(k,:,:),             &
             &  runoff_drainto(:,:,:),runoff_detail(:,:),                           &
             &  loc_force_flux_weather_o_ocean(k,:,:)                               )
+       ! if (k==io_DIC) print*,'after'
+       ! if (k==io_DIC) print*,sum(loc_force_flux_weather_o_land(k,:,:))
+       ! if (k==io_DIC) print*,sum(loc_force_flux_weather_o_ocean(k,:,:))
+       ! stop
     END DO
     ! convert from Mol/yr to Mol/sec and put it into passing array 
     dum_sfxrok(:,:,:) = loc_force_flux_weather_o_ocean(:,:,:)/conv_yr_s
