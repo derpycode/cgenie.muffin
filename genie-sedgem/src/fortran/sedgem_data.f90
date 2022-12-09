@@ -126,6 +126,7 @@ CONTAINS
        print*,'Option for how margin is chosen                     : ',par_sed_hydrate_opt_margin
        print*,'Option for how geotherm is chosen                   : ',par_sed_hydrate_opt_geotherm
        print*,'Option for which thermodynamics is chosen           : ',par_sed_hydrate_opt_therm
+       print*,'option for thermal conductivity for sediment        : ',par_sed_hydrate_opt_sedthermcond
        print*,'name of run from which run is restarted             : ',par_sed_hydrate_resdir
        print*,'Depth threshold for hydrate formation               : ',par_sed_hydrate_threshold
        print*,'Geothermal gradient oC/m                            : ',par_sed_hydrate_geotherm
@@ -133,6 +134,7 @@ CONTAINS
        print*,'frequency to save data                              : ',par_sed_hydrate_savefreq
        print*,'water flux of external source in cm/kyr             : ',par_sed_hydrate_exflow
        print*,'OM available for ch4gen and so4red                  : ',par_sed_hydrate_orgCfrac
+       print*,'thermal conductivity for sediment in W/m/K          : ',par_sed_hydrate_thermcond
        print*,'starting time to implement hydrate-feedback         : ',par_sed_hydrate_istart
       ! --- DIAGENESIS SCHEME: ARCHER 1991 -------------------------------------------------------------------------------------- !
        print*,'--- DIAGENESIS SCHEME: ARCHER 1991 -----------------'

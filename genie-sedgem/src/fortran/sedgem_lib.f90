@@ -117,7 +117,8 @@ MODULE sedgem_lib
   character(len=63)::par_sed_hydrate_opt_margin                  ! option for how margin is chosen
   character(len=63)::par_sed_hydrate_opt_geotherm                ! option for how geotherm is chosen
   character(len=63)::par_sed_hydrate_opt_therm                   ! option for whic thermodynamics is chosen
-  NAMELIST /ini_sedgem_nml/par_sed_hydrate_opt_org,par_sed_hydrate_opt_margin,par_sed_hydrate_opt_geotherm,par_sed_hydrate_opt_therm
+  character(len=63)::par_sed_hydrate_opt_sedthermcond            ! option for thermal conductivity for sediment
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_opt_org,par_sed_hydrate_opt_margin,par_sed_hydrate_opt_geotherm,par_sed_hydrate_opt_therm,par_sed_hydrate_opt_sedthermcond
   character(len=126)::par_sed_hydrate_resdir                     ! name of run from which run is restarted
   NAMELIST /ini_sedgem_nml/par_sed_hydrate_resdir
   REAL::par_sed_hydrate_threshold                                ! depth threshold above which is not considered as location of hydrate formation
@@ -125,7 +126,8 @@ MODULE sedgem_lib
   REAL::par_sed_bubble_threshold                                 ! threshold (volume ratio) for bubble escape to ocean/muds/omen
   REAL::par_sed_hydrate_exflow                                   ! water flux of external source in cm/kyr
   REAL::par_sed_hydrate_orgCfrac                                 ! OM available for ch4gen and so4red
-  NAMELIST /ini_sedgem_nml/par_sed_hydrate_threshold,par_sed_hydrate_geotherm,par_sed_bubble_threshold,par_sed_hydrate_exflow,par_sed_hydrate_orgCfrac
+  REAL::par_sed_hydrate_thermcond                                ! OM available for ch4gen and so4red
+  NAMELIST /ini_sedgem_nml/par_sed_hydrate_threshold,par_sed_hydrate_geotherm,par_sed_bubble_threshold,par_sed_hydrate_exflow,par_sed_hydrate_orgCfrac,par_sed_hydrate_thermcond
   integer::par_sed_hydrate_savefreq                              ! frequency to save data 
   integer::par_sed_hydrate_istart                                ! integer to denote the starting time to implement hydrate-feedback 
   NAMELIST /ini_sedgem_nml/par_sed_hydrate_savefreq,par_sed_hydrate_istart

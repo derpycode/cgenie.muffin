@@ -59,6 +59,7 @@ real,intent(in)::depth_in,btmocn_in(n_ocn),dtyr_in,new_sed_in(n_sed),dis_sed_in(
 
 real loc_D_hydrate,loc_T_hydrate,loc_DO_hydrate,loc_v_sed,dum_dtyr,loc_org_0,loc_geotherm,loc_margin,loc_v_sedv
 real loc_sed_pres_fracC,loc_sed_pres_fracP,loc_exe_ocn(n_ocn),loc_sed_mean_OM_top,loc_sed_mean_OM_bot,sedthick
+real loc_thermcond
 
 loc_D_hydrate = depth_in
 loc_T_hydrate = btmocn_in(io_T)
@@ -66,6 +67,19 @@ loc_DO_hydrate = btmocn_in(io_O2)*1e6 ! converting from mol/kg to umol/kg
 dum_dtyr = dtyr_in
 loc_v_sed = (fun_calc_sed_mass(new_sed_in(:)) - fun_calc_sed_mass(dis_sed_in(:)))/dum_dtyr  ! g/cm2/yr
 loc_v_sedv = (fun_calc_sed_vol(new_sed_in(:)) - fun_calc_sed_vol(dis_sed_in(:)))/dum_dtyr  ! cm3/cm2/yr
+
+selectcase(trim(par_sed_hydrate_opt_sedthermcond))
+    case('larowe17') ! depth dependent conductivity (but ignoring different parameterization for Antarctica for now)
+        if ( loc_D_hydrate < 200. ) then 
+            loc_thermcond = 1.5 ! W/m/oC
+        elseif ( (200. <= loc_D_hydrate) .and. (loc_D_hydrate < 3500.) ) then 
+            loc_thermcond = 0.87 ! W/m/oC
+        else
+            loc_thermcond = 0.82 ! W/m/oC
+        endif 
+    case('cnst')
+        loc_thermcond = par_sed_hydrate_thermcond ! W/m/oC
+endselect 
 
 if (par_sed_hydrate_hunter2013) then ! use depth, temperature, DO from global maps in Hunter et al. (2013)
     call get_bwt_Hunter13(dum_i,dum_j,loc_T_hydrate)
@@ -125,7 +139,7 @@ select case(trim(par_sed_hydrate_opt_geotherm))
         loc_geotherm = par_sed_hydrate_geotherm
     case('hamza08')
         call get_heatflow_data_Hamza08(dum_i,dum_j,loc_geotherm)  ! get heatflux from Hamza et al. (2008)
-        loc_geotherm = loc_geotherm/1.5/1000.
+        loc_geotherm = loc_geotherm/loc_thermcond/1000.
 endselect
 
 select case(trim(par_sed_hydrate_opt_margin)) ! calculation is conducted only on margins 
@@ -329,6 +343,7 @@ real time_fin
 real z_prev(nz),z_err,dz_prev(nz)
 real,dimension(nflx,nz)::dumflx
 real loc_margin
+real thermcond
 
 integer,parameter::n_interp=1
 integer::iz_min,iz_max,nz_interp
@@ -421,6 +436,8 @@ cm_0 = max(0.0,cm_0_in)
 org_0 = org_0_in
 loc_margin = margin_in
 
+thermcond = par_sed_hydrate_thermcond
+
 print '(11(3x,A9))', 'wdpth', 'wtemp', 'org_0', 'frac', 'v_sed', 'u_ext', 'geotherm', 'dec_m0', 'so4s', 'sal', 'seddep'
 print '(11(3x,e9.3e2))', wdpth, wtemp, org_0, frac, v_sed, u_ext, geotherm, dec_m0, so4s, sal, seddep
 
@@ -502,7 +519,7 @@ if(loc_margin <= 0d0 .or. (.not.bubble_only.and.hszflg == 2)) then
     hsz_map(dum_i,dum_j) = loc_hsz
     ceqh_map(dum_i,dum_j) = ceqh
     ceqb_map(dum_i,dum_j) = ceqb
-    heatflow_map(dum_i,dum_j) = geotherm_in*1.5*1000.
+    heatflow_map(dum_i,dum_j) = geotherm_in*par_sed_hydrate_thermcond*1000.
     depth_map(dum_i,dum_j) = wdpth
     om_map(dum_i,dum_j) = org_0 * frac
     btso4_map(dum_i,dum_j) = so4s
@@ -1216,7 +1233,7 @@ zs_map(dum_i,dum_j) = zs
 hsz_map(dum_i,dum_j) = z3
 ceqh_map(dum_i,dum_j) = ceqh
 ceqb_map(dum_i,dum_j) = ceqb
-heatflow_map(dum_i,dum_j) = geotherm_in*1.5*1000.
+heatflow_map(dum_i,dum_j) = geotherm_in*par_sed_hydrate_thermcond*1000.
 depth_map(dum_i,dum_j) = wdpth
 om_map(dum_i,dum_j) = org_0 ! /frac
 btso4_map(dum_i,dum_j) = so4s

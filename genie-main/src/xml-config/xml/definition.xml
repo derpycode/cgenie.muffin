@@ -7178,6 +7178,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">duan</value>
                         <description>option for which thermodynamics is chosen</description>
                     </param>
+                    <param name="par_sed_hydrate_opt_sedthermcond">
+			<value datatype="string">cnst</value>
+                        <description>option for thermal conductivity for sediment</description>
+                    </param>
                     <param name="par_sed_hydrate_resdir">
 			<value datatype="string">.</value>
                         <description>name of run from which run is restarted</description>
@@ -7201,6 +7205,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_hydrate_orgCfrac">
 			<value datatype="real">0.25</value>
                         <description>OM available for ch4gen and so4red</description>
+                    </param>
+                    <param name="par_sed_hydrate_thermcond">
+			<value datatype="real">1.5</value>
+                        <description>thermal conductivity for sediment in W/m/K</description>
                     </param>
                     <param name="par_sed_hydrate_savefreq">
 			<value datatype="integer">10</value>
