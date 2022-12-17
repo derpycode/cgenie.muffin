@@ -59,7 +59,7 @@ SUBROUTINE initialise_atchem( &
      
      call sub_init_slabbiosphere_box()
      
-     if ( par_atm_slab_hetero) call sub_init_slabbiosphere_hetero()
+     if (par_atm_slab_hetero) call sub_init_slabbiosphere_hetero()
      
      if (par_atm_slabsave) then 
         call system ('mkdir -p '//trim(adjustl(par_outdir_name))//'/tem/')
@@ -78,23 +78,9 @@ SUBROUTINE initialise_atchem( &
         write(utest,*) 'time / T (oC)/ pCO2 (atm) / Vegie (PgC) / Litter (PgC) / Total terrestrial OM (PgC)'
         close(utest)
      endif 
-     if (par_atm_slab_restart) then 
-        call system ('mkdir -p '//trim(adjustl(par_rstdir_name))//'/tem/')
-        utest = 100
-        call check_unit(utest)
-        open(unit=utest,file=trim(adjustl(par_rstdir_name))//'/tem/terPOOl.res',action='read',status='old')
-        read (utest,'()')
-        do
-           read(utest, *,iostat=io) dum_slab(1:6)
-           IF (io < 0) exit
-        enddo 
-        close(utest)
-        atm_slabbiosphere(ia_pCO2,:,:) = dum_slab(6)/real(n_i*n_j)
-        slab_frac_vegi(:,:) = dum_slab(4)/dum_slab(6)
-        
-        if ( par_atm_slab_hetero ) call sub_load_terrbio()
-        
-     endif 
+     
+     if (par_atm_slab_restart) call sub_load_terrbio()
+     
   endif 
   ! ----- End addition -----
 
