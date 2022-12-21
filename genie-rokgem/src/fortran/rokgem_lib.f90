@@ -48,11 +48,11 @@ MODULE rokgem_lib
   ! --- RIVER ROUTING PARAMETERS ------------------------------------------------------------------------------------------------- !
   INTEGER::routing_scheme                                                                ! routing scheme to use: 1 = 'roof' routing using k1 file; 
   NAMELIST /ini_rokgem_nml/routing_scheme                                                ! 2 = intermediate using detailed map, but roof for stuff that ends up on genie land grid (about half)
-                                                                                         ! 3 = detailed scheme, scaling up coastal ocean flux to match total number of genie land cells
+  ! 3 = detailed scheme, scaling up coastal ocean flux to match total number of genie land cells
   CHARACTER(len=63)::topo                                                                ! file containing basic (roof) river routing to read (k1 file)
   NAMELIST /ini_rokgem_nml/topo
   CHARACTER(len=63)::routing                                                             ! prefix of file containing detailed river routing to read (based on detailed topographic data)
-                                                                                         ! - suffix is grid dimensions (n_i_n_j.dat)
+  ! - suffix is grid dimensions (n_i_n_j.dat)
   NAMELIST /ini_rokgem_nml/routing
   INTEGER::max_drain_cells                                                               ! maximum number of ocean cells a single land cell routes to
   NAMELIST /ini_rokgem_nml/max_drain_cells
@@ -170,10 +170,15 @@ MODULE rokgem_lib
   REAL::par_weather_CaSiO3b_d88Sr                                                         ! basaltic d88Sr (o/oo)
   REAL::par_weather_CaSiO3g_d88Sr                                                        ! granitic d88r (o/oo) 
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3b_d88Sr,par_weather_CaSiO3g_d88Sr
-  REAL::par_weather_fracOs								 ! Os:Ca2+ ratio in weathering flux
-  REAL::par_weather_187Os_188Os								 ! 187Os/188Os ratio of weathering flux
-  REAL::par_weather_188Os_192Os								 ! 188Os/192Os ratio of weathering flux
-  NAMELIST /ini_rokgem_nml/par_weather_fracOs,par_weather_187Os_188Os,par_weather_188Os_192Os
+  REAL::par_weather_CaSiO3_fracOs                                                        ! Os:Ca2+ ratio in silicate weathering flux
+  REAL::par_weather_CaCO3_fracOs                                                         ! Os:Ca2+ ratio in carbonate weathering flux
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracOs,par_weather_CaCO3_fracOs
+  REAL::par_weather_CaSiO3_187Os_188Os                                                   ! 187Os/188Os ratio of silicate weathering flux
+  REAL::par_weather_CaCO3_187Os_188Os                                                    ! 187Os/188Os ratio of carbonate weathering flux
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_187Os_188Os,par_weather_CaCO3_187Os_188Os
+  REAL::par_weather_CaSiO3_188Os_192Os                                                   ! 188Os/192Os ratio of silicate weathering flux
+  REAL::par_weather_CaCO3_188Os_192Os                                                    ! 188Os/192Os ratio of carbonate weathering flux
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_188Os_192Os,par_weather_CaCO3_188Os_192Os
   real:: par_weather_CaSiO3_fracCa5PO43                                                  ! global silicate apatite relative abundance
   REAL:: par_weather_CaSiO3_fracCa5PO43_d44Ca                                            ! global apatite d44Ca
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_fracCa5PO43,par_weather_CaSiO3_fracCa5PO43_d44Ca
@@ -199,6 +204,12 @@ MODULE rokgem_lib
   real::par_weather_fCaCO3_enh_nt                              ! enhanced weathering total inventory
   real::par_weather_fCaSiO3_enh_nt                             ! enhanced weathering total inventory
   NAMELIST /ini_rokgem_nml/par_weather_fCaCO3_enh_nt,par_weather_fCaSiO3_enh_nt
+  CHARACTER(len=63)::opt_weather_CaSiO3_fracLi                                           ! Li weathering scheme
+  NAMELIST /ini_rokgem_nml/opt_weather_CaSiO3_fracLi
+  LOGICAL::ctrl_weather_CaSiO3_7Li_epsilon_fixed                                         ! Fixed (non T-dep) clay fractionation?
+  NAMELIST /ini_rokgem_nml/ctrl_weather_CaSiO3_7Li_epsilon_fixed
+  REAL::par_weather_CaSiO3_7Li_epsilon_DT                                                ! T-dependent D7Li sensitivity (o/oo K-1)
+  NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_7Li_epsilon_DT
   ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_lith_data 
   CHARACTER(len=63)::par_lith_data2 
@@ -220,11 +231,11 @@ MODULE rokgem_lib
   LOGICAL:: opt_calibrate_P_2D                                                           ! calibrate productivity fields to data (recreate real world patterns)
   NAMELIST /ini_rokgem_nml/opt_calibrate_T_2D,opt_calibrate_R_2D,opt_calibrate_P_2D
   CHARACTER(len=63)::par_ref_T0_2D                                                       ! land surface temperature (C) calibration file containing base pattern for 
-                                                                                         ! (model field is scaled by rg_par_data_T_2D divided by this if rg_opt_calibrate_T_2D=.true.)
+  ! (model field is scaled by rg_par_data_T_2D divided by this if rg_opt_calibrate_T_2D=.true.)
   CHARACTER(len=63)::par_ref_R0_2D                                                       ! land surface runoff (mm/yr) calibration file containing base pattern for calibration
-                                                                                         ! (model field is scaled by rg_par_data_R_2D divided by this if rg_opt_calibrate_R_2D=.true.)
+  ! (model field is scaled by rg_par_data_R_2D divided by this if rg_opt_calibrate_R_2D=.true.)
   CHARACTER(len=63)::par_ref_P0_2D                                                       ! land surface productivity (kgC m-2 yr-1) calibration file containing base pattern for calibration 
-                                                                                         ! (model field is scaled by rg_par_data_P_2D divided by this if rg_opt_calibrate_P_2D=.true.)
+  ! (model field is scaled by rg_par_data_P_2D divided by this if rg_opt_calibrate_P_2D=.true.)
   NAMELIST /ini_rokgem_nml/par_ref_T0_2D,par_ref_R0_2D,par_ref_P0_2D
   CHARACTER(len=63)::par_data_T_2D                                                       ! file containing weathering reference land surface temperature (C) data field to calibrate to
   CHARACTER(len=63)::par_data_R_2D                                                       ! file containing weathering reference land surface runoff (mm/yr) data field to calibrate to
@@ -280,8 +291,8 @@ MODULE rokgem_lib
   INTEGER,PARAMETER                              ::n_ko = inl1_ocn                                 ! no. of depth levels in ocean
   REAL,DIMENSION(n_phys_ocnrok,n_io,n_jo)        ::phys_ocnrok                                     ! 'physical' array info for ocean-atmosphere - see above (lats, lons, areas of grid cells)
   INTEGER,DIMENSION(ilon1_ocn,ilat1_ocn)         ::goldstein_k1                                    ! taken from goldstein (put this in somewhere: goldstein_k1(:,:) = go_k1(:,:))  
- 
- ! ocean-atmosphere interface 'physics' properties array indices
+
+  ! ocean-atmosphere interface 'physics' properties array indices
   INTEGER,PARAMETER::ipoa_lat                    = 01                                              ! latitude (degrees) [mid-point]
   INTEGER,PARAMETER::ipoa_lon                    = 02                                              ! longitude (degrees) [mid-point]
   INTEGER,PARAMETER::ipoa_dlat                   = 03                                              ! latitude (degrees) [width]
@@ -324,15 +335,15 @@ MODULE rokgem_lib
   REAL                                           :: weather_fCaSiO3
   REAL                                           :: weather_fCaSiO3b
   REAL                                           :: weather_fCaSiO3g
-          
+
   ! *** landmask and runoff routing arrays ***
   INTEGER                                        :: landmask(n_i,n_j)
   REAL                                           :: runoff_drainage(n_i+2,n_j+2)                   !'+2' comes from fact that *.k1 file is 38x38
   INTEGER                                        :: runoff_detail_i   
   INTEGER                                        :: runoff_detail_j
   REAL, DIMENSION(:,:), ALLOCATABLE              :: runoff_detail                                  ! contains n_i*n_j rows, each with a sucession of (lat, long, fraction) data 
-                                                                                                   ! for each ocean cell corresponding to the land cell in question (each row represents the land
-                                                                                                   ! cell given by lat= floor(rownumber/n_i) lon=mod(rownumber,n_i).
+  ! for each ocean cell corresponding to the land cell in question (each row represents the land
+  ! cell given by lat= floor(rownumber/n_i) lon=mod(rownumber,n_i).
   INTEGER                                        :: runoff_drainto(n_i,n_j,2)                      !'+2' comes from fact that *.k1 file is 38x38
   REAL                                           :: runoff_coast(n_i,n_j)
   REAL                                           :: runoff_calib                                   ! calibration faction for routing schemes 2 and 3
@@ -346,11 +357,23 @@ MODULE rokgem_lib
   REAL                                           :: total_calcium_flux(n_i,n_j)                    ! Ca2+ weathering fluxes
   REAL                                           :: total_calcium_flux_Ca(n_i,n_j)
   REAL                                           :: total_calcium_flux_Si(n_i,n_j)  
+  REAL                                           :: total_osmium_flux_Ca(n_i,n_j) 
+  REAL                                           :: total_187osmium_flux_Ca(n_i,n_j) 
+  REAL                                           :: total_188osmium_flux_Ca(n_i,n_j) 
+  REAL                                           :: total_osmium_flux_Si(n_i,n_j) 
+  REAL                                           :: total_187osmium_flux_Si(n_i,n_j) 
+  REAL                                           :: total_188osmium_flux_Si(n_i,n_j) 
   REAL                                           :: weather_fCaCO3_2D(n_i,n_j)                     ! weathering fluxes after T & P feedbacks
   REAL                                           :: weather_fCaSiO3_2D(n_i,n_j)
+  REAL                                           :: weather_fCaCO3_Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaCO3_187Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaCO3_188Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaSiO3_Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaSiO3_187Os_2D(n_i,n_j)
+  REAL                                           :: weather_fCaSiO3_188Os_2D(n_i,n_j)
   REAL                                           :: orogeny(n_i,n_j)                               ! Orogeny Landmask to divide weathering into kinetic and transport limited regimes. Used if opt_weath_regimes=.true.
   REAL                                           :: regimes_calib(n_i,n_j)                         ! Array for use in calculations involving different weathering regimes.
-  
+
   ! Calibration constants and arrays
   REAL                                           :: calibrate_T_0D
   REAL                                           :: calibrate_R_0D
@@ -371,90 +394,90 @@ MODULE rokgem_lib
   REAL                                           :: conv_GEM_CO2
   REAL                                           :: k_T                                            ! constant factor for temperature-silicate weathering feedback = 1000*E_a/(R*T_0^2)
 
-  contains
-    
-! Subroutine: define_river_array
-!
-! dynamic memory allocation
-!
-! Uses:
-!
-!  - <genie_util.f90>
-!
-! Calls:
-!
-! - <check_iostat>
+contains
 
-subroutine define_river_array()
-      
-      USE genie_util, ONLY : check_iostat
-      
-      implicit none
-      
-      ! locals
-      integer :: alloc_stat
-      
-      ALLOCATE(runoff_detail(runoff_detail_i,runoff_detail_j),stat=alloc_stat)                       
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      
-    end subroutine define_river_array
+  ! Subroutine: define_river_array
+  !
+  ! dynamic memory allocation
+  !
+  ! Uses:
+  !
+  !  - <genie_util.f90>
+  !
+  ! Calls:
+  !
+  ! - <check_iostat>
 
+  subroutine define_river_array()
 
+    USE genie_util, ONLY : check_iostat
 
-    subroutine define_2D_arrays()
-      
-      USE genie_util, ONLY : check_iostat
-      
-      implicit none
-      
-      ! locals
-      integer :: alloc_stat
-      
-      ALLOCATE(weath_consts(par_nliths,4),stat=alloc_stat)                                                ! coeffs in weathering equations
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      ALLOCATE(lithology_names(par_nliths),stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      ALLOCATE(lithology(par_nliths,n_i,n_j),stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      ALLOCATE(calcium_flux(par_nliths,n_i,n_j),stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      
-    end subroutine define_2D_arrays
+    implicit none
+
+    ! locals
+    integer :: alloc_stat
+
+    ALLOCATE(runoff_detail(runoff_detail_i,runoff_detail_j),stat=alloc_stat)                       
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+
+  end subroutine define_river_array
 
 
-! Subroutine: define_river_array
-!
-! dynamic memory cleanup
-!
-! Uses:
-!
-!  - <genie_util.f90>
-!
-! Calls:
-!
-! - <check_iostat>
-    
-    subroutine deallocate_arrays()
-      
-      USE genie_util, ONLY : check_iostat
-      
-      implicit none
-      
-      ! locals
-      integer :: alloc_stat
-            
-      if (ALLOCATED(runoff_detail)) DEALLOCATE(runoff_detail,stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      if (ALLOCATED(weath_consts)) DEALLOCATE(weath_consts,stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      if (ALLOCATED(lithology_names)) DEALLOCATE(lithology_names,stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      if (ALLOCATED(lithology)) DEALLOCATE(lithology,stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      if (ALLOCATED(calcium_flux)) DEALLOCATE(calcium_flux,stat=alloc_stat)
-      call check_iostat(alloc_stat,__LINE__,__FILE__)
-      
-    end subroutine deallocate_arrays
+
+  subroutine define_2D_arrays()
+
+    USE genie_util, ONLY : check_iostat
+
+    implicit none
+
+    ! locals
+    integer :: alloc_stat
+
+    ALLOCATE(weath_consts(par_nliths,7),stat=alloc_stat)                                                ! coeffs in weathering equations
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+    ALLOCATE(lithology_names(par_nliths),stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+    ALLOCATE(lithology(par_nliths,n_i,n_j),stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+    ALLOCATE(calcium_flux(par_nliths,n_i,n_j),stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+
+  end subroutine define_2D_arrays
+
+
+  ! Subroutine: define_river_array
+  !
+  ! dynamic memory cleanup
+  !
+  ! Uses:
+  !
+  !  - <genie_util.f90>
+  !
+  ! Calls:
+  !
+  ! - <check_iostat>
+
+  subroutine deallocate_arrays()
+
+    USE genie_util, ONLY : check_iostat
+
+    implicit none
+
+    ! locals
+    integer :: alloc_stat
+
+    if (ALLOCATED(runoff_detail)) DEALLOCATE(runoff_detail,stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+    if (ALLOCATED(weath_consts)) DEALLOCATE(weath_consts,stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+    if (ALLOCATED(lithology_names)) DEALLOCATE(lithology_names,stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+    if (ALLOCATED(lithology)) DEALLOCATE(lithology,stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+    if (ALLOCATED(calcium_flux)) DEALLOCATE(calcium_flux,stat=alloc_stat)
+    call check_iostat(alloc_stat,__LINE__,__FILE__)
+
+  end subroutine deallocate_arrays
 
 END MODULE rokgem_lib
 

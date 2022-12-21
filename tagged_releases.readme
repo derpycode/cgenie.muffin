@@ -3,7 +3,40 @@
 *** TAGGED RELEASES *******************************************
 ***************************************************************
 
-v0.9.20 --  Adloff et al.           [revised for GMD]      
+LATEST == v0.9.33
+
+***************************************************************
+*** /PUBS/manuscript/ *****************************************
+*** (releases associated with manuscripts) ********************
+***************************************************************
+
+***************************************************************
+*** /PUBS/submitted/ ******************************************
+*** (releases associated with submitted papers) ***************
+***************************************************************
+v0.9.32 --  Keane_et_al.ClimateDynamics.2022    DOI: 10.5281/zenodo.6987451 -- Keane at al. submitted to Climate Dynamics
+v0.9.33 --  Wu_et_al.SciAdv.2022                DOI: 10.5281/zenodo.7268917 -- Wu et al. (revised for Sci. Adv.)
+v0.9.34 --  Naidoo-Bagwell_et_al.GMDD.2022                                  -- Naidoo-Bagwell et al. submitted to GMDD      NOTE: branch == _ECOGENIE2
+v0.9.35 --  Pohl_et_al.SciAdv.2022
+***************************************************************
+*** /PUBS/published/ (published papers) ***********************
+*** (releases associated with accepted/published papers) ******
+***************************************************************
+v0.9.31 --  Pohl_et_al.2022                     DOI: 10.5281/zenodo.6823664 --  Pohl et al. [2022] (Nature)
+v0.9.30 --  Cermeno_et_al.2022                  DOI: 10.5281/zenodo.6676435 --  Cermeño et al. [2022] (Nature)
+***************************************************************
+*** /MS/ (old directory structure) ****************************
+***************************************************************
+v0.9.29 --  Pohl et al.             [revised for Nature]    DOI: 10.5281/zenodo.5885685
+v0.9.28 --  Pohl et al.             [submitted to Nature]   DOI: 10.5281/zenodo.5500719
+v0.9.27 --  Cermeño et al.          [submitted to Nature]   DOI: 10.5281/zenodo.5259363
+v0.9.26 --  Crichton et al.         [submitted to SciAdv]   DOI: 10.5281/zenodo.5140571
+v0.9.25 --  Vervoort et al.         [re-revised for PO&PC]  DOI: 10.5281/zenodo.5130666
+v0.9.24 --  Shao et al.             [revised for CP]        DOI: 10.5281/zenodo.4903423
+v0.9.23 --  Adloff et al.           [revised for GMD]       DOI: 10.5281/zenodo.4776445
+v0.9.22 --  Crichton et al.         [revised for CP]        DOI: 10.5281/zenodo.4741336
+v0.9.21 --  van de Velde et al.     [revised for GMD]       DOI: 10.5281/zenodo.4651390
+v0.9.20 --  Pohl et al.             [revised for NatGeo]    DOI: 10.5281/zenodo.4618023
 v0.9.19 --  Stockey et al.          [submitted to PNAS]     DOI: 10.5281/zenodo.4473048
 v0.9.18 --  Boscolo-Galazzo et al.  [2021] (Science)        DOI: 10.5281/zenodo.4469673
 v0.9.17 --  Vervoort et al.         [revised for PO&PC]     DOI: 10.5281/zenodo.4441292
@@ -24,6 +57,5 @@ v0.9.3  --  Hülse et al.            [2019] (PO&PC)          DOI: 10.5281/zenodo
 0.9.2   --  Wilson et al.           [2018] (PO)             DOI: 10.5281/zenodo.1484884
 0.9.1   --  Ward et al. [2018]      (GMD) [revised]         DOI: 10.5281/zenodo.1404210
 0.9.0   --  Ward et al. [2018]      (GMD-D)                 DOI: 10.5281/zenodo.1312518
-
 ***************************************************************
 ***************************************************************
