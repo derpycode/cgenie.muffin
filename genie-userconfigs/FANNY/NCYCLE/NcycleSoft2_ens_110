@@ -128,3 +128,16 @@ gm_par_carbchem_Tmax = 45.0
 # *******************************************************************
 # *** END ***********************************************************
 # *******************************************************************
+Ensemble created: 210713
+bg_par_bio_mu1=144.64
+bg_par_bio_c0_PO4=1.1959E-06
+bg_par_bio_c0_N=19.1344E-06
+bg_par_bio_c0_Fe=5.34029E-09
+bg_par_bio_mu2=2.2422
+bg_par_bio_NPdiaz=125.06
+bg_par_bio_c0_Fe_Diaz=14.3974E-09
+bg_par_bio_remin_c0_O2=36.478E-06
+bg_par_bio_remin_ci_O2=0.43012E-06
+bg_par_bio_remin_c0_NO3=38.539E-06
+bg_par_bio_remin_ci_NO3=38.539E-06
+bg_ctrl_bio_remin_thresh=.false.
