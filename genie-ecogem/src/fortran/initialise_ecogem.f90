@@ -71,8 +71,6 @@ SUBROUTINE initialise_ecogem(    &
 
   ! get specifications of plankton populations from input file
   CALL sub_init_populations()
-  ! get names and locations of time-series sites for output
-  CALL sub_init_timeseries()
 
   if (ctrl_debug_eco_init) then
      write(*,*),' ---------------------------------------------------'
@@ -137,6 +135,8 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(phys_limit(iomax+2,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(zoo_limit(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
   !ckc ISOTOPES
   ALLOCATE(nutiso(iimaxiso,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -155,6 +155,8 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(int_gamma_timeslice(iomax+2,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(int_nutrient_timeslice(iimax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_zoogamma_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(int_export_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -198,6 +200,9 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(autotrophy(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(heterotrophy(npmax),STAT=alloc_error)
+  ALLOCATE(herbivory(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(carnivory(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(palatability(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -208,6 +213,20 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(calcify(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(silicify(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(prey_refuge(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  !ALLOCATE(grazing_protect(npmax),STAT=alloc_error)
+  !call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(pp_opt_a_array(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(pp_sig_a_array(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(ns_array(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(mort_protect(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(growthcost_factor(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Nutrient and nutrient quota parameters
   ALLOCATE(qmin(iomax,npmax),STAT=alloc_error)
@@ -305,14 +324,19 @@ SUBROUTINE initialise_ecogem(    &
      wet_mask_ijk(:,:,k) = MERGE(1,0,goldstein_k1.le.k)
   enddo
 
+  ! get explicit grazing parameters from input file
+  if(ctrl_grazing_explicit)then
+    CALL sub_init_explicit_grazing_params()
+  endif
+
   ! *** initialise plankton biomass array
   call sub_init_plankton()
 
   ! JDW: allocate and load temperature forcing dataset
   if(ctrl_force_T)then
-  	allocate(T_input(n_i,n_j),STAT=alloc_error)
-	T_input(:,:)=0.0
-	call sub_init_load_forceT()
+        allocate(T_input(n_i,n_j),STAT=alloc_error)
+        T_input(:,:)=0.0
+        call sub_init_load_forceT()
   end if
 
   ! ---------------------------------------------------------- ! INITIALIZE netCDF OUTPUT
@@ -340,9 +364,10 @@ SUBROUTINE initialise_ecogem(    &
   call sub_init_netcdf(trim(string_ncout2d),loc_iou,2)
   ncout2d_iou = loc_iou
   ncout2d_ntrec = 0
-  call sub_init_netcdf(trim(string_ncout3d),loc_iou,3)
-  ncout3d_iou = loc_iou
-  ncout3d_ntrec = 0
+  ! NOTE: 3D data is not currently saved, so disable nc file creation
+  !call sub_init_netcdf(trim(string_ncout3d),loc_iou,3)
+  !ncout3d_iou = loc_iou
+  !ncout3d_ntrec = 0
   ! ---------------------------------------------------------- ! LOAD RE-START
   IF (ctrl_continuing) then
      IF (ctrl_debug_init > 0) print*,'LOAD RE-START'

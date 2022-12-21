@@ -7,7 +7,7 @@
 
 ! ******************************************************************************************************************************** !
 ! COUPLE FLUXES: rok->atm
- SUBROUTINE cpl_flux_rokatm(    &
+SUBROUTINE cpl_flux_rokatm(    &
      & dum_dts,                 &
      & dum_n_maxatm,            &
      & dum_nr_maxi,dum_nr_maxj, &
@@ -47,23 +47,23 @@
   !       (iii) within each grid, grid points all have equal area
   !       (iv) the grid masks correspond between biogem and rokgem grids
   !            (i.e., loc_scalei x loc_scalej valid rokgem grid points correspond to each valid biogem grid point
-!  DO i1=1,dum_n_maxi
-!     DO j1=1,dum_n_maxj
-!        dum_sfxatm1(:,i1,j1) = 0.0
-!        do di=1,loc_scalei
-!           i = loc_scalei*(i1 - 1) + di
-!           do dj=1,loc_scalej
-!              j = loc_scalei*(j1 - 1) + dj
-!              dum_sfxatm1(:,i1,j1) = dum_sfxatm1(:,i1,j1) + loc_scale*dum_sfxatm(:,i,j)
-!           end do
-!        end do
-!     end DO
-!  end DO
+  !  DO i1=1,dum_n_maxi
+  !     DO j1=1,dum_n_maxj
+  !        dum_sfxatm1(:,i1,j1) = 0.0
+  !        do di=1,loc_scalei
+  !           i = loc_scalei*(i1 - 1) + di
+  !           do dj=1,loc_scalej
+  !              j = loc_scalei*(j1 - 1) + dj
+  !              dum_sfxatm1(:,i1,j1) = dum_sfxatm1(:,i1,j1) + loc_scale*dum_sfxatm(:,i,j)
+  !           end do
+  !        end do
+  !     end DO
+  !  end DO
 !!! *** KLUDGE (works for matching grids) ***
-   dum_sfxsumatm(:,:,:) = dum_sfxsumatm(:,:,:) + dum_dts*dum_sfxatm1(:,:,:)
-   if (.NOT. dum_gem) then
-      dum_sfxatm1(:,:,:) = 0.0
-   end if
+  dum_sfxsumatm(:,:,:) = dum_sfxsumatm(:,:,:) + dum_dts*dum_sfxatm1(:,:,:)
+  if (.NOT. dum_gem) then
+     dum_sfxatm1(:,:,:) = 0.0
+  end if
 !!! *****************************************
 end SUBROUTINE cpl_flux_rokatm
 ! ******************************************************************************************************************************** !

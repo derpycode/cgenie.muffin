@@ -172,6 +172,13 @@ MODULE ecogem_lib
   namelist /ini_ecogem_nml/ctrl_force_T
   character(LEN=127)::par_ecogem_force_T_file
   namelist /ini_ecogem_nml/par_ecogem_force_T_file
+  ! explicit grazing parameters
+  logical::ctrl_grazing_explicit
+  namelist /ini_ecogem_nml/ctrl_grazing_explicit
+  logical::gkernel_cap
+  namelist /ini_ecogem_nml/gkernel_cap
+  character(len=127)::par_ecogem_grazing_file
+  namelist /ini_ecogem_nml/par_ecogem_grazing_file
   ! ------------------- ISOTOPIC FRACTIONATION ----------------------------------------------------------------------------------- !
   CHARACTER(len=63)::opt_d13C_DIC_Corg                           ! Corg 13C fractionation scheme ID string
   NAMELIST /ini_ecogem_nml/opt_d13C_DIC_Corg
@@ -286,6 +293,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carbalk   ! carbonate chemistry alkalinity
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carbisor  ! carbonate (carbon) isotopic properties array
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::phys_limit    ! growth limitation factors
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::zoo_limit     ! zoo food limitation factors
   ! Size-dependent parameters (npmax)
   character(len=16),ALLOCATABLE,DIMENSION(:)    ::pft                                      ! Plankton functional type
   character(len=3) ,ALLOCATABLE,DIMENSION(:)    ::quotastrng                               ! Plankton biomass quota labels
@@ -295,6 +303,11 @@ MODULE ecogem_lib
   INTEGER          ,ALLOCATABLE,DIMENSION(:)    ::nut2quota                                ! match nutrients to quotas
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::volume,diameter ,logvol,logesd           ! Size parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::autotrophy,heterotrophy                  ! Trophic strategy
+  LOGICAL          ,ALLOCATABLE,DIMENSION(:)    ::herbivory,carnivory                      ! Feeding behavior - Added by Grigoratou, Nov18
+  real             ,ALLOCATABLE,DIMENSION(:)    ::pp_opt_a_array,pp_sig_a_array,ns_array   ! grazing parameters as arrays
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::prey_refuge                              ! PFT dependent traits - Added by Grigoratou, Dec18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::mort_protect                             ! PFT dependent traits - Added by Grigoratou, Dec18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::growthcost_factor                        ! PFT dependent traits - Added by Grigoratou, Dec18
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::palatability                             ! Lower value for defence strategy
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::NO3up,Nfix,calcify,silicify              ! PFT dependent traits
   REAL             ,ALLOCATABLE,DIMENSION(:,:)  ::qmin,qmax,vmax,affinity,kexc             ! Nutrient quota parameters
@@ -360,6 +373,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_uptake_timeslice   !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_gamma_timeslice    !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_nutrient_timeslice !
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_zoogamma_timeslice !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_export_timeslice   ! Surface export flux for each plankton (iomax,npmax,i,j,k)  Fanny/Maria - Aug19
 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
