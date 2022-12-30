@@ -539,11 +539,11 @@ CONTAINS
        errmsg=errmsg(1:nstr)//'PO4, '
        nstr=nstr+5
     endif
-    !  if (useFe  .and. .not. ocn_select(io_???) ) then
-    !    errflag=.true.
-    !    errmsg=errmsg(1:nstr)//'PO4, '
-    !    nstr=nstr+5
-    !  endif
+    if (useFe  .and. .not. ocn_select(io_TDFe) ) then
+      errflag=.true.
+      errmsg=errmsg(1:nstr)//'TDFe), '
+      nstr=nstr+6
+    endif
     if (useSiO2 .and. .not. ocn_select(io_SiO2)) then
        errflag=.true.
        errmsg=errmsg(1:nstr)//'SiO2  '

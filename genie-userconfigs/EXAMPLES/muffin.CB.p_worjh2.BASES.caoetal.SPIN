@@ -48,7 +48,7 @@ bg_par_bio_remin_CaCO3_eL2=1000000.0
 # *** DATA SAVING ***************************************************
 #
 # Preformed diagnostics option == BASIC + biology + tracer + proxy
-bg_par_data_save_level=11
+bg_par_data_save_level=7
 # force time-slice save at run end only
 bg_par_infile_slice_name='save_timeslice_NONE.dat'
 #
