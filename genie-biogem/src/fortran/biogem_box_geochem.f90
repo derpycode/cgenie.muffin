@@ -1466,7 +1466,8 @@ CONTAINS
        ! calculate precipitation
        ! NOTE: remove an assumption of non-zero loc_PO4 
        if (loc_Fe2 > const_rns .AND. loc_PO4 > const_rns) then
-          ! calculate Ion Activity Product (IAP) (not used when using Dijkstra et al. (2018) scheme: TODO parameterization choice facilitation?) 
+          ! calculate Ion Activity Product (IAP)
+          ! (not used when using Dijkstra et al. (2018) scheme: TODO parameterization choice facilitation?) 
           ! NOTE: gamma parameters are activity coefficients
           loc_IAP = (par_bio_remin_gammaPO4*loc_HPO4)**2.0*(par_bio_remin_gammaFe2*loc_Fe2)**3.0/(par_bio_remin_gammaFe2*loc_H)**2.0
           ! calculate vivianite precipitation based on IAP. Vivianite precipitates at very high supersaturation (very unlikely to 
@@ -2380,9 +2381,11 @@ CONTAINS
           ! calculate IO3 reduction
           SELECT CASE (opt_bio_remin_reduce_IO3toI)
           case ('inhibition')
-             ! NOTE: (1.0 - par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2)) -> provides inhibition at high [O2] 
+             ! NOTE: this is meant to be a parallel to the Fennel scheme for I- oxidation
+             !       but with an [O2] inhibition of reduction rather than MM [O2] limitation of oxidation
+             ! NOTE: par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2) -> provides inhibition at high [O2] 
              loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
-                  & (1.0 - par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2))
+                  & (par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2))
           case ('threshold')
              if (loc_O2 < par_bio_remin_cO2_IO3toI) then
                 loc_IO3_reduction = loc_IO3
