@@ -1625,10 +1625,16 @@ CONTAINS
     !       This fix ensures that IO3- is taken up, but 3/2 O2 is then released to balance the O2 cycle
     !       becasue I- is going to be released when POI is remineralized.
     !       ... not ideal to have to have 'exceptions' like this :(
+    ! NOTE: ensure that [IO3] is not below zero before setting uptake
     if (ocn_select(io_IO3)) then
-       loc_bio_uptake(io_IO3,loc_k_mld:n_k) = loc_bio_uptake(io_IO3,loc_k_mld:n_k) + loc_bio_uptake(io_I,loc_k_mld:n_k)
-       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
-       loc_bio_uptake(io_I,loc_k_mld:n_k)   = 0.0
+       if (ocn(io_IO3,dum_i,dum_j,n_k) > const_rns) then
+!!$          if (loc_bio_uptake(io_I,n_k) > ocn(io_IO3,dum_i,dum_j,n_k)) loc_bio_uptake(io_I,n_k) = ocn(io_IO3,dum_i,dum_j,n_k)
+          loc_bio_uptake(io_IO3,n_k) = loc_bio_uptake(io_IO3,n_k) + loc_bio_uptake(io_I,n_k)
+          loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - 1.5*loc_bio_uptake(io_I,n_k)
+          loc_bio_uptake(io_I,n_k)   = 0.0
+       else
+          loc_bio_uptake(io_I,n_k)   = 0.0
+       end if
     end if
     ! Fe cycle
     ! NOTE: when Fe3+ and Fe2+ are selected, we are taking them up in proportion to minimize numerical issues
