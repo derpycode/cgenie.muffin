@@ -35,7 +35,7 @@ subroutine ecogem(          &
   ! ------------------------------------------------------------ !
   ! DEFINE LOCAL VARIABLES
   ! ------------------------------------------------------------ !
-  INTEGER                                  ::i,j,k,l,ii,io,jp,ko,kbase,is,nsub,tstep ! counting indices
+  INTEGER                                  ::i,j,k,ii,io,jp,kbase,nsub,tstep ! counting indices
   INTEGER                                  ::jpred,jprey,i_tser ! counting indices
 
   REAL,DIMENSION(n_ocn,n_i,n_j,n_k)        ::loc_ocn
@@ -62,6 +62,8 @@ subroutine ecogem(          &
   REAL                                     ::gamma_T,totPP
   REAL                                     ::mld,totchl,k_tot
   INTEGER                                  ::imld
+  REAL,DIMENSION(npmax)                    ::Totzoolimit
+  REAL,DIMENSION(npmax,npmax)                    ::zoolimit
 
   REAL,DIMENSION(iomax+iChl,npmax)         ::loc_biomass
   REAL,DIMENSION(iimax)                    ::loc_nuts
@@ -70,9 +72,6 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax+iChl,npmax)              ::ratiobGraz, biobGraz !ckc for isotopes (jdw: added iChl)
   REAL,DIMENSION(iomax+iChl,komax)              ::ratioGraz, orgbGraz  !ckc for isotope grazing calculations  (jdw: added iChl)
   REAL,DIMENSION(n_i,n_j,n_k)              ::POC_Rfrac, CaCO3_Rfrac  !ckc local Corg d13C dependent on local water iso
-  REAL                                     ::Corg_frac
-  REAL                                     ::PDBstnd !ckc VPDB d13C standard
-  REAL,DIMENSION(n_i,n_j,n_k)              ::frac_ratio !for iCarb multiplier
   REAL                                     ::loc_delta_CaCO3, loc_alpha, loc_R !CaCO3 13C calculation
 
   REAL,DIMENSION(iomax+iChl,npmax)         ::dbiomassdt
@@ -91,8 +90,10 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax+iChl,npmax)         ::GrazPredEat,GrazPreyEaten
   REAL,DIMENSION(npmax)                    ::BioCiso
 
-  real		   		     ::loc_total_weights ! JDW total weights
+
+  real                                     ::loc_total_weights ! JDW total weights
   real                                     ::loc_weighted_mean_size ! JDW weighted geometric mean size
+
 
   REAL                                     ::loc_dts,loc_dtyr,loc_t,loc_yr ! local time and time step etc.
   REAL                                     ::loc_rdts,loc_rdtyr            ! time reciprocals
@@ -111,7 +112,7 @@ subroutine ecogem(          &
 
   ! JDW Overwrite surface temperature with input
   if(ctrl_force_T)then
-	loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface layer?
+      loc_ocn(io_T,:,:,n_k)  = T_input ! JDW: currently running with only 1 surface layer?
   end if
 
   ! zero output arrays
@@ -135,6 +136,8 @@ subroutine ecogem(          &
   orgmatiso_flux(:,:,:,:,:) = 0.0 !ckc isotopes
   !
   phys_limit(:,:,:,:,:) = 0.0
+  zoo_limit(:,:,:,:) = 0.0
+  zoolimit(:,:)      = 0.0
   ! initialise subroutine returns to null values
   ! quota_status outputs
   quota(:,:)              = 0.0
@@ -277,15 +280,15 @@ subroutine ecogem(          &
                  !print*,templocal,temp_max,MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
                  templocal = MERGE(templocal,(temp_max+273.15),templocal.lt.(temp_max+273.15))
 
-		IF(ctrl_limit_neg_biomass)THEN
+                 IF(ctrl_limit_neg_biomass)THEN
                         !IF(ANY(plankton(:,:,i,j,k).lt.0.0)) print*,'\/',i,j
-                 	loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
-                 	loc_biomass(:,:) = merge(plankton(:,:,i,j,k),1.0e-4,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
-                 	BioC(:) = loc_biomass(iCarb,:)
+                        loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
+                        loc_biomass(:,:) = merge(plankton(:,:,i,j,k),1.0e-4,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
+                        BioC(:) = loc_biomass(iCarb,:)
                  else
-                 	loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
-                 	loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
-                 	BioC(:) = loc_biomass(iCarb,:)
+                        loc_nuts(:)      = merge(  nutrient(:,i,j,k),0.0,  nutrient(:,i,j,k).gt.0.0) ! -ve nutrients to zero
+                        loc_biomass(:,:) = merge(plankton(:,:,i,j,k),0.0,plankton(:,:,i,j,k).gt.0.0) ! -ve biomass to small
+                        BioC(:) = loc_biomass(iCarb,:)
                  endif
 
                  if (c13trace) then
@@ -345,7 +348,7 @@ subroutine ecogem(          &
 
                  call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_T,up_inorg(iDIC,:),chlsynth,totPP)
 
-                 call grazing(loc_biomass,gamma_T,GrazMat(:,:,:))
+                 call grazing(loc_biomass,gamma_T,zoolimit(:,:),GrazMat(:,:,:))
 
                  !ckc isotopes uptake, from nutrient uptake, nutrient concentration and fractionation
                  if (c13trace) then
@@ -360,7 +363,7 @@ subroutine ecogem(          &
                  mortality(:)   = mort(:)   * (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce mortality at very low biomass
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                  ! Stoopid calcification related moratlity
-                 mortality(:)   = mortality(:) + mortality(:) * calcify(:) / omega(i,j,k) ! Coccolithophores and Forams only
+                 !mortality(:)   = mortality(:) + mortality(:) * calcify(:) / omega(i,j,k) ! Coccolithophores and Forams only
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                  ! mortality(:) = mortality(:)  * gamma_T ! temp adjusted?
 
@@ -368,6 +371,7 @@ subroutine ecogem(          &
                  respiration(:) = respir(:) !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
 
                  ! calculate assimilation efficiency based on quota status
+                 Totzoolimit(:) = 0.0  !total food limitation - Maria May 2019 !!! Need to check if consistent!!!
                  do io=1,iomax+iChl
                     ! Integrate grazing interactions
                     GrazPredEat(io,:)   = 0.0 ! Total prey biomass killed (pre-assimilation), summed by predator and by prey
@@ -376,6 +380,9 @@ subroutine ecogem(          &
                        do jprey=1,npmax
                           GrazPredEat(io,jpred) = GrazPredEat(io,jpred)   + BioC(jpred) * GrazMat(io,jpred,jprey)
                           GrazPreyEaten(io,jprey) = GrazPreyEaten(io,jprey) + BioC(jpred) * GrazMat(io,jpred,jprey)
+                          if (io.eq.iCarb) then  !calculate total food limitation - Maria May 2019 !!! Need to check if consistent!!!
+                             Totzoolimit(jpred) = zoolimit(jpred,jprey)
+                          endif
                        enddo
                     enddo
 
@@ -512,6 +519,7 @@ subroutine ecogem(          &
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  ! ORGANIC MATTER
                  dorgmatdt(:,:) = 0.0 ! initialise
+
                  dorgmatisodt(:,:) = 0.0
                  dorgmatdt_plankton(:,:) = 0.0           ! Fanny/Maria Aug19
 
@@ -568,23 +576,23 @@ subroutine ecogem(          &
 		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
                  if (sed_select(is_POC_size)) then
 
-                 	loc_weighted_mean_size=0.0
-                 	loc_total_weights=0.0
+                        loc_weighted_mean_size=0.0
+                        loc_total_weights=0.0
 
-                 	do jp=1,npmax
-				if(autotrophy(jp).gt.0.0)then
+                        do jp=1,npmax
+                                if(autotrophy(jp).gt.0.0)then
 
 				! Biomass weighted
-				loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(jp) ! sum of weights * size
-				loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
+                                loc_weighted_mean_size=loc_weighted_mean_size+loc_biomass(iCarb,jp)*logesd(jp) ! sum of weights * size
+                                loc_total_weights=loc_total_weights+loc_biomass(iCarb,jp) ! sum of weights
 
 				! POC weighted
                  		!loc_weighted_mean_size=loc_weighted_mean_size+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp)))*logesd(jp) ! sum of weights * size
                  		!loc_total_weights=loc_total_weights+((loc_biomass(iCarb,jp) * mortality(jp) * beta_mort_1(jp))+(GrazPredEat(iCarb,jp) * unassimilated(iCarb,jp) * beta_graz_1(jp))) ! sum of weights
-				endif
-			enddo
+                                endIF
+                        enddo
 
-                 	dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
+                        dum_egbg_sfcpart(is_POC_size,i,j,k)=10**(loc_weighted_mean_size / loc_total_weights) ! to biogem
                  endif
                  ! ***************************************************
 
@@ -631,6 +639,7 @@ subroutine ecogem(          &
                  phys_limit(iomax+1,:,i,j,k) = 0.0
                  phys_limit(iomax+1,1,i,j,k) = gamma_T
                  phys_limit(iomax+2,:,i,j,k) = 0.0
+                 zoo_limit(:,i,j,k) = Totzoolimit(:)
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  !ckc ISOTOPES POC as Biogem
                  if (.NOT.c13trace) then
@@ -834,12 +843,10 @@ SUBROUTINE diag_ecogem_timeslice( &
   real   ,intent(out),dimension(n_ocn ,n_i,n_j,n_k)::dum_egbg_sfcdiss    ! ecology -> ocean flux; ocn grid
 
   ! local variables
-  integer :: i,j,k,l,io,ia,is
-  integer :: loc_k1                                                !
+  integer :: k
   real    :: loc_t,loc_dts,loc_dtyr                                   !
   real    :: loc_yr_save                                              !
   logical :: write_timeslice
-  integer :: dum_ntrec
 
   ! to convert per day rates into per second
   real,parameter :: pday = 86400.0
@@ -866,6 +873,7 @@ SUBROUTINE diag_ecogem_timeslice( &
      int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr *   uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
      int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) + loc_dtyr *    phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
      int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr *        nutrient(:,:,:,:)        ! mmol m^-3
+     int_zoogamma_timeslice(:,:,:,:) =   int_zoogamma_timeslice(:,:,:,:) + loc_dtyr * zoo_limit(:,:,:,:)              ! mmol m^-3
      int_export_timeslice(:,:,:,:,:) =   int_export_timeslice(:,:,:,:,:) + loc_dtyr * export_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
   end if
 
@@ -930,7 +938,6 @@ SUBROUTINE ecogem_save_rst(dum_genie_clock)
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
-  integer::l
   integer::loc_iou
   real::loc_yr                                                 !
   CHARACTER(len=255)::loc_filename

@@ -7,8 +7,7 @@ SUBROUTINE end_ecogem()
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
-  integer::loc_iou 
-  integer        :: ii,io,jp
+  integer:: ii,io,jp
   ! ---------------------------------------------------------- !
   ! START
   ! ---------------------------------------------------------- !
@@ -28,11 +27,12 @@ SUBROUTINE end_ecogem()
   ! ---------------------------------------------------------- !
   ! SAVE DATA: 3-D netCDF
   ! ---------------------------------------------------------- !
-  if (ctrl_debug_end > 0) print*,'WRITE 3D netCDF OUTPUT'
-  call sub_update_netcdf(const_real_zero,3)
-  call sub_save_netcdf_3d()
-  call sub_closefile(ncout3d_iou)
-  ncout3d_ntrec = ncout3d_ntrec + 1
+  ! NOTE: 3D data is not currently saved, so disable nc file creation
+  !if (ctrl_debug_end > 0) print*,'WRITE 3D netCDF OUTPUT'
+  !call sub_update_netcdf(const_real_zero,3)
+  !call sub_save_netcdf_3d()
+  !call sub_closefile(ncout3d_iou)
+  !ncout3d_ntrec = ncout3d_ntrec + 1
 101 continue
 
 
