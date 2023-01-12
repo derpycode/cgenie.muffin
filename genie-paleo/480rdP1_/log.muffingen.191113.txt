@@ -1,0 +1,219 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.8
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GCM == foam (OK)
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+       - Axis info read.
+>   4. READING MASK & TOPO GRIDS ...
+       - Mask & topo info read.
+>   5. RE-GRIDING MASK ...
+       - Mask re-gridded.
+       * Original land area fraction    = 0.16489
+       * Re-gridded land area fraction  = 0.15895
+>   6. FILTERING MASK ...
+       - Single cell embayments filtered out.
+       - Polar connections cleaned up.
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.16049
+>   7. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (19, 1) now land
+         -> Cell at (20, 1) now land
+         -> Cell at (21, 1) now land
+         -> Cell at (16, 1) now land
+         -> Cell at (32, 19) now land
+         -> Cell at (32, 18) now land
+         -> Cell at (32, 17) now land
+       - Out of grid range
+       * Mask alteration complete
+       * Revised land area fraction = 0.1659
+       - User-editing complete.
+>   8. CREATE FINAL MASK ...
+       - .mask_out.FINAL.dat saved
+       * Final land area fraction   = 0.1659
+>   9. RE-GRIDING TOPOGRAPHY ...
+       - Topography re-gridded.
+>   10. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  11. FILTERING BATHYMETRY ...
+         -> MAKE SHALLOWER :: Loop count = 1 @ (6,27,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (6,31,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (7,32,9); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (10,33,9); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (11,34,4); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (11,36,6); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (12,35,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (12,36,3); s = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (13,35,12); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (14,27,15); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (14,36,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (15,35,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,34,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (18,35,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (19,16,7); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (19,27,8); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (19,34,15); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (19,35,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (20,15,7); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,35,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (21,32,5); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (22,16,10); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (22,36,4); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (28,32,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (31,31,13); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (6,26,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (6,31,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (10,33,8); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (12,36,4); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (13,35,11); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (13,36,4); s = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (14,27,14); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (18,35,4); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (19,16,6); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (19,34,14); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (19,35,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,35,4); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (22,16,9); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (28,32,9); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (31,31,12); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (6,31,9); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (10,33,7); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (13,35,10); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (14,27,13); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (19,16,5); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (19,34,13); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (22,16,8); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (28,32,8); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (31,31,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (6,31,8); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (10,33,6); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (13,35,9); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 4 @ (14,27,12); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (19,34,12); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 4 @ (22,16,7); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 4 @ (28,32,7); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (31,31,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (10,33,5); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (13,35,8); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 5 @ (14,27,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (22,16,6); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 5 @ (28,32,6); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (31,31,9); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 6 @ (10,33,4); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 6 @ (13,35,7); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 6 @ (28,32,5); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 7 @ (28,32,4); d = 2; l = 2
+       - Topography filtered.
+>  12. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button, or clickoutside the grid, to finish
+       - Out of grid range
+       * Mask alteration complete
+       - User-editing complete.
+>  13. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  14. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+       * found 5 land masses
+       * found 6 land masses
+       * found 7 land masses
+>  15. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * updated find: 3 islands
+       * updated find: 4 islands
+       * updated find: 5 islands
+       * updated find: N pole island (currently uncounted)
+       * updated find: 6 islands
+       * total # true islands = 6
+       * Borders alteration procedure :
+         (1) left button to increase border #
+         (2) right button to decrease border # (0 == no border)
+         (3) middle button, or clickoutside the grid, to finish
+         [exit (middle button) if unsure WTF]
+       - Out of grid range
+       * Mask alteration complete
+>  16. GENERATING .paths FILE ...
+       * Creating raw path #1 ...
+       ! Initial E direction path follow step failed ...
+         ... trying the S direction ...
+       * Creating raw path #2 ...
+       * Creating raw path #3 ...
+       * Creating raw path #4 ...
+       * Creating raw path #5 ...
+       * Creating raw path #6 ...
+       * Creating raw path #7 ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (21,10)
+         -> SE corner :: Add additional path entry @ (17,3)
+       * Building path #3 ...
+         -> NE corner :: Skip path entry @ (22,22)
+         -> SE corner :: Add additional path entry @ (18,19)
+       * Building path #4 ...
+         -> NE corner :: Skip path entry @ (33,24)
+         -> SE corner :: Add additional path entry @ (31,16)
+       * Building path #5 ...
+         -> NE corner :: Skip path entry @ (35,31)
+         -> SE corner :: Add additional path entry @ (33,28)
+       * Building path #6 ...
+         -> NE corner :: Skip path entry @ (14,19)
+         -> SE corner :: Add additional path entry @ (14,12)
+         -> NE corner :: Skip path entry @ (15,12)
+         -> SE corner :: Add additional path entry @ (11,9)
+       * Building path #7 ...
+       - .paths file saved
+>  17. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  18. GENERATING SEDIMENT TOPO ...
+       - Converted k1 file data (nothing to re-grid).
+       - .depth.dat saved
+       - template file .sedcoremask.dat saved
+       - template file .reefmask.dat saved
+>  19. SWITCH GRIDS ...
+         (Nothing to re-read.)
+>  19. CREATING WIND PRODUCTS ...
+       - Regridding wind stress (x) to GOLDSTEIN u-grid
+       - Regridding wind stress (y) to GOLDSTEIN u-grid
+       - Regridding wind stress (x) to GOLDSTEIN v-grid
+       - Regridding wind stress (y) to GOLDSTEIN v-grid
+       - Regridding wind velocity (x) to GOLDSTEIN c-grid
+       - Regridding wind velocity (y) to GOLDSTEIN c-grid
+       - Regridding wind speed to GOLDSTEIN c-grid
+       - Written tau u (u point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/480rdP1_/480rdP1_.taux_u.dat
+       - Written tau u (v point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/480rdP1_/480rdP1_.taux_v.dat
+       - Written tau v (u point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/480rdP1_/480rdP1_.tauy_u.dat
+       - Written tau v (v point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/480rdP1_/480rdP1_.tauy_v.dat
+       - Written u wind speed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/480rdP1_/480rdP1_.wvelx.dat
+       - Written v wind speed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/480rdP1_/480rdP1_.wvely.dat
+       - Written BIOGEM windspeed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/480rdP1_/480rdP1_.windspeed_uvma.dat
+       - Re-grided GCM wind products.
+>  20. LOADING ALBEDO DATA ...
+       - Read GCM albedo data.
+>  21. CREATING ALBEDO DATA ...
+       - Re-gridded GCM albedo data.
+       - 2D albedo file saved
+       - Generated zonal mean albedo profile.
+       - .albd.dat file saved
+>  22. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

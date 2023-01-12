@@ -1,0 +1,75 @@
+
+*** FILE GENERATION *******************************************
+
+The sediment model bathymetry is derived from the ETOPO5 dataset, via a re-gridding to an intermediate 1 degree grid.
+This 1 degree data is re-gridded to a 36x36 equal area GENIE grid.
+
+The re-gridded bathymetry is then masked with the worbe2 land-sea mask.
+
+The resulting sediment topography file is called:
+worbe2.190813.depth.dat
+and is displayed in file:
+mask_worbe2_ALL.depth.190813.ps
+
+Associated with this is:
+
+(1) A reef mask.
+This has been created by firstly identifying all points shallower than 1000 m.
+Then, latitudes higher than +- 41.8 N/S (6 most norther and southern bands of latitude) are excluded, 
+on the basis that reefal carbonate deposition is predominantly a tropical and sub-tropical process.
+The file is: worbe2.190813.reefmask.dat
+
+(2) A templerate (currently blank sediment core save location grid file.)
+The file is: worbe2.190813.reefmask.dat
+
+*** REEF CONFIGURATION ****************************************
+
+sg_par_sed_Dmax_neritic=1000.0
+sg_par_sed_reef_mask_name="worbe2.190813.reefmask.36x36"
+
+Between them should result in all locations shallower than 1000.0 m being identifed as shallow rather than deep-sea sediments.
+The reef mask worbe2.190813.reefmask.36x36 then determines which are 'reef', with the remaining locations shallower than 1000.0 m, 'mud'
+(which do not accumulate any carbonate, whether pelagic or neritic).
+
+All locations deeper than 1000.0 m are 'normal' deep-sea sediments.
+
+*** CaCO3 BUDGET **********************************************
+
+The original 36x36x8 sediment model has a global burial rate of about 10 Tmol yr-1.
+
+A generic weathering scheme has:
+
+terrestrial carbonate weathering of ca. 8 CaCO3 Tmol yr-1 (range: 7-12)
+terrestrial silicate weathering of ca. 6 Tmol Ca yr-1
+
+for a total of 14 Tmol Ca yr-1.
+
+Hence the long-term steady-state reefla deposition needs to be 4 Tmol CaCO3 yr-1.
+
+To impose a global rate of CaCO3 deposition (4 Tmol yr-1) set
+
+sg_par_sed_CaCO3burialTOT=4E12
+
+*** CONFIG FILES **********************************************
+
+Also included are:
+
+(a) 190813.worbe2.RidgwellHargreaves1997_S36x36.SPIN1
+-- the origial 2007 paper closed system experiment as reference
+
+(b) 190813.reef_0Tmol.SPIN
+-- the new sediment bathymetry with reefal and mud locations shallower than 1000 
+BUT no reefal CaCO3 deposition
+
+(c) 190813.reef_4Tmol.SPIN
+-- the new sediment bathymetry with reefal and mud locations shallower than 1000 
+WITH no reefal CaCO3 deposition
+
+(a) vs. (b) tests whether global deep-sea CaCO3 is veyr different from originally
+
+(b) vs. (c) tests whether adding reefal deposition locations distorts spatial carbonate chem and hence deep-sea CaCO3 burial
+
+The result is that the new sediment bathymetry grid does a similar job and it does not matter much to deep-sea sediment composition
+whether you include reefal deposition or not.
+(Remembering that these are closed systems and weathering always balances total global burial regardless of whether additional reefal deposition is selected or not.)
+(The base-config used for all was: cgenie.eb_go_gs_ac_bg_sg_rg.worbe2.BASE)
