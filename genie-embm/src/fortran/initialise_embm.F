@@ -127,6 +127,10 @@ c                 files
       character u_wspeed*127, v_wspeed*127
       integer   len_uws, len_vws
 
+c PV (28/07/22): add filename variables for orograpy and icemask files
+c character filenameorog*127, filenamelice*127
+      integer   len_orog, len_lice
+      
 c AY (09/01/04) : local variables reinstated
       character ans, lin*13
 
@@ -143,21 +147,18 @@ c SG > Dummy variables to be passed to/from ENTS via genie.F
       real eb_ca(maxi,maxj)
 c      real eb_co2(maxi,maxj)
       real gn_daysperyear
-c SG <      
-
+      
+c orography 
       real,intent(out)::torog_atm(maxi,maxj)
       real,intent(out)::surf_orog_atm(maxi,maxj)
-
 c land ice sheet mask
-      real,dimension(maxi,maxj),
-     &     intent(out)::landice_slicemask_lic
-
+      real,intent(out)::landice_slicemask_lic(maxi,maxj)
+      
       real::syr
 
 c ENTS functionality
       logical flag_ents
       real deltq
-
       real qsat
 
 c     file access checks
@@ -249,6 +250,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/orogswitch
       NAMELIST /ini_embm_nml/t_orog
       NAMELIST /ini_embm_nml/filenameorog
+      NAMELIST /ini_embm_nml/filenameoroglice_2d
       NAMELIST /ini_embm_nml/norog
       NAMELIST /ini_embm_nml/orogsteps
       NAMELIST /ini_embm_nml/t_lice
@@ -418,6 +420,10 @@ c AY (20/03/17) : read in albedo filenames
      & '1D albedo file ',trim(par_albedo1d_name)
       if (debug_init) print*,
      & '2D albedo file ',trim(par_albedo2d_name)
+     
+c PV (07/28/22): Read in orography filenames
+      len_orog = lnsig1(filenameorog)
+      len_lice = lnsig1(filenamelice)
 
 c     Time-steps information
 c AY (08/12/03) : have total steps passed into initialise_ocean.F
@@ -2031,7 +2037,7 @@ c can be used for ice sheet melwater as well as climatology)
             print*,"ERROR: Both transient orography switches are on"
             stop
           endif
-          open(77,file=trim(filenameorog))
+          open(77,file=indir_name(1:lenin)//filenameorog(1:len_orog))
           do l=1,norog
              do i=1,imax
                 do j=1,jmax
@@ -2094,13 +2100,20 @@ c land (no ice)
             enddo
           enddo
        else
+c PV (15/01/2023) Added conditional to check if orog input file is 1D or 2D
           if (orogswitch.ge.1) then
-             open(77,file=trim(filenameorog))
-             do i=1,imax
-                do j=1,jmax
-                   read(77,*) surf_orog_atm(i,j)
-                enddo
-             enddo
+             open(77,file=indir_name(1:lenin)//filenameorog(1:len_orog))
+	     if (filenameoroglice_2d) then
+	         do j = jmax,1,-1
+		     read(77,*) (surf_orog_atm(i,j),i=1,imax)
+	         enddo
+	     else
+	         do i=1,imax
+		    do j=1,jmax
+		         read(77,*) surf_orog_atm(i,j)
+		    enddo
+	         enddo
+	     endif
              close(77)
           else
              do i=1,imax
@@ -2131,7 +2144,7 @@ cdjl If t_lice is on (i.e. time-varying ice-sheets) then file is big.
           print*,"ERROR: Both transient icemask switches are on"
           stop
         endif
-        open(77,file=trim(filenamelice))
+        open(77,file=indir_name(1:lenin)//filenamelice(1:len_lice))
           do l=1,nlice
             do i=1,imax
               do j=1,jmax
@@ -2160,13 +2173,20 @@ c land
           enddo
         enddo
       else
+c PV (15/01/2023) Added conditional to check if lice input file is 1D or 2D
          if (flag_ents) then
-            open(77,file=trim(filenamelice))
-            do i=1,imax
-               do j=1,jmax
-                  read(77,*) landice_slicemask_lic(i,j)
-               enddo
-            enddo
+            open(77,file=indir_name(1:lenin)//filenamelice(1:len_lice))
+	     if (filenameoroglice_2d) then
+	         do j = jmax,1,-1
+		    read(77,*) (landice_slicemask_lic(i,j),i=1,imax)
+	         enddo
+	     else
+	         do i=1,imax
+		    do j=1,jmax
+                       read(77,*) landice_slicemask_lic(i,j)
+                    enddo
+                 enddo
+	     endif
             close(77)
          else
             do i=1,imax

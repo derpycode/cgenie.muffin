@@ -1668,7 +1668,7 @@ CONTAINS
     integer::loc_k1
     integer::loc_iou,loc_ntrec
     CHARACTER(len=255)::loc_unitsname,loc_longname
-    real,DIMENSION(n_i,n_j)::loc_ij,loc_mask_surf,loc_mask_surf_ALL
+    real,DIMENSION(n_i,n_j)::loc_ij,loc_mask_surf,loc_mask_surf_ALL, loc_mask_lnd
     real::loc_tot,loc_frac,loc_standard
     real::loc_d13C,loc_d14C
     !-----------------------------------------------------------------------
@@ -1678,6 +1678,14 @@ CONTAINS
     loc_ntrec = ncout2d_ntrec
     loc_mask_surf(:,:)     = phys_ocnatm(ipoa_mask_ocn,:,:)
     loc_mask_surf_ALL(:,:) = 1.0
+    loc_mask_lnd(:,:) = ents(iel_mask_lnd,:,:)
+	do i=1,n_i
+		do j=1,n_j
+			if (loc_mask_lnd(i,j).eq.2.0) then
+				loc_mask_lnd(i,j) = 1
+			end if
+		end do
+	end do
     !-----------------------------------------------------------------------
     !              <ocnatm_*>
     !       save ocean-atmosphere interface tracer data field
@@ -1839,7 +1847,7 @@ CONTAINS
              DO j=1,n_j
                 SELECT CASE (iel)
                 CASE (iel_Csoil,iel_Cveg,iel_photo,iel_leaf,iel_respsoil,iel_respveg, &
-                     & iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd)
+                     & iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd,iel_mask_lnd)
                    loc_ij(i,j) = int_ents_timeslice(iel,i,j)/int_t_timeslice
                 CASE (iel_Cveg_13C)
                    loc_tot = int_ents_timeslice(iel_Cveg,i,j)/int_t_timeslice
@@ -1886,12 +1894,12 @@ CONTAINS
           END DO
           SELECT CASE (iel)
           CASE (iel_Csoil,iel_Cveg,iel_photo,iel_leaf,iel_respsoil,iel_respveg, &
-                   & iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd, & 
+                   & iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd,iel_mask_lnd, & 
                    & iel_Cveg_13C,iel_Csoil_13C,iel_Cveg_14C,iel_Csoil_14C)   
              call sub_adddef_netcdf(loc_iou,3,'ents_'//trim(string_ents(iel)), &
                       & 'ents output - '//trim(string_ents(iel)),' ',const_real_zero,const_real_zero)
              call sub_putvar2d('ents_'//trim(string_ents(iel)),loc_iou, &
-                      & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf_ALL) 
+                      & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_lnd) 
           END SELECT
        END DO
     end if

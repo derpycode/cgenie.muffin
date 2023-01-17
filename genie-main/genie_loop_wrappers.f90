@@ -704,7 +704,8 @@ contains
          & el_photo,                                         &
          & el_respveg,                                       &
          & el_respsoil,                                      &
-         & el_leaf                                           &
+         & el_leaf,                                          &
+	 & landice_slicemask_lic			& ! input
          )
     end subroutine biogem_ents_wrapper
 

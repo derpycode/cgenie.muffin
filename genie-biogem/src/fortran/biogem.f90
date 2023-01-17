@@ -2404,7 +2404,8 @@ subroutine biogem_ents( &
      & dum_photo,               &
      & dum_respveg,             &
      & dum_respsoil,            &
-     & dum_leaf                 & 
+     & dum_leaf,                 & 
+     & dum_mask_lnd		&
      & )
   USE biogem_lib
   USE biogem_box
@@ -2423,7 +2424,8 @@ subroutine biogem_ents( &
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_photo                  ! Photosynthesis (kg/m2/yr)                                                                                             
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_respveg                ! Vegetation respiration (kg/m2/yr)                                                                                     
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_respsoil               ! Soil respiration (kg/m2/yr)                                                                                           
-  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_leaf                   ! Leaf litter (kg/m2/yr)             
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_leaf                   ! Leaf litter (kg/m2/yr)  
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_mask_lnd                  ! Sea-land-landice mask       
 ! LOCAL VARIABLES                                                                                                                                                
   INTEGER::i,j
 ! Copy ENTS data
@@ -2448,6 +2450,8 @@ subroutine biogem_ents( &
         ents(iel_respveg,i,j) = dum_respveg(i,j)
         ents(iel_respsoil,i,j) = dum_respsoil(i,j)
         ents(iel_leaf,i,j)  = dum_leaf(i,j)
+	! Sea-land-landice mask   
+	ents(iel_mask_lnd,i,j)  = dum_mask_lnd(i,j)
      end DO
   end DO
 
