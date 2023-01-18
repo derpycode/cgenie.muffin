@@ -30,7 +30,7 @@ The initial, 1st-stage closed system spin-up
 
 The follow-on, 2nd-stage open system and accelerated spin-up
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0251b.BASESCO2 PUBS/published/Wu_et_al.2023  spinup2 400000 spinup1
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg_gl.p0251b.BASESCO2 PUBS/published/Wu_et_al.2023 spinup2 400000 spinup1
 
 ### model experiments -- main ensemble ##########################
 
