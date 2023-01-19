@@ -320,14 +320,14 @@ ifeq ($(F77),gfortran)
 ###  LDFLAGS += -static
 ###  LDFLAGS += -fopenmp
   # NOTE: Apparently ... the compiler detects differences in the kind (byte-length) of actual arguments used in different calls to the same subroutine.
-  #       (but I can't seem to resolve things, if true ...)
-  #       => error (-fallow-argument-mismatch turns this is a warning)
-  #          (cannot then have -pedantic)
-  #       [error occurs in outm_netcdf.F]
-  # first get gfortran major version number -- add flag if version == 10 (will worry later when version 11 comes out ...)
+  #       => error (-fallow-argument-mismatch turns this is a warning) (cannot then have -pedantic) [error occurs in outm_netcdf.F]
+  # first get gfortran major version number
   FVER=$(shell gfortran -dumpversion)
-###  ifeq ($(shell [ $(gfortran -dumpversion) -gt 8 ]),1)
-  ifeq ($(FVER),10)
+###  add flag if version == 10 (will worry later when version 11 comes out ...)
+###  ifeq ($(FVER),10)
+###    FFLAGS += -fallow-argument-mismatch
+###  endif
+  ifeq ($(shell test $(FVER) -gt 9; echo $$?),0)
     FFLAGS += -fallow-argument-mismatch
   endif
   # NOTE: Arrays larger than limit set by ‘-fmax-stack-var-size=’, are moved from stack to static storage. 
