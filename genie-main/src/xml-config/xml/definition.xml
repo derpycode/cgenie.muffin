@@ -6716,6 +6716,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Or ... automatic ocean age single-tracer tracer?</description>
                     </param>
+                    <param name="ctrl_force_ocn_age1_truezero">
+			<value datatype="boolean">.false.</value>
+                        <description>Hard force age tracer to zero at surface?</description>
+                    </param>
 <!-- TRANSPORT MATRIX  -->
 		<param name="ctrl_data_diagnose_TM">
 			<value datatype="boolean">.false.</value>

@@ -2071,6 +2071,7 @@ subroutine biogem_tracercoupling( &
   integer::matrix_tracer,nc_record_count ! matrix
   real::loc_t,loc_yr
   real::loc_dilution
+  real,dimension(n_i,n_j,n_k)::loc_age                         ! 
   ! ---------------------------------------------------------- !
   ! INITIALIZE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
@@ -2334,7 +2335,7 @@ subroutine biogem_tracercoupling( &
      end do
      do n=1,n_vocn
         loc_k1 = vocn(n)%k1
-        vphys_ocn(n)%mk(ipo_M,loc_k1:n_k) = loc_rSratio*vphys_ocn(n)%mk(ipo_M,loc_k1:n_k)
+        vphys_ocn(n)%mk(ipo_M,loc_k1:n_k)  = loc_rSratio*vphys_ocn(n)%mk(ipo_M,loc_k1:n_k)
         vphys_ocn(n)%mk(ipo_rM,loc_k1:n_k) = loc_Sratio*vphys_ocn(n)%mk(ipo_rM,loc_k1:n_k)
      end do
      ! ---------------------------------------------------------- !
@@ -2386,10 +2387,14 @@ subroutine biogem_tracercoupling( &
      end if ! ctrl_data_diagnose_TM
 
      ! ---------------------------------------------------- !
-     ! (4) SET DUMMARY VARIABLE VALUES FOR RETURN
+     ! (4) SET DUMMY VARIABLE VALUES FOR RETURN
      ! ---------------------------------------------------- !
+     ! ---------------------------------------------------- ! kludge for fully resetting the ventillation tracer
+     if (ctrl_force_ocn_age1 .AND. ctrl_force_ocn_age1_truezero) then
+        loc_age(:,:,:) = dum_ts(io2l(io_colr),:,:,:)
+     end if
      ! ---------------------------------------------------- ! GOLDSTEIN arrays
-     dum_ts(:,:,:,:) = fun_lib_conv_vocnTOts(loc_vts(:))
+     dum_ts(:,:,:,:)  = fun_lib_conv_vocnTOts(loc_vts(:))
      dum_ts1(:,:,:,:) = dum_ts(:,:,:,:)
      ! ---------------------------------------------------- ! ECOGEM interface array
      do n=1,n_vocn
@@ -2402,11 +2407,19 @@ subroutine biogem_tracercoupling( &
         end DO
      end do
      ! ### temporary v -> 3D conversion ########################################################################################## !
-     ocn(:,:,:,:) = fun_lib_conv_vocnTOocn(vocn(:))
-     bio_part(:,:,:,:) = fun_lib_conv_vsedTOsed(vbio_part(:))
-     phys_ocn(ipo_M,:,:,:) = loc_rSratio*phys_ocn(ipo_M,:,:,:)
+     ocn(:,:,:,:)           = fun_lib_conv_vocnTOocn(vocn(:))
+     bio_part(:,:,:,:)      = fun_lib_conv_vsedTOsed(vbio_part(:))
+     phys_ocn(ipo_M,:,:,:)  = loc_rSratio*phys_ocn(ipo_M,:,:,:)
      phys_ocn(ipo_rM,:,:,:) = loc_Sratio*phys_ocn(ipo_rM,:,:,:)
      ! ########################################################################################################################### !
+     ! ---------------------------------------------------- ! kludge for fully resetting the ventillation tracer
+     ! NOTE: by resetting dum_ts to ocn, salinity-normalization is removed for age
+     if (ctrl_force_ocn_age1 .AND. ctrl_force_ocn_age1_truezero) then
+        dum_ts(io2l(io_colr),:,:,1:n_k-1) = loc_age(:,:,1:n_k-1)
+        dum_ts(io2l(io_colr),:,:,n_k)     = 0.0
+        dum_ts1(io2l(io_colr),:,:,:)      = dum_ts(io2l(io_colr),:,:,:)
+        ocn(io_colr,:,:,:)                = dum_ts(io2l(io_colr),:,:,:)
+     end if
   end If
   ! ---------------------------------------------------------- !
   ! CLEAN UP

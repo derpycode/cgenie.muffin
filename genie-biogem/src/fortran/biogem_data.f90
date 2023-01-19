@@ -540,6 +540,7 @@ CONTAINS
        print*,'Force explicit inversion?                           : ',ctrl_force_invert_explicit
        print*,'Automatic ocean age tracer?                         : ',ctrl_force_ocn_age
        print*,'Or ... automatic ocean age single-tracer tracer?    : ',ctrl_force_ocn_age1
+       print*,'Hard force age tracer to zero at surface?           : ',ctrl_force_ocn_age1_truezero
        ! --- TRANSPORT MATRIX ---------------------------------------------------------------------------------------------------- !
        print*,'Diagnose transport matrix during run?		: ',ctrl_data_diagnose_TM
        print*,'Year to start diagnosing transport matrix	: ',par_data_TM_start

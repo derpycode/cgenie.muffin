@@ -748,7 +748,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ctrl_force_invert_explicit
   logical::ctrl_force_ocn_age                                   ! automatic ocean age tracer
   logical::ctrl_force_ocn_age1                                  ! Or ... automatic ocean age single-tracer tracer?
-  NAMELIST /ini_biogem_nml/ctrl_force_ocn_age,ctrl_force_ocn_age1
+  logical::ctrl_force_ocn_age1_truezero                         ! Hard force age tracer to zero at surface? 
+  NAMELIST /ini_biogem_nml/ctrl_force_ocn_age,ctrl_force_ocn_age1,ctrl_force_ocn_age1_truezero
   ! ---------------- TRANSPORT MATRIX---------------------------!
   LOGICAL::ctrl_data_diagnose_TM !                              ! diagnose matrix in run?
   NAMELIST /ini_biogem_nml/ctrl_data_diagnose_TM
