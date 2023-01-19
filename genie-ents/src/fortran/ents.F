@@ -122,6 +122,10 @@ c Local variable declaration
       real::asoil !< surface albedo of soil
 
 ccccccccccccccccccccccccc FOR NETCDF
+
+c PV local copy of land ice mask to make ocn grid cell NaN in netCDF
+        real,dimension(maxi,maxj) :: land_slicemask_tmp
+     
         character fname*200, label*200
         real, allocatable :: var_data(:,:,:)
         character*8, dimension(10) :: labels=(/'photo   ','respveg ',
@@ -256,6 +260,7 @@ ccccccccccccccccccccccccccccccccccccccc ncdf-replacement
                 close(8,status='delete')
         end if
 ccccccccccccccccccccccccccccccccccccccccccccccc
+
        do kk=1,10
           allocate(var_data(1,jmax,imax))
           label=labels(kk)
