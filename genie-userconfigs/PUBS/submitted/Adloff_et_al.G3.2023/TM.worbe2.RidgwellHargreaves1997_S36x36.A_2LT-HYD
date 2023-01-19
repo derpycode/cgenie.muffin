@@ -117,9 +117,13 @@ bg_ocn_init_105=1.05
 bg_ocn_init_106=0.3244
 #
 # RIVER FLUX
-rg_par_weather_fracOs=1.9184574446472725E-10
-rg_par_weather_187Os_188Os=1.153
-rg_par_weather_188Os_192Os=0.3244
+rg_par_weather_CaCO3_fracOs=1.9184574446472725E-10
+rg_par_weather_CaCO3_187Os_188Os=1.153
+rg_par_weather_CaCO3_188Os_192Os=0.3244
+
+rg_par_weather_CaSiO3_fracOs=1.9184574446472725E-10
+rg_par_weather_CaSiO3_187Os_188Os=1.153
+rg_par_weather_CaSiO3_188Os_192Os=0.3244
 #
 # HYDROTHERMAL FLUX
 sg_par_sed_hydroip_fOs=830.0
