@@ -3163,16 +3163,16 @@ CONTAINS
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_carbconst = .true.
-       ctrl_data_save_slice_diag_geochem = .true.
+!!$       ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_diag = .true.
-       ctrl_data_save_sig_diag_geochem = .true.
+!!$       ctrl_data_save_sig_diag_geochem = .true.
     case (11)
-       ! BASIC + biology + tracer + proxy + redox diagnostics
+       ! BASIC + biology + tracer + proxy
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.

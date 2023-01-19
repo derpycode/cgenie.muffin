@@ -415,7 +415,7 @@ CONTAINS
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opsi',string_results_ext)
        select case (fname_topo)
-       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
+       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4', 'p_worbe2', 'p_worjh2')
           loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv) / '// &
                & 'Atlantic min overturning (Sv) / Atlantic max overturning (Sv)'
        case default
@@ -1931,7 +1931,7 @@ CONTAINS
        OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
        select case (fname_topo)
-       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
+       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4', 'p_worbe2', 'p_worjh2')
           WRITE(unit=out,fmt='(f12.3,4f9.3)',iostat=ios)          &
                & loc_t,                                           &
                & loc_opsi_scale*int_misc_opsi_min_sig/int_t_sig,  &
@@ -3662,7 +3662,7 @@ CONTAINS
     ! *** echo run-time ***
     IF (opt_select(iopt_select_carbchem)) THEN
        select case (fname_topo)
-       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
+       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4', 'p_worbe2', 'p_worjh2')
           ! print header (if necessary)
           if (par_misc_t_echo_header) then
              print*,' '
@@ -3768,7 +3768,7 @@ CONTAINS
        end select
     else
        select case (fname_topo)
-       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
+       case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4', 'p_worbe2', 'p_worjh2')
           if (par_misc_t_echo_header) then
              print*,' '
              ! ### MAKE MODIFICATIONS TO SCREEN PRINTING INFORMATION HERE ######################################################## !

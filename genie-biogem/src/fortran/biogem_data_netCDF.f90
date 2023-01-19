@@ -3708,7 +3708,7 @@ CONTAINS
     call sub_putvar2d('phys_opsi',loc_iou,n_j+1,n_k+1,loc_ntrec,loc_tmp_jk,loc_mask)
     ! Atlantic & Pacific -- modern topos only
     select case (fname_topo)
-    case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4')
+    case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4', 'p_worbe2', 'p_worjh2')
        ! Atlantic
        loc_tmp_jk(:,:) = loc_scale*int_opsia_timeslice(:,:)/int_t_timeslice
        loc_tmp_jk(:,n_k:0:-1) = loc_tmp_jk(:,0:n_k:1)
