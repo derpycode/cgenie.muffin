@@ -2031,9 +2031,10 @@ end subroutine biogem
 ! NOTE: <loc_vocn> is the array into which the GOLDSTEIn tracer field <ts> is going to be de-salinity normalized and placed
 !       plus a copy of <ts> T,S for completeness
 subroutine biogem_tracercoupling( &
+     & dum_dts,                   &
+     & dum_genie_clock,           &
      & dum_ts,                    &
      & dum_ts1,                   &
-     & dum_genie_clock,           &
      & dum_egbg_sfcpart,          &
      & dum_egbg_sfcremin,         &
      & dum_egbg_sfcocn            &
@@ -2046,12 +2047,13 @@ subroutine biogem_tracercoupling( &
   ! ---------------------------------------------------------- !
   ! DUMMY ARGUMENTS
   ! ---------------------------------------------------------- !
+  REAL,INTENT(IN)::dum_dts                                      ! biogem time-step length (seconds)
+  integer(kind=8),INTENT(IN)::dum_genie_clock                   ! genie clock (ms since start) NOTE: 8-byte integer
   real,intent(inout),dimension(intrac_ocn,n_i,n_j,n_k)::dum_ts  ! NOTE: number of tracers in GOLDSTEIN used in dimension #1
   real,intent(inout),dimension(intrac_ocn,n_i,n_j,n_k)::dum_ts1 ! NOTE: number of tracers in GOLDSTEIN used in dimension #1
   real,intent(in),   dimension(n_sed,n_i,n_j,n_k)     ::dum_egbg_sfcpart  ! ecology-interface: particulate composition change; ocn grid
   real,intent(in),   dimension(n_ocn,n_i,n_j,n_k)     ::dum_egbg_sfcremin ! ecology-interface: ocean tracer composition change; ocn grid
   real,intent(out),  dimension(n_ocn,n_i,n_j,n_k)     ::dum_egbg_sfcocn   ! ecology-interface: ocean tracer composition; ocn grid
-  integer(kind=8),INTENT(IN)::dum_genie_clock                    ! genie clock (ms since start) NOTE: 8-byte integer
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
@@ -2069,7 +2071,7 @@ subroutine biogem_tracercoupling( &
   type(fieldocn),DIMENSION(:),ALLOCATABLE::loc_vts             !
   real,DIMENSION(:),ALLOCATABLE::loc_partialtot                !
   integer::matrix_tracer,nc_record_count ! matrix
-  real::loc_t,loc_yr
+  real::loc_t,loc_yr,loc_dts,loc_dtyr
   real::loc_dilution
   real,dimension(n_i,n_j,n_k)::loc_age                         ! 
   ! ---------------------------------------------------------- !
@@ -2114,7 +2116,9 @@ subroutine biogem_tracercoupling( &
   ! update model time
   ! NOTE: par_misc_t_runtime is counted DOWN in years
   !       => for BIOGEM, the 'end of the world' occurs when time reaches zero
-  loc_t = par_misc_t_runtime - real(dum_genie_clock)/(1000.0*conv_yr_s)
+  loc_t     = par_misc_t_runtime - real(dum_genie_clock)/(1000.0*conv_yr_s)
+  loc_dts   = dum_dts
+  loc_dtyr  = loc_dts/conv_yr_s
   ! calculate actual year (counting years Before Present or otherwise)
   IF (ctrl_misc_t_BP) THEN
      loc_yr = loc_t + par_misc_t_end
@@ -2350,8 +2354,9 @@ subroutine biogem_tracercoupling( &
            if(matrix_vocn_n.eq.0)then ! catch issue when matrix_vocn_n=0 initally
               print*,'>>> Initialising transport matrix at depth level:',matrix_k
            end if
-
-           if(mod(matrix_vocn_n,conv_kocn_ksedgem).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed, n.b. conv_kocn_ksedgem = n_timesteps!!
+           
+           ! once 96 steps have been completed, n.b. conv_kocn_ksedgem = n_timesteps!!
+           if(mod(matrix_vocn_n,conv_kocn_ksedgem).eq.0 .and. matrix_vocn_n.ne.0)then 
               matrix_k=matrix_k-1 ! decrement matrix_k for next time
               if(matrix_k.gt.0) print*,'>>> Initialising transport matrix at depth level:',matrix_k
            end if
@@ -2391,7 +2396,7 @@ subroutine biogem_tracercoupling( &
      ! ---------------------------------------------------- !
      ! ---------------------------------------------------- ! kludge for fully resetting the ventillation tracer
      if (ctrl_force_ocn_age1 .AND. ctrl_force_ocn_age1_truezero) then
-        loc_age(:,:,:) = dum_ts(io2l(io_colr),:,:,:)
+        loc_age(:,:,:) = dum_ts(io2l(io_colr),:,:,:) + loc_dtyr
      end if
      ! ---------------------------------------------------- ! GOLDSTEIN arrays
      dum_ts(:,:,:,:)  = fun_lib_conv_vocnTOts(loc_vts(:))

@@ -641,9 +641,10 @@ contains
   subroutine biogem_tracercoupling_wrapper
     implicit none
     call biogem_tracercoupling(                              &
+         & real(conv_kocn_kbiogem*kocn_loop)*genie_timestep, & ! input
+	 & genie_clock,                                      & ! input 
          & go_ts,                                            & ! input/output
          & go_ts1,                                           & ! input/output
-	 & genie_clock,                                     & ! input (matrix)
          & egbg_sfcpart,                                     & ! input
          & egbg_sfcremin,                                    & ! input
          & egbg_sfcocn                                       & ! output
