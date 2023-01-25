@@ -44,8 +44,13 @@ bg_par_bio_red_POC_CaCO3_pP=0.7440
 #
 # *** REMINERALIZATION **********************************************
 #
+# *** recommended ***************************************************
+# set 'instantaneous' water column remineralziation
+bg_par_bio_remin_sinkingrate_physical=9.9E9
+bg_par_bio_remin_sinkingrate_reaction=125.0
+# *** common settings ***********************************************
 # DOC lifetime (yrs)
-bg_par_bio_remin_DOMlifetime=1.0
+bg_par_bio_remin_DOMlifetime=0.5
 # initial fractional abundance of POC component #2
 bg_par_bio_remin_POC_frac2=0.0557
 # depth of remineralization or particulate organic matter
@@ -66,15 +71,14 @@ bg_par_bio_remin_cthresh_O2=84.939E-06
 # *** IRON CYCLING **************************************************
 #
 # iron tracer scheme
-# NOTE: 'ALT' corrects for missing surface layer scavening of 'OLD' in the original FeMIP configuration
-#       'hybrid' then just swaps out the tracer basis compared to 'ALT'
+# NOTE: the base-config requires TFe and TL tracers
 bg_opt_geochem_Fe='hybrid'
+# exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
+bg_par_det_Fe_sol_exp=0.500
 # aeolian Fe solubility
 bg_par_det_Fe_sol=0.002441
 # modifier of the scavenging rate of dissolved Fe
 bg_par_scav_Fe_sf_POC=0.225
-# exponent for aeolian Fe solubility [use 1.0 for uniform solubility]
-bg_par_det_Fe_sol_exp=0.500
 # no scavenged regeneration
 bg_par_scav_fremin=0.0
 # return POFe
