@@ -8299,6 +8299,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0</value>
 	                  <description>modifier of the partitioning of C into POM vs. DOM</description>
                     </param>
+                    <param name="eco_export_verbose">
+                        <value datatype="boolean">.FALSE.</value>
+                        <description></description>
+                    </param>
+                    <param name="eco_uptake_fluxes">
+                        <value datatype="boolean">.FALSE.</value>
+                        <description></description>
+                    </param>
                     <param name="ctrl_Tdep_POCtoDOC">
                       <value datatype="boolean">.FALSE.</value>
                       <description>Temperature-dependent POC/DOC partitioning?</description>
@@ -8771,8 +8779,16 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
 <!-- Temperature dependence -->
                     <param name="temp_A">
-			<value datatype="real">0.05</value>
-	                  <description>Slope of Arrhenius-like function</description>
+			<value datatype="real">0.0500</value>
+	                  <description>Slope of Arrhenius-like function (Laws et al. 2000)</description>
+                    </param>
+                    <param name="temp_P">
+			<value datatype="real">0.0633</value>
+	                  <description>Thermal sensitivity for photon capture</description>
+                    </param>
+                    <param name="temp_K">
+			<value datatype="real">0.1000</value>
+	                  <description>Thermal sensitivity for kinetic reactions</description>
                     </param>
                     <param name="temp_T0">
 			<value datatype="real">20.0</value>
