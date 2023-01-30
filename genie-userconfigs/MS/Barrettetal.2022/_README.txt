@@ -31,6 +31,9 @@ The commands to run the model configurations as in the Methods are:
 
 ./runmuffin.sh muffin.CBE.p0055c.BASES MS/Barrettetal.2022 Barrettetal.PETM.p0055c.8P7Z3F 200000 Barrettetal.Eocene.p0055c.3x 
 
+(3) PETM seperating temperature impact on circulation from physiology ** [B]
+
+./runmuffin.sh muffin.CBE.p0055c.BASES MS/Barrettetal.2022 Barrettetal.PETM.p0055c.8P7Z3F_PETM1SST 200000 Barrettetal.Eocene.p0055c.3x 
 
 ############## Supplementary Model Experiments ###############
 
