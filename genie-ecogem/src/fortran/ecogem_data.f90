@@ -170,6 +170,7 @@ CONTAINS
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst
        print*,'netCDF restart file name                            : ',trim(par_ncrst_name)
+       print*,'timeseries locations file name                      : ',trim(par_ecogem_timeseries_file)
     end if ! end ctrl_debug_eco_init
 66  format(a56,l2)
 67  format(a56,i2)
@@ -815,7 +816,7 @@ CONTAINS
     loc_lat(1:n_j) = fun_get_grid_lat(n_j)
 
     ! check file format and determine number of lines of data
-    loc_filename = TRIM(par_indir_name)//"/timeseries_sites.eco"!//TRIM(par_ecogem_timeseries_file)
+    loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_timeseries_file)
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
 
     ! open file pipe
