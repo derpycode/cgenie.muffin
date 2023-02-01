@@ -292,6 +292,7 @@ echo el_24="rst.sland" >> $CONFIGPATH/$CONFIGNAME
 # => disable netCDF restart input flag
 # => set restart input number
 # => copy restart files to data directory
+# NOTE: always disable ECOGEM restart
 if [ -n "$5" ]; then
   echo ">> Checking whether restart directory $RESTARTPATH exists ..."
   if test -d $RESTARTPATH
@@ -309,7 +310,7 @@ if [ -n "$5" ]; then
   echo bg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
   echo sg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
   echo rg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
-  echo eg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
+  echo eg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo ea_30=n >> $CONFIGPATH/$CONFIGNAME
   echo go_18=n >> $CONFIGPATH/$CONFIGNAME
   echo gs_13=n >> $CONFIGPATH/$CONFIGNAME

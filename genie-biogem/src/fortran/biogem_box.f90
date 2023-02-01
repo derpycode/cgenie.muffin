@@ -942,7 +942,6 @@ CONTAINS
        else
           loc_dPO4 = 0.0
        end if
-
     CASE ( &
          & '3N2T_PNFe_Tdep', &
          & 'bio_PNFe'        &
