@@ -3,7 +3,7 @@
   \/ \/ \/ \/   \/ \/ \/  \/  \/  \/
 
 -START-OF-DATA-
-  2  f  f  0.1  t  t   3  01  01  01  '[salinity (PSU)]'
+ 10  t  f  0.1  f  T   9  01  01  01  '[dissolved inorganic carbon (DIC) (mol kg-1)]'
 -END-OF-DATA-
 
   /\ /\ /\ /\   /\ /\ /\  /\  /\  /\

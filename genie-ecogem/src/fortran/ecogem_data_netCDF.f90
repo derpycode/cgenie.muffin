@@ -33,9 +33,9 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_lon,loc_id_lat,loc_id_lon_e,loc_id_lat_e
     integer::loc_id_depth,loc_id_depth_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
-    integer,dimension(1:4)::loc_it_3
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
+    integer,dimension(1:3)::loc_it_3
     character(127)::loc_title,loc_timunit
     character(127)::shrtstrng,longstrng,vardesc
     character(7)::loc_string_year
@@ -219,7 +219,7 @@ CONTAINS
     call sub_defvar('lat', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
          & 'latitude of the t grid', 'latitude', 'degrees_north')
     loc_it(1) = loc_id_zt
-    call sub_defvar('zt', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+    call sub_defvar('zt', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
          &'z-level mid depth', 'depth', 'm')
     loc_it(1) = loc_id_lon_e
     call sub_defvar('lon_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
@@ -228,7 +228,7 @@ CONTAINS
     call sub_defvar('lat_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          & 'latitude of t grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_zt_e
-    call sub_defvar('zt_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar('zt_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'depth of t grid edges', ' ', 'm')
     !-----------------------------------------------------------------------
     !       define basic 2d/3d data (x,y)
@@ -251,6 +251,7 @@ CONTAINS
   END SUBROUTINE sub_init_netcdf
   ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   ! INITIALIZE netCDF
   SUBROUTINE sub_init_netcdf_tser(dum_name,dum_iou)
@@ -407,6 +408,7 @@ CONTAINS
   END SUBROUTINE sub_update_netcdf
   ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   SUBROUTINE sub_update_netcdf_tser(k)
     !-----------------------------------------------------------------------

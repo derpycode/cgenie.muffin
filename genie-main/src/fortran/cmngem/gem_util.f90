@@ -92,21 +92,9 @@ CONTAINS
     conv_sed_ocn(io_SiO2,is_opal)                = 1.0
     conv_sed_ocn(io_SiO2_30Si,is_opal_30Si)      = 1.0
     conv_sed_ocn(io_Fe,is_POM_Fe)                = 1.0
-    conv_sed_ocn(io_Fe,is_CaCO3_Fe)              = 1.0
-    conv_sed_ocn(io_Fe,is_opal_Fe)               = 1.0
-    conv_sed_ocn(io_Fe,is_det_Fe)                = 1.0
     conv_sed_ocn(io_Fe_56Fe,is_POM_Fe_56Fe)      = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_CaCO3_Fe_56Fe)    = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_opal_Fe_56Fe)     = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_det_Fe_56Fe)      = 1.0
     conv_sed_ocn(io_TDFe,is_POM_Fe)              = 1.0
-    conv_sed_ocn(io_TDFe,is_CaCO3_Fe)            = 1.0
-    conv_sed_ocn(io_TDFe,is_opal_Fe)             = 1.0
-    conv_sed_ocn(io_TDFe,is_det_Fe)              = 1.0
     conv_sed_ocn(io_TDFe_56Fe,is_POM_Fe_56Fe)    = 1.0
-    conv_sed_ocn(io_TDFe_56Fe,is_CaCO3_Fe_56Fe)  = 1.0
-    conv_sed_ocn(io_TDFe_56Fe,is_opal_Fe_56Fe)   = 1.0
-    conv_sed_ocn(io_TDFe_56Fe,is_det_Fe_56Fe)    = 1.0
     conv_sed_ocn(io_231Pa,is_POM_231Pa)          = 1.0
     conv_sed_ocn(io_231Pa,is_CaCO3_231Pa)        = 1.0
     conv_sed_ocn(io_231Pa,is_opal_231Pa)         = 1.0
@@ -155,6 +143,9 @@ CONTAINS
     conv_sed_ocn(io_Fe2,is_FeCO3)                = 1.0
     conv_sed_ocn(io_DIC_13C,is_FeCO3_13C)        = 1.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeCO3_56Fe)      = 1.0
+    conv_sed_ocn(io_PO4,is_Fe3PO42)              = 2.0
+    conv_sed_ocn(io_Fe2,is_Fe3PO42)              = 3.0
+    conv_sed_ocn(io_Fe2_56Fe,is_Fe3PO42_56Fe)    = 3.0
     conv_sed_ocn(io_Fe2,is_Fe3Si2O4)             = 3.0
     conv_sed_ocn(io_SiO2,is_Fe3Si2O4)            = 2.0
     conv_sed_ocn(io_Fe2_56Fe,is_Fe3Si2O4_56Fe)   = 3.0
@@ -169,12 +160,23 @@ CONTAINS
     conv_sed_ocn(io_SO4_34S,is_FeS2_34S)         = 1.0/4.0
     conv_sed_ocn(io_FeS_56Fe,is_FeS2_56Fe)       = 0.0
     conv_sed_ocn(io_Fe2_56Fe,is_FeS2_56Fe)       = 1.0
-    conv_sed_ocn(io_Fe,is_FeOOH)                 = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_FeOOH_56Fe)       = 1.0
-    conv_sed_ocn(io_O2,is_FeOOH)                 = 0.0
-    conv_sed_ocn(io_Fe,is_POM_FeOOH)             = 1.0
-    conv_sed_ocn(io_Fe_56Fe,is_POM_FeOOH_56Fe)   = 1.0 
-    conv_sed_ocn(io_O2,is_POM_FeOOH)             = 0.0
+    conv_sed_ocn(io_Fe2,is_FeOOH)                = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_FeOOH_56Fe)      = 1.0
+    conv_sed_ocn(io_O2,is_FeOOH)                 = 1.0
+    conv_sed_ocn(io_Fe2,is_POM_FeOOH)            = 1.0
+    conv_sed_ocn(io_Fe2,is_CaCO3_FeOOH)          = 1.0
+    conv_sed_ocn(io_Fe2,is_opal_FeOOH)           = 1.0
+    conv_sed_ocn(io_Fe2,is_det_FeOOH)            = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_POM_FeOOH_56Fe)  = 1.0 
+    conv_sed_ocn(io_Fe2_56Fe,is_CaCO3_FeOOH_56Fe)= 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_opal_FeOOH_56Fe) = 1.0
+    conv_sed_ocn(io_Fe2_56Fe,is_det_FeOOH_56Fe)  = 1.0
+    conv_sed_ocn(io_O2,is_POM_FeOOH)             = 1.0/4.0
+    conv_sed_ocn(io_O2,is_CaCO3_FeOOH)           = 1.0/4.0
+    conv_sed_ocn(io_O2,is_opal_FeOOH)            = 1.0/4.0
+    conv_sed_ocn(io_O2,is_det_FeOOH)             = 1.0/4.0
+    conv_sed_ocn(io_PO4,is_POM_FeOOH_PO4)        = 1.0
+    conv_sed_ocn(io_PO4,is_FeOOH_PO4)            = 1.0
     conv_sed_ocn(io_Os,is_POM_Os)                = 1.0
     conv_sed_ocn(io_Os_187Os,is_POM_Os_187Os)    = 1.0
     conv_sed_ocn(io_Os_188Os,is_POM_Os_188Os)    = 1.0
@@ -291,6 +293,41 @@ CONTAINS
     fun_find_str_i = i
     ! -------------------------------------------------------- !
   END FUNCTION fun_find_str_i
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! FIND INDEX OF STRING (in a vector)
+  FUNCTION fun_find_int_i(dum_int,dum_data)
+    ! common blocks
+    IMPLICIT NONE
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    INTEGER::fun_find_int_i
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    integer,INTENT(in)::dum_int
+    integer,DIMENSION(:),INTENT(in)::dum_data
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::i,loc_imax
+    ! -------------------------------------------------------- !
+    ! FIND i
+    ! -------------------------------------------------------- !
+    loc_imax = size(dum_data)
+    i = 0
+    do i=1,loc_imax
+       if (dum_int == dum_data(i)) exit 
+    end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+    fun_find_int_i = i
+    ! -------------------------------------------------------- !
+  END FUNCTION fun_find_int_i
   ! ****************************************************************************************************************************** !
 
 
@@ -492,6 +529,9 @@ CONTAINS
        ELSEIF (ios > 0) THEN
           PRINT*,'File <'//trim(dum_filename)//'>: Problem with data format'
           STOP
+       elseif (LEN_TRIM(loc_data) < 1) then
+          loc_n = n
+          EXIT          
        else
           n=n+1
        END IF
@@ -546,6 +586,38 @@ CONTAINS
     ! END
     ! -------------------------------------------------------- !
   END subroutine sub_load_data_npt
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! LOAD IN (i,j,depth) LOCATION DATA
+  SUBROUTINE sub_load_data_nptd(dum_filename,dum_n,dum_data,dum_datad)
+    ! common blocks
+    IMPLICIT NONE
+    ! dummy variables
+    CHARACTER(len=*),INTENT(in)::dum_filename
+    integer,intent(in)::dum_n
+    integer,INTENT(inout),DIMENSION(dum_n,2)::dum_data
+    REAL,INTENT(inout),DIMENSION(dum_n)::dum_datad
+    ! local variables
+    INTEGER::n
+    integer::ios
+    ! read data
+    OPEN(unit=in,status='old',file=TRIM(dum_filename),action='read',IOSTAT=ios)
+    If (ios /= 0) then
+       CALL sub_report_error( &
+            & 'gem_util','sub_load_data_ij', &
+            & 'File <'//trim(dum_filename)//'> does not exist', &
+            & 'STOPPING', &
+            & (/const_real_zero/),.true. &
+            & )
+    else
+       DO n=1,dum_n,1
+          READ(unit=in,fmt=*) dum_data(n,1),dum_data(n,2),dum_datad(n)
+       ENDDO
+    end if
+    CLOSE(in)
+  END SUBROUTINE sub_load_data_nptd
   ! ****************************************************************************************************************************** !
 
 
@@ -951,6 +1023,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012ocn = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012ocn = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012ocn', &
@@ -992,6 +1065,7 @@ CONTAINS
     CASE (2)
        fun_calc_isotope_abundanceR012sed = loc_R2*loc_tot
     CASE DEFAULT
+       fun_calc_isotope_abundanceR012sed = 0.0
        ! ERROR
        CALL sub_report_error( &
             & 'gem_util','fun_calc_isotope_abundanceR012sed', &
@@ -1160,6 +1234,80 @@ CONTAINS
     ! cap potential oxidation capacity at zero
     if (fun_potO2cap < const_real_nullsmall) fun_potO2cap = 0.0
   END FUNCTION fun_potO2cap
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! LINEARILY INTERPOLATE IN 2 DIMENSIONAL SPACE
+  FUNCTION fun_interp_2Dvec(a,b,vec_a,vec_b,array)
+    IMPLICIT NONE
+    ! result variable
+    REAL::fun_interp_2Dvec
+    ! dummy arguments
+    REAL,INTENT(in)::a
+    REAL,INTENT(in)::b
+    REAL,INTENT(in),DIMENSION(:)::vec_a
+    REAL,INTENT(in),DIMENSION(:)::vec_b
+    REAL,INTENT(in),DIMENSION(size(vec_a),size(vec_b))::array
+    ! local variables
+    integer::n,n_max
+    REAL::a1,a2
+    REAL::b1,b2
+    INTEGER::i_a1,i_a2
+    INTEGER::i_b1,i_b2
+
+    ! *** calculate grid points enclosing the passes point coordinates ***
+    ! find dimension pair; indices and values -- a
+    n_max = size(vec_a)
+    if (a < vec_a(1)) then
+       i_a1 = 1
+       i_a2 = 2
+    elseif (a >= vec_a(n_max)) then
+       i_a1 = n_max-1
+       i_a2 = n_max
+    else
+       DO n = 2,n_max
+          if (vec_a(n) >= a) then
+             i_a1 = n-1
+             i_a2 = n
+             exit
+          end if
+       end do
+    end if
+    a1 = vec_a(i_a1)
+    a2 = vec_a(i_a2)
+    ! find dimension pair; indices and values -- b
+    n_max = size(vec_b)
+    if (b < vec_b(1)) then
+       i_b1 = 1
+       i_b2 = 2
+    elseif (b >= vec_b(n_max)) then
+       i_b1 = n_max-1
+       i_b2 = n_max
+    else
+       DO n = 2,n_max
+          if (vec_b(n) >= b) then
+             i_b1 = n-1
+             i_b2 = n
+             exit
+          end if
+       end do
+    end if
+    b1 = vec_b(i_b1)
+    b2 = vec_b(i_b2)
+
+    ! *** return function value ***
+    ! interpolate
+    ! NOTE: see 'Applied Numerical Methods with Software' by Nakamura for details of 1-D and 2-D interpolation
+    fun_interp_2Dvec = (1.0 / ((a2-a1)*(b2-b1)) ) * &
+         & (                                        &
+         &   (a-a1)*(b-b1) * array(i_a2,i_b2) +     &
+         &   (a-a1)*(b2-b) * array(i_a2,i_b1) +     &
+         &   (a2-a)*(b-b1) * array(i_a1,i_b2) +     &
+         &   (a2-a)*(b2-b) * array(i_a1,i_b1)       &
+         & )
+
+  END FUNCTION fun_interp_2Dvec
   ! ****************************************************************************************************************************** !
 
 

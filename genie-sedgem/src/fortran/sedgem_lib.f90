@@ -6,7 +6,7 @@
 
 
 MODULE sedgem_lib
-  
+
 
   use genie_control
   USE gem_cmn
@@ -54,6 +54,9 @@ MODULE sedgem_lib
   character(len=63)::par_sed_diagen_opalopt                      ! opal diagenesis scheme
   character(len=63)::par_sed_diagen_Corgopt                      ! Corg diagenesis scheme
   NAMELIST /ini_sedgem_nml/par_sed_diagen_CaCO3opt,par_sed_diagen_opalopt,par_sed_diagen_Corgopt
+  character(len=63)::par_sed_diagen_POM_FeOOH_opt                ! POM_FeOOH diagenesis option
+  LOGICAL::ctrl_sed_diagen_POM_FeOOH_cap                         ! Cap Fe2+ dissolution at POM_FeOOH rain flux?
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_POM_FeOOH_opt,ctrl_sed_diagen_POM_FeOOH_cap
   ! ------------------- DIAGENESIS SCHEME: CONTROL ------------------------------------------------------------------------------- !
   LOGICAL::ctrl_sed_bioturb                                      ! Bioturbate sediment stack?
   logical::ctrl_sed_bioturb_Archer                               ! Use Archer et al. [2002] bioturbation scheme?
@@ -87,15 +90,28 @@ MODULE sedgem_lib
   REAL::par_sed_diagen_fracC2Ppres_anox                          ! Fraction of P relative to C buried -- anoxic
   REAL::par_sed_diagen_fracC2Ppres_eux                           ! Fraction of P relative to C buried -- euxinic
   NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_ox,par_sed_diagen_fracC2Ppres_anox,par_sed_diagen_fracC2Ppres_eux
-  LOGICAL::ctrl_sed_huelse2017_remin_POP                         ! Force return of PO4 to ocean in HUELSE 2017 scheme
-  NAMELIST /ini_sedgem_nml/ctrl_sed_huelse2017_remin_POP  
+  REAL::par_sed_diagen_fracCpres_scale                           ! Fractional POC burial scaling (Dunne scheme)
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_fracCpres_scale
+  LOGICAL::ctrl_sed_diagen_fracC2Ppres_wallmann2010              ! Apply Wallmann [2010] C:P remin parameterization?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_diagen_fracC2Ppres_wallmann2010
+  REAL::par_sed_diagen_fracC2Ppres_off                           ! C:P remin C/P offset
+  REAL::par_sed_diagen_fracC2Ppres_c0_O2                         ! C:P remin [O2] threshold (mol kg-1)
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_off,par_sed_diagen_fracC2Ppres_c0_O2
+  LOGICAL::ctrl_sed_dunne2007_remin_POP                          ! Force return of PO4 to ocean in Dunne 2007 scheme
+  NAMELIST /ini_sedgem_nml/ctrl_sed_dunne2007_remin_POP
+  LOGICAL::ctrl_sed_conv_sed_ocn_old                             ! Retain original (biological production) 'Redfield' remin
+  NAMELIST /ini_sedgem_nml/ctrl_sed_conv_sed_ocn_old
+  REAL::par_sed_diagen_O2thresh                                  ! [O2] threshold for switching redox transformtion arrays
+  REAL::par_sed_diagen_NO3thresh                                 ! [NO3] threshold for switching redox transformtion arrays
+  REAL::par_sed_diagen_SO4thresh                                 ! [SO4] threshold for switching redox transformtion arrays
+  NAMELIST /ini_sedgem_nml/par_sed_diagen_O2thresh,par_sed_diagen_NO3thresh,par_sed_diagen_SO4thresh
   ! ------------------- DIAGENESIS SCHEME: ORGANIC MATTER HUELSE 2017 ------------------------------------------------------------ !
   character(len=63)::par_sed_huelse2017_kscheme                  ! Corg k parametrisation scheme ID string
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_kscheme
   logical::par_sed_huelse2017_redox                              ! Corg degradation rates redox dependent?
   logical::par_sed_huelse2017_P_cycle                            ! Include explicit P-cycle in OMEN-SED?
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_redox,par_sed_huelse2017_P_cycle
-  logical::par_sed_huelse2017_remove_impl_sulALK                 ! Remove implicit Alk associated with buried sulf-OM? / no permanent ALk gain?
+  logical::par_sed_huelse2017_remove_impl_sulALK                 ! Remove implicit Alk associated with buried sulf-OM?
   logical::par_sed_huelse2017_sim_P_loss                         ! Simulate ocean Porg loss with buried sulf-OM?
   logical::par_sed_huelse2017_sim_P_loss_pres_fracC              ! Simulate ocean Porg loss related to Corg burial?
   logical::par_sed_huelse2017_sim_P_regeneration                 ! Simulate increased P-regeneration under anoxia?
@@ -105,6 +121,8 @@ MODULE sedgem_lib
   REAL::par_sed_huelse2017_k2_order                              ! k2 = k1/par_sed_huelse2017_k2_order
   REAL::par_sed_huelse2017_k2_anoxic                             ! refractory degradation rate constant under anoxia, units of 1/yr
   NAMELIST /ini_sedgem_nml/par_sed_huelse2017_k1,par_sed_huelse2017_k2,par_sed_huelse2017_k2_order,par_sed_huelse2017_k2_anoxic 
+  LOGICAL::ctrl_sed_huelse2017_remin_POP                         ! Force return of PO4 to ocean in HUELSE 2017 scheme
+  NAMELIST /ini_sedgem_nml/ctrl_sed_huelse2017_remin_POP
   ! ------------------- DIAGENESIS SCHEME: ARCHER 1991 --------------------------------------------------------------------------- !
   REAL::par_sed_archer1991_dissc                                 ! dissolution rate constant, units of 1/s
   REAL::par_sed_archer1991_disscpct                              ! dissolution rate scaling (%)
@@ -205,16 +223,16 @@ MODULE sedgem_lib
   real::par_sed_hydroip_fDIC                                     ! hydrothermal CO2 outgassing (mol yr-1)    
   real::par_sed_hydroip_fDIC_d13C                                ! d13C                
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fDIC,par_sed_hydroip_fDIC_d13C
-  real::par_sed_Os_depTOT					 ! deposition rate of Os in oxic bottom waters (mol yr-1)
+  real::par_sed_Os_depTOT                                        ! deposition rate of Os in oxic bottom waters (mol yr-1)
   real::par_sed_Os_dep                                           ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
-  real::par_sed_Os_dep_oxic					 ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
-  real::par_sed_Os_dep_suboxic					 ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_oxic                                      ! deposition rate of Os in oxic bottom waters (mol m-2 yr-1)
+  real::par_sed_Os_dep_suboxic                                   ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
   real::par_sed_Os_O2_threshold                                  ! oxygen threshold for oxic/suboxic deposition
-  logical::ctrl_sed_Os_O2                                           ! switch to turn on oxygen dependent deposition
+  logical::ctrl_sed_Os_O2                                        ! switch to turn on oxygen dependent deposition
   NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic,par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
-  real::par_sed_hydroip_fOs					 ! hydrothermal Os flux (mol yr-1)
-  real::par_sed_hydroip_fOs_187Os_188Os				 ! 187Os/188Os ratio of hydrothermal Os flux
-  real::par_sed_hydroip_fOs_188Os_192Os				 ! 188Os/192Os ratio of hydrothermal Os flux
+  real::par_sed_hydroip_fOs                                      ! hydrothermal Os flux (mol yr-1)
+  real::par_sed_hydroip_fOs_187Os_188Os                          ! 187Os/188Os ratio of hydrothermal Os flux
+  real::par_sed_hydroip_fOs_188Os_192Os                          ! 188Os/192Os ratio of hydrothermal Os flux
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fOs,par_sed_hydroip_fOs_187Os_188Os,par_sed_hydroip_fOs_188Os_192Os
   logical::ctrl_sed_Fhydr2D                                      ! Make hydrothermal input 2D?
   NAMELIST /ini_sedgem_nml/ctrl_sed_Fhydr2D
@@ -228,14 +246,18 @@ MODULE sedgem_lib
   real::par_sed_ohmegamin                                        ! forced minimum saturation (calcite ohmega) anywhere
   real::par_sed_ohmegamin_flux                                   ! imposed sed->ocn flux (mol Ca cm-2 per time-step) for saturation
   NAMELIST /ini_sedgem_nml/par_sed_ohmegamin,par_sed_ohmegamin_flux
-  logical::ctrl_sed_Fdet,ctrl_sed_Fcaco3,ctrl_sed_Fopal          ! alt sedimentation fields
+  logical::ctrl_sed_Fdet,ctrl_sed_Fcaco3,ctrl_sed_Fopal          ! apply alt sedimentation fields?
   NAMELIST /ini_sedgem_nml/ctrl_sed_Fdet,ctrl_sed_Fcaco3,ctrl_sed_Fopal
-  logical::ctrl_force_sed_closedsystem_CaCO3                            ! Set dissolution flux = rain flux for CaCO3 ONLY?
+  logical::ctrl_sed_Pcorg,ctrl_sed_Pporg                         ! apply alt preservation (burial) fields?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_Pcorg,ctrl_sed_Pporg
+  logical::ctrl_sed_Prr                                          ! apply alt preservation (burial) rain ratio (C/P) field?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_Prr
+  logical::ctrl_force_sed_closedsystem_CaCO3                     ! Set dissolution flux = rain flux for CaCO3 ONLY?
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_CaCO3
-  logical::ctrl_force_sed_closedsystem_opal                            ! Set dissolution flux = rain flux for opal ONLY?
+  logical::ctrl_force_sed_closedsystem_opal                      ! Set dissolution flux = rain flux for opal ONLY?
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_opal
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
-  CHARACTER(len=255)::par_pindir_name                           ! 
+  CHARACTER(len=255)::par_pindir_name                            ! 
   CHARACTER(len=255)::par_indir_name                             ! 
   CHARACTER(len=255)::par_outdir_name                            ! 
   CHARACTER(len=255)::par_rstdir_name                            ! 
@@ -245,13 +267,20 @@ MODULE sedgem_lib
   CHARACTER(len=127)::par_sed_topo_D_name                        ! Sediment water depth grid name
   CHARACTER(len=127)::par_sed_reef_mask_name                     ! Shallow water sediment (coral reef) mask name
   CHARACTER(len=127)::par_sedcore_save_mask_name                 ! Sediment core save mask name
+  NAMELIST /ini_sedgem_nml/par_sed_topo_D_name,par_sed_reef_mask_name,par_sedcore_save_mask_name
+  CHARACTER(len=127)::par_sedcore_save_list_name                 ! Sediment core save list name
   CHARACTER(len=127)::par_sed_mix_k_name                         ! Biodiffusion profile name
-  NAMELIST /ini_sedgem_nml/par_sed_topo_D_name,par_sed_reef_mask_name,par_sedcore_save_mask_name,par_sed_mix_k_name  
+  NAMELIST /ini_sedgem_nml/par_sedcore_save_list_name,par_sed_mix_k_name  
   CHARACTER(len=127)::par_output_years_file_0d                   ! file containing years for 0D output (to summary file)
   CHARACTER(len=127)::par_output_years_file_2d                   ! file containing years for 2D output (to netcdf/ascii)
   NAMELIST /ini_sedgem_nml/par_output_years_file_0d,par_output_years_file_2d
   CHARACTER(len=127)::par_sed_Fdet_name,par_sed_Fcaco3_name,par_sed_Fopal_name ! alt sedimentation field file names
   NAMELIST /ini_sedgem_nml/par_sed_Fdet_name,par_sed_Fcaco3_name,par_sed_Fopal_name
+  CHARACTER(len=127)::par_sed_Pcorg_name,par_sed_Pporg_name      ! alt preservation (burial) field file names
+  NAMELIST /ini_sedgem_nml/par_sed_Pcorg_name,par_sed_Pporg_name
+  CHARACTER(len=127)::par_sed_Prr_name                           ! alt preservation (burial) rain ratio field file name
+  NAMELIST /ini_sedgem_nml/par_sed_Prr_name
+  ! ------------------- I/O: MISC --------------------------------------------------
   ! ------------------- I/O: MISC ------------------------------------------------------------------------------------------------ !
   logical::ctrl_append_data                                      ! append data to output files on restart
   logical::ctrl_timeseries_output                                ! save timeseries output
@@ -447,6 +476,9 @@ MODULE sedgem_lib
   REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Fsed_det                ! alt detrital burial flux field
   REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Fsed_caco3              ! alt caco3 burial flux field
   REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Fsed_opal               ! alt opal burial flux field
+  REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Psed_corg               ! alt Corg preservation (burial) flux field
+  REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Psed_porg               ! alt Porg preservation (burial) flux field
+  REAL,ALLOCATABLE,DIMENSION(:,:)::sed_Psed_rr                 ! alt preservation (burial) rain ratio (C/P) field
   REAL,ALLOCATABLE,DIMENSION(:,:,:)::sed_diag                  ! sediment diagnostics
   ! allocatable sedcoe arrays
   REAL,ALLOCATABLE,DIMENSION(:,:,:)::sedcore                   ! sedcore sediment layer stack (num sedcores x layers x variables)
@@ -490,7 +522,7 @@ MODULE sedgem_lib
   REAL::par_sed_FeO_fdis                 ! forced dussolution flux of Fe from the sediments
   REAL::par_sed_diagen_fPOCmax           ! max POC rain flux in carbonate dissolution (umol cm-2 yr-1)
   ! opal diagenesis
-  !!!REAL::par_sed_opal_KSi0                ! base opal dissolution rate constant (intercept at zero opal rain rate)
+!!!REAL::par_sed_opal_KSi0                ! base opal dissolution rate constant (intercept at zero opal rain rate)
   REAL::par_sed_opal_Sitoopalmax         ! asymptotic [Si] %refrac/%opal ratio max limite sediments  
   ! ash tracing
   logical::par_sed_ashevent              ! ash event?
@@ -713,58 +745,41 @@ CONTAINS
   END function fun_sed_coretop
   ! ****************************************************************************************************************************** !
 
-    ! ****************************************************************************************************************************** !
-     ! CALCULATE SEDIMENT Corg concentration in mol cm-3 and mol %- FROM POC FLUX (FOR BOTH FRACTIONS) - NEEDED FOR HUELSEETAL2016
-    function fun_sed_calcCorgwt(dum_FPOC, loc_sed_w, dum_por,dum_den)
-        ! -------------------------------------------------------- !
-        ! RESULT VARIABLE
-        ! -------------------------------------------------------- !
-        real::fun_sed_calcCorgwt
-        ! -------------------------------------------------------- !
-        ! -------------------------------------------------------- !
-        ! DUMMY ARGUMENTS
-        ! -------------------------------------------------------- !
-        real,INTENT(in)::dum_FPOC                                  ! POC flux as timestep is yr (cm^3 cm-2 yr-1)
-        real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1] (Middelburg et al., Deep Sea Res. 1, 1997)
-        real,INTENT(in)::dum_por                                   ! sediment porosity (cm3 cm-3)
-        real,INTENT(in)::dum_den                                   ! sediment density (g cm-3)
-        ! -------------------------------------------------------- !
-        ! -------------------------------------------------------- !
-        ! DEFINE LOCAL VARIABLES
-        ! -------------------------------------------------------- !
-        real::fun_sed_calcCorg
 
-        ! mass fraction of Corg is equal to % of total mass per unit volume ...
-        ! but taken at the bottom boundary level, also equal to the % of the burial fraction
-        ! wt% Corg = FCorg/(FCorg + Fdet)*100.0
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE SEDIMENT Corg concentration in mol cm-3 and mol %- FROM POC FLUX (FOR BOTH FRACTIONS) - NEEDED FOR HUELSEETAL2016
+  function fun_sed_calcCorgwt(dum_FPOC, loc_sed_w, dum_por,dum_den)
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    real::fun_sed_calcCorgwt
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    real,INTENT(in)::dum_FPOC                                  ! POC flux as timestep is yr (cm^3 cm-2 yr-1)
+    real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1] (Middelburg et al., Deep Sea Res. 1, 1997)
+    real,INTENT(in)::dum_por                                   ! sediment porosity (cm3 cm-3)
+    real,INTENT(in)::dum_den                                   ! sediment density (g cm-3)
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::fun_sed_calcCorg
+    ! mass fraction of Corg is equal to % of total mass per unit volume ...
+    ! but taken at the bottom boundary level, also equal to the % of the burial fraction
+    ! wt% Corg = FCorg/(FCorg + Fdet)*100.0
+    ! C = (1-por)*Corg/Sed_accumulation units: conv_POC_cm3_mol* cm3 cm-2 / (cm3 cm-2) = mol cm-3
+    ! Note: units of concentration must be changed from (cm2 cm-3) to (mol cm-3)
+    fun_sed_calcCorg = conv_POC_cm3_mol*(1-dum_por)*dum_FPOC/loc_sed_w
+    ! calculate wt%: g/g = mol cm-3 * g/mol * cm3/g
+    fun_sed_calcCorgwt = 100*fun_sed_calcCorg*12/dum_den
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end function fun_sed_calcCorgwt
+  ! ****************************************************************************************************************************** !
 
-        !        print*, ' '
-        !        print*, '----------- IN fun_sed_calcCorgwt --------------'
-        !        print*, ' '
-
-        ! C = (1-por)*Corg/Sed_accumulation units: conv_POC_cm3_mol* cm3 cm-2 / (cm3 cm-2) = mol cm-3
-        ! Note: units of concentration must be changed from (cm2 cm-3) to (mol cm-3)
-        fun_sed_calcCorg = conv_POC_cm3_mol*(1-dum_por)*dum_FPOC/loc_sed_w
-
-        ! calculate wt%: g/g = mol cm-3 * g/mol * cm3/g
-        fun_sed_calcCorgwt = 100*fun_sed_calcCorg*12/dum_den
-
-
-!!!!!!!!! DH 28.50.2016: was before
-!        ! assume all buried sediment is detrital to a first approximation
-!        ! (burial velocity) x (solids as a fraction of total volume) x (density)
-!        ! NOTE: units of (g cm-2 yr-1) -> *1/12 -> (mol cm-2 yr-1) ! DH: 1/12 is wrong for detrital!
-!        loc_sed_Fdet = loc_sed_w*(1.0 - dum_por)*dum_den/12.0
-!        ! calculate Corg wt%
-!        ! NOTE: 100% scale
-!here 100*mass_POC/fun_calc_sed_mass (or sum(densityCaCO3*totalmasCaCO3+densitydetrital*totalmasdetirtal+densityPOC*totalmassPOC))
-!        fun_sed_calcCorgwt = 100.0*dum_FPOC/(dum_FPOC+loc_sed_Fdet)
-
-        ! -------------------------------------------------------- !
-        ! END
-        ! -------------------------------------------------------- !
-    end function fun_sed_calcCorgwt
-   
 
 END MODULE sedgem_lib
 
