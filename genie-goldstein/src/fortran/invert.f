@@ -76,7 +76,7 @@ c for periodic boundary in i
          do 725 j=i+1,im
             rat=gap(j,n+2-j+i)/gap(i,n+2)
             ratm(j,j-i)=rat
-            if(abs(rat) .gt. 1E-20)then
+            if(abs(rat) .gt. 1E-30)then
                do 730 k=n+2-j+i,2*n+3-j+i
                   gap(j,k)=gap(j,k) - rat*gap(i,k+j-i)
  730           continue
