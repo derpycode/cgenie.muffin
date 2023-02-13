@@ -1880,12 +1880,12 @@
                         <description>eccentricity</description>
                     </param>
                     <param name="par_orbit_oscsob">
-			<value datatype="real">0.397789</value>
-                        <description>sine of obliquity</description>
+			<value datatype="real">0.409093</value>
+                        <description>obliquity (in radians)</description>
                     </param>
                     <param name="par_orbit_osclonperi">
-			<value datatype="real">102.499952</value>
-                        <description>longitude of perihelion (in degrees)</description>
+			<value datatype="real">1.796257</value>
+                        <description>longitude of perihelion (in radians)</description>
                     </param>
                     <param name="par_orbit_osctau0">
 			<value datatype="real">-0.5</value>
