@@ -116,6 +116,11 @@ c     This bit modified from initialise_ocean.F
 !-------------------------------------------------------
 !     create a netcdf file
 !-------------------------------------------------------
+! NOTE: Apparently ... 'the compiler detects differences in 
+!       the kind (byte-length) of actual arguments used in 
+!       different calls to the same subroutine.
+!       (but I can't seem to resolve things, if true ...)
+!       => error (-fallow-argument-mismatch turns this is a warning)
       fname=trim(dirnetout)//
      :        '/goldstein_restart_'//
      :        trim(adjustl(yearstring))//'_'//monthstring//'_'//

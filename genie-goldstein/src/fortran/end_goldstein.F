@@ -70,11 +70,12 @@ c AY (03/12/03)
 c     open(3,file='../results/'//lout//'.psi')
       open(3,file=outdir_name(1:lenout)//lout//'.psi',iostat=ios)
       call check_iostat(ios,__LINE__,__FILE__)
-      do 60 j=0,jmax
-         do 60 i=0,imax
+      do j=0,jmax
+         do i=0,imax
             if (debug_end) write(3,*,iostat=ios)psi(i,j)
             call check_iostat(ios,__LINE__,__FILE__)
-  60  continue
+         enddo
+      enddo
       close(3,iostat=ios)
       call check_iostat(ios,__LINE__,__FILE__)
 

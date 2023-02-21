@@ -17,9 +17,9 @@ C
       real out_file(4,kmax,imax,jmax) 
 C      real u_file(2,kmax,imax,jmax) 
 C
-      do 20 j=1,jmax
-         do 20 i=1,imax
-            do 20 k=1,kmax
+      do j=1,jmax
+         do i=1,imax
+            do k=1,kmax
                do 30 l=1,2  
                   if(k.ge.k1(i,j))then
 c                     write(unit,* )ts(l,i,j,k)
@@ -33,8 +33,10 @@ c                     write(unit,* )0.0
 c                 write(unit,* )u(l,i,j,k)
                   out_file(l+2,k,i,j)=u(l,i,j,k)
                enddo
-   20 continue
-        write(unit,fmt='(e24.15)') out_file
+            end do
+         end do
+      end do  
+      write(unit,fmt='(e24.15)') out_file
         
 c        write(102,fmt='(e13.7)') u_file
 

@@ -3637,6 +3637,19 @@ SUBROUTINE diag_biogem_timeseries( &
   ! *** TIME-SERIES DATA UPDATE ***
   IF (ctrl_debug_lvl1) print*, '*** RUN-TIME DATA UPDATE ***'
 
+  ! ------------------------------------------------------------------ !
+  ! INITIALIZE LOCAL VARIABLES
+  ! ------------------------------------------------------------------ ! 
+  loc_opsi(:,:)        = 0.0;
+  loc_zpsi(:,:)        = 0.0;
+  loc_opsia(:,:)       = 0.0;
+  loc_opsip(:,:)       = 0.0;
+  locij_focnatm(:,:,:) = 0.0;
+  locij_focnsed(:,:,:) = 0.0;
+  locij_fsedocn(:,:,:) = 0.0;
+  locij_ocn_ben(:,:,:) = 0.0;
+  locij_mask_ben(:,:)  = 0.0;
+    
   ! update time slice data
   ! NOTE: carried out only when the local (BioGeM) time falls between a selected time slice time plus integration time,
   !       and the time slice time itself

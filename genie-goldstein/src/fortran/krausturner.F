@@ -63,7 +63,7 @@ c Mixed layer reaches bottom
            mldkt = k
            mldt = zw(k-1)
            partmix=0
-           em=-1.d-8
+           em=-1.e-8
            if (k.lt.kmax) then
            do l=1,lmax
              do n=k,kmax

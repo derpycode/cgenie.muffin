@@ -218,7 +218,10 @@ c AY (02/04/04) : stresses copied for output routines
 c KICO wind calculations needed for mld
       if(imld.eq.1)then
 c Following code taken from genie-embm/src/fortan/surflux.F
-c but min(j,jmax-1): avoids effect of N Pole singularity
+c     but min(j,jmax-1): avoids effect of N Pole singularity
+c NOTE: gfortran compiler will flag as (both i and j loops):
+c       'Array reference at (1) out of bounds (0 < 1)'
+c       but all OK
         do j=1,jmax
            tv3 = 0.
            do i=1,imax
