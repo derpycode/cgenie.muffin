@@ -1522,14 +1522,13 @@ CONTAINS
     ! -------------------------------------------------------- ! establish POC currency
     ! NOTE: calculate export in currency of particulate carbon (rather than PO4)
     ! NOTE: put everything into particulate form initially, but re-scale later to account for DOM export
-    bio_part(is_POC,dum_i,dum_j,loc_k_mld:n_k) = bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4
+    bio_part(is_POC,dum_i,dum_j,n_k) = bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4
     ! -------------------------------------------------------- ! set bulk export (CaCO3, opal)
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        select case (sed_type(is))
        case (par_sed_type_bio)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,n_k)
        end select
     end DO
     ! -------------------------------------------------------- !
@@ -1587,6 +1586,13 @@ CONTAINS
              bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = 0.0
           END select
        end if
+       ! ----------------------------------------------------- ! Correction for available [IO3]
+       ! NOTE: limit POI export to available [IO3]
+       ! NOTE: ensure that [IO3] is not less than zero is assigning a POI flux
+       if (is == is_POI) then
+          bio_part(is_POI,dum_i,dum_j,n_k) = min(bio_part(is_POI,dum_i,dum_j,n_k),ocn(io_IO3,dum_i,dum_j,n_k))
+          if (bio_part(is_POI,dum_i,dum_j,n_k) < const_rns) bio_part(is_POI,dum_i,dum_j,n_k) = 0.0
+       end if
     end DO
     ! -------------------------------------------------------- !
     ! CALCULATE ASSOCIATED ISOTOPIC EXPORT
@@ -1611,8 +1617,7 @@ CONTAINS
        loc_tot_i = conv_sed_ocn_i(0,is)
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
-          loc_bio_uptake(io,loc_k_mld:n_k) = loc_bio_uptake(io,loc_k_mld:n_k) + &
-               & conv_sed_ocn(io,is)*bio_part(is,dum_i,dum_j,loc_k_mld:n_k)
+          loc_bio_uptake(io,n_k) = loc_bio_uptake(io,n_k) + conv_sed_ocn(io,is)*bio_part(is,dum_i,dum_j,n_k)
        end do
     end DO
     ! -------------------------------------------------------- !
@@ -1625,16 +1630,10 @@ CONTAINS
     !       This fix ensures that IO3- is taken up, but 3/2 O2 is then released to balance the O2 cycle
     !       becasue I- is going to be released when POI is remineralized.
     !       ... not ideal to have to have 'exceptions' like this :(
-    ! NOTE: ensure that [IO3] is not below zero before setting uptake
     if (ocn_select(io_IO3)) then
-       if (ocn(io_IO3,dum_i,dum_j,n_k) > const_rns) then
-!!$          if (loc_bio_uptake(io_I,n_k) > ocn(io_IO3,dum_i,dum_j,n_k)) loc_bio_uptake(io_I,n_k) = ocn(io_IO3,dum_i,dum_j,n_k)
-          loc_bio_uptake(io_IO3,n_k) = loc_bio_uptake(io_IO3,n_k) + loc_bio_uptake(io_I,n_k)
-          loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - 1.5*loc_bio_uptake(io_I,n_k)
-          loc_bio_uptake(io_I,n_k)   = 0.0
-       else
-          loc_bio_uptake(io_I,n_k)   = 0.0
-       end if
+       loc_bio_uptake(io_IO3,n_k) = loc_bio_uptake(io_IO3,n_k) + loc_bio_uptake(io_I,n_k)
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - 1.5*loc_bio_uptake(io_I,n_k)
+       loc_bio_uptake(io_I,n_k)   = 0.0
     end if
     ! Fe cycle
     ! NOTE: when Fe3+ and Fe2+ are selected, we are taking them up in proportion to minimize numerical issues

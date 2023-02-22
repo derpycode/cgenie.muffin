@@ -1482,7 +1482,6 @@ CONTAINS
              endif 
              ! Dijkstra et al. (2018) scheme 
              loc_Fe3PO42_precipitation = dum_dtyr * 0.025e-3 * loc_Fe2 * loc_PO4
-                
           else
              loc_Fe3PO42_precipitation = 0.0 
           end if
@@ -2383,7 +2382,9 @@ CONTAINS
           case ('inhibition')
              ! NOTE: this is meant to be a parallel to the Fennel scheme for I- oxidation
              !       but with an [O2] inhibition of reduction rather than MM [O2] limitation of oxidation
-             ! NOTE: par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2) -> provides inhibition at high [O2] 
+             ! NOTE: par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2) -> provides inhibition at high [O2]
+             ! NOTE: make sure [O2] is not negative (even though O2 is being released by IO3 reduction) ...
+             if (loc_O2 < const_real_nullsmall) loc_O2 = 0.0
              loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
                   & (par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2))
           case ('threshold')
