@@ -1538,14 +1538,14 @@ CONTAINS
        is = conv_iselected_is(l)
        select case (sed_type(is))
        case (par_sed_type_POM)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,n_k)
        case (par_sed_type_CaCO3)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_CaCO3,is,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(is_CaCO3,is,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,n_k)
        case (par_sed_type_opal)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_opal,is,dum_i,dum_j)*bio_part(is_opal,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(is_opal,is,dum_i,dum_j)*bio_part(is_opal,dum_i,dum_j,n_k)
        end select
        ! ----------------------------------------------------- ! Correction for higher N:P ratio of N2 fixers
        ! NOTE: Fanny (June 2010)
@@ -1556,7 +1556,7 @@ CONTAINS
                & '3N2T_PNFe_Tdep', &
                & 'bio_PNFe'        &
                & )
-             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = loc_bio_NP*loc_dPO4_1 + par_bio_NPdiaz*loc_dPO4_2
+             bio_part(is,dum_i,dum_j,n_k) = loc_bio_NP*loc_dPO4_1 + par_bio_NPdiaz*loc_dPO4_2
           END select
        end if
        ! ----------------------------------------------------- ! Correction for higher Fe:P ratio for N2 fixers
@@ -1568,7 +1568,7 @@ CONTAINS
                &'3N2T_PNFe_Tdep', &
                & 'bio_PNFe'       &
                & )
-             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
+             bio_part(is,dum_i,dum_j,n_k) = &
                   & bio_part_red(is_POC,is_POFe,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4_1 &
                   & + par_bio_c0_Fe_Diaz/par_bio_c0_PO4*loc_dPO4_2
           END select
@@ -1582,7 +1582,7 @@ CONTAINS
           CASE ( &
                & '2N2T_PO4MM_NO3' &
                & )
-             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = 0.0
+             bio_part(is,dum_i,dum_j,n_k) = 0.0
           END select
        end if
        ! ----------------------------------------------------- ! Correction for available [IO3]
@@ -1600,11 +1600,11 @@ CONTAINS
        is = conv_iselected_is(l)
        select case (sed_type(is))
        case (n_itype_min:n_itype_max)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,n_k)
        case (n_itype_minR:n_itype_maxR)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,n_k)
        end select
     end do
     ! -------------------------------------------------------- !
@@ -1752,23 +1752,23 @@ CONTAINS
        ! NOTE: assuemd stiochometry: 2NO3- + 2H+ <-> (5/2)O2 + N2 + H2O
        !                             NO3- + H2O + 2H+ <-> 2O2 + NH4+
        ! NOTE: because the N2 uptake (anomoly) is being used, no prior sources or sinks of N2 are assumed
-       loc_bio_uptake(io_N2,loc_k_mld:n_k) = &
+       loc_bio_uptake(io_N2,n_k) = &
             & 0.5* &
             & ( &
             &   (par_bio_NPdiaz/loc_bio_NP) / ((1.0/loc_frac_N2fix - 1.0) + (par_bio_NPdiaz/loc_bio_NP)) &
             & )* &
-            & loc_bio_uptake(io_NO3,loc_k_mld:n_k)
-       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  + (5.0/2.0)*loc_bio_uptake(io_N2,loc_k_mld:n_k)
-       loc_bio_uptake(io_ALK,loc_k_mld:n_k) = loc_bio_uptake(io_ALK,loc_k_mld:n_k) + 2.0*loc_bio_uptake(io_N2,loc_k_mld:n_k)
-       loc_bio_uptake(io_NO3,loc_k_mld:n_k) = loc_bio_uptake(io_NO3,loc_k_mld:n_k) - 2.0*loc_bio_uptake(io_N2,loc_k_mld:n_k)
+            & loc_bio_uptake(io_NO3,n_k)
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + (5.0/2.0)*loc_bio_uptake(io_N2,n_k)
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + 2.0*loc_bio_uptake(io_N2,n_k)
+       loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) - 2.0*loc_bio_uptake(io_N2,n_k)
        ! -------------------------------------------------------- ! adjustment due to NH4 uptake
        ! adjust default biological tracer uptake stoichiometry due to NH4 consumption (replacing some NO3 consumption)
        ! assuming: NH4 is consummed first (Fanny - July 2011)
-       loc_bio_uptake(io_NH4,loc_K_mld:n_k) = &
-            & min(loc_bio_uptake(io_NO3,loc_k_mld:n_k),ocn(io_NH4,dum_i,dum_j,loc_k_mld:n_k))
-       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  + 2.0*loc_bio_uptake(io_NH4,loc_k_mld:n_k)
-       loc_bio_uptake(io_ALK,loc_k_mld:n_k) = loc_bio_uptake(io_ALK,loc_k_mld:n_k) + 2.0*loc_bio_uptake(io_NH4,loc_k_mld:n_k)
-       loc_bio_uptake(io_NO3,loc_k_mld:n_k) = loc_bio_uptake(io_NO3,loc_k_mld:n_k) - 1.0*loc_bio_uptake(io_NH4,loc_k_mld:n_k)
+       loc_bio_uptake(io_NH4,n_k) = &
+            & min(loc_bio_uptake(io_NO3,n_k),ocn(io_NH4,dum_i,dum_j,n_k))
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + 2.0*loc_bio_uptake(io_NH4,n_k)
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + 2.0*loc_bio_uptake(io_NH4,n_k)
+       loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) - 1.0*loc_bio_uptake(io_NH4,n_k)
     END select
     ! -------------------------------------------------------- !
     ! RE-SCALE FOR DISSOLVED ORGANIC MATTER PRODUCTION
@@ -1793,9 +1793,9 @@ CONTAINS
              loc_r_POM_DOM = 1.0
           end select
           ! calculate decrease in particulate fraction
-          loc_bio_part_DOM(is,loc_k_mld:n_k) = loc_r_POM_DOM*loc_bio_red_DOMfrac*bio_part(is,dum_i,dum_j,loc_k_mld:n_k)
+          loc_bio_part_DOM(is,n_k) = loc_r_POM_DOM*loc_bio_red_DOMfrac*bio_part(is,dum_i,dum_j,n_k)
           ! create (and add) dissolved tracers
-          bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) + loc_bio_part_DOM(is,loc_k_mld:n_k)
+          bio_remin(io,dum_i,dum_j,n_k) = bio_remin(io,dum_i,dum_j,n_k) + loc_bio_part_DOM(is,n_k)
        end do
        ! create RDOM fraction
        loc_tot_i = conv_POM_RDOM_i(0,is)
@@ -1811,9 +1811,9 @@ CONTAINS
              loc_r_POM_RDOM = 1.0
           end select
           ! calculate decrease in particulate fraction
-          loc_bio_part_RDOM(is,loc_k_mld:n_k) = loc_r_POM_RDOM*loc_bio_red_RDOMfrac*bio_part(is,dum_i,dum_j,loc_k_mld:n_k)
+          loc_bio_part_RDOM(is,n_k) = loc_r_POM_RDOM*loc_bio_red_RDOMfrac*bio_part(is,dum_i,dum_j,n_k)
           ! create (and add) dissolved tracers
-          bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) + loc_bio_part_RDOM(is,loc_k_mld:n_k)
+          bio_remin(io,dum_i,dum_j,n_k) = bio_remin(io,dum_i,dum_j,n_k) + loc_bio_part_RDOM(is,n_k)
        end do
        ! save total DOM fraction [NOTE: not a global mean ... just this (i,j) location ...]
        if ((loc_r_POM_DOM + loc_r_POM_RDOM) > const_real_nullsmall) then
@@ -1823,8 +1823,8 @@ CONTAINS
        end if
     end do
     ! decrease particulate fraction
-    bio_part(:,dum_i,dum_j,loc_k_mld:n_k) = bio_part(:,dum_i,dum_j,loc_k_mld:n_k) - &
-         (loc_bio_part_DOM(:,loc_k_mld:n_k) + loc_bio_part_RDOM(:,loc_k_mld:n_k))
+    bio_part(:,dum_i,dum_j,n_k) = bio_part(:,dum_i,dum_j,n_k) - &
+         (loc_bio_part_DOM(:,n_k) + loc_bio_part_RDOM(:,n_k))
 
     ! *** INITIAL PARTICULATE FRACTION PARTITIONING ***
     ! set partitioning between differently remineralized particulate fluxes
@@ -1847,10 +1847,10 @@ CONTAINS
        end DO
     else
        loc_kPO4 = loc_PO4/(loc_PO4 + par_bio_remin_POC_c0frac2)
-       bio_part(is_POC_frac2,dum_i,dum_j,loc_k_mld:n_k) = (1.0-loc_kPO4)*par_bio_remin_POC_dfrac2 + par_bio_remin_POC_frac2
+       bio_part(is_POC_frac2,dum_i,dum_j,n_k) = (1.0-loc_kPO4)*par_bio_remin_POC_dfrac2 + par_bio_remin_POC_frac2
     end if
-    bio_part(is_CaCO3_frac2,dum_i,dum_j,loc_k_mld:n_k) = par_bio_remin_CaCO3_frac2
-    bio_part(is_opal_frac2,dum_i,dum_j,loc_k_mld:n_k)  = par_bio_remin_opal_frac2
+    bio_part(is_CaCO3_frac2,dum_i,dum_j,n_k) = par_bio_remin_CaCO3_frac2
+    bio_part(is_opal_frac2,dum_i,dum_j,n_k)  = par_bio_remin_opal_frac2
     ! set 'b' exponent in the Martin curve (if selected)
     if (par_bio_remin_fun == 'Henson2012') then
        par_bio_remin_b(dum_i,dum_j) = (0.024 * loc_TC) - 1.06
@@ -1877,8 +1877,8 @@ CONTAINS
        loc_alpha = 1.0 + loc_delta_CaCO3/1000.0
        loc_R = carbisor(ici_HCO3_r13C,dum_i,dum_j,n_k)/(1.0 - carbisor(ici_HCO3_r13C,dum_i,dum_j,n_k))
        bio_part_red(is_CaCO3,is_foram_p_13C,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
-       bio_part(is_foram_p_13C,dum_i,dum_j,loc_k_mld:n_k) = &
-            & bio_part_red(is_CaCO3,is_foram_p_13C,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,loc_k_mld:n_k)
+       bio_part(is_foram_p_13C,dum_i,dum_j,n_k) = &
+            & bio_part_red(is_CaCO3,is_foram_p_13C,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,n_k)
     end if
     if (sed_select(is_CaCO3) .AND. sed_select(is_CaCO3_18O)) then
        ! assume no fractionation for now
@@ -1892,8 +1892,8 @@ CONTAINS
        end if
        loc_R = loc_r18O/(1.0 - loc_r18O)
        bio_part_red(is_CaCO3,is_CaCO3_18O,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
-       bio_part(is_CaCO3_18O,dum_i,dum_j,loc_k_mld:n_k) = &
-            & bio_part_red(is_CaCO3,is_CaCO3_18O,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,loc_k_mld:n_k)
+       bio_part(is_CaCO3_18O,dum_i,dum_j,n_k) = &
+            & bio_part_red(is_CaCO3,is_CaCO3_18O,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,n_k)
     end if
 
     ! *** Fe SCAVENGING ***
@@ -1934,7 +1934,7 @@ CONTAINS
     ! NOTE: depletion of dissolved species as a result of biological productivity is implimented as negative remineralization
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) - loc_bio_uptake(io,loc_k_mld:n_k)
+       bio_remin(io,dum_i,dum_j,n_k) = bio_remin(io,dum_i,dum_j,n_k) - loc_bio_uptake(io,n_k)
     end do
     ! record diagnostics
     ! NOTE: scale productivity modifiers by time-step to get correct average
