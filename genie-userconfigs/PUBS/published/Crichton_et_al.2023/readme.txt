@@ -9,7 +9,7 @@ Katherine A. Crichton, Jamie D. Wilson, Andy Ridgwell, Flavia Boscolo-Galazzo, E
 ################################################################
 16/07/2021 -- README.txt file creation (J.D.W)
 06/03/2023 -- updated for final revisions (J.D.W)
-2023/03/07 -- testing and directory change (AR)
+2023/03/07 -- all experiments tested; made directory change (AR)
 ################################################################
 
 Provided is the code used to create the model experiments presented in the paper.
@@ -30,7 +30,7 @@ Crichtonetal_*_Tdep.SPIN - tempereature-dependent biological pump model (Crichto
 
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2.SPIN 10000
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep.SPIN 10000
-./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023  Crichtonetal_worjh2_Tdep_Tdom.SPIN 10000
+./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep_Tdom.SPIN 10000
 
 (2) Late Paleocene Early Eocene spinups
 
