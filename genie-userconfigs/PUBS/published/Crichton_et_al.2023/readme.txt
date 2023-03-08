@@ -46,15 +46,15 @@ Crichtonetal_*_Tdep.SPIN - tempereature-dependent biological pump model (Crichto
 
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2.transient.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep.transient.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
-./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep_Tdom.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep_Tdom.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep_Tdom.transient.logistic625.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep_Tdom.SPIN
 
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2.transient.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep.transient.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
-./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep_Tdom.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep_Tdom.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep_Tdom.transient.logistic2500.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep_Tdom.SPIN
 
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2.transient.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2.SPIN
 ./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep.transient.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep.SPIN
-./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep_Tdom.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep_Tdom.SPIN
+./runmuffin.sh muffin.CB.p_worjh2.BASES PUBS/published/Crichton_et_al.2023 Crichtonetal_worjh2_Tdep_Tdom.transient.logistic5000.Winkelmann2015 11750 Crichtonetal_worjh2_Tdep_Tdom.SPIN
 
 ################################################################
 ################################################################
