@@ -54,7 +54,7 @@ fixed carbonate weathering (only)                       :: xxx ==   fixedCARBw
 fixed silicate AND carbonate weathering                 :: xxx ==   fixedSIwCARBw
 NONE (all feedbacks duplicate as a 'control')           :: xxx ==   fixedNONE
 
-e.g. for all feedbacks combined (non fixed), the perturbation experiment would be run:
+e.g. for all feedbacks combined (none fixed), the perturbation experiment would be run:
 
 ./runmuffin.sh muffin.CBSR.fkl_pp51.BASES PUBS/submitted/Huelse_et_al.Science.2023 muffin.CBSR.fkl_pp51.BASES.mud2.fixedNONE.EXPT 400000 muffin.CBSR.fkl_pp51.BASES.mud2.SPIN2
 
