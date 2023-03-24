@@ -5213,8 +5213,12 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>scaling between rate of SO42- and IO3- reduction [MADE UP (order of magnitude plausible) DEFAULT]</description>
                     </param>
                     <param name="par_bio_remin_SO4toIO3lifetime">
-			<value datatype="real">1.0E-6	</value>
+			<value datatype="real">1.0E-6</value>
                         <description>scaling between rate of SO42- and IO3- reduction ... but to create a 'lifetime' [MADE UP (order of magnitude plausible) DEFAULT]</description>
+                    </param>
+                    <param name="par_bio_remin_r_IO3toI">
+			<value datatype="real">0.01</value>
+                        <description>SO4 POC remin/O2 ratio for IO3 -> I [for option thresholdflex]</description>
                     </param>
 <!-- ABIOTIC PRECIPITATION  -->
                     <param name="par_bio_CaCO3precip_sf">

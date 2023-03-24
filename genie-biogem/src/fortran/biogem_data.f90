@@ -319,6 +319,7 @@ CONTAINS
        print*,'scaling between rate of SO42- and IO3- reduction    : ',par_bio_remin_SO4toIO3
        print*,'scaling between SO42- and IO3- reduction lifetime   : ',par_bio_remin_SO4toIO3lifetime
        print*,'exclude DOC from iodine redox calculation           : ',ctrl_bio_remin_iodine_POConly
+       print*,'SO4 POC remin/O2 ratio for IO3 -> I                 : ',par_bio_remin_r_IO3toI
        print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
@@ -815,7 +816,8 @@ CONTAINS
           ! an alternative is to scale only PC_alpha2 = 1.16
           DO i = 1,n_i
              do j = 1,n_j
-                bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,i,j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+                bio_part_red(is_POC,is_POP,i,j) = &
+                     & par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,i,j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
                 if (par_bio_red_PC_flex > 1) then  ! limit C:P for high PO4 (no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
                    if (bio_part_red(is_POC,is_POP,i,j) > par_bio_red_PC_max) then
                       bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_max
@@ -3046,7 +3048,7 @@ CONTAINS
           ctrl_bio_remin_redox_save = .true.
        end select
        SELECT CASE (opt_bio_remin_reduce_IO3toI)
-       case ('reminSO4','reminSO4lifetime')
+       case ('reminSO4','reminSO4lifetime','thresholdflex')
           call sub_report_error( &
                & 'biogem_data','sub_check_par', &
                & 'You need ctrl_bio_remin_redox_save to be .true. ...', &
