@@ -524,6 +524,7 @@ CONTAINS
        print*,'                                                    : ',n_orb_pts_nmax
        print*,'                                                    : ',trim(par_infile_orb_pts_loc_name)
        print*,'                                                    : ',trim(par_infile_orb_pts_var_name)
+       print*,'Align netCDF filenames with experiment name?        : ',ctrl_ncout_expid_name
        ! --- TRACER AUDITING AND DEBUGGING OPTIONS ------------------------------------------------------------------------------- !
        print*,'--- TRACER AUDITING AND DEBUGGING OPTIONS ----------'
        print*,'Audit tracer inventory?                             : ',ctrl_audit
@@ -3234,16 +3235,16 @@ CONTAINS
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_carbconst = .true.
-       ctrl_data_save_slice_diag_geochem = .true.
+!!$       ctrl_data_save_slice_diag_geochem = .true.
        ctrl_data_save_sig_carb_sur = .true.
        ctrl_data_save_sig_fexport = .true.
        ctrl_data_save_sig_focnsed = .true.
        ctrl_data_save_sig_fairsea = .true.
        ctrl_data_save_sig_focnatm = .true.
        ctrl_data_save_sig_diag = .true.
-       ctrl_data_save_sig_diag_geochem = .true.
+!!$       ctrl_data_save_sig_diag_geochem = .true.
     case (11)
-       ! BASIC + biology + tracer + proxy + redox diagnostics
+       ! BASIC + biology + tracer + proxy
        ctrl_data_save_slice_bio = .true.
        ctrl_data_save_slice_carb = .true.
        ctrl_data_save_slice_diag_bio = .true.

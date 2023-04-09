@@ -628,6 +628,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_indir_name,par_outdir_name,par_rstdir_name,par_fordir_name,par_pindir_name
   CHARACTER(len=127)::par_infile_name,par_outfile_name           !
   NAMELIST /ini_biogem_nml/par_infile_name,par_outfile_name
+  LOGICAL::ctrl_ncout_expid_name                                 ! align netCDF filenames with experiment name?
+  NAMELIST /ini_biogem_nml/ctrl_ncout_expid_name
   ! ------------------- DATA SAVING: TIME-SLICES --------------------------------------------------------------------------------- !
   LOGICAL::ctrl_data_save_slice_ocnatm                           ! time-slice data save: Atmospheric (interface) composition (2D)?
   LOGICAL::ctrl_data_save_slice_ocn                              ! time-slice data save: Ocean composition (3D)?

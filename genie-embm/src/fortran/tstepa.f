@@ -21,18 +21,21 @@
 c lower boundary fluxes
 
       do 220 j=1,jmax
-         do 220 i=1,imax
-            do 220 l=1,2   
+         do 221 i=1,imax
+            do 222 l=1,2   
                fb(l,i,j) = 0
-  220 continue
+ 222        continue
+ 221     continue
+ 220  continue
 
 c southern boundary fluxes
 
          j = 1
          do 230 i=1,imax
-            do 230 l=1,2   
+            do 231 l=1,2   
                fs(l,i) = 0
-  230    continue
+ 231        continue
+ 230     continue
 
          do 100 j=1,jmax
 c western boundary fluxes
@@ -49,7 +52,7 @@ c add zonal heat diffusion
                fwsave(l) = fw(l)
 210         continue
 
-            do 100 i=1,imax
+            do 101 i=1,imax
                do 120 l=1,2   
 c flux to east
                   if(i.eq.imax)then
@@ -103,12 +106,15 @@ c nre dimless height of atm set to 1, implies factor of h in fluxsc
                   fb(l,i,j) = fa(l)
   120          continue
 
-  100 continue
+ 101        continue
+ 100     continue
 
       do 10 j=1,jmax
-         do 10 i=1,imax
-            do 10 l=1,2   
+         do 11 i=1,imax
+            do 12 l=1,2   
                tq1(l,i,j) = tq(l,i,j)
-   10 continue
+ 12         continue
+ 11      continue
+ 10   continue
 
       end

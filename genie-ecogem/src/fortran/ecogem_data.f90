@@ -43,113 +43,113 @@ CONTAINS
     if ((ctrl_debug_init > 0) .OR. ctrl_debug_eco_init) then
        ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ############################################################################# !
        ! --- ECOLOGICALCONFIGURATION --------------------------------------------------------------------------------------------- !
-       write(*,*), ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-       write(*,*), '--- ECOLOGICAL MODEL CONFIGURATION-------------------'
-       write(*,67),'   - number of layers with living plankton        :   ',n_keco
-       write(*,*), '---- Plankton ---------------------------------------'
-       write(*,66),'   - planktonic N biomass                         :   ',nquota
-       write(*,66),'   - planktonic P biomass                         :   ',pquota
-       write(*,66),'   - planktonic Fe biomass                        :   ',fquota
-       write(*,66),'   - planktonic Si biomass                        :   ',squota
-       write(*,66),'   - planktonic chlorophyll biomass               :   ',chlquota
-       write(*,*), '---- Organic Matter ---------------------------------'
-       write(*,67),'   - number of organic matter classes             :   ',komax
-       write(*,*), '---- Inorganic nutrients ----------------------------'
-       write(*,66),'   - using DIC                                    :   ',useDIC
-       write(*,66),'   - using NO3                                    :   ',useNO3
-       write(*,66),'   - using NO2                                    :   ',useNO2
-       write(*,66),'   - using NH4                                    :   ',useNH4
-       write(*,66),'   - using PO4                                    :   ',usePO4
-       write(*,66),'   - using Fe (dissolved iron)                    :   ',useFe
-       write(*,66),'   - using SiO2                                   :   ',useSiO2
-       write(*,*), '-----------------------------------------------------'
-       write(*,*), '--- ECOLOGICAL PARAMETERS ---------------------------'
+       write(*,*)  ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+       write(*,*)  '--- ECOLOGICAL MODEL CONFIGURATION-------------------'
+       write(*,67) '   - number of layers with living plankton        :   ',n_keco
+       write(*,*)  '---- Plankton ---------------------------------------'
+       write(*,66) '   - planktonic N biomass                         :   ',nquota
+       write(*,66) '   - planktonic P biomass                         :   ',pquota
+       write(*,66) '   - planktonic Fe biomass                        :   ',fquota
+       write(*,66) '   - planktonic Si biomass                        :   ',squota
+       write(*,66) '   - planktonic chlorophyll biomass               :   ',chlquota
+       write(*,*)  '---- Organic Matter ---------------------------------'
+       write(*,67) '   - number of organic matter classes             :   ',komax
+       write(*,*)  '---- Inorganic nutrients ----------------------------'
+       write(*,66) '   - using DIC                                    :   ',useDIC
+       write(*,66) '   - using NO3                                    :   ',useNO3
+       write(*,66) '   - using NO2                                    :   ',useNO2
+       write(*,66) '   - using NH4                                    :   ',useNH4
+       write(*,66) '   - using PO4                                    :   ',usePO4
+       write(*,66) '   - using Fe (dissolved iron)                    :   ',useFe
+       write(*,66) '   - using SiO2                                   :   ',useSiO2
+       write(*,*)  '-----------------------------------------------------'
+       write(*,*)  '--- ECOLOGICAL PARAMETERS ---------------------------'
        if (nquota) then
-          write(*,*), '- Nitrogen parameters  -------------------------------'
-          write(*,69),'  - N minimum quota                       (qminN) : a=',    qminN_a,', b=',    qminN_b
-          write(*,69),'  - N maximum quota                       (qmaxN) : a=',    qmaxN_a,', b=',    qmaxN_b
+          write(*,*)  '- Nitrogen parameters  -------------------------------'
+          write(*,69) '  - N minimum quota                       (qminN) : a=',    qminN_a,', b=',    qminN_b
+          write(*,69) '  - N maximum quota                       (qmaxN) : a=',    qmaxN_a,', b=',    qmaxN_b
           if (useNO3) then
-             write(*,69),'  - Maximum nitrate uptake rate         (vmaxNO3) : a=',  vmaxNO3_a,', b=',  vmaxNO3_b
-             write(*,69),'  - Nitrate uptake affinity            (affinNO3) : a=', affinNO3_a,', b=', affinNO3_b
-             write(*,69),'  - Half-sat. for nitrate uptake           (kNO3) : a=', vmaxNO3_a/affinNO3_a,', b=', vmaxNO3_b-affinNO3_b
+             write(*,69) '  - Maximum nitrate uptake rate         (vmaxNO3) : a=',  vmaxNO3_a,', b=',  vmaxNO3_b
+             write(*,69) '  - Nitrate uptake affinity            (affinNO3) : a=', affinNO3_a,', b=', affinNO3_b
+             write(*,69) '  - Half-sat. for nitrate uptake           (kNO3) : a=', vmaxNO3_a/affinNO3_a,', b=', vmaxNO3_b-affinNO3_b
           endif
           if (useNO2) then
-             write(*,69),'  - Maximum nitrite uptake rate         (vmaxNO2) : a=',  vmaxNO2_a,', b=',  vmaxNO2_b
-             write(*,69),'  - Nitrite uptake affinity            (affinNO2) : a=', affinNO2_a,', b=', affinNO2_b
-             write(*,69),'  - Half-sat. for nitrite uptake           (kNO2) : a=', vmaxNO2_a/affinNO2_a,', b=', vmaxNO2_b-affinNO2_b
+             write(*,69) '  - Maximum nitrite uptake rate         (vmaxNO2) : a=',  vmaxNO2_a,', b=',  vmaxNO2_b
+             write(*,69) '  - Nitrite uptake affinity            (affinNO2) : a=', affinNO2_a,', b=', affinNO2_b
+             write(*,69) '  - Half-sat. for nitrite uptake           (kNO2) : a=', vmaxNO2_a/affinNO2_a,', b=', vmaxNO2_b-affinNO2_b
           endif
           if (useNH4) then
-             write(*,69),'  - Maximum ammonium uptake rate        (vmaxNH4) : a=',  vmaxNH4_a,', b=',  vmaxNH4_b
-             write(*,69),'  - Ammonium uptake affinity           (affinNH4) : a=', affinNH4_a,', b=', affinNH4_b
-             write(*,69),'  - Half-sat. for ammonium uptake          (kNH4) : a=', vmaxNH4_a/affinNH4_a,', b=', vmaxNH4_b-affinNH4_b
+             write(*,69) '  - Maximum ammonium uptake rate        (vmaxNH4) : a=',  vmaxNH4_a,', b=',  vmaxNH4_b
+             write(*,69) '  - Ammonium uptake affinity           (affinNH4) : a=', affinNH4_a,', b=', affinNH4_b
+             write(*,69) '  - Half-sat. for ammonium uptake          (kNH4) : a=', vmaxNH4_a/affinNH4_a,', b=', vmaxNH4_b-affinNH4_b
           endif
-          write(*,69),'  - N excretion rate                      (kexcN) : a=',    kexcN_a,', b=',    kexcN_b
+          write(*,69) '  - N excretion rate                      (kexcN) : a=',    kexcN_a,', b=',    kexcN_b
        endif
        if (pquota) then
-          write(*,*), '- Phosphorus parameters  -----------------------------'
-          write(*,69),'  - P minimum quota                       (qminP) : a=',    qminP_a,', b=',    qminP_b
-          write(*,69),'  - P maximum quota                       (qmaxP) : a=',    qmaxP_a,', b=',    qmaxP_b
-          write(*,69),'  - Maximum phosphate uptake rate       (vmaxPO4) : a=',  vmaxPO4_a,', b=',  vmaxPO4_b
-          write(*,69),'  - Phosphate uptake affinity          (affinPO4) : a=', affinPO4_a,', b=', affinPO4_b
-          write(*,69),'  - Half-sat. for phosphate uptake         (kPO4) : a=', vmaxPO4_a/affinPO4_a,', b=', vmaxPO4_b-affinPO4_b
-          write(*,69),'  - P excretion rate                      (kexcP) : a=',    kexcP_a,', b=',    kexcP_b
+          write(*,*)  '- Phosphorus parameters  -----------------------------'
+          write(*,69) '  - P minimum quota                       (qminP) : a=',    qminP_a,', b=',    qminP_b
+          write(*,69) '  - P maximum quota                       (qmaxP) : a=',    qmaxP_a,', b=',    qmaxP_b
+          write(*,69) '  - Maximum phosphate uptake rate       (vmaxPO4) : a=',  vmaxPO4_a,', b=',  vmaxPO4_b
+          write(*,69) '  - Phosphate uptake affinity          (affinPO4) : a=', affinPO4_a,', b=', affinPO4_b
+          write(*,69) '  - Half-sat. for phosphate uptake         (kPO4) : a=', vmaxPO4_a/affinPO4_a,', b=', vmaxPO4_b-affinPO4_b
+          write(*,69) '  - P excretion rate                      (kexcP) : a=',    kexcP_a,', b=',    kexcP_b
        endif
        if (fquota) then
-          write(*,*), '-- Dynamic Iron quotas  ------------------------------'
-          write(*,69),'  - Fe minimum quota                     (qminFe) : a=',   qminFe_a,', b=',   qminFe_b
-          write(*,69),'  - Fe maximum quota                     (qmaxFe) : a=',   qmaxFe_a,', b=',   qmaxFe_b
-          write(*,69),'  - Maximum iron uptake rate             (vmaxFe) : a=',   vmaxFe_a,', b=',   vmaxFe_b
-          write(*,69),'  - Iron uptake affinity                (affinFe) : a=',  affinFe_a,', b=',  affinFe_b
-          write(*,69),'  - Half-sat. for iron uptake               (kFe) : a=', vmaxFe_a/affinFe_a,', b=', vmaxFe_b-affinFe_b
-          write(*,69),'  - Fe excretion rate                    (kexcFe) : a=',   kexcFe_a,', b=',   kexcFe_b
+          write(*,*)  '-- Dynamic Iron quotas  ------------------------------'
+          write(*,69) '  - Fe minimum quota                     (qminFe) : a=',   qminFe_a,', b=',   qminFe_b
+          write(*,69) '  - Fe maximum quota                     (qmaxFe) : a=',   qmaxFe_a,', b=',   qmaxFe_b
+          write(*,69) '  - Maximum iron uptake rate             (vmaxFe) : a=',   vmaxFe_a,', b=',   vmaxFe_b
+          write(*,69) '  - Iron uptake affinity                (affinFe) : a=',  affinFe_a,', b=',  affinFe_b
+          write(*,69) '  - Half-sat. for iron uptake               (kFe) : a=', vmaxFe_a/affinFe_a,', b=', vmaxFe_b-affinFe_b
+          write(*,69) '  - Fe excretion rate                    (kexcFe) : a=',   kexcFe_a,', b=',   kexcFe_b
        endif
        if (squota) then
-          write(*,*), '-- Dynamic Silicon quotas  ---------------------------'
-          write(*,69),'  - Si minimum quota                     (qminSi) : a=' ,   qminSi_a,', b=',   qminSi_b
-          write(*,69),'  - Si maximum quota                     (qmaxSi) : a=' ,   qmaxSi_a,', b=',   qmaxSi_b
-          write(*,69),'  - Maximum silica uptake rate         (vmaxSiO2) : a=' , vmaxSiO2_a,', b=', vmaxSiO2_b
-          write(*,69),'  - Silica uptake affinity            (affinSiO2) : a=' ,affinSiO2_a,', b=',affinSiO2_b
-          write(*,69),'  - Half-sat. for silica uptake           (kSiO2) : a=', vmaxSiO2_a/affinSiO2_a,', b=', vmaxSiO2_b-affinSiO2_b
-          write(*,69),'  - Si excretion rate                    (kexcSi) : a=' ,   kexcSi_a,', b=',   kexcSi_b
+          write(*,*)  '-- Dynamic Silicon quotas  ---------------------------'
+          write(*,69) '  - Si minimum quota                     (qminSi) : a=' ,   qminSi_a,', b=',   qminSi_b
+          write(*,69) '  - Si maximum quota                     (qmaxSi) : a=' ,   qmaxSi_a,', b=',   qmaxSi_b
+          write(*,69) '  - Maximum silica uptake rate         (vmaxSiO2) : a=' , vmaxSiO2_a,', b=', vmaxSiO2_b
+          write(*,69) '  - Silica uptake affinity            (affinSiO2) : a=' ,affinSiO2_a,', b=',affinSiO2_b
+          write(*,69) '  - Half-sat. for silica uptake           (kSiO2) : a=', vmaxSiO2_a/affinSiO2_a,', b=', vmaxSiO2_b-affinSiO2_b
+          write(*,69) '  - Si excretion rate                    (kexcSi) : a=' ,   kexcSi_a,', b=',   kexcSi_b
        endif
-       write(*,*), '- Carbon quota and Photosynthesis parameters --------'
-       write(*,70),'  - Maximum photosynthetic rate         (vmaxDIC) : a=',  vmaxDIC_a,', b=',  vmaxDIC_b,', c=',  vmaxDIC_c
-       write(*,69),'  - Carbon per cell                     (qcarbon) : a=',  qcarbon_a,', b=',  qcarbon_b
-       write(*,69),'  - initial slope of PI curve          (alphachl) : a=', alphachl_a,', b=', alphachl_b
-       write(*,68),'  - maximum chlorophyll to N ratio     (chl2nmax) :   ',   chl2nmax
-       write(*,68),'  - cost of biosynthesis               (biosynth) :   ',   biosynth
-       write(*,68),'  - light attenuation by water              (k_w) :   ',        k_w
-       write(*,68),'  - light attenuation by chlorophyll a    (k_chl) :   ',      k_chl
-       write(*,66),'  - restrict MLD for mean light calculation?      :   ',      ctrl_restrict_mld
-       write(*,66),'  - PAR attenutation by sea-ice cover?            :   ',      ctrl_PARseaicelimit
-       write(*,*), '- Grazing parameters --------------------------------'
-       write(*,68),'  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
-       write(*,68),'  - hill number for grazing assimilation   (hill) :   ',       hill
-       write(*,68),'  - grazing refuge parameter             (Lambda) :   ',     Lambda
-       write(*,69),'  - maximum grazing rate                   (graz) : a=',     graz_a,', b=',     graz_b
-       write(*,69),'  - half-sat. concentration for grazing      (kg) : a=',       kg_a,', b=',       kg_b
-       write(*,*), '- Other loss parameters ------------------------------'
-       write(*,69),'  - carbon respiration rate              (respir) : a=',   respir_a,', b=',   respir_b
-       write(*,69),'  - biomass sinking rate                (biosink) : a=',  biosink_a,', b=',  biosink_b
-       write(*,69),'  - basal mortality                        (mort) : a=',     mort_a,', b=',     mort_b
-       write(*,70),'  - fraction messy feed. to dissolved (beta_graz) : a=',beta_graz_a,', b=',beta_graz_b,', c=',beta_graz_c
-       write(*,70),'  - fraction mortality to dissolved   (beta_mort) : a=',beta_mort_a,', b=',beta_mort_b,', c=',beta_mort_c
-       write(*,70),'  - adjusted partitioning of C into POM vs. DOM   :   ',par_beta_POCtoDOC
-       write(*,*), '- Other stuff -----------------------------'
-       write(*,71),'  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
-       write(*,68),'  - maximum temperature                (temp_max) :   ',temp_max
+       write(*,*)  '- Carbon quota and Photosynthesis parameters --------'
+       write(*,70) '  - Maximum photosynthetic rate         (vmaxDIC) : a=',  vmaxDIC_a,', b=',  vmaxDIC_b,', c=',  vmaxDIC_c
+       write(*,69) '  - Carbon per cell                     (qcarbon) : a=',  qcarbon_a,', b=',  qcarbon_b
+       write(*,69) '  - initial slope of PI curve          (alphachl) : a=', alphachl_a,', b=', alphachl_b
+       write(*,68) '  - maximum chlorophyll to N ratio     (chl2nmax) :   ',   chl2nmax
+       write(*,68) '  - cost of biosynthesis               (biosynth) :   ',   biosynth
+       write(*,68) '  - light attenuation by water              (k_w) :   ',        k_w
+       write(*,68) '  - light attenuation by chlorophyll a    (k_chl) :   ',      k_chl
+       write(*,66) '  - restrict MLD for mean light calculation?      :   ',      ctrl_restrict_mld
+       write(*,66) '  - PAR attenutation by sea-ice cover?            :   ',      ctrl_PARseaicelimit
+       write(*,*)  '- Grazing parameters --------------------------------'
+       write(*,68) '  - maximum assimilation efficiency     (ass_eff) :   ',    ass_eff
+       write(*,68) '  - hill number for grazing assimilation   (hill) :   ',       hill
+       write(*,68) '  - grazing refuge parameter             (Lambda) :   ',     Lambda
+       write(*,69) '  - maximum grazing rate                   (graz) : a=',     graz_a,', b=',     graz_b
+       write(*,69) '  - half-sat. concentration for grazing      (kg) : a=',       kg_a,', b=',       kg_b
+       write(*,*)  '- Other loss parameters ------------------------------'
+       write(*,69) '  - carbon respiration rate              (respir) : a=',   respir_a,', b=',   respir_b
+       write(*,69) '  - biomass sinking rate                (biosink) : a=',  biosink_a,', b=',  biosink_b
+       write(*,69) '  - basal mortality                        (mort) : a=',     mort_a,', b=',     mort_b
+       write(*,70) '  - fraction messy feed. to dissolved (beta_graz) : a=',beta_graz_a,', b=',beta_graz_b,', c=',beta_graz_c
+       write(*,70) '  - fraction mortality to dissolved   (beta_mort) : a=',beta_mort_a,', b=',beta_mort_b,', c=',beta_mort_c
+       write(*,70) '  - adjusted partitioning of C into POM vs. DOM   :   ',par_beta_POCtoDOC
+       write(*,*)  '- Other stuff -----------------------------'
+       write(*,71) '  - ecogem tsteps per biogem tstep     (nsubtime) :   ',nsubtime
+       write(*,68) '  - maximum temperature                (temp_max) :   ',temp_max
        if(ctrl_grazing_explicit)then
-         write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a= plankton specific values set in:',par_ecogem_grazing_file, ', b=', pp_opt_b
-         write(*,69),'  - width of grazing kernel              (pp_sig) : a= plankton specific values set in:',par_ecogem_grazing_file, ', b=',  pp_sig_b
-         write(*,67),'  - prey switching exponent (integer)        (ns) :    plankton specific values set in:',par_ecogem_grazing_file
-         write(*,67),'  - herbivory                                     :    plankton specific values set in:',par_ecogem_grazing_file
-         write(*,67),'  - carnivory                                     :    plankton specific values set in:',par_ecogem_grazing_file
-         write(*,69),'  - palatability                                  :    plankton specific values set in:',par_ecogem_grazing_file
-         write(*,69),'  - growth cost factor                            :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,69) '  - optimal predator:prey length ratio   (pp_opt) : a= plankton specific values set in:',par_ecogem_grazing_file, ', b=', pp_opt_b
+         write(*,69) '  - width of grazing kernel              (pp_sig) : a= plankton specific values set in:',par_ecogem_grazing_file, ', b=',  pp_sig_b
+         write(*,67) '  - prey switching exponent (integer)        (ns) :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,67) '  - herbivory                                     :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,67) '  - carnivory                                     :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,69) '  - palatability                                  :    plankton specific values set in:',par_ecogem_grazing_file
+         write(*,69) '  - growth cost factor                            :    plankton specific values set in:',par_ecogem_grazing_file
        else
-         write(*,69),'  - optimal predator:prey length ratio   (pp_opt) : a=',   pp_opt_a,', b=',   pp_opt_b
-         write(*,69),'  - width of grazing kernel              (pp_sig) : a=',   pp_sig_a,', b=',   pp_sig_b
-         write(*,67),'  - prey switching exponent (integer)        (ns) :   ',   ns
+         write(*,69) '  - optimal predator:prey length ratio   (pp_opt) : a=',   pp_opt_a,', b=',   pp_opt_b
+         write(*,69) '  - width of grazing kernel              (pp_sig) : a=',   pp_sig_a,', b=',   pp_sig_b
+         write(*,67) '  - prey switching exponent (integer)        (ns) :   ',   ns
       endif
 
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
@@ -170,6 +170,7 @@ CONTAINS
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst
        print*,'netCDF restart file name                            : ',trim(par_ncrst_name)
+       print*,'timeseries locations file name                      : ',trim(par_ecogem_timeseries_file)
     end if ! end ctrl_debug_eco_init
 66  format(a56,l2)
 67  format(a56,i2)
@@ -533,56 +534,56 @@ CONTAINS
     ! ****************************************************************************************
     ! Write plankton parameters to output file (opened in initialise_ecogem)
     ! parameter headers
-    WRITE(301,301,ADVANCE = "NO" ),"PFT             "
-    WRITE(301,202,ADVANCE = "NO" ),"    diameter","      volume"
-    WRITE(301,201,ADVANCE = "NO" ),"      vmax_C"
+    WRITE(301,301,ADVANCE = "NO" ) "PFT             "
+    WRITE(301,202,ADVANCE = "NO" ) "    diameter","      volume"
+    WRITE(301,201,ADVANCE = "NO" ) "      vmax_C"
     if (nquota) then
-       WRITE(301,202,ADVANCE = "NO" ),"      qmin_N","      qmax_N"
-       if (useNO3) WRITE(301,202,ADVANCE = "NO" ),"    vmax_NO3","   affin_NO3"
-       if (useNO2) WRITE(301,202,ADVANCE = "NO" ),"    vmax_NO2","   affin_NO2"
-       if (useNH4) WRITE(301,202,ADVANCE = "NO" ),"    vmax_NH4","   affin_NH4"
-       WRITE(301,201,ADVANCE = "NO" ),"      kexc_N"
+       WRITE(301,202,ADVANCE = "NO" ) "      qmin_N","      qmax_N"
+       if (useNO3) WRITE(301,202,ADVANCE = "NO" ) "    vmax_NO3","   affin_NO3"
+       if (useNO2) WRITE(301,202,ADVANCE = "NO" ) "    vmax_NO2","   affin_NO2"
+       if (useNH4) WRITE(301,202,ADVANCE = "NO" ) "    vmax_NH4","   affin_NH4"
+       WRITE(301,201,ADVANCE = "NO" ) "      kexc_N"
     endif
     if (pquota) then
-       WRITE(301,205,ADVANCE = "NO" ),"      qmin_P","      qmax_P","    vmax_PO4","   affin_PO4","      kexc_P"
+       WRITE(301,205,ADVANCE = "NO" ) "      qmin_P","      qmax_P","    vmax_PO4","   affin_PO4","      kexc_P"
     endif
     if (fquota) then
-       WRITE(301,205,ADVANCE = "NO" ),"     qmin_Fe","     qmax_Fe","     vmax_Fe","    affin_Fe","     kexc_Fe"
+       WRITE(301,205,ADVANCE = "NO" ) "     qmin_Fe","     qmax_Fe","     vmax_Fe","    affin_Fe","     kexc_Fe"
     endif
     if (squota) then
-       WRITE(301,205,ADVANCE = "NO" ),"     qmin_Si","     qmax_Si","   vmax_SiO4","  affin_SiO4","     kexc_Si"
+       WRITE(301,205,ADVANCE = "NO" ) "     qmin_Si","     qmax_Si","   vmax_SiO4","  affin_SiO4","     kexc_Si"
     endif
-    WRITE(301,202,ADVANCE = "NO" ),"         q_C","    alphachl"
-    WRITE(301,204,ADVANCE = "NO" ),"  max_graz_C","        kg_C","      pp_opt","      pp_sig"
-    WRITE(301,203,ADVANCE = "NO" )," respiration","     biosink","   mortality"
-    WRITE(301,202,ADVANCE = "YES"),"   beta_graz","   beta_mort"
+    WRITE(301,202,ADVANCE = "NO" ) "         q_C","    alphachl"
+    WRITE(301,204,ADVANCE = "NO" ) "  max_graz_C","        kg_C","      pp_opt","      pp_sig"
+    WRITE(301,203,ADVANCE = "NO" ) " respiration","     biosink","   mortality"
+    WRITE(301,202,ADVANCE = "YES") "   beta_graz","   beta_mort"
     ! ****************************************************************************************
     ! parameter values
     do n=1,2
        do jp=1,npmax
-          if (n.eq.1)     WRITE(300+n,301,ADVANCE = "NO" ),pft(jp)
-          WRITE(300+n,102,ADVANCE = "NO" ),diameter(jp),volume(jp)
-          WRITE(300+n,101,ADVANCE = "NO" ),vmax(iDIC,jp)
+          if (n.eq.1)     WRITE(300+n,301,ADVANCE = "NO" ) pft(jp)
+          WRITE(300+n,102,ADVANCE = "NO" ) diameter(jp),volume(jp)
+          WRITE(300+n,101,ADVANCE = "NO" ) vmax(iDIC,jp)
           if (nquota) then
-             WRITE(300+n,102,ADVANCE = "NO" ),qmin(iNitr,jp),qmax(iNitr,jp)
-             if (useNO3) WRITE(300+n,102,ADVANCE = "NO" ),vmax(iNO3,jp),affinity(iNO3,jp)
-             if (useNO2) WRITE(300+n,102,ADVANCE = "NO" ),vmax(iNO2,jp),affinity(iNO2,jp)
-             if (useNH4) WRITE(300+n,102,ADVANCE = "NO" ),vmax(iNO3,jp),affinity(iNO3,jp)
-             WRITE(300+n,101,ADVANCE = "NO" ),kexc(iNitr,jp)
+             WRITE(300+n,102,ADVANCE = "NO" ) qmin(iNitr,jp),qmax(iNitr,jp)
+             if (useNO3) WRITE(300+n,102,ADVANCE = "NO" ) vmax(iNO3,jp),affinity(iNO3,jp)
+             if (useNO2) WRITE(300+n,102,ADVANCE = "NO" ) vmax(iNO2,jp),affinity(iNO2,jp)
+             if (useNH4) WRITE(300+n,102,ADVANCE = "NO" ) vmax(iNO3,jp),affinity(iNO3,jp)
+             WRITE(300+n,101,ADVANCE = "NO" ) kexc(iNitr,jp)
           endif
           if (pquota) then
-             WRITE(300+n,105,ADVANCE = "NO" ),qmin(iPhos,jp),qmax(iPhos,jp),vmax(iPO4,jp),affinity(iPO4,jp),kexc(iPhos,jp)
+             WRITE(300+n,105,ADVANCE = "NO" ) qmin(iPhos,jp),qmax(iPhos,jp),vmax(iPO4,jp),affinity(iPO4,jp),kexc(iPhos,jp)
           endif
           if (fquota) then
-             WRITE(300+n,105,ADVANCE = "NO" ),qmin(iIron,jp),qmax(iIron,jp),vmax(iFe,jp),affinity(iFe,jp),kexc(iIron,jp)
+             WRITE(300+n,105,ADVANCE = "NO" ) qmin(iIron,jp),qmax(iIron,jp),vmax(iFe,jp),affinity(iFe,jp),kexc(iIron,jp)
           endif
           if (squota) then
-             WRITE(300+n,105,ADVANCE = "NO" ),qmin(iSili,jp),qmax(iSili,jp),vmax(iSiO2,jp),affinity(iSiO2,jp),kexc(iSili,jp)
+             WRITE(300+n,105,ADVANCE = "NO" ) qmin(iSili,jp),qmax(iSili,jp),vmax(iSiO2,jp),affinity(iSiO2,jp),kexc(iSili,jp)
           endif
-          WRITE(300+n,102,ADVANCE = "NO" ),qcarbon(jp),alphachl(jp)
-          WRITE(300+n,104,ADVANCE = "NO" ),graz(jp),kg(jp),pp_opt(jp),pp_sig(jp)
-          WRITE(300+n,103,ADVANCE = "NO" ),respir(jp),biosink(jp),mort(jp)
-          WRITE(300+n,102,ADVANCE = "YES"),beta_graz(jp),beta_mort(jp)
+          WRITE(300+n,102,ADVANCE = "NO" ) qcarbon(jp),alphachl(jp)
+          WRITE(300+n,104,ADVANCE = "NO" ) graz(jp),kg(jp),pp_opt(jp),pp_sig(jp)
+          WRITE(300+n,103,ADVANCE = "NO" ) respir(jp),biosink(jp),mort(jp)
+          WRITE(300+n,102,ADVANCE = "YES") beta_graz(jp),beta_mort(jp)
        enddo
     enddo
     ! close plankton parameter files
@@ -595,9 +596,9 @@ CONTAINS
         gkernel(jpred,:) = 0.0
      endif
      do jprey=1,npmax-1
-        WRITE(303,101,ADVANCE = "NO" ),gkernel(jpred,jprey)
+        WRITE(303,101,ADVANCE = "NO" ) gkernel(jpred,jprey)
      enddo
-     WRITE(303,101,ADVANCE = "YES" ),gkernel(jpred,npmax)
+     WRITE(303,101,ADVANCE = "YES" ) gkernel(jpred,npmax)
   enddo
   close(303)
     !****************************************************************************************
@@ -815,7 +816,7 @@ CONTAINS
     loc_lat(1:n_j) = fun_get_grid_lat(n_j)
 
     ! check file format and determine number of lines of data
-    loc_filename = TRIM(par_indir_name)//"/timeseries_sites.eco"!//TRIM(par_ecogem_timeseries_file)
+    loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_timeseries_file)
     CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
 
     ! open file pipe
@@ -844,7 +845,7 @@ CONTAINS
 
        ! read in population specifications
        if ((ctrl_debug_init > 0) .OR. ctrl_debug_eco_init) then
-          write(*,*), ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          write(*,*) ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           print*,"Time-series output locations (shifted to sit of GEnIE grid)"
        endif
        DO n = 1,n_tser
@@ -861,7 +862,7 @@ CONTAINS
           endif
        END DO
        if ((ctrl_debug_init > 0) .OR. ctrl_debug_eco_init) then
-          write(*,*), ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          write(*,*) ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
        endif
     endif
     ! close file pipe
@@ -882,8 +883,14 @@ CONTAINS
     int_uptake_timeslice(:,:,:,:,:)   = 0.0
     int_gamma_timeslice(:,:,:,:,:)    = 0.0
     int_nutrient_timeslice(:,:,:,:)   = 0.0
-    int_zoogamma_timeslice(:,:,:,:)   = 0.0
-    int_export_timeslice(:,:,:,:,:)   = 0.0  !Fanny/Maria - Aug19
+!BAW: zoolimit should be optional    int_zoogamma_timeslice(:,:,:,:)   = 0.0
+    if (eco_export_verbose) then
+      int_export_timeslice(:,:,:,:,:)   = 0.0  !Fanny/Maria - Aug19
+    end if
+    if (eco_uptake_fluxes) then
+      int_AP_timeslice(:,:,:,:,:)   = 0.0  
+      int_HP_timeslice(:,:,:,:,:)   = 0.0  
+    end if
 
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
     !

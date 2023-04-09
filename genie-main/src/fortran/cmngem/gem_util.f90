@@ -851,10 +851,13 @@ CONTAINS
     ! local variables
     INTEGER::n
     INTEGER::loc_n_elements,loc_n_start
-    character(len=255),dimension(32767)::loc_string
+    character(len=255),ALLOCATABLE,DIMENSION(:)::loc_string
+    !!!character(len=255),dimension(32767)::loc_string ! 2^15-1
     ! *** INPUT DATA ***
     ! check file format
     CALL sub_check_fileformat(dum_filename_in,loc_n_elements,loc_n_start)
+    ! allocate array
+    ALLOCATE(loc_string(loc_n_elements),STAT=alloc_error)
     ! open file pipe
     OPEN(unit=in,file=dum_filename_in,action='read')
     ! goto start-of-file tag
@@ -875,6 +878,8 @@ CONTAINS
     end do
     write(unit=out,fmt='(A13)') '-END-OF-DATA-'
     CLOSE(unit=out)
+    ! de-allocate array
+    DEALLOCATE(loc_string,STAT=alloc_error)
   END SUBROUTINE sub_copy_ascii_file
   ! ****************************************************************************************************************************** !
 
