@@ -100,8 +100,10 @@ CONTAINS
        print*,'--- BOUNDARY CONDITIONS ----------------------------'
        print*,'Set dissolution flux = rain flux to close system?   : ',ctrl_force_sed_closedsystem
        print*,'Set dissolution flux = rain flux at surface?        : ',ctrl_force_sed_closedsystem_SUR
-       print*,'Balance the P cycle (with weathering)?              : ',ctrl_force_sed_closed_P
-       print*,'Balance the C cycle (with weathering)?              : ',ctrl_force_sed_closed_C
+       print*,'Balance the P cycle ((i,j)-matching ocean return)?  : ',ctrl_force_sed_closed_P
+       print*,'Balance the C cycle ((i,j)-matching ocean return)?  : ',ctrl_force_sed_closed_C
+       print*,'Balance the P cycle (with weathering)?              : ',ctrl_force_sed_closed_P_weather
+       print*,'Balance the C cycle (with weathering)?              : ',ctrl_force_sed_closed_C_weather
        print*,'set reflective boundary condition for POM?          : ',ctrl_force_sed_reflective_POM
        print*,'Allow temperature / salinity forcing of climate?    : ',ctrl_force_GOLDSTEInTS
        print*,'Allow ONLY temperature / salinity forcing?          : ',ctrl_force_GOLDSTEInTSonly
@@ -302,14 +304,22 @@ CONTAINS
        print*,'Activity coefficient for H+                         : ',par_bio_remin_gammaH
        print*,'Activity coefficient for OH-                        : ',par_bio_remin_gammaOH
        print*,'Activity coefficient for SiO2                       : ',par_bio_remin_gammaSiO2
+       print*,'Activity coefficient for PO4                        : ',par_bio_remin_gammaPO4
        print*,'I -> IO3 oxidation option                           : ',trim(opt_bio_remin_oxidize_ItoIO3)
        print*,'IO3 -> I reduction option                           : ',trim(opt_bio_remin_reduce_IO3toI)
        print*,'(oxidation) lifetime for I (yrs)                    : ',par_bio_remin_Ilifetime
        print*,'Oxidation rate constant for I -> IO3                : ',par_bio_remin_kItoIO3
        print*,'Reduction rate constant for IO3 -> I                : ',par_bio_remin_kIO3toI
-       print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
+       print*,'O2 inhibition for IO3 -> I                          : ',par_bio_remin_iO2_IO3toI
        print*,'O2 half-saturation for IO3 -> I                     : ',par_bio_remin_cO2_IO3toI
+       print*,'O2 half-saturation for for I -> IO3                 : ',par_bio_remin_cO2_ItoIO3
        print*,'IO3 half-saturation for IO3 -> I                    : ',par_bio_remin_cIO3_IO3toI
+       print*,'scaling between rate of O2 consumption and I- ox    : ',par_bio_remin_O2toI
+       print*,'scaling between O2 consumption and I- ox lifetime   : ',par_bio_remin_O2toIlifetime
+       print*,'scaling between rate of SO42- and IO3- reduction    : ',par_bio_remin_SO4toIO3
+       print*,'scaling between SO42- and IO3- reduction lifetime   : ',par_bio_remin_SO4toIO3lifetime
+       print*,'exclude DOC from iodine redox calculation           : ',ctrl_bio_remin_iodine_POConly
+       print*,'SO4 POC remin/O2 ratio for IO3 -> I                 : ',par_bio_remin_r_IO3toI
        print*,'dilute tracers across the mixed layer               : ',ctrl_bio_remin_ecogemMLD
        ! ------------------- ISOTOPIC FRACTIONATION ------------------------------------------------------------------------------ !
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
@@ -404,10 +414,14 @@ CONTAINS
        print*,'Rate law power for FeCO3 precipitation              : ',par_bio_FeCO3precip_exp
        print*,'Ohmega constant for FeCO3 preciptiation             : ',par_bio_FeCO3precip_abioticohm_cte
        print*,'Fe fractionation factor for FeCO3 precipitation     : ',par_d56Fe_FeCO3_alpha
+       print*,'Scale factor for Fe3PO42 precipitation              : ',par_bio_Fe3PO42precip_sf
+       print*,'Rate law power for Fe3PO42 precipitation            : ',par_bio_Fe3PO42precip_exp
+       print*,'Thermodynamic const for Fe3PO42 precipitation       : ',par_bio_Fe3PO42precip_eq
+       print*,'Fe fractionation factor for Fe3PO42 precipitation   : ',par_d56Fe_Fe3PO42_alpha
        print*,'Scale factor for Fe3Si2O4 precipitation             : ',par_bio_Fe3Si2O4precip_sf
        print*,'Rate law power for Fe3Si2O4 precipitation           : ',par_bio_Fe3Si2O4precip_exp
        print*,'Ohmega constant for Fe3Si2O4 precipitation          : ',par_bio_Fe3Si2O4precip_abioticohm_cte
-       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_FeCO3_alpha
+       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_Fe3Si2O4_alpha ! 08.12.2021: YK changed from par_d56Fe_FeCO3_alpha to par_d56Fe_Fe3Si2O4_alpha
        print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte
@@ -428,6 +442,7 @@ CONTAINS
        print*,'kinetic constant for FeOOH reduction                : ',par_bio_remin_kFeOOHtoFe2
        print*,'Fe fractionation factor for Fe reduction with S     : ',par_d56Fe_Fered_alpha
        print*,'S fractionation factor for S oxidation with Fe      : ',par_d34S_Fered_alpha
+       print*,'Ads constant for PO4 adsorption on (POM-)FeOOH      : ',par_bio_Kd_PO4_FeOOH                                     ! 
        ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DIRECTORY DEFINITIONS ----------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -495,6 +510,7 @@ CONTAINS
        print*,'Save time-series data in ASCII format?              : ',ctrl_data_save_sig_ascii
        print*,'append data to output files on restart              : ',opt_append_data
        print*,'Minimum depth for benthic average (m)               : ',par_data_save_ben_Dmin
+       print*,'Minimum depth for opsi min/max identification (m)   : ',par_data_save_opsi_Dmin
        print*,'Time-step for snap-shot saving (N)                  : ',par_t_sig_count_N
        print*,'Time-step for snap-shot saving (S)                  : ',par_t_sig_count_S
        print*,'Generic N j value (for time-series data saving)     : ',par_sig_j_N
@@ -801,7 +817,8 @@ CONTAINS
           ! an alternative is to scale only PC_alpha2 = 1.16
           DO i = 1,n_i
              do j = 1,n_j
-                bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,i,j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+                bio_part_red(is_POC,is_POP,i,j) = &
+                     & par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,i,j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
                 if (par_bio_red_PC_flex > 1) then  ! limit C:P for high PO4 (no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
                    if (bio_part_red(is_POC,is_POP,i,j) > par_bio_red_PC_max) then
                       bio_part_red(is_POC,is_POP,i,j) = par_bio_red_PC_max
@@ -964,11 +981,21 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! -------------------------------------------------------- !
     CHARACTER(len=255)::loc_filename                           ! filename string
+    integer::loc_len
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    ! set alt dir path string length
+    loc_len = LEN_TRIM(par_pindir_name)
     ! -------------------------------------------------------- !
     ! LOAD 2D FIELD
     ! -------------------------------------------------------- !
-    ! -------------------------------------------------------- ! load geothermal 2D field
-    loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    ! -------------------------------------------------------- ! load BIOGEM virtual grid
+    if (loc_len > 0) then
+       loc_filename = TRIM(par_pindir_name)//TRIM(par_force_Vgrid_file)
+    else
+       loc_filename = TRIM(par_indir_name)//TRIM(par_force_Vgrid_file)
+    end if
     CALL sub_load_data_ij_INT(loc_filename,n_i,n_j,force_Vgrid(:,:))
     ! -------------------------------------------------------- !
     ! END
@@ -1335,6 +1362,7 @@ CONTAINS
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
        !       BUT, it is going to be implicitly assumed to be oxidized during remin under oxic conditions
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_O(io_Fe,is_POFe)  = 1.0
           conv_sed_ocn_O(io_Fe2,is_POFe) = 0.0
@@ -1431,6 +1459,7 @@ CONTAINS
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
        !       BUT, it is going to be implicitly assumed to be oxidized during remin under denitrifying conditions
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_N(io_Fe,is_POFe)  = 1.0
           conv_sed_ocn_N(io_Fe2,is_POFe) = 0.0
@@ -1535,6 +1564,7 @@ CONTAINS
        end if
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_S(io_Fe,is_POFe)  = 0.0
           conv_sed_ocn_S(io_Fe2,is_POFe) = 1.0
@@ -1583,6 +1613,7 @@ CONTAINS
        conv_sed_ocn_meth(io_DIC_13C,is_POC_13C) = 1.0 - conv_sed_ocn_meth(io_CH4_13C,is_POC_13C)
        ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_meth(io_Fe,is_POFe)  = 0.0
           conv_sed_ocn_meth(io_Fe2,is_POFe) = 1.0
@@ -1595,13 +1626,19 @@ CONTAINS
     end if
     ! -------------------------------------------------------- ! Set local remin array reflecting 'mix' of redox possibilities
     ! NOTE: this is the 'redox tree' of all enabled posibilities
+    ! NOTE: without this, the elemental transformation from particulate formation to tracer update misses
+    !       e.g. NO3update into PON ...
+    !       (the 'compact equivalent' also includes this)
+    !       effectively, the bug-fix of the original code (see note below) introduced its own bug ...
+    if (ocn_select(io_O2))    loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn)
     if (ocn_select(io_O2))    loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_O)
     if (ocn_select(io_NO3))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_N)
     if (ocn_select(io_FeOOH)) loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_Fe)
     if (ocn_select(io_SO4))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_S)
     if (ocn_select(io_CH4))   loc_conv_sed_ocn(:,:) = loc_conv_sed_ocn(:,:) + abs(conv_sed_ocn_meth)
-    ! -------------------------------------------------------- !  indexing array (basic oxic-only)
-    conv_sed_ocn_i(:,:) = fun_recalc_tracerrelationships_i(conv_sed_ocn(:,:))
+    ! -------------------------------------------------------- ! indexing array (all possible)
+    ! NOTE: original code set conv_sed_ocn_i only as the indices of conv_sed_ocn (and basic/oxic-only)
+    conv_sed_ocn_i(:,:) = fun_recalc_tracerrelationships_i(loc_conv_sed_ocn(:,:))
     ! -------------------------------------------------------- !
     ! CREATE COMPACT TRACER INDEX FORMAT ARRAY EQUIVALENTS
     ! -------------------------------------------------------- !
@@ -1612,7 +1649,7 @@ CONTAINS
     if (ocn_select(io_FeOOH)) conv_ls_lo_Fe(:,:)   =  fun_conv_sedocn2lslo(conv_sed_ocn_Fe(:,:))
     if (ocn_select(io_SO4))   conv_ls_lo_S(:,:)    =  fun_conv_sedocn2lslo(conv_sed_ocn_S(:,:))
     if (ocn_select(io_CH4))   conv_ls_lo_meth(:,:) =  fun_conv_sedocn2lslo(conv_sed_ocn_meth(:,:))
-    ! -------------------------------------------------------- !  indexing array (all possible)
+    ! -------------------------------------------------------- ! indexing array (all possible)
     conv_ls_lo_i(:,:) =  fun_conv_sedocn2lslo_i(fun_recalc_tracerrelationships_i(loc_conv_sed_ocn(:,:)))
     ! -------------------------------------------------------- ! POM -> DOM
     conv_lP_lD(:,:)   =  fun_conv_sedocn2lslo(conv_POM_DOM(:,:))
@@ -1673,7 +1710,6 @@ CONTAINS
     int_diag_airsea_timeslice(:,:,:)    = 0.0
     int_diag_redox_timeslice(:,:,:,:)   = 0.0
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
-    !
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeslice
   ! ****************************************************************************************************************************** !
@@ -1711,6 +1747,8 @@ CONTAINS
     int_misc_seaice_sig_vol = 0.0
     int_misc_opsi_min_sig   = 0.0
     int_misc_opsi_max_sig   = 0.0
+    int_misc_opsid_min_sig  = 0.0
+    int_misc_opsid_max_sig  = 0.0
     int_misc_opsia_min_sig  = 0.0
     int_misc_opsia_max_sig  = 0.0
     int_misc_SLT_sig        = 0.0
@@ -1731,13 +1769,14 @@ CONTAINS
     int_diag_airsea_sig(:)  = 0.0
     int_diag_misc_2D_sig(:) = 0.0
     int_diag_forcing_sig(:) = 0.0
+    int_diag_forcing_atm_sig(:) = 0.0
+    int_diag_forcing_ocn_sig(:) = 0.0
     int_diag_redox_sig(:)   = 0.0
     int_diag_ecogem_part    = 0.0
     int_diag_ecogem_remin   = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
-    !
     ! ############################################################################################################################ !
   END SUBROUTINE sub_init_int_timeseries
   ! ****************************************************************************************************************************** !
@@ -1838,6 +1877,9 @@ CONTAINS
     diag_airsea(:,:,:)        = 0.0
     diag_ecogem_part(:,:,:)   = 0.0
     diag_ecogem_remin(:,:,:)  = 0.0
+    diag_forcing(:,:,:)       = 0.0
+    diag_forcing_atm(:)       = 0.0
+    diag_forcing_ocn(:)       = 0.0
   END SUBROUTINE sub_init_diag
   ! ****************************************************************************************************************************** !
 
@@ -1859,6 +1901,7 @@ CONTAINS
     ! NOTE: initialize basic grid structure values for the (i,j,k) grid, not just ocean-only points
     ! NOTE: depth in in unit of m BELOW sealevel (i.e., a +ve scale)
     ! NOTE: set default rho
+    ! NOTE: depth layer edges are the MOC centers
     DO i=1,n_i
        DO j=1,n_j
           DO k=1,n_k
@@ -2389,17 +2432,19 @@ CONTAINS
     ! check first-order consistency between biologial option, and selected dissolved and sedimentary tracers
     ! NOTE: only the existence of inconsistency will be highlighted, not exactly what the problem is ...
     SELECT CASE (par_bio_prodopt)
-    CASE (                        &
-         & '1N1T_PO4restore',     &
-         & '1N1T_PO4restoreLL',   &
-         & '1N1T_PO4MM',          &
-         & '1N1T_PO4MM_Tdep',     &
-         & '2N1T_PO4MM_SiO2',     &
-         & '2N2T_PN_Tdep',        &
-         & '3N2T_PNFe_Tdep',      &
-         & 'bio_PFe',             &
-         & 'bio_PFeSi',           &
-         & 'bio_PFeSi_Ridgwell02' &
+    CASE (                         &
+         & '1N1T_PO4restore',      &
+         & '1N1T_PO4restoreLL',    &
+         & '1N1T_PO4MM',           &
+         & '1N1T_PO4MM_Tdep',      &
+         & '2N1T_PO4MM_SiO2',      &
+         & '2N2T_PN_Tdep',         &
+         & '2N1T_PFe_Tdep',        &
+         & '3N2T_PNFe_Tdep',       &
+         & 'bio_PFe',              &
+         & 'bio_PFeSi',            &
+         & 'bio_PFeSi_Ridgwell02', &
+         & 'bio_PNFe'              &
          & )
        IF (.NOT. ocn_select(io_PO4)) loc_flag = .TRUE.
        IF (.NOT. sed_select(is_POP)) loc_flag = .TRUE.
@@ -2414,10 +2459,11 @@ CONTAINS
        IF (.NOT. sed_select(is_opal)) loc_flag = .TRUE.
     end select
     SELECT CASE (par_bio_prodopt)
-    case (                    &
+    case (                     &
          & '2N2T_PO4MM_NO3',   &
          & '2N2T_PN_Tdep',     &
-         & '3N2T_PNFe_Tdep'    &
+         & '3N2T_PNFe_Tdep',   &
+         & 'bio_PNFe'          &
          & )
        IF (.NOT. ocn_select(io_NO3)) loc_flag = .TRUE.
        IF (.NOT. ocn_select(io_N2)) loc_flag = .TRUE.
@@ -2426,7 +2472,9 @@ CONTAINS
     end select
     SELECT CASE (par_bio_prodopt)
     case (                    &
-         & '3N2T_PNFe_Tdep'   &
+         & '2N1T_PFe_Tdep',   &
+         & '3N2T_PNFe_Tdep',  &
+         & 'bio_PNFe'         &
          & )
        if (.NOT. (ocn_select(io_TDFe) .AND. ocn_select(io_TL)) ) then
           IF (.NOT. ocn_select(io_Fe)) loc_flag = .TRUE.
@@ -2986,6 +3034,30 @@ CONTAINS
                & )
           par_data_save_slice_n=int(conv_kocn_ksedgem/par_data_TM_avg_n)
        end if
+    end if
+    
+    ! *** redox-requiring schemes ***
+    if (.NOT. ctrl_bio_remin_redox_save) THEN
+       SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
+       case ('reminO2','reminO2lifetime')
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You need ctrl_bio_remin_redox_save to be .true. ...', &
+               & '... making this change for you.', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_bio_remin_redox_save = .true.
+       end select
+       SELECT CASE (opt_bio_remin_reduce_IO3toI)
+       case ('reminSO4','reminSO4lifetime','thresholdflex')
+          call sub_report_error( &
+               & 'biogem_data','sub_check_par', &
+               & 'You need ctrl_bio_remin_redox_save to be .true. ...', &
+               & '... making this change for you.', &
+               & (/const_real_null/),.false. &
+               & )
+          ctrl_bio_remin_redox_save = .true.
+       end select
     end if
 
   END SUBROUTINE sub_check_par_biogem
@@ -3660,8 +3732,10 @@ CONTAINS
   !        3 == 3D (uniform across entire ocean volumne)
   !        2 == 2D (uniform across surface)
   !        0 == forcing at a point
+  !       -1 == SURFACE (spatially explicit on ocean surface -- needs 2D file '_BSUR')
   !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       -3 == LEVEL (spatially explicit on any depth surface -- needs 2D file '_LVL')
+  !       -4 == SURFACE + BENTHIC
   !       ELSE, 3D spatially explicit forcing (needs a pair of 3D files '_I' and '_II')
   SUBROUTINE sub_init_force_restore_ocn()
     ! local variables
@@ -4014,6 +4088,7 @@ CONTAINS
   !       -1 == SURFACE (spatially explicit @ surface -- needs 2D file '_SUR')
   !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       -3 == LEVEL (spatially explicit on any depth surface -- needs 2D file '_LVL')
+  !       -4 == SURFACE + BENTHIC
   !       ELSE, 3D spatially explicit forcing (needs a pair of 3D files '_I' and '_II')
   SUBROUTINE sub_init_force_flux_ocn()
     ! local variables
@@ -4060,6 +4135,15 @@ CONTAINS
                 DO j=1,n_j
                    if (goldstein_k1(i,j) <= n_k) then
                       loc_ijk(:,:,force_ocn_point_k(io)) = 0.0
+                   end if
+                end DO
+             end DO
+          elseif (force_ocn_uniform(io) == -4) then
+             loc_ijk(:,:,n_k) = 0.0
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(:,:,goldstein_k1(i,j)) = 0.0
                    end if
                 end DO
              end DO
@@ -4119,6 +4203,25 @@ CONTAINS
                 DO j=1,n_j
                    if (goldstein_k1(i,j) <= n_k) then
                       loc_ijk(i,j,force_ocn_point_k(io)) = loc_ij(i,j)
+                   end if
+                end do
+             end DO
+          elseif (force_ocn_uniform(io) == -4) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_ocn_'//TRIM(string_ocn(io))//'_SUR'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,n_k) = loc_ij(i,j)
+                   end if
+                end do
+             end DO
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_ocn_'//TRIM(string_ocn(io))//'_BEN'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+             DO i=1,n_i
+                DO j=1,n_j
+                   if (goldstein_k1(i,j) <= n_k) then
+                      loc_ijk(i,j,goldstein_k1(i,j)) = loc_ij(i,j)
                    end if
                 end do
              end DO
@@ -4274,6 +4377,7 @@ CONTAINS
   !        2 == 2D (uniform across surface)
   !        0 == forcing at a point
   !       -1 == SURFACE (spatially explicit across surface -- needs 2D file '_SUR')
+  !       -2 == BENTHIC (spatially explicit on benthic surface -- needs 2D file '_BEN')
   !       ELSE, 2D spatially explicit forcing (needs a pair of 2D files '_I' and '_II')
   SUBROUTINE sub_init_force_flux_sed()
     ! local variables
@@ -4296,6 +4400,10 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 0.0
           elseif (force_sed_uniform(is) == -1) then
              loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -2) then
+             loc_ij(:,:) = 0.0
+          elseif (force_sed_uniform(is) == -5) then
+             loc_ij(:,:) = 0.0
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_I'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
@@ -4315,6 +4423,12 @@ CONTAINS
              loc_ij(force_sed_point_i(is),force_sed_point_j(is)) = 1.0
           elseif (force_sed_uniform(is) == -1) then
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_SUR'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -2) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
+             CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
+          elseif (force_sed_uniform(is) == -5) then
+             loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_BEN'//TRIM(string_data_ext)
              CALL sub_load_data_ij(loc_filename,n_i,n_j,loc_ij(:,:))
           else
              loc_filename = TRIM(par_fordir_name)//'biogem_force_flux_sed_'//TRIM(string_sed(is))//'_II'//TRIM(string_data_ext)
