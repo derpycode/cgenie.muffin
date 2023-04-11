@@ -9,7 +9,7 @@ cmsw
 #endif
      : dum_fx0a,dum_fx0o,dum_fxsen,dum_fxlw,
      : dum_evap,dum_pptn,dum_relh,
-     :     albs_lnd,                         !< surface albedo
+     :     albs_lnd,                         !< surface albedo 
      :     land_snow_lnd                     !< land snow cover
      :     )
 c #ifdef dosc
@@ -136,7 +136,7 @@ cmsw water fluxes
                srelh(i,j)=srelh(i,j)+dum_relh(i,j)
 cmsw other quantities
                sbcap(i,j)=sbcap(i,j)+bcap(i,j)
-               salbs(i,j)=salbs(i,j)+albs_lnd(i,j)
+               salbs(i,j)=salbs(i,j)+albs_lnd(i,j)		   
                ssnow(i,j)=ssnow(i,j)+land_snow_lnd(i,j)
                sz0(i,j)=sz0(i,j)+z0(i,j)
             endif

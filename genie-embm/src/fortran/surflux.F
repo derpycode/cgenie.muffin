@@ -73,7 +73,9 @@ c
      :     co2_out,ch4_out,n2o_out,
      :     surf_orog_atm,                    !< orography (m)
      :     landice_slicemask_lic,            !< land ice sheet mask
-     :     albs_atm,                         !< surface albedo
+     :     albs_sur,                         !< surface albedo (ocean + sea ice + land + snow)
+     :     palb,                             !< planetary albedo (surface + atmopshere)
+     :     eb_albo,                          !< ocean albedo	 
      :     land_albs_snow_lnd,               !< albedo over land for snowy conditions
      :     land_albs_nosnow_lnd,             !< albedo over land for snow-free conditions
      :     land_snow_lnd,                    !< land snow cover
@@ -130,8 +132,10 @@ c Dummy variables to be passed to/from BIOGEM via genie.F
 c land ice sheet mask
       real,dimension(maxi,maxj),intent(out)::landice_slicemask_lic
 
-c surface albedo
-      real,dimension(maxi,maxj),intent(inout)::albs_atm
+c albedo
+      real,dimension(maxj),intent(inout)::eb_albo
+      real,dimension(maxi,maxj),intent(inout)::albs_sur
+      real,dimension(maxi,maxj),intent(inout)::palb
       real,dimension(maxi,maxj),intent(in)::land_albs_snow_lnd
       real,dimension(maxi,maxj),intent(in)::land_albs_nosnow_lnd
 c land snow cover
@@ -752,11 +756,11 @@ c pbh surface specific humidity, derived at talt assuming vertically constant re
 
 c use climatological albedo in calculating incoming shortwave radiation
 c shortwave radiation NB modified later over ice
-c
+c PV [30/03/2023] What is climatological albedo? Only atmopshere? Or atmophsere and surface?
+c                 atm_alb(i,j,imth) is the montly ATMOSPHERIC albedo whereas albcl is considered the PLANETARY (atm+surface) albedo 
             if (flag_ents) then
-c SG > Modded for ENTS
+c SG Modded for ENTS
                albedo(i,j) = atm_alb(i,j,imth)
-c SG <
             endif
 c cgv2 seasonal
             if (flag_ents) then
@@ -965,21 +969,13 @@ c SG > Modded for ENTS
      1                    + fxlata(i,j)
      2                    + fxsensic + fxlwsic
      3                    - fxplw(i,j)
-c SG <
                   else
                      fx0sica = ca(i,j)*fxswsic 
      1                    + fxlata(i,j)
      2                    + fxsensic + fxlwsic
      3                    - fxplw(i,j)
                   endif
-                  if (flag_ents) then
-c SG > Modded for ENTS
-                     fx0sica = ca(i,j)*fxswsica 
-     1                    + fxlata(i,j)
-     2                    + fxsensic + fxlwsic
-     3                    - fxplw(i,j)
 c SG <
-                  endif
 
 c AY (10/12/03) : components of heat flux into atmosphere over sea-ice
 c nre only fxlwsic and fxsensic relevant for IGCM
@@ -1126,8 +1122,8 @@ c AY (10/12/03) : set up fluxes -> ocean
 
                if (flag_ents) then
 c SG > Modded for ENTS
-cmsw Calculate planetary albedo over ocean boxes
-                  albs_atm(i,j)=(albo(j,imth)
+cmsw Calculate surface and planetary albedo over ocean boxes
+                  albs_sur(i,j)=(albo(j,imth)
      1                 - (sica(i,j)*(albo(j,imth)-albsic)))
                   palb(i,j)=(1.-albedo(i,j))*(albo(j,imth)
      1                 - (sica(i,j)*(albo(j,imth)-albsic)))
@@ -1236,13 +1232,13 @@ cmsw Replace with offline data
                   pptn(i,j)=pncep(i,j,imth)
                endif
 
-cmsw Snow
+cmsw Snow present
 c also update land surface albedo values according to changes here
 
                if(land_temp_lnd(i,j).lt.-5.and.talt.lt.-5.
      1            and.pptn(i,j).gt.0.)then
                  land_snow_lnd(i,j)=1
-                 albs_atm(i,j)=land_albs_snow_lnd(i,j)
+                 albs_sur(i,j)=land_albs_snow_lnd(i,j)
                endif
 
 cmsw Snow melt
@@ -1251,7 +1247,15 @@ c also update land surface albedo values according to changes here
                if(land_temp_lnd(i,j).ge.-5.and.talt.ge.-5.
      1            and.land_snow_lnd(i,j).eq.1)then
                  land_snow_lnd(i,j)=0
-                 albs_atm(i,j)=land_albs_nosnow_lnd(i,j)
+                 albs_sur(i,j)=land_albs_nosnow_lnd(i,j)
+               endif
+			   
+c PV (22/03/2023) Snow absent -- this conditional was missing and therefore albs_sur
+c did not update when snow is absent (land_snow_lnd(i,j) = 0 during set-up stage)
+
+               if(land_temp_lnd(i,j).ge.-5.and.talt.ge.-5.
+     1            and.land_snow_lnd(i,j).eq.0)then
+                  albs_sur(i,j)=land_albs_nosnow_lnd(i,j)
                endif
 
 cmsw transfer coefficients
@@ -1268,7 +1272,7 @@ c#endif
 c#ifdef fixedveg
 c                  fv(i,j)=0.
 c#endif
-                  albs_atm(i,j)=albs_atm(i,j)
+                  albs_sur(i,j)=albs_sur(i,j)
      &                 *(2-lice_exact(i,j)) +
      1                            0.8*(lice_exact(i,j)-1)
                   land_z0_lnd(i,j)=land_z0_lnd(i,j)*(2-lice_exact(i,j))+
@@ -1339,7 +1343,7 @@ c pbh evap calculated with surface humidity if orogswitch=2
 cmsw ODE for land temp wrt to time
 
                   dtld = rhcld*((1-ca(i,j))*fxsw(i,j)
-     &                 *(1-albs_atm(i,j))
+     &                 *(1-albs_sur(i,j))
      1                  - fxsen(i,j) - fxlw(i,j) - rho0*hlv*evap(i,j))
 cmsw Sensible heat derivative
 
@@ -1406,7 +1410,7 @@ cmsw Radiation fluxes
               fx0a(i,j) = ca(i,j)*fxsw(i,j) + fxlata(i,j)
      1                  + fxlw(i,j) + fxsen(i,j) - fxplw(i,j)
 
-              fx0o(i,j) = (1-ca(i,j))*fxsw(i,j)*(1-albs_atm(i,j))
+              fx0o(i,j) = (1-ca(i,j))*fxsw(i,j)*(1-albs_sur(i,j))
      1             - fxsen(i,j) - fxlw(i,j) - rho0*hlv*evap(i,j)
 
 cmsw Bucket land hydrology: update bucket sizes
@@ -1495,7 +1499,7 @@ cghc balance water budget
        
 cmsw Calculate planetary albedo over land
 
-               palb(i,j)=((1.-albedo(i,j))*albs_atm(i,j))
+               palb(i,j)=((1.-albedo(i,j))*albs_sur(i,j))
      &              +albedo(i,j)
 
 c AY (10/12/03) : add fluxes to include sea-ice and ocean components
@@ -1642,10 +1646,9 @@ ccc            endif
          enddo
       enddo
       do j=1,jmax
-         go_solfor(j) = 
-     :     real(solfor(j,mod(istot-1,nyear)+1))
-      enddo
-      
+         go_solfor(j) = real(solfor(j,mod(istot-1,nyear)+1))
+         eb_albo(j) = real(albo(j,mod(istot-1,nyear)+1))
+      enddo     
 c pbh annual call to radfor if transient orbit is applied
       if(t_orbit.eq.1) then
         if(mod(istep-1,nyear).eq.0) then

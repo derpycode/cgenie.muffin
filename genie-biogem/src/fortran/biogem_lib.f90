@@ -770,8 +770,8 @@ MODULE biogem_lib
   INTEGER,PARAMETER::l_j = ilon1_lnd
   ! misc arrays dimensions
   INTEGER,PARAMETER::n_phys_ocn                           = 24 ! number of ocean box physical descriptors
-  INTEGER,PARAMETER::n_phys_ocnatm                        = 26 ! number of ocean-atmosphere interface physical descriptors
-  INTEGER,PARAMETER::n_ents                               = 17
+  INTEGER,PARAMETER::n_phys_ocnatm                        = 27 ! number of ocean-atmosphere interface physical descriptors
+  INTEGER,PARAMETER::n_ents                               = 20
   INTEGER,PARAMETER::n_data_max     = 32767                    ! (maximum) number of (time series) data points (2^15 - 1)
   ! options arrays dimensions
   INTEGER,PARAMETER::n_opt_misc                           = 14 ! miscellaneous
@@ -846,13 +846,14 @@ MODULE biogem_lib
   INTEGER,PARAMETER::ipoa_evap                            = 20   ! evap
   INTEGER,PARAMETER::ipoa_pptn                            = 21   ! pptn
   INTEGER,PARAMETER::ipoa_seaice_dV                       = 22   ! change in sea-ice volume
+  INTEGER,PARAMETER::ipoa_albo                            = 27   ! ocean albedo
   ! ents indices (SKT)
   INTEGER,PARAMETER::iel_lat                             = 01
   INTEGER,PARAMETER::iel_lon                             = 02
   INTEGER,PARAMETER::iel_mask_lnd                        = 03
   INTEGER,PARAMETER::iel_temp_lnd                        = 04
   INTEGER,PARAMETER::iel_moisture_lnd                    = 05
-  INTEGER,PARAMETER::iel_albs_lnd                        = 06
+  INTEGER,PARAMETER::iel_albs_sur                        = 06
   INTEGER,PARAMETER::iel_fv                              = 07
   INTEGER,PARAMETER::iel_photo                           = 08
   INTEGER,PARAMETER::iel_respveg                         = 09
@@ -864,6 +865,9 @@ MODULE biogem_lib
   INTEGER,PARAMETER::iel_Cveg_14C                        = 15
   INTEGER,PARAMETER::iel_Csoil_14C                       = 16
   INTEGER,PARAMETER::iel_leaf                            = 17
+  INTEGER,PARAMETER::iel_albs_lnd                        = 18
+  INTEGER,PARAMETER::iel_palb                            = 19
+  INTEGER,PARAMETER::iel_snow_lnd                        = 20
   ! options - misc
   integer,parameter::iopt_misc_O2_equil                   = 07   ! force O2 equilibrium of ocean with atmosphere
   integer,parameter::iopt_misc_debugij                    = 10   ! debug - explicit reporting of (i,j) location in main loop
@@ -1003,7 +1007,8 @@ MODULE biogem_lib
        & 'u               ', &
        & 'v               ', &
        & 'usurf           ', &
-       & 'MLD_k           ' /)
+       & 'MLD_k           ', &
+       & 'albo            ' /)
   ! ents (SKT) 
   CHARACTER(len=16),DIMENSION(n_ents),PARAMETER::string_ents = (/ &
        & 'lat             ', &
@@ -1011,7 +1016,7 @@ MODULE biogem_lib
        & 'mask_lnd        ', &
        & 'temp_lnd        ', &
        & 'moisture_lnd    ', &
-       & 'albs_lnd        ', &
+       & 'albs_sur        ', &
        & 'fv              ', &
        & 'photo           ', &
        & 'respveg         ', &
@@ -1022,7 +1027,10 @@ MODULE biogem_lib
        & 'Csoil_13C       ', &
        & 'Cveg_14C        ', &
        & 'Csoil_14C       ', &
-       & 'leaf            ' /)
+	   & 'leaf            ', &
+	   & 'albs_lnd        ', &
+	   & 'alb_palb        ', &
+	   & 'snow_lnd        '/)
   ! diagnostics - biology
   CHARACTER(len=14),DIMENSION(n_diag_bio),PARAMETER::string_diag_bio = (/ &
        & 'dPO4          ', &

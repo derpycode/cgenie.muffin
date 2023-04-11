@@ -754,6 +754,7 @@ MODULE genie_global
   REAL,DIMENSION(ilat1_atm)::solfor_atm
   REAL,DIMENSION(ilon1_ocn,ilat1_ocn)::go_fxsw
   REAL,DIMENSION(ilon1_ocn,ilat1_ocn)::go_mldta
+  REAL,DIMENSION(ilon1_ocn,ilat1_ocn)::eb_albo
   REAL,DIMENSION(0:ilon1_ocn,0:ilat1_ocn)::go_psi
   real,dimension(ilon1_ocn,ilat1_ocn,inl1_ocn)::go_diffv
   real,dimension(ilon1_ocn,ilat1_ocn,inl1_ocn)::go_dzrho
@@ -807,7 +808,8 @@ MODULE genie_global
  real eb_relh(ilon1_ocn,ilat1_ocn)
  real,dimension(ilon1_atm,ilat1_atm)::torog_atm
  real,dimension(ilon1_lic,ilat1_lic)::landice_slicemask_lic
- real,dimension(ilon1_atm,ilat1_atm)::albs_atm
+ real,dimension(ilon1_atm,ilat1_atm)::eb_albs_sur
+ real,dimension(ilon1_atm,ilat1_atm)::eb_palb
  real,dimension(ilon1_lnd,ilat1_lnd)::land_albs_snow_lnd
  real,dimension(ilon1_lnd,ilat1_lnd)::land_albs_nosnow_lnd
  real,dimension(ilon1_lnd,ilat1_lnd)::land_snow_lnd

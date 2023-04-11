@@ -11,7 +11,7 @@ cmsw
      :     dum_rdtdim,dum_co2_out,
      :     gn_daysperyear,
      :     landice_slicemask_lic,            !< land ice sheet mask
-     :     albs_lnd,                         !< surface albedo
+     :     albs_lnd,                         !< surface albedo 
      :     land_snow_lnd                     !< land snow cover
      :     )
 
@@ -65,7 +65,7 @@ c land ice mask
       real,dimension(maxi,maxj),intent(in)::landice_slicemask_lic
 
 c surface albedo
-      real,dimension(maxi,maxj),intent(inout)::albs_lnd
+      real,dimension(maxi,maxj),intent(inout)::albs_lnd 
 c land snow cover
       real,dimension(maxi,maxj),intent(inout)::land_snow_lnd
 
@@ -632,7 +632,7 @@ cmsw zero annual average arrays
             srelh(i,j)=0.
 
             sbcap(i,j)=0.
-            salbs(i,j)=0.
+            salbs(i,j)=0.		
             ssnow(i,j)=0.
             sz0(i,j)=0.
 

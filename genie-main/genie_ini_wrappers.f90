@@ -180,7 +180,7 @@ contains
          tstar_atm,surf_qstar_atm,eb_ca,co2_atm, &
          global_daysperyear,alat1_ocn, &
          landice_slicemask_lic, &
-         albs_atm, &
+         albs_lnd, &
          land_albs_snow_lnd, &
          land_albs_nosnow_lnd, &
          land_snow_lnd, &
@@ -205,7 +205,7 @@ contains
          tstar_atm,surf_qstar_atm,eb_ca,co2_atm, &
          global_daysperyear,alat1_ocn, &
          landice_slicemask_lic, &
-         albs_atm, &
+         albs_lnd, &
          land_albs_snow_lnd, &
          land_albs_nosnow_lnd, &
          land_snow_lnd, &

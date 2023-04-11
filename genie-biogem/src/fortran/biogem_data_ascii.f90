@@ -1531,7 +1531,7 @@ CONTAINS
                   call check_iostat(ios,__LINE__,__FILE__)
                   CLOSE(unit=out,iostat=ios)
                   call check_iostat(ios,__LINE__,__FILE__)
-               CASE (iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd)
+               CASE (iel_fv,iel_albs_sur,iel_temp_lnd,iel_moisture_lnd)
                   loc_sig = int_ents_sig(iel)/int_t_sig
                   call check_unit(out,__LINE__,__FILE__)
                   OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)

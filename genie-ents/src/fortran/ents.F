@@ -15,7 +15,9 @@
      :     dum_evap,dum_pptn,dum_relh,dum_istep0,
      :     dum_el_photo,dum_el_respveg,dum_el_respsoil,dum_el_leaf,
      :     landice_slicemask_lic,            !< land ice sheet mask
-     :     albs_lnd,                         !< surface albedo
+     :     albs_lnd,                         !< surface albedo over land
+     :     albs_sur,                         !< surface albedo over land, ocean, sea ice
+     :     palb,                             !< planetary albedo (surface+atmopshere)
      :     land_albs_snow_lnd,               !< albedo over land for snowy conditions
      :     land_albs_nosnow_lnd,             !< albedo over land for snow-free conditions
      :     land_snow_lnd,                    !< land snow cover
@@ -79,8 +81,10 @@ c land ice mask
       real,dimension(maxi,maxj),
      &     intent(in)::landice_slicemask_lic
 
-c surface albedo
+c albedo
       real,dimension(maxi,maxj),intent(inout)::albs_lnd
+      real,dimension(maxi,maxj),intent(inout)::albs_sur
+      real,dimension(maxi,maxj),intent(inout)::palb
       real,dimension(maxi,maxj),intent(out)::land_albs_snow_lnd
       real,dimension(maxi,maxj),intent(out)::land_albs_nosnow_lnd
 
@@ -386,6 +390,9 @@ c roughness length
                   el_Cveg_14C(i,j)=real(Cveg_14C(i,j))
                   el_Csoil_14C(i,j)=real(Csoil_14C(i,j))
                   el_fv(i,j)=real(fv(i,j))
+				  land_snow_lnd(i,j)=real(land_snow_lnd(i,j))
+				  albs_sur(i,j)=real(albs_sur(i,j))
+				  palb(i,j)=real(palb(i,j))
                enddo
             enddo
 

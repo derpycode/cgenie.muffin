@@ -135,10 +135,12 @@ contains
          co2_atm,ch4_atm,n2o_atm, &               ! output
          surf_orog_atm, &                         ! in/output
          landice_slicemask_lic, &                 ! in/output
-         albs_atm, &                              ! in/output
-         land_albs_snow_lnd, &                    ! input
-         land_albs_nosnow_lnd, &                  ! input
-         land_snow_lnd, &                         ! in/output
+         eb_albs_sur, &                           ! output (to ENTS and BIOGEM)
+		 eb_palb, &                               ! output (to ENTS and BIOGEM)
+         eb_albo, &                               ! output (to ENTS and BIOGEM)
+         land_albs_snow_lnd, &                    ! input (from ENTS)
+         land_albs_nosnow_lnd, &                  ! input (from ENTS)
+         land_snow_lnd, &                         ! output (to ENTS and BIOGEM)
          land_bcap_lnd, &                         ! in/output
          land_z0_lnd, &                           ! in/output
          land_temp_lnd, &                         ! in/output
@@ -363,10 +365,12 @@ contains
          eb_evap,eb_pptn,eb_relh,go_istep0, &
          el_photo,el_respveg,el_respsoil,el_leaf, & ! GHC - added these for use with rokgem
          landice_slicemask_lic, &
-         albs_atm, &
-         land_albs_snow_lnd, &
-         land_albs_nosnow_lnd, &
-         land_snow_lnd, &
+         albs_lnd, &	 						  ! output (to BIOGEM)
+         eb_albs_sur, &	 						  ! input (from EMBM) / output (to BIOGEM)
+         eb_palb, &	 						      ! input (from EMBM) / output (to BIOGEM)
+         land_albs_snow_lnd, &					  ! output (to EMBM)
+         land_albs_nosnow_lnd, &				  ! output (to EMBM)
+         land_snow_lnd, &					 	  ! input (from EMBM) / output (to BIOGEM)
          land_bcap_lnd, &                         ! output
          land_z0_lnd, &                           ! output
          land_temp_lnd, &                         ! input
@@ -374,13 +378,13 @@ contains
          intrac_atm_max, &
          genie_sfcatm_lnd, &
          genie_sfxatm_lnd, &
-         el_Cveg, &
-         el_Csoil, &
-         el_Cveg_13C, &
-         el_Csoil_13C, &
-         el_Cveg_14C, &
-         el_Csoil_14C, &
-         el_fv)
+         el_Cveg, &                               ! output (to BIOGEM)
+         el_Csoil, &                              ! output (to BIOGEM)
+         el_Cveg_13C, &                           ! output (to BIOGEM)
+         el_Csoil_13C, &                          ! output (to BIOGEM)
+         el_Cveg_14C, &                           ! output (to BIOGEM)
+         el_Csoil_14C, &                          ! output (to BIOGEM)
+         el_fv)                                   ! output (to BIOGEM)
   end subroutine ents_wrapper
 
   !!
@@ -684,7 +688,8 @@ contains
          & genie_solar_constant,                             & ! input/output
          & go_diffv,                                         & ! input
          & go_dzrho,                                         & ! input
-         & go_rho                                            & ! input
+		 & go_rho,                                           & ! input
+         & eb_albo                                           & ! input
          ) 
   end subroutine biogem_climate_wrapper
   !!
@@ -699,13 +704,16 @@ contains
          & el_Csoil_14C,                                     &
          & land_temp_lnd,                                    &
          & land_moisture_lnd,                                &
-         & albs_atm,                                         &
+		 & land_snow_lnd,                                    &
+		 & albs_lnd,									     &
+         & eb_albs_sur,                                      &
+         & eb_palb,                                          &		 
          & el_fv,                                            &
          & el_photo,                                         &
          & el_respveg,                                       &
          & el_respsoil,                                      &
          & el_leaf,                                          &
-	 & landice_slicemask_lic			& ! input
+	     & landice_slicemask_lic                             &
          )
     end subroutine biogem_ents_wrapper
 

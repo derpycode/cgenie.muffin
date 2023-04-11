@@ -82,13 +82,13 @@ c EMBM
      1 ,qsata(maxi,maxj),qsato(maxi,maxj)
      2 ,co2(maxi,maxj),ch4(maxi,maxj),n2o(maxi,maxj)
      3 ,varice(2,maxi,maxj),varice1(2,maxi,maxj),dtatm
-     4 ,tqa(2,maxi,maxj),solfor(maxj,maxnyr),ghs,rdtdim,scf
-     5 ,z1_embm
+     4 ,tqa(2,maxi,maxj),solfor(maxj,maxnyr),albo(maxj,maxnyr),ghs
+     5 ,rdtdim,scf,z1_embm
       common /embm_ebmvar/cd,tq,tq1
      1 ,qsata,qsato
      2 ,co2,ch4,n2o
      3 ,varice,varice1,dtatm
-     4 ,tqa,solfor,ghs,rdtdim,scf
+     4 ,tqa,solfor,albo,ghs,rdtdim,scf
      5 ,z1_embm
 c constants for embm
       real emo,
@@ -270,7 +270,7 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
      &                  orbitecc_vect,
      &                  orbitobl_vect,
      &                  orbitlonperi_vect,
-     &   	         orbittau_vect,
+     &                  orbittau_vect,
      &                  orbitall_vect,
      &                  t_orbit,norbit,orbitsteps,
      &                  filenameorbit
@@ -291,12 +291,12 @@ c pbh co2 times series
 
 c SG : added albedo paramters from ENTS
       REAL
-     &  albo(maxj,maxnyr)          ! ocean albedo
-     & ,palb(maxi,maxj)            ! planetary albedo
-     & ,palbavg(maxi,maxj)         ! average planetary albedo
+c     &  albo(maxj,maxnyr)          ! ocean albedo
+c     & palb(maxi,maxj)            ! planetary albedo
+     & palbavg(maxi,maxj)         ! average planetary albedo
 
-      COMMON /entsalb/
-     & albo,palb,palbavg
+c      COMMON /entsalb/
+c     & albo,palb,palbavg
 
 c AR (18/01/08) : run-time seasonality option
       logical dosc,debug_init,debug_end,debug_loop

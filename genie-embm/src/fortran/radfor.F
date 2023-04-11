@@ -223,10 +223,11 @@ c           write(1,'(e15.5)')solfor(j,istep)
       if (dosc) then
       else
 c
-c replace variable forcing by its average
+c replace variable forcing by its average if seasonallity is OFF (dosc=.false.)
 c
       do j=1,jmax
          solavg(j) = 0.
+	     alboavg(j) = 0.
          do istep=1,nyear
             solavg(j) = solavg(j) + solfor(j,istep)
 c SG > ENTS albedo scheme mod

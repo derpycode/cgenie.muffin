@@ -143,7 +143,7 @@ cmsw to calculate .avg files)
      & spptn(maxients,maxjents),       ! summed pptn over land
      & srelh(maxients,maxjents),       ! summed relative humidity over land
      & sbcap(maxients,maxjents),       ! summed soil field capacity
-     & salbs(maxients,maxjents),       ! summed albedo over land
+     & salbs(maxients,maxjents),       ! summed albedo over land 
      & ssnow(maxients,maxjents),       ! summed snow over land
      & sz0(maxients,maxjents)          ! summed roughness length over land
 

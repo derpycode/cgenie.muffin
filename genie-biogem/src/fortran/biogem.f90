@@ -2258,7 +2258,8 @@ subroutine biogem_climate( &
      & dum_solconst,            &
      & dum_diffv,               &
      & dum_dzrho,               &
-     & dum_rho_go               &
+	 & dum_rho_go,              &
+	 & dum_albo                 &
      & )
 
   USE biogem_lib
@@ -2282,6 +2283,7 @@ subroutine biogem_climate( &
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_diffv              ! vertical diffusivity
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_dzrho              ! density gradient
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_rho_go             ! density from goldstein
+  REAL,DIMENSION(n_j),INTENT(in)::dum_albo                       ! ocean albedo from embm 
 ! LOCAL VARIABLES
   INTEGER::i,j,k
   integer::loc_k1                                                ! local topography
@@ -2349,6 +2351,8 @@ subroutine biogem_climate( &
         ! evap and precip
         phys_ocnatm(ipoa_evap,i,j)  = dum_evap(i,j)
         phys_ocnatm(ipoa_pptn,i,j)  = dum_pptn(i,j)
+		! ocean albedo
+		phys_ocnatm(ipoa_albo,i,j)  = dum_albo(j)
      end DO
   end DO
   ! copy barotropic streamfunction
@@ -2399,13 +2403,16 @@ subroutine biogem_ents( &
      & dum_Csoil_14C,           &
      & dum_temp_lnd,            &
      & dum_moisture_lnd,        &
-     & dum_albs_lnd,            &
+	 & dum_snow_lnd,            &
+	 & dum_albs_lnd,            &
+     & dum_albs_sur,            &
+     & dum_palb,                &	 
      & dum_fv,                  &
      & dum_photo,               &
      & dum_respveg,             &
      & dum_respsoil,            &
-     & dum_leaf,                 & 
-     & dum_mask_lnd		&
+     & dum_leaf,                & 
+     & dum_mask_lnd             &
      & )
   USE biogem_lib
   USE biogem_box
@@ -2418,14 +2425,17 @@ subroutine biogem_ents( &
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Cveg_14C               ! Vegetation C 14C (kg/m2)                                                                                                
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_Csoil_14C              ! Soil C 14C (kg/m2)                                                                                                    
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_temp_lnd               ! ENTS Land Temp                                                                                                  
-  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_moisture_lnd           ! ENTS Land Moisture                                                                                              
-  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_lnd               ! ENTS Albedo                                                                                                     
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_moisture_lnd           ! ENTS Land Moisture
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_snow_lnd               ! ENTS Land snow cover
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_lnd               ! ENTS Land albedo  
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_sur               ! Surface albedo (ocean+land) 
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_palb                   ! Planetary albedo (surface+atmosphere)  
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fv                     ! ENTS Vegetation fraction                                                                                        
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_photo                  ! Photosynthesis (kg/m2/yr)                                                                                             
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_respveg                ! Vegetation respiration (kg/m2/yr)                                                                                     
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_respsoil               ! Soil respiration (kg/m2/yr)                                                                                           
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_leaf                   ! Leaf litter (kg/m2/yr)  
-  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_mask_lnd                  ! Sea-land-landice mask       
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_mask_lnd               ! Sea-land-landice mask
 ! LOCAL VARIABLES                                                                                                                                                
   INTEGER::i,j
 ! Copy ENTS data
@@ -2438,11 +2448,14 @@ subroutine biogem_ents( &
         ents(iel_Csoil_13C,i,j) = dum_Csoil_13C(i,j)
         ents(iel_Cveg_14C,i,j) = dum_Cveg_14C(i,j)
         ents(iel_Csoil_14C,i,j) = dum_Csoil_14C(i,j)
-        ! Land temp and moisture - ENTS                                                                                                                                                 
+        ! Land temp, moisture, snow cover - ENTS                                                                                                                                                 
         ents(iel_temp_lnd,i,j) = dum_temp_lnd(i,j)
         ents(iel_moisture_lnd,i,j) = dum_moisture_lnd(i,j)
-        ! Albedo                                                                                                                                                                        
+		ents(iel_snow_lnd,i,j) = dum_snow_lnd(i,j)
+        ! Albedo
         ents(iel_albs_lnd,i,j) = dum_albs_lnd(i,j)
+        ents(iel_albs_sur,i,j) = dum_albs_sur(i,j)
+        ents(iel_palb,i,j) = dum_palb(i,j)
         ! Fraction vegetation                                                                                                                                                           
         ents(iel_fv,i,j) = dum_fv(i,j)
         ! Photosynthesis - ENTS                                                                                                                
@@ -2450,8 +2463,8 @@ subroutine biogem_ents( &
         ents(iel_respveg,i,j) = dum_respveg(i,j)
         ents(iel_respsoil,i,j) = dum_respsoil(i,j)
         ents(iel_leaf,i,j)  = dum_leaf(i,j)
-	! Sea-land-landice mask   
-	ents(iel_mask_lnd,i,j)  = dum_mask_lnd(i,j)
+		! Sea-land-landice mask   
+        ents(iel_mask_lnd,i,j)  = dum_mask_lnd(i,j)
      end DO
   end DO
 
@@ -3855,7 +3868,7 @@ SUBROUTINE diag_biogem_timeseries( &
                          & iel_respsoil,iel_respveg)
                       int_ents_sig(iel) = int_ents_sig(iel) + &
                          & loc_dtyr*SUM((phys_ocnatm(ipoa_A,:,:)*ents(iel,:,:)))
-                 CASE (iel_fv,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd)
+                 CASE (iel_fv,iel_albs_lnd,iel_albs_sur,iel_temp_lnd,iel_moisture_lnd)
                       loc_sig = 0.0
                       loc_tot_A = 0.0
                       DO i=1,n_i
@@ -3863,7 +3876,7 @@ SUBROUTINE diag_biogem_timeseries( &
                             loc_k1 = goldstein_k1(i,j)
                             IF (n_k < loc_k1) THEN
                               loc_sig = loc_sig + phys_ocnatm(ipoa_A,i,j)*ents(iel,i,j)
-                               loc_tot_A = loc_tot_A + phys_ocnatm(ipoa_A,i,j)
+                              loc_tot_A = loc_tot_A + phys_ocnatm(ipoa_A,i,j)
                             end IF
                          end DO
                       end DO
