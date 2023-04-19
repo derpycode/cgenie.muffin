@@ -1,3 +1,4 @@
+
 * ======================================================================
 * initialise_embm.F
 * ======================================================================
@@ -237,6 +238,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/lin,atchem_radfor
       NAMELIST /ini_embm_nml/orbit_radfor
       NAMELIST /ini_embm_nml/t_orbit,norbit,orbitsteps,filenameorbit
+      NAMELIST /ini_embm_nml/opt_orbit_old 
       NAMELIST /ini_embm_nml/t_co2,nco2,co2steps,filenameco2
       NAMELIST /ini_embm_nml/diffa_scl,diffa_len
       NAMELIST /ini_embm_nml/dosc,delf2x
@@ -280,7 +282,8 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/opt_freeze
       NAMELIST /ini_embm_nml/par_albedo1d_name,par_albedo2d_name
       NAMELIST /ini_embm_nml/par_orbit_osce,par_orbit_oscsob
-      NAMELIST /ini_embm_nml/par_orbit_osclonperi,par_orbit_osctau0
+      NAMELIST /ini_embm_nml/par_orbit_oscgam,par_orbit_osctau0
+      NAMELIST /ini_embm_nml/par_orbit_oscobl,par_orbit_osclonperi  
 
 c ------------------------------------------------------------ c
 c INITIALIZE VARIABLES
@@ -1722,13 +1725,14 @@ c AR (14/10/08) -- also re-order time(!)
           open(unit=729,file=indir_name(1:lenin)//trim(filenameorbit),
      $ iostat=ios)
           do i=1,norbit
-             read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,4)
+             read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
           enddo
           close(729)
           do i=1,norbit
             orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
             orbitobl_vect(norbit-i+1) = orbitall_vect(i,3)
-            orbitlonperi_vect(norbit-i+1) = orbitall_vect(i,4)
+            orbitpre_vect(norbit-i+1) = orbitall_vect(i,4)
+            orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
           enddo
         else
           print*,''
