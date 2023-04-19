@@ -1875,22 +1875,34 @@
                         <description>use ENTS albedo scheme (y/n)</description>
                     </param>
 -->
+                    <param name="opt_orbit_old">
+			<value datatype="boolean">.true.</value>
+			<description>use old (incorrect) orbital forcing calculations?</description>
+                    </param>
                     <param name="par_orbit_osce">
 			<value datatype="real">0.0167</value>
                         <description>eccentricity</description>
                     </param>
                     <param name="par_orbit_oscsob">
-			<value datatype="real">0.409093</value>
-                        <description>obliquity (in radians)</description>
+			<value datatype="real">0.397789</value>
+                        <description>sine of obliquity used when opt_orbit_old=true</description>
                     </param>
-                    <param name="par_orbit_osclonperi">
-			<value datatype="real">1.796257</value>
-                        <description>longitude of perihelion (in radians)</description>
+                    <param name="par_orbit_oscgam">
+			<value datatype="real">99999</value>
+                        <description>MEAN longitude of perihelion (in deg) used when opt_orbit_old=true</description>
                     </param>
                     <param name="par_orbit_osctau0">
 			<value datatype="real">-0.5</value>
-                        <description>time (days from calendar yr start) of perihelion</description>
+                        <description>date of perihelion from Jan. 1st (in days)</description>
                     </param>
+					<param name="par_orbit_oscobl">
+			<value datatype="real">0.409093</value>
+                        <description>obliquity (in rad) use when opt_orbit_old=false</description>
+                    </param>	
+                    <param name="par_orbit_osclonperi">
+			<value datatype="real">1.796257</value>
+                        <description>TRUE longitude of perihelion (in rad) used when opt_orbit_old=false</description>
+                    </param>	
                     <param name="orbit_radfor">
 			<value datatype="string">n</value>
                         <description>use orbital parameters for albedo scheme (y/n)</description>
