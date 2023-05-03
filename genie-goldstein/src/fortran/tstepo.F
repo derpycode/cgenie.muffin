@@ -224,10 +224,13 @@ c isoneutral code also needs ts1 bc.
       enddo
 
       do 10 k=1,kmax
-         do 10 j=1,jmax
-            do 10 i=1,imax
-               do 10 l=1,lmax
+         do 11 j=1,jmax
+            do 12 i=1,imax
+               do 13 l=1,lmax
                   if(k.ge.k1(i,j)) ts1(l,i,j,k) = ts(l,i,j,k)
-   10 continue
+ 13            continue
+ 12         continue
+ 11      continue
+ 10   continue
 
       end

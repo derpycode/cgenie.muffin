@@ -51,8 +51,8 @@ MODULE genie_global
   ! var: genie_vesion
   ! Version number for the model
   integer :: genie_version
-  character, parameter :: TAB = char(9) 
-
+  character, parameter :: TAB = char(9)                         !
+  
   ! This is the overall timestep counter
   integer(kind=8) :: koverall 
   integer::katm

@@ -675,11 +675,14 @@ c
 c extended ts1 needed for cimp.ne.1 or isoneutral cases only
 c
       do 10 j=1,jmax
-         do 10 i=0,imax+1
-            do 10 k=k1(i,j),kmax
-               do 10 l=1,lmax
+         do 11 i=0,imax+1
+            do 12 k=k1(i,j),kmax
+               do 13 l=1,lmax
                   ts1(l,i,j,k) = ts(l,i,j,k)
-   10 continue
+ 13            continue
+ 12         continue
+ 11      continue
+ 10   continue
 
 c     print*,'max central coeff * cimp',cenmax, '*',cimp
 c

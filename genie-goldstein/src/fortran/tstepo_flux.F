@@ -41,19 +41,22 @@ c KICO initialise diffv
 
 c lower boundary fluxes
       do 220 j=1,jmax
-         do 220 i=1,imax
-            do 220 l=1,lmax
+         do 221 i=1,imax
+            do 222 l=1,lmax
                fb(l,i,j) = 0
-  220 continue
+ 222        continue
+ 221     continue
+ 220  continue
 
       do 100 k=1,kmax
 c southern boundary fluxes
          j = 1
          do 230 i=1,imax
-            do 230 l=1,lmax
+            do 231 l=1,lmax
                fs(l,i) = 0
-  230    continue
-         do 100 j=1,jmax
+ 231        continue
+ 230     continue
+         do 101 j=1,jmax
 c western boundary fluxes
             i = 1
             pec(1) = u(1,imax,j,k)*dphi/diff(1)
@@ -70,7 +73,7 @@ c western doorway
                endif
                fwsave(l) = fw(l)
   210       continue
-            do 100 i=1,imax
+            do 102 i=1,imax
 
 c KICO calculate local vertical diffusivity
               if(k.ge.k1(i,j).and.k.lt.kmax)then
@@ -223,7 +226,9 @@ c add isoneutral vertical flux
 
                call eos(ec,ts(1,i,j,k),ts(2,i,j,k),zro(k),
      1            ieos,rho(i,j,k))
-  100 continue
+ 102        continue
+ 101     continue
+ 100  continue
 
       end
 
@@ -275,19 +280,22 @@ c KICO initialise diffv
 
 c lower boundary fluxes
       do 220 j=1,jmax
-         do 220 i=1,imax
-            do 220 l=1,lmax
+         do 221 i=1,imax
+            do 222 l=1,lmax
                fb(l,i,j) = 0
-  220 continue
+ 222        continue
+ 221     continue
+ 220  continue
 
       do 100 k=1,kmax
 c southern boundary fluxes
          j = 1
          do 230 i=1,imax
-            do 230 l=1,lmax
+            do 231 l=1,lmax
                fs(l,i) = 0
-  230    continue
-         do 100 j=1,jmax
+ 231        continue
+ 230     continue
+         do 101 j=1,jmax
 c western boundary fluxes
             i = 1
             pec(1) = u(1,imax,j,k)*dphi/diff(1)
@@ -304,7 +312,7 @@ c western doorway
                endif
                fwsave(l) = fw(l)
   210       continue
-            do 100 i=1,imax
+            do 102 i=1,imax
 
 c KICO calculate local vertical diffusivity
               if(k.ge.k1(i,j).and.k.lt.kmax)then
@@ -455,6 +463,8 @@ c add isoneutral vertical flux
 
                call eos(ec,ts_(1,i,j,k),ts_(2,i,j,k),zro(k),
      1            ieos,rho_(i,j,k))
-  100 continue
+ 102        continue
+ 101     continue
+ 100  continue
 
       end
