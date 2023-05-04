@@ -342,8 +342,10 @@ MODULE biogem_lib
   real::par_bio_remin_gammaPO4                                   ! Activity coefficient for aqueous PO43-
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaPO4
   ! JDW size-dependent POC remineralisation
-  real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m) (for implicit exponential scheme)
-  real::par_bio_remin_POC_w0                                     ! sinking speed of smallest ecogem size class (m day-1) (for explicit scheme)
+  real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m)
+                                                                 ! (for implicit exponential scheme)
+  real::par_bio_remin_POC_w0                                     ! sinking speed of smallest ecogem size class (m day-1)
+                                                                 ! (for explicit scheme)
   real::par_bio_remin_POC_size0                                  ! diameter of smallest ecogem size class (um)
   real::par_bio_remin_POC_eta                                    ! exponent linking sinking speed and size (Stemmann et al., 2004)
   NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta,par_bio_remin_POC_w0
@@ -438,6 +440,8 @@ MODULE biogem_lib
   real::par_d187Os_OsCO3_epsilon                                  ! 187/192Os fractionation between Os and OsCO3
   real::par_d188Os_OsCO3_epsilon                                  ! 188/192Os fractionation between Os and OsCO3
   namelist /ini_biogem_nml/par_d187Os_OsCO3_epsilon,par_d188Os_OsCO3_epsilon
+  real::par_d15N_Corg_NO3_epsilon                                ! nitrate reduction fractionation (in N isotopes)
+  namelist /ini_biogem_nml/par_d15N_Corg_NO3_epsilon
   real::par_d56Fe_Corg_FeOOH_epsilon                             ! dissimilatory iron reduction fractionation
   namelist /ini_biogem_nml/par_d56Fe_Corg_FeOOH_epsilon
   real::par_d13C_Corg_CH4_epsilon                                ! methanogenesis fractionation

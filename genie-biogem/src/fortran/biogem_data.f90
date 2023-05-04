@@ -336,6 +336,7 @@ CONTAINS
        print*,'Planktic foram 13C fractionation scheme ID string   : ',opt_bio_foram_p_13C_delta
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
+       print*,'nitrage reduction N-fractionation                   : ',par_d15N_Corg_NO3_epsilon
        print*,'dissimilatory iron reduction fractionation          : ',par_d56Fe_Corg_FeOOH_epsilon  
        print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
        print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
@@ -1345,7 +1346,7 @@ CONTAINS
           conv_sed_ocn_O(io_NH4,is_PON) = 1.0
           conv_sed_ocn_O(io_N2,is_PON)  = 0.0
        end if
-       ! N isotopes (from PON remin) [???]
+       ! N isotopes -- 15N release from 15PON -- assume in the same proporiton as N from PON (no fractionation)
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_O(io_NO3_15N,is_PON_15N) = conv_sed_ocn_O(io_NO3,is_PON)
           conv_sed_ocn_O(io_NH4_15N,is_PON_15N) = conv_sed_ocn_O(io_NH4,is_PON)
@@ -1401,7 +1402,7 @@ CONTAINS
     !
     if (ocn_select(io_NO3)) then
        conv_sed_ocn_N(:,:)  = conv_sed_ocn(:,:)
-       ! N
+       ! > N
        if (ocn_select(io_NH4)) then
           ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_N(io_NO3,is_PON) = 0.0
@@ -1411,13 +1412,13 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes (from PON remin) [???]
+       ! > N isotopes -- 15N release from 15PON -- assume in the same proporiton as N from PON (no fractionation)
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_N(io_NO3_15N,is_PON_15N) = conv_sed_ocn_N(io_NO3,is_PON)
           conv_sed_ocn_N(io_NH4_15N,is_PON_15N) = conv_sed_ocn_N(io_NH4,is_PON)
           conv_sed_ocn_N(io_N2_15N,is_PON_15N)  = conv_sed_ocn_N(io_N2,is_PON)
        end if
-       ! P,C
+       ! > P,C
        if (ocn_select(io_NO2)) then
           ! O2 == 2NO3- - 2NO2-
           conv_sed_ocn_N(io_NO3,is_POP) = 2.0*conv_sed_ocn_N(io_O2,is_POP)
@@ -1430,7 +1431,7 @@ CONTAINS
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        elseif (ocn_select(io_N2)) then
           ! O2 == (4/5)NO3- + (4/5)H+ - (2/5)N2 - (2/5)H2O
-          conv_sed_ocn_N(io_NO3,is_POP) = -(4.0/5.0)*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_NO3,is_POP) = (4.0/5.0)*conv_sed_ocn_N(io_O2,is_POP)
           conv_sed_ocn_N(io_N2,is_POP)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_ALK,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
           conv_sed_ocn_N(io_O2,is_POP)  = 0.0
@@ -1452,13 +1453,26 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes (from denitrification)
-!!!
-       ! ALK
-       ! [N transformations are explicit and hence ALK is associated with neither P nor C (excepting nitrate reduction)]
-       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! > N isotopes (from denitrification) [placeholder values -- corrected for local d15N in sub_box_remin_redfield]
+       if (ocn_select(io_NO3_15N)) then
+          conv_sed_ocn_N(io_NO3_15N,is_POP) = conv_sed_ocn_N(io_NO3,is_POP)
+          conv_sed_ocn_N(io_NO3_15N,is_POC) = conv_sed_ocn_N(io_NO3,is_POC)
+       endif
+       if (ocn_select(io_NO2_15N)) then
+          conv_sed_ocn_N(io_NO2_15N,is_POP) = conv_sed_ocn_N(io_NO2,is_POP)
+          conv_sed_ocn_N(io_NO2_15N,is_POC) = conv_sed_ocn_N(io_NO2,is_POC)
+       elseif (ocn_select(io_N2_15N)) then
+          conv_sed_ocn_N(io_N2_15N,is_POP)  = conv_sed_ocn_N(io_N2,is_POP)
+          conv_sed_ocn_N(io_N2_15N,is_POC)  = conv_sed_ocn_N(io_N2,is_POC)
+       elseif (ocn_select(io_NH4_15N)) then
+          conv_sed_ocn_N(io_NH4_15N,is_POP) = conv_sed_ocn_N(io_NH4,is_POP)
+          conv_sed_ocn_N(io_NH4_15N,is_POC) = conv_sed_ocn_N(io_NH4,is_POC)
+       else
+          ! [DEFAULT, oxic remin relationship]
+       endif
+       ! > ALK -- N transformations are explicit and hence ALK is associated with neither P nor C (excepting nitrate reduction)
+       ! > Fe -- release from POFe (ALT relationship to default if Fe2+ and Fe3+ are resolved)
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
-       !       BUT, it is going to be implicitly assumed to be oxidized during remin under denitrifying conditions
        ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_N(io_Fe,is_POFe)  = 1.0
@@ -1475,7 +1489,7 @@ CONTAINS
     ! NOTE: io_FeOOH assumes both io_Fe2 and io_Fe (Fe3)
     if (ocn_select(io_FeOOH)) then
        conv_sed_ocn_Fe(:,:) = conv_sed_ocn(:,:)
-       ! N
+       ! > N
        if (ocn_select(io_NH4)) then
           ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_Fe(io_NO3,is_PON)   = 0.0
@@ -1486,28 +1500,31 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes [???]
+       ! > N isotopes -- 15N release from 15PON -- assume in the same proporiton as N from PON (no fractionation)
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_Fe(io_NO3_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NO3,is_PON)
           conv_sed_ocn_Fe(io_NH4_15N,is_PON_15N) = conv_sed_ocn_Fe(io_NH4,is_PON)
           conv_sed_ocn_Fe(io_N2_15N,is_PON_15N)  = conv_sed_ocn_Fe(io_N2,is_PON)
        end if
-       ! P,C
+       ! > P,C
        conv_sed_ocn_Fe(io_FeOOH,is_POP) = (4.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POP)
        conv_sed_ocn_Fe(io_Fe2,is_POP)   = -conv_sed_ocn_Fe(io_FeOOH,is_POP)
        conv_sed_ocn_Fe(io_O2,is_POP)    = 0.0
        conv_sed_ocn_Fe(io_FeOOH,is_POC) = (4.0/1.0)*conv_sed_ocn_Fe(io_O2,is_POC)
        conv_sed_ocn_Fe(io_Fe2,is_POC)   = -conv_sed_ocn_Fe(io_FeOOH,is_POC)
        conv_sed_ocn_Fe(io_O2,is_POC)    = 0.0
-       ! Fe isotopes [placeholder values -- corrected for local d34S in sub_box_remin_redfield]
+       ! > Fe isotopes [placeholder values -- corrected for local d56Fe in sub_box_remin_redfield]
        ! NOTE: becasue of the complexity of solid vs. phantom dissolved FeOOH tracer
        !       isotopes are instead, currently done explicitly in sub_box_remin_part
-       !conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POP) = conv_sed_ocn_Fe(io_FeOOH,is_POP)
-       !conv_sed_ocn_Fe(io_Fe_56Fe,is_POP)    = conv_sed_ocn_Fe(io_Fe,is_POP)
-       !conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POC) = conv_sed_ocn_Fe(io_FeOOH,is_POC)
-       !conv_sed_ocn_Fe(io_Fe_56Fe,is_POC)    = conv_sed_ocn_Fe(io_Fe,is_POC)
-       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       if (sed_select(io_FeOOH_56Fe)) then
+          conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POP) = conv_sed_ocn_Fe(io_FeOOH,is_POP)
+          conv_sed_ocn_Fe(io_Fe_56Fe,is_POP)    = conv_sed_ocn_Fe(io_Fe,is_POP)
+          conv_sed_ocn_Fe(io_FeOOH_56Fe,is_POC) = conv_sed_ocn_Fe(io_FeOOH,is_POC)
+          conv_sed_ocn_Fe(io_Fe_56Fe,is_POC)    = conv_sed_ocn_Fe(io_Fe,is_POC)
+       end if
+       ! > Fe -- release from POFe (ALT relationship to default if Fe2+ and Fe3+ are resolved)
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
+       ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
           conv_sed_ocn_Fe(io_Fe,is_POFe)  = 0.0
           conv_sed_ocn_Fe(io_Fe2,is_POFe) = 1.0
@@ -1521,7 +1538,7 @@ CONTAINS
     ! -------------------------------------------------------- ! Modify for S-reducing conditions
     if (ocn_select(io_SO4)) then
        conv_sed_ocn_S(:,:) = conv_sed_ocn(:,:)
-       ! N
+       ! > N
        if (ocn_select(io_NH4)) then
           ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_S(io_NO3,is_PON) = 0.0
@@ -1531,25 +1548,25 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes
+       ! > N isotopes -- 15N release from 15PON -- assume in the same proporiton as N from PON (no fractionation)
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_S(io_NO3_15N,is_PON_15N) = conv_sed_ocn_S(io_NO3,is_PON)
           conv_sed_ocn_S(io_NH4_15N,is_PON_15N) = conv_sed_ocn_S(io_NH4,is_PON)
           conv_sed_ocn_S(io_N2_15N,is_PON_15N)  = conv_sed_ocn_S(io_N2,is_PON)
        end if
-       ! P,C
+       ! > P,C
        conv_sed_ocn_S(io_SO4,is_POP) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POP)
        conv_sed_ocn_S(io_H2S,is_POP) = -conv_sed_ocn_S(io_SO4,is_POP)
        conv_sed_ocn_S(io_O2,is_POP)  = 0.0
        conv_sed_ocn_S(io_SO4,is_POC) = (1.0/2.0)*conv_sed_ocn_S(io_O2,is_POC)
        conv_sed_ocn_S(io_H2S,is_POC) = -conv_sed_ocn_S(io_SO4,is_POC)
        conv_sed_ocn_S(io_O2,is_POC)  = 0.0
-       ! S isotopes [placeholder values -- corrected for local d34S in sub_box_remin_redfield]
+       ! > S isotopes [placeholder values -- corrected for local d34S in sub_box_remin_redfield]
        conv_sed_ocn_S(io_SO4_34S,is_POP) = conv_sed_ocn_S(io_SO4,is_POP)
        conv_sed_ocn_S(io_H2S_34S,is_POP) = conv_sed_ocn_S(io_H2S,is_POP)
        conv_sed_ocn_S(io_SO4_34S,is_POC) = conv_sed_ocn_S(io_SO4,is_POC)
        conv_sed_ocn_S(io_H2S_34S,is_POC) = conv_sed_ocn_S(io_H2S,is_POC)
-       ! ALK
+       ! > ALK
        if (sed_select(is_PON)) then
           ! [N transformations are explicit and hence ALK is associated with neither P nor C (excepting sulphate reduction)]
           conv_sed_ocn_S(io_ALK,is_POP) = 0.0
@@ -1562,7 +1579,7 @@ CONTAINS
           conv_sed_ocn_S(io_ALK,is_POP) = -2.0*conv_sed_ocn_S(io_SO4,is_POP) + conv_sed_ocn_S(io_ALK,is_POP)
           conv_sed_ocn_S(io_ALK,is_POC) = -2.0*conv_sed_ocn_S(io_SO4,is_POC)
        end if
-       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! > Fe -- release from POFe (ALT relationship to default if Fe2+ and Fe3+ are resolved)
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
        ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
@@ -1587,7 +1604,7 @@ CONTAINS
     if (ocn_select(io_CH4)) then
        conv_sed_ocn_meth(:,:) = conv_sed_ocn(:,:)
        loc_alpha = 1.0 + par_d13C_Corg_CH4_epsilon/1000.0
-       ! N
+       ! > N
        if (ocn_select(io_NH4)) then
           ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
           conv_sed_ocn_meth(io_NO3,is_PON) = 0.0
@@ -1597,21 +1614,21 @@ CONTAINS
        else
           ! [DEFAULT, oxic remin relationship]
        endif
-       ! N isotopes
+       ! > N isotopes -- 15N release from 15PON -- assume in the same proporiton as N from PON (no fractionation)]
        if (sed_select(is_PON_15N)) then
           conv_sed_ocn_meth(io_NO3_15N,is_PON_15N) = conv_sed_ocn_meth(io_NO3,is_PON)
           conv_sed_ocn_meth(io_NH4_15N,is_PON_15N) = conv_sed_ocn_meth(io_NH4,is_PON)
           conv_sed_ocn_meth(io_N2_15N,is_PON_15N)  = conv_sed_ocn_meth(io_N2,is_PON)
        end if
-       ! P,C
+       ! > P,C
        conv_sed_ocn_meth(io_O2,is_POP)  = 0.0
        conv_sed_ocn_meth(io_CH4,is_POC) = -(1.0/2.0)*par_bio_red_POP_PO2/par_bio_red_POP_POC
        conv_sed_ocn_meth(io_DIC,is_POC) = 1.0 - conv_sed_ocn_meth(io_CH4,is_POC)
        conv_sed_ocn_meth(io_O2,is_POC)  = 0.0
-       ! C isotopes
+       ! > C isotopes
        conv_sed_ocn_meth(io_CH4_13C,is_POC_13C) = loc_alpha*conv_sed_ocn_meth(io_CH4,is_POC)
        conv_sed_ocn_meth(io_DIC_13C,is_POC_13C) = 1.0 - conv_sed_ocn_meth(io_CH4_13C,is_POC_13C)
-       ! Fe -- ALT relationships if Fe2+ and Fe3+ are resolved
+       ! > Fe -- release from POFe (ALT relationship to default if Fe2+ and Fe3+ are resolved)
        ! NOTE: reduced iron (Fe2+) is the assumed intercellular phase
        ! NOTE: conv_sed_ocn assumes that scavenged Fe is reduced and released as Fe2+
        if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then

@@ -4928,6 +4928,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">1.0</value>
                         <description>188/192Os fractionation between Os and OsCO3</description>
                     </param>
+                    <param name="par_d15N_Corg_NO3_epsilon">
+			<value datatype="real">0.0</value>
+                        <description>nitrate reduction N fractionation</description>
+                    </param>
                     <param name="par_d56Fe_Corg_FeOOH_epsilon">
 			<value datatype="real">-1.3</value>
                         <description>dissimilatory iron reduction fractionation</description>
