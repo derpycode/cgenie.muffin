@@ -2,9 +2,9 @@
 # *** muffin.CBE.worjh2.BASES                  **********************
 # *******************************************************************
 #
-# Initial oceanic PO4 concentration is (1+1) times the startup PO4 field
+# Initial oceanic PO4 concentration is (1-0.75) times the startup PO4 field (from 1P2C)
 bg_ctrl_ocn_dinit=.false.
-bg_ocn_dinit_8=-0.9
+bg_ocn_dinit_8=-0.75
 #
 # *** CLIMATE *******************************************************
 #
@@ -118,7 +118,7 @@ eg_ctrl_continuing = .false.
 # *** FORCINGS ******************************************************
 #
 bg_par_forcing_name="worjh2.RpCO2_Rp13CO2"
-bg_par_atm_force_scale_val_3=1112.0E-06
+bg_par_atm_force_scale_val_3=556.0E-06
 bg_par_atm_force_scale_val_4=-6.5
 #
 # *** MISC **********************************************************
