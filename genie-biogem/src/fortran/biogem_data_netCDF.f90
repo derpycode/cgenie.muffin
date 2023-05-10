@@ -2171,6 +2171,44 @@ CONTAINS
             & 'bottom-water Schmittner d13C (LA1)',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('proxy_ben_LA1',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
     end if
+    If ( ctrl_data_save_slice_diag_proxy .AND. ocn_select(io_IO3) ) then
+       ! I/Ca proxy model
+       ! NOTE: from 'I/Ca evidence for upper ocean deoxygenation during the PETM' [Zhou te al., 2014]; 10.1002/2014PA002702!
+       ! KD is calculated as [I/Ca]/[IO3-], with I/Ca == umol/mol and [IO3] == umol l-1
+       ! KD = -0.16T + 13.65 where T is in oC
+       ! => converting to mol/mol and umol kg-1:
+       ! I/Ca = (1.0E-3*conv_m3_kg)*[IO3-] * KD
+       ! (1) surface ocean I/Ca
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'mol/mol'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_ij(i,j) =(1.0E-3*conv_m3_kg)*int_ocn_timeslice(io_IO3,i,j,n_k)/int_t_timeslice * &
+                     & 1.0E6*(-0.16*(int_ocn_timeslice(io_T,i,j,n_k)/int_t_timeslice - const_zeroC) + 13.65)                
+             END if
+          END DO
+       END DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_sur_ICa','ocean surface I/Ca', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_sur_ICa',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! (2) benthic I/Ca
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'mol/mol'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_ij(i,j) =(1.0E-3*conv_m3_kg)*int_ocn_timeslice(io_IO3,i,j,loc_k1)/int_t_timeslice * &
+                     & 1.0E6*(-0.16*(int_ocn_timeslice(io_T,i,j,loc_k1)/int_t_timeslice - const_zeroC) + 13.65) 
+             END if
+          END DO
+       END DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_ICa','bottom-water I/Ca', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_ICa',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+    end if
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
     !
     ! ############################################################################################################################ !
