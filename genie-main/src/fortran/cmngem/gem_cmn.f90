@@ -130,8 +130,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::io_N2_15N                            = 31    !
   INTEGER,PARAMETER::io_N2O                               = 32    ! 
   INTEGER,PARAMETER::io_N2O_15N                           = 33    !
-  INTEGER,PARAMETER::io_NO2                               = 34    ! 
-  INTEGER,PARAMETER::io_NO2_15N                           = 35    !
+  INTEGER,PARAMETER::io_NO2                               = 79    ! 
+  INTEGER,PARAMETER::io_NO2_15N                           = 80    !
   INTEGER,PARAMETER::io_Cd                                = 34    !
   INTEGER,PARAMETER::io_Cd_114Cd                          = 51    ! 
   INTEGER,PARAMETER::io_Ca                                = 35    ! 

@@ -1727,29 +1727,33 @@ CONTAINS
        ! NOTE: assuemd stiochometry: 2NO3- + 2H+ <-> (5/2)O2 + N2 + H2O
        !                             NO3- + H2O + 2H+ <-> 2O2 + NH4+
        ! NOTE: because the N2 uptake (anomoly) is being used, no prior sources or sinks of N2 are assumed
-       loc_bio_uptake(io_N2,n_k) = &
-            & 0.5* &
-            & ( &
-            &   (par_bio_NPdiaz/loc_bio_NP) / ((1.0/loc_frac_N2fix - 1.0) + (par_bio_NPdiaz/loc_bio_NP)) &
-            & )* &
-            & loc_bio_uptake(io_NO3,n_k)       
+       If (loc_frac_N2fix > const_real_nullsmall) then
+          loc_bio_uptake(io_N2,n_k) = &
+               & 0.5* &
+               & ( &
+               &   (par_bio_NPdiaz/loc_bio_NP) / ((1.0/loc_frac_N2fix - 1.0) + (par_bio_NPdiaz/loc_bio_NP)) &
+               & )* &
+               & loc_bio_uptake(io_NO3,n_k)
+       else
+          loc_bio_uptake(io_N2,n_k) = 0.0
+       end if
        loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + (5.0/2.0)*loc_bio_uptake(io_N2,n_k)
        loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + 2.0*loc_bio_uptake(io_N2,n_k)
        loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) - 2.0*loc_bio_uptake(io_N2,n_k)
        ! -------------------------------------------------------- ! adjustment due to NH4 uptake
        ! adjust default biological tracer uptake stoichiometry due to NH4 consumption (replacing some NO3 consumption)
        ! assuming: NH4 is consummed first (Fanny - July 2011)
-       loc_bio_uptake(io_NH4,n_k) = &
-            & min(loc_bio_uptake(io_NO3,n_k),ocn(io_NH4,dum_i,dum_j,n_k))
-       ! ######################################################################################################################## !
-       ! ### INSERT ALTERNATIVE CODE ############################################################################################ !
-       ! ######################################################################################################################## !
-       !!!loc_bio_uptake(io_NH4,n_k) = min(loc_bio_uptake(io_NO3,n_k),0.5*ocn(io_NH4,dum_i,dum_j,n_k))
-       ! numerically safer accumption would be to assume they are consumed proportionally
-       !!!loc_bio_uptake(io_NH4,n_k) = min(loc_bio_uptake(io_NO3,n_k),(ocn(io_NH4,dum_i,dum_j,n_k)/loc_N)*loc_bio_uptake(io_NO3,n_k))
-       ! ######################################################################################################################## !
-       ! ######################################################################################################################## !
-       ! ######################################################################################################################## !
+!!$          loc_bio_uptake(io_NH4,n_k) = &
+!!$               & min(loc_bio_uptake(io_NO3,n_k),ocn(io_NH4,dum_i,dum_j,n_k))
+       ! if NO3 dominates, then limit NH4 uptake
+       ! if NH4 dominates, assume that in the uptake calculation, only a fraction of available N is going to be taken up
+       if (ocn(io_NO3,dum_i,dum_j,n_k) > ocn(io_NH4,dum_i,dum_j,n_k)) then
+          loc_bio_uptake(io_NH4,n_k) = &
+               & min(loc_bio_uptake(io_NO3,n_k),0.5*ocn(io_NH4,dum_i,dum_j,n_k))
+       else
+          loc_bio_uptake(io_NH4,n_k) = &
+               & min(loc_bio_uptake(io_NO3,n_k),ocn(io_NH4,dum_i,dum_j,n_k))
+       end if
        loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + 2.0*loc_bio_uptake(io_NH4,n_k)
        loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + 2.0*loc_bio_uptake(io_NH4,n_k)
        loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) - 1.0*loc_bio_uptake(io_NH4,n_k)
@@ -2696,7 +2700,7 @@ CONTAINS
     ! ---------------------------------------------------------- !
     ! test for N isotopes selected
     ! NOTE: value of loc_NO3 already determined
-    if (ocn_select(io_NO3_15N)) then
+    if (ocn_select(io_NO3) .AND. ocn_select(io_NO3_15N)) then
        if (loc_NO3 > const_real_nullsmall) then
           loc_r15N  = dum_ocn(io2l(io_NO3_15N))/loc_NO3
        else
@@ -2705,15 +2709,15 @@ CONTAINS
        loc_alpha = 1.0 + par_d15N_Corg_NO3_epsilon/1000.0
        loc_R     = loc_r15N/(1.0 - loc_r15N)
        dum_conv_ls_lo(io2l(io_NO3_15N),:)    = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NO3),:)
-       if (ocn_select(io_NO2_15N)) then
+       if (ocn_select(io_NO2) .AND. ocn_select(io_NO2_15N)) then
           dum_conv_ls_lo(io2l(io_NO2_15N),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NO2),:)
-       elseif (ocn_select(io_N2_15N)) then
+       elseif (ocn_select(io_N2) .AND. ocn_select(io_N2_15N)) then
           dum_conv_ls_lo(io2l(io_N2_15N),:)  = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_N2),:)
-       elseif (ocn_select(io_NH4_15N)) then
+       elseif (ocn_select(io_NH4) .AND. ocn_select(io_NH4_15N)) then
           dum_conv_ls_lo(io2l(io_NH4_15N),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NH4),:)
        else
           ! [DEFAULT, oxic remin relationship]
-       endif       
+       endif
     end if
     ! test for S isotopes selected
     ! NOTE: value of loc_SO4 already determined

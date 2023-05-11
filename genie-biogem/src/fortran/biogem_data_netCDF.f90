@@ -2798,7 +2798,7 @@ CONTAINS
           CASE (par_sed_type_bio,par_sed_type_abio, &
                & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
                & par_sed_type_scavenged)
-             loc_ij(:,:) = phys_ocn(ipo_A,:,:,loc_k1)*loc_ij(:,:)
+             loc_ij(:,:) = phys_ocn(ipo_A,:,:,n_k)*loc_ij(:,:)
              loc_unitsname = 'mol yr-1'
              call sub_adddef_netcdf(loc_iou,3,'bio_fexport_'//trim(string_sed(is)), &
                   & 'particulate biological export (flux) - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)

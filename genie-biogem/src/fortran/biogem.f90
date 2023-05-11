@@ -221,21 +221,23 @@ subroutine biogem(        &
            loc_k1 = goldstein_k1(i,j)
            if (ctrl_force_Vgrid) then
               loc_k1 = max(loc_k1,force_Vgrid(i,j))
-           end if           
+           end if
            IF (n_k >= loc_k1) THEN
               loc_k_icefree = (1.0 - phys_ocnatm(ipoa_seaice,i,j))
               ! Aeolian solubilities
-              ! NOTE: the flux used to derive the solubility, should be in units of  mass per unit area (or volume) (time can be ignored)
-              !       on an equal area grid, it does not matter and hence old code was OK
+              ! NOTE: the flux used to derive the solubility, should be in units of  mass per unit area (or volume)
+              !       (time can be ignored) on an equal area grid, it does not matter and hence old code was OK
               !       (old code was: phys_ocnatm(ipoa_solFe,i,j) = force_flux_sed(is_det,i,j)**(par_det_Fe_sol_exp - 1.0))
               ! NOTE: only implement if par_det_Fe_sol_exp not equal to 1.0 (which is for uniform solubility)
               !       and if a 2D solbility field has not been requested (ctrl_force_det_Fe_sol)
-              if ( (ABS(par_det_Fe_sol_exp - 1.0) > const_real_nullsmall) .AND. .NOT.(ctrl_force_det_Fe_sol) ) then
-                 phys_ocnatm(ipoa_solFe,i,j) = (phys_ocn(ipo_rM,i,j,n_k)*force_flux_sed(is_det,i,j))**(par_det_Fe_sol_exp - 1.0)
-                 loc_det_tot = loc_det_tot + force_flux_sed(is_det,i,j)
-                 loc_det_sol_tot = loc_det_sol_tot + phys_ocnatm(ipoa_solFe,i,j)*force_flux_sed(is_det,i,j)
-              else
-                 loc_det_sol_tot = 0.0
+              if (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) then
+                 if ( (ABS(par_det_Fe_sol_exp-1.0) > const_real_nullsmall) .AND. .NOT.(ctrl_force_det_Fe_sol) ) then
+                    phys_ocnatm(ipoa_solFe,i,j) = (phys_ocn(ipo_rM,i,j,n_k)*force_flux_sed(is_det,i,j))**(par_det_Fe_sol_exp-1.0)
+                    loc_det_tot = loc_det_tot + force_flux_sed(is_det,i,j)
+                    loc_det_sol_tot = loc_det_sol_tot + phys_ocnatm(ipoa_solFe,i,j)*force_flux_sed(is_det,i,j)
+                 else
+                    loc_det_sol_tot = 0.0
+                 end if
               end if
               ! total global weathering (mol per time step)
               DO l=3,n_l_ocn
@@ -386,7 +388,7 @@ subroutine biogem(        &
      else
         phys_ocnatm(ipoa_solFe,:,:) = par_det_Fe_sol_2D(:,:)
      end if
-     
+
      ! ****************************************************************************************************************************
      ! ****************************************************************************************************************************
      ! ****************************************************************************************************************************
@@ -662,7 +664,7 @@ subroutine biogem(        &
                  bio_remin(io,i,j,loc_k1) = bio_remin(io,i,j,loc_k1) + &
                       & phys_ocn(ipo_rM,i,j,loc_k1)*locij_fsedocn(io,i,j)
               end do
-              
+
               ! RESTORE loc_k1 setting!!!
               if (ctrl_force_Vgrid) then
                  loc_k1 = goldstein_k1(i,j)
@@ -732,10 +734,10 @@ subroutine biogem(        &
         call sub_box_remin_part(loc_dtyr,vocn(n),vphys_ocn(n),vbio_part(n),vbio_remin(n))
 
      end do
-     
-     
+
+
      ! ****************************************************************************************************************************
-     
+
 
      ! [temp code in retaining primary use of <bio_remin>] ************************************************************************
      bio_part(:,:,:,:) = fun_lib_conv_vsedTOsed(vbio_part(:))
@@ -1004,8 +1006,8 @@ subroutine biogem(        &
                     locij_fatm(ia,i,j) = locij_fatm(ia,i,j) + force_flux_atm(ia,i,j)
                     ! record (atmopsheric) flux forcing
                     diag_forcing(ia,i,j) = force_flux_atm(ia,i,j)
-                       ! record total flux forcing
-                       diag_forcing_atm(ia) = diag_forcing_atm(ia) + force_flux_atm(ia,i,j)
+                    ! record total flux forcing
+                    diag_forcing_atm(ia) = diag_forcing_atm(ia) + force_flux_atm(ia,i,j)
                  END IF
               END DO
               ! OCEAN TRACERS
@@ -1806,7 +1808,7 @@ subroutine biogem(        &
               if (sed_select(is_FeOOH)) then
                  call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
               end if
-              
+
               !---- YK added 12.13.2020
               ! *** PO4 adsorption ***
               if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
@@ -1816,9 +1818,9 @@ subroutine biogem(        &
                  if (sed_select(is_POM_FeOOH)) then
                     call sub_calc_ads_PO4_POM_FeOOH(i,j,loc_k1,loc_dtyr)
                  end if
-              endif 
+              endif
               ! ---- end 
-              
+
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
                  if (ctrl_bio_FeS2precip_explicit) then
@@ -1989,8 +1991,8 @@ subroutine biogem(        &
      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
      ! *** (i,j) GRID PT LOOP END *** !
      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
-     
-        
+
+
      ! *** CALCULATE TRACER ANOMOLY ***
      ! NOTE: also, for now, vectorize <ocn>
      IF (ctrl_debug_lvl1) print*, '*** CALCULATE TRACER ANOMOLY ***'
