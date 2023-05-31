@@ -17,7 +17,7 @@ Affiliations
 ################################################################
 27/03/2023 -- README.txt file creation (A.P.)
 27/03/2023 -- added files
-04/05/2023 -- checked experiments (AR)
+04/05/2023 -- checked experiments (all run for 2 years) (AR)
 ################################################################
 
 Provided are the configuration files necessary to run the main experiments used in Fig. 5.
@@ -25,8 +25,8 @@ Provided are the configuration files necessary to run the main experiments used 
 All experiments are run from: $HOME/cgenie.muffin/genie-main
 (unless a different installation directory has been used)
 
-./runmuffin.sh muffin.AP.500ebP2_.eb_go_gs_ac_bg.PO4.SPIN PUBS/submitted/heetal.Gloplacha.2023 AP.500ebP2_.bg.PO4.Tdep.pCO2FKr_x1.0.PO4PD.pO2_x0.6_radfor.SPIN 20000
-./runmuffin.sh muffin.AP.500ebP2_.eb_go_gs_ac_bg.PO4.SPIN PUBS/submitted/heetal.Gloplacha.2023 AP.500ebP2_.bg.PO4.Tdep.pCO2FKr_x1.0.PO4PD.pO2_x1.2_radfor.SPIN 20000
+./runmuffin.sh muffin.AP.500ebP2_.eb_go_gs_ac_bg.PO4.SPIN PUBS/submitted/He_etal.Gloplacha.2023 AP.500ebP2_.bg.PO4.Tdep.pCO2FKr_x1.0.PO4PD.pO2_x0.6_radfor.SPIN 20000
+./runmuffin.sh muffin.AP.500ebP2_.eb_go_gs_ac_bg.PO4.SPIN PUBS/submitted/He_etal.Gloplacha.2023 AP.500ebP2_.bg.PO4.Tdep.pCO2FKr_x1.0.PO4PD.pO2_x1.2_radfor.SPIN 20000
 
 ################################################################
 ################################################################
