@@ -18,7 +18,7 @@ Affiliations
 ################################################################
 30/05/2023 -- README.txt file creation (A.P.)
 30/05/2023 -- added files
-2023/05/31 -- adjusted file paths; checked experiments run (AR)
+2023/05/31 -- adjusted file paths; checked experiments run (AR); adjusted user-config name to replace '-' with 'm'
 ################################################################
 
 Provided are the configuration files necessary to run the main experiments used in Fig. 4 and Extended Data Fig. 1, plus WOA [O2] data regridded to the cGENIE resolution and used in Fig. 4a.
@@ -45,11 +45,11 @@ worhj2.WOA13_O2_molkg-1.151207.nc (in this directory)
 [plotted at year 4999.5]
 
 ############### D-O cGENIE simulation ################
-/runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEFePRE14Crbcolx PUBS/submitted/Tetard_et_al.Nature.2023 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2.sc1.pCO2x1.A0.5 2000 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEFePRE14Crbcolx PUBS/submitted/Tetard_et_al.Nature.2023 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2.sc1.pCO2x1.A0.5 2000 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2
 [plotted at year 1449.5]
 
 ############### Heinrich cGENIE simulation ################
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEFePRE14Crbcolx PUBS/submitted/Tetard_et_al.Nature.2023 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2.sc2.pCO2x1.A-0.5 2000 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.worjh2.BASEFePRE14Crbcolx PUBS/submitted/Tetard_et_al.Nature.2023 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2.sc2.pCO2x1.Am0.5 2000 worjh2.Fe14C.preAge.Dye.LGM.PA15.pO2
 [plotted at year 1199.5]
 
 ################################################################
