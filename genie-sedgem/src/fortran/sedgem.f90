@@ -37,8 +37,9 @@ SUBROUTINE sedgem(          &
   real::loc_87Sr,loc_88Sr
   real::loc_187Os,loc_188Os
   real::loc_alpha,loc_R,loc_delta
-  real::loc_depsilon                              ! 
-  real::loc_fsed                                               ! 
+  real::loc_depsilon                                           ! 
+  real::loc_fsed                                               !
+  real::loc_tot_Mg,loc_tot_Ca                                  ! mean (simply area-weighted) benthic cation concentrations
   real,DIMENSION(n_sed,n_i,n_j)::loc_sfxsumsed_OLD                      ! sediment rain flux interface array (COPY)
   real,DIMENSION(n_sed,n_i,n_j)::loc_sed_fsed_OLD                      ! 
   real,DIMENSION(n_ocn,n_sed)::loc_conv_sed_ocn                ! local (redox-dependent) sed -> ocn conversion
@@ -54,10 +55,12 @@ SUBROUTINE sedgem(          &
   sed_fdis(:,:,:)    = 0.0     ! 
   sedocn_fnet(:,:,:) = 0.0     !
 
-  ! *** INITIALIZE LOCAL ARRAYS ***
+  ! *** INITIALIZE LOCAL ARRAYS AND VARIABLES ***
   loc_fhydrothermal(:)           = 0.0
   loc_flowTalteration(:)         = 0.0
   loc_phys_sed_mask_deepsea(:,:) = 0.0
+  loc_tot_Mg = 0.0
+  loc_tot_Ca = 0.0
 
   ! *** CALCULATE SEDGEM TIME STEP ***
   IF (ctrl_misc_debug4) print*,'*** CALCULATE SEDGEM TIME ***'
@@ -133,6 +136,12 @@ SUBROUTINE sedgem(          &
   end if
   if (par_sed_Os_dep < const_real_nullsmall) then
      par_sed_Os_dep = par_sed_Os_depTOT/loc_tot_A
+  end if
+
+  ! *** CALCULATE BENTHIC MEANS ***
+  if (ocn_select(io_Ca) .AND. ocn_select(io_Mg)) then
+     if (ocn_select(io_Mg)) loc_tot_Mg = sum(dum_sfcsumocn(io_Mg,:,:)*loc_phys_sed_mask_deepsea(:,:)*phys_sed(ips_A,:,:))/loc_tot_A
+     if (ocn_select(io_Ca)) loc_tot_Ca = sum(dum_sfcsumocn(io_Ca,:,:)*loc_phys_sed_mask_deepsea(:,:)*phys_sed(ips_A,:,:))/loc_tot_A
   end if
 
   ! *** UPDATE CARBONATE CHEMSITRY ***
@@ -248,7 +257,7 @@ SUBROUTINE sedgem(          &
               dum_sfxsumsed(is_opal,i,j) = conv_m2_cm2*conv_opal_g_mol*(conv_yr_kyr*loc_dtyr)*sed_Fsed_opal(i,j)
            endif
            ! tag CaCO3 'color'
-           if (sed_select(is_CaCO3_red)) dum_sfxsumsed(is_CaCO3_red,i,j) = par_sed_CaCO3_fred*dum_sfxsumsed(is_CaCO3,i,j)
+           if (sed_select(is_CaCO3_red)) dum_sfxsumsed(is_CaCO3_red,i,j)   = par_sed_CaCO3_fred*dum_sfxsumsed(is_CaCO3,i,j)
            if (sed_select(is_CaCO3_blue)) dum_sfxsumsed(is_CaCO3_blue,i,j) = par_sed_CaCO3_fblue*dum_sfxsumsed(is_CaCO3,i,j)
            ! account for clay formation
            If (ocn_select(io_Li)) then
@@ -477,21 +486,27 @@ SUBROUTINE sedgem(          &
      end if
   end if
   ! add Ca, remove Mg
-  ! NOTE: assumes that the prescribed Mg flux is negative
+  ! NOTE: assumes that the prescribed Mg flux (par_sed_hydroip_fMg) is negative in value when explicitly set
   ! NOTE: original code automatically balanced Ca input with Mg removal (par_sed_hydroip_fMg was not defined)
   If (ocn_select(io_Ca)) then
-     loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+     If (ocn_select(io_Mg)) then
+        if (ctrl_sed_hydroip_MgtoCa) then
+           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa*(loc_tot_Mg/loc_tot_Ca)/par_sed_hydroip_rMgCaREF
+           loc_fhydrothermal(io_Ca) = -loc_fhydrothermal(io_Mg)
+        else              
+           loc_fhydrothermal(io_Mg) = par_sed_hydroip_fMg
+           loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+        end if
+     else
+        loc_fhydrothermal(io_Mg) = 0.0
+        loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+     end If
+     loc_fhydrothermal(io_ALK) = 2.0*loc_fhydrothermal(io_Mg) + 2.0*loc_fhydrothermal(io_Ca)
      if (ocn_select(io_Ca_44Ca)) then
         loc_tot = loc_fhydrothermal(io_Ca)
         loc_standard = const_standards(ocn_type(io_Ca_44Ca))
         loc_fhydrothermal(io_Ca_44Ca) = fun_calc_isotope_fraction(par_sed_hydroip_fCa_d44Ca,loc_standard)*loc_tot
      end if
-     If (ocn_select(io_Mg)) then
-        loc_fhydrothermal(io_Mg) = par_sed_hydroip_fMg
-        loc_fhydrothermal(io_ALK) = 2.0*par_sed_hydroip_fMg + 2.0*par_sed_hydroip_fCa
-     else
-        loc_fhydrothermal(io_ALK) = 2.0*par_sed_hydroip_fCa
-     end If
   end if
   ! Sr
   IF (ocn_select(io_Sr_87Sr) .AND. ocn_select(io_Sr_88Sr)) THEN

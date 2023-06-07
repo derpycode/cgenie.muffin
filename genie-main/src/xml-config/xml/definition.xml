@@ -7587,6 +7587,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
                         <description>hydrothermal Mg flux (mol yr-1) -- should normally be equal and opposite in sign to Ca flux</description>
                     </param>
+                    <param name="ctrl_sed_hydroip_MgtoCa">
+			<value datatype="boolean">.false.</value>
+                        <description>link Mg removal and Ca release via a deviation from a reference Mg/Ca ratio</description>
+                    </param>
+                    <param name="par_sed_hydroip_rMgCaREF">
+			<value datatype="real">1.0</value>
+                        <description>reference Mg/Ca</description>
+                    </param>
                     <param name="par_sed_hydroip_fSr">
 			<value datatype="real">3.1E9</value>
                         <description>hydrothermal Sr flux (mol yr-1) [Payton et al.; Davis et al. (2003)]</description>

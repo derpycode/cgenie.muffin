@@ -193,7 +193,7 @@ MODULE sedgem_lib
   real::par_sed_lowTalt_fLi_alpha                                ! Li low temperature alteration sink (mol yr-1) (Li/Ca normalized)
   real::par_sed_lowTalt_7Li_epsilon                              ! Li low temperature alteration sink 7Li epsilon (o/oo)           
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fLi_alpha,par_sed_lowTalt_7Li_epsilon
-  LOGICAL::ctrl_sed_lowTalt_7Li_epsilon_fixed                    ! fixed (non T-dependent) temperature alteration 7Li epsilon?           
+  LOGICAL::ctrl_sed_lowTalt_7Li_epsilon_fixed                    ! fixed (non T-dependent) temperature alteration 7Li epsilon?
   NAMELIST /ini_sedgem_nml/ctrl_sed_lowTalt_7Li_epsilon_fixed
   real::par_sed_lowTalt_7Li_epsilon_DT                           ! T-dependent D7Li sensitivity (o/oo K-1)             
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_7Li_epsilon_DT
@@ -212,13 +212,17 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fCa_alpha,par_sed_lowTalt_44Ca_epsilon
   real::par_sed_hydroip_fMg                                      ! hydrothermal Mg flux (mol yr-1) 
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fMg
+  LOGICAL::ctrl_sed_hydroip_MgtoCa                               ! link Mg -> Ca via a deviation from a reference Mg/Ca ratio
+  NAMELIST /ini_sedgem_nml/ctrl_sed_hydroip_MgtoCa
+  real::par_sed_hydroip_rMgCaREF                                 ! reference Mg/Ca
+  NAMELIST /ini_sedgem_nml/par_sed_hydroip_rMgCaREF
   real::par_sed_hydroip_fSr                                      ! hydrothermal Sr flux (mol yr-1) 
   real::par_sed_hydroip_fSr_r87Sr                                ! hydrothermal Sr flux r87Sr (87/86)   
   real::par_sed_hydroip_fSr_d88Sr                                ! hydrothermal Sr flux d88Sr (o/oo)                      
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fSr,par_sed_hydroip_fSr_r87Sr,par_sed_hydroip_fSr_d88Sr
   real::par_sed_lowTalt_fSr_alpha                                      ! Sr low-T alteration sink (mol yr-1)                   
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fSr_alpha
-  real::par_sed_lowTalt_fCO2                                     ! CO2 low-T alteration (weathering!) sink (mol yr-1)                   
+  real::par_sed_lowTalt_fCO2                                     ! CO2 low-T alteration (weathering!) sink (mol yr-1)
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fCO2
   real::par_sed_hydroip_fDIC                                     ! hydrothermal CO2 outgassing (mol yr-1)    
   real::par_sed_hydroip_fDIC_d13C                                ! d13C                
@@ -229,7 +233,8 @@ MODULE sedgem_lib
   real::par_sed_Os_dep_suboxic                                   ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
   real::par_sed_Os_O2_threshold                                  ! oxygen threshold for oxic/suboxic deposition
   logical::ctrl_sed_Os_O2                                        ! switch to turn on oxygen dependent deposition
-  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic,par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
+  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic
+  NAMELIST /ini_sedgem_nml/par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
   real::par_sed_hydroip_fOs                                      ! hydrothermal Os flux (mol yr-1)
   real::par_sed_hydroip_fOs_187Os_188Os                          ! 187Os/188Os ratio of hydrothermal Os flux
   real::par_sed_hydroip_fOs_188Os_192Os                          ! 188Os/192Os ratio of hydrothermal Os flux

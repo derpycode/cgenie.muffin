@@ -186,6 +186,8 @@ CONTAINS
        print*,'hydrothermal Ca flux (mol yr-1)                     : ',par_sed_hydroip_fCa
        print*,'hydrothermal Ca flux d44Ca (o/oo)                   : ',par_sed_hydroip_fCa_d44Ca
        print*,'hydrothermal Mg flux (mol yr-1)                     : ',par_sed_hydroip_fMg
+       print*,'link Mg -> Ca via a deviation from ref Mg/Ca?       : ',ctrl_sed_hydroip_MgtoCa
+       print*,'reference Mg/Ca ratio                               : ',par_sed_hydroip_rMgCaREF       
        print*,'Ca low-T alteration sink (mol yr-1) (Ca/Mg norm)    : ',par_sed_lowTalt_fCa_alpha
        print*,'Ca low-T alteration sink 44Ca epsilon (o/oo)        : ',par_sed_lowTalt_44Ca_epsilon
        print*,'hydrothermal Sr flux (mol yr-1)                     : ',par_sed_hydroip_fSr
