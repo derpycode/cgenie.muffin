@@ -286,9 +286,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_FeOOH,par_bio_remin_cthresh_SO4
   LOGICAL::ctrl_bio_remin_reminfix                               ! Catch mis-behaving rapidly-oxidizing species going < 0.0?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_reminfix
-  CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
   CHARACTER(len=63)::opt_bio_remin_oxidize_H2StoSO4              ! H2S -> SO4 oxidation option
-  NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_NH4toNO3,opt_bio_remin_oxidize_H2StoSO4
+  NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_H2StoSO4
   CHARACTER(len=63)::opt_bio_remin_scavenge_H2StoPOMS            ! H2S -> POMS
   NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS
   LOGICAL::ctrl_scav_H2S_dt_old                                  ! Old local residence time in layer for H2S?
@@ -371,10 +370,17 @@ MODULE biogem_lib
   real::par_bio_remin_kH2StoPOMS
   NAMELIST /ini_biogem_nml/par_bio_remin_kH2StoSO4,par_bio_remin_kH2StoPOMS
   ! N
+  CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
+  NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_NH4toNO3
+  CHARACTER(len=63)::opt_bio_remin_reduce_NO2toN2O               ! NO2 -> N2O reduction option
+  NAMELIST /ini_biogem_nml/opt_bio_remin_reduce_NO2toN2O
+  CHARACTER(len=63)::opt_bio_remin_reduce_N2OtoN2                ! N2O -> N2 reduction option
+  NAMELIST /ini_biogem_nml/opt_bio_remin_reduce_N2OtoN2
   real::par_bio_remin_kNH4toNO2
   real::par_bio_remin_kNO2toNO3
   real::par_bio_remin_kNO2toN2O
-  NAMELIST /ini_biogem_nml/par_bio_remin_kNH4toNO2,par_bio_remin_kNO2toNO3,par_bio_remin_kNO2toN2O
+  real::par_bio_remin_kN2OtoN2
+  NAMELIST /ini_biogem_nml/par_bio_remin_kNH4toNO2,par_bio_remin_kNO2toNO3,par_bio_remin_kNO2toN2O,par_bio_remin_kN2OtoN2
   real::par_bio_remin_cNH4_NH4toNO2
   real::par_bio_remin_cO2_NH4toNO2
   NAMELIST /ini_biogem_nml/par_bio_remin_cNH4_NH4toNO2,par_bio_remin_cO2_NH4toNO2
@@ -382,10 +388,11 @@ MODULE biogem_lib
   real::par_bio_remin_cO2_NO2toNO3
   NAMELIST /ini_biogem_nml/par_bio_remin_cNO2_NO2toNO3,par_bio_remin_cO2_NO2toNO3
   real::par_bio_remin_cNO2_NO2toN2O
-  real::par_bio_remin_cO2_NO2toN2O
-  NAMELIST /ini_biogem_nml/par_bio_remin_cNO2_NO2toN2O,par_bio_remin_cO2_NO2toN2O
-  real::par_bio_remin_fracN2O
-  NAMELIST /ini_biogem_nml/par_bio_remin_fracN2O
+  real::par_bio_remin_cN2O_N2OtoN2
+  NAMELIST /ini_biogem_nml/par_bio_remin_cNO2_NO2toN2O,par_bio_remin_cN2O_N2OtoN2
+  real::par_bio_remin_NO2lifetime
+  real::par_bio_remin_N2Olifetime
+  NAMELIST /ini_biogem_nml/par_bio_remin_NO2lifetime,par_bio_remin_N2Olifetime
   ! I
   CHARACTER(len=63)::opt_bio_remin_oxidize_ItoIO3              ! I -> IO3 oxidation option
   CHARACTER(len=63)::opt_bio_remin_reduce_IO3toI              ! IO3 -> I reduction option
@@ -456,6 +463,9 @@ MODULE biogem_lib
   real::par_bio_uptake_dNH4_epsilon                              ! NH4 assimilation 15N fractionation
   real::par_bio_uptake_dNO3_epsilon                              ! NO3 uptake 15N fractionation
   namelist /ini_biogem_nml/par_bio_uptake_dN2_epsilon,par_bio_uptake_dNH4_epsilon,par_bio_uptake_dNO3_epsilon
+  real::par_d15N_NO2toN2O_alpha
+  real::par_d15N_N2OtoN2_alpha
+  namelist /ini_biogem_nml/par_d15N_NO2toN2O_alpha,par_d15N_N2OtoN2_alpha
   ! ------------------- IRON CYCLING --------------------------------------------------------------------------------------------- !
   real::par_det_Fe_sol                                           ! fractional solubility of Fe in dust
   real::par_det_Fe_sol_exp                                       ! exponent for aeolian Fe solubility

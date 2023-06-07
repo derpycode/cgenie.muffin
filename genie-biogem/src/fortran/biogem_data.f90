@@ -252,7 +252,6 @@ CONTAINS
        print*,'Hard threshold for FeOOH reduction (mol kg-1)       : ',par_bio_remin_cthresh_FeOOH
        print*,'Hard threshold for sulphate reduction (mol kg-1)    : ',par_bio_remin_cthresh_SO4
        print*,'Catch rapidly-oxidizing species going < 0.0?        : ',ctrl_bio_remin_reminfix
-       print*,'NH4 -> NO3 oxidation option                         : ',trim(opt_bio_remin_oxidize_NH4toNO3)
        print*,'H2S -> SO4 oxidation option                         : ',trim(opt_bio_remin_oxidize_H2StoSO4)
        print*,'H2S -> POCS scavenging option                       : ',trim(opt_bio_remin_scavenge_H2StoPOMS)
        print*,'Old local residence time in layer for H2S?          : ',ctrl_scav_H2S_dt_old
@@ -270,17 +269,22 @@ CONTAINS
        print*,'Inhibition constant by nitrate (mol kg-1)           : ',par_bio_remin_ci_NO3
        print*,'Inhibition constant by FeOOH (mol kg-1)             : ',par_bio_remin_ci_FeOOH
        print*,'Inhibition constant by sulphate (mol kg-1)          : ',par_bio_remin_ci_SO4
+       print*,'NH4 -> NO3 oxidation option                         : ',trim(opt_bio_remin_oxidize_NH4toNO3)
+       print*,'NO2 -> N2O reduction option                         : ',trim(opt_bio_remin_reduce_NO2toN2O)
+       print*,'N2O -> N2 reduction option                          : ',trim(opt_bio_remin_reduce_N2OtoN2)
        print*,'Oxidation rate constant for H2S -> SO4              : ',par_bio_remin_kH2StoSO4
        print*,'Oxidation rate constant for NH4 -> NO2              : ',par_bio_remin_kNH4toNO2
        print*,'Oxidation rate constant for NO2 -> NO3              : ',par_bio_remin_kNO2toNO3
        print*,'Oxidation rate constant for NO2 -> N2O              : ',par_bio_remin_kNO2toN2O
+       print*,'Oxidation rate constant for N2O -> N2               : ',par_bio_remin_kN2OtoN2
        print*,'NH4 half-saturation for for NH4 -> NO2              : ',par_bio_remin_cNH4_NH4toNO2
        print*,'O2 half-saturation for for NH4 -> NO2               : ',par_bio_remin_cO2_NH4toNO2
        print*,'NO2 half-saturation for for NO2 -> NO3              : ',par_bio_remin_cNO2_NO2toNO3
        print*,'O2 half-saturation for for NO2 -> NO3               : ',par_bio_remin_cO2_NO2toNO3
        print*,'NO2 half-saturation for for NO2 -> N2O              : ',par_bio_remin_cNO2_NO2toN2O
-       print*,'O2 half-saturation for for NO2 -> N2O               : ',par_bio_remin_cO2_NO2toN2O
-       print*,'Fraction of NH4 oxidation -> N2O (rather than NO2)  : ',par_bio_remin_fracN2O
+       print*,'N2O half-saturation for for N2O -> N2               : ',par_bio_remin_cN2O_N2OtoN2
+       print*,'NO2 lifetime (yr)                                   : ',par_bio_remin_NO2lifetime
+       print*,'N2O lifetime (yr)                                   : ',par_bio_remin_N2Olifetime
        print*,'Reaction rate constant for H2S -> POMS              : ',par_bio_remin_kH2StoPOMS
        print*,'Specific CH4 oxidation rate (d-1)                   : ',par_bio_remin_CH4rate
        print*,'AER rate constant (yr-1)                            : ',par_bio_remin_AER_kAER
@@ -336,16 +340,18 @@ CONTAINS
        print*,'Planktic foram 13C fractionation scheme ID string   : ',opt_bio_foram_p_13C_delta
        print*,'44/40Ca fractionation between Ca and CaCO3          : ',par_d44Ca_CaCO3_epsilon
        print*,'88/86Sr fractionation between Sr and SrCO3          : ',par_d88Sr_SrCO3_epsilon
-       print*,'nitrage reduction N-fractionation                   : ',par_d15N_Corg_NO3_epsilon
        print*,'dissimilatory iron reduction fractionation          : ',par_d56Fe_Corg_FeOOH_epsilon  
        print*,'methanogenesis fractionation                        : ',par_d13C_Corg_CH4_epsilon
        print*,'sulphate reduction S-fractionation                  : ',par_d34S_Corg_SO4_epsilon
        print*,'AOM S-fractionation                                 : ',par_d34S_AOM_alpha
        print*,'aerobic sulphide oxidation S-fractionation          : ',par_d34S_AerSox_alpha
        print*,'iron-mediated sulphide oxidation S-fractionation    : ',par_d34S_ISO_alpha
+       print*,'nitrage reduction N-fractionation                   : ',par_d15N_Corg_NO3_epsilon
        print*,'N2 fixation 15N fractionation                       : ',par_bio_uptake_dN2_epsilon
        print*,'NH4 assimilation 15N fractionation                  : ',par_bio_uptake_dNH4_epsilon
        print*,'NO3 uptake 15N fractionation                        : ',par_bio_uptake_dNO3_epsilon
+       print*,'alpha for NO2 -> N2O                                : ',par_d15N_NO2toN2O_alpha
+       print*,'alpha for NO2 -> N2                                 : ',par_d15N_N2OtoN2_alpha
        ! --- IRON CYCLING -------------------------------------------------------------------------------------------------------- !
        print*,'--- IRON CYCLING -----------------------------------'
        print*,'Aeolian Fe solubility                               : ',par_det_Fe_sol
@@ -422,7 +428,7 @@ CONTAINS
        print*,'Scale factor for Fe3Si2O4 precipitation             : ',par_bio_Fe3Si2O4precip_sf
        print*,'Rate law power for Fe3Si2O4 precipitation           : ',par_bio_Fe3Si2O4precip_exp
        print*,'Ohmega constant for Fe3Si2O4 precipitation          : ',par_bio_Fe3Si2O4precip_abioticohm_cte
-       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_Fe3Si2O4_alpha ! 08.12.2021: YK changed from par_d56Fe_FeCO3_alpha to par_d56Fe_Fe3Si2O4_alpha
+       print*,'Fe fractionation factor for Fe3Si2O4 precipitation  : ',par_d56Fe_Fe3Si2O4_alpha ! 08.12.2021: YK rename
        print*,'assumed SiO2 concentration in diatom-free ocean     : ',par_bio_Fe3Si2O4precip_cSi
        print*,'kinetic constant for FeS2 precipitation             : ',par_bio_FeS2precip_k
        print*,'Ohmega constant for nanoparticulate FeS formation   : ',par_bio_FeS_part_abioticohm_cte
@@ -1389,6 +1395,9 @@ CONTAINS
     !       e.g. P + (8/5)NO3- + (8/5)H+ -> PO4 + (4/5)N2 + (4/5)H2O
     ! NOTE: assumption for NO2: 2NO3- <-> O2 + 2NO2-
     !                       or: O2 == 2NO3- - 2NO2-
+    ! NOTE: for biological update -- assuemd stiochometry: 
+    !       2NO3- + 2H+ <-> (5/2)O2 + N2 + H2O
+    !       NO3- + H2O + 2H+ <-> 2O2 + NH4+
     ! Wikipedia summary ...
     ! NO3− + 2 H+ + 2 e−→ NO2− + H2O (Nitrate reductase)
     ! NO2− + 2 H+ + e− → NO + H2O (Nitrite reductase)
@@ -1399,6 +1408,19 @@ CONTAINS
     ! NH4+ + NO2− → N2 + 2 H2O
     ! NOTE: will have to assume NO2- as part of the ALK balance ... ?
     !       (then this must be taken inot account when NO or N2O is formed)
+    !
+    ! For N2O ... simple would be: O2 == (4/5)NO3- - (2/5)N2O
+    ! However ... this would mean:
+    ! 4NO3- -> 2N2O + 5O2 -> 2N2 + 6O2
+    ! whereas it all needs to be consistent with the overall NO3- <-> N2 relationship:
+    ! 2NO3- + 2H+ -> (5/2)O2 + N2 + H2O
+    ! => 4NO3- + 4H+ -> 2N2 + 5O2 + 2H2O
+    ! For the removal of N2O to N2, we assume:
+    ! N2O + 2H+ + 2e− -> N2 + H2O
+    ! so the N2O formation from NO3- step needs to be: 
+    ! 2NO3- -> N2O + (5/2)O2 + 2e-
+    ! => 5O2 = 4NO3- - 4e- - 2N2O
+    ! => O2 = (4/5)NO3- - (2/5)N2O
     !
     if (ocn_select(io_NO3)) then
        conv_sed_ocn_N(:,:)  = conv_sed_ocn(:,:)
@@ -1428,6 +1450,16 @@ CONTAINS
           conv_sed_ocn_N(io_NO3,is_POC) = 2.0*conv_sed_ocn_N(io_O2,is_POC)
           conv_sed_ocn_N(io_NO2,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = 0.0
+          conv_sed_ocn_N(io_O2,is_POC)  = 0.0
+       elseif (ocn_select(io_N2O)) then
+          ! O2 = (4/5)NO3- - (2/5)N2O
+          conv_sed_ocn_N(io_NO3,is_POP) = (4.0/5.0)*conv_sed_ocn_N(io_O2,is_POP)
+          conv_sed_ocn_N(io_N2O,is_POP) = -(2.0/5.0)*conv_sed_ocn_N(io_NO3,is_POP)
+          conv_sed_ocn_N(io_ALK,is_POP) = -conv_sed_ocn_N(io_NO3,is_POP)
+          conv_sed_ocn_N(io_O2,is_POP)  = 0.0
+          conv_sed_ocn_N(io_NO3,is_POC) = (4.0/5.0)*conv_sed_ocn_N(io_O2,is_POC)
+          conv_sed_ocn_N(io_N2O,is_POC) = -(2.0/5.0)*conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        elseif (ocn_select(io_N2)) then
           ! O2 == (4/5)NO3- + (4/5)H+ - (2/5)N2 - (2/5)H2O
@@ -1461,6 +1493,9 @@ CONTAINS
        if (ocn_select(io_NO2_15N)) then
           conv_sed_ocn_N(io_NO2_15N,is_POP) = conv_sed_ocn_N(io_NO2,is_POP)
           conv_sed_ocn_N(io_NO2_15N,is_POC) = conv_sed_ocn_N(io_NO2,is_POC)
+       elseif (ocn_select(io_N2O_15N)) then
+          conv_sed_ocn_N(io_N2O_15N,is_POP)  = conv_sed_ocn_N(io_N2O,is_POP)
+          conv_sed_ocn_N(io_N2O_15N,is_POC)  = conv_sed_ocn_N(io_N2O,is_POC)
        elseif (ocn_select(io_N2_15N)) then
           conv_sed_ocn_N(io_N2_15N,is_POP)  = conv_sed_ocn_N(io_N2,is_POP)
           conv_sed_ocn_N(io_N2_15N,is_POC)  = conv_sed_ocn_N(io_N2,is_POC)

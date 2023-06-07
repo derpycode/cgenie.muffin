@@ -515,8 +515,10 @@ SUBROUTINE sedgem(          &
         loc_fhydrothermal(io_Os_187Os) = par_sed_hydroip_fOs_187Os_188Os
         loc_fhydrothermal(io_Os_188Os) = par_sed_hydroip_fOs_188Os_192Os
         ! initialization -- populate array with bulk flux and isotopic delta values
-        loc_fhydrothermal(io_Os_187Os) = 1000.0*(par_sed_hydroip_fOs_187Os_188Os*par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
-        loc_fhydrothermal(io_Os_188Os) = 1000.0*(par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+        loc_fhydrothermal(io_Os_187Os) = 1000.0* &
+             & (par_sed_hydroip_fOs_187Os_188Os*par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+        loc_fhydrothermal(io_Os_188Os) = 1000.0* &
+             & (par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
         ! calculate Os ISOTOPES -- 187Os
         ! NOTE: do not update <loc_fhydrothermal> yet as it is needed for the d188Os calculation ...
         loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_fhydrothermal(:),1)
@@ -558,7 +560,8 @@ SUBROUTINE sedgem(          &
            ! Os
            ! NOTE: deposition rates are given in mol m-2 s-1
            IF ((ocn_select(io_Os)) .AND. (dum_sfcsumocn(io_Os,i,j) > const_real_nullsmall)) then
-              ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018), else suboxic deposition rate
+              ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018),
+              ! else suboxic deposition rate
               if ((ctrl_sed_Os_O2) .AND. (dum_sfcsumocn(io_O2,i,j) > par_sed_Os_O2_threshold)) then
                  loc_fsed = par_sed_Os_dep_oxic*dum_sfcsumocn(io_Os,i,j)
               elseif (ctrl_sed_Os_O2) then

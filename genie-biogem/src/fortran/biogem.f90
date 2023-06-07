@@ -1532,7 +1532,8 @@ subroutine biogem(        &
                        locijk_focn(io_Ca_44Ca,i,j,k) = loc_frac*locijk_focn(io_Ca,i,j,k)
                        locijk_focn(io_ALK,i,j,k)     = loc_force_sign*force_flux_locn(io2l(io_ALK),i,j,k)
                        diag_misc_2D(idiag_misc_2D_FCa,i,j)      = diag_misc_2D(idiag_misc_2D_FCa,i,j) + locijk_focn(io_Ca,i,j,k)
-                       diag_misc_2D(idiag_misc_2D_FCa_44Ca,i,j) = diag_misc_2D(idiag_misc_2D_FCa_44Ca,i,j) + locijk_focn(io_Ca_44Ca,i,j,k)
+                       diag_misc_2D(idiag_misc_2D_FCa_44Ca,i,j) = &
+                            & diag_misc_2D(idiag_misc_2D_FCa_44Ca,i,j) + locijk_focn(io_Ca_44Ca,i,j,k)
                        diag_misc_2D(idiag_misc_2D_FALK,i,j)     = diag_misc_2D(idiag_misc_2D_FALK,i,j) + locijk_focn(io_ALK,i,j,k)
                     end DO
                  end If
@@ -1705,9 +1706,9 @@ subroutine biogem(        &
                        ! update flux reporting
                        locij_focnatm(ia_pO2,i,j)   = locij_focnatm(ia_pO2,i,j)   - 2.0*locij_focnatm(ia_pH2S,i,j)
                        locij_focnatm(ia_pH2S,i,j)  = 0.0
-                       ! ### INSERT CODE FOR ISOTOPES ############################################################################### !
+                       ! ### INSERT CODE FOR ISOTOPES ############################################################################ !
                        !
-                       ! ############################################################################################################ !
+                       ! ######################################################################################################### !
                     end IF
                  case default
                     ! no flux to atmosphere
@@ -1756,6 +1757,13 @@ subroutine biogem(        &
                  else
                     call sub_box_oxidize_NH4toNO3(i,j,loc_k1,loc_dtyr)
                  end if
+              end If
+
+              IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
+                   & '*** WATER COLUMN GEOCHEMISTRY - N2O REDUCTION ***'
+              ! *** WATER COLUMN GEOCHEMISTRY - N2O REDUCTION ***
+              if (ocn_select(io_N2O) .AND. ocn_select(io_N2)) then
+                 call sub_box_reduce_N2OtoN2(i,j,loc_k1,loc_dtyr)
               end If
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -1808,8 +1816,6 @@ subroutine biogem(        &
               if (sed_select(is_FeOOH)) then
                  call sub_calc_precip_FeOOH(i,j,loc_k1,loc_dtyr)
               end if
-
-              !---- YK added 12.13.2020
               ! *** PO4 adsorption ***
               if (ocn_select(io_PO4) .AND. ocn_select(io_Fe2)) then
                  if (sed_select(is_FeOOH)) then
@@ -1819,8 +1825,6 @@ subroutine biogem(        &
                     call sub_calc_ads_PO4_POM_FeOOH(i,j,loc_k1,loc_dtyr)
                  end if
               endif
-              ! ---- end 
-
               ! *** Fe-S cycling ***
               if (ocn_select(io_FeS) .AND. ocn_select(io_Fe2) .AND. ocn_select(io_H2S)) then
                  if (ctrl_bio_FeS2precip_explicit) then
@@ -2395,8 +2399,8 @@ subroutine biogem_tracercoupling( &
            if(matrix_vocn_n.eq.0)then ! catch issue when matrix_vocn_n=0 initally
               print*,'>>> Initialising transport matrix at depth level:',matrix_k
            end if
-
-           if(mod(matrix_vocn_n,conv_kocn_ksedgem).eq.0 .and. matrix_vocn_n.ne.0)then ! once 96 steps have been completed, n.b. conv_kocn_ksedgem = n_timesteps!!
+           ! once 96 steps have been completed, n.b. conv_kocn_ksedgem = n_timesteps!!
+           if(mod(matrix_vocn_n,conv_kocn_ksedgem).eq.0 .and. matrix_vocn_n.ne.0)then 
               matrix_k=matrix_k-1 ! decrement matrix_k for next time
               if(matrix_k.gt.0) print*,'>>> Initialising transport matrix at depth level:',matrix_k
            end if

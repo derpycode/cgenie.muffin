@@ -2711,6 +2711,8 @@ CONTAINS
        dum_conv_ls_lo(io2l(io_NO3_15N),:)    = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NO3),:)
        if (ocn_select(io_NO2) .AND. ocn_select(io_NO2_15N)) then
           dum_conv_ls_lo(io2l(io_NO2_15N),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NO2),:)
+       elseif (ocn_select(io_N2O) .AND. ocn_select(io_N2O_15N)) then
+          dum_conv_ls_lo(io2l(io_N2O_15N),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_N2O),:)
        elseif (ocn_select(io_N2) .AND. ocn_select(io_N2_15N)) then
           dum_conv_ls_lo(io2l(io_N2_15N),:)  = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_N2),:)
        elseif (ocn_select(io_NH4) .AND. ocn_select(io_NH4_15N)) then
@@ -2958,7 +2960,7 @@ CONTAINS
     real::loc_bio_remin_opal_frac1,loc_bio_remin_opal_frac2
     real::loc_bio_part_opal_ratio
 !!!real::loc_bio_part_FeOOH_ratio,loc_bio_part_FeS2_ratio,loc_bio_part_FeCO3_ratio
-    real::loc_eL_size                                                   ! local efolding depth varying with ecosystem size structure JDW
+    real::loc_eL_size                                                   ! efolding depth varying with ecosystem size structure JDW
     real::loc_size0                                                     ! JDW
     real::loc_part_tot,loc_part_tot_mineral
     real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo            !

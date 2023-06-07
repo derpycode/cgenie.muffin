@@ -4688,10 +4688,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                        <value datatype="boolean">.false.</value>
                         <description>Catch mis-behaving rapidly-oxidizing species going less than 0.0?</description>
                     </param>
-                    <param name="opt_bio_remin_oxidize_NH4toNO3">
-			<value datatype="string">Monteiro</value>
-                        <description>NH4 -> NO3 oxidation option</description>
-                    </param>
                     <param name="opt_bio_remin_oxidize_H2StoSO4">
 			<value datatype="string">linear</value>
                         <description>H2S -> SO4 oxidation option</description>
@@ -4827,6 +4823,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <description>Fix for negative O2 ... ?</description>
                     </param>
 <!-- N -->
+                    <param name="opt_bio_remin_oxidize_NH4toNO3">
+			<value datatype="string">Monteiro</value>
+                        <description>NH4 -> NO3 oxidation option</description>
+                    </param>
+                    <param name="opt_bio_remin_reduce_NO2toN2O">
+			<value datatype="string">NONE</value>
+                        <description>NO2 -> N2O reduction option</description>
+                    </param>
+                    <param name="opt_bio_remin_reduce_N2OtoN2">
+			<value datatype="string">NONE</value>
+                        <description>N2O -> N2 reduction option</description>
+                    </param>
                     <param name="par_bio_remin_kNH4toNO2">
                         <value datatype="real">0.0</value>
                         <description>Oxidation rate constant for NH4 -> NO2</description>
@@ -4853,15 +4861,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                     <param name="par_bio_remin_cNO2_NO2toN2O">
                         <value datatype="real">0.0</value>
-                        <description>NH4 half-saturation for for NO2 -> N2O</description>
+                        <description>NO2 half-saturation for for NO2 -> N2O</description>
                     </param>
-                    <param name="par_bio_remin_cO2_NO2toN2O">
+                    <param name="par_bio_remin_cN2O_N2OtoN2">
                         <value datatype="real">0.0</value>
-                        <description>O2 half-saturation (inhibition) for for NO2 -> N2O</description>
+                        <description>N2O half-saturation for for N2O -> N2</description>
                     </param>
-                    <param name="par_bio_remin_fracN2O">
+                    <param name="par_bio_remin_NO2lifetime">
                         <value datatype="real">0.0</value>
-                        <description>Fraction of NH4 oxidation -> N2O (rather than NO2)</description>
+                        <description>NO2 lifetime (yr)</description>
+                    </param>
+                    <param name="par_bio_remin_N2Olifetime">
+                        <value datatype="real">0.0</value>
+                        <description>N2O lifetime (yr)</description>
                     </param>
 <!-- ISOTOPIC FRACTIONATION -->
                     <param name="opt_d13C_DIC_Corg">
@@ -4967,6 +4979,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_uptake_dNO3_epsilon">
 			<value datatype="real">0.0</value>
                         <description>NO3 uptake 15N fractionation</description>
+                    </param>
+                    <param name="par_d15N_NO2toN2O_alpha">
+			<value datatype="real">1.0</value>
+                        <description>alpha for NO2 -> N2O</description>
+                    </param>
+                    <param name="par_d15N_N2OtoN2_alpha">
+			<value datatype="real">1.0</value>
+                        <description>alpha for N2O -> N2</description>
                     </param>
 <!-- IRON  -->
                     <param name="par_det_Fe_sol">
@@ -7015,7 +7035,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
                    <param name="par_atm_CH4_photochem">
                         <value datatype="string">default</value>
-                        <description>Atmospheric photochemistry scheme</description>
+                        <description>CH4 photochemical scheme ID string</description>
                     </param>
                    <param name="par_pCH4_oxidation_C0">
                         <value datatype="real">700.0E-09</value>
@@ -7032,6 +7052,18 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                    <param name="par_atm_pO2_fixed">
                         <value datatype="real">0.2095</value>
                         <description>Atmospheric pO2 for fixed scheme</description>
+                    </param>
+                   <param name="opt_atm_N2O_photochem">
+                        <value datatype="string">lifetime</value>
+                        <description>N2O photochemical scheme option</description>
+                    </param>
+                    <param name="ctrl_atl_N2Oreduct_altO2balance">
+			<value datatype="boolean">.false.</value>
+                        <description>alternative O2 balance (to N2 fixation)?</description>
+                    </param>
+                   <param name="par_N2O_reduction_tau">
+                        <value datatype="real">116.0</value>
+                        <description>pBaseline N2O lifetime (yr)</description>
                     </param>
                     <param name="par_atm_wetlands_FCH4">
 			<value datatype="real">0.0</value>
