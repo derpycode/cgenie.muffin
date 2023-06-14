@@ -212,10 +212,11 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fCa_alpha,par_sed_lowTalt_44Ca_epsilon
   real::par_sed_hydroip_fMg                                      ! hydrothermal Mg flux (mol yr-1) 
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fMg
-  LOGICAL::ctrl_sed_hydroip_MgtoCa                               ! link Mg -> Ca via a deviation from a reference Mg/Ca ratio
-  NAMELIST /ini_sedgem_nml/ctrl_sed_hydroip_MgtoCa
+  character(len=63)::opt_sed_hydroip_MgtoCa                      ! option for linking Mg -> Ca
+  NAMELIST /ini_sedgem_nml/opt_sed_hydroip_MgtoCa
   real::par_sed_hydroip_rMgCaREF                                 ! reference Mg/Ca
-  NAMELIST /ini_sedgem_nml/par_sed_hydroip_rMgCaREF
+  real::par_sed_hydroip_concMgREF                                ! reference Mg concentration (mol kg-1)
+  NAMELIST /ini_sedgem_nml/par_sed_hydroip_rMgCaREF,par_sed_hydroip_concMgREF
   real::par_sed_hydroip_fSr                                      ! hydrothermal Sr flux (mol yr-1) 
   real::par_sed_hydroip_fSr_r87Sr                                ! hydrothermal Sr flux r87Sr (87/86)   
   real::par_sed_hydroip_fSr_d88Sr                                ! hydrothermal Sr flux d88Sr (o/oo)                      

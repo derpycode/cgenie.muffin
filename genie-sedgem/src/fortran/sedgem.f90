@@ -488,15 +488,26 @@ SUBROUTINE sedgem(          &
   ! add Ca, remove Mg
   ! NOTE: assumes that the prescribed Mg flux (par_sed_hydroip_fMg) is negative in value when explicitly set
   ! NOTE: original code automatically balanced Ca input with Mg removal (par_sed_hydroip_fMg was not defined)
+  !       this is now option: 'tracking'
   If (ocn_select(io_Ca)) then
-     If (ocn_select(io_Mg)) then
-        if (ctrl_sed_hydroip_MgtoCa) then
-           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa*(loc_tot_Mg/loc_tot_Ca)/par_sed_hydroip_rMgCaREF
-           loc_fhydrothermal(io_Ca) = -loc_fhydrothermal(io_Mg)
-        else              
+     If (ocn_select(io_Mg)) then        
+        SELECT CASE (opt_sed_hydroip_MgtoCa)
+        CASE ('tracking')
+           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa
+           loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+        CASE ('fixed')
            loc_fhydrothermal(io_Mg) = par_sed_hydroip_fMg
            loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
-        end if
+        case ('rMgCa')
+           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa*(loc_tot_Mg/loc_tot_Ca)/par_sed_hydroip_rMgCaREF
+           loc_fhydrothermal(io_Ca) = -loc_fhydrothermal(io_Mg)
+        case ('concMg')
+           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa*(loc_tot_Mg/par_sed_hydroip_concMgREF)
+           loc_fhydrothermal(io_Ca) = -loc_fhydrothermal(io_Mg)
+        case default
+           loc_fhydrothermal(io_Mg) = par_sed_hydroip_fMg
+           loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+        end SELECT          
      else
         loc_fhydrothermal(io_Mg) = 0.0
         loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
