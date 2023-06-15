@@ -323,7 +323,19 @@ subroutine ecogem(          &
                     PAR_out   = PAR_in * exp(-k_tot*layerthick) ! light leaving bottom of layer
                     PAR_in    = PAR_out
                  endif
-
+                 
+                 ! foram cannot live in environment with < 1 omega
+                 ! Roy et al. 2015. Biogeosciences, 12, 2873–2889, 2015
+                 if (ctrl_foram_oa .and. (omega(i,j,k) .lt. 1.0)) then
+                    do jp=1,npmax
+                       ! for any foram
+                       if (index(pft(jp), "foram") /= 0) then
+                          ! note mortality(:) is changing in place and mort(:) is fixed
+                          mortality(jp) = mortality(jp) * 100
+                       endif
+                    enddo
+                 endif
+                 
                  ! ?
                  up_inorg(:,:) = 0.0 ! (iomax,npmax)
                  qreg(:,:) = 0.0 ! (iomax,npmax)
@@ -348,6 +360,16 @@ subroutine ecogem(          &
 
                  call t_limitation(templocal,gamma_TP,gamma_TK)
 
+                 ! symbiont bleaching for foraminifera
+                 ! implementation: manually disable photosynthesis
+                 if (ctrl_foram_bleach .and. (templocal .gt. (temp_bleach + 273.15))) then
+                    do jp=1,npmax
+                       if (pft(jp).eq.'foram_sn' .or. pft(jp).eq.'foram_ss') then
+                          VLlimit(jp) = 0.0
+                       endif
+                    enddo
+                 endif
+                 
                  call nutrient_uptake(qreg(:,:),loc_nuts(:),gamma_TK,up_inorg(:,:))
 
                  call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_TP,up_inorg(iDIC,:),chlsynth,totPP)
@@ -373,7 +395,7 @@ subroutine ecogem(          &
                  ! mortality(:) = mortality(:)  * gamma_TK ! temp adjusted?
 
                  ! calculate respiration
-                 respiration(:) = respir(:) !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
+                 respiration(:) = respir(:) * gamma_T !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
 
                  ! calculate assimilation efficiency based on quota status
 !BAW: zoolimit should be optional                 Totzoolimit(:) = 0.0  !total food limitation - Maria May 2019 !!! Need to check if consistent!!!
