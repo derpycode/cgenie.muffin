@@ -8889,7 +8889,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 		   <!-- FORAMECOGENIE -->
 		   <!-- *******************************************************************-->
 		   <param name="ctrl_use_foramecogenie">
-		     <value datatype="logical">.FALSE.</value>
+		     <value datatype="boolean">.FALSE.</value>
 		     <description>enable foramecogenie</description>
 		   </param>
 
@@ -8903,7 +8903,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 		     <description>kill foraminifera when calcite saturation state is less than 1</description>
 		   </param>
 
-		   <param name="temp_bleach">
+		   <param name="foramecogenie_bleach_temp">
 		     <value datatype="real">40.0</value>
 		     <description>temperature threshold of symbiont bleaching in Celsius </description>
 		   </param>

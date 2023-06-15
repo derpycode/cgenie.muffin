@@ -494,10 +494,9 @@ CONTAINS
        ! v1/v2 = (r1/r2)^3
        auto_volume(:) = volume(:) * symbiont_esd_scale(:) ** 3
        hetero_volume(:) = volume(:) * grazing_esd_scale(:) ** 3
+       autotrophy(:) = autotrophy(:) * symbiont_auto_cost(:)
+       heterotrophy(:) = heterotrophy(:) * symbiont_hetero_cost(:)
 
-       ! vmax photosynthesis rate
-       vmax(iDIC,:)    = vmax(iDIC,:)    = (vmaxDIC_a  + log10(auto_volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(auto_volume(:)) + log10(auto_volume(:))**2) &
-            & * autotrophy(:) * symbiont_auto_cost(:)
        !-----------------------------------------------------------------------------------------
        ! maximum photosynthetic rate
        !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
