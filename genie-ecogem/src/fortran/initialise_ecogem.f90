@@ -325,6 +325,33 @@ SUBROUTINE initialise_ecogem(    &
   if (useFe )   rsrcstrng(iFe)   = 'Fe'
   if (useSiO2 ) rsrcstrng(iSiO2) = 'SiO2'
 
+  ! foramecogenie arrays allocation
+  if (ctrl_use_foramecogenie) then
+     ALLOCATE(kg_scale(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     
+     ALLOCATE(respir_cost(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     
+     ALLOCATE(auto_volume(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+
+     ALLOCATE(hetero_volume(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     
+     ALLOCATE(grazing_esd_scale(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+
+     ALLOCATE(symbiont_esd_scale(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     
+     ALLOCATE(symbiont_auto_cost(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+
+     ALLOCATE(symbiont_hetero_cost(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+  endif
+
   ! ---------------------------------------------------------- !
   ! OPEN ASCII FILES !---------------------------------------- !
   ! ---------------------------------------------------------- !
