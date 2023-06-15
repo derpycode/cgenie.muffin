@@ -138,8 +138,8 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/beta_graz_a,beta_graz_b,beta_graz_c,beta_mort_a,beta_mort_b,beta_mort_c
   namelist/ini_ecogem_nml/par_bio_remin_POC_frac2,par_bio_remin_CaCO3_frac2
   ! Mixotrophy parameters
-  real :: trophic_tradeoff
-  namelist/ini_ecogem_nml/trophic_tradeoff
+  real :: trophic_tradeoff,foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
+  namelist/ini_ecogem_nml/trophic_tradeoff,foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
   ! Temperature dependence
   real ::  temp_A,temp_P,temp_K,temp_T0   !
   namelist/ini_ecogem_nml/temp_A,temp_P,temp_K,temp_T0
@@ -168,6 +168,9 @@ MODULE ecogem_lib
   namelist /ini_ecogem_nml/ctrl_force_T
   character(LEN=127)::par_ecogem_force_T_file
   namelist /ini_ecogem_nml/par_ecogem_force_T_file
+  ! RY Foram symbiont bleaching, ocean acidification killing control
+  logical::ctrl_foram_bleach, ctrl_foram_oa
+  namelist /ini_ecogem_nml/ctrl_foram_bleach, ctrl_foram_oa
   ! explicit grazing parameters
   logical::ctrl_grazing_explicit
   namelist /ini_ecogem_nml/ctrl_grazing_explicit
@@ -299,6 +302,10 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::qcarbon,alphachl                         ! Carbon quota and Photosynthesis parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::graz,kg,pp_opt,pp_sig                    ! Grazing parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir,biosink,mort,beta_graz,beta_mort  ! Other loss parameters
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::symbiont_auto_cost, symbiont_hetero_cost ! RY, foramecogenie symbiont cost parameter
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::auto_volume, hetero_volume, grazing_esd_scale, symbiont_esd_scale           ! RY, foramecogenie size parameter
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir_cost,kg_scale,                    ! RY, foramecogenie grazing parameter
+  
   ! Grazing kernel
   REAL,ALLOCATABLE,DIMENSION(:,:)::gkernel,gkernelT
   ! netCDF and netCDF restart parameters
