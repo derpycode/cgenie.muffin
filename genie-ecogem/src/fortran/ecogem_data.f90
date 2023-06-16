@@ -454,24 +454,27 @@ CONTAINS
 
     ! initialise foram parameters
     if (ctrl_use_foramecogenie) then
-       symbiont_esd_scale(:) = 1.0
-       grazing_esd_scale(:) = 1.0
-       symbiont_auto_cost(:) = 1.0
-       symbiont_hetero_cost(:) = 1.0
-    
-       ! modify for foraminifera only
-       if (pft(jp).eq.'foram_bs') then
-          grazing_esd_scale(:) = foram_grazing_scale_bs
-       elseif (pft(jp).eq.'foram_sn') then
-          symbiont_esd_scale(:) = foram_symbiont_esd_scale
-          symbiont_auto_cost(:) = foram_auto_cost_sn
-          symbiont_hetero_cost(:) = foram_hetero_cost_sn
-       elseif (pft(jp).eq.'foram_ss') then
-          symbiont_esd_scale(:) = foram_symbiont_esd_scale
-          symbiont_auto_cost(:) = foram_auto_cost_ss
-          symbiont_hetero_cost(:) =  foram_hetero_cost_ss
-          grazing_esd_scale(:) = foram_grazing_scale_ss
-       endif
+       do jp=1,npmax
+          call lower(pft(jp))
+          symbiont_esd_scale(:) = 1.0
+          grazing_esd_scale(:) = 1.0
+          symbiont_auto_cost(:) = 1.0
+          symbiont_hetero_cost(:) = 1.0
+
+          ! modify for foraminifera only
+          if (pft(jp).eq.'foram_bs') then
+             grazing_esd_scale(:) = foram_grazing_scale_bs
+          elseif (pft(jp).eq.'foram_sn') then
+             symbiont_esd_scale(:) = foram_symbiont_esd_scale
+             symbiont_auto_cost(:) = foram_auto_cost_sn
+             symbiont_hetero_cost(:) = foram_hetero_cost_sn
+          elseif (pft(jp).eq.'foram_ss') then
+             symbiont_esd_scale(:) = foram_symbiont_esd_scale
+             symbiont_auto_cost(:) = foram_auto_cost_ss
+             symbiont_hetero_cost(:) =  foram_hetero_cost_ss
+             grazing_esd_scale(:) = foram_grazing_scale_ss
+          endif
+       enddo
     endif
 
     !-----------------------------------------------------------------------------------------
