@@ -495,7 +495,7 @@ CONTAINS
        ! v1/v2 = (r1/r2)^3
        auto_volume(:) = volume(:) * symbiont_esd_scale(:) ** 3
        hetero_volume(:) = volume(:) * grazing_esd_scale(:) ** 3
-       hetero_diamter(:) = diameter(:) * grazing_esd_scale(:)
+       hetero_diameter(:) = diameter(:) * grazing_esd_scale(:)
        autotrophy(:) = autotrophy(:) * symbiont_auto_cost(:)
        heterotrophy(:) = heterotrophy(:) * symbiont_hetero_cost(:)
 
