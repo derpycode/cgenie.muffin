@@ -308,7 +308,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir,biosink,mort,beta_graz,beta_mort  ! Other loss parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::symbiont_auto_cost, symbiont_hetero_cost ! RY, foramecogenie symbiont cost parameter
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::auto_volume, hetero_volume, grazing_esd_scale, symbiont_esd_scale           ! RY, foramecogenie size parameter
-  REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir_cost,kg_scale                    ! RY, foramecogenie grazing parameter
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir_cost,kg_scale, hetero_diameter                    ! RY, foramecogenie grazing parameter
   
   ! Grazing kernel
   REAL,ALLOCATABLE,DIMENSION(:,:)::gkernel,gkernelT

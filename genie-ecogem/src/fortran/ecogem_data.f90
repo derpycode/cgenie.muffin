@@ -415,14 +415,14 @@ CONTAINS
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
-          autotrophy(jp)      = 0.0
+          autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 1.0
        elseif (pft(jp).eq.'foram_ss') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
-          autotrophy(jp)      = 0.0
+          autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 1.0
        else
           print*," "
@@ -458,8 +458,7 @@ CONTAINS
        grazing_esd_scale(:) = 1.0
        symbiont_auto_cost(:) = 1.0
        symbiont_hetero_cost(:) = 1.0
-       
-
+    
        ! modify for foraminifera only
        if (pft(jp).eq.'foram_bs') then
           grazing_esd_scale(:) = foram_grazing_scale_bs
@@ -496,6 +495,7 @@ CONTAINS
        ! v1/v2 = (r1/r2)^3
        auto_volume(:) = volume(:) * symbiont_esd_scale(:) ** 3
        hetero_volume(:) = volume(:) * grazing_esd_scale(:) ** 3
+       hetero_diamter(:) = diameter(:) * grazing_esd_scale(:)
        autotrophy(:) = autotrophy(:) * symbiont_auto_cost(:)
        heterotrophy(:) = heterotrophy(:) * symbiont_hetero_cost(:)
 
@@ -573,7 +573,7 @@ CONTAINS
           ppopt_mat(:,jp)=pp_opt  !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
           ppsig_mat(:,jp)=pp_sig  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
        enddo
-       pred_diam(:,1)=diameter(:) ! standard  prey diameter vector
+       pred_diam(:,1)=hetero_diameter(:) ! standard  prey diameter vector
        prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
        prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
        gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
@@ -587,7 +587,6 @@ CONTAINS
              end do
           end select
        end do
-
 
        if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
        gkernelT(:,:) =transpose(gkernel(:,:))

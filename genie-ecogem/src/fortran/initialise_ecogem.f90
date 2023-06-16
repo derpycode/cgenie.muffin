@@ -338,6 +338,9 @@ SUBROUTINE initialise_ecogem(    &
 
      ALLOCATE(hetero_volume(npmax),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
+
+     ALLOCATE(hetero_diameter(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
      
      ALLOCATE(grazing_esd_scale(npmax),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
