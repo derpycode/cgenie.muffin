@@ -484,12 +484,8 @@ CONTAINS
        mort_protect(:)=1.0
        palatability(:)=1.0
        growthcost_factor(:)=1.0
-       if (ctrl_numerical_feeding) then
-          herbivory_real(:)=0.0
-          carnivory_real(:)=0.0
-       else
-          herbivory(:)=.false.
-          carnivory(:)=.false.
+       herbivory(:)=.false.
+       carnivory(:)=.false.
        endif
     endif
     ! set growth costs (could do the same for autotrophy in coccolithophores) - Fanny Mar21
@@ -591,114 +587,111 @@ CONTAINS
              end do
           end select
        end do
-    
 
-    if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
-    gkernelT(:,:) =transpose(gkernel(:,:))
 
-    ! detrital partitioning
-    ! NOTE: fraction partitioned into DOM (a seperate and explicit array is created for 1-minus this -- the fraction into POM)
-    beta_graz(:) =beta_graz_a - (beta_graz_a-beta_graz_b) / (1.0+beta_mort_c/diameter(:))
-    beta_mort(:) =beta_mort_a - (beta_mort_a-beta_mort_b) / (1.0+beta_mort_c/diameter(:))
- endif
-    
-    !-----------------------------------------------------------------------------------------
-    ! maximum photosynthetic rate
-    !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
-    vmax(iDIC,:)    = (vmaxDIC_a  + log10(volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(volume(:)) + log10(volume(:))**2) * autotrophy(:)
-    !-----------------------------------------------------------------------------------------
-    if (nquota) then ! nitrogen parameters
-       qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
-       qmax(iNitr,:)      =    qmaxN_a * volume(:) **    qmaxN_b
-       if (maxval((qmin(iNitr,:)/qmax(iNitr,:))).gt.1.0) print*,"WARNING: Nitrogen Qmin > Qmax. Population inviable!"
-       if (useNO3) then ! nitrate parameters
-          vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:)
-          affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) * NO3up(:)
+       if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
+       gkernelT(:,:) =transpose(gkernel(:,:))
+
+       ! detrital partitioning
+       ! NOTE: fraction partitioned into DOM (a seperate and explicit array is created for 1-minus this -- the fraction into POM)
+       beta_graz(:) =beta_graz_a - (beta_graz_a-beta_graz_b) / (1.0+beta_mort_c/diameter(:))
+       beta_mort(:) =beta_mort_a - (beta_mort_a-beta_mort_b) / (1.0+beta_mort_c/diameter(:))
+    else
+       ! >>>>>>>> Noraml ECOGEM Setting
+       !-----------------------------------------------------------------------------------------
+       ! maximum photosynthetic rate
+       !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
+       vmax(iDIC,:)    = (vmaxDIC_a  + log10(volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(volume(:)) + log10(volume(:))**2) * autotrophy(:)
+       !-----------------------------------------------------------------------------------------
+       if (nquota) then ! nitrogen parameters
+          qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
+          qmax(iNitr,:)      =    qmaxN_a * volume(:) **    qmaxN_b
+          if (maxval((qmin(iNitr,:)/qmax(iNitr,:))).gt.1.0) print*,"WARNING: Nitrogen Qmin > Qmax. Population inviable!"
+          if (useNO3) then ! nitrate parameters
+             vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:)
+             affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) * NO3up(:)
+          endif
+          if (useNO2) then ! nitrite parameters
+             vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:)
+             affinity(iNO2,:) = affinNO2_a * volume(:) ** affinNO2_b * autotrophy(:)
+          endif
+          if (useNH4) then ! ammonium parameters
+             vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:)
+             affinity(iNH4,:) = affinNH4_a * volume(:) ** affinNH4_b * autotrophy(:)
+          endif
+          kexc(iNitr,:)      =    kexcN_a * volume(:) **    kexcN_b
+
+          !      mumax(iNitr,:) = vmax(iDIC,:)*vmax(iNO3,:) &
+          !                     & /(vmax(iDIC,:)*Qmin(iNitr,:) + vmax(iNO3,:)*qmax(iNitr,:)/(qmax(iNitr,:)-qmin(iNitr,:)))
+          !      alpha(iNitr,:) = affinity(iNitr,:)/Qmin(iNitr,:)
        endif
-       if (useNO2) then ! nitrite parameters
-          vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:)
-          affinity(iNO2,:) = affinNO2_a * volume(:) ** affinNO2_b * autotrophy(:)
+       !-----------------------------------------------------------------------------------------
+       if (pquota) then ! phosphorus parameters
+          qmin(iPhos,:)    =   qminP_a  * volume(:) **    qminP_b
+          qmax(iPhos,:)    =   qmaxP_a  * volume(:) **    qmaxP_b
+          if (maxval((qmin(iPhos,:)/qmax(iPhos,:))).gt.1.0) print*,"WARNING: Phosphate Qmin > Qmax. Population inviable!"
+          vmax(iPO4,:)     = vmaxPO4_a  * volume(:) **  vmaxPO4_b * autotrophy(:)
+          affinity(iPO4,:) = affinPO4_a * volume(:) ** affinPO4_b * autotrophy(:)
+          kexc(iPhos,:)    =   kexcP_a  * volume(:) **    kexcP_b
        endif
-       if (useNH4) then ! ammonium parameters
-          vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:)
-          affinity(iNH4,:) = affinNH4_a * volume(:) ** affinNH4_b * autotrophy(:)
+       !-----------------------------------------------------------------------------------------
+       if (fquota) then ! iron parameters
+          qmin(iIron,:)   =  qminFe_a * volume(:) **  qminFe_b
+          qmax(iIron,:)   =  qmaxFe_a * volume(:) **  qmaxFe_b
+          if (maxval((qmin(iIron,:)/qmax(iIron,:))).gt.1.0) print*,"WARNING: Iron Qmin > Qmax. Population inviable!"
+          vmax(iFe,:)     =  vmaxFe_a * volume(:) **  vmaxFe_b * autotrophy(:)
+          affinity(iFe,:) = affinFe_a * volume(:) ** affinFe_b * autotrophy(:)
+          kexc(iIron,:)   =  kexcFe_a * volume(:) **  kexcFe_b
        endif
-       kexc(iNitr,:)      =    kexcN_a * volume(:) **    kexcN_b
+       !-----------------------------------------------------------------------------------------
+       if (squota) then ! silicon parameters
+          qmin(iSili,:)     =   qminSi_a * volume(:) **    qminSi_b                 * silicify(:)
+          qmax(iSili,:)     =   qmaxSi_a * volume(:) **    qmaxSi_b                 * silicify(:)
+          if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
+          vmax(iSiO2,:)     = vmaxSiO2_a * volume(:) **  vmaxSiO2_b * autotrophy(:) * silicify(:)
+          affinity(iSiO2,:) =affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
+          kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
+       endif
+       !-----------------------------------------------------------------------------------------
+       ! other parameters
+       qcarbon(:)  =     qcarbon_a * volume(:) ** qcarbon_b
+       alphachl(:) =    alphachl_a * volume(:) ** alphachl_b
+       graz(:)     =        graz_a * volume(:) ** graz_b     * heterotrophy(:)
+       kg(:)       =          kg_a * volume(:) ** kg_b
+       pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
+       pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
+       respir(:)   =      respir_a * volume(:) ** respir_b
+       biosink(:)  =     biosink_a * volume(:) ** biosink_b
+       mort(:)     =       (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
+       do jp=1,npmax ! grazing kernel (npred,nprey)
+          ! pad predator dependent pp_opt and pp_sig so that they vary along matrix columns
+          ! (they should be constant within each row)
+          ppopt_mat(:,jp)=pp_opt  !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
+          ppsig_mat(:,jp)=pp_sig  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
+       enddo
+       pred_diam(:,1)=diameter(:) ! standard  prey diameter vector
+       prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
+       prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
+       gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
+       do jpred=1,npmax
+          select case(pft(jpred))
+          case('foram')
+             do jprey=1,npmax
+                if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+                if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+             end do
+          end select
+       end do
 
-       !      mumax(iNitr,:) = vmax(iDIC,:)*vmax(iNO3,:) &
-       !                     & /(vmax(iDIC,:)*Qmin(iNitr,:) + vmax(iNO3,:)*qmax(iNitr,:)/(qmax(iNitr,:)-qmin(iNitr,:)))
-       !      alpha(iNitr,:) = affinity(iNitr,:)/Qmin(iNitr,:)
-    endif
-    !-----------------------------------------------------------------------------------------
-    if (pquota) then ! phosphorus parameters
-       qmin(iPhos,:)    =   qminP_a  * volume(:) **    qminP_b
-       qmax(iPhos,:)    =   qmaxP_a  * volume(:) **    qmaxP_b
-       if (maxval((qmin(iPhos,:)/qmax(iPhos,:))).gt.1.0) print*,"WARNING: Phosphate Qmin > Qmax. Population inviable!"
-       vmax(iPO4,:)     = vmaxPO4_a  * volume(:) **  vmaxPO4_b * autotrophy(:)
-       affinity(iPO4,:) = affinPO4_a * volume(:) ** affinPO4_b * autotrophy(:)
-       kexc(iPhos,:)    =   kexcP_a  * volume(:) **    kexcP_b
-    endif
-    !-----------------------------------------------------------------------------------------
-    if (fquota) then ! iron parameters
-       qmin(iIron,:)   =  qminFe_a * volume(:) **  qminFe_b
-       qmax(iIron,:)   =  qmaxFe_a * volume(:) **  qmaxFe_b
-       if (maxval((qmin(iIron,:)/qmax(iIron,:))).gt.1.0) print*,"WARNING: Iron Qmin > Qmax. Population inviable!"
-       vmax(iFe,:)     =  vmaxFe_a * volume(:) **  vmaxFe_b * autotrophy(:)
-       affinity(iFe,:) = affinFe_a * volume(:) ** affinFe_b * autotrophy(:)
-       kexc(iIron,:)   =  kexcFe_a * volume(:) **  kexcFe_b
-    endif
-    !-----------------------------------------------------------------------------------------
-    if (squota) then ! silicon parameters
-       qmin(iSili,:)     =   qminSi_a * volume(:) **    qminSi_b                 * silicify(:)
-       qmax(iSili,:)     =   qmaxSi_a * volume(:) **    qmaxSi_b                 * silicify(:)
-       if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
-       vmax(iSiO2,:)     = vmaxSiO2_a * volume(:) **  vmaxSiO2_b * autotrophy(:) * silicify(:)
-       affinity(iSiO2,:) =affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
-       kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
-    endif
-    !-----------------------------------------------------------------------------------------
-    ! other parameters
-    qcarbon(:)  =     qcarbon_a * volume(:) ** qcarbon_b
-    alphachl(:) =    alphachl_a * volume(:) ** alphachl_b
-    graz(:)     =        graz_a * volume(:) ** graz_b     * heterotrophy(:)
-    kg(:)       =          kg_a * volume(:) ** kg_b
-    pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
-    pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
-    respir(:)   =      respir_a * volume(:) ** respir_b
-    biosink(:)  =     biosink_a * volume(:) ** biosink_b
-    mort(:)     =       (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
-    do jp=1,npmax ! grazing kernel (npred,nprey)
-       ! pad predator dependent pp_opt and pp_sig so that they vary along matrix columns
-       ! (they should be constant within each row)
-       ppopt_mat(:,jp)=pp_opt  !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
-       ppsig_mat(:,jp)=pp_sig  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
-    enddo
-    pred_diam(:,1)=diameter(:) ! standard  prey diameter vector
-    prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
-    prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
-    gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
-    do jpred=1,npmax
-       select case(pft(jpred))
-       case('foram')
-          do jprey=1,npmax
-             if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
-             if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
-          end do
-       end select
-    end do
-    
-    if(ctrl_numerical_feeding .AND. autotrophy(jprey).gt.0.0) gkernel(jpred,jprey)=gkernel(jpred,jprey) * herbivory_real(jpred)
-    if(ctrl_numerical_feeding .AND. heterotrophy(jprey).gt.0.0) gkernel(jpred,jprey)=gkernel(jpred,jprey) * carnivory_real(jpred)
+       if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
+       gkernelT(:,:) =transpose(gkernel(:,:))
 
-    if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
-    gkernelT(:,:) =transpose(gkernel(:,:))
+       ! detrital partitioning
+       ! NOTE: fraction partitioned into DOM (a seperate and explicit array is created for 1-minus this -- the fraction into POM)
+       beta_graz(:) =beta_graz_a - (beta_graz_a-beta_graz_b) / (1.0+beta_mort_c/diameter(:))
+       beta_mort(:) =beta_mort_a - (beta_mort_a-beta_mort_b) / (1.0+beta_mort_c/diameter(:))
+    endif
 
-    ! detrital partitioning
-    ! NOTE: fraction partitioned into DOM (a seperate and explicit array is created for 1-minus this -- the fraction into POM)
-    beta_graz(:) =beta_graz_a - (beta_graz_a-beta_graz_b) / (1.0+beta_mort_c/diameter(:))
-    beta_mort(:) =beta_mort_a - (beta_mort_a-beta_mort_b) / (1.0+beta_mort_c/diameter(:))
-       
-    
     ! ****************************************************************************************
     ! ****************************************************************************************
     ! Write plankton parameters to output file (opened in initialise_ecogem)
