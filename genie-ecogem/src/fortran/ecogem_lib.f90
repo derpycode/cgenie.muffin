@@ -138,10 +138,17 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/beta_graz_a,beta_graz_b,beta_graz_c,beta_mort_a,beta_mort_b,beta_mort_c
   namelist/ini_ecogem_nml/par_bio_remin_POC_frac2,par_bio_remin_CaCO3_frac2
   ! Mixotrophy parameters
-  real :: trophic_tradeoff,foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
-  namelist/ini_ecogem_nml/trophic_tradeoff,foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
-  real ::foram_grazing_scale_bs, foram_grazing_scale_ss, foram_symbiont_esd_scale
+  real :: trophic_tradeoff
+  namelist/ini_ecogem_nml/trophic_tradeoff
+  ! foramecogenie parameters (11)
+  logical::ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa, ctrl_use_foramecogenie
+  real :: foram_auto_cost_sn, foram_auto_cost_ss, foram_hetero_cost_sn, foram_hetero_cost_ss
+  real :: foram_grazing_scale_bs, foram_grazing_scale_ss, foram_symbiont_esd_scale
+  real :: foramecogenie_bleach_temp
+  namelist/ini_ecogem_nml/foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
   namelist/ini_ecogem_nml/foram_grazing_scale_bs, foram_grazing_scale_ss, foram_symbiont_esd_scale
+  namelist/ini_ecogem_nml/ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa,ctrl_use_foramecogenie
+  namelist/ini_ecogem_nml/foramecogenie_bleach_temp
   ! Temperature dependence
   real ::  temp_A,temp_P,temp_K,temp_T0   !
   namelist/ini_ecogem_nml/temp_A,temp_P,temp_K,temp_T0
@@ -170,11 +177,6 @@ MODULE ecogem_lib
   namelist /ini_ecogem_nml/ctrl_force_T
   character(LEN=127)::par_ecogem_force_T_file
   namelist /ini_ecogem_nml/par_ecogem_force_T_file
-  ! RY Foram symbiont bleaching, ocean acidification killing control
-  logical::ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa, ctrl_use_foramecogenie
-  namelist /ini_ecogem_nml/ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa,ctrl_use_foramecogenie
-  real::foramecogenie_bleach_temp
-  namelist /ini_ecogem_nml/foramecogenie_bleach_temp
   ! explicit grazing parameters
   logical::ctrl_grazing_explicit
   namelist /ini_ecogem_nml/ctrl_grazing_explicit
@@ -340,7 +342,6 @@ MODULE ecogem_lib
   real::par_misc_t_err                                           !
   LOGICAL::par_misc_t_go = .FALSE.                               !
   LOGICAL::par_misc_t_echo_header = .TRUE.                       !
-  !
   real::par_misc_t_tseries = 0.0
   real::par_misc_t_tslice  = 0.0
   logical::par_misc_t_intseries = .FALSE.
