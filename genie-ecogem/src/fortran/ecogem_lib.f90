@@ -175,6 +175,8 @@ MODULE ecogem_lib
   ! RY Foram symbiont bleaching, ocean acidification killing control
   logical::ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa, ctrl_use_foramecogenie
   namelist /ini_ecogem_nml/ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa,ctrl_use_foramecogenie
+  real::foramecogenie_bleach_temp
+  namelist /ini_ecogem_nml/foramecogenie_bleach_temp
   ! explicit grazing parameters
   logical::ctrl_grazing_explicit
   namelist /ini_ecogem_nml/ctrl_grazing_explicit

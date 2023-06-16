@@ -326,7 +326,7 @@ subroutine ecogem(          &
                  
                  ! foram cannot live in environment with < 1 omega
                  ! Roy et al. 2015. Biogeosciences, 12, 2873–2889, 2015
-                 if (ctrl_foram_oa .and. (omega(i,j,k) .lt. 1.0)) then
+                 if (ctrl_foramecogenie_oa .and. (omega(i,j,k) .lt. 1.0)) then
                     do jp=1,npmax
                        ! for any foram
                        if (index(pft(jp), "foram") /= 0) then
@@ -395,7 +395,7 @@ subroutine ecogem(          &
                  ! mortality(:) = mortality(:)  * gamma_TK ! temp adjusted?
 
                  ! calculate respiration
-                 respiration(:) = respir(:) * gamma_T !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
+                 respiration(:) = respir(:) * gamma_TK !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
 
                  ! calculate assimilation efficiency based on quota status
 !BAW: zoolimit should be optional                 Totzoolimit(:) = 0.0  !total food limitation - Maria May 2019 !!! Need to check if consistent!!!
