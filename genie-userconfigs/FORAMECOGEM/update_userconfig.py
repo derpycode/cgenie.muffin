@@ -13,7 +13,7 @@ def update_foramecogem(directory):
         'eg_ctrl_grazing_explicit': '.true.',
         'eg_ctrl_debug_init': '0',
         'eg_ctrl_debug_eco_init': '.false.',
-        'eg_gkernel_cap': '.false.'
+        'eg_gkernel_cap': '.false.',
         ## foramecogenie parameters (logical)
         'eg_ctrl_use_foramecogenie': '.true.',
         'eg_ctrl_foramecogenie_oa': '.false.',
@@ -22,9 +22,9 @@ def update_foramecogem(directory):
         'eg_par_ecogem_plankton_file': "'8P7Z4F.eco'",
         'eg_par_ecogem_grazing_file': "'FORAMECOGEM.zoo'",
         'eg_foram_symbiont_esd_scale': '0.0015',
-        'eg_foram_auto_cost_sn': '0.5',
+        'eg_foram_auto_cost_sn': '0.8',
         'eg_foram_hetero_cost_sn': '0.5',
-        'eg_foram_auto_cost_ss': '0.5',
+        'eg_foram_auto_cost_ss': '1.0',
         'eg_foram_hetero_cost_ss': '0.5',
         'eg_foram_grazing_scale_bs': '2.0',
         'eg_foram_grazing_scale_ss': '2.0',
