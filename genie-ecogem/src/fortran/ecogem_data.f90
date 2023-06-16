@@ -486,8 +486,8 @@ CONTAINS
        growthcost_factor(:)=1.0
        herbivory(:)=.false.
        carnivory(:)=.false.
-       endif
     endif
+       
     ! set growth costs (could do the same for autotrophy in coccolithophores) - Fanny Mar21
     heterotrophy(:) = heterotrophy(:)*growthcost_factor(:)
 
@@ -953,8 +953,8 @@ CONTAINS
                  & loc_kg,                 & ! COLUMN #10: spine-derived kg modification Rui Oct21
                  & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
 
-            herbivory_real(n)         = loc_herbivory
-            carnivory_real(n)         = loc_carnivory
+            herbivory(n)         = loc_herbivory
+            carnivory(n)         = loc_carnivory
             pp_opt_a_array(n)    = loc_pp_opt_a
             pp_sig_a_array(n)    = loc_pp_sig_a
             ns_array(n)          = loc_ns
