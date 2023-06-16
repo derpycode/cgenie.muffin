@@ -1,4 +1,21 @@
-=========================== start ==========================
+################################################################
+### MODELLING_README.txt #######################################
+################################################################
+
+For: Planktic foraminiferal resilience to the environmental change associated with the PETM
+Ruby Barrett, Monsuru Adebowale, Heather Birch, Jamie Wilson and Daniela N. Schmidt
+
+################################################################
+18/08/2022 -- MODELLING_README.txt file creation (R.E.B)
+2023/05/09 -- adjusted dir name; checked experiments run (AR)
+2023/06/16 -- revised readme + testing (AR)
+################################################################
+
+Provided is the code used to run the model experiments presented in the paper. 
+
+All experiments are run from:$HOME/cgenie.muffin/genie-main (unless a different installation directory has been used).
+
+########################### start ##############################
 
 The suffix SPIN.1 denotes the first stage of the spinup The suffix SPIN.2 denotes the second stage of the spinup The suffix .EXPERIMENT denotes the transient experiments 
 
@@ -32,4 +49,4 @@ The suffix SPIN.1 denotes the first stage of the spinup The suffix SPIN.2 denote
 (S2) Modern with Iron Limitation [C]
 ./runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL MS/Barrettetal.2022 Barrettetal.Modern.worlg4.8P7Z3F.1x.Fe.SPIN2 50 Barrettetal.Modern.worlg4.1x.Fe.SPIN1
 
-=========================== end ========================== 
+############################# end #############################
