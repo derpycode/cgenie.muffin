@@ -564,8 +564,8 @@ CONTAINS
        alphachl(:) =    alphachl_a * auto_volume(:) ** alphachl_b
        graz(:)     =        graz_a * hetero_volume(:) ** graz_b * heterotrophy(:)
        kg(:)       =          kg_a * hetero_volume(:) ** kg_b * kg_scale(:)
-       pp_opt(:)   =pp_opt_a_array * hetero_volume(:) ** pp_opt_b
-       pp_sig(:)   =pp_sig_a_array * hetero_volume(:) ** pp_sig_b
+       pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
+       pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
        respir(:)   =      respir_a * volume(:) ** respir_b + respir_cost(:)
        biosink(:)  =     biosink_a * volume(:) ** biosink_b
        mort(:)     =       (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
