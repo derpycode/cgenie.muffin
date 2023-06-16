@@ -314,7 +314,7 @@ CONTAINS
     real,dimension(npmax,1)    ::pred_diam
     real,dimension(1,npmax)    ::prey_diam
     real,dimension(npmax,npmax)::prdpry,ppopt_mat,ppsig_mat
-
+    
     ! to convert per day rates into per second
     real,parameter :: pday = 86400.0
 
@@ -458,6 +458,7 @@ CONTAINS
        grazing_esd_scale(:) = 1.0
        symbiont_auto_cost(:) = 1.0
        symbiont_hetero_cost(:) = 1.0
+       
 
        ! modify for foraminifera only
        if (pft(jp).eq.'foram_bs') then
@@ -481,10 +482,15 @@ CONTAINS
        pp_sig_a_array(:)=pp_sig_a
        ns_array(:)=ns
        mort_protect(:)=1.0
-       herbivory(:)=.false.
-       carnivory(:)=.false.
        palatability(:)=1.0
        growthcost_factor(:)=1.0
+       if (ctrl_numerical_feeding) then
+          herbivory_real(:)=0.0
+          carnivory_real(:)=0.0
+       else
+          herbivory(:)=.false.
+          carnivory(:)=.false.
+       endif
     endif
     ! set growth costs (could do the same for autotrophy in coccolithophores) - Fanny Mar21
     heterotrophy(:) = heterotrophy(:)*growthcost_factor(:)
@@ -575,28 +581,26 @@ CONTAINS
        prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
        prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
        gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
-       
+
        do jpred=1,npmax
           select case(pft(jpred))
           case('foram','foram_bn','foram_bs','foram_sn','foram_ss')
              do jprey=1,npmax
-                if(autotrophy(jprey).gt.0.0) gkernel(jpred,jprey)=gkernel(jpred,jprey) * herbivory(jpred)
-                if(heterotrophy(jprey).gt.0.0) gkernel(jpred,jprey)=gkernel(jpred,jprey) * carnivory(jpred)
                 ! foram dont eat foram, they are always brothers
                 if (index(pft(jprey), "foram") /= 0) gkernel(jpred, jprey)=0.0
              end do
           end select
        end do
-       
-       if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
-       gkernelT(:,:) =transpose(gkernel(:,:))
+    
 
-       ! detrital partitioning
-       ! NOTE: fraction partitioned into DOM (a seperate and explicit array is created for 1-minus this -- the fraction into POM)
-       beta_graz(:) =beta_graz_a - (beta_graz_a-beta_graz_b) / (1.0+beta_mort_c/diameter(:))
-       beta_mort(:) =beta_mort_a - (beta_mort_a-beta_mort_b) / (1.0+beta_mort_c/diameter(:))
-    endif
+    if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
+    gkernelT(:,:) =transpose(gkernel(:,:))
 
+    ! detrital partitioning
+    ! NOTE: fraction partitioned into DOM (a seperate and explicit array is created for 1-minus this -- the fraction into POM)
+    beta_graz(:) =beta_graz_a - (beta_graz_a-beta_graz_b) / (1.0+beta_mort_c/diameter(:))
+    beta_mort(:) =beta_mort_a - (beta_mort_a-beta_mort_b) / (1.0+beta_mort_c/diameter(:))
+ endif
     
     !-----------------------------------------------------------------------------------------
     ! maximum photosynthetic rate
@@ -674,14 +678,18 @@ CONTAINS
     prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
     gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
     do jpred=1,npmax
-    select case(pft(jpred))
-      case('foram')
-        do jprey=1,npmax
-          if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
-          if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
-        end do
-    end select
+       select case(pft(jpred))
+       case('foram')
+          do jprey=1,npmax
+             if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+             if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+          end do
+       end select
     end do
+    
+    if(ctrl_numerical_feeding .AND. autotrophy(jprey).gt.0.0) gkernel(jpred,jprey)=gkernel(jpred,jprey) * herbivory_real(jpred)
+    if(ctrl_numerical_feeding .AND. heterotrophy(jprey).gt.0.0) gkernel(jpred,jprey)=gkernel(jpred,jprey) * carnivory_real(jpred)
+
     if (gkernel_cap) gkernel(:,:)  =merge(gkernel(:,:),0.0,gkernel(:,:).gt.1e-2) ! set kernel<1e-2 to 0.0 (wardetal.2018)
     gkernelT(:,:) =transpose(gkernel(:,:))
 
@@ -898,14 +906,11 @@ CONTAINS
     real              ::loc_mort_protect
     real              ::loc_palatability
     real              ::loc_growthcost_factor
+    real           ::loc_herbivory_real
+    real           ::loc_carnivory_real
+    real              ::loc_kg
+    real              ::loc_respir
 
-    if (ctrl_use_foramecogenie) then
-       ! make herbivory and carnivory not logical but range from 0 to 1
-       real           ::loc_herbivory_real
-       real           ::loc_carnivory_real
-       real              ::loc_kg
-       real              ::loc_respir
-    endif
 
     ! if setting plankton specific parameters
    ! check file format and determine number of lines of data
@@ -941,13 +946,13 @@ CONTAINS
          READ(unit=in,fmt='(1X)')
       END DO
       
-      if (ctrl_use_foramecogenie) then
+      if (ctrl_use_foramecogenie .AND. ctrl_numerical_feeding) then
          !read in richer population specifications
          DO n = 1,loc_n_elements
             READ(unit=in,FMT=*)            &
                  & loc_plnktn_pft,         & ! COLUMN #01: plankton PFT (not used here)
-                 & loc_herbivory,          & ! COLUMN #02: herbivory
-                 & loc_carnivory,          & ! COLUMN #03: carnivory
+                 & loc_herbivory_real,          & ! COLUMN #02: herbivory
+                 & loc_carnivory_real,          & ! COLUMN #03: carnivory
                  & loc_pp_opt_a,           & ! COLUMN #04: pp_opt_a
                  & loc_pp_sig_a,           & ! COLUMN #05: pp_sig_a
                  & loc_ns,                 & ! COLUMN #06: ns (prey switching)
@@ -957,8 +962,8 @@ CONTAINS
                  & loc_kg,                 & ! COLUMN #10: spine-derived kg modification Rui Oct21
                  & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
 
-            herbivory(n)         = loc_herbivory
-            carnivory(n)         = loc_carnivory
+            herbivory_real(n)         = loc_herbivory_real
+            carnivory_real(n)         = loc_carnivory_real
             pp_opt_a_array(n)    = loc_pp_opt_a
             pp_sig_a_array(n)    = loc_pp_sig_a
             ns_array(n)          = loc_ns
@@ -967,6 +972,7 @@ CONTAINS
             growthcost_factor(n) = loc_growthcost_factor
             kg_scale(n)         = loc_kg
             respir_cost(n)      = loc_respir
+            END DO
          else
             !read in population specifications
             DO n = 1,loc_n_elements

@@ -140,6 +140,10 @@ MODULE ecogem_lib
   ! Mixotrophy parameters
   real :: trophic_tradeoff,foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
   namelist/ini_ecogem_nml/trophic_tradeoff,foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
+  real ::foram_grazing_scale_bs, foram_grazing_scale_ss, foram_symbiont_esd_scale
+  namelist/ini_ecogem_nml/foram_grazing_scale_bs, foram_grazing_scale_ss, foram_symbiont_esd_scale
+  logical :: ctrl_numerical_feeding
+  namelist/ini_ecogem_nml/ctrl_numerical_feeding
   ! Temperature dependence
   real ::  temp_A,temp_P,temp_K,temp_T0   !
   namelist/ini_ecogem_nml/temp_A,temp_P,temp_K,temp_T0
@@ -292,6 +296,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::volume,diameter ,logvol,logesd           ! Size parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::autotrophy,heterotrophy                  ! Trophic strategy
   LOGICAL          ,ALLOCATABLE,DIMENSION(:)    ::herbivory,carnivory                      ! Feeding behavior - Added by Grigoratou, Nov18
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::herbivory_real,carnivory_real            ! Feeding behavior - Added by Grigoratou, Nov18
   real             ,ALLOCATABLE,DIMENSION(:)    ::pp_opt_a_array,pp_sig_a_array,ns_array   ! grazing parameters as arrays
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::prey_refuge                              ! PFT dependent traits - Added by Grigoratou, Dec18
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::mort_protect                             ! PFT dependent traits - Added by Grigoratou, Dec18
