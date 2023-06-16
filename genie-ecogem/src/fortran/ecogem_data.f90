@@ -906,8 +906,6 @@ CONTAINS
     real              ::loc_mort_protect
     real              ::loc_palatability
     real              ::loc_growthcost_factor
-    real           ::loc_herbivory_real
-    real           ::loc_carnivory_real
     real              ::loc_kg
     real              ::loc_respir
 
@@ -946,13 +944,13 @@ CONTAINS
          READ(unit=in,fmt='(1X)')
       END DO
       
-      if (ctrl_use_foramecogenie .AND. ctrl_numerical_feeding) then
+      if (ctrl_use_foramecogenie) then
          !read in richer population specifications
          DO n = 1,loc_n_elements
             READ(unit=in,FMT=*)            &
                  & loc_plnktn_pft,         & ! COLUMN #01: plankton PFT (not used here)
-                 & loc_herbivory_real,          & ! COLUMN #02: herbivory
-                 & loc_carnivory_real,          & ! COLUMN #03: carnivory
+                 & loc_herbivory,          & ! COLUMN #02: herbivory
+                 & loc_carnivory,          & ! COLUMN #03: carnivory
                  & loc_pp_opt_a,           & ! COLUMN #04: pp_opt_a
                  & loc_pp_sig_a,           & ! COLUMN #05: pp_sig_a
                  & loc_ns,                 & ! COLUMN #06: ns (prey switching)
@@ -962,8 +960,8 @@ CONTAINS
                  & loc_kg,                 & ! COLUMN #10: spine-derived kg modification Rui Oct21
                  & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
 
-            herbivory_real(n)         = loc_herbivory_real
-            carnivory_real(n)         = loc_carnivory_real
+            herbivory_real(n)         = loc_herbivory
+            carnivory_real(n)         = loc_carnivory
             pp_opt_a_array(n)    = loc_pp_opt_a
             pp_sig_a_array(n)    = loc_pp_sig_a
             ns_array(n)          = loc_ns
