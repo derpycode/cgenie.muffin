@@ -403,14 +403,14 @@ CONTAINS
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
           heterotrophy(jp)    = 1.0
-       elseif (pft(jp).eq.'foram_bn') then
+       elseif (pft(jp).eq.'foram_bs') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
           silicify(jp)        = 0.0
           autotrophy(jp)      = 0.0
           heterotrophy(jp)    = 1.0
-       elseif (pft(jp).eq.'foram_bn') then
+       elseif (pft(jp).eq.'foram_sn') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
