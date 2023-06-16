@@ -556,7 +556,7 @@ CONTAINS
           if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
           vmax(iSiO2,:)     = vmaxSiO2_a * auto_volume(:) **  vmaxSiO2_b * autotrophy(:) * silicify(:)
           affinity(iSiO2,:) =affinSiO2_a * auto_volume(:) ** affinSiO2_b * autotrophy(:)
-          kexc(iSili,:)     =  kexcSi_a  * auto_volume(:) **    kexcSi_b                 * silicify(:)
+          kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
        endif
        !-----------------------------------------------------------------------------------------
        ! other parameters
