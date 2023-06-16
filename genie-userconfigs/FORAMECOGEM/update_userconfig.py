@@ -11,7 +11,7 @@ def update_foramecogem(directory):
         'eg_ctrl_ncrst' : '.false.',
         'eg_ctrl_continuing' : '.false.',
         'eg_ctrl_grazing_explicit': '.true.',
-        'eg_ctrl_debug_init': '0',
+        'ma_ctrl_debug_init': '0',
         'eg_ctrl_debug_eco_init': '.false.',
         'eg_gkernel_cap': '.false.',
         ## foramecogenie parameters (logical)
