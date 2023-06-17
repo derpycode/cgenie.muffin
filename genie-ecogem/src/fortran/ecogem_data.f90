@@ -588,8 +588,8 @@ CONTAINS
        ! other parameters
        qcarbon(:)  =     qcarbon_a * auto_volume(:) ** qcarbon_b !seems not used
        alphachl(:) =    alphachl_a * auto_volume(:) ** alphachl_b
-       graz(:)     =        graz_a * volume(:) ** graz_b * heterotrophy(:)
-       kg(:)       =          kg_a * volume(:) ** kg_b * kg_scale(:)
+       graz(:)     =        graz_a * hetero_volume(:) ** graz_b * heterotrophy(:)
+       kg(:)       =          kg_a * hetero_volume(:) ** kg_b * kg_scale(:)
        pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
        pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
        respir(:)   =      respir_a * volume(:) ** respir_b + respir_cost(:)
@@ -608,14 +608,15 @@ CONTAINS
        prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
        gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
 
+       ! set carnivory and herbivory feeding strategy for foraminifera
        do jpred=1,npmax
           select case(pft(jpred))
           case('foram','foram_bn','foram_bs','foram_sn','foram_ss')
              do jprey=1,npmax
                 ! foram dont eat foram, they are always brothers
                 if (index(pft(jprey), "foram") /= 0) gkernel(jpred, jprey)=0.0
-                if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
-                if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+                if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 
+                if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0
              end do
           end select
        end do

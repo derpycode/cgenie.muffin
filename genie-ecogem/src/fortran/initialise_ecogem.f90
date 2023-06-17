@@ -375,7 +375,7 @@ SUBROUTINE initialise_ecogem(    &
      CALL sub_init_explicit_rich_grazing_params()
   endif
 
-  if (ctrl_use_foramecogenie) call sub_debug_foramecogem()
+  if (ctrl_use_foramecogenie .AND. ctrl_debug_init > 0) call sub_debug_foramecogem()
 
   ! *** initialise plankton biomass array
   call sub_init_plankton()
