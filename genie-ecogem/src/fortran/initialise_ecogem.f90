@@ -371,7 +371,7 @@ SUBROUTINE initialise_ecogem(    &
   ! get explicit grazing parameters from input file
   if(ctrl_grazing_explicit .AND. .NOT. ctrl_use_foramecogenie)then
      CALL sub_init_explicit_grazing_params()
-  else if (ctrl_grazing_explicit .AND. ctrl_use_foramecogenie)
+  else if (ctrl_grazing_explicit .AND. ctrl_use_foramecogenie) then
      CALL sub_init_explicit_rich_grazing_params()
   endif
 
