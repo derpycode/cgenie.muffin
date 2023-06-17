@@ -499,7 +499,7 @@ CONTAINS
              symbiont_esd_scale(jp) = foram_symbiont_esd_scale
              symbiont_auto_cost(jp) = foram_auto_cost_ss
              symbiont_hetero_cost(jp) =  foram_hetero_cost_ss
-             spine_esd_scale(jp) = foram_grazing_scale_ss
+             spine_esd_scale(jp) = foram_spine_scale_ss
           endif
        enddo
     endif

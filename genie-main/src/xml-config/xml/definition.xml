@@ -8913,7 +8913,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 		     <description>symbiont/foraminifera host size ratio</description>
 		   </param>
 
-		   <param name="foram_grazing_scale_bs">
+		   <param name="foram_spine_scale_bs">
 		     <value datatype="real">1.0</value>
 		     <description>stronger "grazing volume" for symbiont-barren spinose foraminifera</description>
 		   </param>
