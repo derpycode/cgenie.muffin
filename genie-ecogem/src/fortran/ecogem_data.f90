@@ -973,8 +973,8 @@ CONTAINS
     INTEGER           :: loc_n_elements,loc_n_start
     CHARACTER(len=16) :: loc_plnktn_pft
     CHARACTER(len=255):: loc_filename
-    real              :: loc_herbivory
-    real              :: loc_carnivory
+    logical              :: loc_herbivory
+    logical              :: loc_carnivory
     real              :: loc_pp_opt_a
     real              :: loc_pp_sig_a
     real              :: loc_ns
@@ -1033,8 +1033,8 @@ CONTAINS
               & loc_kg,                 & ! COLUMN #10: spine-derived kg modification Rui Oct21
               & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
 
-         herbivory_real(n)    = loc_herbivory
-         carnivory_real(n)    = loc_carnivory
+         herbivory(n)    = loc_herbivory
+         carnivory(n)    = loc_carnivory
          pp_opt_a_array(n)    = loc_pp_opt_a
          pp_sig_a_array(n)    = loc_pp_sig_a
          ns_array(n)          = loc_ns
