@@ -8918,11 +8918,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 		     <description>stronger "grazing volume" for symbiont-barren spinose foraminifera</description>
 		   </param>
 
-		   <param name="foram_grazing_scale_ss">
+		   <param name="foram_spine_scale_ss">
 		     <value datatype="real">1.0</value>
 		     <description>stronger "grazing volume" for symbiont-bearing spinose foraminifera</description>
 		   </param>
-
 
 		   <param name="foram_auto_cost_sn">
 		     <value datatype="real">1.0</value>

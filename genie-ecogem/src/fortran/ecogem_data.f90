@@ -482,7 +482,7 @@ CONTAINS
     if (ctrl_use_foramecogenie) then
        ! initialise arrays
        symbiont_esd_scale(:) = 1.0
-       grazing_esd_scale(:) = 1.0
+       spine_esd_scale(:) = 1.0
        symbiont_auto_cost(:) = 1.0
        symbiont_hetero_cost(:) = 1.0
 
@@ -490,7 +490,7 @@ CONTAINS
        do jp=1,npmax
           call lower_case(pft(jp))
           if (pft(jp).eq.'foram_bs') then             
-             grazing_esd_scale(jp) = foram_grazing_scale_bs
+             spine_esd_scale(jp) = foram_spine_scale_bs
           elseif (pft(jp).eq.'foram_sn') then
              symbiont_esd_scale(jp) = foram_symbiont_esd_scale
              symbiont_auto_cost(jp) = foram_auto_cost_sn
@@ -499,7 +499,7 @@ CONTAINS
              symbiont_esd_scale(jp) = foram_symbiont_esd_scale
              symbiont_auto_cost(jp) = foram_auto_cost_ss
              symbiont_hetero_cost(jp) =  foram_hetero_cost_ss
-             grazing_esd_scale(jp) = foram_grazing_scale_ss
+             spine_esd_scale(jp) = foram_grazing_scale_ss
           endif
        enddo
     endif
@@ -524,8 +524,8 @@ CONTAINS
     if(ctrl_use_foramecogenie)then
        ! v1/v2 = (r1/r2)^3
        auto_volume(:) = volume(:) * symbiont_esd_scale(:) ** 3
-       hetero_volume(:) = volume(:) * grazing_esd_scale(:) ** 3
-       hetero_diameter(:) = diameter(:) * grazing_esd_scale(:)
+       hetero_volume(:) = volume(:) * spine_esd_scale(:) ** 3
+       hetero_diameter(:) = diameter(:) * spine_esd_scale(:)
        autotrophy(:) = autotrophy(:) * symbiont_auto_cost(:)
        heterotrophy(:) = heterotrophy(:) * symbiont_hetero_cost(:)
 
@@ -589,7 +589,7 @@ CONTAINS
        qcarbon(:)  =     qcarbon_a * auto_volume(:) ** qcarbon_b !seems not used
        alphachl(:) =    alphachl_a * auto_volume(:) ** alphachl_b
        graz(:)     =        graz_a * hetero_volume(:) ** graz_b * heterotrophy(:)
-       kg(:)       =          kg_a * hetero_volume(:) ** kg_b * kg_scale(:)
+       kg(:)       =          kg_a * volume(:) ** kg_b * kg_scale(:)
        pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
        pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
        respir(:)   =      respir_a * volume(:) ** respir_b + respir_cost(:)

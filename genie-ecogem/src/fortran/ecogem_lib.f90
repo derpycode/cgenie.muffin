@@ -143,10 +143,10 @@ MODULE ecogem_lib
   ! foramecogenie parameters (11)
   logical::ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa, ctrl_use_foramecogenie
   real :: foram_auto_cost_sn, foram_auto_cost_ss, foram_hetero_cost_sn, foram_hetero_cost_ss
-  real :: foram_grazing_scale_bs, foram_grazing_scale_ss, foram_symbiont_esd_scale
+  real :: foram_spine_scale_bs, foram_spine_scale_ss, foram_symbiont_esd_scale
   real :: foramecogenie_bleach_temp
   namelist/ini_ecogem_nml/foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
-  namelist/ini_ecogem_nml/foram_grazing_scale_bs, foram_grazing_scale_ss, foram_symbiont_esd_scale
+  namelist/ini_ecogem_nml/foram_spine_scale_bs, foram_spine_scale_ss, foram_symbiont_esd_scale
   namelist/ini_ecogem_nml/ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa,ctrl_use_foramecogenie
   namelist/ini_ecogem_nml/foramecogenie_bleach_temp
   ! Temperature dependence
@@ -309,7 +309,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::graz,kg,pp_opt,pp_sig                    ! Grazing parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir,biosink,mort,beta_graz,beta_mort  ! Other loss parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::symbiont_auto_cost, symbiont_hetero_cost ! RY, foramecogenie symbiont cost parameter
-  REAL             ,ALLOCATABLE,DIMENSION(:)    ::auto_volume, hetero_volume, grazing_esd_scale, symbiont_esd_scale           ! RY, foramecogenie size parameter
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::auto_volume, hetero_volume, spine_esd_scale, symbiont_esd_scale           ! RY, foramecogenie size parameter
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir_cost,kg_scale, hetero_diameter                    ! RY, foramecogenie grazing parameter
   
   ! Grazing kernel
