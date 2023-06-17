@@ -885,7 +885,8 @@ CONTAINS
 
   END SUBROUTINE sub_init_populations
 
-  ! ****************************************************************************************************************************** !
+
+    ! ****************************************************************************************************************************** !
   ! DEFINE AND INITIALIZE EXPLICIT GRAZER PARMAETERS FROM INPUT FILE
   SUBROUTINE sub_init_explicit_grazing_params
 
@@ -902,9 +903,6 @@ CONTAINS
     real              ::loc_mort_protect
     real              ::loc_palatability
     real              ::loc_growthcost_factor
-    real              ::loc_kg
-    real              ::loc_respir
-
 
     ! if setting plankton specific parameters
    ! check file format and determine number of lines of data
@@ -939,63 +937,119 @@ CONTAINS
       DO n = 1,loc_n_start
          READ(unit=in,fmt='(1X)')
       END DO
-      
-      if (ctrl_use_foramecogenie) then
-         !read in richer population specifications
-         DO n = 1,loc_n_elements
-            READ(unit=in,FMT=*)            &
-                 & loc_plnktn_pft,         & ! COLUMN #01: plankton PFT (not used here)
-                 & loc_herbivory,          & ! COLUMN #02: herbivory
-                 & loc_carnivory,          & ! COLUMN #03: carnivory
-                 & loc_pp_opt_a,           & ! COLUMN #04: pp_opt_a
-                 & loc_pp_sig_a,           & ! COLUMN #05: pp_sig_a
-                 & loc_ns,                 & ! COLUMN #06: ns (prey switching)
-                 & loc_mort_protect,       & ! COLUMN #07: mortality_protection
-                 & loc_palatability,       & ! COLUMN #08: palatability - in development - Fanny Mar21
-                 & loc_growthcost_factor,  & ! COLUMN #09: growth-cost factor - in development - Fanny Mar21
-                 & loc_kg,                 & ! COLUMN #10: spine-derived kg modification Rui Oct21
-                 & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
+      !read in population specifications
+      DO n = 1,loc_n_elements
+         READ(unit=in,FMT=*)            &
+              & loc_plnktn_pft,         & ! COLUMN #01: plankton PFT (not used here)
+              & loc_herbivory,          & ! COLUMN #02: herbivory
+              & loc_carnivory,          & ! COLUMN #03: carnivory
+              & loc_pp_opt_a,           & ! COLUMN #04: pp_opt_a
+              & loc_pp_sig_a,           & ! COLUMN #05: pp_sig_a
+              & loc_ns,                 & ! COLUMN #06: ns (prey switching)
+              & loc_mort_protect,       & ! COLUMN #07: mortality_protection
+	      & loc_palatability,       & ! COLUMN #08: palatability - in development - Fanny Mar21
+              & loc_growthcost_factor     ! COLUMN #09: growth-cost factor - in development - Fanny Mar21
+         herbivory(n)         = loc_herbivory
+         carnivory(n)         = loc_carnivory
+         pp_opt_a_array(n)    = loc_pp_opt_a
+         pp_sig_a_array(n)    = loc_pp_sig_a
+         ns_array(n)          = loc_ns
+         mort_protect(n)      = loc_mort_protect
+         palatability(n)      = loc_palatability
+         growthcost_factor(n) = loc_growthcost_factor
 
-            herbivory(n)         = loc_herbivory
-            carnivory(n)         = loc_carnivory
-            pp_opt_a_array(n)    = loc_pp_opt_a
-            pp_sig_a_array(n)    = loc_pp_sig_a
-            ns_array(n)          = loc_ns
-            mort_protect(n)      = loc_mort_protect
-            palatability(n)      = loc_palatability
-            growthcost_factor(n) = loc_growthcost_factor
-            kg_scale(n)         = loc_kg
-            respir_cost(n)      = loc_respir
-            END DO
-         else
-            !read in population specifications
-            DO n = 1,loc_n_elements
-               READ(unit=in,FMT=*)            &
-                    & loc_plnktn_pft,         & ! COLUMN #01: plankton PFT (not used here)
-                    & loc_herbivory,          & ! COLUMN #02: herbivory
-                    & loc_carnivory,          & ! COLUMN #03: carnivory
-                    & loc_pp_opt_a,           & ! COLUMN #04: pp_opt_a
-                    & loc_pp_sig_a,           & ! COLUMN #05: pp_sig_a
-                    & loc_ns,                 & ! COLUMN #06: ns (prey switching)
-                    & loc_mort_protect,       & ! COLUMN #07: mortality_protection
-                    & loc_palatability,       & ! COLUMN #08: palatability - in development - Fanny Mar21
-                    & loc_growthcost_factor     ! COLUMN #09: growth-cost factor - in development - Fanny Mar21
-               herbivory(n)         = loc_herbivory
-               carnivory(n)         = loc_carnivory
-               pp_opt_a_array(n)    = loc_pp_opt_a
-               pp_sig_a_array(n)    = loc_pp_sig_a
-               ns_array(n)          = loc_ns
-               mort_protect(n)      = loc_mort_protect
-               palatability(n)      = loc_palatability
-               growthcost_factor(n) = loc_growthcost_factor
-            END DO
-         endif
-         
+      END DO
       !close file pipe
       CLOSE(unit=in)
 
   END SUBROUTINE sub_init_explicit_grazing_params
 
+  ! ****************************************************************************************************************************** !
+  ! DEFINE AND INITIALIZE EXPLICIT GRAZER PARMAETERS FROM INPUT FILE
+  SUBROUTINE sub_init_explicit_rich_grazing_params
+
+    ! local variables
+    INTEGER::n
+    INTEGER           :: loc_n_elements,loc_n_start
+    CHARACTER(len=16) :: loc_plnktn_pft
+    CHARACTER(len=255):: loc_filename
+    real              :: loc_herbivory
+    real              :: loc_carnivory
+    real              :: loc_pp_opt_a
+    real              :: loc_pp_sig_a
+    real              :: loc_ns
+    real              :: loc_mort_protect
+    real              :: loc_palatability
+    real              :: loc_growthcost_factor
+    real              :: loc_kg
+    real              :: loc_respir
+    
+    ! if setting plankton specific parameters
+   ! check file format and determine number of lines of data
+    loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+    CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
+
+
+      if (loc_n_elements.eq.0) then
+         print*," "
+         print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         print*,"! No plankton types specified in grazing input file ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+         print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         stop
+      endif
+
+      if (loc_n_elements.ne.npmax) then
+         print*," "
+         print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         print*,"! Different number of plankton types defined in ",TRIM(par_indir_name)//"/"//TRIM(par_ecogem_plankton_file),'and',TRIM(par_indir_name)//"/"//TRIM(par_ecogem_grazing_file)
+         print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         stop
+      endif
+
+      !open file pipe
+      OPEN(unit=in,file=loc_filename,action='read')
+      DO n = 1,loc_n_start
+         READ(unit=in,fmt='(1X)')
+      END DO
+
+      ! re-set filepipe
+      REWIND(unit=in)
+      DO n = 1,loc_n_start
+         READ(unit=in,fmt='(1X)')
+      END DO
+      
+      !read in richer population specifications
+      DO n = 1,loc_n_elements
+         READ(unit=in,FMT=*)            &
+              & loc_plnktn_pft,         & ! COLUMN #01: plankton PFT (not used here)
+              & loc_herbivory,          & ! COLUMN #02: herbivory
+              & loc_carnivory,          & ! COLUMN #03: carnivory
+              & loc_pp_opt_a,           & ! COLUMN #04: pp_opt_a
+              & loc_pp_sig_a,           & ! COLUMN #05: pp_sig_a
+              & loc_ns,                 & ! COLUMN #06: ns (prey switching)
+              & loc_mort_protect,       & ! COLUMN #07: mortality_protection
+              & loc_palatability,       & ! COLUMN #08: palatability - in development - Fanny Mar21
+              & loc_growthcost_factor,  & ! COLUMN #09: growth-cost factor - in development - Fanny Mar21
+              & loc_kg,                 & ! COLUMN #10: spine-derived kg modification Rui Oct21
+              & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
+
+         herbivory_real(n)    = loc_herbivory
+         carnivory_real(n)    = loc_carnivory
+         pp_opt_a_array(n)    = loc_pp_opt_a
+         pp_sig_a_array(n)    = loc_pp_sig_a
+         ns_array(n)          = loc_ns
+         mort_protect(n)      = loc_mort_protect
+         palatability(n)      = loc_palatability
+         growthcost_factor(n) = loc_growthcost_factor
+         kg_scale(n)         = loc_kg
+         respir_cost(n)      = loc_respir
+      END DO
+            
+         
+      !close file pipe
+      CLOSE(unit=in)
+
+  END SUBROUTINE sub_init_explicit_rich_grazing_params
 
   ! ****************************************************************************************************************************** !
   ! LOAD TIME-SERIES LOCATIONS FROM INPUT FILE SUBROUTINE sub_init_timeseries()

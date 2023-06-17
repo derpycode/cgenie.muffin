@@ -369,8 +369,10 @@ SUBROUTINE initialise_ecogem(    &
   enddo
 
   ! get explicit grazing parameters from input file
-  if(ctrl_grazing_explicit)then
-    CALL sub_init_explicit_grazing_params()
+  if(ctrl_grazing_explicit .AND. .NOT. ctrl_use_foramecogenie)then
+     CALL sub_init_explicit_grazing_params()
+  else if (ctrl_grazing_explicit .AND. ctrl_use_foramecogenie)
+     CALL sub_init_explicit_rich_grazing_params()
   endif
 
   ! *** initialise plankton biomass array
