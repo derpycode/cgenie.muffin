@@ -375,9 +375,11 @@ SUBROUTINE initialise_ecogem(    &
      CALL sub_init_explicit_rich_grazing_params()
   endif
 
+  if (ctrl_use_foramecogenie) call sub_debug_foramecogem()
+
   ! *** initialise plankton biomass array
   call sub_init_plankton()
-
+  
   ! JDW: allocate and load temperature forcing dataset
   if(ctrl_force_T)then
         allocate(T_input(n_i,n_j),STAT=alloc_error)

@@ -305,6 +305,32 @@ CONTAINS
   ! ****************************************************************************************************************************** !
 
 
+  subroutine sub_debug_foramecogem()
+    ! local variables
+    integer :: jp
+    ! -------------------------------------------------------- !
+    ! DEBUG
+    ! -------------------------------------------------------- !
+    ! loop to filter foraminifera groups
+    do jp=1,npmax
+       if (index(pft(jp), "foram") /= 0) then
+          ! reprot foraminifera parameters
+          print*, "-------------------------------"
+          print*, "foraminifera group: ", pft(jp)
+          print*, "diameter", diameter(jp)
+          print*, "volume", volume(jp)
+          print*, "auto_volume", auto_volume(jp)
+          print*, "hetero_volume", hetero_volume(jp)
+          print*, "autotrophy", autotrophy(jp)
+          print*, "heterotrophy", heterotrophy(jp)
+          print*, "Vmax C (auto)", vmax(iDIC,jp)
+          print*, "Vmax P (auto)", vmax(iPO4,jp)
+          print*, "graz (hetero)", graz(jp)
+          print*, "-------------------------------"
+       endif
+    enddo
+  end subroutine sub_debug_foramecogem
+  
   ! ****************************************************************************************************************************** !
   ! INITIALISE PLANKTON
   SUBROUTINE sub_init_plankton()
@@ -463,7 +489,7 @@ CONTAINS
        !modify foraminifera PFTs' parameters
        do jp=1,npmax
           call lower_case(pft(jp))
-          if (pft(jp).eq.'foram_bs') then
+          if (pft(jp).eq.'foram_bs') then             
              grazing_esd_scale(jp) = foram_grazing_scale_bs
           elseif (pft(jp).eq.'foram_sn') then
              symbiont_esd_scale(jp) = foram_symbiont_esd_scale
@@ -562,8 +588,8 @@ CONTAINS
        ! other parameters
        qcarbon(:)  =     qcarbon_a * auto_volume(:) ** qcarbon_b !seems not used
        alphachl(:) =    alphachl_a * auto_volume(:) ** alphachl_b
-       graz(:)     =        graz_a * hetero_volume(:) ** graz_b * heterotrophy(:)
-       kg(:)       =          kg_a * hetero_volume(:) ** kg_b * kg_scale(:)
+       graz(:)     =        graz_a * volume(:) ** graz_b * heterotrophy(:)
+       kg(:)       =          kg_a * volume(:) ** kg_b * kg_scale(:)
        pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
        pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
        respir(:)   =      respir_a * volume(:) ** respir_b + respir_cost(:)
@@ -577,7 +603,7 @@ CONTAINS
           ppopt_mat(:,jp)=pp_opt  !added an optimal predator-prey length ratio for each plankton group, Grigoratou, Dec18
           ppsig_mat(:,jp)=pp_sig  !added an optimal standar deviation for predator-prey length ratio for each plankton group, Grigoratou, Dec18
        enddo
-       pred_diam(:,1)=hetero_diameter(:) ! standard  prey diameter vector
+       pred_diam(:,1)=diameter(:) ! standard  prey diameter vector
        prey_diam(1,:)=diameter(:) ! transpose pred diameter vector
        prdpry(:,:)   =matmul(pred_diam,1.0/prey_diam)
        gkernel(:,:)  =exp(-log(prdpry(:,:)/ppopt_mat(:,:))**2 / (2*ppsig_mat(:,:)**2)) ! [jpred,jprey] populate whole array at once, then find exceptions to set to 0.0 based on type
@@ -588,6 +614,8 @@ CONTAINS
              do jprey=1,npmax
                 ! foram dont eat foram, they are always brothers
                 if (index(pft(jprey), "foram") /= 0) gkernel(jpred, jprey)=0.0
+                if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
+                if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0 ! if predator is carnivorous and prey is phytoplankton, - no grazing
              end do
           end select
        end do
