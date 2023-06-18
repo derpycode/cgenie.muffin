@@ -615,8 +615,13 @@ CONTAINS
              do jprey=1,npmax
                 ! foram dont eat foram, they are always brothers
                 if (index(pft(jprey), "foram") /= 0) gkernel(jpred, jprey)=0.0
-                if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred))gkernel(jpred,jprey)=0.0 
-                if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0
+                ! enable omnivory for foram
+                if(herbivory(jpred) .AND. carnivory(jpred)) then
+                   CONTINUE
+                else
+                   if(autotrophy(jprey).gt.0.0 .AND. carnivory(jpred)) gkernel(jpred,jprey)=0.0 
+                   if(heterotrophy(jprey).gt.0.0 .AND. herbivory(jpred))gkernel(jpred,jprey)=0.0
+                endif
              end do
           end select
        end do
