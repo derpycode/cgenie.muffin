@@ -214,6 +214,7 @@ CONTAINS
        print*,'Impose alt preservation (burial) rain ratio?        : ',ctrl_sed_Prr
        print*,'Set dissolution flux = rain flux for CaCO3 only?    : ',ctrl_force_sed_closedsystem_CaCO3
        print*,'Set dissolution flux = rain flux for opal only?     : ',ctrl_force_sed_closedsystem_opal
+       print*,'Impose alt sedimentation rates to sedcores?         : ',ctrl_sed_Fdet_sedcore
        ! --- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------ !
        print*,'--- I/O: DIRECTORY DEFINITIONS ---------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -475,6 +476,7 @@ CONTAINS
     REAL,DIMENSION(n_i,n_j)::loc_ij
     integer,ALLOCATABLE,DIMENSION(:,:)::loc_vij                ! (i,j) vector
     REAL,ALLOCATABLE,DIMENSION(:)::loc_vd                      ! depth vector
+    REAL,ALLOCATABLE,DIMENSION(:)::loc_vmar                    ! MAR vector (g cm-1 kyr-1)
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- !
@@ -509,8 +511,16 @@ CONTAINS
        call check_iostat(alloc_error,__LINE__,__FILE__)
        ALLOCATE(loc_vd(1:loc_nmax),STAT=alloc_error)
        call check_iostat(alloc_error,__LINE__,__FILE__)
+       ALLOCATE(loc_vmar(1:loc_nmax),STAT=alloc_error)
+       call check_iostat(alloc_error,__LINE__,__FILE__)
        ! read file
-       call sub_load_data_nptd(loc_filename,loc_nmax,loc_vij,loc_vd)
+       ! NOTE: use extended read function if site-specific detrital fluxes (MAR values) are required
+       ! NOTE: the same filename is used regardless
+       if (ctrl_sed_Fdet_sedcore) then
+          call sub_load_data_nptdmar(loc_filename,loc_nmax,loc_vij,loc_vd,loc_vmar)
+       else
+          call sub_load_data_nptd(loc_filename,loc_nmax,loc_vij,loc_vd)
+       end if
        ! populate 2D sedcore mask file
        DO n=1,loc_nmax
           loc_ij(loc_vij(n,1),loc_vij(n,2)) = 1.0
@@ -518,11 +528,19 @@ CONTAINS
        ! modify SEDGEM sediment ocean depth
        DO n=1,loc_nmax
           phys_sed(ips_D,loc_vij(n,1),loc_vij(n,2)) = loc_vd(n)
-       end do      
+       end do
+       ! modify SEDGEM detrital fluxes
+       if (ctrl_sed_Fdet_sedcore) then
+          DO n=1,loc_nmax
+             sed_Fsed_det(loc_vij(n,1),loc_vij(n,2)) = loc_vmar(n)
+          end do
+       end if
        ! deallocate local vectors
        DEALLOCATE(loc_vij,STAT=dealloc_error)
        call check_iostat(dealloc_error,__LINE__,__FILE__)
        DEALLOCATE(loc_vd,STAT=dealloc_error)
+       call check_iostat(dealloc_error,__LINE__,__FILE__)
+       DEALLOCATE(loc_vmar,STAT=dealloc_error)
        call check_iostat(dealloc_error,__LINE__,__FILE__)
     end if
     ! -------------------------------------------------------- ! set sediment save mask & count number of sedcores

@@ -115,7 +115,10 @@ MODULE sedgem_lib
   logical::par_sed_huelse2017_sim_P_loss                         ! Simulate ocean Porg loss with buried sulf-OM?
   logical::par_sed_huelse2017_sim_P_loss_pres_fracC              ! Simulate ocean Porg loss related to Corg burial?
   logical::par_sed_huelse2017_sim_P_regeneration                 ! Simulate increased P-regeneration under anoxia?
-  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_remove_impl_sulALK,par_sed_huelse2017_sim_P_loss,par_sed_huelse2017_sim_P_loss_pres_fracC,par_sed_huelse2017_sim_P_regeneration
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_remove_impl_sulALK
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_sim_P_loss
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_sim_P_loss_pres_fracC
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_sim_P_regeneration
   REAL::par_sed_huelse2017_k1                                    ! labile degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2                                    ! refractory degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2_order                              ! k2 = k1/par_sed_huelse2017_k2_order
@@ -262,6 +265,8 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_CaCO3
   logical::ctrl_force_sed_closedsystem_opal                      ! Set dissolution flux = rain flux for opal ONLY?
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_opal
+  logical::ctrl_sed_Fdet_sedcore                                 ! apply alt sedimentation rates to sedcores?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_Fdet_sedcore
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            ! 
   CHARACTER(len=255)::par_indir_name                             ! 
@@ -286,7 +291,6 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_Pcorg_name,par_sed_Pporg_name
   CHARACTER(len=127)::par_sed_Prr_name                           ! alt preservation (burial) rain ratio field file name
   NAMELIST /ini_sedgem_nml/par_sed_Prr_name
-  ! ------------------- I/O: MISC --------------------------------------------------
   ! ------------------- I/O: MISC ------------------------------------------------------------------------------------------------ !
   logical::ctrl_append_data                                      ! append data to output files on restart
   logical::ctrl_timeseries_output                                ! save timeseries output
@@ -764,7 +768,8 @@ CONTAINS
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     real,INTENT(in)::dum_FPOC                                  ! POC flux as timestep is yr (cm^3 cm-2 yr-1)
-    real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1] (Middelburg et al., Deep Sea Res. 1, 1997)
+    real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1]
+                                                               ! (Middelburg et al., Deep Sea Res. 1, 1997)
     real,INTENT(in)::dum_por                                   ! sediment porosity (cm3 cm-3)
     real,INTENT(in)::dum_den                                   ! sediment density (g cm-3)
     ! -------------------------------------------------------- !

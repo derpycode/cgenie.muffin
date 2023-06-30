@@ -208,7 +208,7 @@ SUBROUTINE sedgem(          &
   DO i=1,n_i
      DO j=1,n_j
         IF (sed_mask(i,j)) THEN
-           ! amend sediment rain flux according to prescribed detrital input
+           ! ammend sediment rain flux according to prescribed detrital input
            ! NOTE: convert units from (g cm-2 kyr-1) to (mol m-2 (per time-step))
            ! NOTE: add age tracer if selected
            ! NOTE: assume that not both surface-derived flux and prescribed det fluxes are allowed ...

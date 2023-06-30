@@ -7712,6 +7712,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="boolean">.false.</value>
                         <description>Use alt preservation (burial) rain ratio field?</description>
                     </param>
+                    <param name="ctrl_sed_Fdet_sedcore">
+                        <value datatype="boolean">.false.</value>
+                        <description>Use alt detrital burial rates for sedcores?</description>
+                    </param>
 <!-- I/O: DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
 			<value datatype="string"></value>
