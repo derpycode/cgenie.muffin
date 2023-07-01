@@ -422,6 +422,8 @@ CONTAINS
           autotrophy(jp)      = 0.0
           heterotrophy(jp)    = 1.0
        elseif (pft(jp).eq.'foram_bn') then
+          ! symbiont-barren non-spinose foraminifera
+          ! e.g., N. pacyderma, T. quinqueloba
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
@@ -429,6 +431,8 @@ CONTAINS
           autotrophy(jp)      = 0.0
           heterotrophy(jp)    = 1.0
        elseif (pft(jp).eq.'foram_bs') then
+          ! symbiont-barren spinose foraminifera
+          ! e.g., G. bulloides, H. pelagica
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
@@ -436,6 +440,8 @@ CONTAINS
           autotrophy(jp)      = 0.0
           heterotrophy(jp)    = 1.0
        elseif (pft(jp).eq.'foram_sn') then
+          ! symbiont-facultative non-spinose foraminifera
+          ! e.g., N. dutertrei, G. menardii
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
@@ -443,6 +449,8 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 1.0
        elseif (pft(jp).eq.'foram_ss') then
+          ! symbiont-obligate spinose foraminifera
+          ! e.g., T. sacculifer, G. ruber
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
@@ -594,13 +602,9 @@ CONTAINS
        mort(:)     =       (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
 
        ! spine mechanism
-       ! surface area = 4 pi r^2, greater r by spine -> surface area times r^2
-       ! -> surface area/volume ratio times r^2
-       ! set z = surface/volume ratio,
-       ! then Gm/kg = a*z^-b increases by r^-2b times
-       kg(:)       =     kg(:) * foram_spine_scale ** (-2*kg_b)
-       graz(:)     =     graz(:) * foram_spine_scale ** (-2*graz_b)
-
+       ! influence selection process, but not grazing process that is determined by host's size
+       pp_sig(:)   =     pp_sig(:)  * spine_esd_scale(:) ** 3
+       pp_opt(:)   =     pp_opt(:)  * spine_esd_scale(:) ** 3
        
        ! grazing parameters
        do jp=1,npmax ! grazing kernel (npred,nprey)
@@ -1069,7 +1073,7 @@ CONTAINS
               & loc_mort_protect,       & ! COLUMN #07: mortality_protection
               & loc_palatability,       & ! COLUMN #08: palatability - in development - Fanny Mar21
               & loc_growthcost_factor,  & ! COLUMN #09: growth-cost factor - in development - Fanny Mar21
-              & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
+              & loc_respir                ! COLUMN #10: increased respiration rate for the calcite building cost
 
          herbivory(n)    = loc_herbivory
          carnivory(n)    = loc_carnivory
