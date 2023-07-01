@@ -320,7 +320,6 @@ CONTAINS
           print*, "diameter", diameter(jp)
           print*, "volume", volume(jp)
           print*, "auto_volume", auto_volume(jp)
-          print*, "hetero_volume", hetero_volume(jp)
           print*, "autotrophy", autotrophy(jp)
           print*, "heterotrophy", heterotrophy(jp)
           print*, "Vmax C (auto)", vmax(iDIC,jp)
@@ -524,8 +523,6 @@ CONTAINS
     if(ctrl_use_foramecogenie)then
        ! v1/v2 = (r1/r2)^3
        auto_volume(:) = volume(:) * symbiont_esd_scale(:) ** 3
-       hetero_volume(:) = volume(:) * spine_esd_scale(:) ** 3
-       hetero_diameter(:) = diameter(:) * spine_esd_scale(:)
        autotrophy(:) = autotrophy(:) * symbiont_auto_cost(:)
        heterotrophy(:) = heterotrophy(:) * symbiont_hetero_cost(:)
 
@@ -588,14 +585,23 @@ CONTAINS
        ! other parameters
        qcarbon(:)  =     qcarbon_a * auto_volume(:) ** qcarbon_b !seems not used
        alphachl(:) =    alphachl_a * auto_volume(:) ** alphachl_b
-       graz(:)     =        graz_a * hetero_volume(:) ** graz_b * heterotrophy(:)
-       kg(:)       =          kg_a * volume(:) ** kg_b * kg_scale(:)
+       graz(:)     =        graz_a * volume(:) ** graz_b * heterotrophy(:)
+       kg(:)       =          kg_a * volume(:) ** kg_b
        pp_opt(:)   =pp_opt_a_array * volume(:) ** pp_opt_b
        pp_sig(:)   =pp_sig_a_array * volume(:) ** pp_sig_b
        respir(:)   =      respir_a * volume(:) ** respir_b + respir_cost(:)
        biosink(:)  =     biosink_a * volume(:) ** biosink_b
        mort(:)     =       (mort_a * volume(:) ** mort_b) * mort_protect(:) ! mort_protect added by Grigoratou, Dec2018 as a benefit for foram's calcification
 
+       ! spine mechanism
+       ! surface area = 4 pi r^2, greater r by spine -> surface area times r^2
+       ! -> surface area/volume ratio times r^2
+       ! set z = surface/volume ratio,
+       ! then Gm/kg = a*z^-b increases by r^-2b times
+       kg(:)       =     kg(:) * foram_spine_scale ** (-2*kg_b)
+       graz(:)     =     graz(:) * foram_spine_scale ** (-2*graz_b)
+
+       
        ! grazing parameters
        do jp=1,npmax ! grazing kernel (npred,nprey)
           ! pad predator dependent pp_opt and pp_sig so that they vary along matrix columns
@@ -1015,7 +1021,6 @@ CONTAINS
     real              :: loc_mort_protect
     real              :: loc_palatability
     real              :: loc_growthcost_factor
-    real              :: loc_kg
     real              :: loc_respir
     
     ! if setting plankton specific parameters
@@ -1064,7 +1069,6 @@ CONTAINS
               & loc_mort_protect,       & ! COLUMN #07: mortality_protection
               & loc_palatability,       & ! COLUMN #08: palatability - in development - Fanny Mar21
               & loc_growthcost_factor,  & ! COLUMN #09: growth-cost factor - in development - Fanny Mar21
-              & loc_kg,                 & ! COLUMN #10: spine-derived kg modification Rui Oct21
               & loc_respir                ! COLUMN #11: increased respiration rate for the calcite building cost
 
          herbivory(n)    = loc_herbivory
@@ -1075,7 +1079,6 @@ CONTAINS
          mort_protect(n)      = loc_mort_protect
          palatability(n)      = loc_palatability
          growthcost_factor(n) = loc_growthcost_factor
-         kg_scale(n)         = loc_kg
          respir_cost(n)      = loc_respir
       END DO
             

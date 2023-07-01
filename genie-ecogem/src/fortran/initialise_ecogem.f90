@@ -327,20 +327,12 @@ SUBROUTINE initialise_ecogem(    &
 
   ! foramecogenie arrays allocation
   if (ctrl_use_foramecogenie) then
-     ALLOCATE(kg_scale(npmax),STAT=alloc_error)
-     call check_iostat(alloc_error,__LINE__,__FILE__)
      
      ALLOCATE(respir_cost(npmax),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
      
      ALLOCATE(auto_volume(npmax),STAT=alloc_error)
-     call check_iostat(alloc_error,__LINE__,__FILE__)
-
-     ALLOCATE(hetero_volume(npmax),STAT=alloc_error)
-     call check_iostat(alloc_error,__LINE__,__FILE__)
-
-     ALLOCATE(hetero_diameter(npmax),STAT=alloc_error)
-     call check_iostat(alloc_error,__LINE__,__FILE__)
+     call check_iostat(alloc_error,__LINE__,__FILE__)     
      
      ALLOCATE(spine_esd_scale(npmax),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
