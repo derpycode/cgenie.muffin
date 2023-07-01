@@ -142,11 +142,11 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/trophic_tradeoff
   ! foramecogenie parameters (11)
   logical::ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa, ctrl_use_foramecogenie
-  real :: foram_auto_cost_sn, foram_auto_cost_ss, foram_hetero_cost_sn, foram_hetero_cost_ss
-  real :: foram_spine_scale_bs, foram_spine_scale_ss, foram_symbiont_esd_scale
+  real :: foram_auto_cost, foram_hetero_cost
+  real :: foram_spine_scale, foram_symbiont_esd_scale
   real :: foramecogenie_bleach_temp
-  namelist/ini_ecogem_nml/foram_auto_cost_sn,foram_auto_cost_ss,foram_hetero_cost_sn,foram_hetero_cost_ss
-  namelist/ini_ecogem_nml/foram_spine_scale_bs, foram_spine_scale_ss, foram_symbiont_esd_scale
+  namelist/ini_ecogem_nml/foram_auto_cost, foram_hetero_cost
+  namelist/ini_ecogem_nml/foram_spine_scale, foram_symbiont_esd_scale
   namelist/ini_ecogem_nml/ctrl_foramecogenie_bleach, ctrl_foramecogenie_oa,ctrl_use_foramecogenie
   namelist/ini_ecogem_nml/foramecogenie_bleach_temp
   ! Temperature dependence

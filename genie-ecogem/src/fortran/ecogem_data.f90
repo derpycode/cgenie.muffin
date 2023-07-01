@@ -490,16 +490,16 @@ CONTAINS
        do jp=1,npmax
           call lower_case(pft(jp))
           if (pft(jp).eq.'foram_bs') then             
-             spine_esd_scale(jp) = foram_spine_scale_bs
+             spine_esd_scale(jp) = foram_spine_scale
           elseif (pft(jp).eq.'foram_sn') then
              symbiont_esd_scale(jp) = foram_symbiont_esd_scale
-             symbiont_auto_cost(jp) = foram_auto_cost_sn
-             symbiont_hetero_cost(jp) = foram_hetero_cost_sn
+             symbiont_auto_cost(jp) = foram_auto_cost
+             symbiont_hetero_cost(jp) = foram_hetero_cost
           elseif (pft(jp).eq.'foram_ss') then
              symbiont_esd_scale(jp) = foram_symbiont_esd_scale
-             symbiont_auto_cost(jp) = foram_auto_cost_ss
-             symbiont_hetero_cost(jp) =  foram_hetero_cost_ss
-             spine_esd_scale(jp) = foram_spine_scale_ss
+             symbiont_auto_cost(jp) = foram_auto_cost
+             symbiont_hetero_cost(jp) =  foram_hetero_cost
+             spine_esd_scale(jp) = foram_spine_scale
           endif
        enddo
     endif
