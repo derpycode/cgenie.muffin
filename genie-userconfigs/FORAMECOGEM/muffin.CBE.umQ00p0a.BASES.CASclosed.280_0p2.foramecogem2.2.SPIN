@@ -56,13 +56,10 @@ eg_ctrl_foramecogenie_bleach = .false.
 
 eg_par_ecogem_plankton_file = '8P7Z4F.eco'
 eg_par_ecogem_grazing_file = 'FORAMECOGEM.zoo'
-eg_foram_symbiont_esd_scale = 0.0015
-eg_foram_auto_cost_sn = 0.8
-eg_foram_hetero_cost_sn = 0.5
-eg_foram_auto_cost_ss = 1.0
-eg_foram_hetero_cost_ss = 0.5
-eg_foram_grazing_scale_bs = 2.0
-eg_foram_grazing_scale_ss = 2.0
+eg_foram_symbiont_esd_scale = 0.01
+eg_foram_auto_cost = 0.05
+eg_foram_hetero_cost = 0.5
+eg_foram_grazing_scale = 3.0
 
 #################### Nitrogen ############################
 eg_useNO3                   =.false.
