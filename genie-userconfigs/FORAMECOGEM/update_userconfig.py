@@ -24,7 +24,7 @@ def update_foramecogem(directory):
         'eg_foram_symbiont_esd_scale': '0.01',
         'eg_foram_auto_cost': '0.05',
         'eg_foram_hetero_cost': '0.5',
-        'eg_foram_grazing_scale': '3.0',
+        'eg_foram_grazing_scale': '5.0',
     }
     
 
