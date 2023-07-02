@@ -57,25 +57,25 @@ qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTD
 ## Historical (1765-2022) 
 
 ```sh
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL RUI_LABS/foramecogem muffin.CBE.worlg4.BASESFeTDTL.foramecogem2.1.historical 257 muffin.CBE.worlg4.BASESFeTDTL.foramecogem2.1.SPIN
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.historical 257 muffin.CBE.worlg4.BASESFeTDTL.SPIN
 ```
 
 ## Future (2022-2100)
 
 ```sh
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL RUI_LABS/foramecogem muffin.CBE.worlg4.BASESFeTDTL.foramecogem2.1.2100.[XXX]deg 78 muffin.CBE.worlg4.BASESFeTDTL.foramecogem2.1.historical
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.2100.[XXX]deg 78 muffin.CBE.worlg4.BASESFeTDTL.historical
 ```
 
 ## LGM
 
 ```sh
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.GIteiiva.BASESFeTDTL_rb RUI_LABS/foramecogem muffin.CBE.GIteiiva.BASESFeTDTL_rb_foramecogem2.1 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.GIteiiva.BASESFeTDTL_rb FORAMECOGEM muffin.CBE.GIteiiva.BASESFeTDTL_rb.SPIN 10000
 ```
 
 ## Holocene
 
 ```sh
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.GIteiiaa.BASESFeTDTL_rb RUI_LABS/foramecogem muffin.CBE.GIteiiaa.BASESFeTDTL_rb_foramecogem2.1 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.GIteiiaa.BASESFeTDTL_rb FORAMECOGEM muffin.CBE.GIteiiaa.BASESFeTDTL_rb.SPIN 10000
 ```
 
 ## Pliocene
@@ -85,29 +85,29 @@ muffin.CB.umQ04p5b.BASES (Pliocene close)
 
 ``` sh
 ## Pliocene open, 400 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5a.BASES RUI_LABS/foramecogem 20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.8P7Z4F.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5a.BASES FORAMECOGEM 20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.SPIN 10000
 
 ## Modern CAS closed, 280 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ00p0a.BASES RUI_LABS/foramecogem 20220104.CB.umQ00p0a.BASES.CASclosed.280_0p2.8P7Z4F.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ00p0a.BASES FORAMECOGEM 20220104.CB.umQ00p0a.BASES.CASclosed.280_0p2.SPIN 10000
 
 ## Pliocene closed, 400 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES RUI_LABS/foramecogem 20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.8P7Z4F.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES FORAMECOGEM 20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.SPIN 10000
 
 ## Pliocene closed, 280 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES RUI_LABS/foramecogem 20220104.CB.umQ04p5b.BASES.CASclosed.280_0p2.8P7Z4F.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES FORAMECOGEM 20220104.CB.umQ04p5b.BASES.CASclosed.280_0p2.SPIN 10000
 ```
 
 
 > Full effect:4.5 Ma (open,   400 ppm) - 0 Ma (closed, 280 ppm)
-20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.8P7Z4F.SPIN
-20220104.CB.umQ00p0a.BASES.CASclosed.280_0p2.8P7Z4F.SPIN
+20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.SPIN
+20220104.CB.umQ00p0a.BASES.CASclosed.280_0p2.SPIN
 
 > CO2 effect: 4.5 Ma (closed, 400 ppm) - 4.5 Ma (closed, 280 ppm)
-20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.8P7Z4F.SPIN
-20220104.CB.umQ04p5b.BASES.CASclosed.280_0p2.8P7Z4F.SPIN
+20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.SPIN
+20220104.CB.umQ04p5b.BASES.CASclosed.280_0p2.SPIN
 
 > CAS effect: 4.5 Ma (open,   400 ppm) - 4.5 Ma (closed, 400 ppm)
-20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.8P7Z4F.SPIN
-20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.8P7Z4F.SPIN
+20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.SPIN
+20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.SPIN
 
 ## K-Pg
