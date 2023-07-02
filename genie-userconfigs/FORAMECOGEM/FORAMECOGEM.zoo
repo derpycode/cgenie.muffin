@@ -18,9 +18,9 @@ Zooplankton        f     f   10.0    2.0     2.0     1.0     1.0     1.0    0.0
 Zooplankton        f     f   10.0    2.0     2.0     1.0     1.0     1.0    0.0
 Zooplankton        f     f   10.0    2.0     2.0     1.0     1.0     1.0    0.0
 Zooplankton        f     f   10.0    2.0     2.0     1.0     1.0     1.0    0.0
-foram_bn           t     f   10.0    2.0     1.0     0.7     0.8     1.2    0.02
+foram_bn           t     f   10.0    2.0     1.0     0.7     0.8     1.3    0.02
 foram_bs           t     f   10.0    2.0     5.0     0.7     0.8     1.0    0.04
-foram_sn           t     f   10.0    2.0     1.0     0.7     0.8     1.0    0.02
+foram_sn           t     f   10.0    2.0     1.0     0.7     0.8     1.3    0.02
 foram_ss           f     t   10.0    2.0     5.0     0.7     0.8     1.0    0.04
 -END-OF-DATA-
 
