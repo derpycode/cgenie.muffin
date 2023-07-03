@@ -215,6 +215,8 @@ CONTAINS
        print*,'Set dissolution flux = rain flux for CaCO3 only?    : ',ctrl_force_sed_closedsystem_CaCO3
        print*,'Set dissolution flux = rain flux for opal only?     : ',ctrl_force_sed_closedsystem_opal
        print*,'Impose alt sedimentation rates to sedcores?         : ',ctrl_sed_Fdet_sedcore
+       print*,'Assumed fraction of silicate vs. total weathering   : ',par_sed_diag_fracSiweath
+       print*,'Assumed d13C of volcanic emissions                  : ',par_sed_diag_volcanicd13C
        ! --- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------ !
        print*,'--- I/O: DIRECTORY DEFINITIONS ---------------------'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
@@ -1454,6 +1456,7 @@ CONTAINS
     real::loc_tot_FCaCO3,loc_tot_FPOC,loc_tot_FPOP
     real::loc_tot_FCaCO3_d13C,loc_tot_FPOC_d13C
     real::loc_gamma,loc_Foutgassing,loc_Fkerogen
+    real::loc_FCaCO3_d13C
     
     ! *** INITIALIZE LOCAL VARIABLES ***
     ! averaging time-step
@@ -2091,9 +2094,18 @@ CONTAINS
     Write(unit=out,fmt=*) '---------------------------------'
 
     ! WEATHERING PARAMETER CALCULATIONS
+    ! NOTE: originally assumed are:
+    !       (1) CaSiO3:CaCO3 weathering is assumed to be in a 2:3 proportion
+    !       (2) CO2 outgassing d13C is assumed to be -6 o/oo
+    !       this is becasue the adjustable parameters are held by ROKGEM and not accessible to SEDGEM
+    !       NOW, 2 SEDGEM parameters allow different choices to be made in the open system flux balance calculation:
+    !       (1) par_sed_diag_Siweatheringfrac
+    !       (2) par_sed_diag_volcanicd13C
+    ! sum global total burial fluxes
     loc_tot_FCaCO3 = loc_deep_FCaCO3+loc_mud_FCaCO3+loc_reef_FCaCO3
     loc_tot_FPOC   = loc_deep_FPOC+loc_mud_FPOC+loc_reef_FPOC
     loc_tot_FPOP   = loc_deep_FPOP+loc_mud_FPOP+loc_reef_FPOP
+    ! calculate mean CaCO3 burial d13C
     if (loc_tot_FCaCO3 > const_real_nullsmall) then
        loc_tot_FCaCO3_d13C = &
             & (loc_deep_FCaCO3_d13C*loc_deep_FCaCO3+loc_mud_FCaCO3_d13C*loc_mud_FCaCO3+loc_reef_FCaCO3_d13C*loc_reef_FCaCO3)/ &
@@ -2101,6 +2113,7 @@ CONTAINS
     else
        loc_tot_FCaCO3_d13C = 0.0
     end if
+    ! calculate mean POC burial d13C
     if (loc_tot_FPOC > const_real_nullsmall) then
        loc_tot_FPOC_d13C = &
             & (loc_deep_FPOC_d13C*loc_deep_FPOC+loc_mud_FPOC_d13C*loc_mud_FPOC+loc_reef_FPOC_d13C*loc_reef_FPOC)/ &
@@ -2108,47 +2121,61 @@ CONTAINS
     else
        loc_tot_FPOC_d13C = 0.0
     end if
-    if (abs((loc_tot_FPOC_d13C-loc_tot_FCaCO3_d13C)) > const_real_nullsmall) then
-       loc_gamma = (-6.0-loc_tot_FCaCO3_d13C)/(loc_tot_FPOC_d13C-loc_tot_FCaCO3_d13C)
+    ! calculate gamma
+    if ( (abs((loc_tot_FPOC_d13C-loc_tot_FCaCO3_d13C)) > const_real_nullsmall) .AND. (loc_tot_FPOC > const_real_nullsmall) ) then
+       loc_gamma = (par_sed_diag_volcanicd13C-loc_tot_FCaCO3_d13C)/(loc_tot_FPOC_d13C-loc_tot_FCaCO3_d13C)
     else
        loc_gamma = 0.0
     end if
-    loc_Foutgassing = (2.0/5.0)*loc_tot_FCaCO3/(1.0-loc_gamma)
-    loc_Fkerogen    = loc_tot_FPOC - loc_gamma*(2.0/5.0)*loc_tot_FCaCO3/(1.0-loc_gamma)
+    ! outgassing and ketogen carbon fluxes
+    loc_Foutgassing = par_sed_diag_fracSiweath*loc_tot_FCaCO3/(1.0-loc_gamma)
+    loc_Fkerogen    = loc_tot_FPOC - loc_gamma*par_sed_diag_fracSiweath*loc_tot_FCaCO3/(1.0-loc_gamma)
+    ! create simple mass balance if no organic carbon cycle is active
+    ! NOTE: loc_FCaCO3_d13C*(1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3 + par_sed_diag_volcanicd13C*loc_Foutgassing = 
+    !       loc_tot_FCaCO3_d13C*loc_tot_FCaCO3
+    if (loc_tot_FPOC > const_real_nullsmall) then
+       loc_FCaCO3_d13C = loc_tot_FCaCO3_d13C
+    else
+       loc_FCaCO3_d13C = (loc_tot_FCaCO3_d13C*loc_tot_FCaCO3 - par_sed_diag_volcanicd13C*loc_Foutgassing)/ &
+            & ((1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3)
+    end if
+    ! write out data
     Write(unit=out,fmt=*) ' '
     Write(unit=out,fmt=*) '--- DERIVED PARAMETER VALUES ----'
     Write(unit=out,fmt=*) ' '
     Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
          & ' Global CaCO3 burial       :',loc_tot_FCaCO3,' mol yr-1'
-    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
-         & ' 2/5 silicate weathering   =',(2.0/5.0)*loc_tot_FCaCO3,' mol yr-1'
-    write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
-         & ' 3/5 carbonate weathering  =',(3.0/5.0)*loc_tot_FCaCO3,' mol yr-1'
+    write(unit=out,fmt='(A28,e14.6,A9,A16,f8.6,A29)',iostat=ios) &
+         & ' silicate weathering       :',par_sed_diag_fracSiweath*loc_tot_FCaCO3,' mol yr-1', &
+         & ' for an assumed ',par_sed_diag_fracSiweath,' silicate weathering fraction'
+    write(unit=out,fmt='(A28,e14.6,A9,A16,f8.6,A30)',iostat=ios) &
+         & ' carbonate weathering      :',(1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3,' mol yr-1', &
+         & ' for an assumed ',(1.0-par_sed_diag_fracSiweath),' carbonate weathering fraction'
     write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
          & ' Global POC burial         :',loc_tot_FPOC,' mol yr-1'
     write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
          & ' Global POP burial         :',loc_tot_FPOP,' mol yr-1'
     Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,e14.6,A5)',iostat=ios) &
-         & ' Global CaCO3 d13C         :',loc_tot_FCaCO3_d13C,' o/oo'
+         & ' Global CaCO3 d13C         :',loc_FCaCO3_d13C,' o/oo'
     write(unit=out,fmt='(A28,e14.6,A5)',iostat=ios) &
          & ' Global POC d13C           :',loc_tot_FPOC_d13C,' o/oo'
-    write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
-         & ' gamma (@ -6 outgassing)   =',loc_gamma
+    write(unit=out,fmt='(A28,e14.6,A14,f7.3,A16)',iostat=ios) &
+         & ' gamma                     :',loc_gamma,' @ an assumed ',par_sed_diag_volcanicd13C,' o/oo outgassing'
     Write(unit=out,fmt=*) '---------------------------------'
     write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
-         & ' CO2 outgassing            =',loc_Foutgassing,' mol yr-1'
+         & ' CO2 outgassing            :',loc_Foutgassing,' mol yr-1'
     write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
-         & ' kerogen weathering        =',loc_Fkerogen,' mol yr-1'
+         & ' kerogen weathering        :',loc_Fkerogen,' mol yr-1'
     Write(unit=out,fmt=*) '---------------------------------'
     if (loc_tot_FCaCO3 > const_real_nullsmall) then
        write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
-            & ' kerogen C/silicate ratio  =',loc_Fkerogen/((2.0/5.0)*loc_tot_FCaCO3)
+            & ' kerogen C/silicate ratio  =',loc_Fkerogen/(par_sed_diag_fracSiweath*loc_tot_FCaCO3)
     end if
     if (loc_tot_FCaCO3 > const_real_nullsmall) then
        write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
-            & ' kerogen P/silicate ratio  =',loc_tot_FPOP/((2.0/5.0)*loc_tot_FCaCO3)
+            & ' kerogen P/silicate ratio  =',loc_tot_FPOP/(par_sed_diag_fracSiweath*loc_tot_FCaCO3)
     end if
     if (loc_Fkerogen > const_real_nullsmall) then
        write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
@@ -2159,10 +2186,13 @@ CONTAINS
             & ' kerogen ALK/C ratio       =',-16.0*loc_tot_FPOP/loc_Fkerogen
     end if
     Write(unit=out,fmt=*) '---------------------------------'
-    
+    ! write out section of text for copy-paste into a user-config
     Write(unit=out,fmt=*) ' '
     Write(unit=out,fmt=*) '# --- ROKGEM USER-CONFIG --------'
     Write(unit=out,fmt=*) '# NOTE: automatically generated by SEDGEM'
+    Write(unit=out,fmt=*) '# NOTE: this calculation assumes:'
+    write(unit=out,fmt=*) '#       silicate weathering fraction (sg_par_sed_diag_fracSiweath) == ',par_sed_diag_fracSiweath
+    write(unit=out,fmt=*) '#       volcanic outgassing d13C (sg_par_sed_diag_volcanicd13C)    == ',par_sed_diag_volcanicd13C
     Write(unit=out,fmt=*) '#'
     Write(unit=out,fmt=*) '# set an OPEN system'
     Write(unit=out,fmt=*) 'bg_ctrl_force_sed_closedsystem=.FALSE.'
@@ -2174,18 +2204,18 @@ CONTAINS
     Write(unit=out,fmt=*) '# NOTE: you need to fetch this value from BIOGEM biogem_series_misc_SLT.res and replace xxx'
     Write(unit=out,fmt=*) 'rg_par_ref_T0=xxx'
     Write(unit=out,fmt=*) '# global carbonate weathering rate (mol Ca2+ yr-1)'
-    write(unit=out,fmt=*) 'rg_par_weather_CaCO3=',(3.0/5.0)*loc_tot_FCaCO3
+    write(unit=out,fmt=*) 'rg_par_weather_CaCO3=',(1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3
     Write(unit=out,fmt=*) '#  global silicate weathering rate (mol Ca2+ yr-1)'
-    Write(unit=out,fmt=*) 'rg_par_weather_CaSiO3=',(2.0/5.0)*loc_tot_FCaCO3
+    Write(unit=out,fmt=*) 'rg_par_weather_CaSiO3=',par_sed_diag_fracSiweath*loc_tot_FCaCO3
     Write(unit=out,fmt=*) '# CO2 outgassing rate (mol C yr-1)'
     Write(unit=out,fmt=*) 'rg_par_outgas_CO2=',loc_Foutgassing
     Write(unit=out,fmt=*) '# set isotopic value of CO2 outgassing (assumed) (o/oo)'
-    Write(unit=out,fmt=*) 'rg_par_outgas_CO2_d13C=-6.0'
+    Write(unit=out,fmt=*) 'rg_par_outgas_CO2_d13C=',par_sed_diag_volcanicd13C
     Write(unit=out,fmt=*) '# set isotopic value of carbonate weathering (o/oo)'
-    Write(unit=out,fmt=*) 'rg_par_weather_CaCO3_d13C=',loc_tot_FCaCO3_d13C
+    Write(unit=out,fmt=*) 'rg_par_weather_CaCO3_d13C=',loc_FCaCO3_d13C
     Write(unit=out,fmt=*) '# kerogen POC weathering ratio (to silicate Ca2+) and isotopic composiiton'
     if (loc_tot_FCaCO3 > const_real_nullsmall) then
-       Write(unit=out,fmt=*) 'rg_par_weather_CaSiO3_fracC=',loc_Fkerogen/((2.0/5.0)*loc_tot_FCaCO3)
+       Write(unit=out,fmt=*) 'rg_par_weather_CaSiO3_fracC=',loc_Fkerogen/(par_sed_diag_fracSiweath*loc_tot_FCaCO3)
        Write(unit=out,fmt=*) 'rg_par_weather_CaSiO3_fracC_d13C=',loc_tot_FPOC_d13C
     else
        Write(unit=out,fmt=*) '# WARNING: could not be calculated'

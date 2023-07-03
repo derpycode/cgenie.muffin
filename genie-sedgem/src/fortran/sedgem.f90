@@ -211,8 +211,8 @@ SUBROUTINE sedgem(          &
            ! ammend sediment rain flux according to prescribed detrital input
            ! NOTE: convert units from (g cm-2 kyr-1) to (mol m-2 (per time-step))
            ! NOTE: add age tracer if selected
-           ! NOTE: assume that not both surface-derived flux and prescribed det fluxes are allowed ...
-           !       ... but allow prescribed (uniform) sed det flux PLUS spatial burial flux
+           ! NOTE: add a switch for excluding pelagic (dust) detrital flux reaching the seafloor
+           !       automatically combine prescribed (uniform) sed det flux PLUS a spatial burial flux
            ! NOTE: if an opal flux is provided but opal is not selected as a tracer, add to the detrital field
            if (sed_select(is_det)) then
               if (ctrl_sed_det_NOdust) then
@@ -220,7 +220,8 @@ SUBROUTINE sedgem(          &
                  dum_sfxsumsed(is_det,i,j) = 0.0
               endif
               if (ctrl_sed_Fdet) then
-                 dum_sfxsumsed(is_det,i,j) =  &
+                 ! add prescribed (uniform) sed det flux to prescribed spatial field plus whatever reaches the seafloor
+                 dum_sfxsumsed(is_det,i,j) =  dum_sfxsumsed(is_det,i,j) + &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*par_sed_fdet + &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*sed_Fsed_det(i,j)
                  if (.NOT. sed_select(is_opal) .AND. ctrl_sed_Fopal) then
@@ -229,6 +230,7 @@ SUBROUTINE sedgem(          &
                          & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*sed_Fsed_opal(i,j)
                  endif
               else
+                 ! add prescribed (uniform) sed det flux to whatever pelagic source reaches the seafloor
                  dum_sfxsumsed(is_det,i,j) = dum_sfxsumsed(is_det,i,j) + &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*par_sed_fdet              
               endif

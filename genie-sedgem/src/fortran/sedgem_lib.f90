@@ -267,6 +267,9 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_opal
   logical::ctrl_sed_Fdet_sedcore                                 ! apply alt sedimentation rates to sedcores?
   NAMELIST /ini_sedgem_nml/ctrl_sed_Fdet_sedcore
+  real::par_sed_diag_fracSiweath                                 ! assumed fraction of silicate vs. total weathering
+  real::par_sed_diag_volcanicd13C                                ! assumed d13C of volcanic emissions
+  NAMELIST /ini_sedgem_nml/par_sed_diag_fracSiweath,par_sed_diag_volcanicd13C
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            ! 
   CHARACTER(len=255)::par_indir_name                             ! 

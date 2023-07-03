@@ -7716,6 +7716,14 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="boolean">.false.</value>
                         <description>Use alt detrital burial rates for sedcores?</description>
                     </param>
+                    <param name="par_sed_diag_fracSiweath">
+			<value datatype="real">0.4</value>
+                        <description>assumed fraction of silicate vs. total weathering (2/5 by default)</description>
+                    </param>
+                    <param name="par_sed_diag_volcanicd13C">
+			<value datatype="real">-6.0</value>
+                        <description>assumed d13C of volcanic emissions (o/oo)</description>
+                    </param>
 <!-- I/O: DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">
 			<value datatype="string"></value>
