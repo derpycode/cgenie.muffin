@@ -324,18 +324,6 @@ subroutine ecogem(          &
                     PAR_in    = PAR_out
                  endif
                  
-                 ! foram cannot live in environment with < 1 omega
-                 ! Roy et al. 2015. Biogeosciences, 12, 2873–2889, 2015
-                 if (ctrl_foramecogenie_oa .and. (omega(i,j,k) .lt. 1.0)) then
-                    do jp=1,npmax
-                       ! for any foram
-                       if (index(pft(jp), "foram") /= 0) then
-                          ! note mortality(:) is changing in place and mort(:) is fixed
-                          mortality(jp) = mortality(jp) * 100
-                       endif
-                    enddo
-                 endif
-                 
                  ! ?
                  up_inorg(:,:) = 0.0 ! (iomax,npmax)
                  qreg(:,:) = 0.0 ! (iomax,npmax)
@@ -359,16 +347,6 @@ subroutine ecogem(          &
                  call quota_limitation(quota,limit,VLlimit,qreg,qreg_h)
 
                  call t_limitation(templocal,gamma_TP,gamma_TK)
-
-                 ! symbiont bleaching for foraminifera
-                 ! implementation: manually disable photosynthesis
-                 if (ctrl_foramecogenie_bleach .and. (templocal .gt. (foramecogenie_bleach_temp + 273.15))) then
-                    do jp=1,npmax
-                       if (pft(jp).eq.'foram_sn' .or. pft(jp).eq.'foram_ss') then
-                          VLlimit(jp) = 0.0
-                       endif
-                    enddo
-                 endif
                  
                  call nutrient_uptake(qreg(:,:),loc_nuts(:),gamma_TK,up_inorg(:,:))
 
