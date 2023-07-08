@@ -141,16 +141,5 @@ bg_par_forcing_name="worlg4.RpCO2_Rp13CO2.FeMahowald2006"
 bg_par_atm_force_scale_val_3=278.0E-06
 bg_par_atm_force_scale_val_4=-6.5
 #
-# --- MISC ----------------------------------------------------------
-#
-# kraus-turner mixed layer scheme on (1) or off (0)
-go_imld = 1
-
-# diagnosed only mixed layer depth 
-go_ctrl_diagmld=.true.
-
-# add seaice attenuation of PAR
-eg_ctrl_PARseaicelimit=.false.
-
 # --- END -----------------------------------------------------------
 #

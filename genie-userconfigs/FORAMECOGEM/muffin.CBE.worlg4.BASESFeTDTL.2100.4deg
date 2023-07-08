@@ -145,14 +145,5 @@ bg_par_atm_force_scale_val_4=-6.5
 # --- MISC ----------------------------------------------------------
 # starting year
 bg_par_misc_t_start=2022.0
-
-# kraus-turner mixed layer scheme on (1) or off (0)
-go_imld = 1
-
-# diagnosed only mixed layer depth 
-go_ctrl_diagmld=.true.
-
-# add seaice attenuation of PAR
-eg_ctrl_PARseaicelimit=.false.
 #
 # --- END -----------------------------------------------------------

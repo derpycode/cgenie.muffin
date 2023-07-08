@@ -170,15 +170,5 @@ bg_par_misc_brinerejection_jmax=19
 # wind-stress
 go_13=1.3
 ea_11=1.3
-
-# kraus-turner mixed layer scheme on (1) or off (0)
-go_imld = 1
-
-# diagnosed only mixed layer depth 
-go_ctrl_diagmld=.true.
-
-# add seaice attenuation of PAR
-eg_ctrl_PARseaicelimit=.false.
-
 #
 # --- END -----------------------------------------------------------
