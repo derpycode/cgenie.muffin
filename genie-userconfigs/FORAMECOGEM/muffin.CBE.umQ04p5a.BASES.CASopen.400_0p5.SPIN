@@ -117,10 +117,10 @@ bg_par_ocn_force_scale_val_2=0.5
 # *** MISC **********************************************************
 #
 # kraus-turner mixed layer scheme on (1) or off (0)
-go_imld = 1
+go_imld=1
 # *** optional changes to align with PALEO recommendations **********
 # set mixed layer to be only diagnosed (for ECOGEM)
-go_ctrl_diagmld=.true.
+go_ctrl_diagmld=.false.
 # add seaice attenuation of PAR
 eg_ctrl_PARseaicelimit=.false.
 # relative partitioning of C into DOM

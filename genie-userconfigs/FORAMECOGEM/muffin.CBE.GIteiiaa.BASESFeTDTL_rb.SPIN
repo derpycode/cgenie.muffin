@@ -140,9 +140,11 @@ bg_par_atm_force_scale_val_4=-6.35
 #
 # *** MISC **********************************************************
 #
+# kraus-turner mixed layer scheme on (1) or off (0)
+go_imld=1
+
 # relative partitioning of C into DOM
 eg_par_beta_POCtoDOC=0.75
-
 # (no preformed)
 bg_ctrl_bio_preformed=.false.
 # add ventillation tracers

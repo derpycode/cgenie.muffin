@@ -51,7 +51,7 @@ Tested implementation: directly transfer biomass from phytoplankton, or mixotrop
 ## pre-industrial spinup (0-10000)
 
 ```
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL RUI_LABS/foramecogem muffin.CBE.worlg4.BASESFeTDTL.foramecogem2.1.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.SPIN 10000
 ```
 
 ## Historical (1765-2022) 

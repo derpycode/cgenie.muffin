@@ -171,4 +171,7 @@ bg_par_misc_brinerejection_jmax=19
 go_13=1.3
 ea_11=1.3
 #
+# kraus-turner mixed layer scheme on (1) or off (0)
+go_imld=1
+
 # --- END -----------------------------------------------------------

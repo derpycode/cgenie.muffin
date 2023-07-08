@@ -186,5 +186,8 @@ gm_par_carbchem_Tmax = 45.0
 # set 'instantaneous' water column remineralziation
 bg_par_bio_remin_sinkingrate_physical=9.9E9
 bg_par_bio_remin_sinkingrate_reaction=125.0
+# kraus-turner mixed layer scheme on (1) or off (0)
+go_imld=1
+
 #
 # --- END -----------------------------------------------------------

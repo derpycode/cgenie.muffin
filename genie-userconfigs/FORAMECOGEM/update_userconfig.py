@@ -14,6 +14,9 @@ def update_foramecogem(directory):
         'ma_ctrl_debug_init': '0',
         'eg_ctrl_debug_eco_init': '.false.',
         'eg_gkernel_cap': '.false.',
+        # kraus-turner mixed layer scheme
+        'go_imld' :1,
+        'go_ctrl_diagmld': '.false.',
         ## foramecogenie parameters (logical)
         'eg_ctrl_use_foramecogenie': '.true.',
         'eg_ctrl_foramecogenie_oa': '.false.',
