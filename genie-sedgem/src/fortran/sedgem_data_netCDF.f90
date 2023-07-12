@@ -1640,6 +1640,11 @@ CONTAINS
     call sub_putvar2d('muds_sed_'//trim(string_sed(is)),ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask_muds)
 
     ! MISCELLANEOUS FIELDS
+    ! ocean depth (rather than topography)
+    loc_unitsname = 'm'
+    loc_ij(:,:) = phys_sed(ips_mask_sed,:,:)*phys_sed(ips_D,:,:)
+    call sub_adddef_netcdf(ntrec_siou,3,'grid_depth','seafloor depth',trim(loc_unitsname),loc_c0,loc_c0)
+    call sub_putvar2d('grid_depth',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
     ! 
     loc_unitsname = 'cm3 cm-3'
     loc_ij(:,:) = phys_sed(ips_poros,:,:)
