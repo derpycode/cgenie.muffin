@@ -21,7 +21,7 @@ PUBLICATION DETAILS [summary of manuscript/publication]
 EDITING LOG [list of changes made to this file, when, and by who]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-DD/MM/YYYY  --  README.txt file created by [INITIALS]
+YYYY/MM/DD -- README.txt file created by [INITIALS]
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 SUMMARY OF EXPERIMENTS [summerize experiments detailed and in which e.g. figures they appear]
@@ -33,14 +33,13 @@ SUMMARY OF EXPERIMENTS [summerize experiments detailed and in which e.g. figures
 RUNNING THE EXPERIMENTS [command lines, broken down in sub-sections for spinups, main experiments, SI, etc where appropriate]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Note that all experiments are run from:
-$HOME/cgenie.muffin/genie-main
-(unless a different installation directory has been used)
+
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-
+Note that all experiments are run from:
+$HOME/cgenie.muffin/genie-main
+(unless a different installation directory has been used)
 
 ================================================================
 ================================================================
