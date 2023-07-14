@@ -40,7 +40,7 @@ Three main model experiments were run:
         The results of this are shown in the SI.
         This is experiment: muffin.p0055c.CIE1.NOemissions.EXPT
 
-All 3 experiments are run for a total of 50 yr following from a spinup (experiment: muffin.p0055c.closed.SPIN).
+All 3 experiments are run for a total of 50 kyr following from a spinup (experiment: muffin.p0055c.closed.SPIN).
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 RUNNING THE EXPERIMENTS [command lines, broken down in sub-sections for spinups, main experiments, SI, etc where appropriate]
@@ -52,15 +52,16 @@ To run the spinup (10 kyr total):
 
 Then to run the main experiment (i) from the spuinup (50 kyr total):
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.p0055c.BASESrb PUBS/submitted/KirtlandTurner_et_al.2023 muffin.p0055c.closed.SPIN 50000 muffin.p0055c.closed.SPIN
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.p0055c.BASESrb PUBS/submitted/KirtlandTurner_et_al.2023 muffin.p0055c.CIE1.EXPT 50000 muffin.p0055c.closed.SPIN
 
 Additional experiment (ii) is run similarly:
 
 ./runmuffin.sh cgenie.eb_go_gs_ac_bg.p0055c.BASESrb PUBS/submitted/KirtlandTurner_et_al.2023 muffin.p0055c.CIE1.NOradfor.EXPT 50000 muffin.p0055c.closed.SPIN
 
-However, experiment (iii) requires (conservative) atmospheric CH4 tracers in order to force climate without carbon emissions and hence a different base-config:
+However, experiment (iii) requires (conservative) atmospheric CH4 tracers to force climate without carbon emissions 
+and hence a different base-config (cgenie.eb_go_gs_ac_bg.p0055c.BASESCH4rb):
 
-./runmuffin.sh cgenie.eb_go_gs_ac_bg.p0055c.BASESCH4rb PUBS/submitted/KirtlandTurner_et_al.2023 muffin.p0055c.CIE1.NOradfor.EXPT 50000 muffin.p0055c.closed.SPIN
+./runmuffin.sh cgenie.eb_go_gs_ac_bg.p0055c.BASESCH4rb PUBS/submitted/KirtlandTurner_et_al.2023 muffin.p0055c.CIE1.NOemissions.EXPT 50000 muffin.p0055c.closed.SPIN
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
