@@ -3956,6 +3956,14 @@
                     <param name="ctrl_ocn_dinit">
 			<value datatype="boolean">.true.</value>
                         <description>absolute (not relative) tracer re-start adjustment?</description>
+                    </param>                    
+                    <param name="ctrl_ocn_rinit_ALL">
+			<value datatype="boolean">.false.</value>
+                        <description>Adjust all tracers by some fraction w.r.t. restart?</description>
+                    </param>
+                    <param name="par_ocn_rinit_ALL">
+			<value datatype="real">0.0</value>
+                        <description>Fractional tracer change (increase) w.r.t. a restart</description>
                     </param>
 <!-- RUN CONTROL  -->
                     <param name="ctrl_continuing">

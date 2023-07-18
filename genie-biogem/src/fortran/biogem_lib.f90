@@ -26,6 +26,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ocn_dinit
   logical::ctrl_ocn_dinit                                               ! absolute (not relative) tracer re-start adjustment?
   NAMELIST /ini_biogem_nml/ctrl_ocn_dinit
+  logical::ctrl_ocn_rinit_ALL                                           ! adjust ALL tracers by some fraction w.r.t. a restart
+  NAMELIST /ini_biogem_nml/ctrl_ocn_rinit_ALL
+  REAL::par_ocn_rinit_ALL                                               ! fractional tracer change w.r.t. a restart
+  NAMELIST /ini_biogem_nml/par_ocn_rinit_ALL
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                              ! continuing run?
   NAMELIST /ini_biogem_nml/ctrl_continuing

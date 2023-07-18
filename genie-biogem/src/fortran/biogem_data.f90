@@ -73,6 +73,8 @@ CONTAINS
           print*,'ocn tracer perturbation : ',trim(string_ocn(io)),' = ',ocn_dinit(io)
        end do
        print*,'Absolute (not relative) tracer re-start adjustment? : ',ctrl_ocn_dinit
+       print*,'Adjust all tracers by some fraction w.r.t. restart? : ',ctrl_ocn_rinit_ALL
+       print*,'Fractional tracer change (increase) w.r.t. restart  : ',par_ocn_rinit_ALL
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
        print*,'--- BIOGEM TIME CONTROL ----------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing
@@ -760,6 +762,7 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        endif
        ! -------------------------------------------------------- ! adjust restart data
+       ! NOTE: icnludes T and S in loop
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
           if (ctrl_ocn_dinit) then
@@ -774,6 +777,14 @@ CONTAINS
        ! NOTE: no adjustment needed for single tracer age (ctrl_force_ocn_age1)
        if (ctrl_force_ocn_age) then
           ocn(io_colb,:,:,:) = ocn(io_colb,:,:,:) + par_misc_t_runtime*ocn(io_colr,:,:,:)
+       end if
+       ! force all tracers (e.g. in response to an ocean volume change)
+       ! NOTE: including salinity but excluding temperature => start l-index at 2
+       if (ctrl_ocn_rinit_ALL) then
+          DO l=2,n_l_ocn
+             io = conv_iselected_io(l)
+             ocn(io,:,:,:) = (1.0 + par_ocn_rinit_ALL)*ocn(io,:,:,:)
+          end do
        end if
     end If
     ! -------------------------------------------------------- !
