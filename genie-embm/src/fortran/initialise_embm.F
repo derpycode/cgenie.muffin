@@ -236,6 +236,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/lin,atchem_radfor
       NAMELIST /ini_embm_nml/orbit_radfor
       NAMELIST /ini_embm_nml/t_orbit,norbit,orbitsteps,filenameorbit
+      NAMELIST /ini_embm_nml/opt_orbit_old
       NAMELIST /ini_embm_nml/t_co2,nco2,co2steps,filenameco2
       NAMELIST /ini_embm_nml/diffa_scl,diffa_len
       NAMELIST /ini_embm_nml/dosc,delf2x
@@ -279,6 +280,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/par_albedo1d_name,par_albedo2d_name
       NAMELIST /ini_embm_nml/par_orbit_osce,par_orbit_oscsob
       NAMELIST /ini_embm_nml/par_orbit_oscgam,par_orbit_osctau0
+      NAMELIST /ini_embm_nml/par_orbit_oscobl,par_orbit_osclonperi
       NAMELIST /ini_embm_nml/opt_delf2x_cesm,opt_co2ch4radfor
 
 c ------------------------------------------------------------ c
