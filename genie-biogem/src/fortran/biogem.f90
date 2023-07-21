@@ -463,10 +463,14 @@ subroutine biogem(        &
               ! update ocean flux array
               if (ocn_select(io_Fe)) then
                  locijk_focn(io_Fe,i,j,n_k) = locijk_focn(io_Fe,i,j,n_k) + loc_dust_Fe
+                 if (ocn_select(io_Fe_56Fe)) then
+                    locijk_focn(io_Fe_56Fe,i,j,n_k) = locijk_focn(io_Fe_56Fe,i,j,n_k) + loc_dust_Fe ! DO ISOTOPES PROPERLY!!!
+                 end if
               elseif (ocn_select(io_TDFe)) then
                  locijk_focn(io_TDFe,i,j,n_k) = locijk_focn(io_TDFe,i,j,n_k) + loc_dust_Fe
-              else
-                 !
+                 if (ocn_select(io_TDFe_56Fe)) then
+                    locijk_focn(io_TDFe_56Fe,i,j,n_k) = locijk_focn(io_TDFe_56Fe,i,j,n_k) + loc_dust_Fe ! DO ISOTOPES PROPERLY!!!
+                 end if
               end if
               ! ### ADD CODE FOR ADDITIONAL AEOLIAN DISSOLUTION INPUTS ########################################################### !
               !
@@ -495,6 +499,7 @@ subroutine biogem(        &
               if (ctrl_force_sed_closedsystem) then
                  If (flag_sedgem) then
                     ! set weathering flux equal to sediment preservation flux (globally averaged)
+                    ! NOTE: exclude iron!!!
                     DO l=3,n_l_ocn
                        io = conv_iselected_io(l)
                        locij_fsedocn(io,i,j) = locij_fsedocn(io,i,j) + &
@@ -503,6 +508,10 @@ subroutine biogem(        &
                             & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)
                        if (abs(loc_fsedpres_tot(io)) < const_real_nullsmall) &
                             & dum_sfxsumrok1(io,i,j) = 0.0
+                       select case (trim(string_ocn(io)))
+                       case ('Fe','Fe_56Fe','Fe2','Fe2_56Fe','TDFe','TDFe_56Fe')
+                          dum_sfxsumrok1(io,i,j) = 0.0
+                       end SELECT
                     end do
                  else ! [not (flag_sedgem)]
                     ! set dissolution flux equal to rain flux
