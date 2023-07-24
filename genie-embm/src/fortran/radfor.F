@@ -59,7 +59,6 @@ c >>>>>>>>>> OLD ORBITS CODE STARTS HERE >>>>>>>>>>>>>>>>>>>>>>>>>
 c >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
       if (opt_orbit_old) then
-	     print *,'OLD RADFOR CODE INITIATED'
 		 
       osce=par_orbit_osce
       oscsob=par_orbit_oscsob
@@ -92,8 +91,8 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
    
       if (t_orbit.eq.2) then
         osce=orbitecc_vect(1)
-        oscsob=orbitobl_vect(1)
-        oscgam=orbitpre_vect(1)
+        oscsob=orbitsob_vect(1)
+        oscgam=orbitgam_vect(1)
         osctau0=orbittau_vect(1)
         print*,'orbitvars:',iistep
         print*,'orbitosce,oscsob:',osce,oscsob
@@ -107,23 +106,23 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
         if (time_2.le.norbit) then
           osce=(1-time_frac)*orbitecc_vect(time_1)+
      &                time_frac*orbitecc_vect(time_2)
-          oscsob=(1-time_frac)*orbitobl_vect(time_1)+
-     &                time_frac*orbitobl_vect(time_2)
+          oscsob=(1-time_frac)*orbitsob_vect(time_1)+
+     &                time_frac*orbitsob_vect(time_2)
 
-          if (abs(orbitpre_vect(time_1)-
-     &        orbitpre_vect(time_2)).gt.pi) then
+          if (abs(orbitgam_vect(time_1)-
+     &        orbitgam_vect(time_2)).gt.pi) then
 
-            if (orbitpre_vect(time_1).gt.orbitpre_vect(time_2)) then
-              oscgam=mod((1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*(orbitpre_vect(time_2)+2*pi),2*pi)
+            if (orbitgam_vect(time_1).gt.orbitgam_vect(time_2)) then
+              oscgam=mod((1-time_frac)*orbitgam_vect(time_1)+
+     &                time_frac*(orbitgam_vect(time_2)+2*pi),2*pi)
             else
-              oscgam=mod((1-time_frac)*(orbitpre_vect(time_1)+2*pi)+
-     &                time_frac*(orbitpre_vect(time_2)),2*pi)
+              oscgam=mod((1-time_frac)*(orbitgam_vect(time_1)+2*pi)+
+     &                time_frac*(orbitgam_vect(time_2)),2*pi)
             endif
   
           else
-          oscgam=(1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*orbitpre_vect(time_2)
+          oscgam=(1-time_frac)*orbitgam_vect(time_1)+
+     &                time_frac*orbitgam_vect(time_2)
           endif
 
           if (abs(orbittau_vect(time_1)-
@@ -148,8 +147,8 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
         else 
           if (time_frac.ne.0) print*,'Time out of bounds for orbit'
           osce=orbitecc_vect(norbit)
-          oscsob=orbitobl_vect(norbit)
-          oscgam=orbitpre_vect(norbit)
+          oscsob=orbitsob_vect(norbit)
+          oscgam=orbitgam_vect(norbit)
           osctau0=orbittau_vect(norbit)
         endif
 
@@ -217,7 +216,6 @@ c >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 c PV if opt_orbit_old=false, do the below	
   
       else
-	     print *,'NEW RADFOR CODE INITIATED'
 		 
         osce=par_orbit_osce
         oscobl=par_orbit_oscobl
@@ -232,7 +230,7 @@ c than MEAN longitude converted from heliocentric to geocentric perspective
       if (t_orbit.eq.2) then
         osce=orbitecc_vect(1)
         oscobl=orbitobl_vect(1)
-        zw=orbitpre_vect(1)
+        zw=orbitper_vect(1)
         
         print*,'orbitvars:',iistep
         print*,'orbitosce,oscobl:',osce,oscobl
@@ -249,21 +247,21 @@ c than MEAN longitude converted from heliocentric to geocentric perspective
           oscobl=(1-time_frac)*orbitobl_vect(time_1)+
      &                time_frac*orbitobl_vect(time_2)
 
-          if (abs(orbitpre_vect(time_1)-
-     &        orbitpre_vect(time_2)).gt.pi) then
+          if (abs(orbitper_vect(time_1)-
+     &        orbitper_vect(time_2)).gt.pi) then
 
-            if (orbitpre_vect(time_1)
-     &          .gt.orbitpre_vect(time_2)) then
-              zw=mod((1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*(orbitpre_vect(time_2)+2*pi),2*pi)
+            if (orbitper_vect(time_1)
+     &          .gt.orbitper_vect(time_2)) then
+              zw=mod((1-time_frac)*orbitper_vect(time_1)+
+     &                time_frac*(orbitper_vect(time_2)+2*pi),2*pi)
             else
-              zw=mod((1-time_frac)*(orbitpre_vect(time_1)+2*pi)+
-     &                time_frac*(orbitpre_vect(time_2)),2*pi)
+              zw=mod((1-time_frac)*(orbitper_vect(time_1)+2*pi)+
+     &                time_frac*(orbitper_vect(time_2)),2*pi)
             endif
   
           else
-          zw=(1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*orbitpre_vect(time_2)
+          zw=(1-time_frac)*orbitper_vect(time_1)+
+     &                time_frac*orbitper_vect(time_2)
           endif
 
 
@@ -271,7 +269,7 @@ c than MEAN longitude converted from heliocentric to geocentric perspective
           if (time_frac.ne.0) print*,'Time out of bounds for orbit'
           osce=orbitecc_vect(norbit)
           oscobl=orbitobl_vect(norbit)
-          zw=orbitpre_vect(norbit)
+          zw=orbitper_vect(norbit)
         endif
 
       if (mod(iistep-1,10000).eq.0) then
@@ -334,7 +332,7 @@ c SKT osct = mean anomaly (fraction of orbital period elapsed since perihelion)
 	     osct = (float(mod(istep-1,nyear)+1) - 
      &          (nyear*osctau1/gn_daysperyear))*oscryr
 c oscv = true anomaly calculated from eccentricity and mean anomaly
-c       (i.e. the angular distance of the earth round its orbit from perihelion)
+c       (i.e. the angular distance of the earth around its orbit from perihelion)
 	     oscv = osct + osce1*sin(osct) + osce2*sin(2.0*osct) 
      &           + osce3*sin(3.0*osct)
 c oscsolf = insolation at the top of the atmosphere
@@ -345,7 +343,7 @@ c       between the vernal equinox and earth, i.e. substract the geocentric (tru
 c       longitude of perihelion(zv) from the true anomaly (angle perihelion-Earth)
 	     oscsind = sin(oscobl)*sin(oscv-zv)
 c SKT for each latitude, calculate the following:
-c     oscss = sin( solar declination) * sin(latitude)
+c     oscss = sin(solar declination) * sin(latitude)
 c     oscccc = cos(solar declination)
 c     osctt = tan(latitude)*tan(solar declination)
 c     oscday = hour angle of sunset (the angle through which earth
@@ -367,10 +365,10 @@ c            (TOA insolation multiplied by mean cos(solar zenith angle))
 	  
 		
       endif
-C >>>>>>>>>> NEW ORBITS CODE ENDS HERE >>>>>>>>>>>>>>>>>>>>>>>>>>>
+C PV >>>>>>>>> NEW ORBITS CODE ENDS HERE >>>>>>>>>>>>>>>>>>>>>>>>>
 c >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-c SEASONALITY 	  
+c SEASONALITY
 
       if (dosc) then
       else

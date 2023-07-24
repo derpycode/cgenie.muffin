@@ -258,10 +258,13 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
       integer t_orbit,norbit,orbitsteps
       logical opt_orbit_old
       real orbitecc_vect(en_ntimes_max)
-      real orbitobl_vect(en_ntimes_max)
-      real orbitpre_vect(en_ntimes_max)
+      real orbitsob_vect(en_ntimes_max)
+      real orbitgam_vect(en_ntimes_max)
       real orbittau_vect(en_ntimes_max)
       real orbitall_vect(en_ntimes_max,5)
+      real orbitobl_vect(en_ntimes_max)
+      real orbitper_vect(en_ntimes_max)
+      real orbitla_vect(en_ntimes_max,4)
       real par_orbit_osce
       real par_orbit_oscsob
       real par_orbit_oscgam
@@ -271,10 +274,12 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
 
       common/orbit_vary/
      &                  orbitecc_vect,
-     &                  orbitobl_vect,
-     &                  orbitpre_vect,
+     &                  orbitsob_vect,
+     &                  orbitgam_vect,
      &                  orbittau_vect,
-     &                  orbitall_vect,
+     &                  orbitall_vect,orbitla_vect,
+     &                  orbitper_vect,
+     &                  orbitobl_vect,
      &                  t_orbit,norbit,orbitsteps,
      &                  opt_orbit_old,
      &                  filenameorbit
