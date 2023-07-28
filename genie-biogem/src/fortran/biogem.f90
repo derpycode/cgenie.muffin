@@ -4251,6 +4251,8 @@ SUBROUTINE diag_biogem_timeseries( &
                       & )
                  call sub_echo_runtime(loc_yr,loc_opsi_scale,loc_opsia_minmax,dum_sfcatm1(:,:,:),dum_gemlite)
               endif
+              ! preserve SLT
+              int_SLT = int_misc_SLT_sig/int_t_sig
            end if
 
         else

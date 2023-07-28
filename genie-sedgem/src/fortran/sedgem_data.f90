@@ -1421,11 +1421,12 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! SAVE SEDIMENT DIAGNOSTICS DATA
-  SUBROUTINE sub_data_save_seddiag_GLOBAL(dum_dtyr,dum_sfcsumocn)
+  SUBROUTINE sub_data_save_seddiag_GLOBAL(dum_dtyr,dum_sfcsumocn,dum_SLT)
     USE genie_util, ONLY: check_unit, check_iostat
     ! dummy valiables
     real,INTENT(in)::dum_dtyr                                  ! 
     real,DIMENSION(n_ocn,n_i,n_j),intent(in)::dum_sfcsumocn    ! 
+    real,INTENT(in)::dum_SLT                                  ! 
     ! local variables
     INTEGER::i,j,l,is 
     integer::ios  ! for file checks
@@ -2201,8 +2202,8 @@ CONTAINS
     Write(unit=out,fmt=*) '# set CaSiO3_weathering-temperature feedback'
     Write(unit=out,fmt=*) 'rg_opt_weather_T_Si=.true.'
     Write(unit=out,fmt=*) '# weathering reference mean global land air surface temperature (oC)'
-    Write(unit=out,fmt=*) '# NOTE: you need to fetch this value from BIOGEM biogem_series_misc_SLT.res and replace xxx'
-    Write(unit=out,fmt=*) 'rg_par_ref_T0=xxx'
+    Write(unit=out,fmt=*) '# NOTE: this value can also be obtained from BIOGEM time-series: biogem_series_misc_SLT.res'
+    Write(unit=out,fmt=*) 'rg_par_ref_T0=',dum_SLT
     Write(unit=out,fmt=*) '# global carbonate weathering rate (mol Ca2+ yr-1)'
     write(unit=out,fmt=*) 'rg_par_weather_CaCO3=',(1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3
     Write(unit=out,fmt=*) '#  global silicate weathering rate (mol Ca2+ yr-1)'
@@ -2214,7 +2215,7 @@ CONTAINS
     Write(unit=out,fmt=*) '# set isotopic value of carbonate weathering (o/oo)'
     Write(unit=out,fmt=*) 'rg_par_weather_CaCO3_d13C=',loc_FCaCO3_d13C
     Write(unit=out,fmt=*) '# kerogen POC weathering ratio (to silicate Ca2+) and isotopic composiiton'
-    if (loc_tot_FCaCO3 > const_real_nullsmall) then
+    if ((par_sed_diag_fracSiweath*loc_tot_FCaCO3) > const_real_nullsmall) then
        Write(unit=out,fmt=*) 'rg_par_weather_CaSiO3_fracC=',loc_Fkerogen/(par_sed_diag_fracSiweath*loc_tot_FCaCO3)
        Write(unit=out,fmt=*) 'rg_par_weather_CaSiO3_fracC_d13C=',loc_tot_FPOC_d13C
     else

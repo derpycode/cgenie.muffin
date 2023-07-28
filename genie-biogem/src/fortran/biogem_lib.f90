@@ -1434,6 +1434,7 @@ MODULE biogem_lib
   real,DIMENSION(:),ALLOCATABLE::orb_pts_time                ! orbital point time
   ! global means
   REAL,DIMENSION(n_sed)::int_fracdom                         !
+  real::int_SLT
 
   ! *** forcing ***
   ! forcing - restoring
