@@ -57,6 +57,8 @@ MODULE rokgem_lib
   INTEGER::max_drain_cells                                                               ! maximum number of ocean cells a single land cell routes to
   NAMELIST /ini_rokgem_nml/max_drain_cells
   !--- WEATHERING PARAMETERS ----------------------------------------------------------------------------------------------------- !
+  LOGICAL::ctrl_force_sed_closedsystem                                                   ! close system (populate unit weathering fluxes)?
+  NAMELIST /ini_rokgem_nml/ctrl_force_sed_closedsystem
   LOGICAL:: opt_short_circuit_atm                                                        ! short circuit atmosphere by not taking CO2 directly, instead have less DIC put into ocean.
   NAMELIST /ini_rokgem_nml/opt_short_circuit_atm
   LOGICAL:: opt_weather_runoff                                                           ! scale (global) weathering with runoff
@@ -161,13 +163,13 @@ MODULE rokgem_lib
   REAL::par_weather_CaSiO3_r87Sr                                                         ! global silicate r87Sr (87/86)
   REAL::par_weather_CaCO3_r87Sr                                                          ! global carbonate r87Sr (87/86)
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_r87Sr,par_weather_CaCO3_r87Sr
-  REAL::par_weather_CaSiO3b_r87Sr                                                         ! basaltic r87Sr (87/86)
+  REAL::par_weather_CaSiO3b_r87Sr                                                        ! basaltic r87Sr (87/86)
   REAL::par_weather_CaSiO3g_r87Sr                                                        ! granitic r87Sr (87/86)
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3b_r87Sr,par_weather_CaSiO3g_r87Sr
   REAL::par_weather_CaSiO3_d88Sr                                                         ! global silicate d88Sr (o/oo)
   REAL::par_weather_CaCO3_d88Sr                                                          ! global carbonate d88r (o/oo) 
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_d88Sr,par_weather_CaCO3_d88Sr
-  REAL::par_weather_CaSiO3b_d88Sr                                                         ! basaltic d88Sr (o/oo)
+  REAL::par_weather_CaSiO3b_d88Sr                                                        ! basaltic d88Sr (o/oo)
   REAL::par_weather_CaSiO3g_d88Sr                                                        ! granitic d88r (o/oo) 
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3b_d88Sr,par_weather_CaSiO3g_d88Sr
   REAL::par_weather_CaSiO3_fracOs                                                        ! Os:Ca2+ ratio in silicate weathering flux
@@ -187,6 +189,12 @@ MODULE rokgem_lib
   REAL::par_weather_SiO2                                                                 ! global quartz weathering rate (mol Si yr-1)
   REAL::par_weather_SiO2_d30Si                                                           ! global quartz d30Si (o/oo)
   NAMELIST /ini_rokgem_nml/par_weather_SiO2,par_weather_SiO2_d30Si  
+  real:: par_weather_kerogen_fracP                                                       ! global kerogen P relative (to C) abundance
+  real:: par_weather_kerogen_fracALK                                                     ! global kerogen 'ALK' relative (to C) abundance
+  NAMELIST /ini_rokgem_nml/par_weather_kerogen_fracP,par_weather_kerogen_fracALK  
+  real:: par_weather_kerogen_fracS                                                       ! global kerogen S relative (to C) abundance
+  REAL:: par_weather_kerogen_fracS_d34S                                                  ! global kerogen S d34S
+  NAMELIST /ini_rokgem_nml/par_weather_kerogen_fracS,par_weather_kerogen_fracS_d34S  
   LOGICAL:: opt_calibrate_T_0D                                                           ! calibrate temperature fields to global average data
   LOGICAL:: opt_calibrate_R_0D                                                           ! calibrate runoff fields to global average data
   LOGICAL:: opt_calibrate_P_0D                                                           ! calibrate productivity fields to global average data
@@ -198,18 +206,36 @@ MODULE rokgem_lib
   real::par_n_max_CaCO3                                        ! imposed maximum carbonate weathering enhancement
   real::par_n_max_CaSiO3                                       ! imposed maximum silicate weathering enhancement
   NAMELIST /ini_rokgem_nml/par_n_max_CaCO3,par_n_max_CaSiO3
-  real::par_weather_fCaCO3_enh_n                               ! enhanced weathering scale factor
-  real::par_weather_fCaSiO3_enh_n                              ! enhanced weathering scale factor
-  NAMELIST /ini_rokgem_nml/par_weather_fCaCO3_enh_n,par_weather_fCaSiO3_enh_n
-  real::par_weather_fCaCO3_enh_nt                              ! enhanced weathering total inventory
-  real::par_weather_fCaSiO3_enh_nt                             ! enhanced weathering total inventory
-  NAMELIST /ini_rokgem_nml/par_weather_fCaCO3_enh_nt,par_weather_fCaSiO3_enh_nt
+  real::par_weather_CaCO3_enh_n                               ! enhanced weathering scale factor
+  real::par_weather_CaSiO3_enh_n                              ! enhanced weathering scale factor
+  NAMELIST /ini_rokgem_nml/par_weather_CaCO3_enh_n,par_weather_CaSiO3_enh_n
+  real::par_weather_CaCO3_enh_nt                              ! enhanced weathering total inventory
+  real::par_weather_CaSiO3_enh_nt                             ! enhanced weathering total inventory
+  NAMELIST /ini_rokgem_nml/par_weather_CaCO3_enh_nt,par_weather_CaSiO3_enh_nt
   CHARACTER(len=63)::opt_weather_CaSiO3_fracLi                                           ! Li weathering scheme
   NAMELIST /ini_rokgem_nml/opt_weather_CaSiO3_fracLi
   LOGICAL::ctrl_weather_CaSiO3_7Li_epsilon_fixed                                         ! Fixed (non T-dep) clay fractionation?
   NAMELIST /ini_rokgem_nml/ctrl_weather_CaSiO3_7Li_epsilon_fixed
   REAL::par_weather_CaSiO3_7Li_epsilon_DT                                                ! T-dependent D7Li sensitivity (o/oo K-1)
   NAMELIST /ini_rokgem_nml/par_weather_CaSiO3_7Li_epsilon_DT
+  LOGICAL::opt_weather_fixed_CaCO3                                                       ! fix bulk carbonate weathering
+  LOGICAL::opt_weather_fixed_CaSiO3                                                      ! fix bulk silicate weathering
+  LOGICAL::opt_weather_fixed_Li                                                          ! fix associated Li fluxes
+  LOGICAL::opt_weather_fixed_Sr                                                          ! fix associated Sr fluxes
+  LOGICAL::opt_weather_fixed_Os                                                          ! fix associated Os fluxes
+  LOGICAL::opt_weather_fixed_kerogenC                                                    ! fix associated kerogen C fluxes
+  LOGICAL::opt_weather_fixed_kerogenP                                                    ! fix associated kerogen P fluxes
+  LOGICAL::opt_weather_fixed_kerogenS                                                    ! fix associated kerogen S fluxes
+  LOGICAL::opt_weather_fixed_FeS2                                                        ! fix associated FeS2 fluxes
+  LOGICAL::opt_weather_fixed_CaSO4                                                       ! fix associated CaSO4 fluxes
+  LOGICAL::opt_weather_fixed_FeCO3                                                       ! fix associated FeCO3 fluxes
+  LOGICAL::opt_weather_fixed_Ca5PO43                                                     ! fix associated Ca5PO43 fluxes
+  LOGICAL::opt_weather_fixed_SiO2                                                        ! fix associated SiO2 fluxes
+  NAMELIST /ini_rokgem_nml/opt_weather_fixed_CaCO3,opt_weather_fixed_CaSiO3  
+  NAMELIST /ini_rokgem_nml/opt_weather_fixed_Li,opt_weather_fixed_Sr,opt_weather_fixed_Os  
+  NAMELIST /ini_rokgem_nml/opt_weather_fixed_kerogenC,opt_weather_fixed_kerogenP,opt_weather_fixed_kerogenS
+  NAMELIST /ini_rokgem_nml/opt_weather_fixed_FeS2,opt_weather_fixed_CaSO4,opt_weather_fixed_FeCO3,opt_weather_fixed_Ca5PO43
+  NAMELIST /ini_rokgem_nml/opt_weather_fixed_SiO2
   ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_lith_data 
   CHARACTER(len=63)::par_lith_data2 
@@ -331,11 +357,10 @@ MODULE rokgem_lib
   INTEGER                                        :: ncout2d_iou_rg                                 ! io for netcdf datasets
 
   ! *** global average weathering variables ***
-  REAL                                           :: weather_fCaCO3
-  REAL                                           :: weather_fCaSiO3
-  REAL                                           :: weather_fCaSiO3b
-  REAL                                           :: weather_fCaSiO3g
-
+  REAL                                           :: adj_weather_CaCO3
+  REAL                                           :: adj_weather_CaSiO3
+  REAL                                           :: adj_weather_CaSiO3b
+  REAL                                           :: adj_weather_CaSiO3g
   ! *** landmask and runoff routing arrays ***
   INTEGER                                        :: landmask(n_i,n_j)
   REAL                                           :: runoff_drainage(n_i+2,n_j+2)                   !'+2' comes from fact that *.k1 file is 38x38

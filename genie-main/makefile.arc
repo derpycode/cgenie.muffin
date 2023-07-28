@@ -349,7 +349,7 @@ ifeq ($(F77),gfortran)
     #FFLAGS += -Wextra
     #FFLAGS += -pedantic
     FFLAGS += -fbacktrace
-    #FFLAGS += -fconserve-stack
+    FFLAGS += -fconserve-stack
     FFLAGS += -fstack-check
     #FFLAGS +=  -fno-automatic
     # -Wunused-parameter warns about unused PARAMETER values. This option is implied by -Wextra if also -Wunused or -Wall is used.

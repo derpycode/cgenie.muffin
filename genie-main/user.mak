@@ -91,4 +91,3 @@ NETCDF_DIR=/usr/local
 #NETCDF_DIR=/opt/local
 
 NETCDF_NAME=netcdf
-
