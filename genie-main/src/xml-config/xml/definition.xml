@@ -1885,23 +1885,23 @@
                     </param>
                     <param name="par_orbit_oscsob">
 			<value datatype="real">0.397789</value>
-                        <description>sine of obliquity used when opt_orbit_old=true</description>
+                        <description>sine of obliquity (for opt_orbit_old=true)</description>
                     </param>
                     <param name="par_orbit_oscgam">
 			<value datatype="real">99999</value>
-                        <description>MEAN longitude of perihelion (in deg) used when opt_orbit_old=true</description>
+                         <description>MEAN longitude of perihelion (in degrees)(for opt_orbit_old=true)</description>
                     </param>
                     <param name="par_orbit_osctau0">
 			<value datatype="real">-0.5</value>
-                        <description>date of perihelion from Jan. 1st (in days)</description>
+                         <description>date of perihelion from Jan. 1st (in days) (for opt_orbit_old=true)</description>
                     </param>
-					<param name="par_orbit_oscobl">
+                    <param name="par_orbit_oscobl">
 			<value datatype="real">0.409093</value>
-                        <description>obliquity (in rad) use when opt_orbit_old=false</description>
+                         <description>obliquity (in radians) (for opt_orbit_old=false)</description>
                     </param>	
                     <param name="par_orbit_osclonperi">
 			<value datatype="real">1.796257</value>
-                        <description>TRUE longitude of perihelion (in rad) used when opt_orbit_old=false</description>
+                        <description>TRUE longitude of perihelion (in radians) (for opt_orbit_old=false)</description>
                     </param>	
                     <param name="orbit_radfor">
 			<value datatype="string">n</value>

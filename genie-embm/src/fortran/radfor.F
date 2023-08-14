@@ -4,19 +4,24 @@ c loosely based on Peter Cox's SUNNY.f or see Peixoto and Oort 1992 p.99
 c
 c nyear = no. dt per year
 c osct  = angular time of year (0,..,2pi)
-c osce = eccentricity (input)
-c oscsind = sin of declination (not an input)
+c oscsind = sin of declination 
 c oscday = 0.5 * sunlit (angular) fraction of day, ie 1/2 length of day
 c solfor = solar forcing = scaling factor * integral of cosine of solar 
 c          elevation during daylight
 c
 c ----- if opt_orbit_old=TRUE, use old definitions 
-c    oscsob = sin of obliquity (input)
-c    oscgam = MEAN longitude (after Berger 1978)
-c    osctau0 = date of perihelion from Jan 1st
+c    osce = eccentricity 
+c    oscsob = sin of obliquity 
+c    oscgam = MEAN longitude (after Berger 1978) (in deg)
+c    osctau0 = date of perihelion from Jan 1st (in days)
 c ----- if opt_orbit_old=FALSE, use new definitions 
-c    oscobl = obliquity in radians (input)
-c    osclonperi = TRUE longitude of perihelon in radians (input)
+c    osce = eccentricity 
+c    oscobl = obliquity (in rad)
+c    osclonperi = TRUE longitude of perihelon (in rad)
+c NOTE: the new orbits code contains (1) corrections for osce4 used to
+c       calculate the insolation as a function of ecc; corrections for 
+c      (2) calculation of solar declination, and for (3) applying
+c      consistency between fixed and time-varying orbits
 
       subroutine radfor (iistep,gn_daysperyear,solconst,flag_ents)
 
@@ -87,8 +92,8 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
    
       if (t_orbit.eq.2) then
         osce=orbitecc_vect(1)
-        oscsob=orbitobl_vect(1)
-        oscgam=orbitpre_vect(1)
+        oscsob=orbitsob_vect(1)
+        oscgam=orbitgam_vect(1)
         osctau0=orbittau_vect(1)
         print*,'orbitvars:',iistep
         print*,'orbitosce,oscsob:',osce,oscsob
@@ -102,23 +107,23 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
         if (time_2.le.norbit) then
           osce=(1-time_frac)*orbitecc_vect(time_1)+
      &                time_frac*orbitecc_vect(time_2)
-          oscsob=(1-time_frac)*orbitobl_vect(time_1)+
-     &                time_frac*orbitobl_vect(time_2)
+          oscsob=(1-time_frac)*orbitsob_vect(time_1)+
+     &                time_frac*orbitsob_vect(time_2)
 
-          if (abs(orbitpre_vect(time_1)-
-     &        orbitpre_vect(time_2)).gt.pi) then
+          if (abs(orbitgam_vect(time_1)-
+     &        orbitgam_vect(time_2)).gt.pi) then
 
-            if (orbitpre_vect(time_1).gt.orbitpre_vect(time_2)) then
-              oscgam=mod((1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*(orbitpre_vect(time_2)+2*pi),2*pi)
+            if (orbitgam_vect(time_1).gt.orbitgam_vect(time_2)) then
+              oscgam=mod((1-time_frac)*orbitgam_vect(time_1)+
+     &                time_frac*(orbitgam_vect(time_2)+2*pi),2*pi)
             else
-              oscgam=mod((1-time_frac)*(orbitpre_vect(time_1)+2*pi)+
-     &                time_frac*(orbitpre_vect(time_2)),2*pi)
+              oscgam=mod((1-time_frac)*(orbitgam_vect(time_1)+2*pi)+
+     &                time_frac*(orbitgam_vect(time_2)),2*pi)
             endif
   
           else
-          oscgam=(1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*orbitpre_vect(time_2)
+          oscgam=(1-time_frac)*orbitgam_vect(time_1)+
+     &                time_frac*orbitgam_vect(time_2)
           endif
 
           if (abs(orbittau_vect(time_1)-
@@ -143,8 +148,8 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
         else 
           if (time_frac.ne.0) print*,'Time out of bounds for orbit'
           osce=orbitecc_vect(norbit)
-          oscsob=orbitobl_vect(norbit)
-          oscgam=orbitpre_vect(norbit)
+          oscsob=orbitsob_vect(norbit)
+          oscgam=orbitgam_vect(norbit)
           osctau0=orbittau_vect(norbit)
         endif
 
@@ -224,7 +229,7 @@ c     the mean longitude converted from heliocentric to geocentric perspective
       if (t_orbit.eq.2) then
         osce=orbitecc_vect(1)
         oscobl=orbitobl_vect(1)
-        zw=orbitpre_vect(1)
+        zw=orbitper_vect(1)
         
         print*,'orbitvars:',iistep
         print*,'orbitosce,oscobl:',osce,oscobl
@@ -241,21 +246,21 @@ c     the mean longitude converted from heliocentric to geocentric perspective
           oscobl=(1-time_frac)*orbitobl_vect(time_1)+
      &                time_frac*orbitobl_vect(time_2)
 
-          if (abs(orbitpre_vect(time_1)-
-     &        orbitpre_vect(time_2)).gt.pi) then
+          if (abs(orbitper_vect(time_1)-
+     &        orbitper_vect(time_2)).gt.pi) then
 
-            if (orbitpre_vect(time_1)
-     &          .gt.orbitpre_vect(time_2)) then
-              zw=mod((1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*(orbitpre_vect(time_2)+2*pi),2*pi)
+            if (orbitper_vect(time_1)
+     &          .gt.orbitper_vect(time_2)) then
+              zw=mod((1-time_frac)*orbitper_vect(time_1)+
+     &                time_frac*(orbitper_vect(time_2)+2*pi),2*pi)
             else
-              zw=mod((1-time_frac)*(orbitpre_vect(time_1)+2*pi)+
-     &                time_frac*(orbitpre_vect(time_2)),2*pi)
+              zw=mod((1-time_frac)*(orbitper_vect(time_1)+2*pi)+
+     &                time_frac*(orbitper_vect(time_2)),2*pi)
             endif
   
           else
-          zw=(1-time_frac)*orbitpre_vect(time_1)+
-     &                time_frac*orbitpre_vect(time_2)
+          zw=(1-time_frac)*orbitper_vect(time_1)+
+     &                time_frac*orbitper_vect(time_2)
           endif
 
 
@@ -263,7 +268,7 @@ c     the mean longitude converted from heliocentric to geocentric perspective
           if (time_frac.ne.0) print*,'Time out of bounds for orbit'
           osce=orbitecc_vect(norbit)
           oscobl=orbitobl_vect(norbit)
-          zw=orbitpre_vect(norbit)
+          zw=orbitper_vect(norbit)
         endif
 
       if (mod(iistep-1,10000).eq.0) then
@@ -312,8 +317,7 @@ c SKT terms for solar insolation calculations
       osce1 = osce * (2.0 - 0.25*tv)
       osce2 = 1.25 * tv 
       osce3 = osce*tv * 13./12.
-c PV (05/10/2022) correcton for osce4 for consistency with other codes
-c      old osce4 = ((1.0 + 0.5*tv)/(1.0 - tv))**2 
+c PV (05/10/2022) correction for osce4 
       osce4 = ((1.0)/(1.0 - tv))**2 
       oscryr = 2.0*pi/float(nyear)
 
@@ -366,6 +370,7 @@ c >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 c SEASONALITY 
 
       if (dosc) then
+	  
       else
 c replace variable forcing by its average if seasons are disabled (dosc=false)
       do j=1,jmax
