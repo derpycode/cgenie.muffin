@@ -2176,7 +2176,8 @@ CONTAINS
                       elseif (io == io_Sr_88Sr) then
                          ocn(io,i,j,k) = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,ocn_init(:),2)
                       elseif (io == io_Os_187Os) then
-                         ocn(io,i,j,k) = ocn_init(io)*ocn_init(io_Os_188Os)*(ocn_init(io_Os)/(1.0+ocn_init(io_Os_188Os)+ocn_init(io)*ocn_init(io_Os_188Os)))
+                         ocn(io,i,j,k) = ocn_init(io)*ocn_init(io_Os_188Os)*(ocn_init(io_Os)/ &
+                              & (1.0+ocn_init(io_Os_188Os)+ocn_init(io)*ocn_init(io_Os_188Os)))
                       elseif (io == io_Os_188Os) then
                          ocn(io,i,j,k) = ocn_init(io)*(ocn_init(io_Os)/(1.0+ocn_init(io)+ocn_init(io_Os_187Os)*ocn_init(io)))
                       end if
@@ -2997,7 +2998,7 @@ CONTAINS
                       CALL sub_report_error( &
                            & 'biogem_data','sub_check_par', &
                            & 'Particulate tracer '//TRIM(loc_string2)// &
-                           & ' does does not have *all possible* corresponding ocean tracers selected, such as '//TRIM(loc_string1)// &
+                           & ' does does not have *all possible* corresponding ocean tracers selected, e.g. '//TRIM(loc_string1)// &
                            & ' (BUT may not need them, esp. if involving the Fe sytem ...)', &
                            & 'CONTINUING', &
                            & (/const_real_null/),.false. &
@@ -3056,7 +3057,7 @@ CONTAINS
        if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then
           call sub_report_error( &
                & 'biogem_data','sub_check_par', &
-               & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
+               & 'Diagnosing transport matrix will take longer than the run.', &
                & '[par_data_TM_start] HAS BEEN CHANGED TO ALLOW MATRIX DIAGNOSIS TO FINISH', &
                & (/const_real_null/),.false. &
                & )
@@ -3100,6 +3101,7 @@ CONTAINS
     end if
     
     ! *** redox-requiring schemes ***
+    ! NOTE: also set ctrl_data_save_slice_diag_geochem + ctrl_data_save_sig_diag_geochem to ensure that redox data is saved
     if (.NOT. ctrl_bio_remin_redox_save) THEN
        SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
        case ('reminO2','reminO2lifetime')
@@ -3109,7 +3111,9 @@ CONTAINS
                & '... making this change for you.', &
                & (/const_real_null/),.false. &
                & )
-          ctrl_bio_remin_redox_save = .true.
+          ctrl_bio_remin_redox_save         = .true.
+          ctrl_data_save_slice_diag_geochem = .true.
+          ctrl_data_save_sig_diag_geochem   = .true.
        end select
        SELECT CASE (opt_bio_remin_reduce_IO3toI)
        case ('reminSO4','reminSO4lifetime','thresholdflex')
@@ -3119,7 +3123,9 @@ CONTAINS
                & '... making this change for you.', &
                & (/const_real_null/),.false. &
                & )
-          ctrl_bio_remin_redox_save = .true.
+          ctrl_bio_remin_redox_save         = .true.
+          ctrl_data_save_slice_diag_geochem = .true.
+          ctrl_data_save_sig_diag_geochem   = .true.
        end select
     end if
 
