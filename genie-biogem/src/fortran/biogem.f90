@@ -1356,7 +1356,7 @@ subroutine biogem(        &
                        else
                           ! (3b) atmosphere pCO2-13C
                           ! NOTE: this code has a similar effect of restoring forcing, except that it allows
-                          !       isotopic properties of a target signal to be followed via input/loss of carbon with a prescribed d13C
+                          !       isotopic properties of a target signal followed via input/loss of carbon with a prescribed d13C
                           loc_frac = force_flux_atm(ia_pCO2_13C,i,j)/force_flux_atm(ia_pCO2,i,j)
                           ! calculate the sign of the CO2 input
                           If (loc_delta_target > loc_delta_actual) then
@@ -3501,11 +3501,11 @@ SUBROUTINE diag_biogem_timeslice( &
            int_diag_iron_timeslice(:,:,:,:)        = int_diag_iron_timeslice(:,:,:,:)        + loc_dtyr*diag_iron(:,:,:,:)
            ! gemlite
            if (dum_gemlite) then
-              int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + loc_dtyr*dum_sfxsumrok1(:,:,:)
+              int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + loc_dtyr*dum_sfxsumrok1(:,:,:)
            else
-              int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:)   + dum_sfxsumrok1(:,:,:)
+              int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + dum_sfxsumrok1(:,:,:)
            end if
-           int_diag_airsea_timeslice(:,:,:)    = int_diag_airsea_timeslice(:,:,:)    + diag_airsea(:,:,:)
+           int_diag_airsea_timeslice(:,:,:)    = int_diag_airsea_timeslice(:,:,:)     + loc_dtyr*diag_airsea(:,:,:)
            ! eceogem
            if (flag_ecogem) then
               int_diag_ecogem_part(:,:,:)  = int_diag_ecogem_part(:,:,:)  + loc_dtyr*diag_ecogem_part(:,:,:)
