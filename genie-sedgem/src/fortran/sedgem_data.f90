@@ -1307,12 +1307,18 @@ CONTAINS
     ENDIF
     ! calculate local d13C
     ! NOTE: pass -999.999 rather than NaN values to fun_calc_isotope_delta and hence prevent overflow when writing out ASCII
-    loc_ocn_DIC_d13C        = fun_calc_isotope_delta(dum_ocn(io_DIC),dum_ocn(io_DIC_13C),const_standards(11),.FALSE.,const_nulliso)
-    loc_sed_CaCO3_d13C      = fun_calc_isotope_delta(loc_sed(is_CaCO3),loc_sed(is_CaCO3_13C),const_standards(11),.FALSE.,const_nulliso)
-    loc_sed_fsed_POC_d13C   = fun_calc_isotope_delta(dum_sed_fsed(is_POC),dum_sed_fsed(is_POC_13C),const_standards(11),.FALSE.,const_nulliso)
-    loc_sed_fsed_CaCO3_d13C = fun_calc_isotope_delta(dum_sed_fsed(is_CaCO3),dum_sed_fsed(is_CaCO3_13C),const_standards(11),.FALSE.,const_nulliso)
-    loc_sed_fdis_POC_d13C   = fun_calc_isotope_delta(dum_sed_fdis(is_POC),dum_sed_fdis(is_POC_13C),const_standards(11),.FALSE.,const_nulliso)
-    loc_sed_fdis_CaCO3_d13C = fun_calc_isotope_delta(dum_sed_fdis(is_CaCO3),dum_sed_fdis(is_CaCO3_13C),const_standards(11),.FALSE.,const_nulliso)
+    loc_ocn_DIC_d13C        = &
+         & fun_calc_isotope_delta(dum_ocn(io_DIC),dum_ocn(io_DIC_13C),const_standards(11),.FALSE.,const_nulliso)
+    loc_sed_CaCO3_d13C      = &
+         & fun_calc_isotope_delta(loc_sed(is_CaCO3),loc_sed(is_CaCO3_13C),const_standards(11),.FALSE.,const_nulliso)
+    loc_sed_fsed_POC_d13C   = &
+         & fun_calc_isotope_delta(dum_sed_fsed(is_POC),dum_sed_fsed(is_POC_13C),const_standards(11),.FALSE.,const_nulliso)
+    loc_sed_fsed_CaCO3_d13C = &
+         & fun_calc_isotope_delta(dum_sed_fsed(is_CaCO3),dum_sed_fsed(is_CaCO3_13C),const_standards(11),.FALSE.,const_nulliso)
+    loc_sed_fdis_POC_d13C   = &
+         & fun_calc_isotope_delta(dum_sed_fdis(is_POC),dum_sed_fdis(is_POC_13C),const_standards(11),.FALSE.,const_nulliso)
+    loc_sed_fdis_CaCO3_d13C = &
+         & fun_calc_isotope_delta(dum_sed_fdis(is_CaCO3),dum_sed_fdis(is_CaCO3_13C),const_standards(11),.FALSE.,const_nulliso)
     ! re-open file and write (append) data
     loc_filename = TRIM(par_outdir_name)//'sedcoreenv_'// &
          & fun_conv_num_char_n(2,dum_i)//fun_conv_num_char_n(2,dum_j)// &
