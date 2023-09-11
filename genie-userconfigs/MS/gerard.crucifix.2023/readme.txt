@@ -2,7 +2,7 @@
 ### readme.txt #################################################
 ################################################################
 
-For: 'Diagnosing the MS/gerard.crucifix.2023 slowdown in a coupled model: a cautionary tale'
+For: 'Diagnosing the AMOC slowdown in a coupled model: a cautionary tale'
 
 Justin GERARD1, Michel CRUCIFIX1
 
