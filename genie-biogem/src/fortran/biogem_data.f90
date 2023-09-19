@@ -201,6 +201,7 @@ CONTAINS
        print*,'Ridgwell [2001] -- opal:POC KSp for FeT (mol kg-1)  : ',par_part_red_opal_FeTKSp
        print*,'Ridgwell [2001] -- opal:POC offset, FeT (mol kg-1)  : ',par_part_red_opal_FeToff
        print*,'opal:POC rain ratio option ID string                : ',opt_bio_red_SitoC
+       print*,'target potential global mean CaCO3:POC rain ratio   : ',par_bio_POC_CaCO3_target
        ! --- REMINERALIZATION ---------------------------------------------------------------------------------------------------- !
        print*,'--- REMINERALIZATION -------------------------------'
        print*,'Fraction of POM remin concverted to RDOM            : ',par_bio_remin_RDOMfrac
@@ -1837,6 +1838,7 @@ CONTAINS
     int_diag_redox_sig(:)   = 0.0
     int_diag_ecogem_part    = 0.0
     int_diag_ecogem_remin   = 0.0
+    int_diag_bio_red_POC_CaCO3  = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !

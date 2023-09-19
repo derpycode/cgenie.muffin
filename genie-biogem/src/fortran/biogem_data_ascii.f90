@@ -842,6 +842,19 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
     end if
+    ! rain ratio export diagnostics
+    IF (ctrl_data_save_sig_diag_bio .AND. ctrl_data_save_sig_fexport .AND. (par_bio_POC_CaCO3_target>const_real_nullsmall)) THEN
+       loc_filename=fun_data_timeseries_filename(loc_t, &
+            & par_outdir_name,trim(par_outfile_name)//'_series','diag_bio_red_POC_CaCO3',string_results_ext)
+       loc_string = '% time (yr) / (potential, not actual) global mean (area-weighted) CaCO3:POC rain ratio'
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+    end if
     ! diagnostics
     IF (ctrl_data_save_sig_diag_bio .AND. ctrl_data_save_sig_fexport) THEN
        DO ib=1,n_diag_bio
@@ -2630,6 +2643,21 @@ CONTAINS
              call check_iostat(ios,__LINE__,__FILE__)
           end if
        end if
+    end if
+    ! rain ratio export diagnostics
+    IF (ctrl_data_save_sig_diag_bio .AND. ctrl_data_save_sig_fexport .AND. (par_bio_POC_CaCO3_target>const_real_nullsmall) ) THEN
+       loc_filename=fun_data_timeseries_filename(loc_t, &
+            & par_outdir_name,trim(par_outfile_name)//'_series','diag_bio_red_POC_CaCO3',string_results_ext)
+       loc_sig = int_diag_bio_red_POC_CaCO3/int_t_sig
+       call check_unit(out,__LINE__,__FILE__)
+       OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
+       WRITE(unit=out,fmt='(f12.3,f12.7)',iostat=ios) &
+            & loc_t,                                   &
+            & loc_sig
+       call check_iostat(ios,__LINE__,__FILE__)
+       CLOSE(unit=out,iostat=ios)
+       call check_iostat(ios,__LINE__,__FILE__)
     end if
     ! diagnostic diagnostics
     IF (ctrl_data_save_sig_diag_bio .AND. ctrl_data_save_sig_fexport) THEN
