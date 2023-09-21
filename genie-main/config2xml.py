@@ -273,7 +273,11 @@ sed_select = {
     "gm_sed_select_104" : ["104",""],
     "gm_sed_select_105" : ["105",""],
     "gm_sed_select_106" : ["106",""],
-    "gm_sed_select_107" : ["107",""]
+    "gm_sed_select_107" : ["107",""],
+    "gm_sed_select_108" : ["108",""],
+    "gm_sed_select_109" : ["109",""],
+    "gm_sed_select_110" : ["110",""],
+    "gm_sed_select_111" : ["111",""]
     }
 # atchem
 atm_init = {
