@@ -29,11 +29,10 @@ Same predator-prey size ratio: 10/1
 
 Reference of 0D model test: Grigoratou et al. (2019) Biogeoscience; Grigoratou et al. (2022) Marine Micropaleotonlogy;
 
-Tested alternative cost: respiration
+respiration is incorporated because the mismatch of model-data biogeography; This should be
 
 ### Symbiosis
 - Independent symbiont size: 1% foraminifera shell size
-- Slight stronger photosynthesis efficiency for symbiont-obligate species (Takagi et al. 2019, Fig. 11)
 - Low autotrophy efficiency: Great amount of excessive carbon from symbionts (theoretical growth rate = 0.89 d-1, >> ~0.2 d-1 in observation) 
 - Low heterotrophy efficiency: mixotrophy modelling convention (Ward and Follows. 2016 PNAS)
 
