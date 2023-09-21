@@ -110,7 +110,6 @@ SUBROUTINE rest_rokgem()
   WRITE(20,fmt='(i6)') ncout2d_ntrec_rg                             
   close(20)
 
-
   !        Conditionals commented out because no calibration is done for stage 1 spin-up 
   ! and files are needed to be written for stage 2.
   !        IF (opt_calibrate_T_2D) THEN

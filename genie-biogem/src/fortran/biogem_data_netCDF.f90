@@ -35,9 +35,9 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_lonm,loc_id_latm,loc_id_lon_e,loc_id_lat_e
     integer::loc_id_zt,loc_id_zt_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
-    integer,dimension(1:4)::loc_it_3
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
+    integer,dimension(1:3)::loc_it_3
     character(127)::loc_title,loc_timunit
     character(7)::loc_string_year
     real::loc_c0,loc_c1
@@ -208,70 +208,70 @@ CONTAINS
     !       define 1d data (t)
     !-----------------------------------------------------------------------
     loc_it(1) = loc_id_time
-    call sub_defvar ('time', dum_iou, 1, loc_it, loc_c0, loc_c0, 'T', 'D' &
+    call sub_defvar ('time', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'T', 'D' &
          &, 'Year', 'time', trim(loc_timunit))
-    call sub_defvar ('year', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'F','year', ' ',' ')
+    call sub_defvar ('year', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'F','year', ' ',' ')
     !-----------------------------------------------------------------------
     !       define 1d data (x, y or z)
     !-----------------------------------------------------------------------
     loc_it(1) = loc_id_lonm
-    call sub_defvar ('lon', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+    call sub_defvar ('lon', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
          &'longitude of the t grid', 'longitude', 'degrees_east')
     loc_it(1) = loc_id_latm
-    call sub_defvar ('lat', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+    call sub_defvar ('lat', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
          &'latitude of the t grid', 'latitude', 'degrees_north')
     loc_it(1) = loc_id_zt
-    call sub_defvar ('zt', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+    call sub_defvar ('zt', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
          &'z-level mid depth', 'depth', 'm')
     loc_it(1) = loc_id_xu
-    call sub_defvar ('xu', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+    call sub_defvar ('xu', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
          &'longitude of the u grid', 'longitude', 'degrees_east')
     loc_it(1) = loc_id_yu
-    call sub_defvar ('yu', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+    call sub_defvar ('yu', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
          &'latitude of the u grid', 'latitude', 'degrees_north')
     loc_it(1) = loc_id_lon_e
-    call sub_defvar ('lon_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('lon_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'longitude of t grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_lat_e
-    call sub_defvar ('lat_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('lat_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'latitude of t grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_zt_e
-    call sub_defvar ('zt_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('zt_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'depth of t grid edges', ' ', 'm')
     loc_it(1) = loc_id_xu_e
-    call sub_defvar ('xu_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('xu_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'longitude of u grid edges', ' ', 'degrees')
     loc_it(1) = loc_id_yu_e
-    call sub_defvar ('yu_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, ' ', 'D' , &
+    call sub_defvar ('yu_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, ' ', 'D' , &
          &'latitude of u grid edges', ' ', 'degrees')
     SELECT CASE (dum_dd)
     CASE (2)
        ! MOC
        loc_it(1) = loc_id_latp
-       call sub_defvar ('lat_moc', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_moc', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of moc grid', 'latitude', 'degrees_north')
        loc_it(1) = loc_id_ztp
-       call sub_defvar ('zt_moc', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+       call sub_defvar ('zt_moc', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
             &'depth of moc grid', 'depth', 'm')
        call sub_putatttext ('zt_moc', dum_iou, 'positive', 'down')
        loc_it(1) = loc_id_latp_e
-       call sub_defvar ('lat_moc_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_moc_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of moc grid edges', 'latitude', 'degrees_north')
        loc_it(1) = loc_id_ztp_e
-       call sub_defvar ('zt_moc_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Z', 'D' , &
+       call sub_defvar ('zt_moc_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Z', 'D' , &
             &'depth of moc grid edges', 'depth', 'm')
        ! PSI
        loc_it(1) = loc_id_lonps
-       call sub_defvar ('lon_psi', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+       call sub_defvar ('lon_psi', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
             &'longitude of psi grid', 'longitude', 'degrees_east')
        loc_it(1) = loc_id_latps
-       call sub_defvar ('lat_psi', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_psi', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of psi grid', 'latitude', 'degrees_north')
        loc_it(1) = loc_id_lonps_e
-       call sub_defvar ('lon_psi_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'X', 'D' , &
+       call sub_defvar ('lon_psi_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'X', 'D' , &
             &'longitude of psi grid edges', 'longitude', 'degrees_east')
        loc_it(1) = loc_id_latps_e
-       call sub_defvar ('lat_psi_edges', dum_iou, 1, loc_it, loc_c0, loc_c0, 'Y', 'D' , &
+       call sub_defvar ('lat_psi_edges', dum_iou, 1, loc_it(1), loc_c0, loc_c0, 'Y', 'D' , &
             &'latitude of psi grid edges', 'latitude', 'degrees_north')
     end select
     !-----------------------------------------------------------------------
@@ -281,13 +281,13 @@ CONTAINS
     CASE (2)
        loc_it(1) = loc_id_lonm
        loc_it(2) = loc_id_latm
-       call sub_defvar('grid_level',dum_iou,2,loc_it,loc_c0,100.0,' ','I', &
+       call sub_defvar('grid_level',dum_iou,2,loc_it(1:2),loc_c0,100.0,' ','I', &
             & 'grid definition','model_level_number','n/a')
-       call sub_defvar ('grid_mask', dum_iou, 2, loc_it, loc_c0, 100.0, ' ', 'F', &
+       call sub_defvar ('grid_mask', dum_iou, 2, loc_it(1:2), loc_c0, 100.0, ' ', 'F', &
             &'land-sea mask', ' ' ,'n/a')
-       call sub_defvar ('grid_topo', dum_iou, 2, loc_it, loc_c0, 100000., ' ', 'F', &
+       call sub_defvar ('grid_topo', dum_iou, 2, loc_it(1:2), loc_c0, 100000., ' ', 'F', &
             &'ocean depth ', ' ' ,'m')
-       call sub_defvar ('grid_area', dum_iou, 2, loc_it, loc_c0, 0.5099044E+15, ' ', 'F', &
+       call sub_defvar ('grid_area', dum_iou, 2, loc_it(1:2), loc_c0, 0.5099044E+15, ' ', 'F', &
             &'grid area ', ' ' ,'m2')
     end select
     SELECT CASE (dum_dd)
@@ -295,15 +295,15 @@ CONTAINS
        loc_it(1) = loc_id_lonm
        loc_it(2) = loc_id_latm
        loc_it(3) = loc_id_zt
-       call sub_defvar('grid_level',dum_iou,2,loc_it,loc_c0,100.0,' ','I', &
+       call sub_defvar('grid_level',dum_iou,2,loc_it(1:2),loc_c0,100.0,' ','I', &
             & 'grid definition','model_level_number','n/a')
-       call sub_defvar ('grid_mask', dum_iou, 2, loc_it, loc_c0, 100.0, ' ', 'F', &
+       call sub_defvar ('grid_mask', dum_iou, 2, loc_it(1:2), loc_c0, 100.0, ' ', 'F', &
             &'land-sea mask', ' ' ,'n/a')
-       call sub_defvar ('grid_topo', dum_iou, 2, loc_it, loc_c0, 100000., ' ', 'F', &
+       call sub_defvar ('grid_topo', dum_iou, 2, loc_it(1:2), loc_c0, 100000., ' ', 'F', &
             &'ocean depth ', ' ' ,'m')
-       call sub_defvar ('grid_area', dum_iou, 2, loc_it, loc_c0, 0.5099044E+15, ' ', 'F', &
+       call sub_defvar ('grid_area', dum_iou, 2, loc_it(1:2), loc_c0, 0.5099044E+15, ' ', 'F', &
             &'grid area ', ' ' ,'m2')
-       call sub_defvar('grid_mask_3d',dum_iou,3,loc_it,loc_c0, 1.,' ','F', &
+       call sub_defvar('grid_mask_3d',dum_iou,3,loc_it(1:3),loc_c0, 1.,' ','F', &
             & 'ocean mask',' ','n/a')
     end select
     !-----------------------------------------------------------------------
@@ -954,8 +954,8 @@ CONTAINS
        DO i=1,n_i
           DO j=1,n_j
              DO k=goldstein_k1(i,j),n_k
-                loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k),ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)
-
+                loc_ijk(i,j,k) = fun_calc_isotope_deltaR(ocn(io_Sr,i,j,k)-ocn(io_Sr_87Sr,i,j,k)-ocn(io_Sr_88Sr,i,j,k), &
+                     & ocn(io_Sr_88Sr,i,j,k),const_standardsR(ocn_type(io_Sr_88Sr)),const_real_null)
              END DO
           END DO
        END DO
@@ -1869,18 +1869,26 @@ CONTAINS
             & trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('misc_sur_fpartFe',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        ! total scavenged Fe loss
-       ! NOTE: new calculation of loc_ij(:,:)
        loc_unitsname = 'umol Fe m-2 yr-1'
        loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
             & ( &
-            &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k)   + &
-            &   int_bio_settle_timeslice(is_CaCO3_Fe,:,:,n_k) + &
-            &   int_bio_settle_timeslice(is_opal_Fe,:,:,n_k) + &
-            &   int_bio_settle_timeslice(is_det_Fe,:,:,n_k) &
+            &   int_bio_settle_timeslice(is_POM_Fe,:,:,n_k) &
             & )
-       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged iron loss from surface', &
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFetot','Total scavenged Fe loss from surface', &
             & trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('misc_sur_fscavFetot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! total scavenged FeOOH loss
+       loc_unitsname = 'umol Fe m-2 yr-1'
+       loc_ij(:,:) = (conv_mol_umol*int_phys_ocn_timeslice(ipo_rA,:,:,n_k)/(int_t_timeslice**2))* &
+            & ( &
+            &   int_bio_settle_timeslice(is_POM_FeOOH,:,:,n_k)   + &
+            &   int_bio_settle_timeslice(is_CaCO3_FeOOH,:,:,n_k) + &
+            &   int_bio_settle_timeslice(is_opal_FeOOH,:,:,n_k)  + &
+            &   int_bio_settle_timeslice(is_det_FeOOH,:,:,n_k)     &
+            & )
+       call sub_adddef_netcdf(loc_iou,3,'misc_sur_fscavFeOOHtot','Total scavenged FeOOH loss from surface', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('misc_sur_fscavFeOOHtot',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        ! solubility (%)
        ! NOTE: new calculation of loc_ij(:,:)
        loc_unitsname = '%'
@@ -2162,6 +2170,44 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,3,'proxy_ben_LA1', &
             & 'bottom-water Schmittner d13C (LA1)',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('proxy_ben_LA1',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+    end if
+    If ( ctrl_data_save_slice_diag_proxy .AND. ocn_select(io_IO3) ) then
+       ! I/Ca proxy model
+       ! NOTE: from 'I/Ca evidence for upper ocean deoxygenation during the PETM' [Zhou te al., 2014]; 10.1002/2014PA002702!
+       ! KD is calculated as [I/Ca]/[IO3-], with I/Ca == umol/mol and [IO3] == umol l-1
+       ! KD = -0.16T + 13.65 where T is in oC
+       ! => converting to mol/mol and umol kg-1:
+       ! I/Ca = (1.0E-3*conv_m3_kg)*[IO3-] * KD
+       ! (1) surface ocean I/Ca
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'mol/mol'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_ij(i,j) =(1.0E-3*conv_m3_kg)*int_ocn_timeslice(io_IO3,i,j,n_k)/int_t_timeslice * &
+                     & 1.0E6*(-0.16*(int_ocn_timeslice(io_T,i,j,n_k)/int_t_timeslice - const_zeroC) + 13.65)                
+             END if
+          END DO
+       END DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_sur_ICa','ocean surface I/Ca', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_sur_ICa',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+       ! (2) benthic I/Ca
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'mol/mol'
+       DO i=1,n_i
+          DO j=1,n_j
+             loc_k1 = goldstein_k1(i,j)
+             IF (n_k >= loc_k1) THEN
+                loc_ij(i,j) =(1.0E-3*conv_m3_kg)*int_ocn_timeslice(io_IO3,i,j,loc_k1)/int_t_timeslice * &
+                     & 1.0E6*(-0.16*(int_ocn_timeslice(io_T,i,j,loc_k1)/int_t_timeslice - const_zeroC) + 13.65) 
+             END if
+          END DO
+       END DO
+       call sub_adddef_netcdf(loc_iou,3,'proxy_ben_ICa','bottom-water I/Ca', &
+            & trim(loc_unitsname),const_real_zero,const_real_zero)
+       call sub_putvar2d('proxy_ben_ICa',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
     end if
     ! ### INSERT CODE TO SAVE ADDITIONAL 2-D DATA FIELDS ######################################################################### !
     !
@@ -2706,7 +2752,7 @@ CONTAINS
        end if
     end if
     !----------------------------------------------------------------
-    !       PARTICULATE FLUXES
+    ! PARTICULATE FLUXES -- surface
     !----------------------------------------------------------------
     If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
        DO l=1,n_l_sed
@@ -2741,9 +2787,78 @@ CONTAINS
                & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
                & par_sed_type_scavenged,n_itype_min:n_itype_max, &
                & par_sed_type_frac)
-             call sub_adddef_netcdf(loc_iou,3,'bio_export_'//trim(string_sed(is)), &
-                  & 'biological export - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
-             call sub_putvar2d('bio_export_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+             call sub_adddef_netcdf(loc_iou,3,'bio_fdexport_'//trim(string_sed(is)), &
+                  & 'particulate biological export (flux density) - '//trim(string_sed(is)), &
+                  & loc_unitsname,const_real_zero,const_real_zero)
+             call sub_putvar2d('bio_fdexport_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
+          !---------------------------------------------------------- flux
+          ! simply multiply bulk (flux density) array by area again
+          SELECT CASE (sed_type(is))
+          CASE (par_sed_type_bio,par_sed_type_abio, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_scavenged)
+             loc_ij(:,:) = phys_ocn(ipo_A,:,:,n_k)*loc_ij(:,:)
+             loc_unitsname = 'mol yr-1'
+             call sub_adddef_netcdf(loc_iou,3,'bio_fexport_'//trim(string_sed(is)), &
+                  & 'particulate biological export (flux) - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
+             call sub_putvar2d('bio_fexport_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
+       end do
+    end if
+    !----------------------------------------------------------------
+    ! PARTICULATE FLUXES -- benthic
+    !----------------------------------------------------------------
+    If (ctrl_data_save_slice_sur .OR. ctrl_data_save_slice_bio) then
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          loc_ij(:,:) = const_real_zero
+          !---------------------------------------------------------- flux density
+          DO i=1,n_i
+             DO j=1,n_j
+                loc_k1 = goldstein_k1(i,j)
+                IF (n_k >= loc_k1) THEN
+                   SELECT CASE (sed_type(is))
+                   CASE (par_sed_type_bio,par_sed_type_abio, &
+                        & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+                        & par_sed_type_scavenged)
+                      loc_ij(i,j) = int_bio_settle_timeslice(is,i,j,loc_k1)*phys_ocn(ipo_rA,i,j,loc_k1)/int_t_timeslice
+                      loc_unitsname = 'mol m-2 yr-1'
+                   case (n_itype_min:n_itype_max)
+                      loc_tot  = int_bio_settle_timeslice(sed_dep(is),i,j,loc_k1)*phys_ocn(ipo_rA,i,j,loc_k1)/int_t_timeslice
+                      loc_frac = int_bio_settle_timeslice(is,i,j,loc_k1)*phys_ocn(ipo_rA,i,j,loc_k1)/int_t_timeslice
+                      loc_standard = const_standards(sed_type(is))
+                      loc_ij(i,j) = fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null)
+                      loc_unitsname = 'o/oo'
+                   CASE (par_sed_type_frac)
+                      loc_ij(i,j) = int_bio_settle_timeslice(is,i,j,loc_k1)
+                      loc_unitsname = 'n/a'
+                   end SELECT
+                end if
+             end do
+          end do
+          SELECT CASE (sed_type(is))
+          CASE (par_sed_type_bio,par_sed_type_abio, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_scavenged,n_itype_min:n_itype_max, &
+               & par_sed_type_frac)
+             call sub_adddef_netcdf(loc_iou,3,'biosed_fdrain_'//trim(string_sed(is)), &
+                  & 'particulate sediment rain (flux density) - '//trim(string_sed(is)), &
+                  & loc_unitsname,const_real_zero,const_real_zero)
+             call sub_putvar2d('biosed_fdrain_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
+          end SELECT
+          !---------------------------------------------------------- flux
+          ! simply multiply bulk (flux density) array by area again
+          ! NOTE: being lazy ... simply multiplying by surface area ...
+          SELECT CASE (sed_type(is))
+          CASE (par_sed_type_bio,par_sed_type_abio, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_scavenged)
+             loc_ij(:,:) = phys_ocn(ipo_A,:,:,n_k)*loc_ij(:,:)
+             loc_unitsname = 'mol yr-1'
+             call sub_adddef_netcdf(loc_iou,3,'biosed_frain_'//trim(string_sed(is)), &
+                  & 'particulate sediment rain (flux) - '//trim(string_sed(is)),loc_unitsname,const_real_zero,const_real_zero)
+             call sub_putvar2d('biosed_frain_'//trim(string_sed(is)),loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
           end SELECT
        end do
     end if
@@ -3413,7 +3528,8 @@ CONTAINS
     !       PARTICULATE CONCENTRATION FIELD
     !----------------------------------------------------------------
     loc_sed_mask = loc_mask
-    If (ctrl_data_save_slice_bio .AND. ctrl_data_save_derived) then
+    ! If (ctrl_data_save_slice_bio .AND. ctrl_data_save_derived) then
+    If (ctrl_data_save_slice_bio ) then
        DO l=1,n_l_sed
           is = conv_iselected_is(l)
           loc_ijk(:,:,:) = const_real_zero

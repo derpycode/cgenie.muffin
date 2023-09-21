@@ -306,7 +306,8 @@ c AR : radiative forcing by CH4 and N2O
       real alphach4,alphan2o
       common /embm_greenhouse/alphach4,alphan2o
       logical opt_delf2x_cesm
-      common /embm_greenhouse/opt_delf2x_cesm
+      logical opt_co2ch4radfor
+      common /embm_greenhouse/opt_delf2x_cesm,opt_co2ch4radfor
 
 c orography
       real lapse_rate
