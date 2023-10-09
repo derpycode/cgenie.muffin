@@ -84,29 +84,29 @@ muffin.CB.umQ04p5b.BASES (Pliocene close)
 
 ``` sh
 ## Pliocene open, 400 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5a.BASES FORAMECOGEM 20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5a.BASES FORAMECOGEM muffin.CBE.umQ04p5a.BASES.CASopen.400_0p5.SPIN 10000
 
 ## Modern CAS closed, 280 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ00p0a.BASES FORAMECOGEM 20220104.CB.umQ00p0a.BASES.CASclosed.280_0p2.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ00p0a.BASES FORAMECOGEM muffin.CBE.umQ00p0a.BASES.CASclosed.280_0p2.SPIN 10000
 
 ## Pliocene closed, 400 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES FORAMECOGEM 20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES FORAMECOGEM muffin.CBE.umQ04p5b.BASES.CASclosed.400_0p2.SPIN 10000
 
 ## Pliocene closed, 280 ppm
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES FORAMECOGEM 20220104.CB.umQ04p5b.BASES.CASclosed.280_0p2.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CB.umQ04p5b.BASES FORAMECOGEM muffin.CBE.umQ04p5b.BASES.CASclosed.280_0p2.SPIN 10000
 ```
 
 
 > Full effect:4.5 Ma (open,   400 ppm) - 0 Ma (closed, 280 ppm)
-20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.SPIN
-20220104.CB.umQ00p0a.BASES.CASclosed.280_0p2.SPIN
+muffin.CBE.umQ04p5a.BASES.CASopen.400_0p5.SPIN
+muffin.CBE.umQ00p0a.BASES.CASclosed.280_0p2.SPIN
 
 > CO2 effect: 4.5 Ma (closed, 400 ppm) - 4.5 Ma (closed, 280 ppm)
-20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.SPIN
-20220104.CB.umQ04p5b.BASES.CASclosed.280_0p2.SPIN
+muffin.CBE.umQ04p5b.BASES.CASclosed.400_0p2.SPIN
+muffin.CBE.umQ04p5b.BASES.CASclosed.280_0p2.SPIN
 
 > CAS effect: 4.5 Ma (open,   400 ppm) - 4.5 Ma (closed, 400 ppm)
-20220104.CB.umQ04p5a.BASES.CASopen.400_0p5.SPIN
-20220104.CB.umQ04p5b.BASES.CASclosed.400_0p2.SPIN
+muffin.CBE.umQ04p5a.BASES.CASopen.400_0p5.SPIN
+muffin.CBE.umQ04p5b.BASES.CASclosed.400_0p2.SPIN
 
 ## K-Pg
