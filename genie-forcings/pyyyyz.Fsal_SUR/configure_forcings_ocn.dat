@@ -3,7 +3,7 @@
   \/ \/ \/ \/   \/ \/ \/  \/  \/  \/
 
 -START-OF-DATA-
-  2  f  f  0.1  t  t   2  01  01  01  '[salinity (PSU)]'
+  2  f  f  0.1  t  t   -1  01  01  01  '[salinity (PSU)]'
 -END-OF-DATA-
 
   /\ /\ /\ /\   /\ /\ /\  /\  /\  /\

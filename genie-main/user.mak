@@ -91,4 +91,3 @@ NETCDF_DIR=/share/apps/netcdf
 #NETCDF_DIR=/opt/local
 
 NETCDF_NAME=netcdf
-
