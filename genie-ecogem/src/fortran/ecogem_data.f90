@@ -1182,7 +1182,10 @@ CONTAINS
     end if
     if (eco_uptake_fluxes) then
       int_AP_timeslice(:,:,:,:,:)   = 0.0  
-      int_HP_timeslice(:,:,:,:,:)   = 0.0  
+      int_HP_timeslice(:,:,:,:,:)   = 0.0
+      int_pmort_timeslice(:,:,:,:)   = 0.0
+      int_peaten_timeslice(:,:,:,:)   = 0.0
+      int_prespir_timeslice(:,:,:,:)   = 0.0
     end if
 
     ! ### ADD ADDITIONAL TIME-SLICE ARRAY INITIALIZATIONS HERE ################################################################### !
