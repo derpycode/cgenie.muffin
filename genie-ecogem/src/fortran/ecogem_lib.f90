@@ -278,6 +278,9 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::export_flux   ! surface export flux for each plankton (iomax,npmax,i,j,k)    Fanny/Maria - Aug19
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::AP_flux   ! surface autotrophic flux for each plankton (iomax,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::HP_flux   ! surface heterotrophic flux for each plankton (iomax,npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:):: plankton_respir   ! respiration carbon flux for each plankton (npmax,i,j,k), RY, Oct 2023
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:):: plankton_mort   ! mortality carbon flux for each plankton (npmax,i,j,k), RY, Oct 2023
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:):: plankton_eaten   !grazed carbon flux for each plankton (npmax,i,j,k), RY, Oct 2023
   !ckc isotope uptake flux array, to trace full food web interaction
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::up_flux_iso   !ckc rate of upstake isotopes (iimaxiso,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carb      ! carbonate chemistry variables
@@ -376,6 +379,9 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_export_timeslice   ! Surface export flux for each plankton (iomax,npmax,i,j,k)  Fanny/Maria - Aug19
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_AP_timeslice   ! Surface autotrophic uptake flux for each plankton (iomax,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_HP_timeslice   ! Surface heterotrophic uptake flux for each plankton (iomax,npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:) ::int_peaten_timeslice   ! Surface grazed (carbon) flux for each plankton (npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:) ::int_pmort_timeslice   ! Surface mortality (carbon) flux for each plankton (npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:) ::int_prespir_timeslice   ! Surface respiration (carbon) flux for each plankton (npmax,i,j,k)
 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
 

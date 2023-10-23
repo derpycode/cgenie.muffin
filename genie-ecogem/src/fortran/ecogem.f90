@@ -84,8 +84,8 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax,npmax)              ::AP_uptake ! Auto uptake for each plankton 
   REAL,DIMENSION(iomax,npmax)              ::HP_uptake ! Auto uptake for each plankton 
   !REAL,DIMENSION(npmax)                    ::diameter     !ckc for size dependent fractionation
-
   REAL,DIMENSION(npmax)                    ::mortality,respiration
+  REAL,DIMENSION(npmax)                    ::mort_loss, respir_loss, eaten_loss ! real-time carbon biomass loss
   REAL,DIMENSION(npmax)                    ::beta_mort_1,beta_graz_1
   REAL,DIMENSION(iomax+iChl,npmax)         ::assimilated,unassimilated
   REAL,DIMENSION(npmax)                    ::BioC,PP
@@ -452,6 +452,9 @@ subroutine ecogem(          &
                     do io=1,iomax
                        AP_uptake(io,:) = dbiomassdt(io,:)      
                        HP_uptake(io,:) = GrazPredEat(io,:) * assimilated(io,:)
+                       mort_loss(:) = mortality(:) * loc_biomass(io,:)
+                       respire_loss(:) = respiration(:) * loc_biomass(io,:)
+                       eaten_loss(:)= GrazPreyEaten(iCarb, :)
                     enddo
                  endif
                     
@@ -621,6 +624,10 @@ subroutine ecogem(          &
                     if (eco_uptake_fluxes) then
                       AP_flux(io,:,i,j,k) = AP_uptake(io,:) ! mmol/m^3/s
                       HP_flux(io,:,i,j,k) = HP_uptake(io,:) ! mmol/m^3/s
+                      ! save the global biomass loss fluxes
+                      plankton_mort(:,i,j,k) = mort_loss(:)
+                      plankton_eaten(:,i,j,k) = eaten_loss(:)
+                      plankton_respir(:,i,j,k) = respir_loss(:)
                     end if
                  enddo
 
@@ -886,7 +893,7 @@ SUBROUTINE diag_ecogem_timeslice( &
      end if
      if (eco_uptake_fluxes) then
        int_AP_timeslice(:,:,:,:,:) =   int_AP_timeslice(:,:,:,:,:) + loc_dtyr * AP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  autotrophic flux in each plankton
-       int_HP_timeslice(:,:,:,:,:) =   int_HP_timeslice(:,:,:,:,:) + loc_dtyr * HP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  heterotrophic flux in each plankton
+       int_HP_timeslice(:,:,:,:,:) =   int_HP_timeslice(:,:,:,:,:) + loc_dtyr * HP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  heterotrophic flux in each plankton       
      end if
   end if
 
