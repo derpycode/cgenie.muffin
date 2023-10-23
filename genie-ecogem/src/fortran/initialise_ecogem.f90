@@ -157,6 +157,12 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(plankton_respir(npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_pmort_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_prespir_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_peaten_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
 
   ! ecogem time-slice arrays
   ALLOCATE(int_plankton_timeslice(iomax+iChl,npmax,n_i,n_j,n_k),STAT=alloc_error)
