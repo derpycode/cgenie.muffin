@@ -453,7 +453,7 @@ subroutine ecogem(          &
                        AP_uptake(io,:) = dbiomassdt(io,:)      
                        HP_uptake(io,:) = GrazPredEat(io,:) * assimilated(io,:)
                        mort_loss(:) = mortality(:) * loc_biomass(io,:)
-                       respire_loss(:) = respiration(:) * loc_biomass(io,:)
+                       respir_loss(:) = respiration(:) * loc_biomass(io,:)
                        eaten_loss(:)= GrazPreyEaten(iCarb, :)
                     enddo
                  endif
