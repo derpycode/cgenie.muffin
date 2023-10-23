@@ -558,21 +558,22 @@ CONTAINS
             if (io .eq. iCarb) then
                
                loc_ij(:,:) = int_peaten_timeslice(jp,:,:,n_k)
-               write (shrtstrng, "(A10,A,A6)") "_Eaten_",trim(adjustl(quotastrng(io))),'_',jp
-               write (longstrng, "(A,A16)") trim(adjustl(quotastrng(io))),' Grazed - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
-               call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               ! eco2D_Eaten_C_001
+               write (shrtstrng, "(A5, A10, A2, I3.3)") 'eco2D' '_Eaten_',trim(adjustl(quotastrng(io))),'_',jp
+               write (longstrng, "(A,A16,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Grazed - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
                call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
 
                loc_ij(:,:) = int_pmort_timeslice(jp,:,:,n_k)
-               write (shrtstrng, "(A10,A,A6)") "_Mortality_",trim(adjustl(quotastrng(io))),'_',jp
-               write (longstrng, "(A,A16)") trim(adjustl(quotastrng(io))),' Mortality - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
-               call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               write (shrtstrng, "(A5, A10, A2, I3.3)") 'eco2D' '_Mortality_',trim(adjustl(quotastrng(io))),'_',jp
+               write (longstrng, "(A,A20,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Mortality - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
                call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
 
                loc_ij(:,:) = int_prespir_timeslice(jp,:,:,n_k)
-               write (shrtstrng, "(A10,A,A6)") "_Respiration_",trim(adjustl(quotastrng(io))),'_',jp
-               write (longstrng, "(A,A16)") trim(adjustl(quotastrng(io))),' Respiration - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
-               call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               write (shrtstrng, "(A5, A10, A2, I3.3)") 'eco2D' '_Respiration_',trim(adjustl(quotastrng(io))),'_',jp
+               write (longstrng, "(A,A22,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Respiration - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
                call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
 
             endif
