@@ -896,7 +896,7 @@ SUBROUTINE diag_ecogem_timeslice( &
        int_HP_timeslice(:,:,:,:,:) =   int_HP_timeslice(:,:,:,:,:) + loc_dtyr * HP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  heterotrophic flux in each plankton
        int_pmort_timeslice(:,:,:,:) =   int_pmort_timeslice(:,:,:,:) + loc_dtyr * plankton_mort(:,:,:,:) * pday ! mmol C m^-3 d^-1  plankton mortality flux in each plankton
        int_peaten_timeslice(:,:,:,:) =   int_peaten_timeslice(:,:,:,:) + loc_dtyr * plankton_eaten(:,:,:,:) * pday ! mmol C m^-3 d^-1  plankton grazing flux in each plankton
-       int_respir_timeslice(:,:,:,:) =   int_respir_timeslice(:,:,:,:) + loc_dtyr * plankton_respir(:,:,:,:) * pday ! mmol C m^-3 d^-1  plankton respiration flux in each plankton
+       int_prespir_timeslice(:,:,:,:) =   int_prespir_timeslice(:,:,:,:) + loc_dtyr * plankton_respir(:,:,:,:) * pday ! mmol C m^-3 d^-1  plankton respiration flux in each plankton
      end if
   end if
 
