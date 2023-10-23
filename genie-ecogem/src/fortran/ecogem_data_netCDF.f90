@@ -574,7 +574,7 @@ CONTAINS
 
                !short string: eco2D_Respiration_C_001
                loc_ij(:,:) = int_prespir_timeslice(jp,:,:,n_k)
-               write (shrtstrng, "(A5, A10, A, A1, I3.3)") 'eco2D','_Respiration_',trim(adjustl(quotastrng(io))),'_',jp
+               write (shrtstrng, "(A5, A13, A, A1, I3.3)") 'eco2D','_Respiration_',trim(adjustl(quotastrng(io))),'_',jp
                write (longstrng, "(A,A22,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Respiration - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
                call sub_adddef_netcdf(loc_iou,3,shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
                call sub_putvar2d(shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
