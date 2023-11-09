@@ -467,8 +467,11 @@ CONTAINS
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_opsi',string_results_ext)
        select case (fname_topo)
        case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4', 'p_worbe2', 'p_worjh2')
-          loc_string = '% time (yr) / global min overturning (Sv) / global max overturning (Sv) / '// &
-               & 'Atlantic min overturning (Sv) / Atlantic max overturning (Sv)'
+          loc_string = '% time (yr) / global min opsi (Sv) [full k grid] / global max opsi (Sv) [full k grid] / '// &
+               & 'Atlantic min opsi (Sv) [k <= '// fun_conv_num_char_n(2,int(n_k/2)) //'] / '// &
+               & 'Atlantic min opsi (Sv) [k <= '// fun_conv_num_char_n(2,int(n_k/2)) //'] / '// &
+               & 'global min opsi (Sv) [depth > '// fun_conv_num_char_n(4,int(par_data_save_opsi_Dmin)) //' m] / '// &
+               & 'global max opsi (Sv) [depth > '// fun_conv_num_char_n(4,int(par_data_save_opsi_Dmin)) //' m]'
        case default
           loc_string = '% time (yr) / global min opsi (Sv) [full k grid] / global max opsi (Sv) [full k grid] / '// &
                & 'global min opsi (Sv) [> '// fun_conv_num_char_n(4,int(par_data_save_opsi_Dmin)) //' m] / '// &
@@ -2116,7 +2119,7 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        select case (fname_topo)
        case ('worbe2', 'worjh2', 'worjh4', 'worlg2', 'worlg4', 'wv2jh2', 'wv3jh2', 'worri4', 'p_worbe2', 'p_worjh2')
-          WRITE(unit=out,fmt='(f12.3,4f9.3)',iostat=ios)          &
+          WRITE(unit=out,fmt='(f12.3,6f9.3)',iostat=ios)          &
                & loc_t,                                           &
                & loc_opsi_scale*int_misc_opsi_min_sig/int_t_sig,  &
                & loc_opsi_scale*int_misc_opsi_max_sig/int_t_sig,  &
