@@ -97,6 +97,18 @@ SUBROUTINE atchem(    &
            CALL sub_calc_wetlands_CH4(loc_dtyr,locij_fatm(:,i,j))
         END IF
         
+        ! *** REDUCE N2O ***
+        select case (opt_atm_N2O_photochem)
+        case ('lifetime')  
+           IF (atm_select(ia_pN2O) .AND. atm_select(ia_pN2) .AND. atm_select(ia_pO2)) THEN
+              CALL sub_calc_reduce_N2O_lifetime(i,j,loc_dtyr)
+           END IF    
+        case ('NONE')  
+            !!! NOTHING
+        case default
+            !!! NOTHING
+        end select    
+        
         ! *** PRODUCE RADIOACTIVE TRACERS ***
         IF (atm_select(ia_pCO2_14C)) THEN
            CALL sub_calc_generate_14C(loc_dtyr,locij_fatm(:,i,j))

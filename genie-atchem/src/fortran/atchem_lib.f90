@@ -31,7 +31,7 @@ MODULE atchem_lib
   real::par_atm_F14C                                           ! Global cosmogenic production rate of 14C (mol yr-1)
   NAMELIST /ini_atchem_nml/par_atm_F14C
   ! ------------------- ATMOSPHERIC PHOTOCHEMISTRY --------------------------------------------------------------------------------!
-  CHARACTER(len=63)::par_atm_CH4_photochem                     ! Atmospheric photochemical scheme ID string (e.g., golblatt, claire)
+  CHARACTER(len=63)::par_atm_CH4_photochem                     ! CH4 photochemical scheme ID string (e.g., golblatt, claire)
   NAMELIST /ini_atchem_nml/par_atm_CH4_photochem
   real::par_pCH4_oxidation_C0                                  ! Baseline atmospheric pCH4 (atm)
   NAMELIST /ini_atchem_nml/par_pCH4_oxidation_C0
@@ -41,6 +41,12 @@ MODULE atchem_lib
   NAMELIST /ini_atchem_nml/par_pCH4_oxidation_N
   real::par_atm_pO2_fixed                                      ! Atmospheric pO2 for fixed fixed scheme
   NAMELIST /ini_atchem_nml/par_atm_pO2_fixed
+  CHARACTER(len=63)::opt_atm_N2O_photochem                     ! N2O photochemical scheme option
+  NAMELIST /ini_atchem_nml/opt_atm_N2O_photochem
+  logical::ctrl_atl_N2Oreduct_altO2balance                     ! alternative O2 balance (to N2 fixation)
+  NAMELIST /ini_atchem_nml/ctrl_atl_N2Oreduct_altO2balance
+  real::par_N2O_reduction_tau                                  ! Baseline N2O lifetime (yr)
+  NAMELIST /ini_atchem_nml/par_N2O_reduction_tau
   ! ------------------- EMISSIONS-TO-ATMOSPHERE ---------------------------------------------------------------------------------- !
   real::par_atm_wetlands_FCH4                                  ! Wetlands CH4 flux (mol yr-1) 
   real::par_atm_wetlands_FCH4_d13C                             ! Wetlands CH4 d13C (o/oo) 
