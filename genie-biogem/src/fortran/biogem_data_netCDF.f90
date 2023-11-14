@@ -1995,13 +1995,18 @@ CONTAINS
        ! nutrient limitation
        ! NOTE: -1.0 equates to dominance of PO4 limitation, +1.0 to dominance of Fe limitation
        !       a value of ~0.0 represents nutrient replete conditions OR ~equal limitation
+       ! for reference: loc_kPO4 = loc_PO4/(loc_PO4 + par_bio_c0_PO4), loc_kFe = loc_FeT/(loc_FeT + par_bio_c0_Fe)
+       !                i.e. 1.0 == no limitation, 0.0 == complete limitation
        if ( ocn_select(io_PO4) .AND. (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) ) then
           loc_unitsname = 'n/a'
-          loc_ij(:,:) = ( int_diag_bio_timeslice(idiag_bio_kFe,:,:) - int_diag_bio_timeslice(idiag_bio_kPO4,:,:) )/ &
-               & int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_PO4Felimbalance','occurrence of Fe vs. PO4 limitation condition', &
+          loc_ij(:,:) = ( &
+               & (1.0 - int_diag_bio_timeslice(idiag_bio_kFe,:,:)) &
+               & - &
+               & (1.0 - int_diag_bio_timeslice(idiag_bio_kPO4,:,:)) &
+               & )/int_t_timeslice
+          call sub_adddef_netcdf(loc_iou,3,'misc_sur_FeminusPO4limitation','occurrence of Fe (+1.0) vs. PO4 (-1.0) limitation', &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_PO4Felimbalance',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+          call sub_putvar2d('FeminusPO4limitation',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end if
     end if
     !-----------------------------------------------------------------------
