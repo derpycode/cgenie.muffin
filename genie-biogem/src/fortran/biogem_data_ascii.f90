@@ -518,10 +518,10 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! insolation (wet grid only)
+       ! insolation
        loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_insol',string_results_ext)
-       loc_string = '% time (yr) / mean (wet grid) insolation (W m-2) / ' // &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_insol',string_results_ext)
+       loc_string = '% time (yr) / mean insolation (W m-2) / ' // &
             & 'N mean zonal insolation (W m-2) @ j=' // fun_conv_num_char_n(2,par_sig_j_N) // &
             & ' and BIOGEM time-step: ' // fun_conv_num_char_n(2,par_t_sig_count_N) // &
             & ' / ' // &
@@ -535,8 +535,8 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
        loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_swflux',string_results_ext)
-       loc_string = '% time (yr) / mean annual Sw flux at ocean surface (W m-2)'
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_swflux',string_results_ext)
+       loc_string = '% time (yr) / mean annual SW flux at surface (W m-2)'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -817,8 +817,8 @@ CONTAINS
        end if
        ! insolation (wet grid only)
        loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_insol',string_results_ext)
-       loc_string = '% time (yr) / mean (wet grid) insolation (W m-2) / ' // &
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_insol',string_results_ext)
+       loc_string = '% time (yr) / mean insolation (W m-2) / ' // &
             & 'N mean zonal insolation (W m-2) @ j=' // fun_conv_num_char_n(2,par_sig_j_N) // &
             & ' and BIOGEM time-step: ' // fun_conv_num_char_n(2,par_t_sig_count_N) // &
             & ' / ' // &
@@ -832,8 +832,8 @@ CONTAINS
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
        loc_filename=fun_data_timeseries_filename( &
-            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_swflux',string_results_ext)
-       loc_string = '% time (yr) / mean annual Sw flux at ocean surface (W m-2)'
+            & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_swflux',string_results_ext)
+       loc_string = '% time (yr) / mean annual SW flux at surface (W m-2)'
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -2171,9 +2171,9 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! insolation (wet grid only)
+       ! insolation (ocnatm grid) at top of atmosphere
        loc_filename=fun_data_timeseries_filename( &
-            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_insol',string_results_ext)
+            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_insol',string_results_ext)
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
@@ -2185,9 +2185,9 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! SW flux at surface (wet grid only)
+       ! SW flux (ocnatm grid) at surface (accounted for albedo)
        loc_filename=fun_data_timeseries_filename( &
-            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_ocn_swflux',string_results_ext)
+            & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_swflux',string_results_ext)
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
