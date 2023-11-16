@@ -1495,7 +1495,7 @@ CONTAINS
           conv_sed_ocn_N(io_ALK,is_POC) = -2.0*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        else
-          ! [DEFAULT, oxic remin relationship]
+          ! (this should not occur)
        endif
        ! > N isotopes (from denitrification) [placeholder values -- corrected for local d15N in sub_box_remin_redfield]
        if (ocn_select(io_NO3_15N)) then
@@ -2902,6 +2902,22 @@ CONTAINS
             & )
     ENDIF
 
+    ! *** parameter consistency check - selected tracers and redox pairs ***
+    IF (ocn_select(io_NO3) .AND. (.NOT. ocn_select(io_NH4))) THEN
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par','A reduced N species (e.g. NH4) tracer must be selected along with NO3 ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
+    IF (ocn_select(io_SO4) .AND. (.NOT. ocn_select(io_H2S))) THEN
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par','The H2S tracer must be selected along with SO4 ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
+
     ! *** parameter consistency check - selected tracers and sediment-sediment option combinations ***
     do is=1,n_sed
        if (sed_type(is) == par_sed_type_frac) then
@@ -2918,7 +2934,7 @@ CONTAINS
     end do
     IF (sed_select(is_CaCO3) .AND. (.NOT. sed_select(is_POC))) THEN
        CALL sub_report_error( &
-            & 'biogem_data','sub_check_par','The POC tracer must be selected with CaCO3 in biogem_config_sed.par ', &
+            & 'biogem_data','sub_check_par','The POC tracer must be selected with CaCO3 ', &
             & 'STOPPING', &
             & (/const_real_null/),.true. &
             & )
@@ -3000,7 +3016,7 @@ CONTAINS
                       CALL sub_report_error( &
                            & 'biogem_data','sub_check_par', &
                            & 'Particulate tracer '//TRIM(loc_string2)// &
-                           & ' does does not have *all possible* corresponding ocean tracers selected, e.g. '//TRIM(loc_string1)// &
+                           & ' does not have *all possible* corresponding ocean tracers selected, e.g. '//TRIM(loc_string1)// &
                            & ' (BUT may not need them, esp. if involving the Fe sytem ...)', &
                            & 'CONTINUING', &
                            & (/const_real_null/),.false. &
