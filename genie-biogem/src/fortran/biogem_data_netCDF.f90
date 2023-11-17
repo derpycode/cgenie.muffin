@@ -2006,7 +2006,7 @@ CONTAINS
                & )/int_t_timeslice
           call sub_adddef_netcdf(loc_iou,3,'misc_sur_FeminusPO4limitation','occurrence of Fe (+1.0) vs. PO4 (-1.0) limitation', &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('FeminusPO4limitation',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+          call sub_putvar2d('misc_sur_FeminusPO4limitation',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end if
     end if
     !-----------------------------------------------------------------------
