@@ -21,9 +21,6 @@ $HOME/cgenie.muffin/genie-main
 
 The commands to run the model configurations are listed as follows:
 
-Ensure base config muffin.CBE.worjh2.BASESFeTDTLSi.Albani is in cgenie.muffin/genie-main/configs
-Ensure config file 3Diat_4ZP_PiEu.eco is in cgenie.muffin/genie-ecogem/data
-
 Initial new physics spin :
 
 ./runmuffin.sh muffin.CBE.worjh2.BASESFeTDTLSi.Albani PUBS/submitted/Naidoo-Bagwell_et_al.GMD.2023 diat.worjh2.Albani 20000
@@ -43,6 +40,7 @@ Once the spin has completed:
 ./runmuffin.sh muffin.CBE.worjh2.BASESFeTDTLSi.Albani PUBS/submitted/Naidoo-Bagwell_et_al.GMD.2023 NoDiatom 2000 diat.worjh2.Albani
 ./runmuffin.sh muffin.CBE.worjh2.BASESFeTDTLSi.Albani PUBS/submitted/Naidoo-Bagwell_et_al.GMD.2023 EcoGEnIE1.1_phys 2000 diat.worjh2.Albani
 ./runmuffin.sh muffin.CBE.worjh2.BASESFeTDTLSi.Albani PUBS/submitted/Naidoo-Bagwell_et_al.GMD.2023 EcoGEnIE1.1_phys_eco 2000 diat.worjh2.Albani
+
 ################################################################
 ################################################################
 ################################################################
