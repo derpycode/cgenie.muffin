@@ -8864,7 +8864,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     </param>
 <!-- Silicon parameters -->
                     <param name="qminSi_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.002</value>
 	                  <description>Silicon minimum quota - intercept</description>
                     </param>
                     <param name="qminSi_b">
@@ -8872,7 +8872,7 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 	                  <description>Silicon minimum quota - exponent</description>
                     </param>
                     <param name="qmaxSi_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.004</value>
 	                  <description>Silicon maximum quota - intercept</description>
                     </param>
                     <param name="qmaxSi_b">
@@ -8880,19 +8880,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 	                  <description>Silicon maximum quota - exponent</description>
                     </param>
                     <param name="vmaxSiO2_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">0.077</value>
 	                  <description>Maximum silica uptake rate - intercept</description>
                     </param>
                     <param name="vmaxSiO2_b">
-			<value datatype="real">0.0</value>
+			<value datatype="real">-0.27</value>
 	                  <description>Maximum silica uptake rate - exponent</description>
                     </param>
                     <param name="affinSiO2_a">
-			<value datatype="real">0.0</value>
+			<value datatype="real">3.208</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - intercept</description>
                     </param>
                     <param name="affinSiO2_b">
-			<value datatype="real">0.0</value>
+			<value datatype="real">-0.54</value>
 	                  <description>Silica uptake affinity (Michaelis-Menten) - exponent</description>
                     </param>
                     <param name="kexcSi_a">
@@ -8916,6 +8916,46 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">-3.80</value>
 	                  <description>maximum photosynthetic rate - c</description>
                     </param>
+                    <param name="vmaxDIC_a_pft_pico">
+			<value datatype="real">0.9</value>
+	                  <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_b_pft_pico">
+      <value datatype="real">0.08</value>
+                    <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_a_pft_cocco">
+      <value datatype="real">1.4</value>
+                    <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_b_pft_cocco">
+      <value datatype="real">-0.08</value>
+                    <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_a_pft_diatom">
+      <value datatype="real">3.9</value>
+                    <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_b_pft_diatom">
+      <value datatype="real">-0.08</value>
+                    <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_a_pft_eukaryote">
+      <value datatype="real">1.7</value>
+                    <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_b_pft_eukaryote">
+      <value datatype="real">-0.08</value>
+                    <description>maximum photosynthetic rate - a</description>
+                    </param>
+                    <param name="vmaxDIC_a_pft_diazotroph">
+      <value datatype="real">0.95</value>
+                    <description>Diazotroph maximum photosynthetic rate (d-1) - intercept</description>
+                    </param>
+                    <param name="vmaxDIC_b_pft_diazotroph">
+      <value datatype="real">-0.08</value>
+                    <description>Diazotroph maximum photosynthetic rate - exponent</description>
+                    </param> ! Aaron Diatom 23
                     <param name="qcarbon_a">
 			<value datatype="real">1.45e-11</value>
 	                  <description>Carbon per cell - intercept</description>
@@ -9187,10 +9227,23 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">temperature.dat</value>
 		     			<description>Input file for forcing temperature in ecogem</description>
                     </param>
-                    <param name="par_ecogem_timeseries_file">
-			<value datatype="string">timeseries_sites.eco</value>
-		     			<description>timeseries locations file name</description>
+<!-- Misc -->
+                   <param name="par_cocco_palatability_mod">
+      <value datatype="real">1.0</value>
+              <description>modifier for coccolithophore palatability</description>
                     </param>
+                    <param name="par_cocco_vmax_mod">
+      <value datatype="real">1.0</value>
+              <description>modifier for coccolithophore uptake rate</description>
+                    </param>
+                    <param name="par_diatom_palatability_mod">
+      <value datatype="real">1.0</value>
+              <description>Modifier for diatom palatability</description>
+                    </param>
+                    <param name="par_diatom_vmax_mod">
+      <value datatype="real">1.0</value>
+              <description>Modifier for diatom uptake and growth</description>    ! Aaron Diatom 23                
+                   </param>
                 </namelist>
             </file>
         </model>
