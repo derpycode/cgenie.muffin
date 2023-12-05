@@ -28,6 +28,7 @@ SUBROUTINE initialise_ecogem(    &
   integer,DIMENSION(n_i,n_j),INTENT(in)::dum_k1                  !
   REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 !
   REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv    !
+  integer :: stat
   CHARACTER(len=64)::site_string
   ! ---------------------------------------------------------- !
   ! local variables
@@ -70,9 +71,7 @@ SUBROUTINE initialise_ecogem(    &
 
   ! get specifications of plankton populations from input file
   CALL sub_init_populations()
-  ! get names and locations of time-series sites for output
-  CALL sub_init_timeseries()
-
+  
   if (ctrl_debug_eco_init) then
      write(*,*) ' ---------------------------------------------------'
      write(*,*) '- Plankton population specifications from input file'
@@ -364,8 +363,8 @@ SUBROUTINE initialise_ecogem(    &
   ! ---------------------------------------------------------- !
   open(301,File=TRIM(par_outdir_name)//"/Plankton_params.txt"       ,Status="Replace",Action="Write")
   open(302,File=TRIM(par_outdir_name)//"/Plankton_params_nohead.dat",Status="Replace",Action="Write")
-  open(303,File=TRIM(par_outdir_name)//"/Plankton_grazing.dat"      ,Status="Replace",Action="Write")
-
+!  open(303,File=TRIM(par_outdir_name)//"/Plankton_grazing.dat"      ,Status="Replace",Action="Write")
+  open(304,File=TRIM(par_outdir_name)//"/Ecogem_properties.dat"      ,Status="Replace",Action="Write")
   ! make wet mask for ocean cells
   wet_mask_ij(:,:) = MERGE(1,0,goldstein_k1.le.n_k)
   do k=1,n_k
