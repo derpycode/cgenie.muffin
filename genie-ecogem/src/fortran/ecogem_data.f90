@@ -436,6 +436,7 @@ CONTAINS
           autotrophy(jp)      = trophic_tradeoff
           heterotrophy(jp)    = trophic_tradeoff
        elseif (pft(jp).eq.'foram') then
+          ! default foram is symbiont-barren non-spinose
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
           calcify(jp)         = 0.0
@@ -548,14 +549,14 @@ CONTAINS
     ! set growth costs (could do the same for autotrophy in coccolithophores) - Fanny Mar21
     heterotrophy(:) = heterotrophy(:)*growthcost_factor(:)
 
-    ! overwrite the plankton PFT parameters
+    
+    ! Seprarate the symbiont and host body size (auto_volume and hetero_volume) in ForamECOGENIE
     if(ctrl_use_foramecogenie)then
        ! v1/v2 = (r1/r2)^3
        auto_volume(:) = volume(:) * symbiont_esd_scale(:) ** 3
        autotrophy(:) = autotrophy(:) * symbiont_auto_cost(:)
-       heterotrophy(:) = heterotrophy(:) * symbiont_hetero_cost(:)  
-
-       ! Seprarate the symbiont and host body size (auto_volume and hetero_volume)
+       heterotrophy(:) = heterotrophy(:) * symbiont_hetero_cost(:)
+       
        vmax(iDIC,:)    = (vmaxDIC_a  + log10(auto_volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(auto_volume(:)) + log10(auto_volume(:))**2) &
             & * autotrophy(:)
        ! modify rates for functional types
@@ -584,7 +585,6 @@ CONTAINS
           kexc(iNitr,:)      =    kexcN_a * auto_volume(:) **    kexcN_b
        endif
        !-----------------------------------------------------------------------------------------
-!-----------------------------------------------------------------------------------------
        if (pquota) then ! phosphorus parameters
           qmin(iPhos,:)    =   qminP_a  * auto_volume(:) **    qminP_b
           qmax(iPhos,:)    =   qmaxP_a  * auto_volume(:) **    qmaxP_b
@@ -605,9 +605,6 @@ CONTAINS
           qmin(iIron,:)   = merge(qmin(iIron,:)*10.0,qmin(iIron,:),Nfix.eq.1.0)
           qmax(iIron,:)   = merge(qmax(iIron,:)*10.0,qmax(iIron,:),Nfix.eq.1.0)
           affinity(iFe,:) = merge(affinity(iFe,:)/10.0,affinity(iFe,:),Nfix.eq.1.0)
-!!! FANNY CHECK
-          !io = 1
-          !write(*,*) 'qmin(iron)=',qmin(iIron,1:3), 'qmax(iron)=',qmax(iIron,1:3)
        endif
        !-----------------------------------------------------------------------------------------
        if (squota) then ! silicon parameters
