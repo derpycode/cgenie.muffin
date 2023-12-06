@@ -123,4 +123,9 @@ ea_radfor_scl_co2=3.9109
 #       => 2.46 C climate sensitivity
 #       Phanerozoic mean ~ 22.9 C
 #       => to achive 4.84 C of warming (compared to x1) requires 1.9675 doublings
-#       => x 3.9109
+#       => x 3.9109 
+# ADJUST REDOX
+# atmospheric pO2 (atm) -- modern default = 0.21
+ac_atm_init_6=0.210
+# ocean SO4 (mol kg-1) -- modern default = 0.28
+bg_ocn_init_38=0.028

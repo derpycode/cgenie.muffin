@@ -121,4 +121,9 @@ ea_radfor_scl_co2=57.2737
 #       from worjh2: climate sensitivity == 2.46 C 
 #       Phanerozoic mean ~ 22.9 C
 #       => to achive 6.9860 C of warming (compared to x8) requires a further 2.8398 doublings
-#       => 8*2^2.8398 = x 57.2737
+#       => 8*2^2.8398 = x 57.2737 
+# ADJUST REDOX
+# atmospheric pO2 (atm) -- modern default = 0.21
+ac_atm_init_6=0.210
+# ocean SO4 (mol kg-1) -- modern default = 0.28
+bg_ocn_init_38=0.028

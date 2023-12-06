@@ -116,4 +116,9 @@ bg_ocn_init_12=5227.416E-6  #   ALK -- 'alkalinity (ALK)'
 #
 # >>> ADDED BY MATLAB 
 # scaling for atmospheric CO2 radiative forcing, relative to 278 ppm 
-ea_radfor_scl_co2=6.4108 
+ea_radfor_scl_co2=6.4108  
+# ADJUST REDOX
+# atmospheric pO2 (atm) -- modern default = 0.21
+ac_atm_init_6=0.210
+# ocean SO4 (mol kg-1) -- modern default = 0.28
+bg_ocn_init_38=0.028
