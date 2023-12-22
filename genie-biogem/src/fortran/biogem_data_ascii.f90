@@ -435,6 +435,63 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end if
     end if
+    ! estimted mineral weathering flux
+    IF (ctrl_data_save_sig_diag .AND. flag_rokgem) THEN
+       IF (ocn_select(io_DIC) .AND. ocn_select(io_Ca) .AND. ocn_select(io_SiO2)) THEN
+          ! (1) silicate weathering
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_silicate',string_results_ext &
+               & )
+          loc_string = '% time (yr) / estimated global silicate weathering (Ca+Mg) flux (mol yr-1)' // &
+               & ' [assuming carbonate provides Ca only, silicates Ca and Mg, with no other sources of these cations]'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)          
+          ! (2) carbonate weathering
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_carbonate',string_results_ext &
+               & )
+          loc_string = '% time (yr) / estimated global carbonate weathering (Ca) flux (mol yr-1)' // &
+               & ' [assuming carbonate provides Ca only, silicates Ca and Mg, with no other sources of these cations]'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)  
+          ! (3) kerogen weathering
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_kerogen',string_results_ext &
+               & )
+          loc_string = '% time (yr) / estimated global kerogen weathering (DIC) flux (mol yr-1)' // &
+               & ' [assuming there is krogen weathering ... otherwise the diagnosed flux should be very small]'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          ! (4) diagnosed volcanic outgassing (at steady state) or imbalance (including outgassing)          
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_net',string_results_ext &
+               & ) 
+          loc_string = '% time (yr) / estimated (-ve.) volcanic flux (at steady state) or source-sink imbalance (mol yr-1)' // &
+               & ' [for non-steady states, the imbalance includes any volcanic flux]'
+          call check_unit(out,__LINE__,__FILE__)
+          OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          call check_iostat(ios,__LINE__,__FILE__)
+          CLOSE(unit=out,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+       end IF
+    end if   
     ! miscellaneous
     IF (ctrl_data_save_sig_misc) THEN
        if (flag_gemlite) then
@@ -969,6 +1026,8 @@ CONTAINS
                & )
           loc_string = '% time (yr) / excess cation compared to DIC weathering (mol 2+ yr-1) / % excess (not useful!)'
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
+          write(unit=out,fmt=*,iostat=ios) trim(loc_string)
+          loc_string = '% WARNING: This is only a meaningful estimate if there is not Corg weathering!'
           write(unit=out,fmt=*,iostat=ios) trim(loc_string)
           CLOSE(unit=out,iostat=ios)
        end IF
@@ -2080,6 +2139,81 @@ CONTAINS
        end if          
     end if
         
+    ! *** <sig_misc_fweather_*> ***
+    ! write estimted weathering flux data
+    ! NOTE: write data only as the total flux
+    ! NOTE: only valid if the Si tracer is selcted AND rg_par_weather_CaSiO3_fracSi=1.0 (whose value is not known to BIOGEM ...)
+    ! NOTE: assume that Mg is only from silicates,
+    !       and that Si weathering is equal to Mg plus the fraction of Ca not from carbonate
+    ! NOTE: for kerogen weathering, assume that DIC associated with silicates and carbonates = 2.0*(Ca+Mg)
+    !       BUT, this is only valid if rg_opt_short_circuit_atm=.false. (whose value is not known to BIOGEM ...)
+    ! NOTE: for the net carbon flux, the calculation is:
+    !       DIC (from CaCO3 and Corg) minus CaCO3 burial minus Corg burial
+    !       so a negative net flux indicates sinks > sources (but not accounting for volcanic emissions)
+    IF (ctrl_data_save_sig_diag .AND. flag_rokgem) THEN
+       IF (ocn_select(io_DIC) .AND. ocn_select(io_Ca) .AND. ocn_select(io_SiO2)) THEN
+          ! (1) silicate weathering
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_silicate',string_results_ext &
+               & )
+          loc_tot = int_diag_weather_sig(io_SiO2)/int_t_sig
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          WRITE(unit=out,fmt='(f12.3,e15.7)',iostat=ios) &
+               & loc_t,                                  &
+               & loc_tot
+          CLOSE(unit=out,iostat=ios)
+          ! (2) carbonate weathering
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_carbonate',string_results_ext &
+               & )
+          IF (ocn_select(io_Mg)) THEN
+             loc_tot = ((int_diag_weather_sig(io_Ca)+int_diag_weather_sig(io_Mg)) - int_diag_weather_sig(io_SiO2))/int_t_sig
+          else
+             loc_tot = (int_diag_weather_sig(io_Ca) - int_diag_weather_sig(io_SiO2))/int_t_sig
+          end if
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          WRITE(unit=out,fmt='(f12.3,e15.7)',iostat=ios) &
+               & loc_t,                                  &
+               & loc_tot
+          CLOSE(unit=out,iostat=ios)
+          ! (3) kerogen weathering
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_kerogen',string_results_ext &
+               & )
+          IF (ocn_select(io_Mg)) THEN
+             loc_tot = (int_diag_weather_sig(io_DIC) - 2.0*(int_diag_weather_sig(io_Ca)+int_diag_weather_sig(io_Mg)))/int_t_sig
+          else
+             loc_tot = (int_diag_weather_sig(io_DIC) - 2.0*int_diag_weather_sig(io_Ca))/int_t_sig
+          end if
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          WRITE(unit=out,fmt='(f12.3,e15.7)',iostat=ios) &
+               & loc_t,                                  &
+               & loc_tot
+          CLOSE(unit=out,iostat=ios)  
+          ! (4) diagnosed volcanic outgassing (at steady state) or imbalance (including outgassing)          
+          loc_filename=fun_data_timeseries_filename(loc_t, &
+               & par_outdir_name,trim(par_outfile_name)//'_series','misc_fweather_net',string_results_ext &
+               & )
+          IF (ocn_select(io_Mg)) THEN
+             loc_tot = ((int_diag_weather_sig(io_Ca)+int_diag_weather_sig(io_Mg)) - int_diag_weather_sig(io_SiO2)) +  &
+                  & (int_diag_weather_sig(io_DIC) - 2.0*(int_diag_weather_sig(io_Ca)+int_diag_weather_sig(io_Mg))) - &
+                  & (int_focnsed_sig(is_CaCO3) - int_fsedocn_sig(io_Ca)) - &
+                  & (int_focnsed_sig(is_POC) - (int_fsedocn_sig(io_DIC) - int_fsedocn_sig(io_Ca)))
+          else
+             loc_tot = (int_diag_weather_sig(io_Ca) - int_diag_weather_sig(io_SiO2)) +  &
+                  & (int_diag_weather_sig(io_DIC) - 2.0*int_diag_weather_sig(io_Ca)) - &
+                  & (int_focnsed_sig(is_CaCO3) - int_fsedocn_sig(io_Ca)) - &
+                  & (int_focnsed_sig(is_POC) - (int_fsedocn_sig(io_DIC) - int_fsedocn_sig(io_Ca)))
+          end if
+          loc_tot = loc_tot/int_t_sig ! remember to scale with int_t_sig
+          OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
+          WRITE(unit=out,fmt='(f12.3,e15.7)',iostat=ios) &
+               & loc_t,                                  &
+               & loc_tot
+          CLOSE(unit=out,iostat=ios)                
+       end IF
+    end if
+    
     ! *** <sig_misc_*> ***
     ! write miscellaneous data (if requested)
     IF (ctrl_data_save_sig_misc) THEN
