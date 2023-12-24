@@ -2101,6 +2101,16 @@ CONTAINS
          & ' Mean wt% CaCO3            :',loc_mean_sedgrid,' %'
     call check_iostat(ios,__LINE__,__FILE__)
     Write(unit=out,fmt=*) '---------------------------------'
+    ! write out mean global detrital flux in units of g cm-2 kyr-1 as a check 
+    ! NOTE: local fluxes (loc_fsed) in units of mol cm-2 yr-1
+    loc_mean_sedgrid = sum(loc_mask(:,:)*loc_area(:,:)*loc_fsed(is_det,:,:))/loc_tot_mask_area
+    print*,loc_mean_sedgrid
+    loc_mean_sedgrid = loc_mean_sedgrid/(conv_det_g_mol*conv_yr_kyr)
+    print*,loc_mean_sedgrid
+    write(unit=out,fmt='(A28,f7.3,A13)',iostat=ios) &
+         & ' Mean detrital flux        :',loc_mean_sedgrid,' g cm-2 kyr-1'
+    call check_iostat(ios,__LINE__,__FILE__)
+    Write(unit=out,fmt=*) '---------------------------------'
 
     ! WEATHERING PARAMETER CALCULATIONS
     ! NOTE: originally assumed are:
@@ -2243,7 +2253,7 @@ CONTAINS
     Write(unit=out,fmt=*) '# kerogen POP weathering settings (as ratios with kerogen C)'
     Write(unit=out,fmt=*) '# NOTE: also account for implicitly associated ALK which is (sg_par_sed_diag_P2ALK):'
     Write(unit=out,fmt=*) '#       the PO4 flux * ',par_sed_diag_P2ALK
-    Write(unit=out,fmt=*) '# (but really ths should be zero when simulating geologic carbon cycling)'
+    Write(unit=out,fmt=*) '#       (but really ths should simply be zero when simulating geologic carbon cycling)'
     if (loc_Fkerogen > const_real_nullsmall) then
        Write(unit=out,fmt=*) 'rg_par_weather_kerogen_fracP=',loc_tot_FPOP/loc_Fkerogen
        Write(unit=out,fmt=*) 'rg_par_weather_kerogen_fracALK=',par_sed_diag_P2ALK*loc_tot_FPOP/loc_Fkerogen
