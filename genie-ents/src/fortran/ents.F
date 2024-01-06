@@ -8,7 +8,6 @@
       subroutine ents(istep,
      :     nyear,
      :     torog_atm,                        !< surface air temperature adjusted for orography
-     :     dum_co2_out,
      :     dum_rh0sc,dum_rhosc,dum_rsc,dum_ds,dum_dphi,
      :     dum_dsc,dum_saln0,dum_dz,dum_ec,dum_rho,
      :     dum_fx0a,dum_fx0o,dum_fxsen,dum_fxlw,
@@ -44,7 +43,6 @@
 c SG > Argument list Variable declaration
       integer istep,nyear
       real ,dimension(maxi,maxj)::torog_atm
-      real ,dimension(maxi,maxj)::dum_co2_out
 
 c SG  Variables passed from other modules
       integer dum_istep0
@@ -112,7 +110,6 @@ c carbon stocks SKT
       real,dimension(maxi,maxj),intent(inout)::el_Csoil_14C
       real,dimension(maxi,maxj),intent(inout)::el_fv
             
-
 c atmospheric tracer concentrations and land-atmosphere fluxes
       integer,intent(in)::ntrac_atm
       real,intent(in),dimension(ntrac_atm,maxi,maxj)::sfcatm_lnd
@@ -207,13 +204,8 @@ c          itv = mod(istep+nyear-1,nyear)
 c Note, the index for the atmospheric pCO2 tracer is 3
 c TODO: define this index globally
 c SKT: added tracers 4 & 5 for isotopes
-            if (atchem_fert) then
-               call carbon(torog_atm,sfcatm_lnd(3:5,:,:),
-     &              landice_slicemask_lic,sfxatm_lnd(3:5,:,:))
-            else
-               call carbon(torog_atm,dum_co2_out,landice_slicemask_lic
-     &              ,sfxatm_lnd(3:5,:,:))
-         endif
+            call carbon(torog_atm,sfcatm_lnd(3:5,:,:),
+     &           landice_slicemask_lic,sfxatm_lnd(3:5,:,:))
          endif
          
 c SG > Write ENTS restarts

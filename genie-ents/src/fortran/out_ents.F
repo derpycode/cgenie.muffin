@@ -29,4 +29,10 @@ c land snow cover
 
       write(unit,*)pco2ld
 
+c add isotopic inventories to restart
+      write(unit,*)((Cveg_13C(i,j),i=1,imax),j=1,jmax)
+      write(unit,*)((Csoil_13C(i,j),i=1,imax),j=1,jmax)
+      write(unit,*)((Cveg_14C(i,j),i=1,imax),j=1,jmax)
+      write(unit,*)((Csoil_14C(i,j),i=1,imax),j=1,jmax)
+      
       end

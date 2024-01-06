@@ -5,7 +5,6 @@
 * SG (02/01/2K7)
 * conversion of simpleland into geniefied ents (henceforth genie-ents)
 
-
       subroutine initialise_ents(
      :     dum_lin,
      :     dum_rsc,dum_syr,dum_nyear,
@@ -207,7 +206,6 @@ c Convert tstar_atm & qstar_atm arrays into one tq array
             do i=1,imax
                dum_tq(1,i,j) = real(dum_tstar_atm(i,j),kind(dum_tq))
                dum_tq(2,i,j) = real(dum_qstar_atm(i,j),kind(dum_tq))
-c	       co2(i,j) = dum_co2_out(i,j)
                ents_k1(i,j) = dum_k1(i,j)
             enddo
          enddo

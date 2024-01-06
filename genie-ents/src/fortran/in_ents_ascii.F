@@ -23,16 +23,26 @@ c land snow cover
       read(unit,*)((tqld(2,i,j),i=1,imax),j=1,jmax)
       read(unit,*)((land_snow_lnd(i,j),i=1,imax),j=1,jmax)
       read(unit,*)pco2ld
+c     read in add isotopic inventories from restart
+c     NOTE: comment these lines out to use the old restart format
+      read(unit,*)((Cveg_13C(i,j),i=1,imax),j=1,jmax)
+      read(unit,*)((Csoil_13C(i,j),i=1,imax),j=1,jmax)
+      read(unit,*)((Cveg_14C(i,j),i=1,imax),j=1,jmax)
+      read(unit,*)((Csoil_14C(i,j),i=1,imax),j=1,jmax)
 
-cmsw Initialise water bucket capacity
-
+c     initialize associated variables
       do i=1,imax
         do j=1,jmax
           if(ents_k1(i,j).gt.ents_kmax)then
+cmswinitialwater bucket capacity
              bcap(i,j)=min(k8,k9+(k10*Csoil(i,j)))
 cmsw initial roughness length
              z0(i,j)=max(0.001,kz0*Cveg(i,j))
           endif
+c     uncomment these lines to create an isotopic inventory from a old restart format
+c     NOTE: the example value is for a vegetation and soil isotopic composition of 0.0 o/oo
+c         Cveg_13C(i,j)  = 0.011202/(1+0.011202)*Cveg(i,j)
+c         Csoil_13C(i,j) = 0.011202/(1+0.011202)*Csoil(i,j)
         enddo
       enddo
 

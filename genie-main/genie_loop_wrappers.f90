@@ -358,7 +358,6 @@ contains
     implicit none
     call ents(istep_ocn,go_nyear, &
          torog_atm, &
-         co2_atm, &
          go_rh0sc,go_rhosc,go_rsc,go_ds,go_dphi, &
          go_dsc,go_saln0,go_dz,go_ec,go_rho, &
          eb_fx0a,eb_fx0o,eb_fxsen,eb_fxlw, &
