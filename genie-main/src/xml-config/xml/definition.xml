@@ -1952,17 +1952,21 @@
                         <description>planetary albedo: 6th order modulation</description>
                     </param>
                     <param name="par_albedo1d_name">
-                        <value datatype="string">NONE</value>
+            <value datatype="string">NONE</value>
                         <description>Name of zonal planetary albedo file</description>
                     </param>
                     <param name="par_albedo2d_name">
-                        <value datatype="string">NONE</value>
+            <value datatype="string">NONE</value>
                         <description>Name of 2D planetary albedo file</description>
                     </param>
-		    <param name="lapse_rate">
-		         <value datatype="real">-6.5e-3</value>
-			 <description>lapse rate (K/km)</description>
-		    </param>
+					<param name="filenamealba">
+                        <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>atm_albedo_monthly.dat</value>
+                        <description>atmospheric (cloud) albedo filename</description>
+                    </param>
+		            <param name="lapse_rate">
+		                 <value datatype="real">-6.5e-3</value>
+			             <description>lapse rate (K/km)</description>
+		            </param>
                     <param name="orogswitch">
                         <value datatype="integer">0</value>
                         <description>switch (0/1/2) to take into account orography (=2: orography only affects surface processes)</description>
@@ -1975,7 +1979,7 @@
                         <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>orography.dat</value>
                         <description>orography filename</description>
                     </param>
-		    <param name="filenameoroglice_2d">
+		            <param name="filenameoroglice_2d">
                         <value datatype="logical">.false.</value>
                         <description>true if orography and land ice mask are in 2D (lat-lon) format</description>
                     </param>

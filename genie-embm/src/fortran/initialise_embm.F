@@ -128,9 +128,9 @@ c                 files
       character u_wspeed*127, v_wspeed*127
       integer   len_uws, len_vws
 
-c PV (28/07/22): add filename variables for orograpy and icemask files
+c PV (28/07/22): add filename variables for orograpy, icemask & atm albedo files
 c character filenameorog*127, filenamelice*127
-      integer   len_orog, len_lice
+      integer   len_orog, len_lice, len_alba
       
 c AY (09/01/04) : local variables reinstated
       character ans, lin*13
@@ -248,6 +248,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/albedop_offs,albedop_amp
       NAMELIST /ini_embm_nml/albedop_skew,albedop_skewp
       NAMELIST /ini_embm_nml/albedop_mod2,albedop_mod4,albedop_mod6
+      NAMELIST /ini_embm_nml/filenamealba
       NAMELIST /ini_embm_nml/lapse_rate
       NAMELIST /ini_embm_nml/orogswitch
       NAMELIST /ini_embm_nml/t_orog
@@ -424,9 +425,12 @@ c AY (20/03/17) : read in albedo filenames
       if (debug_init) print*,
      & '2D albedo file ',trim(par_albedo2d_name)
      
-c PV (07/28/22): Read in orography filenames
+c PV (07/28/23): Read in orography filenames
       len_orog = lnsig1(filenameorog)
       len_lice = lnsig1(filenamelice)
+c PV (01/08/24): Read atmopsheric albedo filename
+      len_alba = lnsig1(filenamealba)
+	  
 
 c     Time-steps information
 c AY (08/12/03) : have total steps passed into initialise_ocean.F
@@ -2137,7 +2141,7 @@ c PV (15/01/2023) Added conditional to check if orog input file is 1D or 2D
              open(77,file=indir_name(1:lenin)//filenameorog(1:len_orog))
 	     if (filenameoroglice_2d) then
 	         do j = jmax,1,-1
-		     read(77,*) (surf_orog_atm(i,j),i=1,imax)
+		         read(77,*) (surf_orog_atm(i,j),i=1,imax)
 	         enddo
 	     else
 	         do i=1,imax
@@ -2259,7 +2263,7 @@ cmsw Read in offline NCEP fields if offline version selected
 
 cmsw Create atmospheric albedo fields
 
-         open(77,file=indir_name(1:lenin)//'atm_albedo_monthly.dat')
+         open(77,file=indir_name(1:lenin)//filenamealba(1:len_alba))
          do l=1,nmth+1
             do i=1,imax
                do j=1,jmax

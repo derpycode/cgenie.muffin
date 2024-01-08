@@ -352,13 +352,14 @@ cmsw Offline arrays
 
       integer ents_seasonswitch,ents_offlineswitch,nmth
       parameter(nmth=12)
+      character*200 filenamealba
       real uatml(2,maxi,maxj,maxnyr),  ! u and v wind comp.'s
      &     usurfl(maxi,maxj,maxnyr),   ! windspeed (m/s)
      &     tncep(maxi,maxj,maxnyr),    ! NCEP air temperature (oC)
      &     pncep(maxi,maxj,maxnyr),    ! NCEP pptn (m/s)
      &     rhncep(maxi,maxj,maxnyr),   ! NCEP relative humidity at 1000mb (%)
      &     atm_alb(maxi,maxj,maxnyr)   ! atmospheric albedo
-      common /embm_seasonal/tncep,pncep,rhncep,atm_alb,
+      common /embm_seasonal/tncep,pncep,rhncep,atm_alb,filenamealba,
      &     uatml,usurfl,ents_seasonswitch,ents_offlineswitch
 
 c transfer coefficients for land grid boxes
