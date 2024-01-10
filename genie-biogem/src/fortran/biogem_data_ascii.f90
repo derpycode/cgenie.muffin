@@ -2002,7 +2002,7 @@ CONTAINS
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       WRITE(unit=out,fmt='(f12.3,3e12.4)',iostat=ios) &
+       WRITE(unit=out,fmt='(f12.3,3e14.6)',iostat=ios) &
             & loc_t, &
             & (int_misc_ocn_solfor_sig/int_t_sig), &
             & snap_misc_ocn_solfor_N_sig, &
@@ -2016,7 +2016,7 @@ CONTAINS
        call check_unit(out,__LINE__,__FILE__)
        OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       WRITE(unit=out,fmt='(f12.3,e12.4)',iostat=ios) &
+       WRITE(unit=out,fmt='(f12.3,e14.6)',iostat=ios) &
             & loc_t, &
             & (int_misc_ocn_fxsw_sig/int_t_sig)
        call check_iostat(ios,__LINE__,__FILE__)
