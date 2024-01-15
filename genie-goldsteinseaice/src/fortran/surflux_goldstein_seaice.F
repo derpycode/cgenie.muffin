@@ -137,7 +137,7 @@ c tv5 is the depth of the k+1th density level from the top
 !melting factor
       rrholf=1.0/(rhoice*hlf)
 !useful constant for surface freezing (timescale 17.5 days)
-      rsictscsf=dsc*dz(kmax)*rho0*cpo_ice/(17.5*86400.)
+      rsictscsf=dsc*dz(kmax)*rho0*cpo_ice/(17.5*sodaylen)
       rsictscsf=scale_oheat*rsictscsf
 
 !INITIALISE VARIABLES
