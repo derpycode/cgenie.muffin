@@ -58,6 +58,14 @@ c AY (23/09/04) : sea-ice albedo added (for restarts)
      3 ,varicedy,variceth                                                 ! yka101004
      4 ,maxalbice,scale_oheat
 
+c CL (01/15/24) : seconds per solar day (necessary for GENIE)
+      real sodaylen
+      common /sic_sodaylen/sodaylen
+
+c CL (01/15/24) : seconds per sidereal day (necessary for GENIE)
+      real sidaylen
+      common /sic_sidaylen/sidaylen
+
 c AY (08/04/04) : days per year (necessary for GENIE)
       real yearlen
       common /sic_yearlen/yearlen
