@@ -214,9 +214,9 @@ c+DJL First of all, update seaice energy from the previous timestep...
             endif
          enddo
       enddo
-      diff_latent=diff_latent*3600.0*24.0*yearlen*rsc*rsc*4.0*pi/
+      diff_latent=diff_latent*sodaylen*yearlen*rsc*rsc*4.0*pi/
      :               real(nyear)
-      diff_sensible=diff_sensible*3600.0*24.0*yearlen*rsc*rsc*4.0*pi/
+      diff_sensible=diff_sensible*sodaylen*yearlen*rsc*rsc*4.0*pi/
      :               real(nyear)
       endif
 c-DJL
@@ -776,9 +776,9 @@ c       to seaice energy.
             endif
          enddo
       enddo
-      diff_netsolar=diff_netsolar*3600.0*24.0*yearlen*rsc*rsc*4.0*pi/
+      diff_netsolar=diff_netsolar*sodaylen*yearlen*rsc*rsc*4.0*pi/
      :               real(nyear)
-      diff_netlong=diff_netlong*3600.0*24.0*yearlen*rsc*rsc*4.0*pi/
+      diff_netlong=diff_netlong*sodaylen*yearlen*rsc*rsc*4.0*pi/
      :               real(nyear)
       test_energy_seaice=real(
      :              test_energy_seaice-diff_latent-diff_sensible-
