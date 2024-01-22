@@ -2406,6 +2406,7 @@ subroutine biogem_ents( &
 	 & dum_snow_lnd,            &
 	 & dum_albs_lnd,            &
      & dum_albs_sur,            &
+     & dum_albs_atm,            &
      & dum_palb,                &	 
      & dum_fv,                  &
      & dum_photo,               &
@@ -2428,7 +2429,8 @@ subroutine biogem_ents( &
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_moisture_lnd           ! ENTS Land Moisture
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_snow_lnd               ! ENTS Land snow cover
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_lnd               ! ENTS Land albedo  
-  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_sur               ! Surface albedo (ocean+land) 
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_sur               ! Surface albedo (ocean+land)
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_albs_atm              ! Atmopsheric albedo (clouds etc)   
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_palb                   ! Planetary albedo (surface+atmosphere)  
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fv                     ! ENTS Vegetation fraction                                                                                        
   REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_photo                  ! Photosynthesis (kg/m2/yr)                                                                                             
@@ -2455,6 +2457,7 @@ subroutine biogem_ents( &
         ! Albedo
         ents(iel_albs_lnd,i,j) = dum_albs_lnd(i,j)
         ents(iel_albs_sur,i,j) = dum_albs_sur(i,j)
+        ents(iel_albs_atm,i,j) = dum_albs_atm(i,j)		
         ents(iel_palb,i,j) = dum_palb(i,j)
         ! Fraction vegetation                                                                                                                                                           
         ents(iel_fv,i,j) = dum_fv(i,j)
@@ -3868,7 +3871,7 @@ SUBROUTINE diag_biogem_timeseries( &
                          & iel_respsoil,iel_respveg)
                       int_ents_sig(iel) = int_ents_sig(iel) + &
                          & loc_dtyr*SUM((phys_ocnatm(ipoa_A,:,:)*ents(iel,:,:)))
-                 CASE (iel_fv,iel_albs_lnd,iel_albs_sur,iel_temp_lnd,iel_moisture_lnd)
+                 CASE (iel_fv,iel_albs_lnd,iel_albs_sur,iel_temp_lnd,iel_moisture_lnd,iel_palb,iel_albs_atm)
                       loc_sig = 0.0
                       loc_tot_A = 0.0
                       DO i=1,n_i

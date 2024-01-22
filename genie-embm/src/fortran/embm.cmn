@@ -322,9 +322,9 @@ c orography
       real orog_vect(maxi,maxj,en_ntimes_max)
       integer orogswitch,t_orog,norog,orogsteps
       character*200 filenameorog
-      logical filenameoroglice_2d
+      logical filename_ents2d
       common /embm_orog/lapse_rate,orog_vect,orogswitch,t_orog,norog,
-     &       orogsteps,filenameorog,filenameoroglice_2d
+     &       orogsteps,filenameorog,filename_ents2d
 
 c land ice sheet
       character*200 filenamelice

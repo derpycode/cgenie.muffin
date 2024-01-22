@@ -1771,7 +1771,7 @@ CONTAINS
        loc_unitsname = 'm s-1'
        call sub_adddef_netcdf(loc_iou,3,'phys_wspeed','gas transfer windspeed',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('phys_wspeed',loc_iou,n_i,n_j,loc_ntrec, &
-            & int_phys_ocnatm_timeslice(ipoa_wspeed,:,:)/int_t_timeslice,loc_mask_surf)
+            & int_phys_ocnatm_timeslice(ipoa_wspeed,:,:)/int_t_timeslice,loc_mask_surf_ALL)
        ! (3) fractional sea-ice cover
        loc_unitsname = 'n/a'
        call sub_adddef_netcdf(loc_iou,3,'phys_seaice','sea-ice cover (%)',trim(loc_unitsname),const_real_zero,const_real_zero)
@@ -1796,11 +1796,11 @@ CONTAINS
        loc_unitsname = 'N/m-2'
        call sub_adddef_netcdf (loc_iou,3,'phys_tau_u','wind stress (u)',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('phys_tau_u',loc_iou,n_i,n_j,loc_ntrec, &
-            & int_phys_ocnatm_timeslice(ipoa_tau_u,:,:)/int_t_timeslice,loc_mask_surf)
+            & int_phys_ocnatm_timeslice(ipoa_tau_u,:,:)/int_t_timeslice,loc_mask_surf_ALL)
        loc_unitsname = 'N/m-2'
        call sub_adddef_netcdf(loc_iou,3,'phys_tau_v','wind stress (v)',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('phys_tau_v',loc_iou,n_i,n_j,loc_ntrec, &
-            & int_phys_ocnatm_timeslice(ipoa_tau_v,:,:)/int_t_timeslice,loc_mask_surf)
+            & int_phys_ocnatm_timeslice(ipoa_tau_v,:,:)/int_t_timeslice,loc_mask_surf_ALL)
        ! (8) convective 'cost' (need to un-do the time-step weighting)
        loc_unitsname = 'yr-1'
        loc_longname = 'convective cost (column integrated adjustments per year)'
@@ -1848,7 +1848,7 @@ CONTAINS
                 SELECT CASE (iel)
                 CASE (iel_Csoil,iel_Cveg,iel_photo,iel_leaf,iel_respsoil,iel_respveg, &
                      & iel_fv,iel_albs_sur,iel_albs_lnd,iel_temp_lnd,iel_moisture_lnd,iel_mask_lnd, &
-					 & iel_palb,iel_snow_lnd)
+					 & iel_palb,iel_snow_lnd,iel_albs_atm)
                    loc_ij(i,j) = int_ents_timeslice(iel,i,j)/int_t_timeslice
                 CASE (iel_Cveg_13C)
                    loc_tot = int_ents_timeslice(iel_Cveg,i,j)/int_t_timeslice
@@ -1902,7 +1902,7 @@ CONTAINS
                       & 'ents output - '//trim(string_ents(iel)),' ',const_real_zero,const_real_zero)
              call sub_putvar2d('ents_'//trim(string_ents(iel)),loc_iou, &
                       & n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_lnd) 
-          CASE (iel_albs_sur,iel_palb)
+          CASE (iel_albs_sur,iel_palb,iel_albs_atm)
              call sub_adddef_netcdf(loc_iou,3,'ents_'//trim(string_ents(iel)), &
                       & 'ents output - '//trim(string_ents(iel)),' ',const_real_zero,const_real_zero)
              call sub_putvar2d('ents_'//trim(string_ents(iel)),loc_iou, &

@@ -16,6 +16,7 @@
      :     landice_slicemask_lic,            !< land ice sheet mask
      :     albs_lnd,                         !< surface albedo over land
      :     albs_sur,                         !< surface albedo over land, ocean, sea ice
+     :     albs_atm,                         !< atmopsheric albedo (if ENTS enabled)
      :     palb,                             !< planetary albedo (surface+atmopshere)
      :     land_albs_snow_lnd,               !< albedo over land for snowy conditions
      :     land_albs_nosnow_lnd,             !< albedo over land for snow-free conditions
@@ -82,6 +83,7 @@ c land ice mask
 c albedo
       real,dimension(maxi,maxj),intent(inout)::albs_lnd
       real,dimension(maxi,maxj),intent(inout)::albs_sur
+      real,dimension(maxi,maxj),intent(inout)::albs_atm
       real,dimension(maxi,maxj),intent(inout)::palb
       real,dimension(maxi,maxj),intent(out)::land_albs_snow_lnd
       real,dimension(maxi,maxj),intent(out)::land_albs_nosnow_lnd
@@ -384,6 +386,7 @@ c roughness length
                   el_fv(i,j)=real(fv(i,j))
 				  land_snow_lnd(i,j)=real(land_snow_lnd(i,j))
 				  albs_sur(i,j)=real(albs_sur(i,j))
+                  albs_atm(i,j)=real(albs_atm(i,j))
 				  palb(i,j)=real(palb(i,j))
                enddo
             enddo

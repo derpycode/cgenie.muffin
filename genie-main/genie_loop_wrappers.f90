@@ -136,6 +136,7 @@ contains
          surf_orog_atm, &                         ! in/output
          landice_slicemask_lic, &                 ! in/output
          eb_albs_sur, &                           ! output (to ENTS and BIOGEM)
+         eb_albs_atm, &                           ! output (to ENTS and BIOGEM)
 		 eb_palb, &                               ! output (to ENTS and BIOGEM)
          eb_albo, &                               ! output (to ENTS and BIOGEM)
          land_albs_snow_lnd, &                    ! input (from ENTS)
@@ -366,6 +367,7 @@ contains
          landice_slicemask_lic, &
          albs_lnd, &	 						  ! output (to BIOGEM)
          eb_albs_sur, &	 						  ! input (from EMBM) / output (to BIOGEM)
+         eb_albs_atm, &                           ! input (from EMBM) / output (to BIOGEM)
          eb_palb, &	 						      ! input (from EMBM) / output (to BIOGEM)
          land_albs_snow_lnd, &					  ! output (to EMBM)
          land_albs_nosnow_lnd, &				  ! output (to EMBM)
@@ -706,6 +708,7 @@ contains
 		 & land_snow_lnd,                                    &
 		 & albs_lnd,									     &
          & eb_albs_sur,                                      &
+         & eb_albs_atm,                                       &
          & eb_palb,                                          &		 
          & el_fv,                                            &
          & el_photo,                                         &

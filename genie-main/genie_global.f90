@@ -809,6 +809,7 @@ MODULE genie_global
  real,dimension(ilon1_atm,ilat1_atm)::torog_atm
  real,dimension(ilon1_lic,ilat1_lic)::landice_slicemask_lic
  real,dimension(ilon1_atm,ilat1_atm)::eb_albs_sur
+ real,dimension(ilon1_atm,ilat1_atm)::eb_albs_atm
  real,dimension(ilon1_atm,ilat1_atm)::eb_palb
  real,dimension(ilon1_lnd,ilat1_lnd)::land_albs_snow_lnd
  real,dimension(ilon1_lnd,ilat1_lnd)::land_albs_nosnow_lnd

@@ -1979,9 +1979,9 @@
                         <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>orography.dat</value>
                         <description>orography filename</description>
                     </param>
-		            <param name="filenameoroglice_2d">
+		            <param name="filename_ents2d">
                         <value datatype="logical">.false.</value>
-                        <description>true if orography and land ice mask are in 2D (lat-lon) format</description>
+                        <description>true if orography, land ice mask, and atm albedo are in 2D (lat-lon) format</description>
                     </param>
                     <param name="norog">
                         <value datatype="integer">0</value>

@@ -771,7 +771,7 @@ MODULE biogem_lib
   ! misc arrays dimensions
   INTEGER,PARAMETER::n_phys_ocn                           = 24 ! number of ocean box physical descriptors
   INTEGER,PARAMETER::n_phys_ocnatm                        = 27 ! number of ocean-atmosphere interface physical descriptors
-  INTEGER,PARAMETER::n_ents                               = 20
+  INTEGER,PARAMETER::n_ents                               = 21
   INTEGER,PARAMETER::n_data_max     = 32767                    ! (maximum) number of (time series) data points (2^15 - 1)
   ! options arrays dimensions
   INTEGER,PARAMETER::n_opt_misc                           = 14 ! miscellaneous
@@ -868,6 +868,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::iel_albs_lnd                        = 18
   INTEGER,PARAMETER::iel_palb                            = 19
   INTEGER,PARAMETER::iel_snow_lnd                        = 20
+  INTEGER,PARAMETER::iel_albs_atm                        = 21
   ! options - misc
   integer,parameter::iopt_misc_O2_equil                   = 07   ! force O2 equilibrium of ocean with atmosphere
   integer,parameter::iopt_misc_debugij                    = 10   ! debug - explicit reporting of (i,j) location in main loop
@@ -1029,8 +1030,9 @@ MODULE biogem_lib
        & 'Csoil_14C       ', &
 	   & 'leaf            ', &
 	   & 'albs_lnd        ', &
-	   & 'alb_palb        ', &
-	   & 'snow_lnd        '/)
+       & 'alb_palb        ', &
+	   & 'snow_lnd        ', &
+	   & 'albs_atm        '/)
   ! diagnostics - biology
   CHARACTER(len=14),DIMENSION(n_diag_bio),PARAMETER::string_diag_bio = (/ &
        & 'dPO4          ', &

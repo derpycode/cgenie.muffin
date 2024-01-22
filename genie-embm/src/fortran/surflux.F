@@ -74,6 +74,7 @@ c
      :     surf_orog_atm,                    !< orography (m)
      :     landice_slicemask_lic,            !< land ice sheet mask
      :     albs_sur,                         !< surface albedo (ocean + sea ice + land + snow)
+     :     albs_atm,                         !< atmospheric albedo (clouds etc)
      :     palb,                             !< planetary albedo (surface + atmopshere)
      :     eb_albo,                          !< ocean albedo	 
      :     land_albs_snow_lnd,               !< albedo over land for snowy conditions
@@ -135,6 +136,7 @@ c land ice sheet mask
 c albedo
       real,dimension(maxj),intent(inout)::eb_albo
       real,dimension(maxi,maxj),intent(inout)::albs_sur
+      real,dimension(maxi,maxj),intent(inout)::albs_atm
       real,dimension(maxi,maxj),intent(inout)::palb
       real,dimension(maxi,maxj),intent(in)::land_albs_snow_lnd
       real,dimension(maxi,maxj),intent(in)::land_albs_nosnow_lnd
@@ -757,10 +759,12 @@ c pbh surface specific humidity, derived at talt assuming vertically constant re
 c use climatological albedo in calculating incoming shortwave radiation
 c shortwave radiation NB modified later over ice
 c PV [30/03/2023] What is climatological albedo? Only atmopshere? Or atmophsere and surface?
-c                 atm_alb(i,j,imth) is the montly ATMOSPHERIC albedo whereas albcl is considered the PLANETARY (atm+surface) albedo 
+c                 atm_alb(i,j,imth) is the montly ATMOSPHERIC albedo
+c                 albcl is the PLANETARY (atm+surface) albedo 
             if (flag_ents) then
 c SG Modded for ENTS
                albedo(i,j) = atm_alb(i,j,imth)
+			   albs_atm(i,j) = atm_alb(i,j,imth)
             endif
 c cgv2 seasonal
             if (flag_ents) then

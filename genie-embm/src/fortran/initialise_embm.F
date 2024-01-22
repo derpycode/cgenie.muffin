@@ -195,7 +195,8 @@ c seasonal fields
       real pncep1(maxi,maxj,nmth+1)
       real rhncep1(maxi,maxj,nmth+1)
       real atm_alb1(maxi,maxj,nmth+1)
-
+      real atm_alb_tmp(maxi,maxj)
+	  
 c precipitation timescale and land radiation
       real timepptn
       real hld,cld
@@ -253,7 +254,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/orogswitch
       NAMELIST /ini_embm_nml/t_orog
       NAMELIST /ini_embm_nml/filenameorog
-      NAMELIST /ini_embm_nml/filenameoroglice_2d
+      NAMELIST /ini_embm_nml/filename_ents2d
       NAMELIST /ini_embm_nml/norog
       NAMELIST /ini_embm_nml/orogsteps
       NAMELIST /ini_embm_nml/t_lice
@@ -876,7 +877,7 @@ c             and to fit HadCM3 predictions
 c AR/170320 : added option of reading-from-file
       if (debug_init) print*,'climatological albedo, by latitude'
       if (par_albedo2d_name.ne.'NONE') then   
-c 2D ABLEDO    
+c 2D ALBEDO    
 c          ccc NOTHING SO FAR cccccccccccccccccccccccccccccccccccccccc
       elseif (par_albedo1d_name.ne.'NONE') then    
 c ZONAL (1D) ABLEDO   
@@ -1009,8 +1010,8 @@ c AY (11/12/03) : note to self - these winds are the advective transport
 c	          winds used in tstepa/tstipa
 
 c AY (04/12/03) : file location altered to include input directory
-c     open(35,file='uncep.silo')
 
+c     open(35,file='uncep.silo')
       call check_unit(35,__LINE__,__FILE__)
       open(35,file=indir_name(1:lenin)//u_wspeed(1:len_uws),
      &     iostat=ios)
@@ -2136,20 +2137,20 @@ c land (no ice)
             enddo
           enddo
        else
-c PV (15/01/2023) Added conditional to check if orog input file is 1D or 2D
+c PV (15/01/2023) check if orog input file is 1D or 2D
           if (orogswitch.ge.1) then
              open(77,file=indir_name(1:lenin)//filenameorog(1:len_orog))
-	     if (filenameoroglice_2d) then
-	         do j = jmax,1,-1
-		         read(77,*) (surf_orog_atm(i,j),i=1,imax)
-	         enddo
-	     else
-	         do i=1,imax
-		    do j=1,jmax
-		         read(77,*) surf_orog_atm(i,j)
-		    enddo
-	         enddo
-	     endif
+	         if (filename_ents2d) then
+	            do j = jmax,1,-1
+		           read(77,*) (surf_orog_atm(i,j),i=1,imax)
+	            enddo
+	         else
+	            do i=1,imax
+		          do j=1,jmax
+		             read(77,*) surf_orog_atm(i,j)
+		          enddo
+	            enddo
+	         endif
              close(77)
           else
              do i=1,imax
@@ -2209,20 +2210,20 @@ c land
           enddo
         enddo
       else
-c PV (15/01/2023) Added conditional to check if lice input file is 1D or 2D
+c PV (15/01/2023) check if lice input file is 1D or 2D
          if (flag_ents) then
             open(77,file=indir_name(1:lenin)//filenamelice(1:len_lice))
-	     if (filenameoroglice_2d) then
-	         do j = jmax,1,-1
-		    read(77,*) (landice_slicemask_lic(i,j),i=1,imax)
-	         enddo
-	     else
-	         do i=1,imax
-		    do j=1,jmax
-                       read(77,*) landice_slicemask_lic(i,j)
-                    enddo
-                 enddo
-	     endif
+	        if (filename_ents2d) then
+	           do j = jmax,1,-1
+		          read(77,*) (landice_slicemask_lic(i,j),i=1,imax)
+	           enddo
+	        else
+	           do i=1,imax
+		          do j=1,jmax
+                     read(77,*) landice_slicemask_lic(i,j)
+                  enddo
+               enddo
+	        endif
             close(77)
          else
             do i=1,imax
@@ -2264,33 +2265,68 @@ cmsw Read in offline NCEP fields if offline version selected
 cmsw Create atmospheric albedo fields
 
          open(77,file=indir_name(1:lenin)//filenamealba(1:len_alba))
-         do l=1,nmth+1
-            do i=1,imax
-               do j=1,jmax
-                  read(77,*) atm_alb1(i,j,l)
+c PV (19/01/2024) check if file input is 2D (lat X lon) or 3D (lat X lon X month)
+c NOTE: if 2D, duplicate albedo in 3D matrix, i.e. same atm albedo each month
+         if (filename_ents2d) then
+            do j = jmax,1,-1
+		       read(77,*) (atm_alb_tmp(i,j),i=1,imax)
+            enddo
+            do l = 1,nmth+1
+		       atm_alb1(:,:,l) = atm_alb_tmp(:,:)
+            enddo
+         else
+            do l=1,nmth+1
+               do i=1,imax
+                  do j=1,jmax
+                     read(77,*) atm_alb1(i,j,l)
+                  enddo
                enddo
             enddo
-         enddo
+         endif
          close(77)
 
 cmsw Read in and initialise monthly winds
-  
+c PV [22/01/2024] only when unify_winds=0 (use monthly winds, else assign 
+c                 empty arrays that will be overwritten by EMBM winds
+
+         if (unify_winds .eq. 0) then
             open(35,file=indir_name(1:lenin)//'uvic_windx.silo')
             read(35,*)(((uatml1(1,i,j,l),i=1,imax),j=1,jmax)
      1           ,l=1,nmth+1)
             close(35)
-            
             open(35,file=indir_name(1:lenin)//'uvic_windy.silo')
             read(35,*)(((uatml1(2,i,j,l),i=1,imax),j=1,jmax)
      1           ,l=1,nmth+1)
             close(35)
+         else
+            do l=1,nyear
+               do i=1,imax
+                  do j=1,jmax
+                     uatml(1,i,j,l)=0.
+                     uatml(2,i,j,l)=0.
+                  enddo
+               enddo
+            enddo
+         endif
             
 cmsw read in wind speeds for use in radiation/evap calc.
-            
+c PV [22/01/2024] only when unify_winds=0 or =2,(use monthly wind speed, 
+c               else assign empty arrays that will be overwritten by EMBM winds
+
+          if (unify_winds .ne. 1) then
             open(35,file=indir_name(1:lenin)//'monthly_windspd.silo')
             read(35,*)(((usurfl1(i,j,l),i=1,imax),j=1,jmax)
      1           ,l=1,nmth+1)
             close(35)
+          else
+            do l=1,nyear
+               do i=1,imax
+                  do j=1,jmax
+                     usurfl(i,j,l)=0.
+                  enddo
+               enddo
+            enddo
+          endif
 
 cmsw preprocess for use in tsetpa/tstipa
 c conditional zonal average
