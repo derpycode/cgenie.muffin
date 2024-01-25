@@ -1,7 +1,13 @@
 #!/usr/local/bin/python
-#
+
+#####################################################################
+# python2 -> python3 conversion by tristan-salles / Nov 1, 2021
+# additional changes by:
+# > 
+#####################################################################
+
 # $Id$
-#
+
 """A program to compare two NetCDF files."""
 
 import sys

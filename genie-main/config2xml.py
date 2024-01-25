@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+#####################################################################
+# python2 -> python3 conversion by tristan-salles / Nov 1, 2021
+# additional changes by:
+# > derpycode
+# 
+#####################################################################
+
 import sys
 import os.path
 import re
@@ -273,7 +280,11 @@ sed_select = {
     "gm_sed_select_104" : ["104",""],
     "gm_sed_select_105" : ["105",""],
     "gm_sed_select_106" : ["106",""],
-    "gm_sed_select_107" : ["107",""]
+    "gm_sed_select_107" : ["107",""],
+    "gm_sed_select_108" : ["108",""],
+    "gm_sed_select_109" : ["109",""],
+    "gm_sed_select_110" : ["110",""],
+    "gm_sed_select_111" : ["111",""]
     }
 # atchem
 atm_init = {
@@ -542,8 +553,8 @@ ocn_dinit = {
     "bg_ocn_dinit_105" : ["105",""],
     "bg_ocn_dinit_106" : ["106",""],
     "bg_ocn_dinit_107" : ["107",""],
-    "bg_ocn_dinit_106" : ["108",""],
-    "bg_ocn_dinit_107" : ["109",""]
+    "bg_ocn_dinit_108" : ["108",""],
+    "bg_ocn_dinit_109" : ["109",""]
     }
 par_atm_force_scale_val = {
     "bg_par_atm_force_scale_val_1" : ["1",""],

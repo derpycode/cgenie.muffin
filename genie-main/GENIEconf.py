@@ -1,5 +1,11 @@
 #! /usr/bin/python
 
+#####################################################################
+# python2 -> python3 conversion by tristan-salles / Nov 1, 2021
+# additional changes by:
+# > 
+#####################################################################
+
 #
 # Functionality which allows to handle (query/set/remove) parameters
 # in configuration files for GENIE (to be extended with functionality

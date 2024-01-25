@@ -1,5 +1,11 @@
 #! /usr/bin/python
 
+#####################################################################
+# python2 -> python3 conversion by tristan-salles / Nov 1, 2021
+# additional changes by:
+# > derpycode
+# > 
+#####################################################################
 
 def translate_config(config_filename, script_name="translate_config.py"):
     #
