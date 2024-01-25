@@ -905,10 +905,11 @@ def translate_config(config_filename, script_name="translate_config.py"):
 
     job_element.appendChild(parameters_element)
     xml_config = job.toprettyxml(encoding="UTF-8")
+    xml_config2 = xml_config.decode("UTF-8")
 
     # all matched key-value pairs have been removed from 'old_config'
     # as the translation has proceeded.
-    if "BUILDTEST_NAME" not in old_config:
+    if "BUILDTEST_NAME" in old_config:
         del old_config["BUILDTEST_NAME"]
     # If there are any entries left in 'old-config', then it is
     # an unrecognised setting and so the configuration file is
@@ -921,7 +922,7 @@ def translate_config(config_filename, script_name="translate_config.py"):
         sys.stderr.write(repr(old_config) + "\n")
         sys.exit(1)
 
-    return xml_config
+    return xml_config2
 
 
 #
