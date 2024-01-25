@@ -12,7 +12,7 @@ varlist = ["EXPID","RESTARTREAD","CHECKFLUXES"]
 # GEM common is included in control section
 # initialise with default science module choices
 configflags = {
-    # flag name in control,shortname,defual config, prefix 
+    # flag name in control,shortname,defual config, prefix
     # atmos
     "ma_flag_ebatmos" : ["embm",".FALSE.","ea"],
     "ma_flag_goldsteinocean" : ["goldstein",".FALSE.","go"],
@@ -28,7 +28,7 @@ configflags = {
     "gl_flag_gemlite" : ["gemlite",".TRUE.","gl"],
     }
 
-control = {} 
+control = {}
 
 # paramarrays!
 # gem
@@ -273,11 +273,7 @@ sed_select = {
     "gm_sed_select_104" : ["104",""],
     "gm_sed_select_105" : ["105",""],
     "gm_sed_select_106" : ["106",""],
-    "gm_sed_select_107" : ["107",""],
-    "gm_sed_select_108" : ["108",""],
-    "gm_sed_select_109" : ["109",""],
-    "gm_sed_select_110" : ["110",""],
-    "gm_sed_select_111" : ["111",""]
+    "gm_sed_select_107" : ["107",""]
     }
 # atchem
 atm_init = {
@@ -861,12 +857,12 @@ configfile = {} # to hold data from config file
 
 # Parse command line--only one arg permitted
 if len(sys.argv) != 2:
-    print "usage: config2xml <config-file-name>"
+    print("usage: config2xml <config-file-name>")
     sys.exit(2)
 configname = sys.argv[1]
 # ensure that the arg is a genuine file
 if not os.path.isfile(configname):
-    print "error: could not find file %s" % configname
+    print("error: could not find file %s" % configname)
     sys.exit(1)
 
 # load genie-main/namelists.sh
@@ -929,7 +925,7 @@ for item in configfile:
     for var in testlist:
         if var == item:
             testing[item] = configfile[item]
-    
+
     # sort out the <control> and <config> sections
     if (item.startswith("ma_") or item.startswith("gem_") or item.startswith("gm_")):
         done=0
@@ -948,76 +944,76 @@ for item in configfile:
         if item in paramarray.keys():
             paramarray[item][1] = configfile[item]
             deletelist.append(item)
-            
+
 # must delete param array entries outside of loop
 for item in deletelist:
     del configfile[item]
 
-#print betaz
-#print deletelist
+#print(betaz)
+#print(deletelist)
 #sys.exit(0)
 
 # Let's start printing!
 # header
-print '<?xml version="1.0" encoding="UTF-8"?>'
-print '<job author="config2xml.py - automatic conversion of ASCII text config file">'
+print('<?xml version="1.0" encoding="UTF-8"?>')
+print('<job author="config2xml.py - automatic conversion of ASCII text config file">')
 # <vars> section
-print '\t<vars>'
+print('\t<vars>')
 for var in vars:
-    print '\t\t<var name="' + str(var) + '">' + str(vars[var]) + '</var>' 
-print '\t</vars>'
+    print('\t\t<var name="' + str(var) + '">' + str(vars[var]) + '</var>')
+print('\t</vars>')
 # <config> section
-print '\t<config>'
+print('\t<config>')
 for model in configflags:
     if (configflags[model][1] == ".TRUE." or configflags[model][1] == ".true."):
-        print '\t\t<model name="' + str(configflags[model][0]) + '"/>'
-print '\t</config>'
+        print('\t\t<model name="' + str(configflags[model][0]) + '"/>')
+print('\t</config>')
 # <parameters> section
-print '\t<parameters>'
+print('\t<parameters>')
 #    <control> subsection
-print '\t\t<control>'
+print('\t\t<control>')
 for entry in control:
     myval = control[entry]
     repval = pp.sub(r'<varref>\1</varref>/', myval)
-    print '\t\t\t<param name="' +str(namelists[entry]) + '">' + str(repval) +'</param>'
+    print('\t\t\t<param name="' +str(namelists[entry]) + '">' + str(repval) +'</param>')
         # --gem--
 vals = ""
 for list in atm_select.values():
     vals = vals + list[1]
 if vals:
-    print '\t\t\t<paramArray name="atm_select">'
+    print('\t\t\t<paramArray name="atm_select">')
     for key in atm_select.keys():
         if atm_select[key][1] != "":
-            print '\t\t\t\t<param index="'+str(atm_select[key][0])+'">'+str(atm_select[key][1])+'</param>'
-    print '\t\t\t</paramArray>'
+            print('\t\t\t\t<param index="'+str(atm_select[key][0])+'">'+str(atm_select[key][1])+'</param>')
+    print('\t\t\t</paramArray>')
 vals = ""
 for list in ocn_select.values():
     vals = vals + list[1]
 if vals:
-    print '\t\t\t<paramArray name="ocn_select">'
+    print('\t\t\t<paramArray name="ocn_select">')
     for key in ocn_select.keys():
         if ocn_select[key][1] != "":
-            print '\t\t\t\t<param index="'+str(ocn_select[key][0])+'">'+str(ocn_select[key][1])+'</param>'
-    print '\t\t\t</paramArray>'
+            print('\t\t\t\t<param index="'+str(ocn_select[key][0])+'">'+str(ocn_select[key][1])+'</param>'
+    print('\t\t\t</paramArray>')
 vals = ""
 for list in sed_select.values():
     vals = vals + list[1]
 if vals:
-    print '\t\t\t<paramArray name="sed_select">'
+    print('\t\t\t<paramArray name="sed_select">')
     for key in sed_select.keys():
         if sed_select[key][1] != "":
-            print '\t\t\t\t<param index="'+str(sed_select[key][0])+'">'+str(sed_select[key][1])+'</param>'
-    print '\t\t\t</paramArray>'
-print '\t\t</control>'
+            print('\t\t\t\t<param index="'+str(sed_select[key][0])+'">'+str(sed_select[key][1])+'</param>')
+    print('\t\t\t</paramArray>')
+print('\t\t</control>')
 for model in configflags:
     # only need output params for selected models..
     if (configflags[model][1] == ".TRUE." or configflags[model][1] == ".true."):
-        print '\t\t<model name="' + str(configflags[model][0]) + '">'
+        print('\t\t<model name="' + str(configflags[model][0]) + '">')
         for entry in configfile:
             if entry.startswith(configflags[model][2]+'_'):
                 myval = configfile[entry]
                 repval = pp.sub(r'<varref>\1</varref>/', myval)
-                print '\t\t\t<param name="' +str(namelists[entry]) + '">' + str(repval) +'</param>'
+                print('\t\t\t<param name="' +str(namelists[entry]) + '">' + str(repval) +'</param>')
         # plus paramarray specials
         # --atchem--
         if configflags[model][0] == "atchem":
@@ -1025,88 +1021,88 @@ for model in configflags:
             for list in atm_init.values():
                 vals = vals + list[1]
             if vals:
-                print '\t\t\t<paramArray name="atm_init">'
+                print('\t\t\t<paramArray name="atm_init">')
                 for key in atm_init.keys():
                     if atm_init[key][1] != "":
-                        print '\t\t\t\t<param index="'+str(atm_init[key][0])+'">'+str(atm_init[key][1])+'</param>'
-                print '\t\t\t</paramArray>'
+                        print('\t\t\t\t<param index="'+str(atm_init[key][0])+'">'+str(atm_init[key][1])+'</param>')
+                print('\t\t\t</paramArray>')
         # --biogem--
         if configflags[model][0] == "biogem":
             vals = ""
             for list in ocn_init.values():
                 vals = vals + list[1]
             if vals:
-                print '\t\t\t<paramArray name="ocn_init">'
+                print('\t\t\t<paramArray name="ocn_init">')
                 for key in ocn_init.keys():
                     if ocn_init[key][1] != "":
-                        print '\t\t\t\t<param index="'+str(ocn_init[key][0])+'">'+str(ocn_init[key][1])+'</param>'
-                print '\t\t\t</paramArray>'
+                        print('\t\t\t\t<param index="'+str(ocn_init[key][0])+'">'+str(ocn_init[key][1])+'</param>')
+                print('\t\t\t</paramArray>')
         # --embm--
         if configflags[model][0] == "embm":
             vals = ""
             for list in diffamp.values():
                 vals = vals + list[1]
             if vals:
-                print '\t\t\t<paramArray name="diffamp">'
+                print('\t\t\t<paramArray name="diffamp">')
                 for key in diffamp.keys():
                     if diffamp[key][1] != "":
-                        print '\t\t\t\t<param index="'+str(diffamp[key][0])+'">'+str(diffamp[key][1])+'</param>'
-                print '\t\t\t</paramArray>'
+                        print('\t\t\t\t<param index="'+str(diffamp[key][0])+'">'+str(diffamp[key][1])+'</param>')
+                print('\t\t\t</paramArray>')
             vals = ""
             for list in betaz.values():
                 vals = vals + list[1]
             if vals:
-                print '\t\t\t<paramArray name="betaz">'
+                print('\t\t\t<paramArray name="betaz">')
                 for key in betaz.keys():
                     if betaz[key][1] != "":
-                        print '\t\t\t\t<param index="'+str(betaz[key][0])+'">'+str(betaz[key][1])+'</param>'
-                print '\t\t\t</paramArray>'
+                        print('\t\t\t\t<param index="'+str(betaz[key][0])+'">'+str(betaz[key][1])+'</param>')
+                print('\t\t\t</paramArray>')
             vals = ""
             for list in betam.values():
                 vals = vals + list[1]
             if vals:
-                print '\t\t\t<paramArray name="betam">'
+                print('\t\t\t<paramArray name="betam">')
                 for key in betam.keys():
                     if betam[key][1] != "":
-                        print '\t\t\t\t<param index="'+str(betam[key][0])+'">'+str(betam[key][1])+'</param>'
-                print '\t\t\t</paramArray>'
-        # --goldstein--        
+                        print('\t\t\t\t<param index="'+str(betam[key][0])+'">'+str(betam[key][1])+'</param>')
+                print('\t\t\t</paramArray>')
+        # --goldstein--
         if configflags[model][0] == "goldstein":
             vals = ""
             for list in diff.values():
                 vals = vals + list[1]
             if vals:
-                print '\t\t\t<paramArray name="diff">'
+                print('\t\t\t<paramArray name="diff">')
                 for key in diff.keys():
                     if diff[key][1] != "":
-                        print '\t\t\t\t<param index="'+str(diff[key][0])+'">'+str(diff[key][1])+'</param>'
-                print '\t\t\t</paramArray>'
-        print '\t\t</model>'
-print '\t</parameters>'
+                        print('\t\t\t\t<param index="'+str(diff[key][0])+'">'+str(diff[key][1])+'</param>')
+                print('\t\t\t</paramArray>')
+        print('\t\t</model>')
+print('\t</parameters>')
 # <build> section
-print '\t<build>'
+print('\t<build>')
 # make args first
 for arg in makeargs:
-    print '\t\t<make-arg name="'+str(arg)+'">'+str(makeargs[arg])+'</make-arg>'
+    print('\t\t<make-arg name="'+str(arg)+'">'+str(makeargs[arg])+'</make-arg>')
 # then macros
 for macro in macros:
-    print '\t\t<macro handle="'+str(macro)+'" status="defined">'
+    print('\t\t<macro handle="'+str(macro)+'" status="defined">')
     myval = macros[macro]
     myval = myval.replace('$(DEFINE)','')
     myval = myval.replace("'","")
     # may not contain an '='
     splitret = myval.split('=')
     ident = splitret[0]
-    print '\t\t\t<identifier>'+str(ident)+'</identifier>'
+    print('\t\t\t<identifier>'+str(ident)+'</identifier>')
     if len(splitret) > 1:
         repl = splitret[1]
-        print '\t\t\t<replacement>'+str(repl)+'</replacement>'
-    print '\t\t</macro>'
-print '\t</build>'
+        print('\t\t\t<replacement>'+str(repl)+'</replacement>')
+    print('\t\t</macro>')
+print('\t</build>')
 # <testing> section
-print '\t<testing>'
+print('\t<testing>')
 for var in testing:
     if testing[var] != "${EXPID}_assumedgood":
-        print '\t\t<var name="'+str(var)+'">'+str(testing[var])+'</var>'
-print '\t</testing>'
-print '</job>'
+        print('\t\t<var name="'+str(var)+'">'+str(testing[var])+'</var>')
+print('\t</testing>')
+print('</job>')
