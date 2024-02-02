@@ -4048,11 +4048,11 @@ SUBROUTINE diag_biogem_timeseries( &
               ! NOTE: apply ocean mask (@ surface)
               ! (1) mean global properties
               int_misc_ocn_solfor_sig = int_misc_ocn_solfor_sig + &
-                   & loc_dtyr*loc_ocn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_solfor,:,:))
+                   & loc_dtyr*loc_ocnatm_rtot_A*sum(phys_ocnatm(ipo_A,:,:)*phys_ocnatm(ipoa_solfor,:,:))
               int_misc_opn_solfor_sig = int_misc_opn_solfor_sig + &
                    & loc_dtyr*loc_opn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_solfor,:,:))
               int_misc_ocn_fxsw_sig = int_misc_ocn_fxsw_sig + &
-                   & loc_dtyr*loc_ocn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_fxsw,:,:))
+                   & loc_dtyr*loc_ocnatm_rtot_A*sum(phys_ocnatm(ipo_A,:,:)*phys_ocnatm(ipoa_fxsw,:,:))
               int_misc_opn_fxsw_sig = int_misc_opn_fxsw_sig + &
                    & loc_dtyr*loc_opn_rtot_A*sum(phys_ocn(ipo_A,:,:,n_k)*phys_ocnatm(ipoa_fxsw,:,:))
               ! (2) latitudinal/seasonal properties
