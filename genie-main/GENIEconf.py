@@ -216,7 +216,7 @@ def add_var_section_element(dom, section_name):
     if not element:
         element = dom_config.createElement(section_name)
         job_element[0].appendChild(element)
-    return section_element
+    return element
 
 
 def extract_value(element):

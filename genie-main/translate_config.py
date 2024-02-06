@@ -441,7 +441,7 @@ def translate_config(config_filename, script_name="translate_config.py"):
 
     # ensure that the arg is a genuine file
     if not os.path.isfile(config_filename):
-        print("Error: File %s not found!" % configname)
+        print("Error: File %s not found!" % config_filename)
         sys.exit(1)
     else:
         re_key_val_1 = re.compile(r"^\s*([^\s\'\"]+?)\s*=\s*\'([^\']*)\'")

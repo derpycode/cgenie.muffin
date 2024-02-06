@@ -842,6 +842,12 @@ diff = {
     "go_14" : ["1",""],
     "go_15" : ["2",""]
     }
+snolook = {}
+watertransport = {}
+albsnf_nvg = {}
+albsnf_max = {}
+hcon_nvg = {}
+hcap_nvg = {}
 
 deletelist = []
 
@@ -1004,7 +1010,7 @@ if vals:
     print('\t\t\t<paramArray name="ocn_select">')
     for key in ocn_select.keys():
         if ocn_select[key][1] != "":
-            print('\t\t\t\t<param index="'+str(ocn_select[key][0])+'">'+str(ocn_select[key][1])+'</param>'
+            print('\t\t\t\t<param index="'+str(ocn_select[key][0])+'">'+str(ocn_select[key][1])+'</param>')
     print('\t\t\t</paramArray>')
 vals = ""
 for list in sed_select.values():
