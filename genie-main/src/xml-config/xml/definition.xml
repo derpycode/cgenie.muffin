@@ -4427,6 +4427,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">Ridgwell2001</value>
                         <description>opal:POC rain ratio option ID string</description>
                     </param>
+                    <param name="par_bio_POC_CaCO3_target">
+			<value datatype="real">0.0</value>
+                        <description>(tuning) target potential global mean CaCO3:POC rain ratio (set to zero to disable)</description>
+                    </param>
 <!-- REMINERALIZATION  -->
                     <param name="par_bio_remin_RDOMfrac">
 			<value datatype="real">0.0</value>
@@ -7747,6 +7751,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_sed_diag_volcanicd13C">
 			<value datatype="real">-6.0</value>
                         <description>assumed d13C of volcanic emissions (o/oo)</description>
+                    </param>
+                    <param name="par_sed_diag_P2ALK">
+			<value datatype="real">-16.0</value>
+                        <description>assumed implicit P:ALK (non zero values only really make any sense in ocean-only biogeochemical cycling)</description>
                     </param>
 <!-- I/O: DIRECTORY DEFINITIONS  -->
                     <param name="par_pindir_name">

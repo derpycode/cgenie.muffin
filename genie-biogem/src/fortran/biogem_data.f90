@@ -201,6 +201,7 @@ CONTAINS
        print*,'Ridgwell [2001] -- opal:POC KSp for FeT (mol kg-1)  : ',par_part_red_opal_FeTKSp
        print*,'Ridgwell [2001] -- opal:POC offset, FeT (mol kg-1)  : ',par_part_red_opal_FeToff
        print*,'opal:POC rain ratio option ID string                : ',opt_bio_red_SitoC
+       print*,'target potential global mean CaCO3:POC rain ratio   : ',par_bio_POC_CaCO3_target
        ! --- REMINERALIZATION ---------------------------------------------------------------------------------------------------- !
        print*,'--- REMINERALIZATION -------------------------------'
        print*,'Fraction of POM remin concverted to RDOM            : ',par_bio_remin_RDOMfrac
@@ -1494,7 +1495,7 @@ CONTAINS
           conv_sed_ocn_N(io_ALK,is_POC) = -2.0*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        else
-          ! [DEFAULT, oxic remin relationship]
+          ! (this should not occur)
        endif
        ! > N isotopes (from denitrification) [placeholder values -- corrected for local d15N in sub_box_remin_redfield]
        if (ocn_select(io_NO3_15N)) then
@@ -1837,6 +1838,7 @@ CONTAINS
     int_diag_redox_sig(:)   = 0.0
     int_diag_ecogem_part    = 0.0
     int_diag_ecogem_remin   = 0.0
+    int_diag_bio_red_POC_CaCO3  = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
@@ -2176,7 +2178,8 @@ CONTAINS
                       elseif (io == io_Sr_88Sr) then
                          ocn(io,i,j,k) = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,ocn_init(:),2)
                       elseif (io == io_Os_187Os) then
-                         ocn(io,i,j,k) = ocn_init(io)*ocn_init(io_Os_188Os)*(ocn_init(io_Os)/(1.0+ocn_init(io_Os_188Os)+ocn_init(io)*ocn_init(io_Os_188Os)))
+                         ocn(io,i,j,k) = ocn_init(io)*ocn_init(io_Os_188Os)*(ocn_init(io_Os)/ &
+                              & (1.0+ocn_init(io_Os_188Os)+ocn_init(io)*ocn_init(io_Os_188Os)))
                       elseif (io == io_Os_188Os) then
                          ocn(io,i,j,k) = ocn_init(io)*(ocn_init(io_Os)/(1.0+ocn_init(io)+ocn_init(io_Os_187Os)*ocn_init(io)))
                       end if
@@ -2899,6 +2902,22 @@ CONTAINS
             & )
     ENDIF
 
+    ! *** parameter consistency check - selected tracers and redox pairs ***
+    IF (ocn_select(io_NO3) .AND. (.NOT. ocn_select(io_NH4))) THEN
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par','A reduced N species (e.g. NH4) tracer must be selected along with NO3 ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
+    IF (ocn_select(io_SO4) .AND. (.NOT. ocn_select(io_H2S))) THEN
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par','The H2S tracer must be selected along with SO4 ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
+
     ! *** parameter consistency check - selected tracers and sediment-sediment option combinations ***
     do is=1,n_sed
        if (sed_type(is) == par_sed_type_frac) then
@@ -2915,7 +2934,7 @@ CONTAINS
     end do
     IF (sed_select(is_CaCO3) .AND. (.NOT. sed_select(is_POC))) THEN
        CALL sub_report_error( &
-            & 'biogem_data','sub_check_par','The POC tracer must be selected with CaCO3 in biogem_config_sed.par ', &
+            & 'biogem_data','sub_check_par','The POC tracer must be selected with CaCO3 ', &
             & 'STOPPING', &
             & (/const_real_null/),.true. &
             & )
@@ -2997,7 +3016,7 @@ CONTAINS
                       CALL sub_report_error( &
                            & 'biogem_data','sub_check_par', &
                            & 'Particulate tracer '//TRIM(loc_string2)// &
-                           & ' does does not have *all possible* corresponding ocean tracers selected, such as '//TRIM(loc_string1)// &
+                           & ' does not have *all possible* corresponding ocean tracers selected, e.g. '//TRIM(loc_string1)// &
                            & ' (BUT may not need them, esp. if involving the Fe sytem ...)', &
                            & 'CONTINUING', &
                            & (/const_real_null/),.false. &
@@ -3056,7 +3075,7 @@ CONTAINS
        if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then
           call sub_report_error( &
                & 'biogem_data','sub_check_par', &
-               & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
+               & 'Diagnosing transport matrix will take longer than the run.', &
                & '[par_data_TM_start] HAS BEEN CHANGED TO ALLOW MATRIX DIAGNOSIS TO FINISH', &
                & (/const_real_null/),.false. &
                & )
@@ -3100,6 +3119,7 @@ CONTAINS
     end if
     
     ! *** redox-requiring schemes ***
+    ! NOTE: also set ctrl_data_save_slice_diag_geochem + ctrl_data_save_sig_diag_geochem to ensure that redox data is saved
     if (.NOT. ctrl_bio_remin_redox_save) THEN
        SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
        case ('reminO2','reminO2lifetime')
@@ -3109,7 +3129,9 @@ CONTAINS
                & '... making this change for you.', &
                & (/const_real_null/),.false. &
                & )
-          ctrl_bio_remin_redox_save = .true.
+          ctrl_bio_remin_redox_save         = .true.
+          ctrl_data_save_slice_diag_geochem = .true.
+          ctrl_data_save_sig_diag_geochem   = .true.
        end select
        SELECT CASE (opt_bio_remin_reduce_IO3toI)
        case ('reminSO4','reminSO4lifetime','thresholdflex')
@@ -3119,7 +3141,9 @@ CONTAINS
                & '... making this change for you.', &
                & (/const_real_null/),.false. &
                & )
-          ctrl_bio_remin_redox_save = .true.
+          ctrl_bio_remin_redox_save         = .true.
+          ctrl_data_save_slice_diag_geochem = .true.
+          ctrl_data_save_sig_diag_geochem   = .true.
        end select
     end if
 

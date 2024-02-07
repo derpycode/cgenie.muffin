@@ -781,6 +781,13 @@ MODULE gem_cmn
   REAL,PARAMETER::const_d13C_DIC_Corg_Q2_x2 = +2.829E-10         ! 2nd order polymonial c(i) approximation: x2
   REAL,PARAMETER::const_d13C_DIC_Corg_Q2_x  = -1.788E-07         ! 2nd order polymonial c(i) approximation: x
   REAL,PARAMETER::const_d13C_DIC_Corg_Q2_c  = +3.170E-05         ! 2nd order polymonial c(i) approximation: c
+  ! ---------------------------------------------------------- !
+  ! SEDIMENTS
+  ! ---------------------------------------------------------- !
+  REAL,PARAMETER::const_d13C_LA1_a = 0.45                        ! Schmittner LA1 d13C proxy coefficient
+  REAL,PARAMETER::const_d13C_LA1_b = 1.0                         ! Schmittner LA1 d13C proxy coefficient
+  REAL,PARAMETER::const_d13C_LA1_c = -2.2e-3                     ! Schmittner LA1 d13C proxy coefficient
+  REAL,PARAMETER::const_d13C_LA1_d = -6.6e-5                     ! Schmittner LA1 d13C proxy coefficient 
 
   ! *** miscellaneous ***
   ! PI

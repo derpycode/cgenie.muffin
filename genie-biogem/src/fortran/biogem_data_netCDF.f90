@@ -1034,6 +1034,31 @@ CONTAINS
           call sub_putvar3d_g('carb_d13C_CO32',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
        end if
     end If
+    !-----------------------------------------------------------------------
+    ! ocean carbonate system isotopic properties -- proxies
+    !-----------------------------------------------------------------------
+    If (ctrl_data_save_slice_carb .AND. ctrl_data_save_slice_diag_proxy .AND. ocn_select(io_DIC_13C)) then
+       ! Schmittner LA1 d13C proxy
+       loc_unitsname = 'o/oo'
+       loc_ijk(:,:,:) = const_real_null
+       DO i=1,n_i
+          DO j=1,n_j
+             DO k=goldstein_k1(i,j),n_k
+                loc_tot  = int_ocn_timeslice(io_DIC,i,j,k)
+                loc_frac = int_ocn_timeslice(io_DIC_13C,i,j,k)
+                loc_standard = const_standards(ocn_type(io_DIC_13C))
+                loc_ijk(i,j,k) = const_d13C_LA1_a + &
+                     & const_d13C_LA1_b*fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null) + &
+                     & const_d13C_LA1_c*1.0E6*int_carb_timeslice(ic_conc_CO3,i,j,k) + &
+                     & const_d13C_LA1_d*int_phys_ocn_timeslice(ipo_Dmid,i,j,k)/int_t_timeslice
+             end DO
+          end DO
+       end DO
+       call sub_adddef_netcdf(loc_iou,4,'misc_proxy_d13C_LA1','Schmittner d13C (LA1) proxy','o/oo',const_real_zero,const_real_zero)
+       call sub_putvar3d_g('misc_proxy_d13C_LA1',loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
+    end If
+    !-----------------------------------------------------------------------
+    !-----------------------------------------------------------------------
     If (ctrl_data_save_slice_ocn .AND. (ctrl_data_save_slice_diag_bio .OR. ctrl_data_save_slice_diag_geochem)) then
        !-----------------------------------------------------------------------
        !       N-star
@@ -1643,7 +1668,6 @@ CONTAINS
     CHARACTER(len=255)::loc_unitsname
     real::loc_tot,loc_frac,loc_standard
     real::loc_tot1,loc_frac1,loc_tot2,loc_frac2
-    real::loc_a,loc_b,loc_c,loc_d
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
@@ -1971,13 +1995,18 @@ CONTAINS
        ! nutrient limitation
        ! NOTE: -1.0 equates to dominance of PO4 limitation, +1.0 to dominance of Fe limitation
        !       a value of ~0.0 represents nutrient replete conditions OR ~equal limitation
+       ! for reference: loc_kPO4 = loc_PO4/(loc_PO4 + par_bio_c0_PO4), loc_kFe = loc_FeT/(loc_FeT + par_bio_c0_Fe)
+       !                i.e. 1.0 == no limitation, 0.0 == complete limitation
        if ( ocn_select(io_PO4) .AND. (ocn_select(io_Fe) .OR. ocn_select(io_TDFe)) ) then
           loc_unitsname = 'n/a'
-          loc_ij(:,:) = ( int_diag_bio_timeslice(idiag_bio_kFe,:,:) - int_diag_bio_timeslice(idiag_bio_kPO4,:,:) )/ &
-               & int_t_timeslice
-          call sub_adddef_netcdf(loc_iou,3,'misc_sur_PO4Felimbalance','occurrence of Fe vs. PO4 limitation condition', &
+          loc_ij(:,:) = ( &
+               & (1.0 - int_diag_bio_timeslice(idiag_bio_kFe,:,:)) &
+               & - &
+               & (1.0 - int_diag_bio_timeslice(idiag_bio_kPO4,:,:)) &
+               & )/int_t_timeslice
+          call sub_adddef_netcdf(loc_iou,3,'misc_sur_FeminusPO4limitation','occurrence of Fe (+1.0) vs. PO4 (-1.0) limitation', &
                & trim(loc_unitsname),const_real_zero,const_real_zero)
-          call sub_putvar2d('misc_sur_PO4Felimbalance',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
+          call sub_putvar2d('misc_sur_FeminusPO4limitation',loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask_surf)
        end if
     end if
     !-----------------------------------------------------------------------
@@ -2146,11 +2175,7 @@ CONTAINS
        call sub_adddef_netcdf(loc_iou,3,'proxy_ben_HCO3_d13C', &
             & 'bottom-water HCO3- d13C',trim(loc_unitsname),const_real_zero,const_real_zero)
        call sub_putvar2d('proxy_ben_HCO3_d13C',loc_iou,n_i,n_j,loc_ntrec,loc_ij,loc_mask_surf)
-       ! benthic Schmittner d13C
-       loc_a = 0.45
-       loc_b = 1.0
-       loc_c = -2.2e-3
-       loc_d = -6.6e-5
+       ! benthic Schmittner d13C LAI
        loc_ij(:,:) = const_real_zero
        loc_unitsname = 'o/oo'
        DO i=1,n_i
@@ -2160,10 +2185,10 @@ CONTAINS
                 loc_tot  = int_ocn_timeslice(io_DIC,i,j,loc_k1)
                 loc_frac = int_ocn_timeslice(io_DIC_13C,i,j,loc_k1)
                 loc_standard = const_standards(ocn_type(io_DIC_13C))
-                loc_ij(i,j) = loc_a + &
-                     & loc_b*fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null) + &
-                     & loc_c*1.0E6*int_carb_timeslice(ic_conc_CO3,i,j,loc_k1) + &
-                     & loc_d*int_phys_ocn_timeslice(ipo_Dbot,i,j,loc_k1)/int_t_timeslice
+                loc_ij(i,j) = const_d13C_LA1_a + &
+                     & const_d13C_LA1_b*fun_calc_isotope_delta(loc_tot,loc_frac,loc_standard,.FALSE.,const_real_null) + &
+                     & const_d13C_LA1_c*1.0E6*int_carb_timeslice(ic_conc_CO3,i,j,loc_k1) + &
+                     & const_d13C_LA1_d*int_phys_ocn_timeslice(ipo_Dbot,i,j,loc_k1)/int_t_timeslice
              end IF
           end DO
        end DO

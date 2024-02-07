@@ -111,10 +111,10 @@ SUBROUTINE initialise_sedgem( &
   ! initialize sediment sub-system
   call sub_init_sed()
   call sub_init_sed_layers_default()
-  ! initialize sediment core location data save mask
-  call sub_init_sedgem_save_sed_data()
-  ! initialize sediment core environmental conditions saving
-  if (ctrl_data_save_sedcorenv) call sub_sedgem_init_sedcoresenv()
+!!$  ! initialize sediment core location data save mask
+!!$  call sub_init_sedgem_save_sed_data()
+!!$  ! initialize sediment core environmental conditions saving
+!!$  if (ctrl_data_save_sedcorenv) call sub_sedgem_init_sedcoresenv()
   ! seed the aqueous carbonate system with an initial value of [H+]
   sed_carb(ic_H,:,:) = 1.0E-8
   ! initialize bioturbation profile
@@ -217,6 +217,8 @@ SUBROUTINE initialise_sedgem( &
   n_sedcore_tot = par_n_sedcore_tot_min + par_n_sedcore_tot_perky*int(par_misc_t_runtime/1000.0)
   ! initialize sedcores
   call sub_data_sedcore_init()
+  ! initialize sediment core environmental conditions saving
+  if (ctrl_data_save_sedcorenv) call sub_sedgem_init_sedcoresenv()
 
   print*,' <<< Initialisation complete'
   print*,'======================================================='
