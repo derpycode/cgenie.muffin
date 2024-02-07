@@ -578,7 +578,7 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! insolation 
+       ! insolation
        loc_filename=fun_data_timeseries_filename( &
             & loc_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_insol',string_results_ext)
        loc_string = '% time (yr) / mean insolation (W m-2) / ' // &
@@ -2321,7 +2321,7 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! insolation
+       ! insolation (ocnatm grid) at top of atmosphere
        loc_filename=fun_data_timeseries_filename( &
             & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_insol',string_results_ext)
        call check_unit(out,__LINE__,__FILE__)
@@ -2335,7 +2335,7 @@ CONTAINS
        call check_iostat(ios,__LINE__,__FILE__)
        CLOSE(unit=out,iostat=ios)
        call check_iostat(ios,__LINE__,__FILE__)
-       ! SW flux at surface
+       ! SW flux (ocnatm grid) at surface (accounted for albedo)
        loc_filename=fun_data_timeseries_filename( &
             & dum_t,par_outdir_name,trim(par_outfile_name)//'_series','misc_swflux',string_results_ext)
        call check_unit(out,__LINE__,__FILE__)

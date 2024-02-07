@@ -156,6 +156,8 @@ CONTAINS
        print*,'Corg 13C fractionation scheme ID string             : ',trim(opt_d13C_DIC_Corg)
        print*,'b value for Popp et al. fractionation               : ',par_d13C_DIC_Corg_b
        print*,'fractionation for intercellular C fixation          : ',par_d13C_DIC_Corg_ef
+       ! ------------------- BALLAST PROPERTIES ------------------------------------------------------------------------------ !
+       print*,'ballasting parameterization?                        : ',ctrl_bio_remin_POC_ballast_eco ! Aaron Diatom 23
        ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
        print*,'--- RUN CONTROL ------------------------------------'
        print*,'Continuing run?                                     : ',ctrl_continuing
@@ -170,8 +172,7 @@ CONTAINS
        print*,'--- DATA SAVING: MISC ------------------------------'
        print*,'Restart in netCDF format?                           : ',ctrl_ncrst
        print*,'netCDF restart file name                            : ',trim(par_ncrst_name)
-       print*,'timeseries locations file name                      : ',trim(par_ecogem_timeseries_file)
-    end if ! end ctrl_debug_eco_init
+       end if ! end ctrl_debug_eco_init
 66  format(a56,l2)
 67  format(a56,i2)
 71  format(a56,i4)
@@ -334,12 +335,21 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'synechococcus') then
-          NO3up(jp)           = 0.0
-          Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
-          silicify(jp)        = 0.0
-          autotrophy(jp)      = 1.0
-          heterotrophy(jp)    = 0.0
+          NO3up(jp)       = 1.0
+          Nfix(jp)        = 0.0
+          calcify(jp)     = 0.0
+          silicify(jp)    = 0.0
+          autotrophy(jp)  = 1.0
+          heterotrophy(jp)= 0.0
+          palatability(jp)= 1.0
+       elseif (pft(jp).eq.'picoplankton') then
+          NO3up(jp)       = 1.0
+          Nfix(jp)        = 0.0
+          calcify(jp)     = 0.0
+          silicify(jp)    = 0.0
+          autotrophy(jp)  = 1.0
+          heterotrophy(jp)= 0.0
+          palatability(jp)= 1.0
        elseif (pft(jp).eq.'picoeukaryote') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -348,19 +358,21 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'diatom') then
-          NO3up(jp)           = 0.0
-          Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
-          silicify(jp)        = 0.0
-          autotrophy(jp)      = 1.0
-          heterotrophy(jp)    = 0.0
+          NO3up(jp)       = 1.0
+          Nfix(jp)        = 0.0
+          calcify(jp)     = 0.0
+          silicify(jp)    = 1.0
+          autotrophy(jp)  = 1.0
+          heterotrophy(jp)= 0.0
+          palatability(jp)= par_diatom_palatability_mod ! JDW / Aaron Diatom 23
        elseif (pft(jp).eq.'coccolithophore') then
-          NO3up(jp)           = 0.0
-          Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
-          silicify(jp)        = 0.0
-          autotrophy(jp)      = 1.0
-          heterotrophy(jp)    = 0.0
+          NO3up(jp)       = 1.0
+          Nfix(jp)        = 0.0
+          calcify(jp)     = 1.0
+          silicify(jp)    = 0.0
+          autotrophy(jp)  = 1.0
+          heterotrophy(jp)= 0.0
+          palatability(jp)= 1.0 * par_cocco_palatability_mod
        elseif (pft(jp).eq.'diazotroph') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -369,12 +381,21 @@ CONTAINS
           autotrophy(jp)      = 1.0
           heterotrophy(jp)    = 0.0
        elseif (pft(jp).eq.'phytoplankton') then
-          NO3up(jp)           = 0.0
-          Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
-          silicify(jp)        = 0.0
-          autotrophy(jp)      = 1.0
-          heterotrophy(jp)    = 0.0
+          NO3up(jp)       = 1.0
+          Nfix(jp)        = 0.0
+          calcify(jp)     = 0.0
+          silicify(jp)    = 0.0
+          autotrophy(jp)  = 1.0
+          heterotrophy(jp)= 0.0
+          palatability(jp)= 1.0
+       elseif (pft(jp).eq.'eukaryote') then
+           NO3up(jp)       = 1.0
+           Nfix(jp)        = 0.0
+           calcify(jp)     = 0.0
+           silicify(jp)    = 0.0
+           autotrophy(jp)  = 1.0
+           heterotrophy(jp)= 0.0
+           palatability(jp)= 1.0 ! Aaron Diatom 23
        elseif (pft(jp).eq.'zooplankton') then
           NO3up(jp)           = 0.0
           Nfix(jp)            = 0.0
@@ -390,18 +411,19 @@ CONTAINS
           autotrophy(jp)      = trophic_tradeoff
           heterotrophy(jp)    = trophic_tradeoff
        elseif (pft(jp).eq.'foram') then
-          NO3up(jp)           = 0.0
-          Nfix(jp)            = 0.0
-          calcify(jp)         = 0.0
-          silicify(jp)        = 0.0
-          autotrophy(jp)      = 0.0
-          heterotrophy(jp)    = 1.0
+          NO3up(jp)       = 0.0
+          Nfix(jp)        = 0.0
+          calcify(jp)     = 1.0
+          silicify(jp)    = 0.0
+          autotrophy(jp)  = trophic_tradeoff*0.5
+          heterotrophy(jp)= trophic_tradeoff*0.5
+          palatability(jp)= 0.5
        else
           print*," "
           print*,"! ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           print*,"! Unknown plankton functional type '"//trim(pft(jp))//"'"
           print*,"! Specified in input file "//TRIM(par_indir_name)//TRIM(par_ecogem_plankton_file)
-          print*,"Choose from Prochlorococcus, Synechococcus, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Phytoplankton, Zooplankton or Mixotroph"
+          print*,"Choose from Prochlorococcus, Synechococcus, Picoplankton, Picoeukaryote, Diatom, Coccolithophore, Diazotroph, Phytoplankton, Zooplankton or Mixotroph"
           print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           stop
        endif
@@ -442,6 +464,12 @@ CONTAINS
     ! maximum photosynthetic rate
     !    vmax(iDIC,:)    = vmaxDIC_a * volume(:) ** vmaxDIC_b * autotrophy(:)
     vmax(iDIC,:)    = (vmaxDIC_a  + log10(volume(:))) / (vmaxDIC_b + vmaxDIC_c * log10(volume(:)) + log10(volume(:))**2) * autotrophy(:)
+    ! modify rates for functional types
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_pico * volume(:) ** vmaxDIC_b_pft_pico,vmax(iDIC,:),pft.eq.'picoplankton')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_cocco * volume(:) ** vmaxDIC_b_pft_cocco,vmax(iDIC,:),pft.eq.'coccolithophore')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diatom * volume(:) ** vmaxDIC_b_pft_diatom,vmax(iDIC,:),pft.eq.'diatom')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_eukaryote * volume(:) ** vmaxDIC_b_pft_eukaryote,vmax(iDIC,:),pft.eq.'eukaryote')
+    vmax(iDIC,:)    = merge(vmaxDIC_a_pft_diazotroph * volume(:) ** vmaxDIC_b_pft_diazotroph,vmax(iDIC,:),pft.eq.'diazotroph') ! Aaron Diatom 23
     !-----------------------------------------------------------------------------------------
     if (nquota) then ! nitrogen parameters
        qmin(iNitr,:)      =    qminN_a * volume(:) **    qminN_b
@@ -449,14 +477,14 @@ CONTAINS
        if (maxval((qmin(iNitr,:)/qmax(iNitr,:))).gt.1.0) print*,"WARNING: Nitrogen Qmin > Qmax. Population inviable!"
        if (useNO3) then ! nitrate parameters
           vmax(iNO3,:)     =  vmaxNO3_a * volume(:) **  vmaxNO3_b * autotrophy(:) * NO3up(:)
-          affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) * NO3up(:)
+          affinity(iNO3,:) = affinNO3_a * volume(:) ** affinNO3_b * autotrophy(:) !* NO3up(:) Fanny - otherwise up_inorg(NO3) is NaN -> the best would be to prevent up_inorg to be Nan
        endif
-       if (useNO2) then ! nitrite parameters
-          vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:)
+       if (useNO2) then ! nitrite parameters - modified to account for nitrogen fixation - Fanny Jun20
+          vmax(iNO2,:)     =  vmaxNO2_a * volume(:) **  vmaxNO2_b * autotrophy(:) * (1.0 - Nfix(:))          
           affinity(iNO2,:) = affinNO2_a * volume(:) ** affinNO2_b * autotrophy(:)
        endif
-       if (useNH4) then ! ammonium parameters
-          vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:)
+       if (useNH4) then ! ammonium parameters - modified to account for nitrogen fixation - Fanny Jun20
+          vmax(iNH4,:)     =  vmaxNH4_a * volume(:) **  vmaxNH4_b * autotrophy(:) * (1.0 - Nfix(:))
           affinity(iNH4,:) = affinNH4_a * volume(:) ** affinNH4_b * autotrophy(:)
        endif
        kexc(iNitr,:)      =    kexcN_a * volume(:) **    kexcN_b
@@ -482,6 +510,13 @@ CONTAINS
        vmax(iFe,:)     =  vmaxFe_a * volume(:) **  vmaxFe_b * autotrophy(:)
        affinity(iFe,:) = affinFe_a * volume(:) ** affinFe_b * autotrophy(:)
        kexc(iIron,:)   =  kexcFe_a * volume(:) **  kexcFe_b
+       ! Diazotrophs have higher Fe demands - Fanny Jun20
+       qmin(iIron,:)   = merge(qmin(iIron,:)*10.0,qmin(iIron,:),Nfix.eq.1.0)
+       qmax(iIron,:)   = merge(qmax(iIron,:)*10.0,qmax(iIron,:),Nfix.eq.1.0)
+       affinity(iFe,:) = merge(affinity(iFe,:)/10.0,affinity(iFe,:),Nfix.eq.1.0)
+      !!! FANNY CHECK
+      !io = 1
+      !write(*,*) 'qmin(iron)=',qmin(iIron,1:3), 'qmax(iron)=',qmax(iIron,1:3)
     endif
     !-----------------------------------------------------------------------------------------
     if (squota) then ! silicon parameters
@@ -489,7 +524,7 @@ CONTAINS
        qmax(iSili,:)     =   qmaxSi_a * volume(:) **    qmaxSi_b                 * silicify(:)
        if (maxval((qmin(iSili,:)/qmax(iSili,:))).gt.1.0) print*,"WARNING: Silicon Qmin > Qmax. Population inviable!"
        vmax(iSiO2,:)     = vmaxSiO2_a * volume(:) **  vmaxSiO2_b * autotrophy(:) * silicify(:)
-       affinity(iSiO2,:) =affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
+       affinity(iSiO2,:) = affinSiO2_a * volume(:) ** affinSiO2_b * autotrophy(:)
        kexc(iSili,:)     =  kexcSi_a  * volume(:) **    kexcSi_b                 * silicify(:)
     endif
     !-----------------------------------------------------------------------------------------
@@ -591,16 +626,16 @@ CONTAINS
     close(302)
 
   ! grazing matrix
-  do jpred=1,npmax
-     if (heterotrophy(jpred).le.0.0) then
-        gkernel(jpred,:) = 0.0
-     endif
-     do jprey=1,npmax-1
-        WRITE(303,101,ADVANCE = "NO" ) gkernel(jpred,jprey)
-     enddo
-     WRITE(303,101,ADVANCE = "YES" ) gkernel(jpred,npmax)
-  enddo
-  close(303)
+  !do jpred=1,npmax
+  !   if (heterotrophy(jpred).le.0.0) then
+  !      gkernel(jpred,:) = 0.0
+  !   endif
+  !   do jprey=1,npmax-1
+  !      WRITE(303,101,ADVANCE = "NO" ) gkernel(jpred,jprey)
+  !   enddo
+  !   WRITE(303,101,ADVANCE = "YES" ) gkernel(jpred,npmax)
+  !enddo
+  !close(303)
     !****************************************************************************************
     !****************************************************************************************
 
@@ -800,77 +835,7 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! LOAD TIME-SERIES LOCATIONS FROM INPUT FILE SUBROUTINE sub_init_timeseries()
-  SUBROUTINE sub_init_timeseries()
-    ! local variables
-    INTEGER::n
-    INTEGER           :: loc_n_elements,loc_n_start
-    CHARACTER(len=16) :: loc_tser_name
-    REAL              :: loc_tser_lat,loc_tser_lon
-    CHARACTER(len=255)::loc_filename
-    real,dimension(1:n_i)::loc_lon
-    real,dimension(1:n_j)::loc_lat
-
-    ! get grid coordinates
-    loc_lon(1:n_i) = fun_get_grid_lon(n_i)
-    loc_lat(1:n_j) = fun_get_grid_lat(n_j)
-
-    ! check file format and determine number of lines of data
-    loc_filename = TRIM(par_indir_name)//"/"//TRIM(par_ecogem_timeseries_file)
-    CALL sub_check_fileformat(loc_filename,loc_n_elements,loc_n_start)
-
-    ! open file pipe
-    OPEN(unit=in,file=loc_filename,action='read')
-    ! goto start-of-file tag
-    DO n = 1,loc_n_start
-       READ(unit=in,fmt='(1X)')
-    END DO
-
-    n_tser=loc_n_elements
-
-    if (n_tser.gt.0) then
-       ALLOCATE(tser_name(n_tser),STAT=alloc_error)
-       call check_iostat(alloc_error,__LINE__,__FILE__)
-       ALLOCATE(tser_i(n_tser),STAT=alloc_error)
-       call check_iostat(alloc_error,__LINE__,__FILE__)
-       ALLOCATE(tser_j(n_tser),STAT=alloc_error)
-       call check_iostat(alloc_error,__LINE__,__FILE__)
-
-       ! re-set filepipe
-       REWIND(unit=in)
-       ! goto start-of-file tag
-       DO n = 1,loc_n_start
-          READ(unit=in,fmt='(1X)')
-       END DO
-
-       ! read in population specifications
-       if ((ctrl_debug_init > 0) .OR. ctrl_debug_eco_init) then
-          write(*,*) ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          print*,"Time-series output locations (shifted to sit of GEnIE grid)"
-       endif
-       DO n = 1,n_tser
-          READ(unit=in,FMT=*)      &
-               & loc_tser_name,    & ! COLUMN #02: time series name
-               & loc_tser_lat,     & ! COLUMN #01: time series lat
-               & loc_tser_lon        ! COLUMN #03: time series lon
-          tser_name(n) = TRIM(loc_tser_name)
-          if (loc_tser_lon.gt.maxval(loc_lon)) loc_tser_lon = loc_tser_lon - 360.00
-          tser_i(n) = minloc(abs(loc_tser_lon-loc_lon), DIM=1)
-          tser_j(n) = minloc(abs(loc_tser_lat-loc_lat), DIM=1)
-          if ((ctrl_debug_init > 0) .OR. ctrl_debug_eco_init) then
-             print*,tser_name(n),loc_lat(tser_j(n)),loc_lon(tser_i(n))
-          endif
-       END DO
-       if ((ctrl_debug_init > 0) .OR. ctrl_debug_eco_init) then
-          write(*,*) ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-       endif
-    endif
-    ! close file pipe
-    CLOSE(unit=in)
-  END SUBROUTINE sub_init_timeseries
-
-
-
+  
   ! ****************************************************************************************************************************** !
   ! INITIALIZE INTEGRATED TIME-SLICE VALUE ARRAYS
   SUBROUTINE sub_init_int_timeslice()

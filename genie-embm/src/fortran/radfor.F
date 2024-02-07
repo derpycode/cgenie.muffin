@@ -22,7 +22,6 @@ c NOTE: the new orbits code contains (1) corrections for osce4 used to
 c       calculate the insolation as a function of ecc, corrections for 
 c      (2) calculation of solar declination, and for (3) applying
 c      consistency between fixed and time-varying orbits
-c
 
       subroutine radfor (iistep,gn_daysperyear,solconst,flag_ents)
 
@@ -32,7 +31,7 @@ c
 
       integer istep, j
       real rpi, osce, oscsob, oscgam, tv, osce1, osce2, osce3, osce4
-      real oscobl,osclonperi	
+      real oscobl,osclonperi	  
       real oscryr, osct, oscv, oscsolf, oscsind, oscss, osccc, osctt 
       real oscday
       real zw, zw1, zv, zm, dn
@@ -49,20 +48,18 @@ c SG (16/02/2K7) orbital variables
       
       logical flag_ents
 
-
 c SG (16/02/2K7): Changed static declaration of osce,oscsob, oscgam
-c      parameter(osce=0.0167, oscsob=0.397789, oscgam=1.352631)
+c    parameter(osce=0.0167, oscsob=0.397789, oscgam=1.352631)
 c pbh initialise osctau0 for angular time of year.
-c value of osctau0=-0.5 (=> osctau1=0.0) reproduces old orbital calculation
+c    value of osctau0=-0.5 (=> osctau1=0.0) reproduces old orbital calculation
 c ajr namelist replacements
-
 c PV [17/04/2023] add conditional to check if OLD or NEW orbit code should be applied
 
 c >>>>>>>>>> OLD ORBITS CODE STARTS HERE >>>>>>>>>>>>>>>>>>>>>>>>>
 c >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
       if (opt_orbit_old) then
-	  
+		 
       osce=par_orbit_osce
       oscsob=par_orbit_oscsob
       osctau0=par_orbit_osctau0
@@ -109,7 +106,7 @@ c      if ((ents_radfor.eq.'y').or.(ents_radfor.eq.'Y')) then
         if (time_2.le.norbit) then
           osce=(1-time_frac)*orbitecc_vect(time_1)+
      &                time_frac*orbitecc_vect(time_2)
-           oscsob=(1-time_frac)*orbitsob_vect(time_1)+
+          oscsob=(1-time_frac)*orbitsob_vect(time_1)+
      &                time_frac*orbitsob_vect(time_2)
 
           if (abs(orbitgam_vect(time_1)-
@@ -371,7 +368,7 @@ c            (TOA insolation multiplied by mean cos(solar zenith angle))
 C PV >>>>>>>>> NEW ORBITS CODE ENDS HERE >>>>>>>>>>>>>>>>>>>>>>>>>
 c >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-c SEASONALITY	  
+c SEASONALITY
 
       if (dosc) then
       else

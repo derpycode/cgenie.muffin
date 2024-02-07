@@ -270,7 +270,7 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
       real par_orbit_oscgam
       real par_orbit_osctau0
       real par_orbit_oscobl
-      real par_orbit_osclonperi       
+      real par_orbit_osclonperi     
 
       common/orbit_vary/
      &                  orbitecc_vect,
@@ -281,6 +281,7 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
      &                  orbitper_vect,
      &                  orbitobl_vect,
      &                  t_orbit,norbit,orbitsteps,
+     &                  opt_orbit_old,
      &                  filenameorbit
      
       COMMON /embm_orbits/

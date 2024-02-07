@@ -35,7 +35,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     integer :: io
-    !
+        !
     ! *****************************************************************
     ! ******************** Evaluate Quota Status **********************
     ! *****************************************************************
@@ -80,6 +80,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     integer :: io
+    real,dimension(iomax,npmax) :: denom ! JDW Aaron Diatom 23   
     !
     ! *****************************************************************
     ! ******************** Evaluate Limitation ***********************
@@ -100,21 +101,30 @@ CONTAINS
     VLlimit(:)       = 0.0 ! (npmax)
     qreg(:,:)        = 0.0 ! (iomax,npmax)
     qreg_h(:,:)      = 0.0 ! (iomax,npmax)
-
+    ! JDW: precalculate qmin-qmax to avoid divide by zero errorss
+    denom = merge(1.0/(qmax - qmin),0.0,qmax.gt.0.0) ! JDW: calculate 1.0/denominator and take care of instances of 1.0/0.0 Aaron Diatom 23
     ! Calculate quota limitation terms
     ! N and Si take linear form
-    if (nquota) limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) / ( qmax(iNitr,:) - qmin(iNitr,:))
-    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:))
+    ! Modified to take into account no N limitation by diazotrophs - Fanny Jun20
+    if (nquota) then
+      limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) * denom(iNitr,:)
+      limit(iNitr,:) = merge(1.0,limit(iNitr,:),pft.eq.'diazotroph')
+    endif
+    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) * denom(iSili,:) ! JDW
+    !if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:)) ! original Aaron Diatom 23
     ! P and Fe take normalised Droop form
     if (pquota) limit(iPhos,:) = (1.0 - qmin(iPhos,:)/quota(iPhos,:)) / (1.0 - qmin(iPhos,:)/qmax(iPhos,:) )
     if (fquota) limit(iIron,:) = (1.0 - qmin(iIron,:)/quota(iIron,:)) / (1.0 - qmin(iIron,:)/qmax(iIron,:) )
 
     ! Set Von Leibig limitation according to most limiting nutrient (excluding iCarb=1)
-    VLlimit(:) = minval(limit(2:iomax,:),1)
+    ! VLlimit(:) = minval(limit(2:iomax,:),1) ! original
+    VLlimit(:) = minval(limit(2:max(iNitr,iPhos,iIron),:),1) ! JDW: calculate limitation for N,P,Fe only
+    VLlimit = merge(minval(limit(2:iomax,:),1),minval(limit(2:max(iNitr,iPhos,iIron),:),1),silicify.eq.1.0) ! JDW: in case of diatom reset taking into account SiO2 Aaron Diatom 23
 
     do io = 2,iomax ! skip carbon index; quota = X:C biomass ratio
        ! Calculate linear regulation term
-       qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) )
+       qreg(io,:) = (qmax(io,:) - quota(io,:)) * denom(io,:) ! JDW
+       !qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) ) ! original Aaron Diatom 23
        ! Transform regulation term using hill number
        qreg_h(io,:) = qreg(io,:) ** hill
     enddo
@@ -295,7 +305,9 @@ CONTAINS
              if (useNO3)  VCN(:) = VCN(:) + up_inorg(iNO3,:)
              if (useNO2)  VCN(:) = VCN(:) + up_inorg(iNO2,:)
              if (useNH4)  VCN(:) = VCN(:) + up_inorg(iNH4,:)
-          elseif (pquota) then
+          ! To account for nitrogen fixation ! Fanny - June 2020 - Still need to check Moore et al (2002) + parameterise N:P_diazo (=40.0) - probably should scale with nitrogen fixation rate!!
+             VCN(:) = merge(up_inorg(iPO4,:) * 40.0,VCN(:),pft.eq.'diazotroph') ! Aaron Diatom 23
+         elseif (pquota) then
              VCN(:) = up_inorg(iPO4,:) * 16.0
           else
              print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"

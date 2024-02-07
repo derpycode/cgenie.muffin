@@ -157,7 +157,6 @@ c land ice sheet mask
 c ENTS functionality
       logical flag_ents
       real deltq
-
       real qsat
 
 c     file access checks
@@ -236,7 +235,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/lin,atchem_radfor
       NAMELIST /ini_embm_nml/orbit_radfor
       NAMELIST /ini_embm_nml/t_orbit,norbit,orbitsteps,filenameorbit
-	  NAMELIST /ini_embm_nml/opt_orbit_old
+      NAMELIST /ini_embm_nml/opt_orbit_old
       NAMELIST /ini_embm_nml/t_co2,nco2,co2steps,filenameco2
       NAMELIST /ini_embm_nml/diffa_scl,diffa_len
       NAMELIST /ini_embm_nml/dosc,delf2x
@@ -280,7 +279,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/par_albedo1d_name,par_albedo2d_name
       NAMELIST /ini_embm_nml/par_orbit_osce,par_orbit_oscsob
       NAMELIST /ini_embm_nml/par_orbit_oscgam,par_orbit_osctau0
-	  NAMELIST /ini_embm_nml/par_orbit_oscobl,par_orbit_osclonperi
+      NAMELIST /ini_embm_nml/par_orbit_oscobl,par_orbit_osclonperi
       NAMELIST /ini_embm_nml/opt_delf2x_cesm,opt_co2ch4radfor
 
 c ------------------------------------------------------------ c
@@ -1712,6 +1711,9 @@ c AY (02/02/05) : read in observational data filenames
 c pbh read in time varying orbital forcing
 c AR (14/10/08) -- input format changed to 5 column format (time first)
 c AR (14/10/08) -- also re-order time(!)
+c PV (22/07/223) -- add option to swap old vs new radfor code (opt_orbit_old)
+c    if opt_orbit_old=true, use old 5-column orbit input file (t,ecc,sin(obl),gamma,tau)
+c    if opt_orbit_old=false, use 4-column orbit input file (t,ecc,obl,long.peri) format as per La2004
       if(orbit_radfor.eq."y".or.orbit_radfor.eq."Y") then
          if(opt_orbit_old) then
             inquire(file=indir_name(1:lenin)//trim(filenameorbit), 
