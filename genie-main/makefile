@@ -156,13 +156,9 @@ $(EXE_COSTFN) : $(EXE) $(CONTROL_OBJS) $(UTIL_LIBS) $(LOCAL_LIBS) $(MODULE_LIBS)
         $(LINK_MODULE_LIBRARIES) $(LINK_UTIL_LIBRARIES) \
 	$(NETCDF) $(GLIMMER) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS)
 
-# Rule to make custom netcdf comparison program
+# Rule to make FORTRAN nccompare
 nccompare :
-	\cd $(C_DIR); $(MAKE)
-
-# Rule to make custom netcdf comparison program
-errfn_ea_go_gs :
-	\cd $(F_DIR); $(MAKE) -I ../..
+	\cd $(F_DIR); $(MAKE)
 
 # rule to set up data directories of individual modules
 $(MODULE_DATA): FORCE
