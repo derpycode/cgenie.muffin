@@ -126,7 +126,6 @@ cleanall : clean cleanutils cleanmodules
 # clean  - just local files
 clean : $(CLEAN_LOCAL_TARGETS)
 	\rm -f *.$(OBJ_EXT) $(EXECUTABLES) *.dep *.mod
-	cd $(C_DIR); $(MAKE) clean
 	cd $(F_DIR); $(MAKE) -I ../../ clean
 
 $(CLEAN_LOCAL_TARGETS) : clean_% :
