@@ -750,29 +750,29 @@ SUBROUTINE sedgem(          &
           & )
   end if
 
-  ! *** RUN-TIME OUTPUT ***
-  ! GHC 20/05/09 - Save time-series output
-  IF (ctrl_timeseries_output) THEN
-     ! increment timestep counter  
-     tstep_count = tstep_count + 1  
-     ! if output due then change year  
-     CALL sub_output_year()  
-     IF (tstep_count.eq.output_tsteps_0d(output_counter_0d)) THEN
-        call sub_data_save_seddiag_GLOBAL(loc_dtyr,dum_sfcsumocn)  
-     ENDIF
-     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
-        ! save requested sediment cores as ASCII     
-        ! call sub_sedgem_save_sedcore()
-        ! save oecan-sediment interface properties
-        !if (ctrl_data_save_ascii) call sub_data_save_seddiag_2D(loc_dtyr,dum_sfcsumocn)
-        call sub_save_netcdf(year)
-        call sub_save_netcdf_sed2d(loc_dtyr,dum_sfcsumocn)
-        call sub_closefile(ntrec_siou)
-        ntrec_sout = ntrec_sout + 1  
-     ENDIF
-     ! if output then increment output counter  
-     CALL sub_output_counters()
-  ENDIF
+!!$  ! *** RUN-TIME OUTPUT ***
+!!$  ! GHC 20/05/09 - Save time-series output
+!!$  IF (ctrl_timeseries_output) THEN
+!!$     ! increment timestep counter  
+!!$     tstep_count = tstep_count + 1  
+!!$     ! if output due then change year  
+!!$     CALL sub_output_year()  
+!!$     IF (tstep_count.eq.output_tsteps_0d(output_counter_0d)) THEN
+!!$        call sub_data_save_seddiag_GLOBAL(loc_dtyr,dum_sfcsumocn)  
+!!$     ENDIF
+!!$     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
+!!$        ! save requested sediment cores as ASCII     
+!!$        ! call sub_sedgem_save_sedcore()
+!!$        ! save oecan-sediment interface properties
+!!$        !if (ctrl_data_save_ascii) call sub_data_save_seddiag_2D(loc_dtyr,dum_sfcsumocn)
+!!$        call sub_save_netcdf(year)
+!!$        call sub_save_netcdf_sed2d(loc_dtyr,dum_sfcsumocn)
+!!$        call sub_closefile(ntrec_siou)
+!!$        ntrec_sout = ntrec_sout + 1  
+!!$     ENDIF
+!!$     ! if output then increment output counter  
+!!$     CALL sub_output_counters()
+!!$  ENDIF
 
   ! *** UPDATE SEDGEM TIME ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE SEDGEM TIME ***'

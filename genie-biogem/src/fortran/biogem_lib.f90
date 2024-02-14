@@ -172,6 +172,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_zc,par_bio_I_eL,par_bio_kT0,par_bio_kT_eT
   real::par_bio_kT_dT                                            ! temperature offset for T-dependent bio schemes
   NAMELIST /ini_biogem_nml/par_bio_kT_dT
+  real::par_bio_POC_CaCO3_target                                 ! target potential global mean CaCO3:POC export rain ratio
+  NAMELIST /ini_biogem_nml/par_bio_POC_CaCO3_target
   ! ------------------- ORGANIC MATTER EXPORT RATIOS ----------------------------------------------------------------------------- !
   real::par_bio_red_POP_PON                                             ! N/P organic matter Redfield ratio
   real::par_bio_red_POP_POC                                             ! C/P organic matter Redfield ratio
@@ -590,13 +592,13 @@ MODULE biogem_lib
   real::par_bio_FeCO3precip_abioticohm_cte                       ! Ohmega constant for siderite formation
   real::par_bio_FeCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte
-  real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
+  real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe frac. between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
   real::par_bio_Fe3PO42precip_sf                                 ! Scale factor for Fe3PO42 precipitation
   real::par_bio_Fe3PO42precip_exp                                ! Rate law power for Fe3PO42 precipitation
   real::par_bio_Fe3PO42precip_eq                                 ! Thermodynamic const for Fe3PO42 precipitation
   NAMELIST /ini_biogem_nml/par_bio_Fe3PO42precip_sf,par_bio_Fe3PO42precip_exp,par_bio_Fe3PO42precip_eq
-  real::par_d56Fe_Fe3PO42_alpha                                  ! 56/54Fe fractionation between Fe2 and Fe3PO42 (not known currently: 2020)
+  real::par_d56Fe_Fe3PO42_alpha                                  ! 56/54Fe frac. between Fe2 and Fe3PO42 (not known currently: 2020)
   namelist /ini_biogem_nml/par_d56Fe_Fe3PO42_alpha
   real::par_d56Fe_Fe3Si2O4_alpha                                 ! 56/54Fe fractionation between Fe2 and greenalite
   namelist /ini_biogem_nml/par_d56Fe_Fe3Si2O4_alpha
@@ -609,7 +611,7 @@ MODULE biogem_lib
   real::par_bio_FeS_part_abioticohm_cte                          ! Ohmega constant for nanoparticulate FeS formation
   real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
   NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k,par_bio_FeS_part_abioticohm_cte
-  real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
+  real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe frac. between Fe2 and FeS2 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
   real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
@@ -635,7 +637,7 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte
   LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
   NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
-  real::par_bio_Kd_PO4_FeOOH                                     ! first order constant for PO4 adsorption on FeOOH (and POM associated FeOOH)
+  real::par_bio_Kd_PO4_FeOOH                                     ! 1st order const. PO4 adsorption on FeOOH (+ POM associated FeOOH)
   NAMELIST /ini_biogem_nml/par_bio_Kd_PO4_FeOOH
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            !
@@ -1343,6 +1345,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm)::int_diag_forcing_atm_sig                ! forcing diagnostics
   REAL,DIMENSION(n_ocn)::int_diag_forcing_ocn_sig                ! forcing diagnostics
   REAL,DIMENSION(n_diag_misc_2D)::int_diag_misc_2D_sig           !
+  real::int_diag_bio_red_POC_CaCO3
   ! misc
   real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
   real::int_misc_ocn_fxsw_sig,int_misc_opn_fxsw_sig              !
@@ -1434,6 +1437,7 @@ MODULE biogem_lib
   real,DIMENSION(:),ALLOCATABLE::orb_pts_time                ! orbital point time
   ! global means
   REAL,DIMENSION(n_sed)::int_fracdom                         !
+  real::int_SLT
 
   ! *** forcing ***
   ! forcing - restoring

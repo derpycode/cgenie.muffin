@@ -327,17 +327,17 @@ SUBROUTINE initialise_biogem(                       &
   if (ctrl_ncout_expid_name) then
      string_ncout2d    = TRIM(par_outdir_name)//trim(expid_name)//'.2d.nc'
      string_ncout3d    = TRIM(par_outdir_name)//trim(expid_name)//'.3d.nc'
-     string_nctsint    = TRIM(par_outdir_name)//trim(expid_name)//'.ts.nc'
-     string_nctsi      = TRIM(par_outdir_name)//trim(expid_name)//'.ts_int.nc'
-     string_nctsglob   = TRIM(par_outdir_name)//trim(expid_name)//'.ts_glob.nc'
-     string_ncout3dsig = TRIM(par_outdir_name)//trim(expid_name)//'.3dts.nc'
+!!$     string_nctsint    = TRIM(par_outdir_name)//trim(expid_name)//'.ts.nc'
+!!$     string_nctsi      = TRIM(par_outdir_name)//trim(expid_name)//'.ts_int.nc'
+!!$     string_nctsglob   = TRIM(par_outdir_name)//trim(expid_name)//'.ts_glob.nc'
+!!$     string_ncout3dsig = TRIM(par_outdir_name)//trim(expid_name)//'.3dts.nc'
   else
      string_ncout2d    = TRIM(par_outdir_name)//'fields_biogem_2d.nc'
      string_ncout3d    = TRIM(par_outdir_name)//'fields_biogem_3d.nc'
-     string_nctsint    = TRIM(par_outdir_name)//'timeseries_biogem.nc'
-     string_nctsi      = TRIM(par_outdir_name)//'ts_biogem_int.nc'
-     string_nctsglob   = TRIM(par_outdir_name)//'ts_biogem_glob.nc'
-     string_ncout3dsig = TRIM(par_outdir_name)//'fields_biogem_3dts.nc'
+!!$     string_nctsint    = TRIM(par_outdir_name)//'timeseries_biogem.nc'
+!!$     string_nctsi      = TRIM(par_outdir_name)//'ts_biogem_int.nc'
+!!$     string_nctsglob   = TRIM(par_outdir_name)//'ts_biogem_glob.nc'
+!!$     string_ncout3dsig = TRIM(par_outdir_name)//'fields_biogem_3dts.nc'
   end if
   ! initialise 2d and 3d netcdf files
   IF (ctrl_continuing.AND.opt_append_data) THEN
@@ -351,13 +351,12 @@ SUBROUTINE initialise_biogem(                       &
      call sub_init_netcdf(trim(string_ncout3d),loc_iou,3)
      ncout3d_iou = loc_iou
      ncout3d_ntrec = 0
-     if (ctrl_data_save_3d_sig) then
-        call sub_init_netcdf(trim(string_ncout3dsig),loc_iou,4)
-        ncout3dsig_iou = loc_iou
-        ncout3dsig_ntrec = 0
-     end if
+!!$     if (ctrl_data_save_3d_sig) then
+!!$        call sub_init_netcdf(trim(string_ncout3dsig),loc_iou,4)
+!!$        ncout3dsig_iou = loc_iou
+!!$        ncout3dsig_ntrec = 0
+!!$     end if
   ENDIF
-
   ! JDW: initialise matrix netcdf output
   if(ctrl_data_diagnose_TM)THEN
      ! find number of wet grid-points
@@ -391,7 +390,8 @@ SUBROUTINE initialise_biogem(                       &
   if (ctrl_force_GOLDSTEInTS) call sub_biogem_copy_ocntotsTS(dum_ts,dum_ts1)
 
   ! ############################################################################################################################# !
-!!! *** TESTING ***
+  ! *** TESTING ***
+  ! (it will not currently compile without this ... !)
   vocn(:)=fun_lib_conv_ocnTOvocn(ocn(:,:,:,:))
   ocn = 0.0
   ocn(:,:,:,:)=fun_lib_conv_vocnTOocn(vocn(:))

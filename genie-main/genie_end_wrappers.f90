@@ -38,7 +38,9 @@ contains
   !!
   subroutine end_biogem_wrapper
     implicit none
-    call end_biogem()
+    call end_biogem(                                    &
+         & genie_SLT                                    &               ! output
+         & )
   end subroutine end_biogem_wrapper
 
   !!
@@ -52,7 +54,8 @@ contains
     implicit none
     call end_sedgem(                                    &
     & real(conv_kocn_ksedgem*kocn_loop)*genie_timestep, &               ! input
-         & genie_sfcsumocn                              &               ! input
+         & genie_sfcsumocn,                             &               ! input
+         & genie_SLT                                    &               ! input
          & )
   end subroutine end_sedgem_wrapper
 

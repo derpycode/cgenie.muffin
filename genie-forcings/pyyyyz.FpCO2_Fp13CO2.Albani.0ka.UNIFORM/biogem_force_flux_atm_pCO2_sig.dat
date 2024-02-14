@@ -1,0 +1,9 @@
+-START-OF-DATA-
+        0.0  1.0
+        1.0  1.0
+        1.0  0.0
+999999999.0  0.0
+-END-OF-DATA-
+
+NOTE: units of PgC yr-1, hence scaling of factor 8.3333e+013 (to mol yr-1) needed in user-config file, i.e.:
+bg_par_atm_force_scale_val_3=8.3333e+013

@@ -834,6 +834,8 @@ CONTAINS
     ! NOTE: allow the primary silicate weathering to be 'fixed'
     !       (even as the derived elements could vary in response to climate)
     ! NOTE: implicitly, granitic is distinguished from basaltic weathering
+    ! NOTE: opt_short_circuit_atm=.true. only represents net CO2 consumption:
+    !       nothing is removed from the atmosphere, and weathering DIC is only from the carbon in CaCO3 + volcanic outgassing
     if (opt_weather_fixed_CaCO3) then
        loc_weather_CaCO3   = par_weather_CaCO3
     else
@@ -1091,8 +1093,10 @@ CONTAINS
     ! NOTE: populate array with bulk flux and isotopic delta values
     loc_weather_o(:) = 0.0
     loc_weather_o(io_Os) = par_weather_CaCO3_fracOs*loc_weather_CaCO3
-    loc_weather_o(io_Os_187Os) = 1000.0*(par_weather_CaCO3_187Os_188Os*par_weather_CaCO3_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
-    loc_weather_o(io_Os_188Os) = 1000.0*(par_weather_CaCO3_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+    loc_weather_o(io_Os_187Os) = &
+         & 1000.0*(par_weather_CaCO3_187Os_188Os*par_weather_CaCO3_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+    loc_weather_o(io_Os_188Os) = &
+         & 1000.0*(par_weather_CaCO3_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
     ! calculate Os ISOTOPES -- 187Os
     ! NOTE: do not update <loc_weather_o> yet as it is needed for the d188Os calculation ...
     loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),1)
@@ -1107,8 +1111,10 @@ CONTAINS
     ! NOTE: populate array with bulk flux and isotopic delta values
     loc_weather_o(:) = 0.0
     loc_weather_o(io_Os) = par_weather_CaSiO3_fracOs*loc_weather_CaSiO3
-    loc_weather_o(io_Os_187Os) = 1000.0*(par_weather_CaSiO3_187Os_188Os*par_weather_CaSiO3_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
-    loc_weather_o(io_Os_188Os) = 1000.0*(par_weather_CaSiO3_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+    loc_weather_o(io_Os_187Os) = &
+         & 1000.0*(par_weather_CaSiO3_187Os_188Os*par_weather_CaSiO3_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+    loc_weather_o(io_Os_188Os) = &
+         & 1000.0*(par_weather_CaSiO3_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
     ! calculate Os ISOTOPES -- 187Os
     ! NOTE: do not update <loc_weather_o> yet as it is needed for the d188Os calculation ...
     loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_weather_o(:),1)
