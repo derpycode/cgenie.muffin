@@ -204,7 +204,7 @@ c     namelist for reading initialisation data
       NAMELIST /ini_gold_nml/indir_name,outdir_name,rstdir_name
       NAMELIST /ini_gold_nml/igrid,world
       NAMELIST /ini_gold_nml/npstp,iwstp,itstp,ianav
-      NAMELIST /ini_gold_nml/conserv_per,ans,yearlen,nyear
+      NAMELIST /ini_gold_nml/conserv_per,ans,sodaylen,sidaylen,yearlen,nyear
       NAMELIST /ini_gold_nml/temp0,temp1,rel,scf,diff,adrag
       NAMELIST /ini_gold_nml/hosing,hosing_trend,nyears_hosing
       NAMELIST /ini_gold_nml/fwanomin,cmip_model,albocn
@@ -289,7 +289,7 @@ c read in namelist
       end if
 
 c SG > syr re-defined here
-      syr = yearlen * 86400
+      syr = yearlen * sodaylen
       if (debug_init) print*, 'syr = ',syr
 c SG <
 
@@ -341,6 +341,16 @@ c     New or continuing run
       if (debug_init) print*,'new or continuing run ?'
       if (debug_init) print*,ans
 
+c CL (01/15/24) : number of seconds per solar day
+c     sodaylen = 86400.0
+      if (debug_init) print*,'number of seconds per solar day'
+      if (debug_init) print*,sodaylen
+
+c CL (01/15/24) : number of seconds per sidereal day
+c     sidaylen = 86164.0
+      if (debug_init) print*,'number of seconds per sidereal day'
+      if (debug_init) print*,sidaylen
+
 c AY (05/05/04) : number of days per GOLDSTEIN year (usually 365.25)
 c     yearlen = 365.25
       if (debug_init) print*,'number of days per GOLDSTEIN year'
@@ -366,7 +376,8 @@ c dimensional scale values
       rsc = 6.37e6
 c      dsc = 5e3
       dsc = par_dsc
-      fsc = 2*7.2921e-5
+c CL (01/15/24) : used sidereal day length for Coriolis effect scaling factor
+      fsc = 4*pi/sidaylen
       gsc = 9.81
       rh0sc = 1e3
       rhosc = rh0sc*fsc*usc*rsc/gsc/dsc
@@ -496,7 +507,7 @@ c                 descriptor in the line below from (i) to (i10)
       if(nyear.gt.maxnyr)stop 'goldstein : nyear > maxnyr' 
       if (debug_init) print*,nyear
 
-      tv = 86400.0*yearlen/(nyear*tsc)
+      tv = sodaylen*yearlen/(nyear*tsc)
 
 c     dtatm = tv/ndta
 
@@ -507,7 +518,7 @@ c initialize
          dzu(1,k) = 0
          dzu(2,k) = 0
       enddo
-      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/86400
+      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/sodaylen
 
 c set up grid
 c For variable (exponential) dz use ez0 > 0, else use ez0 < 0
@@ -1098,8 +1109,8 @@ c drag takes the value adrag in the interior, rising twice by factor
 c drgf per gridpoint close to equator and in regions of
 c shallow water (k1>kmxdrg) ie land in the case kmxdrg=kmax
 c jeb = 1/2 width of equatorial region of maximum drag
-
-      adrag = 1.0/(adrag*86400*fsc)
+c CL (01/15/24) : used sidereal day length for inverse of frictional drag
+      adrag = 1.0/(adrag*sidaylen*fsc)
 c cross equator need * 4 if drag is constant ie if drgf=1
       drgf = 3.0
       kmxdrg = kmax/2
@@ -1363,7 +1374,7 @@ c rotate grid to check b.c.s
       if (debug_init) print*,'density variation scale',rhosc,' kg/m**3'
       if (debug_init) print*,
      & 'vertical velocity scale',usc*dsc/rsc,' m/s'
-      if (debug_init) print*,'time scale',tsc/86400/yearlen,' yrs'
+      if (debug_init) print*,'time scale',tsc/sodaylen/yearlen,' yrs'
       if (debug_init) print*,'overturning scale',dsc*usc*rsc*1e-6,' Sv'
       if (debug_init) print*,
      & 'vertical heat flux scale',dsc*usc*rh0sc*cpsc/rsc,' W/m**2'
@@ -1460,7 +1471,7 @@ c representative ice density (kg/m**3)
       rhoice = 913.
 c useful constant proportional to inverse timscale for surface freezing
 c     rsictscsf = ch_ice*u_tau_ice*rho0*cpo_ice
-      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*86400.0)
+      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*sodaylen)
 c minimum average sea-ice thickness over a grid cell
       hmin = 0.01
       rhmin = 1.0/hmin
