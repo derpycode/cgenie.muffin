@@ -287,7 +287,7 @@ c read in namelist
          close(56,iostat=ios)
          call check_iostat(ios,__LINE__,__FILE__)
       end if
-
+      
 c SG > syr re-defined here
       syr = yearlen * sodaylen
       if (debug_init) print*, 'syr = ',syr
@@ -376,8 +376,13 @@ c dimensional scale values
       rsc = 6.37e6
 c      dsc = 5e3
       dsc = par_dsc
-c CL (01/15/24) : used sidereal day length for Coriolis effect scaling factor
-      fsc = 4*pi/sidaylen
+c     CL (01/15/24) : used sidereal day length for Coriolis effect scaling factor
+c     AR (24/03/03) : check for sidereal and solar days being different, otherwise use original code for backwards compatabilty
+      if (abs(sodaylen-sidaylen).gt.0.001)then
+         fsc = 4*pi/sidaylen
+      else
+         fsc = 2*7.2921e-5
+      endif
       gsc = 9.81
       rh0sc = 1e3
       rhosc = rh0sc*fsc*usc*rsc/gsc/dsc
