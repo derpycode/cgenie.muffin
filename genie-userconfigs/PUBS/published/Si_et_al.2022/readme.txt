@@ -72,11 +72,11 @@ The initial, 500 kyr spin-ups are run as follows.
 
 For the preindustrial control:
 
-./runmuffin.sh muffin.CB.umQ00p0a.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ00p0a_sg_rg_gl_P.SPIN 500000
+./runmuffin.sh muffin.CB.umQ00p0a_sg_rg_gl.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ00p0a_sg_rg_gl_P.SPIN 500000
 
 and for the Miocene configurations at 600 ppm:
 
-./runmuffin.sh muffin.CB.umQ12p5a.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ12p5a_sg_rg_gl_Mxxx.SPIN 500000
+./runmuffin.sh muffin.CB.umQ12p5a_sg_rg_gl.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ12p5a_sg_rg_gl_Mxxx.SPIN 500000
 
 where xxx is one of the letters 'a' through 'e', with (meaning 1120 ppm CO2) or without (600 ppm) a '+' -- see above.
 
@@ -84,9 +84,9 @@ where xxx is one of the letters 'a' through 'e', with (meaning 1120 ppm CO2) or 
 
 The 80 kyr long continuing experiments are then run:
 
-./runmuffin.sh muffin.CB.umQ00p0a.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ00p0a_sg_rg_gl_P 80000 muffin.CB.umQ00p0a_sg_rg_gl_P.SPIN 
+./runmuffin.sh muffin.CB.umQ00p0a_sg_rg_gl.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ00p0a_sg_rg_gl_P 80000 muffin.CB.umQ00p0a_sg_rg_gl_P.SPIN 
 
-./runmuffin.sh muffin.CB.umQ12p5a.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ12p5a_sg_rg_gl_Mxxx 80000 muffin.CB.umQ12p5a_sg_rg_gl_Mxxx.SPIN 
+./runmuffin.sh muffin.CB.umQ12p5a_sg_rg_gl.BASES PUBS/published/Si_et_al.2022 muffin.CB.umQ12p5a_sg_rg_gl_Mxxx 80000 muffin.CB.umQ12p5a_sg_rg_gl_Mxxx.SPIN 
 
 where again, xxx is one of the letters 'a' through 'e', with (meaning 1120 ppm CO2) or without (600 ppm) a '+'.
 
