@@ -1510,6 +1510,14 @@
 			<value datatype="string">n</value>
                         <description>new/continuing embm</description>
                     </param>
+		    <param name="sodaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of solar day in embm</description>
+                    </param>
+		    <param name="sidaylen">
+                        <value datatype="real">86164.0</value>
+                        <description>length of sidereal day in embm</description>
+                    </param>
                     <param name="yearlen">
                         <value datatype="real">365.25</value>
                         <description>number of days per year embm</description>
@@ -2471,6 +2479,14 @@
 			<value datatype="string">n</value>
                         <description>new/continuing goldstein</description>
                     </param>
+		    <param name="sodaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of solar day in goldstein</description>
+                    </param>
+		    <param name="sidaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of sidereal day in goldstein -- 86400.0 is for backwards compatablity; 86164.0 is the 'real' value</description>
+                    </param>
                     <param name="yearlen">
                         <value datatype="real">365.25</value>
                         <description>number of days per year goldstein</description>
@@ -2792,6 +2808,14 @@
                     <param name="ans">
 			<value datatype="string">n</value>
                         <description>new/continuing seaice</description>
+                    </param>
+		    <param name="sodaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of solar day in goldsteinseaice</description>
+                    </param>
+		    <param name="sidaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of sidereal day in goldsteinseaice -- 86400.0 is for backwards compatablity; 86164.0 is the 'real' value</description>
                     </param>
                     <param name="yearlen">
                         <value datatype="real">365.25</value>
