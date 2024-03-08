@@ -28,7 +28,7 @@ c AY (06/10/04) : extra variables for printing out average model properties
       real    area
 
 c      timestep=24.0*60.0*60.0*yearlen/real(nyear)
-      timestep=24.0*60.0*60.0*yearlen/real(nyear*ndta)
+      timestep=sodaylen*yearlen/real(nyear*ndta)
 
 c AY (06/10/04) : append input filename to input directory name
 c      fnamein=trim(indir_name(1:lenin))//trim(filenetin)
@@ -66,7 +66,7 @@ c      fnamein=trim(indir_name(1:lenin))//trim(filenetin)
          day_rest=iday
          ioffset_rest=mod(ioffset_rest,nint(yearlen))
 
-      day_rest=day_rest+timestep/(24*60*60.)
+      day_rest=day_rest+timestep/sodaylen
 c     This bit so that we don't get too far out in our count....
 c     Anchor to a day if we start drifting.
 c     Means timestep can never be less than 1/1000 of a day!!!!

@@ -31,7 +31,7 @@ c AY (06/10/04) : extra variables for printing out average model properties
       
       logical lrestart_genie
 
-      timestep=24.0*60.0*60.0*yearlen/real(nyear)
+      timestep=sodaylen*yearlen/real(nyear)
 
       fnamein=trim(filenetin)
 
@@ -77,7 +77,7 @@ c AY (06/10/04) : extra variables for printing out average model properties
          day_rest=iday
          ioffset_rest=mod(ioffset_rest,nint(yearlen))
 
-      day_rest=day_rest+timestep/(24*60*60.)
+      day_rest=day_rest+timestep/sodaylen
 c     This bit so that we don't get too far out in our count....
 c     Anchor to a day if we start drifting.
 c     Means timestep can never be less than 1/1000 of a day!!!!
