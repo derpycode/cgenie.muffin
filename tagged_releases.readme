@@ -3,8 +3,13 @@
 *** TAGGED RELEASES *******************************************
 ***************************************************************
 
-LATEST == v0.9.33
+LATEST == v0.9.50
 
+***************************************************************
+*** N/A *******************************************************
+*** (releases with no associated manuscripts) *****************
+***************************************************************
+v0.9.50	--	N/A									DOI: 10.5281/zenodo.10798347	-- includes sideral vs. solar day length addition, plus Si et al. [2022] configs
 ***************************************************************
 *** /PUBS/manuscript/ *****************************************
 *** (releases associated with manuscripts) ********************
@@ -40,6 +45,7 @@ v0.9.42 --  Barrett_et_al.2023                  DOI: 10.5281/zenodo.8049100 --  
 v0.9.48 --  vervoortetal.2024       			DOI: 10.5281/zenodo.10668485 -- Vervoort et al. [2024] (Paleoceanography & Paleoclimatology)
 ***************************************************************
 *** /MS/ (old directory structure) ****************************
+*** (reverse order -- newest first) ***************************
 ***************************************************************
 v0.9.771dfd8 -- Gerard and Crucifix [2023]					DOI: 10.5281/zenodo.10658783	(branch: _DEV_UCLouvain, version number from last committ before release)
 v0.9.29 --  Pohl et al.             [revised for Nature]    DOI: 10.5281/zenodo.5885685
