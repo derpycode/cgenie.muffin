@@ -323,10 +323,6 @@ ifeq ($(F77),gfortran)
   #       => error (-fallow-argument-mismatch turns this is a warning) (cannot then have -pedantic) [error occurs in outm_netcdf.F]
   # first get gfortran major version number
   FVER=$(shell gfortran -dumpversion)
-###  add flag if version == 10 (will worry later when version 11 comes out ...)
-###  ifeq ($(FVER),10)
-###    FFLAGS += -fallow-argument-mismatch
-###  endif
   ifeq ($(shell test $(FVER) -gt 9; echo $$?),0)
     FFLAGS += -fallow-argument-mismatch
   endif
@@ -341,8 +337,11 @@ ifeq ($(F77),gfortran)
     FFLAGS += -O2
     FFLAGS += -O3 
     FFLAGS += -funroll-loops 
-    FFLAGS += -msse
     FFLAGS += -fno-automatic
+    ifneq ($(MACHINE),OSX_M)
+      # NOTE: -msse is an Intel flag
+      FFLAGS += -msse
+    endif
   endif
   ifeq ($(BUILD),DEBUG)
     FFLAGS += -g -ffpe-trap=zero,overflow,invalid -O0 -Wall -fbounds-check

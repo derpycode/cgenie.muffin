@@ -29,7 +29,7 @@ RUNTIME_ROOT      = ../../cgenie.muffin
 
 # === Fortran compiler (ifc/ifort/f90/pgf90) ===
 F77=gfortran
-###F77=ifort
+#F77=ifort
 #F77=ifc
 #F77=f90
 #F77=f95
@@ -58,7 +58,8 @@ MACHINE=LINUX
 #MACHINE=SGI
 #MACHINE=SOLARIS
 #MACHINE=WIN32
-#MACHINE=OSX
+#MACHINE=OSX	# Intel processor
+#MACHINE=OSX_M	# Apple silicon (M1, M2 etc.)
 
 # === Extension for module files ===
 MODEXT=mod
@@ -75,19 +76,11 @@ MODEXT=mod
 
 ### DEFAULT ###
 NETCDF_DIR=/usr/local
-### sterling ###
+### sterling cluster ###
 #NETCDF_DIR=/share/apps
-### eevee ###
+### eevee cluster ###
 #NETCDF_DIR=/share/apps/netcdf
-### iwan ###
-#NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.4
-### sprout ###
-#NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.6
-### almond ###
-#NETCDF_DIR=/share/apps/netcdf-4.0/gcc-4.4.7
-### VM ###
-#NETCDF_DIR=/home/mushroom/netcdf/ifort
-### Ben Mac Pro ###
-#NETCDF_DIR=/opt/local
+### Mac (example) ###
+#NETCDF_DIR=/usr/local/Cellar/netcdf/4.9.2_1
 
 NETCDF_NAME=netcdf
