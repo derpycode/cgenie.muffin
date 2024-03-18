@@ -843,7 +843,7 @@ do
     if (signal_tracking) then 
         if (nspcc==4) then 
             if (abs(d13c_flx - d13c_ocn)>tol .or. abs(d18o_flx - d18o_ocn)>tol) then ! check comparability with input signals 
-                print*,'error in assignment of proxy'
+                if (loc_display) print*,'error in assignment of proxy'
                 if (signal_tracking) then
                     write(file_err,*)'error in assignment of proxy',d18o_ocn,d13c_ocn,d18o_flx,d13c_flx
                     open(unit=file_tmp,file=trim(par_outdir_name)//'/signal-tracking-error-'  &
@@ -854,7 +854,7 @@ do
             endif 
         elseif (nspcc==2) then 
             if (abs(d13c_flx - d13c_ocn)>tol ) then ! check comparability with input signals 
-                print*,'error in assignment of proxy'
+                if (loc_display) print*,'error in assignment of proxy'
                 if (signal_tracking) then 
                     write(file_err,*)'error in assignment of proxy',d18o_ocn,d13c_ocn,d18o_flx,d13c_flx
                     open(unit=file_tmp,file=trim(par_outdir_name)//'/signal-tracking-error-'  &
@@ -986,7 +986,7 @@ do
             ,file_tmp,workdir,flg_500 &
             )
         if (flg_500) then 
-            print *, 'error detected in om calc: exit om-o2 loop'
+            if (loc_display) print *, 'error detected in om calc: exit om-o2 loop'
             exit
         endif 
         !~~~~~~~~~~~~~~~~~ O2 calculation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1191,16 +1191,18 @@ do
         itr = itr + 1
         
         if (itr > 100) then 
-            print*
-            print*
-            print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-            print*,'*** Warning : too much iterations for ox & om: exit'
-            print*,'    minimum error in zox = ',minerr
-            print*,'    zox = ', izox_errmin
-            print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-            print*
-            print*
-            print*
+			if (loc_display) then
+				print*
+				print*
+				print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+				print*,'*** Warning : too much iterations for ox & om: exit'
+				print*,'    minimum error in zox = ',minerr
+				print*,'    zox = ', izox_errmin
+				print*,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+				print*
+				print*
+				print*
+			endif 
             write(file_err,*) 'too much iterations for om & ox',loc_time,itr,izox,iizox_errmin
             
             if (izox_errmin < nz) then 
@@ -1234,8 +1236,10 @@ do
         ! nt = nt*10
         ! tol = tol/10d0
         if (.not. first_call) then 
-            print *,'*** error detected in om calculation'
-            print *,'reduce dt and restart time-integration from the begining'
+			if (loc_display) then
+				print *,'*** error detected in om calculation'
+				print *,'reduce dt and restart time-integration from the begining'
+			endif 
             dt = dt /10d0
             ! dt_save = dt_save/10d0 ! permanently reduce dt within one time step 
             flg_500 = .false. 
@@ -1320,9 +1324,11 @@ do
         ! nt = nt*10
         ! tol = tol/10d0
         write(file_err,*) loc_time,tol,dt,loc_nt,loc_time_proc,loc_time_fin
-        print*
-        print*,loc_time,tol,dt,loc_nt,loc_time_proc,loc_time_fin
-        print*
+		if (loc_display) then
+			print*
+			print*,loc_time,tol,dt,loc_nt,loc_time_proc,loc_time_fin
+			print*
+		endif 
         ! go to 500
         ! if (first_call) then 
         if (first_call .and. itr_w==0 ) then 
@@ -1330,7 +1336,7 @@ do
             ccx(:,:) = cc(:,:)
             alkx(:) = alk(:)
             dicx(:) = dic(:)
-            print *, 'due to flg, return to previous values for cc, alk and dic ...',itr_stst
+            if (loc_display) print *, 'due to flg, return to previous values for cc, alk and dic ...',itr_stst
             ! w = wx     
             ! call burial_pre(  &
                 ! w,wi  & ! output
@@ -1343,14 +1349,16 @@ do
             ! print*, w
             itr_stst = itr_stst + 1
             if (itr_stst > 100) then 
-                print *
-                print *
-                print *,' ******* WARNING ******* '
-                print *,' steady state cannot be reached within 100 iterations @ site: ',trim(adjustl(filechr))
-                print *,' simulation continues nonetheless ... ' 
-                print *,' *********************** '
-                print *
-                print *
+				if (loc_display) then
+					print *
+					print *
+					print *,' ******* WARNING ******* '
+					print *,' steady state cannot be reached within 100 iterations @ site: ',trim(adjustl(filechr))
+					print *,' simulation continues nonetheless ... ' 
+					print *,' *********************** '
+					print *
+					print *
+				endif 
             else 
                 go to 700 
             endif 
@@ -1365,15 +1373,17 @@ do
             if (infosbr==1) then 
                 ! nt = nt*10
                 ! tol = tol/10d0
-                print *
-                print *
-                print *
-                print *,' ******* WARNING ******* '
-                print *,' raising flag to repeat calculation with reduced dt and increased nt '
-                print *,' here is caco3 system calculation subroutine: simple co2 chemistry ' 
-                print *,' *********************** '
-                print *
-                print *
+				if (loc_display) then
+					print *
+					print *
+					print *
+					print *,' ******* WARNING ******* '
+					print *,' raising flag to repeat calculation with reduced dt and increased nt '
+					print *,' here is caco3 system calculation subroutine: simple co2 chemistry ' 
+					print *,' *********************** '
+					print *
+					print *
+				endif 
                 write(file_err,*) loc_time,tol,dt,loc_nt,loc_time_proc,loc_time_fin
         ! #ifdef sense
                 ! go to 500
@@ -1412,15 +1422,17 @@ do
             if (infosbr==1) then 
                 ! nt = nt*10
                 ! tol = tol/10d0
-                print *
-                print *
-                print *
-                print *,' ******* WARNING ******* '
-                print *,' raising flag to repeat calculation with reduced dt and increased nt '
-                print *,' here is caco3 system calculation subroutine: genie co2 chemistry ' 
-                print *,' *********************** '
-                print *
-                print *
+				if (loc_display) then
+					print *
+					print *
+					print *
+					print *,' ******* WARNING ******* '
+					print *,' raising flag to repeat calculation with reduced dt and increased nt '
+					print *,' here is caco3 system calculation subroutine: genie co2 chemistry ' 
+					print *,' *********************** '
+					print *
+					print *
+				endif 
                 write(file_err,*) loc_time,tol,dt,loc_nt,loc_time_proc,loc_time_fin
         ! #ifdef sense
                 ! go to 500
@@ -1535,7 +1547,7 @@ do
     if (err_f < err_fx) err_f_min = err_f  ! recording minimum error 
 ! #ifdef sense
     if (err_f < tol) then 
-        if (signal_tracking) print*,'almost steady state ... leaving time integration ...' 
+        if (signal_tracking .and. loc_display) print*,'almost steady state ... leaving time integration ...' 
         exit  ! if total vol. fraction is near enough to 1, steady-state solution is obtained 
     endif 
 ! #endif 
@@ -1634,8 +1646,10 @@ do
         !! in theory, o2dec/ox2om + alkdec = dicdec = omdec (in absolute value)
         if (om2cc /= 0d0) then 
             if ( abs((o2dec/ox2om - alkdec + dicdec)/dicdec) > tol) then
-                print*,' ____ om calc weird ____'
-                print*, abs((o2dec/ox2om + alkdec - dicdec)/dicdec) ,o2dec/ox2om,alkdec,dicdec
+				if (loc_display) then
+					print*,' ____ om calc weird ____'
+					print*, abs((o2dec/ox2om + alkdec - dicdec)/dicdec) ,o2dec/ox2om,alkdec,dicdec
+				endif 
                 write(file_err,*) trim(adjustl(dumchr(1))), loc_time, dt &
                     , abs((o2dec/ox2om + alkdec - dicdec)/dicdec),o2dec/ox2om,alkdec,dicdec
                 ! pause
@@ -3060,6 +3074,7 @@ integer :: nsp,nmx,iz,row,col,iiz,infobls
 integer,allocatable::ipiv(:)
 real,allocatable :: amx(:,:),ymx(:),emx(:)
 real::loc_error,loc_tol,loc_itr,loc_itr_max
+logical :: dum_loc_disp = .false.
 
 !  om calculation adopting newton's method
     
@@ -3217,24 +3232,28 @@ endif
 if (loc_itr > loc_itr_max) then 
     flg_500 = .true.
     ! dt=dt/10d0
-    print *
-    print *
-    print *
-    print *,' ******* WARNING ******* '
-    print *,' raising flag to repeat calculation with reduced dt and increased nt '
-    print *,' here is om system calculation subroutine:',loc_error 
-    print *,' ... too many iterations but cannot get convergence '
-    print *,' *********************** '
-    print *
-    print *
+	if (dum_loc_disp) then 
+		print *
+		print *
+		print *
+		print *,' ******* WARNING ******* '
+		print *,' raising flag to repeat calculation with reduced dt and increased nt '
+		print *,' here is om system calculation subroutine:',loc_error 
+		print *,' ... too many iterations but cannot get convergence '
+		print *,' *********************** '
+		print *
+		print *
+	endif 
     exit 
 endif 
 
 enddo
 
-do iz=1,nz
-    print*,omx(iz)
-enddo 
+if (dum_loc_disp) then 
+	do iz=1,nz
+		print*,omx(iz)
+	enddo 
+endif 
 
 endsubroutine omcalc_newton
 !**************************************************************************************************************************************
@@ -3255,6 +3274,7 @@ logical,dimension(nspcc+2),intent(in)::turbo2,labs,nonlocal
 logical,intent(inout)::flg_500
 character*255,intent(in)::workdir
 integer :: iz,row,iiz,col,isp,nsp=1
+logical :: dum_loc_disp = .false.
 
 omadv = 0d0
 omdec = 0d0
@@ -3300,8 +3320,10 @@ enddo
 omres = omadv + omdec + omdif + omrain + omtflx ! this is residual flux should be zero equations are exactly satisfied 
 
 if (any(omx<0d0)) then  ! if negative om conc. is detected, need to stop  
-    print*,'negative om, stop',dt
-    print*, workdir
+	if (dum_loc_disp) then
+		print*,'negative om, stop',dt
+		print*, workdir
+	endif 
     open(unit=file_tmp,file=trim(adjustl(workdir))//'NEGATIVE_OM.res',status = 'unknown')
     do iz = 1, nz
         write (file_tmp,*) z(iz),omx(iz)*mom/rho(iz)*100d0,w(iz),up(iz),dwn(iz),cnr(iz),adf(iz)
@@ -3310,10 +3332,12 @@ if (any(omx<0d0)) then  ! if negative om conc. is detected, need to stop
     ! stop
     flg_500 = .true.
     if (dt < 1d-2) then 
-        print*
-        print*,'*** because it is unlikely to obtain reasonable OM profile'
-        print*,'    om with negative values are set to 0 and proceed'
-        print*
+		if (dum_loc_disp) then
+			print*
+			print*,'*** because it is unlikely to obtain reasonable OM profile'
+			print*,'    om with negative values are set to 0 and proceed'
+			print*
+		endif 
         do iz=1,nz
             if (omx(iz)<0d0) omx(iz)= 0d0
         enddo 
@@ -3321,9 +3345,11 @@ if (any(omx<0d0)) then  ! if negative om conc. is detected, need to stop
     endif             
 endif 
 if (any(isnan(omx))) then  ! if NAN, ... the same ... stop
-    print*,'nan om, stop'
-    print*, workdir
-    print*,omx
+	if (dum_loc_disp) then 
+		print*,'nan om, stop'
+		print*, workdir
+		print*,omx
+	endif
     ! stop
     flg_500 = .true.
 endif 
@@ -3651,6 +3677,7 @@ real dev
 real,intent(inout)::co3sat
 ! maximum iteration to shorten calculation time 
 real :: loc_itr_max = 100
+logical :: dum_loc_disp = .false.
 
 !       Here the system is non-linear and thus Newton's method is used (e.g., Steefel and Lasaga, 1994).
 ! 
@@ -3716,15 +3743,17 @@ case('archer1991')
     if (infosbr==1) then ! which means error in calculation 
         ! dt=dt/10d0
     ! #ifdef sense
-        print *
-        print *
-        print *
-        print *,' ******* WARNING ******* '
-        print *,' raising flag to repeat calculation with reduced dt and increased nt '
-        print *,' here is caco3 system calculation subroutine: simple co2 chemistry ' 
-        print *,' *********************** '
-        print *
-        print *
+		if (dum_loc_disp) then
+			print *
+			print *
+			print *
+			print *,' ******* WARNING ******* '
+			print *,' raising flag to repeat calculation with reduced dt and increased nt '
+			print *,' here is caco3 system calculation subroutine: simple co2 chemistry ' 
+			print *,' *********************** '
+			print *
+			print *
+		endif 
         flg_500=.true.
         return
     ! #else
@@ -3736,15 +3765,17 @@ case('archer1991')
     if (infosbr==1) then ! if error in calculation 
         ! dt=dt/10d0
     ! #ifdef sense
-        print *
-        print *
-        print *
-        print *,' ******* WARNING ******* '
-        print *,' raising flag to repeat calculation with reduced dt and increased nt '
-        print *,' here is caco3 system calculation subroutine: simple co2 chemistry ' 
-        print *,' *********************** '
-        print *
-        print *
+		if (dum_loc_disp) then
+			print *
+			print *
+			print *
+			print *,' ******* WARNING ******* '
+			print *,' raising flag to repeat calculation with reduced dt and increased nt '
+			print *,' here is caco3 system calculation subroutine: simple co2 chemistry ' 
+			print *,' *********************** '
+			print *
+			print *
+		endif 
         flg_500=.true.
         return
     ! #else
@@ -3816,15 +3847,17 @@ case('genie')
         ! nt = nt*10
     ! #ifdef sense
         ! go to 500
-        print *
-        print *
-        print *
-        print *,' ******* WARNING ******* '
-        print *,' raising flag to repeat calculation with reduced dt and increased nt '
-        print *,' here is caco3 system calculation subroutine: genie co2 chemistry ' 
-        print *,' *********************** '
-        print *
-        print *
+		if (dum_loc_disp) then
+			print *
+			print *
+			print *
+			print *,' ******* WARNING ******* '
+			print *,' raising flag to repeat calculation with reduced dt and increased nt '
+			print *,' here is caco3 system calculation subroutine: genie co2 chemistry ' 
+			print *,' *********************** '
+			print *
+			print *
+		endif 
         flg_500=.true.
         return
     ! #else
@@ -4388,16 +4421,18 @@ endif
 if (itr > loc_itr_max) then 
     flg_500 = .true.
     ! dt=dt/10d0
-    print *
-    print *
-    print *
-    print *,' ******* WARNING ******* '
-    print *,' raising flag to repeat calculation with reduced dt and increased nt '
-    print *,' here is caco3 system calculation subroutine:',loc_error 
-    print *,' ... too many iterations but cannot get convergence '
-    print *,' *********************** '
-    print *
-    print *
+	if (dum_loc_disp) then
+		print *
+		print *
+		print *
+		print *,' ******* WARNING ******* '
+		print *,' raising flag to repeat calculation with reduced dt and increased nt '
+		print *,' here is caco3 system calculation subroutine:',loc_error 
+		print *,' ... too many iterations but cannot get convergence '
+		print *,' *********************** '
+		print *
+		print *
+	endif 
     exit 
 endif 
 
@@ -4587,6 +4622,7 @@ character*255,intent(in)::workdir
 integer::nsp,nmx,iz,row,iiz,infobls,col
 integer,allocatable::ipiv(:)
 real,allocatable::amx(:,:),ymx(:),emx(:)
+logical :: dum_loc_disp = .false.
 
 nsp = 1 !  only consider clay
 nmx = nz*nsp  ! matrix is linear and solved like om and o2, so see comments there for calculation procedures 
@@ -4680,7 +4716,7 @@ call dgesv(nmx,int(1),amx,nmx,ipiv,ymx,nmx,infobls)
 
 ! #ifndef nonrec
 if (any(isnan(amx))) then
-    print*,'NAN in amx:pt'
+    if (dum_loc_disp) print*,'NAN in amx:pt'
     open(unit=file_tmp,file=trim(adjustl(workdir))//'chk_amx_pt.res',status = 'unknown')
     do iz = 1, nmx
         write (file_tmp,*) amx(iz,:)
@@ -4690,7 +4726,7 @@ if (any(isnan(amx))) then
 endif
 
 if (any(isnan(ymx))) then 
-    print*,'NAN in ymx:pt'
+    if (dum_loc_disp) print*,'NAN in ymx:pt'
     open(unit=file_tmp,file=trim(adjustl(workdir))//'chk_ymx_pt.res',status = 'unknown')
     do iz = 1, nmx
         write (file_tmp,*) ymx(iz)
