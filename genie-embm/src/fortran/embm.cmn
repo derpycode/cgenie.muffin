@@ -110,12 +110,12 @@ c arrays for embm
      1 ,fxsw(maxi,maxj),fxplw(maxi,maxj)
      2 ,fx0a(maxi,maxj),fx0o(maxi,maxj)
      3 ,fxsen(maxi,maxj),pmeadj(maxi,maxj)
-     4 ,pptn(maxi,maxj),evap(maxi,maxj),usurf(maxi,maxj)
-     5 ,fxlata(maxi,maxj),fxlato(maxi,maxj)
-     6 ,fxlw(maxi,maxj)
-     7 ,diffa(2,2,maxj),betam(2),betaz(2),hatmbl(2)
-     8 ,ca(maxi,maxj)
-     9 ,qb(maxi,maxj),qbsic(maxi,maxj)
+     4 ,pptn(maxi,maxj),evap(maxi,maxj)
+     5 ,usurf(maxi,maxj)
+     6 ,fxlata(maxi,maxj),fxlato(maxi,maxj)
+     7 ,fxlw(maxi,maxj)
+     8 ,diffa(2,2,maxj),betam(2),betaz(2),hatmbl(2)
+     9 ,ca(maxi,maxj),qb(maxi,maxj),qbsic(maxi,maxj)
        real fx0sic(maxi,maxj)
      2 ,fx0neto(maxi,maxj),fwfxneto(maxi,maxj)
      3 ,evapsic(maxi,maxj),tsfreez(maxi,maxj)
@@ -347,21 +347,26 @@ c d18o derived orography and ice sheet
      &       filenamed18o,filenamed18oicethresh,filenamed18oorogmin,
      &       filenamed18ooroggrad
 
-c interpolated seasonal fields
-cmsw Offline arrays
+c interpolated seasonal fields -- Offline arrays
+c PV [26/02/2024] create variables to allow wind input fields
+c    (full-grid) to be used with ENTS (filename_wspeed)
 
       integer ents_seasonswitch,ents_offlineswitch,nmth
       parameter(nmth=12)
       character*200 filenamealba
-      real uatml(2,maxi,maxj,maxnyr),  ! u and v wind comp.'s
+      character*200 filename_wspeed
+      real uatml(2,maxi,maxj,maxnyr),  ! u and v wind velocity comp.'s
      &     usurfl(maxi,maxj,maxnyr),   ! windspeed (m/s)
      &     tncep(maxi,maxj,maxnyr),    ! NCEP air temperature (oC)
      &     pncep(maxi,maxj,maxnyr),    ! NCEP pptn (m/s)
      &     rhncep(maxi,maxj,maxnyr),   ! NCEP relative humidity at 1000mb (%)
      &     atm_alb(maxi,maxj,maxnyr)   ! atmospheric albedo
-      common /embm_seasonal/tncep,pncep,rhncep,atm_alb,filenamealba,
-     &     uatml,usurfl,ents_seasonswitch,ents_offlineswitch
+      common /embm_seasonal/tncep,pncep,rhncep,atm_alb,
+     &     filenamealba,uatml,usurfl,
+     &     ents_seasonswitch,ents_offlineswitch,
+     &     filename_wspeed
 
+	  
 c transfer coefficients for land grid boxes
       real chl(maxi,maxj),             ! transfer coefficient
      &     cel(maxi,maxj)              ! ditto

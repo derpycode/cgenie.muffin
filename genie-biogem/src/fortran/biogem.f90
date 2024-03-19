@@ -2259,6 +2259,14 @@ subroutine biogem_climate( &
      & dum_diffv,               &
      & dum_dzrho,               &
 	 & dum_rho_go,              &
+	 & dum_fxlho,               &
+	 & dum_fxsho,               &
+	 & dum_fxswo,               &
+	 & dum_fxlwo,               &
+	 & dum_fxlha,               &
+	 & dum_fxsha,               &
+	 & dum_fxswa,               &
+	 & dum_fxlwa,               &
 	 & dum_albo                 &
      & )
 
@@ -2283,6 +2291,14 @@ subroutine biogem_climate( &
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_diffv              ! vertical diffusivity
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_dzrho              ! density gradient
   REAL,DIMENSION(n_i,n_j,n_k),INTENT(in)::dum_rho_go             ! density from goldstein
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxlho                  ! latent heat flux into ocean
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxsho                  ! sensible heat flux into ocean
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxswo                  ! shortwave flux into ocean
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxlwo                  ! longwave flux into ocean
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxlha                  ! latent heat flux into atmosphere
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxsha                  ! sensible heat flux into atmosphere
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxswa                  ! shortwave flux into atmosphere
+  REAL,DIMENSION(n_i,n_j),INTENT(in)::dum_fxlwa                  ! longwave flux into atmosphere
   REAL,DIMENSION(n_j),INTENT(in)::dum_albo                       ! ocean albedo from embm 
 ! LOCAL VARIABLES
   INTEGER::i,j,k
@@ -2351,6 +2367,15 @@ subroutine biogem_climate( &
         ! evap and precip
         phys_ocnatm(ipoa_evap,i,j)  = dum_evap(i,j)
         phys_ocnatm(ipoa_pptn,i,j)  = dum_pptn(i,j)
+		! heat fluxes
+		phys_ocnatm(ipoa_fxlho,i,j) = dum_fxlho(i,j)
+		phys_ocnatm(ipoa_fxsho,i,j) = dum_fxsho(i,j)
+		phys_ocnatm(ipoa_fxswo,i,j) = dum_fxswo(i,j)
+		phys_ocnatm(ipoa_fxlwo,i,j) = dum_fxlwo(i,j)
+		phys_ocnatm(ipoa_fxlha,i,j) = dum_fxlha(i,j)
+		phys_ocnatm(ipoa_fxsha,i,j) = dum_fxsha(i,j)
+		phys_ocnatm(ipoa_fxswa,i,j) = dum_fxswa(i,j)
+		phys_ocnatm(ipoa_fxlwa,i,j) = dum_fxlwa(i,j)
 		! ocean albedo
 		phys_ocnatm(ipoa_albo,i,j)  = dum_albo(j)
      end DO

@@ -119,8 +119,7 @@ crma extra explicit declarations (rma, 22/12/03)
 c AY (02/02/05) : now read in from GOIN information
 c     parameter(world='worbe2')
 
-c AY (02/02/05) : add filename variables for wind stress and wind speed
-c                 files
+c AY (02/02/05) : add filename variables for windstress and windspeed
       character xu_wstress*127, yu_wstress*127
       character xv_wstress*127, yv_wstress*127
       integer   len_xu, len_yu, len_xv, len_yv
@@ -131,7 +130,9 @@ c                 files
 c PV (28/07/22): add filename variables for orograpy, icemask & atm albedo files
 c character filenameorog*127, filenamelice*127
       integer   len_orog, len_lice, len_alba
-      
+c PV (26/02/24): add variable for full-grid windspeed with ENTS
+      integer   len_wspeed
+	  
 c AY (09/01/04) : local variables reinstated
       character ans, lin*13
 
@@ -255,6 +256,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/t_orog
       NAMELIST /ini_embm_nml/filenameorog
       NAMELIST /ini_embm_nml/filename_ents2d
+      NAMELIST /ini_embm_nml/filename_wspeed
       NAMELIST /ini_embm_nml/norog
       NAMELIST /ini_embm_nml/orogsteps
       NAMELIST /ini_embm_nml/t_lice
@@ -431,7 +433,8 @@ c PV (07/28/23): Read in orography filenames
       len_lice = lnsig1(filenamelice)
 c PV (01/08/24): Read atmopsheric albedo filename
       len_alba = lnsig1(filenamealba)
-	  
+c PV (26/02/204): Read in full-grid windspeed file
+      len_wspeed = lnsig1(filename_wspeed)
 
 c     Time-steps information
 c AY (08/12/03) : have total steps passed into initialise_ocean.F
@@ -1178,37 +1181,35 @@ c because tau hasn't been assigned yet
 c this piece of code is also in usurf.F after tau has been assigned
 c     open(55,file='usurf.dat')
 
-      cd = 0.0013
-
-      do j=1,jmax
-         tv3 = 0.
-         do i=1,imax
-            if(i.eq.1) then
-               tv = (tau(1,i,j)+tau(1,imax,j))/2
-            else
-               tv = (tau(1,i,j)+tau(1,i-1,j))/2
-            endif
-            if(j.eq.1) then
-               tv2 = tau(2,i,j)/2
-            else
-               tv2 = (tau(2,i,j)+tau(2,i,j-1))/2
-            endif
-            usurf(i,j) = sqrt((sqrt(tv**2 + tv2**2))
-     1          *rh0sc*dsc*usc*fsc/(rhoair*cd*scf))
+c      cd = 0.0013
+c      do j=1,jmax
+c        tv3 = 0.
+c         do i=1,imax
+c            if(i.eq.1) then
+c               tv = (tau(1,i,j)+tau(1,imax,j))/2
+c            else
+c               tv = (tau(1,i,j)+tau(1,i-1,j))/2
+c            endif
+c            if(j.eq.1) then
+c               tv2 = tau(2,i,j)/2
+c            else
+c               tv2 = (tau(2,i,j)+tau(2,i,j-1))/2
+c            endif
+c            usurf(i,j) = sqrt((sqrt(tv**2 + tv2**2))
+c     1          *rh0sc*dsc*usc*fsc/(rhoair*cd*scf))
 c    1          *rh0sc*dsc*usc*fsc/(rhoair*cd))
-            tv3 = tv3 + usurf(i,j)
-         enddo
+c            tv3 = tv3 + usurf(i,j)
+c         enddo
 c          LG :  added wind_polar_avg that undoes the 
 c          zonal average of usurf near poles when eq 2
-         if (par_wind_polar_avg.ne.2) then
-            do i=1,imax
-               if(j.le.2.or.j.ge.jmax-1)usurf(i,j) = tv3/imax
+c         if (par_wind_polar_avg.ne.2) then
+c            do i=1,imax
+c               if(j.le.2.or.j.ge.jmax-1)usurf(i,j) = tv3/imax
 c           write(55,*)usurf(i,j)
-            enddo
-         endif
-      enddo
+c            enddo
+c         endif
+c      enddo
 c     close(55)
-
 
 c AY (06/01/04) : sea-ice parameter definitions
 c                 reinstated from sea-ice section of gseta.f
@@ -2108,6 +2109,7 @@ c minimum (modern) orography
               read(77,*) d18o_orog_min(i,j)
             enddo
           enddo
+          close(77)
 c "gradient" of orography wrt d180 
           open(77,file=trim(filenamed18ooroggrad))
           do i=1,imax
@@ -2285,9 +2287,8 @@ c NOTE: if 2D, duplicate albedo in 3D matrix, i.e. same atm albedo each month
          endif
          close(77)
 
-cmsw Read in and initialise monthly winds
-c PV [22/01/2024] only when unify_winds=0 (use monthly winds, else assign 
-c                 empty arrays that will be overwritten by EMBM winds
+cmsw Read in and initialise monthly winds if unify_winds=0 (NOT recommended)
+c PV [22/01/2024] else assign empty arrays to be overwritten by EMBM winds (velocity)
 
          if (unify_winds .eq. 0) then
             open(35,file=indir_name(1:lenin)//'uvic_windx.silo')
@@ -2308,24 +2309,28 @@ c                 empty arrays that will be overwritten by EMBM winds
                enddo
             enddo
          endif
-            
+		 
 cmsw read in wind speeds for use in radiation/evap calc.
-c PV [22/01/2024] only when unify_winds=0 or =2,(use monthly wind speed, 
-c               else assign empty arrays that will be overwritten by EMBM winds
-
-          if (unify_winds .ne. 1) then
-            open(35,file=indir_name(1:lenin)//'monthly_windspd.silo')
-            read(35,*)(((usurfl1(i,j,l),i=1,imax),j=1,jmax)
+c PV [22/01/2024] if unify_winds=0 or =2, use full-grid windspeed file (recommended)
+        if (unify_winds .ne. 1) then
+           open(35,file=indir_name(1:lenin)//filename_wspeed)
+           if (filename_ents2d) then
+              do j = jmax,1,-1
+                 read(35,*) (usurf(i,j),i=1,imax)
+              enddo
+              do l = 1,nmth+1
+                 usurfl1(:,:,l) = usurf(:,:)
+              enddo
+           else
+              read(35,*) (((usurfl1(i,j,l),i=1,imax),j=1,jmax)
      1           ,l=1,nmth+1)
-            close(35)
-          else
-            do l=1,nyear
-               do i=1,imax
-                  do j=1,jmax
-                     usurfl(i,j,l)=0.
-                  enddo
-               enddo
-            enddo
+           endif
+           close(35)
+        else
+c PV [22/01/2024] if unify_winds=1, EMBM (tau) will be used to convert wind stress 
+c    to windspeed but note that the windstress-to-speed conversion is only valid 
+c    over ocean (NOT recommended)
+            usurfl(i,j,l)=0.
           endif
 
 cmsw preprocess for use in tsetpa/tstipa
@@ -2338,6 +2343,7 @@ cLG Step avoided if par_wind_polar_avg is 2
                         do l=1,2
                            tv = 0.
                            tv1= 0.
+						   tv2= 0.
                            do i=1,imax
                               tv = tv + uatml1(l,i,j,m)
                               tv1= tv1+ usurfl1(i,j,m)
@@ -2345,8 +2351,7 @@ cLG Step avoided if par_wind_polar_avg is 2
                            tv = tv / imax
                            tv1= tv1/ imax
 c     tv = tv * imax_real
-c     tv1= tv1 * imax_real
-                           
+c     tv1= tv1 * imax_real  
                            do i=1,imax
                               uatml1(l,i,j,m) = tv
                               usurfl1(i,j,m) = tv1
@@ -2356,7 +2361,6 @@ c     tv1= tv1 * imax_real
                   enddo
                enddo
             endif
-            
 c remove zonal average of v else fail mass conservation (may not be
 c disastrous).
 cLG Step avoided if par_wind_polar_avg is 2
@@ -2372,9 +2376,12 @@ cLG Step avoided if par_wind_polar_avg is 2
                   endif
                enddo
             enddo
+			
 cmsw Interpolate prescribed model fields
-         call field_interp(uatml1,usurfl1,tncep1,pncep1,rhncep1,
-     &        atm_alb1)
+c PV [19/03/2024] - should be deleted. Allow only annual mean fields 
+         call field_interp(uatml1,usurfl1,tncep1,pncep1,
+     &        rhncep1,atm_alb1)
+		 
 cc LG 23/11/12 I removed this part so that we keep ents
 c  winds separate from embm winds even with unify_winds
          if (unify_winds .ge. 1) then
@@ -2388,6 +2395,7 @@ c     Replace ents uatm with embm fields
                enddo
             enddo
         endif
+        
         if (unify_winds .eq. 1) then
 c     Replace ents usurf by embm fields
             do l=1,nyear

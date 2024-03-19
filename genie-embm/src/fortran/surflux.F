@@ -434,8 +434,10 @@ c LG don't use ents winds when winds are unified
       enddo
 
 c AY (11/12/03) : code below taken from gseta.F
+c PV: if not.flag.ents, tau(:,:,:) is ocean-only windstress, i.e. no evap/fxsens over land
+c     if unify_winds=1, tau(:,:,:) is ocean+land (full grid) windstress
       cd = 0.0013 
-      if (unify_winds .eq. 1 .or..not.flag_ents) then
+      if (unify_winds .eq. 1 .or. .not.flag_ents) then
          do j=1,jmax
             tv3 = 0.
             do i=1,imax
@@ -462,7 +464,7 @@ c zonal average of usurf near poles when eq 2
                enddo
             endif
          enddo
-c LG: and now replace usufl with usurf for the rest of the calculations
+c LG: and now replace usurfl with usurf for the rest of the calculations
          do i=1,imax
             do j=1,jmax
                usurfl(i,j,imth) = usurf(i,j)

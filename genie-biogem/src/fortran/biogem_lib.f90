@@ -770,7 +770,7 @@ MODULE biogem_lib
   INTEGER,PARAMETER::l_j = ilon1_lnd
   ! misc arrays dimensions
   INTEGER,PARAMETER::n_phys_ocn                           = 24 ! number of ocean box physical descriptors
-  INTEGER,PARAMETER::n_phys_ocnatm                        = 27 ! number of ocean-atmosphere interface physical descriptors
+  INTEGER,PARAMETER::n_phys_ocnatm                        = 35 ! number of ocean-atmosphere interface physical descriptors
   INTEGER,PARAMETER::n_ents                               = 21
   INTEGER,PARAMETER::n_data_max     = 32767                    ! (maximum) number of (time series) data points (2^15 - 1)
   ! options arrays dimensions
@@ -847,6 +847,14 @@ MODULE biogem_lib
   INTEGER,PARAMETER::ipoa_pptn                            = 21   ! pptn
   INTEGER,PARAMETER::ipoa_seaice_dV                       = 22   ! change in sea-ice volume
   INTEGER,PARAMETER::ipoa_albo                            = 27   ! ocean albedo
+  INTEGER,PARAMETER::ipoa_fxlho                           = 28   ! lantent heat flux into ocean 
+  INTEGER,PARAMETER::ipoa_fxsho                           = 29   ! sensible heat flux into ocean 
+  INTEGER,PARAMETER::ipoa_fxswo                           = 30   ! shortwave flux into ocean 
+  INTEGER,PARAMETER::ipoa_fxlwo                           = 31   ! longwave flux into ocean 
+  INTEGER,PARAMETER::ipoa_fxlha                           = 32   ! lantent heat flux into atm
+  INTEGER,PARAMETER::ipoa_fxsha                           = 33   ! sensible heat flux into atm
+  INTEGER,PARAMETER::ipoa_fxswa                           = 34   ! shortwave flux into atm
+  INTEGER,PARAMETER::ipoa_fxlwa                           = 35   ! longwave flux into atm
   ! ents indices (SKT)
   INTEGER,PARAMETER::iel_lat                             = 01
   INTEGER,PARAMETER::iel_lon                             = 02
@@ -1009,7 +1017,15 @@ MODULE biogem_lib
        & 'v               ', &
        & 'usurf           ', &
        & 'MLD_k           ', &
-       & 'albo            ' /)
+       & 'albo            ', &
+       & 'fxlho           ', &
+       & 'fxsho           ', &
+       & 'fxswo           ', &
+       & 'fxlwo           ', &
+       & 'fxlha           ', &
+       & 'fxsha           ', &
+       & 'fxswa           ', &
+       & 'fxlwa           ' /)
   ! ents (SKT) 
   CHARACTER(len=16),DIMENSION(n_ents),PARAMETER::string_ents = (/ &
        & 'lat             ', &

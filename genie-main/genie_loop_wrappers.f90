@@ -137,7 +137,7 @@ contains
          landice_slicemask_lic, &                 ! in/output
          eb_albs_sur, &                           ! output (to ENTS and BIOGEM)
          eb_albs_atm, &                           ! output (to ENTS and BIOGEM)
-		 eb_palb, &                               ! output (to ENTS and BIOGEM)
+         eb_palb, &                               ! output (to ENTS and BIOGEM)
          eb_albo, &                               ! output (to ENTS and BIOGEM)
          land_albs_snow_lnd, &                    ! input (from ENTS)
          land_albs_nosnow_lnd, &                  ! input (from ENTS)
@@ -690,6 +690,14 @@ contains
          & go_diffv,                                         & ! input
          & go_dzrho,                                         & ! input
 		 & go_rho,                                           & ! input
+         & latent_ocn,                                       & ! input
+         & sensible_ocn,                                     & ! input
+         & netsolar_ocn,                                     & ! input
+         & netlong_ocn,                                      & ! input
+         & surf_latent_atm,                                  & ! input
+         & surf_sensible_atm,                                & ! input
+         & netsolar_atm,                                     & ! input
+         & netlong_atm,                                      & ! input
          & eb_albo                                           & ! input
          ) 
   end subroutine biogem_climate_wrapper
@@ -706,7 +714,7 @@ contains
          & land_temp_lnd,                                    &
          & land_moisture_lnd,                                &
 		 & land_snow_lnd,                                    &
-		 & albs_lnd,									     &
+         & albs_lnd,									     &
          & eb_albs_sur,                                      &
          & eb_albs_atm,                                       &
          & eb_palb,                                          &		 
