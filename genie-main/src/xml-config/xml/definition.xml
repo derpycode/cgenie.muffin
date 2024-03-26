@@ -14,6 +14,7 @@
     "diffamp(1)", "diffamp(2)" etc. This will need changing if it's incorrect.
     -> CWA: array elements may optionally have names.
 
+
    in embm and goldstein:
    <param name="lout">
     <value datatype="string">spn</value>
@@ -2087,12 +2088,16 @@
                         2 - Removed polar wind averaging of usurf and on ENTS input winds.</description>
                     </param>
                     <param name="unify_winds">
-                        <value datatype="integer">0</value>
+                        <value datatype="integer">2</value>
                         <description>uses embm input winds even with ents on.
-                         0 - (default behaviour) ENTS modifies uatm and usurf winds.
-                         1 - even with ENTS, use EMBM input winds for both uatm and usurf.
-                         2 - even with ENTS, use embm uatm, but replace usurf with ENTS usurfl
+                         0 - ENTS modifies uatm (advection) and usurf (surf-atm heat-moisture flux) winds -> not recommended
+                         1 - use EMBM input winds for uatm (advection) and usurf (surf-atm heat-moisture flux) -> not recommended
+                         2 - use EMBM input winds for uatm but replace usurf with ENTS windspeed
                         </description>
+                    </param>
+                    <param name="filename_wspeed">
+					    <value datatype="string">monthly_windspd.silo</value>
+                        <description>windspeed (full grid for ENTS)</description>
                     </param>
                     <param name="debug_init">
 			<value datatype="boolean">.false.</value>
