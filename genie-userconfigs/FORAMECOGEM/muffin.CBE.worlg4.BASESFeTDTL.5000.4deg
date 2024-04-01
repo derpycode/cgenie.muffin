@@ -137,7 +137,7 @@ bg_par_infile_sig_name='save_timeseries_historicalfuture_FINE.dat'
 # --- FORCINGS ------------------------------------------------------
 #
 # specify forcings
-bg_par_forcing_name="worlg4.RpCO2_Rp13CO2.FeMahowald2006.2100.4deg"
+bg_par_forcing_name="worlg4.RpCO2_Rp13CO2.FeMahowald2006.5000.4deg"
 bg_par_atm_force_scale_val_4=-6.5
 #
 # --- MISC ----------------------------------------------------------
