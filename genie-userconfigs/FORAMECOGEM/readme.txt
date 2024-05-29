@@ -38,41 +38,38 @@ EDITING LOG [list of changes made to this file, when, and by who]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 SUMMARY OF EXPERIMENTS [summerize experiments detailed and in which e.g. figures they appear]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-1. Last Glacial Maximum spin up
-2. Pre-industrial spin up
-3. Historical simulation (until 2022)
-4. Idealised future simulation (2100) with 1.5, 2, 3, 4 degree C warming
+1. Last Glacial Maximum spin up (Fig. 1), adapted from Odalen et al. 2022 with ECOGEM enabled
+2. Pre-industrial spin up (Fig. 1), same physical configuration as Ward et al. 2018 (ECOGEM 1.0)
+3. Historical transient simulation (until 2022) (Fig. 3), running based on preindustrial spinup
+4. Idealised future simulation (2100) with 1.5, 2, 3, 4 degree C warming (Fig. 3)
 
+Other important files:
+8P7Z4F.zoo: plankton functional type configuration
+FORAMECOGEM.zoo: the explicit trait parameters of foraminifera
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 RUNNING THE EXPERIMENTS [command lines, broken down in sub-sections for spinups, main experiments, SI, etc where appropriate]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# Model Runs
-## pre-industrial spinup (0-10000)
-
-```
+# Main experiments
+1. pre-industrial spinup (0-10000)
 qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.SPIN 10000
-```
 
-## Historical (1765-2022) 
 
-```sh
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.historical 257 muffin.CBE.worlg4.BASESFeTDTL.SPIN
-```
+2. Historical (1765-2022)
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.historical 257 muffin.CBE.worlg4.BASESFeTDTL.SPIN `
 
-## Future (2022-2100)
-
-```sh
+3. Future (2022-2100)
 qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.2100.[XXX]deg 78 muffin.CBE.worlg4.BASESFeTDTL.historical
-```
 
-## LGM
 
-```sh
+4. LGM spin up
 qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.GIteiiva.BASESFeTDTL_rb FORAMECOGEM muffin.CBE.GIteiiva.BASESFeTDTL_rb.SPIN 10000
-```
 
+
+# SI model runs
+1. LGM spinup with seasonal output: muffin.CBE.GIteiiva.BASESFeTDTL_rb.seasonal (same command of running as above)
+2. Future warming under different rates: muffin.CBE.worlg4.BASESFeTDTL.{2100, 3000, 4000, 5000}.4deg
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
