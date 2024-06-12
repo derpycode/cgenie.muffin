@@ -815,9 +815,13 @@ c     NOTE units are ppb for CH4 and N2O calculation
      1           alphan2o*(sqrt(1e9*n2o(i,j)) - sqrt(1e9*n2o0))
      2           - ch4_func(1e9*ch40,1e9*n2o(i,j))
      3           + ch4_func(1e9*ch40,1e9*n2o0)
-c     calculate outgoign longwave
+c     calculate outgoing longwave
 c pbh talt dependence removed for olr (orography only affects surface proceses now if orogswitch=2)
-            if((orogswitch.lt.2).and.(flag_ents)) then
+c PV (06/-6/2024) - added back. Weaver et al., 2001: "Using the reduced temperature for calculating OLR 
+c    makes the LW radiation more dependent on topography than seen in observations, but it improves the 
+c    simulated surface temperatures, which are otherwise generally too low over areas of high elevation."
+c    OLR is a function of surface temp so should include lapse rate dependance (Thompson and Warren, 1982)
+            if (flag_ents) then
                fxplw(i,j) = tv0 + talt*(tv1 
      1              + talt*(tv2 
      2              + talt*tv3))
