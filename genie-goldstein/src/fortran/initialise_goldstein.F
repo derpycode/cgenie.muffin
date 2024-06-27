@@ -204,7 +204,7 @@ c     namelist for reading initialisation data
       NAMELIST /ini_gold_nml/indir_name,outdir_name,rstdir_name
       NAMELIST /ini_gold_nml/igrid,world
       NAMELIST /ini_gold_nml/npstp,iwstp,itstp,ianav
-      NAMELIST /ini_gold_nml/conserv_per,ans,yearlen,nyear
+      NAMELIST /ini_gold_nml/conserv_per,ans,sodaylen,sidaylen,yearlen,nyear
       NAMELIST /ini_gold_nml/temp0,temp1,rel,scf,diff,adrag
       NAMELIST /ini_gold_nml/hosing,hosing_trend,nyears_hosing
       NAMELIST /ini_gold_nml/fwanomin,cmip_model,albocn
@@ -287,9 +287,9 @@ c read in namelist
          close(56,iostat=ios)
          call check_iostat(ios,__LINE__,__FILE__)
       end if
-
+      
 c SG > syr re-defined here
-      syr = yearlen * 86400
+      syr = yearlen * sodaylen
       if (debug_init) print*, 'syr = ',syr
 c SG <
 
@@ -341,6 +341,16 @@ c     New or continuing run
       if (debug_init) print*,'new or continuing run ?'
       if (debug_init) print*,ans
 
+c CL (01/15/24) : number of seconds per solar day
+c     sodaylen = 86400.0
+      if (debug_init) print*,'number of seconds per solar day'
+      if (debug_init) print*,sodaylen
+
+c CL (01/15/24) : number of seconds per sidereal day
+c     sidaylen = 86164.0
+      if (debug_init) print*,'number of seconds per sidereal day'
+      if (debug_init) print*,sidaylen
+
 c AY (05/05/04) : number of days per GOLDSTEIN year (usually 365.25)
 c     yearlen = 365.25
       if (debug_init) print*,'number of days per GOLDSTEIN year'
@@ -366,7 +376,13 @@ c dimensional scale values
       rsc = 6.37e6
 c      dsc = 5e3
       dsc = par_dsc
-      fsc = 2*7.2921e-5
+c     CL (01/15/24) : used sidereal day length for Coriolis effect scaling factor
+c     AR (24/03/03) : check for sidereal and solar days being different, otherwise use original code for backwards compatabilty
+      if (abs(sodaylen-sidaylen).gt.0.001)then
+         fsc = 4*pi/sidaylen
+      else
+         fsc = 2*7.2921e-5
+      endif
       gsc = 9.81
       rh0sc = 1e3
       rhosc = rh0sc*fsc*usc*rsc/gsc/dsc
@@ -450,6 +466,8 @@ crma note igcm orders latitude north-to-south!
       endif
       if (debug_init) print*,'GOLDSTEIN latitudes: velocity; tracers'
       if (debug_init) print*,'j, 180/pi*asin(sv(j)), 180/pi*asin(s(j))'
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do j=1,jmax
          ds(j) = sv(j) - sv(j-1)
          rds(j) = 1.0/ds(j)
@@ -494,7 +512,7 @@ c                 descriptor in the line below from (i) to (i10)
       if(nyear.gt.maxnyr)stop 'goldstein : nyear > maxnyr' 
       if (debug_init) print*,nyear
 
-      tv = 86400.0*yearlen/(nyear*tsc)
+      tv = sodaylen*yearlen/(nyear*tsc)
 
 c     dtatm = tv/ndta
 
@@ -505,7 +523,7 @@ c initialize
          dzu(1,k) = 0
          dzu(2,k) = 0
       enddo
-      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/86400
+      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/sodaylen
 
 c set up grid
 c For variable (exponential) dz use ez0 > 0, else use ez0 < 0
@@ -536,6 +554,8 @@ c tv5 is the depth of the k+1th density level from the top
          endif
       enddo
 
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do k=kmax,1,-1
          if(k.gt.1)zro(k-1) = zro(k) - dza(k-1)
          zw(k-1) = zw(k) - dz(k)
@@ -1082,9 +1102,10 @@ c seabed depth h
       enddo   
 
       do 120 j=1,jmax
-         do 120 i=1,imax
+         do 121 i=1,imax
             ku(1,i,j) = max(k1(i,j),k1(i+1,j))
             ku(2,i,j) = max(k1(i,j),k1(i,j+1))
+  121 continue
   120 continue
       tv2 = 0
 
@@ -1093,8 +1114,8 @@ c drag takes the value adrag in the interior, rising twice by factor
 c drgf per gridpoint close to equator and in regions of
 c shallow water (k1>kmxdrg) ie land in the case kmxdrg=kmax
 c jeb = 1/2 width of equatorial region of maximum drag
-
-      adrag = 1.0/(adrag*86400*fsc)
+c CL (01/15/24) : used sidereal day length for inverse of frictional drag
+      adrag = 1.0/(adrag*sidaylen*fsc)
 c cross equator need * 4 if drag is constant ie if drgf=1
       drgf = 3.0
       kmxdrg = kmax/2
@@ -1216,13 +1237,14 @@ c (1+sign(1,kmax-k1(i,j)))/2
 c mk is largest of surrounding wet k1 values if i,j is wet, else 0
 c
       do 130 j=1,jmax
-         do 130 i=1,imax
+         do 131 i=1,imax
             mk(i,j) = max(k1(i,j)*(1+sign(1,kmax-k1(i,j)))/2,
      1                k1(i+1,j)*(1+sign(1,kmax-k1(i+1,j)))/2,
      1                k1(i-1,j)*(1+sign(1,kmax-k1(i-1,j)))/2,
      1                k1(i,j+1)*(1+sign(1,kmax-k1(i,j+1)))/2,
      1                k1(i,j-1)*(1+sign(1,kmax-k1(i,j-1)))/2)
             mk(i,j) = mk(i,j) * (1+sign(1,kmax-k1(i,j)))/2
+  131 continue
   130 continue
 
 c initialize bp, only strictly needed at k=k1
@@ -1248,7 +1270,7 @@ c Hence first condition ensures (i,j) is a wet Psi point, 2nd that bottom
 c is not flat.
 c
       do 140 j=1,jmax
-         do 140 i=1,imax
+         do 141 i=1,imax
             if( (max(k1(i,j),k1(i+1,j),k1(i,j+1),k1(i+1,j+1)).le.kmax)
      1          .and. (k1(i,j).ne.k1(i,j+1).or.k1(i,j).ne.k1(i+1,j)
      1                       .or.k1(i,j).ne.k1(i+1,j+1)))then
@@ -1256,6 +1278,7 @@ c
             else
                getj(i,j) = .false.  
             endif
+  141 continue
   140 continue
 
 c read island geometry file or write out for manual editing
@@ -1356,7 +1379,7 @@ c rotate grid to check b.c.s
       if (debug_init) print*,'density variation scale',rhosc,' kg/m**3'
       if (debug_init) print*,
      & 'vertical velocity scale',usc*dsc/rsc,' m/s'
-      if (debug_init) print*,'time scale',tsc/86400/yearlen,' yrs'
+      if (debug_init) print*,'time scale',tsc/sodaylen/yearlen,' yrs'
       if (debug_init) print*,'overturning scale',dsc*usc*rsc*1e-6,' Sv'
       if (debug_init) print*,
      & 'vertical heat flux scale',dsc*usc*rh0sc*cpsc/rsc,' W/m**2'
@@ -1453,7 +1476,7 @@ c representative ice density (kg/m**3)
       rhoice = 913.
 c useful constant proportional to inverse timscale for surface freezing
 c     rsictscsf = ch_ice*u_tau_ice*rho0*cpo_ice
-      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*86400.0)
+      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*sodaylen)
 c minimum average sea-ice thickness over a grid cell
       hmin = 0.01
       rhmin = 1.0/hmin
@@ -1907,7 +1930,7 @@ c
                ilandmask2(i,j)=0
                ilandmask3(i,j)=0
             endif
-         enddo
+         end do
       end do  
 c
       if (debug_init) print*,'* Depth : depth, depth1 *'
@@ -1923,6 +1946,8 @@ c AY (17/03/04) : extra ocean.cmn arguments for netCDF writing
       end do      
 c
 c AY (09/03/04) : write this information out
+c NOTE: gfortran compiler will flag as:
+c       'Array reference ... out of bounds' ... but all OK
       do l=0,kmax
          if(l.gt.0) then
             if (debug_init) write(*,112) l,depth(l),depth1(l+1)

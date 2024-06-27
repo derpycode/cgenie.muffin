@@ -313,7 +313,7 @@ c The energy bit has units of J, relative to an initial value.
 c THE ENERGY BIT (HERE AND IN SURF_OCN_SIC) IS WELL-DODGY AND
 c IS A COMPLETE FIX.  SEE DJL FOR MORE INFO.
        if (mod(istep,conserv_per).eq.0) then
-       tv = 86400.0*yearlen/(nyear*tsc)
+       tv = sodaylen*yearlen/(nyear*tsc)
        vsc = dphi*rsc*rsc
        tot_energy=0.0
        tot_water=0.0

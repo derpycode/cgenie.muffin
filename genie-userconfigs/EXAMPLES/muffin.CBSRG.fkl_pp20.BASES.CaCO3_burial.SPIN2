@@ -28,7 +28,7 @@ bg_opt_bio_CaCO3toPOCrainratio='FIXED'
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
 # NOTE: the current calibrated Eocene value is 0.200,
 #       whereas the modern uniform equivalent is closer to 0.100
-bg_par_bio_red_POC_CaCO3=0.200
+bg_par_bio_red_POC_CaCO3=0.150
 #
 # *** REMINERALIZATION **********************************************
 #
@@ -66,10 +66,10 @@ sg_par_sed_fdet=0.180
 #
 # *** WEATHERING ****************************************************
 #
-# NOTE: the closed system spinup has 0.172485E+14 mol CaCO3 yr-1 of global burial
+# NOTE: the closed system spinup has 0.672474E+13 mol CaCO3 yr-1 of global burial
 #       splitting in a 2:3 ratio between silicate:carbonate weathering gives:
-#       0.172485E+14 * 2/5 = 6.899400000000000e+12 silicate weathering
-#       0.172485E+14 * 3/5 = 1.034910000000000e+13 carbonate weathering
+#       0.672474E+13*2/5 = 2.689896000000000e+12 silicate weathering
+#       0.672474E+13*3/5 = 4.034844000000000e+12 carbonate weathering
 # set an 'OPEN' system
 bg_ctrl_force_sed_closedsystem=.FALSE.
 # set CaCO3_weathering-temperature feedback
@@ -79,16 +79,16 @@ rg_opt_weather_T_Si=.true.
 # weathering reference mean global land air surface temperature (C)
 rg_par_ref_T0=12.03
 # global carbonate weathering rate (mol Ca2+ yr-1)
-rg_par_weather_CaCO3=1.034910000000000e+13
+rg_par_weather_CaCO3=4.034844000000000e+12
 # global silicate weathering rate (mol Ca2+ yr-1)
-rg_par_weather_CaSiO3=6.899400000000000e+12
+rg_par_weather_CaSiO3=2.689896000000000e+12
 # CO2 outgassing rate (mol C yr-1)
-rg_par_outgas_CO2=6.899400000000000e+12
+rg_par_outgas_CO2=2.689896000000000e+12
 # set isotopic values of CO2 outgassing and carbonate weathering
 # NOTE: calculate d13C of CaCO3 weathering to balance d13C of CaCO3 burial (2.65 o/oo) minus outgasing
-#       (0.172485E+14*2.65-6.899400000000000e+12*(-6))/1.034910000000000e+13
+#       (0.672474E+13*2.65-2.689896000000000e+12*(-6))/4.034844000000000e+12
 rg_par_outgas_CO2_d13C=-6.0
-rg_par_weather_CaCO3_d13C=8.4
+rg_par_weather_CaCO3_d13C=8.42
 #
 # *** GEOCHEM ACCELERATION ******************************************
 #

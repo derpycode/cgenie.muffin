@@ -51,8 +51,8 @@ MODULE genie_global
   ! var: genie_vesion
   ! Version number for the model
   integer :: genie_version
-  character, parameter :: TAB = char(9) 
-
+  character, parameter :: TAB = char(9)                         !
+  
   ! This is the overall timestep counter
   integer(kind=8) :: koverall 
   integer::katm
@@ -831,7 +831,7 @@ MODULE genie_global
   real,dimension(intrac_ocn_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumrok1_gem ! (version of above for GEMlite)
   real,dimension(intrac_atm_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumatm1_gem ! 
   ! atmosphere-rock tracer interface arrays (for purposes of getting temp and runoff into rokgem)
-  ! oecan-sediment tracer interface arrays
+  ! ocean-sediment tracer interface arrays
   real,dimension(intrac_sed_max,ilon1_sed,ilat1_sed) :: genie_sfcsed    ! sediment-surface sediment composition; sed grid
   real,dimension(intrac_sed_max,ilon1_sed,ilat1_sed) :: genie_sfxsumsed ! sediment-surface (ocn->sed) fluxes; integrated, sed grid
   real,dimension(intrac_sed_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumsed1! sediment-surface (ocn->sed) fluxes; integrated, ocn grid
@@ -850,6 +850,8 @@ MODULE genie_global
   real,dimension(intrac_atm_max,ilon1_atm,ilat1_atm)::genie_atm1 = 0.0   ! atmosphere tracers; ocn grid
   real,dimension(intrac_ocn_max,ilon1_ocn,ilat1_ocn,inl1_ocn)::genie_ocn = 0.0 ! ocean tracers; ocn grid
   integer::n_intrac_col = 0
+  ! climate-sediment
+  real::genie_SLT
 ! *********************************
 
 ! these are for whether we have a restart run or not

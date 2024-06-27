@@ -124,6 +124,9 @@ MODULE genie_control
 ! ======================================================================
 ! Miscellaneous control variables
 
+      ! experiment name(!)
+      CHARACTER(len=255)::expid_name
+      
       ! used in for netcdf output in various places
       integer, parameter :: BUFSIZ = 1024  !< to hold character strings
       integer, parameter :: nfiles=4
@@ -145,7 +148,7 @@ MODULE genie_control
       ! WARNING: parameter information duplicated in gem_cmn.f90
       integer, parameter :: intrac_atm_max =  21
       integer, parameter :: intrac_ocn_max = 109
-      integer, parameter :: intrac_sed_max = 107
+      integer, parameter :: intrac_sed_max = 111
       parameter(intrac_sed=intrac_sed_max)
 
       ! others

@@ -16,7 +16,7 @@
 crma extra delaration (22/12/03)
 c      integer tnow
 
-      real tv, ups, ups0, pec, diffpp, cimp, centre, dtloc
+      real tv, ups, pec, diffpp, cimp, centre, dtloc
 
       real cie(0:maxi,0:maxj),ciw(0:maxi,0:maxj),
      +     cin(0:maxi,0:maxj),cis(0:maxi,0:maxj)

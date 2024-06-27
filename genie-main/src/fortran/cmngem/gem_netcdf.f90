@@ -8,6 +8,7 @@
 MODULE gem_netcdf
 
 
+  USE gem_cmn
   use netcdf
   IMPLICIT NONE
   SAVE
@@ -285,7 +286,7 @@ CONTAINS
     if (dum_type .eq. 'D') then
        i = nf90_def_var (dum_ncid, dum_name, nf90_double, dum_id, loc_iv)
        call sub_checkerror (i,'defvar double '//trim(dum_name))
-       if (dum_rmin .ne. dum_rmax) then
+       if (abs(dum_rmin-dum_rmax) > const_rns) then
           dvar(1) = real(dum_rmin)
           dvar(2) = real(dum_rmax)
           i = nf90_put_att (dum_ncid, loc_iv, 'valid_range', dvar)
@@ -296,8 +297,7 @@ CONTAINS
     elseif (dum_type .eq. 'F') then
        i = nf90_def_var (dum_ncid, dum_name, nf90_float, dum_id(1:dum_nd), loc_iv)
        call sub_checkerror (i,'defvar real '//dum_name)
-
-       if (dum_rmin .ne. dum_rmax) then
+       if (abs(dum_rmin-dum_rmax) > const_rns) then
           fvar(1) = real(dum_rmin,4)
           fvar(2) = real(dum_rmax,4)
           i = nf90_put_att (dum_ncid, loc_iv, 'valid_range', fvar)
@@ -309,7 +309,7 @@ CONTAINS
     elseif (dum_type .eq. 'I') then
        i = nf90_def_var (dum_ncid, dum_name, nf90_int, dum_id, loc_iv)
        call sub_checkerror (i,'defvar integer '//trim(dum_name))
-       if (dum_rmin .ne. dum_rmax) then
+       if (abs(dum_rmin-dum_rmax) > const_rns) then
           loc_ivar(1) = int(dum_rmin)
           loc_ivar(2) = int(dum_rmax)
           i = nf90_put_att (dum_ncid, loc_iv, 'valid_range', loc_ivar)
@@ -384,7 +384,7 @@ CONTAINS
     if (dum_type .eq. 'D') then
        i = nf90_def_var (dum_ncid, dum_name, nf90_double, dum_id, loc_iv)
        call sub_checkerror (i,'defvar double '//trim(dum_name))
-       if (dum_rmin .ne. dum_rmax) then
+       if (abs(dum_rmin-dum_rmax) > const_rns) then
           dvar(1) = real(dum_rmin)
           dvar(2) = real(dum_rmax)
           i = nf90_put_att (dum_ncid, loc_iv, 'valid_range', dvar)
@@ -395,8 +395,7 @@ CONTAINS
     elseif (dum_type .eq. 'F') then
        i = nf90_def_var (dum_ncid, dum_name, nf90_float, dum_id, loc_iv)
        call sub_checkerror (i,'defvar real '//dum_name)
-
-       if (dum_rmin .ne. dum_rmax) then
+       if (abs(dum_rmin-dum_rmax) > const_rns) then
           fvar(1) = real(dum_rmin,4)
           fvar(2) = real(dum_rmax,4)
           i = nf90_put_att (dum_ncid, loc_iv, 'valid_range', fvar)
@@ -408,7 +407,7 @@ CONTAINS
     elseif (dum_type .eq. 'I') then
        i = nf90_def_var (dum_ncid, dum_name, nf90_int, dum_id, loc_iv)
        call sub_checkerror (i,'defvar integer '//trim(dum_name))
-       if (dum_rmin .ne. dum_rmax) then
+       if (abs(dum_rmin-dum_rmax) > const_rns) then
           loc_ivar(1) = int(dum_rmin)
           loc_ivar(2) = int(dum_rmax)
           i = nf90_put_att (dum_ncid, loc_iv, 'valid_range', loc_ivar)
@@ -475,6 +474,7 @@ CONTAINS
 
   end subroutine sub_enddef
 
+  
   subroutine sub_checkerror(dum_ind, dum_trace)
     !=======================================================================
     !     check for any netcdf errors
@@ -496,6 +496,7 @@ CONTAINS
 
   end subroutine sub_checkerror
 
+  
   subroutine sub_putvars (dum_name, dum_ncid, dum_is, dum_din, dum_s, dum_o)
     !=======================================================================
     !     write scalar data
@@ -520,7 +521,7 @@ CONTAINS
     real(kind=8) :: loc_dout
 
     loc_rs = 0.0
-    if (dum_s .ne. 0.) loc_rs = 1.0/dum_s
+    if (abs(dum_s) > const_rns) loc_rs = 1.0/dum_s
     loc_dout = (dum_din - dum_o)*loc_rs
     i = nf90_inq_varid (dum_ncid, dum_name, loc_iv)
     call sub_checkerror (i,'putvars nf_inq_varid '//dum_name)
@@ -554,7 +555,7 @@ CONTAINS
     real(kind=8) :: loc_dout
 
     loc_rs = 0.0
-    if (dum_s .ne. 0.) loc_rs = 1.0/dum_s
+    if (abs(dum_s) > const_rns) loc_rs = 1.0/dum_s
     loc_dout = (dum_din - dum_o)*loc_rs
     i = nf90_inq_varid (dum_ncid, dum_name, loc_iv)
     call sub_checkerror (i,'putvarIs nf_inq_varid '//dum_name)
@@ -592,7 +593,7 @@ CONTAINS
 !!$  real(kind=8),dimension(dum_ln)::loc_dout
     ! BLAH
     loc_rs = 0.0
-    if (dum_s .ne. 0.) loc_rs = 1.0/dum_s
+    if (abs(dum_s) > const_rns) loc_rs = 1.0/dum_s
 !!$  do i=1,dum_ln
 !!$     loc_dout(i) = (dum_din(i) - dum_o)*loc_rs
 !!$  enddo
@@ -688,6 +689,7 @@ CONTAINS
 
   end subroutine sub_putvar2dI
 
+  
   subroutine sub_putvar2d (dum_name, dum_ncid, dum_la, dum_lb, dum_is, dum_din, dum_mask)
     !=======================================================================
     !     write data
@@ -714,7 +716,7 @@ CONTAINS
 
     loc_din = dum_din
 
-    where(dum_mask .ne. 1.0)
+    where(abs(dum_mask-1.0) > const_rns)
        loc_din = nf90_fill_double
     endwhere
 
@@ -758,7 +760,8 @@ CONTAINS
 
     loc_din(:,:,:)  = dum_din(:,:,dum_lc:1:-1)
     loc_mask(:,:,:) = dum_mask(:,:,dum_lc:1:-1)
-    where(loc_mask .ne. 1.0)
+    
+    where(abs(loc_mask-1.0) > const_rns)
        loc_din = nf90_fill_double
     endwhere
 
@@ -771,6 +774,7 @@ CONTAINS
 
   end subroutine sub_putvar3d_g
 
+  
   subroutine sub_putvar3d (dum_name, dum_ncid, dum_la, dum_lb, dum_lc, dum_is, dum_din, dum_mask)
     !=======================================================================
     !     write data
@@ -800,7 +804,7 @@ CONTAINS
     loc_din = dum_din
     loc_mask = dum_mask
 
-    where(loc_mask .ne. 1.0)
+    where(abs(loc_mask-1.0) > const_rns)
        loc_din = nf90_fill_double
     endwhere
 
@@ -810,9 +814,7 @@ CONTAINS
     i = nf90_put_var (dum_ncid, loc_iv, loc_din, start = (/ 1, 1, 1, dum_is /), count = (/dum_la, dum_lb, dum_lc, 1 /))
     call sub_checkerror(i,'putvar3d '//dum_name)
 
-
   end subroutine sub_putvar3d
-
 
 
   SUBROUTINE sub_adddef_netcdf (dum_ncid, dum_dino, dum_tname, dum_tlname, dum_unit, dum_min, dum_max)
@@ -981,7 +983,6 @@ CONTAINS
     endif
 
   end subroutine edge_maker
-
 
 
   subroutine sub_sync (dum_ncid)
@@ -1157,7 +1158,7 @@ CONTAINS
 
     integer, intent(in)       :: dum_ncid, dum_varlen
     character(20),intent(in)  :: dum_varname
-    real*8, dimension(dum_varlen), intent(out)  :: dum_dout
+    real, dimension(dum_varlen), intent(out)  :: dum_dout
     integer :: i,loc_iv
 
 
@@ -1206,8 +1207,8 @@ CONTAINS
 
     integer, intent(in)       :: dum_ncid, dum_varlen1, dum_varlen2
     character(20),intent(in)  :: dum_varname
-    real*8, dimension(dum_varlen1,dum_varlen2)  :: dum_out
-    real*8, dimension(dum_varlen2,dum_varlen1), intent(out)  :: dum_dout
+    real, dimension(dum_varlen1,dum_varlen2)  :: dum_out
+    real, dimension(dum_varlen2,dum_varlen1), intent(out)  :: dum_dout
     integer :: i,loc_iv
 
     i = nf90_inq_varid (dum_ncid, dum_varname, loc_iv)

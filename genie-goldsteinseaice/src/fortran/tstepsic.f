@@ -17,9 +17,10 @@ c southern boundary fluxes
 
       j = 1
       do 230 i=1,imax
-         do 230 l=1,2
+         do 231 l=1,2
             fs(l,i) = 0
-  230    continue
+ 231     continue
+ 230  continue
 
       do 100 j=1,jmax
 
@@ -53,7 +54,7 @@ c western doorway
             fwsave(l) = fw(l)
   210       continue
 
-         do 100 i=1,imax
+         do 101 i=1,imax
             do 120 l=1,2
 c flux to east
                if(i.eq.imax)then
@@ -119,6 +120,7 @@ c
 
   120       continue
 
-  100 continue
+ 101     continue
+ 100  continue
 
       end

@@ -2,7 +2,8 @@
 ! END SEDGEM
 SUBROUTINE end_sedgem( &
      & dum_dts,        &
-     & dum_sfcsumocn   &
+     & dum_sfcsumocn,  &
+     & dum_SLT         &
      & )
   use genie_control
   USE gem_cmn
@@ -16,6 +17,7 @@ SUBROUTINE end_sedgem( &
   ! ---------------------------------------------------------- !
   REAL,INTENT(in)::dum_dts
   real,DIMENSION(n_ocn,n_i,n_j),intent(in)::dum_sfcsumocn
+  REAL,INTENT(in)::dum_SLT
   ! ---------------------------------------------------------- !
   ! DEFINE LOCAL VARIABLES
   ! ---------------------------------------------------------- !
@@ -39,7 +41,7 @@ SUBROUTINE end_sedgem( &
   loc_dts  = dum_dts
   loc_dtyr = loc_dts/conv_yr_s
   ! save diagnostics
-  call sub_data_save_seddiag_GLOBAL(loc_dtyr,dum_sfcsumocn)
+  call sub_data_save_seddiag_GLOBAL(loc_dtyr,dum_sfcsumocn,dum_SLT)
   ! save requested sediment cores as ASCII
   if (ctrl_data_save_ascii) call sub_sedgem_save_sedcore()
   ! save final oecan-sediment interface properties
@@ -105,6 +107,12 @@ SUBROUTINE end_sedgem( &
   DEALLOCATE(sed_Fsed_caco3,STAT=dealloc_error)
   call check_iostat(dealloc_error,__LINE__,__FILE__)
   DEALLOCATE(sed_Fsed_opal,STAT=dealloc_error)
+  call check_iostat(dealloc_error,__LINE__,__FILE__)
+  DEALLOCATE(sed_Psed_corg,STAT=dealloc_error)
+  call check_iostat(dealloc_error,__LINE__,__FILE__)
+  DEALLOCATE(sed_Psed_porg,STAT=dealloc_error)
+  call check_iostat(dealloc_error,__LINE__,__FILE__)
+  DEALLOCATE(sed_Psed_rr,STAT=dealloc_error)
   call check_iostat(dealloc_error,__LINE__,__FILE__)
   DEALLOCATE(sed_diag,STAT=dealloc_error)
   call check_iostat(dealloc_error,__LINE__,__FILE__)

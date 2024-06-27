@@ -39,9 +39,12 @@ CONTAINS
     real::loc_potO2cap
     real::loc_NH4_oxidation
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
@@ -69,8 +72,9 @@ CONTAINS
           CASE ('Ozaki')
              ! from: Ozaki et al. [EPSL ... ?]
              loc_NH4_oxidation = dum_dtyr*(18250.0/conv_m3_kg)*loc_NH4*loc_O2
-          CASE ('Fanny')
+          CASE ('Monteiro')
 	     ! Second order equation of enzyme kinetics which accounts for both O2 and NH4 limitations on nitrification
+             ! NOTE: this scheme was used in 2019 PNAS paper (but only in the svn, not git repository code version)
              loc_potO2cap = ocn(io_O2,dum_i,dum_j,k) + bio_remin(io_O2,dum_i,dum_j,k)
              loc_NH4_oxidation = dum_dtyr*par_nitri_mu*loc_NH4*loc_potO2cap &
                   & /(par_nitri_c0_NH4*par_nitri_c0_O2 +par_nitri_c0_O2*loc_NH4 &
@@ -79,13 +83,29 @@ CONTAINS
              If (loc_NH4_oxidation > min(loc_NH4,loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))) then
                 loc_NH4_oxidation = min(loc_NH4,loc_potO2cap*loc_potO2cap*par_bio_red_POP_PON/(-par_bio_red_POP_PO2))
              end if
+          CASE ('Monteiro2')
+	     ! Second order equation of enzyme kinetics which accounts for both O2 and NH4 limitations on nitrification
+             loc_NH4_oxidation = dum_dtyr*par_nitri_mu*min(loc_NH4,0.5*loc_O2)* &
+                  & loc_NH4*loc_O2/ &
+                  & (par_nitri_c0_NH4*par_nitri_c0_O2 + par_nitri_c0_O2*loc_NH4 + par_nitri_c0_NH4*loc_O2 + loc_NH4*loc_O2)
           CASE ('NONE')
              loc_NH4_oxidation = 0.0
           case default
-             loc_NH4_oxidation = min(0.5*loc_NH4,loc_O2)
+             loc_NH4_oxidation = min(loc_NH4,0.5*loc_O2)
           end select
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/ocn(io_NH4,dum_i,dum_j,k)
+          ! cap NH4 oxidation and O2 consumption
+          ! NOTE: omitt reaction rate limitation term for 2019 PNAS paper compatability (CASE ('Monteiro'))
+          SELECT CASE (opt_bio_remin_oxidize_NH4toNO3)
+          CASE ('Monteiro')
+             ! (nothing)
+          case default
+             loc_NH4_oxidation = min(loc_NH4_oxidation,loc_f*loc_NH4,loc_f*0.5*loc_O2)
+          end select
+          ! isotopic fractionation
+          ! NOTE: currently, becasue the reaction has already been limited by factor loc_f,
+          !       Rayleigh fractionation will *ALWAYS* occur
+          ! calculate isotopic ratio (loc_NH4 is already tested for being > 0)
+          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/loc_NH4
           if (loc_NH4_oxidation > loc_NH4) then
              ! complete NH4 oxidation (no N fractionation)
              loc_bio_remin(io_NH4,k) = -loc_NH4
@@ -150,11 +170,14 @@ CONTAINS
     ! -------------------------------------------------------- !
     integer::l,io,k
     real::loc_O2,loc_NH4,loc_r15N
-    real::loc_NH4_oxidation,loc_N2Ofrac
+    real::loc_NH4_oxidation
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
@@ -164,59 +187,28 @@ CONTAINS
     ! OXIDIZE NH4
     ! -------------------------------------------------------- !
     ! look for some NH4 and see if it can be oxidized (using O2; if there is any!)
-    ! 2NH4+ + 2O2 -> N2O + 2H+ + 3H2O
-    ! (2NH4+ + 3O2 -> 2NO2- + 4H+ + 2H2O)
+    ! 2NH4+ + 3O2 -> 2NO2- + 4H+ + 2H2O
     DO k=n_k,dum_k1,-1
-       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_O2  = ocn(io_O2,dum_i,dum_j,k)
        loc_NH4 = ocn(io_NH4,dum_i,dum_j,k)
        if ((loc_O2 > const_real_nullsmall) .AND. (loc_NH4 > const_real_nullsmall)) then
           ! calculate potential NH4 oxidation
           loc_NH4_oxidation = dum_dtyr*par_bio_remin_kNH4toNO2*min(loc_NH4,loc_O2)* &
                & (loc_NH4/(loc_NH4 + par_bio_remin_cNH4_NH4toNO2))*(loc_O2/(loc_O2 + par_bio_remin_cO2_NH4toNO2))
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/ocn(io_NH4,dum_i,dum_j,k)
-          ! calculate fraction to be transformed into N2O (if selected) rather than NO2
-          if (ocn_select(io_N2O)) then
-             loc_N2Ofrac = par_bio_remin_fracN2O
-          else
-             loc_N2Ofrac = 0.0
-          end if
-          if (loc_NH4_oxidation > loc_NH4) then
-             ! complete NH4 oxidation (no N fractionation)
-             loc_bio_remin(io_NH4,k) = -(1.0 - loc_N2Ofrac)*loc_NH4
+          ! cap NH4 oxidation and O2 consumption
+          loc_NH4_oxidation = min(loc_NH4_oxidation,loc_f*loc_NH4,loc_f*loc_O2)
+          ! calculate tracer remin changes
+             loc_bio_remin(io_NH4,k) = -loc_NH4
              loc_bio_remin(io_NO2,k) = -loc_bio_remin(io_NH4,k)
              loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_ALK,k) = loc_bio_remin(io_NH4,k) - loc_bio_remin(io_NO2,k)
-             loc_bio_remin(io_NH4_15N,k) = loc_r15N*loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_NO2_15N,k) = loc_r15N*loc_bio_remin(io_NO2,k)
-             if (ocn_select(io_N2O)) then
-                loc_bio_remin(io_NH4,k) = loc_bio_remin(io_NH4,k) - loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_N2O,k) = loc_bio_remin(io_NO2,k) + 0.5*loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_O2,k)  = loc_bio_remin(io_O2,k) - loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_ALK,k) = loc_bio_remin(io_ALK,k) - loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_NH4_15N,k) = loc_bio_remin(io_NH4_15N,k) - loc_r15N*loc_N2Ofrac*loc_NH4
-                loc_bio_remin(io_N2O_15N,k) = loc_bio_remin(io_N2O_15N,k) + loc_r15N*0.5*loc_N2Ofrac*loc_NH4
-             end if
-          else
-             ! partial NH4 oxidation (=> N isotope Rayleigh fractionation)
-             loc_bio_remin(io_NH4,k) = -(1.0 - loc_N2Ofrac)*loc_NH4_oxidation
-             loc_bio_remin(io_NO2,k) = -loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_O2,k)  = (3.0/2.0)*loc_bio_remin(io_NH4,k)
-             loc_bio_remin(io_ALK,k) = loc_bio_remin(io_NH4,k) - loc_bio_remin(io_NO2,k)
+          ! isotopic fractionation
+          ! NOTE: we already know that loc_NO2 is non-zero
+          if (ocn_select(io_NH4_15N) .AND. ocn_select(io_NO2_15N)) then
              ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ########################################################## !
+             loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,k)/loc_NH4
              loc_bio_remin(io_NH4_15N,k) = loc_r15N*loc_bio_remin(io_NH4,k)
              loc_bio_remin(io_NO2_15N,k) = loc_r15N*loc_bio_remin(io_NO2,k)
              ! ################################################################################################################### !
-             if (ocn_select(io_N2O)) then
-                loc_bio_remin(io_NH4,k) = loc_bio_remin(io_NH4,k) - loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_N2O,k) = loc_bio_remin(io_N2O,k) + 0.5*loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_O2,k)  = loc_bio_remin(io_O2,k) - loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_ALK,k) = loc_bio_remin(io_ALK,k) - loc_N2Ofrac*loc_NH4_oxidation
-                ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ####################################################### !
-                loc_bio_remin(io_NH4_15N,k) = loc_bio_remin(io_NH4_15N,k) - loc_r15N*loc_N2Ofrac*loc_NH4_oxidation
-                loc_bio_remin(io_N2O_15N,k) = loc_bio_remin(io_N2O_15N,k) + loc_r15N*0.5*loc_N2Ofrac*loc_NH4_oxidation
-                ! ################################################################################################################ !
-             end if
           end if
        end if
     end DO
@@ -236,8 +228,8 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
-  ! CALCULATE THE OXIDATION OF NO2
-  SUBROUTINE sub_box_oxidize_NO2(dum_i,dum_j,dum_k1,dum_dtyr)
+  ! CALCULATE THE OXIDATION OF NO2 to NO3
+  SUBROUTINE sub_box_oxidize_NO2toNO3(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
@@ -250,9 +242,12 @@ CONTAINS
     real::loc_O2,loc_NO2,loc_r15N
     real::loc_NO2_oxidation
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
@@ -266,26 +261,21 @@ CONTAINS
        loc_O2 = ocn(io_O2,dum_i,dum_j,k)
        loc_NO2 = ocn(io_NO2,dum_i,dum_j,k)
        if ((loc_O2 > const_real_nullsmall) .AND. (loc_NO2 > const_real_nullsmall)) then
-          ! calculate potential NH4 oxidation
+          ! calculate potential NO2 oxidation
           loc_NO2_oxidation = dum_dtyr*par_bio_remin_kNO2toNO3*min(loc_NO2,loc_O2)* &
                & (loc_NO2/(loc_NO2 + par_bio_remin_cNO2_NO2toNO3))*(loc_O2/(loc_O2 + par_bio_remin_cO2_NO2toNO3))
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/ocn(io_NO2,dum_i,dum_j,k)
-          if (loc_NO2_oxidation > loc_NO2) then
-             ! complete NO2 oxidation (no N fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2
-             loc_bio_remin(io_NO3,k) = loc_NO2
-             loc_bio_remin(io_O2,k)  = -0.5*loc_NO2
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO3,k)
-             loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2
-          else
-             ! partial NO2 oxidation (=> N isotope Rayleigh fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2_oxidation
-             loc_bio_remin(io_NO3,k) = loc_NO2_oxidation
-             loc_bio_remin(io_O2,k)  = -0.5*loc_NO2_oxidation
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO3,k)
+          ! cap NO2 oxidation and O2 consumption
+          loc_NO2_oxidation = min(loc_NO2_oxidation,loc_f*loc_NO2,loc_f*2.0*loc_O2)
+          ! calculate tracer remin changes
+          loc_bio_remin(io_NO2,k) = -loc_NO2
+          loc_bio_remin(io_NO3,k) = loc_NO2
+          loc_bio_remin(io_O2,k)  = -0.5*loc_NO2
+          loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO3,k)
+          ! isotopic fractionation
+          ! NOTE: we already know that loc_NO2 is non-zero
+          if (ocn_select(io_NO2_15N) .AND. ocn_select(io_NO3_15N)) then
              ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ########################################################## !
+             loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/loc_NO2
              loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2_oxidation
              loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2_oxidation
              ! ################################################################################################################### !
@@ -303,13 +293,13 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_oxidize_NO2
+  end SUBROUTINE sub_box_oxidize_NO2toNO3
   ! ****************************************************************************************************************************** !
 
 
   ! ****************************************************************************************************************************** !
-  ! CALCULATE THE REDUCTION OF NO2
-  SUBROUTINE sub_box_reduce_NO2(dum_i,dum_j,dum_k1,dum_dtyr)
+  ! CALCULATE THE REDUCTION OF NO2 to N2O
+  SUBROUTINE sub_box_reduce_NO2toN2O(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
@@ -322,9 +312,12 @@ CONTAINS
     real::loc_O2,loc_NO2,loc_r15N
     real::loc_NO2_reduction
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! initialize remineralization tracer arrays
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
@@ -339,28 +332,34 @@ CONTAINS
        loc_NO2 = ocn(io_NO2,dum_i,dum_j,k)
        if ((loc_O2 > const_real_nullsmall) .AND. (loc_NO2 > const_real_nullsmall)) then
           ! calculate potential NO2 reduction
-          loc_NO2_reduction = dum_dtyr*par_bio_remin_kNO2toN2O*loc_NO2* &
-               & (loc_NO2/(loc_NO2 + par_bio_remin_cNO2_NO2toN2O))*(1.0 - loc_O2/(loc_O2 + par_bio_remin_cO2_NO2toN2O))
-          ! calculate isotopic ratio
-          loc_r15N = ocn(io_NO2_15N,dum_i,dum_j,k)/ocn(io_NO2,dum_i,dum_j,k)
-          if (loc_NO2_reduction > loc_NO2) then
-             ! complete NO2 reduction (no N fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2
-             loc_bio_remin(io_N2O,k) = 0.5*loc_NO2
-             loc_bio_remin(io_O2,k)  = 0.5*loc_NO2
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO2,k)
-             loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2
-          else
-             ! partial NO2 reduction (=> N isotope Rayleigh fractionation)
-             loc_bio_remin(io_NO2,k) = -loc_NO2_reduction
-             loc_bio_remin(io_N2O,k) = 0.5*loc_NO2_reduction
-             loc_bio_remin(io_O2,k)  = 0.5*loc_NO2_reduction
-             loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO2,k)
-             ! ### INSERT ALTERNATIVE CODE FOR NON-ZERO N FRACTIONATION ########################################################## !
-             loc_bio_remin(io_NO2_15N,k) = -loc_r15N*loc_NO2_reduction
-             loc_bio_remin(io_NO3_15N,k) = loc_r15N*loc_NO2_reduction
-             ! ################################################################################################################### !
+          SELECT CASE (opt_bio_remin_reduce_NO2toN2O)
+          CASE ('kinetics')
+             ! NOTE: assume generic reaction [O2] inhibition constant (par_bio_remin_ci_O2)
+             loc_NO2_reduction = dum_dtyr*par_bio_remin_kNO2toN2O*loc_NO2* &
+                  & (loc_NO2/(loc_NO2 + par_bio_remin_cNO2_NO2toN2O))*(par_bio_remin_ci_O2/(loc_O2 + par_bio_remin_ci_O2))
+          CASE ('lifetime')
+             loc_NO2_reduction = (dum_dtyr/par_bio_remin_NO2lifetime)*loc_NO2
+          CASE ('NONE')
+             loc_NO2_reduction = 0.0
+          case default
+             loc_NO2_reduction = loc_NO2
+          end select
+          ! cap NO2 reduction
+          loc_NO2_reduction = min(loc_NO2_reduction,loc_f*loc_NO2)
+          ! calculate tracer remin changes
+          loc_bio_remin(io_NO2,k) = -loc_NO2_reduction
+          loc_bio_remin(io_N2O,k) = 0.5*loc_NO2_reduction
+          loc_bio_remin(io_O2,k)  = 0.5*loc_NO2_reduction
+          loc_bio_remin(io_ALK,k) = -loc_bio_remin(io_NO2,k)
+          ! isotopic fractionation
+          ! NOTE: we already know that loc_NO2 is non-zero
+          if (ocn_select(io_NO2_15N) .AND. ocn_select(io_N2O_15N)) then
+             loc_r15N  = ocn(io_NO2_15N,dum_i,dum_j,k)/loc_NO2
+             loc_R15N = loc_r15N/(1.0 - loc_r15N)
+             loc_bio_remin(io_NO2_15N,k) = &
+                  & par_d15N_NO2toN2O_alpha*loc_R15N/(1.0 + par_d15N_NO2toN2O_alpha*loc_R15N*loc_R15N)*loc_NO2_reduction
+             loc_bio_remin(io_N2O_15N,k)  =  &
+                  & -par_d15N_NO2toN2O_alpha*loc_R15N/(1.0 + par_d15N_NO2toN2O_alpha*loc_R15N*loc_R15N)*loc_NO2_reduction
           end if
        end if
     end DO
@@ -375,7 +374,86 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
-  end SUBROUTINE sub_box_reduce_NO2
+  end SUBROUTINE sub_box_reduce_NO2toN2O
+  ! ****************************************************************************************************************************** !
+
+  
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE THE REDUCTION OF N2O
+  SUBROUTINE sub_box_reduce_N2OtoN2(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    integer::l,io,k
+    real::loc_O2,loc_N2O,loc_r15N
+    real::loc_N2O_reduction
+    real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_remin(io,:) = 0.0
+    end do
+    ! -------------------------------------------------------- !
+    ! REDUCE N2O
+    ! -------------------------------------------------------- !
+    ! anoxic conditions: N2O + 2 H+ + 2 e− → N2 + H2O (Nitrous oxide reductase)
+    DO k=n_k,dum_k1,-1
+       loc_O2 = ocn(io_O2,dum_i,dum_j,k)
+       loc_N2O = ocn(io_N2O,dum_i,dum_j,k)
+       if (loc_N2O > const_real_nullsmall) then
+          ! calculate potential N2O reduction
+          SELECT CASE (opt_bio_remin_reduce_N2OtoN2)
+          CASE ('kinetics')
+          ! NOTE: assume generic reaction [O2] inhibition constant (par_bio_remin_ci_O2)
+             loc_N2O_reduction = dum_dtyr*par_bio_remin_kN2OtoN2*loc_N2O* &
+                  & (loc_N2O/(loc_N2O + par_bio_remin_cN2O_N2OtoN2))*(par_bio_remin_ci_O2/(loc_O2 + par_bio_remin_ci_O2))
+          CASE ('lifetime')
+             loc_N2O_reduction = (dum_dtyr/par_bio_remin_N2Olifetime)*loc_N2O
+          CASE ('NONE')
+             loc_N2O_reduction = 0.0
+          case default
+             loc_N2O_reduction = loc_N2O
+          end select
+          ! cap N2O reduction
+          loc_N2O_reduction = min(loc_N2O_reduction,loc_f*loc_N2O)
+          ! calculate tracer remin changes
+          loc_bio_remin(io_N2O,k) = -loc_N2O_reduction
+          loc_bio_remin(io_N2,k)   = loc_N2O_reduction
+          ! calculate isotopic fractionation -- 15N
+          ! NOTE: we already know that loc_N2O is non-zero
+          if (ocn_select(io_N2O_15N) .AND. ocn_select(io_N2_15N)) then
+             loc_r15N  = ocn(io_N2O_15N,dum_i,dum_j,k)/loc_N2O
+             loc_R15N = loc_r15N/(1.0 - loc_r15N)
+             loc_bio_remin(io_N2O_15N,k) = &
+                  & par_d15N_N2OtoN2_alpha*loc_R15N/(1.0 + par_d15N_N2OtoN2_alpha*loc_R15N*loc_R15N)*loc_N2O_reduction
+             loc_bio_remin(io_N2O_15N,k)  =  &
+                  & -par_d15N_N2OtoN2_alpha*loc_R15N/(1.0 + par_d15N_N2OtoN2_alpha*loc_R15N*loc_R15N)*loc_N2O_reduction
+          end if
+       end if
+    end DO
+    ! -------------------------------------------------------- !
+    ! WRITE GLOBAL ARRAY DATA
+    ! -------------------------------------------------------- !
+    ! write ocean tracer remineralization field (global array)
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) + loc_bio_remin(io,:)
+    end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_box_reduce_N2OtoN2
   ! ****************************************************************************************************************************** !
 
 
@@ -875,6 +953,119 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! CALCULATE PO4 adsorption on FeOOH (YK 12.15.2020)
+  SUBROUTINE sub_calc_ads_PO4_FeOOH(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_FeOOH,loc_dPO4,loc_FeOOH_PO4
+    real::loc_f,loc_Kd
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_PO4_ads = 0.0
+    loc_PO4 = 0.0
+    loc_FeOOH_PO4 = 0.0
+    loc_FeOOH = 0.0
+    loc_dPO4 = 0.0 
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! ads coefficient
+    loc_Kd = par_bio_Kd_PO4_FeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE PO4 ads on FeOOH 
+    ! -------------------------------------------------------- !
+    DO k=n_k,dum_k1,-1
+       loc_PO4(k) = ocn(io_PO4,dum_i,dum_j,k)
+       loc_FeOOH(k) = bio_part(is_FeOOH,dum_i,dum_j,k)
+       loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_FeOOH(k)*1e6 *1e-6
+       loc_FeOOH_PO4(k) = bio_part(is_FeOOH_PO4,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_FeOOH_PO4(k)
+       if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
+    enddo 
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    bio_part(is_FeOOH_PO4,dum_i,dum_j,:) = bio_part(is_FeOOH_PO4,dum_i,dum_j,:) + loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_FeOOH_dPO4,dum_i,dum_j,:) = loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_ads_PO4_FeOOH
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE PO4 adsorption on POM assoc. FeOOH (YK 12.13.2020)
+  SUBROUTINE sub_calc_ads_PO4_POM_FeOOH(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k
+    real,dimension(n_k)::loc_PO4_ads,loc_PO4,loc_POM_FeOOH,loc_dPO4,loc_POM_FeOOH_PO4
+    real::loc_f,loc_Kd
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_PO4_ads = 0.0 
+    loc_PO4 = 0.0
+    loc_POM_FeOOH_PO4 = 0.0
+    loc_POM_FeOOH = 0.0
+    loc_dPO4 = 0.0
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! ads coefficient
+    loc_Kd = par_bio_Kd_PO4_FeOOH
+    ! -------------------------------------------------------- !
+    ! CALCULATE PO4 ads on FeOOH 
+    ! -------------------------------------------------------- !
+    DO k=n_k,dum_k1,-1
+       loc_PO4(k) = ocn(io_PO4,dum_i,dum_j,k)
+       loc_POM_FeOOH(k) = bio_part(is_POM_FeOOH,dum_i,dum_j,k)
+       ! loc_PO4_ads(k) = ocn_ads_POM_FeOOH_dPO4(dum_i,dum_j,k)
+       loc_PO4_ads(k) = loc_Kd*loc_PO4(k)*1e6 * loc_POM_FeOOH(k)*1e6 *1e-6
+       loc_POM_FeOOH_PO4(k) = bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,k)
+       loc_dPO4(k) = loc_PO4_ads(k) - loc_POM_FeOOH_PO4(k)
+       if (loc_dPO4(k) > loc_PO4(k)) loc_dPO4(k) = loc_PO4(k)
+    enddo 
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    bio_remin(io_PO4,dum_i,dum_j,:) = bio_remin(io_PO4,dum_i,dum_j,:) - loc_dPO4(:)
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,:) = bio_part(is_POM_FeOOH_PO4,dum_i,dum_j,:) + loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_react(idiag_react_POMFeOOH_dPO4,dum_i,dum_j,:) = loc_dPO4(:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_ads_PO4_POM_FeOOH
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! CALCULATE AQUATIC IRONSULPHIDE FORMATION
   SUBROUTINE sub_calc_form_FeS(dum_i,dum_j,dum_k1)
     ! -------------------------------------------------------- !
@@ -1250,6 +1441,139 @@ CONTAINS
 
 
   ! ****************************************************************************************************************************** !
+  ! CALCULATE ABIOTIC Fe3(PO4)2 precipitation (added by YK | 08.11.2021)
+  SUBROUTINE sub_calc_precip_Fe3PO42(dum_i,dum_j,dum_k1,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j,dum_k1
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::k,l,io,is
+    integer::loc_i,loc_tot_i
+    real,dimension(n_ocn,n_k)::loc_bio_uptake
+    real,dimension(n_sed,n_k)::loc_bio_part
+    real,dimension(1:3)::loc_Fe2spec
+    real::loc_IAP
+    real::loc_PO4,loc_Fe2,loc_OH,loc_H2S,loc_Fe3PO42_precipitation
+    real::loc_HPO4,loc_H
+    real::loc_r56Fe,loc_R_56Fe
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! initialize remineralization tracer arrays
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       loc_bio_uptake(io,:) = 0.0
+    end do
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       loc_bio_part(is,:) = 0.0
+    end DO
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! CALCULATE VIVIANITE PRECIPITATION
+    ! -------------------------------------------------------- !
+    ! 3Fe2+ + 2HPO42- + 8H2O -> Fe3(PO4)2*8H2O + 2H+ (pK ~= 11; Al-Borno and Tomson, 1994, GCA)
+    
+    DO k=n_k,dum_k1,-1
+       ! set local species concentrations
+       loc_Fe2 = ocn(io_Fe2,dum_i,dum_j,k)
+       loc_PO4 = ocn(io_PO4,dum_i,dum_j,k)
+       loc_HPO4 = carbalk(ica_HPO4,dum_i,dum_j,n_k)
+       loc_OH  = 10.0**(-(14.0-carb(ic_pHsws,dum_i,dum_j,n_k)))
+       loc_H = carb(ic_H,dum_i,dum_j,n_k)
+       loc_H2S = ocn(io_H2S,dum_i,dum_j,k)    
+       ! modify local Fe2 avialability
+       ! NOTE: if explicit FeS2 precip is not selected, Fe2 speciation must be calculated because FeCO3 precipitates
+       !       from free Fe2+, so we need to find the available free Fe2+ pool
+       if (.NOT. ctrl_bio_FeS2precip_explicit) then
+          if ( loc_Fe2>const_rns .AND. loc_H2S>const_rns ) then
+             loc_Fe2spec = fun_box_calc_spec_Fe2(loc_Fe2,loc_H2S,par_bio_FeS_abioticohm_cte)
+             loc_Fe2     = min(loc_Fe2,loc_Fe2spec(1))
+          end if
+       end if
+       ! calculate precipitation
+       ! NOTE: remove an assumption of non-zero loc_PO4 
+       if (loc_Fe2 > const_rns .AND. loc_PO4 > const_rns) then
+          ! calculate Ion Activity Product (IAP)
+          ! (not used when using Dijkstra et al. (2018) scheme: TODO parameterization choice facilitation?) 
+          ! NOTE: gamma parameters are activity coefficients
+          loc_IAP = (par_bio_remin_gammaPO4*loc_HPO4)**2.0*(par_bio_remin_gammaFe2*loc_Fe2)**3.0/(par_bio_remin_gammaFe2*loc_H)**2.0
+          ! calculate vivianite precipitation based on IAP. Vivianite precipitates at very high supersaturation (very unlikely to 
+          ! occur in the ocean). REFERENCE: 
+          if (loc_IAP > const_rns) then 
+             ! Derry (2015) scheme 
+             if (loc_IAP/par_bio_Fe3PO42precip_eq >= 1.0) then 
+                loc_Fe3PO42_precipitation = dum_dtyr*par_bio_Fe3PO42precip_sf &
+                   & *exp(loc_IAP/par_bio_Fe3PO42precip_eq-1.0)**par_bio_Fe3PO42precip_exp
+             else 
+                loc_Fe3PO42_precipitation = 0.0
+             endif 
+             ! Dijkstra et al. (2018) scheme 
+             loc_Fe3PO42_precipitation = dum_dtyr * 0.025e-3 * loc_Fe2 * loc_PO4
+          else
+             loc_Fe3PO42_precipitation = 0.0 
+          end if
+          ! cap Fe3PO42 rpecip at maximum of available Fe2+, PO4
+          ! NOTE: always allow all PO4 to be 'used' in a single time-step 
+          loc_Fe3PO42_precipitation = MIN(loc_Fe3PO42_precipitation,loc_f*loc_Fe2,loc_PO4)
+          ! bulk tracer conversion
+          loc_bio_part(is_Fe3PO42,k) = loc_Fe3PO42_precipitation
+          ! calculate isotopic fractionation -- 56Fe
+          ! NOTE: we already know that loc_Fe2 is non-zero, and to have got this far, io_Fe2 must also be non-zero
+          ! NOTE: loc_Fe2 may differ from ocn(io_Fe2,dum_i,dum_j,k) and hence the isotopic ratio of the Fe reservoir
+          !       needs to be calculated w.r.t. the latter
+          if (sed_select(is_Fe3PO42_56Fe)) then
+             loc_r56Fe = ocn(io_Fe2_56Fe,dum_i,dum_j,k)/ocn(io_Fe2,dum_i,dum_j,k)
+             loc_R_56Fe = loc_r56Fe/(1.0 - loc_r56Fe)
+             loc_bio_part(is_Fe3PO42_56Fe,k) = &
+                  & par_d56Fe_Fe3PO42_alpha*loc_R_56Fe/(1.0 + par_d56Fe_Fe3PO42_alpha*loc_R_56Fe)*loc_bio_part(is_Fe3PO42,k)
+          end if
+       end if
+       ! convert particulate sediment tracer indexed array concentrations to (dissolved) tracer indexed array
+       DO l=1,n_l_sed
+          is = conv_iselected_is(l)
+          loc_tot_i = conv_sed_ocn_i(0,is)
+          do loc_i=1,loc_tot_i
+             io = conv_sed_ocn_i(loc_i,is)
+             loc_bio_uptake(io,k) = loc_bio_uptake(io,k) + conv_sed_ocn(io,is)*loc_bio_part(is,k)
+          end do
+       end DO
+    end DO
+    ! -------------------------------------------------------- !
+    ! SET GLOBAL ARRAYS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! TRACER CONCENTRATIONS
+    DO l=3,n_l_ocn
+       io = conv_iselected_io(l)
+       bio_remin(io,dum_i,dum_j,:) = bio_remin(io,dum_i,dum_j,:) - loc_bio_uptake(io,:)
+    end do
+    ! -------------------------------------------------------- ! PARTICULATE CONCENTRATIONS
+    DO l=3,n_l_sed
+       is = conv_iselected_is(l)
+       bio_part(is,dum_i,dum_j,:) = bio_part(is,dum_i,dum_j,:) + loc_bio_part(is,:)
+    end DO
+    ! -------------------------------------------------------- ! MODIFY DET TRACER FLUX
+    bio_part(is_det,dum_i,dum_j,:) = bio_part(is_det,dum_i,dum_j,:) + loc_bio_part(is_Fe3PO42,:)
+    ! -------------------------------------------------------- !
+    ! DIAGNOSTICS
+    ! -------------------------------------------------------- !
+    ! -------------------------------------------------------- ! record geochem diagnostics (mol kg-1)
+    diag_precip(idiag_precip_Fe3PO42_dFe,dum_i,dum_j,:)  = loc_bio_uptake(io_Fe2,:)
+    diag_precip(idiag_precip_Fe3PO42_dPO4,dum_i,dum_j,:) = loc_bio_uptake(io_PO4,:)
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  end SUBROUTINE sub_calc_precip_Fe3PO42
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
   ! CALCULATE ABIOTIC greenalite precipitation
   SUBROUTINE sub_calc_precip_Fe3Si2O4(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
@@ -1441,7 +1765,7 @@ CONTAINS
              loc_H2S_oxidation = 0.0
           end select
           ! cap H2S oxidation & O2 consumption
-          loc_H2S_oxidation = min(loc_H2S_oxidation,loc_f*loc_H2S,loc_f*(1.0/2.0)*loc_O2)
+          loc_H2S_oxidation = min(loc_H2S_oxidation,loc_f*loc_H2S,loc_f*0.5*loc_O2)
           ! bulk tracer conversion
           loc_bio_remin(io_H2S,k) = -loc_H2S_oxidation
           loc_bio_remin(io_SO4,k) = loc_H2S_oxidation
@@ -1934,7 +2258,7 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! OXIDATION OF IODIDE
-  SUBROUTINE sub_calc_bio_remin_oxidize_I(dum_i,dum_j,dum_k1,dum_dtyr)
+  SUBROUTINE sub_box_oxidize_ItoIO3(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
@@ -1945,8 +2269,9 @@ CONTAINS
     ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2,loc_I
-    real::loc_I_oxidation
+    real::loc_I_oxidation,loc_O2_consumption
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
@@ -1955,6 +2280,8 @@ CONTAINS
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! OXIDIZE IODIDE
     ! -------------------------------------------------------- !
@@ -1966,25 +2293,51 @@ CONTAINS
        loc_I  = ocn(io_I,dum_i,dum_j,k)
        if ((loc_O2 > const_real_nullsmall) .AND. (loc_I > const_real_nullsmall)) then
           ! calculate I oxidation, and cap value at I concentration if necessary
+          ! NOTE: 'complete' option has been removed and can be implemented by a very short lifetime
           SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
           CASE ('Fennel')
-             ! from: Fennel et al. [2005]
-             ! oxidation rate constant: 6 yr-1
-             ! oxidation half saturation for oxygen: 2.0E-05 mol kg-1
+             ! adapted from Fennel et al. [2005]
+             ! NOTE: fixed oxidation rate constant of 6 yr-1 replaced by: par_bio_remin_kItoIO3
+             !       oxidation half saturation for oxygen (2.0E-05 mol kg-1) replaced by par_bio_remin_cO2_ItoIO3
              loc_I_oxidation = dum_dtyr*par_bio_remin_kItoIO3*loc_I*(loc_O2/(par_bio_remin_cO2_ItoIO3 + loc_O2))
           case ('lifetime')
-             if (par_bio_remin_Ilifetime > dum_dtyr) then
-                loc_I_oxidation = min((dum_dtyr/par_bio_remin_Ilifetime)*loc_I,(2.0/3.0)*loc_O2)
+             ! NOTE: revised lifetime code
+             loc_I_oxidation = (dum_dtyr/par_bio_remin_Ilifetime)*loc_I  
+          case ('reminO2')
+             ! NOTE: in the absence of explicit NH4+ and NH4+ oxidation,
+             !       one can scale NH4+ oxidation with DON remin following Martin et al. [2019]
+             !       or ... as a general microbial oxidative activity and hence in terms of OM O2 consumption
+             ! NOTE: remember that the O2 change is negative upon OM oxidation ...
+             ! NOTE: no need for a dependence on [I-] (excessive consumption is caught later)
+             ! NOTE: no need for dum_dtyr, because diag_redox is per time-step
+             ! NOTE: assume that ctrl_bio_remin_redox_save is TRUE (it is checked/corrected in sub_check_par_biogem)
+             if (ctrl_bio_remin_iodine_POConly) then
+                loc_O2_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k) 
              else
-                loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
+                loc_O2_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k) + &
+                     & (-1.0)*diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k)
              end if
-          case ('complete')
-             loc_I_oxidation = min(loc_I,(2.0/3.0)*loc_O2)
+             loc_I_oxidation = par_bio_remin_O2toI*loc_O2_consumption
+          case ('reminO2lifetime')
+             ! an attempt to recreate a I- 'lifetime'
+             ! NOTE: assume that ctrl_bio_remin_redox_save is TRUE (it is checked/corrected in sub_check_par_biogem)
+             if (ctrl_bio_remin_iodine_POConly) then
+                loc_O2_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k) 
+             else
+                loc_O2_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k) + &
+                     & (-1.0)*diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_O2)),dum_i,dum_j,k)
+             end if
+             ! NOTE: only calculate lifetime if there is some O2 consumption
+             if (loc_O2_consumption > const_real_nullsmall) then
+                loc_I_oxidation = (dum_dtyr/(par_bio_remin_O2toIlifetime/loc_O2_consumption))*loc_I
+             else
+                loc_I_oxidation = 0.0
+             end if
           case default
              loc_I_oxidation = 0.0
           end select
-          ! double-check on I removal ...
-          if (loc_I_oxidation > loc_I) loc_I_oxidation = loc_I
+          ! but don't oxidize too much I-
+          loc_I_oxidation = min(loc_I_oxidation,loc_f*loc_I,loc_f*(2.0/3.0)*loc_O2)
           ! calculate tracer remin changes
           loc_bio_remin(io_I,k)   = -loc_I_oxidation
           loc_bio_remin(io_IO3,k) = loc_I_oxidation
@@ -2012,15 +2365,13 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_bio_remin_oxidize_I
+  end SUBROUTINE sub_box_oxidize_ItoIO3
   ! ****************************************************************************************************************************** !
 
-
-  ! ****************************************************************************************************************************** !
-  ! ### >>> TEMPORARY CODE ... ################################################################################################### !
+  
   ! ****************************************************************************************************************************** !
   ! REDUCTION OF IODATE
-  SUBROUTINE sub_calc_bio_remin_reduce_IO3(dum_i,dum_j,dum_k1,dum_dtyr)
+  SUBROUTINE sub_box_reduce_IO3toI(dum_i,dum_j,dum_k1,dum_dtyr)
     ! -------------------------------------------------------- !
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
@@ -2031,8 +2382,9 @@ CONTAINS
     ! -------------------------------------------------------- !
     integer::l,io,k,id
     real::loc_O2,loc_IO3
-    real::loc_IO3_reduction
+    real::loc_IO3_reduction,loc_SO4_consumption
     real,dimension(n_ocn,n_k)::loc_bio_remin
+    real::loc_f
     ! -------------------------------------------------------- !
     ! INITIALIZE VARIABLES
     ! -------------------------------------------------------- !
@@ -2041,6 +2393,8 @@ CONTAINS
        io = conv_iselected_io(l)
        loc_bio_remin(io,:) = 0.0
     end do
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
     ! -------------------------------------------------------- !
     ! REDUCE IODATE
     ! -------------------------------------------------------- !
@@ -2053,19 +2407,68 @@ CONTAINS
           ! calculate IO3 reduction
           SELECT CASE (opt_bio_remin_reduce_IO3toI)
           case ('inhibition')
+             ! NOTE: this is meant to be a parallel to the Fennel scheme for I- oxidation
+             !       but with an [O2] inhibition of reduction rather than MM [O2] limitation of oxidation
+             ! NOTE: par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2) -> provides inhibition at high [O2]
+             ! NOTE: make sure [O2] is not negative (even though O2 is being released by IO3 reduction) ...
+             if (loc_O2 < const_real_nullsmall) loc_O2 = 0.0
              loc_IO3_reduction = dum_dtyr*par_bio_remin_kIO3toI*loc_IO3* &
-                  & (loc_IO3/(loc_IO3 + par_bio_remin_cIO3_IO3toI))*(1.0 - loc_O2/(loc_O2 + par_bio_remin_cO2_IO3toI))
+                  & (par_bio_remin_iO2_IO3toI/(par_bio_remin_iO2_IO3toI + loc_O2))
           case ('threshold')
              if (loc_O2 < par_bio_remin_cO2_IO3toI) then
                 loc_IO3_reduction = loc_IO3
              else
                 loc_IO3_reduction = 0.0
              endif
+          case ('thresholdflex')
+             ! NOTE: assume that ctrl_bio_remin_redox_save is TRUE (it is checked/corrected in sub_check_par_biogem)
+             loc_SO4_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
+             if (loc_O2 > const_real_nullsmall) then
+                if (loc_SO4_consumption/loc_O2 > par_bio_remin_r_IO3toI) then
+                   loc_IO3_reduction = loc_IO3
+                else
+                   loc_IO3_reduction = 0.0
+                end if
+             else
+                loc_IO3_reduction = loc_IO3
+             endif
+          case ('reminSO4')
+             ! alt scheme for in the absence of NO3 reduction
+             ! NOTE: use SO4 reduction (rate) to scale (via par_bio_remin_SO4toIO3) (the rate of) IO3 reduction
+             !       becasue SO4 reduction is [O2] sensitive, no need for addiitonal [O2] inhibition term
+             ! NOTE: because [IO3] is so low relative to electron acceptor requirement,
+             !       => don't both with either a [IO3] dependence or limitaion (meaning that IO3 reduction can do to completion)
+             ! NOTE: remember that the O2 change is negative upon OM oxidation ...
+             ! NOTE: no need for dum_dtyr, because diag_redox is per time-step
+             ! NOTE: assume that ctrl_bio_remin_redox_save is TRUE (it is checked/corrected in sub_check_par_biogem)
+             if (ctrl_bio_remin_iodine_POConly) then
+                loc_SO4_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
+             else
+                loc_SO4_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k) + &
+                     & (-1.0)*diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
+             end if
+             loc_IO3_reduction = par_bio_remin_SO4toIO3*loc_SO4_consumption
+          case ('reminSO4lifetime')
+             ! an attempt to recreate a IO3- 'lifetime'
+             ! NOTE: assume that ctrl_bio_remin_redox_save is TRUE (it is checked/corrected in sub_check_par_biogem)
+             if (ctrl_bio_remin_iodine_POConly) then
+                loc_SO4_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
+             else
+                loc_SO4_consumption = (-1.0)*diag_redox(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k) + &
+                     & (-1.0)*diag_redox(conv_lslo2idD(is2l(is_POC),io2l(io_SO4)),dum_i,dum_j,k)
+             end if
+             loc_IO3_reduction = par_bio_remin_SO4toIO3*loc_SO4_consumption
+             ! NOTE: only calculate lifetime if there is some SO4 consumption
+             if (loc_SO4_consumption > const_real_nullsmall) then
+                loc_IO3_reduction = (dum_dtyr/(par_bio_remin_SO4toIO3lifetime/loc_SO4_consumption))*loc_IO3
+             else
+                loc_IO3_reduction = 0.0
+             end if
           case default
              loc_IO3_reduction = 0.0
           end select
-          ! double-check on IO3 removal ...
-          if (loc_IO3_reduction > loc_IO3) loc_IO3_reduction = loc_IO3
+          ! but don't reduce too much IO-!
+          loc_IO3_reduction = min(loc_IO3_reduction,loc_f*loc_IO3)
           ! calculate tracer remin changes
           loc_bio_remin(io_IO3,k) = -loc_IO3_reduction
           loc_bio_remin(io_I,k)   = loc_IO3_reduction
@@ -2093,9 +2496,7 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! END
     ! -------------------------------------------------------- !
-  end SUBROUTINE sub_calc_bio_remin_reduce_IO3
-  ! ****************************************************************************************************************************** !
-  ! ### <<< TEMPORARY CODE ... ################################################################################################### !
+  end SUBROUTINE sub_box_reduce_IO3toI
   ! ****************************************************************************************************************************** !
 
 

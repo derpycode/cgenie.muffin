@@ -69,7 +69,7 @@
       real ez0,z1,dz(kmax),dza(kmax),dzz
 !open ocean fluxes
       real qsato,evapo,netsolo,netlongo,sensibleo,latento,netheato
-      real debug(10)
+!      real debug(10)
 
       real fx0t,albtemp !for energy conservation check
 
@@ -137,7 +137,7 @@ c tv5 is the depth of the k+1th density level from the top
 !melting factor
       rrholf=1.0/(rhoice*hlf)
 !useful constant for surface freezing (timescale 17.5 days)
-      rsictscsf=dsc*dz(kmax)*rho0*cpo_ice/(17.5*86400.)
+      rsictscsf=dsc*dz(kmax)*rho0*cpo_ice/(17.5*sodaylen)
       rsictscsf=scale_oheat*rsictscsf
 
 !INITIALISE VARIABLES
@@ -209,7 +209,7 @@ c some terms derived to check energy conservation wrt PLASIM
 !     1        netlong_ocn(i,j)+sensible_ocn(i,j)+latent_ocn(i,j)
 !            write(6,600)i,j,sica(i,j),fx0t-netsolar_ocn(i,j)-
 !     1        netlong_ocn(i,j)-sensible_ocn(i,j)-latent_ocn(i,j)
- 600    format(2i4,10f12.4)
+! 600    format(2i4,10f12.4)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 

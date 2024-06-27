@@ -316,9 +316,27 @@ ifeq ($(F77),gfortran)
   F77FLAGS += -x f77-cpp-input -ffixed-line-length-80
   F90FLAGS += -x f95-cpp-input -ffree-line-length-none
   FFLAGS += -Wall -fimplicit-none
-  FFLAGS += -fopenmp
+###  FFLAGS += -fopenmp
 ###  LDFLAGS += -static
-  LDFLAGS += -fopenmp
+###  LDFLAGS += -fopenmp
+  # NOTE: Apparently ... the compiler detects differences in the kind (byte-length) of actual arguments used in different calls to the same subroutine.
+  #       => error (-fallow-argument-mismatch turns this is a warning) (cannot then have -pedantic) [error occurs in outm_netcdf.F]
+  # first get gfortran major version number
+  FVER=$(shell gfortran -dumpversion)
+###  add flag if version == 10 (will worry later when version 11 comes out ...)
+###  ifeq ($(FVER),10)
+###    FFLAGS += -fallow-argument-mismatch
+###  endif
+  ifeq ($(shell test $(FVER) -gt 9; echo $$?),0)
+    FFLAGS += -fallow-argument-mismatch
+  endif
+  # NOTE: Arrays larger than limit set by ‘-fmax-stack-var-size=’, are moved from stack to static storage. 
+  #       This makes the procedure unsafe when called recursively, or concurrently from multiple threads. 
+  #       Consider increasing the ‘-fmax-stack-var-size=’ limit (or use ‘-frecursive’, which implies unlimited ‘-fmax-stack-var-size’) - 
+  #       or change the code to use an ALLOCATABLE array. 
+  #       If the variable is never accessed concurrently, this warning can be ignored, and the variable could also be declared with the SAVE attribute. 
+  #       [warning occurs in biogem.f90]
+###  F90FLAGS += -frecursive
   ifeq ($(BUILD),SHIP)
     FFLAGS += -O2
     FFLAGS += -O3 
@@ -328,12 +346,16 @@ ifeq ($(F77),gfortran)
   endif
   ifeq ($(BUILD),DEBUG)
     FFLAGS += -g -ffpe-trap=zero,overflow,invalid -O0 -Wall -fbounds-check
-    FFLAGS += -Wextra
+    #FFLAGS += -Wextra
     #FFLAGS += -pedantic
     FFLAGS += -fbacktrace
-    #FFLAGS += -fconserve-stack
+    FFLAGS += -fconserve-stack
     FFLAGS += -fstack-check
     #FFLAGS +=  -fno-automatic
+    # -Wunused-parameter warns about unused PARAMETER values. This option is implied by -Wextra if also -Wunused or -Wall is used.
+    #FFLAGS += -Wno-unused-parameter
+    # Warn when comparing real or complex types for equality or inequality. This option is implied by -Wextra. 
+    #FFLAGS += -Wcompare-reals
   endif
   ifeq ($(BUILD),PROFILE)
     FFLAGS += -pg
@@ -344,6 +366,16 @@ ifeq ($(F77),gfortran)
     FFLAGS += -fbacktrace
     FFLAGS += -g -ffpe-trap=zero,overflow,invalid -Wall
     BOUNDS_FLAGS += -fbounds-check
+  endif
+  ifeq ($(BUILD),TEST)
+    FFLAGS += -g -ffpe-trap=zero,overflow,invalid -O0 -Wall -fbounds-check
+    FFLAGS += -Wextra
+    FFLAGS += -Wno-unused-parameter # turn off unused parameter checking (turned on by -Wextra)
+    FFLAGS += -pedantic
+    FFLAGS += -fbacktrace
+    #FFLAGS += -fconserve-stack
+    FFLAGS += -fstack-check
+    FFLAGS += -fno-automatic
   endif
 endif
 

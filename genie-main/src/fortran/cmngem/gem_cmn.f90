@@ -23,7 +23,7 @@ MODULE gem_cmn
   !          (far from an idea situation, but allows the gem carbchem code to be used independently of GENIE)
   INTEGER,PARAMETER::n_atm =  21
   INTEGER,PARAMETER::n_ocn = 109
-  INTEGER,PARAMETER::n_sed = 107
+  INTEGER,PARAMETER::n_sed = 111
 
 
   ! ****************************************************************************************************************************** !
@@ -132,8 +132,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::io_N2_15N                            = 31    !
   INTEGER,PARAMETER::io_N2O                               = 32    ! 
   INTEGER,PARAMETER::io_N2O_15N                           = 33    !
-  INTEGER,PARAMETER::io_NO2                               = 34    ! 
-  INTEGER,PARAMETER::io_NO2_15N                           = 35    !
+  INTEGER,PARAMETER::io_NO2                               = 79    ! 
+  INTEGER,PARAMETER::io_NO2_15N                           = 80    !
   INTEGER,PARAMETER::io_Cd                                = 34    !
   INTEGER,PARAMETER::io_Cd_114Cd                          = 51    ! 
   INTEGER,PARAMETER::io_Ca                                = 35    ! 
@@ -241,6 +241,7 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_POM_Fe_56Fe                       = 75    ! 
   INTEGER,PARAMETER::is_POM_FeOOH                         = 103    !  
   INTEGER,PARAMETER::is_POM_FeOOH_56Fe                    = 104    ! 
+  INTEGER,PARAMETER::is_POM_FeOOH_PO4                     = 108   !
   INTEGER,PARAMETER::is_POM_Nd                            = 47    ! 
   INTEGER,PARAMETER::is_POM_Nd_144Nd                      = 48    ! 
   INTEGER,PARAMETER::is_POM_MoS2                          = 58    ! 
@@ -264,8 +265,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_LiCO3_7Li                         = 46    !
   INTEGER,PARAMETER::is_CaCO3_231Pa                       = 19    ! 
   INTEGER,PARAMETER::is_CaCO3_230Th                       = 20    !  
-  INTEGER,PARAMETER::is_CaCO3_Fe                          = 21    !  
-  INTEGER,PARAMETER::is_CaCO3_Fe_56Fe                     = 76  !  
+  INTEGER,PARAMETER::is_CaCO3_FeOOH                       = 21    !  
+  INTEGER,PARAMETER::is_CaCO3_FeOOH_56Fe                  = 76  !  
   INTEGER,PARAMETER::is_CaCO3_Nd                          = 49    ! 
   INTEGER,PARAMETER::is_CaCO3_Nd_144Nd                    = 50    !  
   INTEGER,PARAMETER::is_CaCO3_MoS2                        = 61    ! 
@@ -280,11 +281,14 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_FeCO3                             = 88    ! 
   INTEGER,PARAMETER::is_FeCO3_13C                         = 89    !
   INTEGER,PARAMETER::is_FeCO3_56Fe                        = 90    !
+  INTEGER,PARAMETER::is_Fe3PO42                           = 110   !
+  INTEGER,PARAMETER::is_Fe3PO42_56Fe                      = 111   !
   INTEGER,PARAMETER::is_FeS2                              = 91    ! 
   INTEGER,PARAMETER::is_FeS2_34S                          = 92    !
   INTEGER,PARAMETER::is_FeS2_56Fe                         = 93    !
   INTEGER,PARAMETER::is_FeOOH                             = 95    ! 
   INTEGER,PARAMETER::is_FeOOH_56Fe                        = 96    !
+  INTEGER,PARAMETER::is_FeOOH_PO4                         = 109   !
   INTEGER,PARAMETER::is_Fe3Si2O4                          = 105   ! 
   INTEGER,PARAMETER::is_Fe3Si2O4_56Fe                     = 106   !
   INTEGER,PARAMETER::is_Fe3Si2O4_30Si                     = 107   !
@@ -293,8 +297,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_detLi_7Li                         = 56    !  
   INTEGER,PARAMETER::is_det_231Pa                         = 23    ! 
   INTEGER,PARAMETER::is_det_230Th                         = 24    ! 
-  INTEGER,PARAMETER::is_det_Fe                            = 25    ! 
-  INTEGER,PARAMETER::is_det_Fe_56Fe                       = 77    ! 
+  INTEGER,PARAMETER::is_det_FeOOH                         = 25    ! 
+  INTEGER,PARAMETER::is_det_FeOOH_56Fe                    = 77    ! 
   INTEGER,PARAMETER::is_det_Nd                            = 51    ! 
   INTEGER,PARAMETER::is_det_Nd_144Nd                      = 52    !  
   INTEGER,PARAMETER::is_det_MoS2                          = 64    ! 
@@ -305,8 +309,8 @@ MODULE gem_cmn
   INTEGER,PARAMETER::is_EMPTY                             = 28    ! 
   INTEGER,PARAMETER::is_opal_231Pa                        = 29    ! 
   INTEGER,PARAMETER::is_opal_230Th                        = 30    ! 
-  INTEGER,PARAMETER::is_opal_Fe                           = 31    ! 
-  INTEGER,PARAMETER::is_opal_Fe_56Fe                      = 78    ! 
+  INTEGER,PARAMETER::is_opal_FeOOH                        = 31    ! 
+  INTEGER,PARAMETER::is_opal_FeOOH_56Fe                   = 78    ! 
   INTEGER,PARAMETER::is_opal_Nd                           = 53    ! 
   INTEGER,PARAMETER::is_opal_Nd_144Nd                     = 54    ! 
   INTEGER,PARAMETER::is_opal_MoS2                         = 67    ! 
@@ -469,7 +473,7 @@ MODULE gem_cmn
   ! tracer conversion - indices for non-zero transformation ratio values
   ! NOTE: the zero index place in the array is used in algorithms identifying null relationships (or something)
   integer,DIMENSION(0:n_ocn,0:n_atm)::conv_atm_ocn_i
-  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! 
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i                    ! (all possibilities)
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_O                  ! tracer conversion array for oxic conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N                  ! tracer conversion array for N-reduction redox conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_Fe                 ! tracer conversion array for FeOOH-reduction
@@ -779,6 +783,13 @@ MODULE gem_cmn
   REAL,PARAMETER::const_d13C_DIC_Corg_Q2_x2 = +2.829E-10         ! 2nd order polymonial c(i) approximation: x2
   REAL,PARAMETER::const_d13C_DIC_Corg_Q2_x  = -1.788E-07         ! 2nd order polymonial c(i) approximation: x
   REAL,PARAMETER::const_d13C_DIC_Corg_Q2_c  = +3.170E-05         ! 2nd order polymonial c(i) approximation: c
+  ! ---------------------------------------------------------- !
+  ! SEDIMENTS
+  ! ---------------------------------------------------------- !
+  REAL,PARAMETER::const_d13C_LA1_a = 0.45                        ! Schmittner LA1 d13C proxy coefficient
+  REAL,PARAMETER::const_d13C_LA1_b = 1.0                         ! Schmittner LA1 d13C proxy coefficient
+  REAL,PARAMETER::const_d13C_LA1_c = -2.2e-3                     ! Schmittner LA1 d13C proxy coefficient
+  REAL,PARAMETER::const_d13C_LA1_d = -6.6e-5                     ! Schmittner LA1 d13C proxy coefficient 
 
   ! *** miscellaneous ***
   ! PI

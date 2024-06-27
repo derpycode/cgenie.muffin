@@ -38,7 +38,7 @@ c AY (17/03/04) : extra declarations
 c
 c AY (17/03/04) : alon1, etc. now calculated in initialise_ocean.F
 c
-      day=istep*dtatm*tsc/86400.0
+      day=istep*dtatm*tsc/sodaylen
 c AY (17/03/04) : 365.25 days per GOLDSTEIN year (not 360.0)
 c AY (23/03/04) : small constant added to day calculation for round-off
 c                 reasons (i.e. 365.2499 vs. 365.25)

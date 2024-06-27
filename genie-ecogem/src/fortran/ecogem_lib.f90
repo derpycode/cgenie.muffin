@@ -47,6 +47,10 @@ MODULE ecogem_lib
   namelist/ini_ecogem_nml/nquota,pquota,fquota,squota,chlquota
   logical :: fundamental ! fundamental niche experiment
   namelist/ini_ecogem_nml/fundamental
+  logical :: eco_export_verbose ! output of size-class POC export
+  namelist/ini_ecogem_nml/eco_export_verbose
+  logical :: eco_uptake_fluxes ! output of size-class POC export
+  namelist/ini_ecogem_nml/eco_uptake_fluxes
   logical :: c13trace !ckc tracing for carbon 13
   namelist/ini_ecogem_nml/c13trace
 
@@ -104,9 +108,19 @@ MODULE ecogem_lib
   real :: biosynth                  !      cost of biosynthesis
   real :: k_w                       !      light attenuation by water
   real :: k_chl                     !      light attenuation by chlorophyll a
+  real :: vmaxDIC_a_pft_pico,vmaxDIC_b_pft_pico
+  real :: vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
+  real :: vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
+  real :: vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
+  real :: vmaxDIC_a_pft_diazotroph,vmaxDIC_b_pft_diazotroph ! Aaron Diatom 23
   namelist/ini_ecogem_nml/vmaxDIC_a,vmaxDIC_b,vmaxDIC_c
   namelist/ini_ecogem_nml/qcarbon_a,alphachl_a,PARfrac,chl2nmax,biosynth,k_w,k_chl
   namelist/ini_ecogem_nml/qcarbon_b,alphachl_b
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_pico,vmaxDIC_b_pft_pico
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_cocco,vmaxDIC_b_pft_cocco
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_diatom,vmaxDIC_b_pft_diatom
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_eukaryote,vmaxDIC_b_pft_eukaryote
+  namelist/ini_ecogem_nml/vmaxDIC_a_pft_diazotroph,vmaxDIC_b_pft_diazotroph ! Aaron Diatom 23
   logical::ctrl_restrict_mld    ! restrict MLD
   NAMELIST /ini_ecogem_nml/ctrl_restrict_mld
   logical::ctrl_PARseaicelimit    ! PAR attenutation by sea-ice cover?
@@ -137,8 +151,8 @@ MODULE ecogem_lib
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff
   ! Temperature dependence
-  real ::  temp_A,temp_T0   !
-  namelist/ini_ecogem_nml/temp_A,temp_T0
+  real ::  temp_A,temp_P,temp_K,temp_T0   !
+  namelist/ini_ecogem_nml/temp_A,temp_P,temp_K,temp_T0
   ! maximum temperature
   real ::  temp_max
   namelist/ini_ecogem_nml/temp_max
@@ -176,6 +190,12 @@ MODULE ecogem_lib
   NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_b
   real::par_d13C_DIC_Corg_ef                                     ! frac for intercellular C fix
   NAMELIST /ini_ecogem_nml/par_d13C_DIC_Corg_ef
+  ! ------------------- EXPORT PROPERTIES ---------------------------------------------------------------------------------------- !
+  LOGICAL::ctrl_bio_remin_POC_ballast_eco                         ! ballasting parameterization?
+  NAMELIST /ini_ecogem_nml/ctrl_bio_remin_POC_ballast_eco
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_kc                      !
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_ko                      !
+  !REAL,DIMENSION(n_i,n_j)::par_bio_remin_kl
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                     ! continuing run?
   NAMELIST /ini_ecogem_nml/ctrl_continuing
@@ -210,6 +230,11 @@ MODULE ecogem_lib
   ! ------------------- MISC ----------------------------------------------------------------------------------------------------- !
   logical::ctrl_limit_neg_biomass
   NAMELIST /ini_ecogem_nml/ctrl_limit_neg_biomass
+  ! functional type parameters
+  real::par_cocco_palatability_mod , par_cocco_vmax_mod
+  namelist /ini_ecogem_nml/ par_cocco_palatability_mod,par_cocco_vmax_mod
+  real::par_diatom_palatability_mod , par_diatom_vmax_mod
+  namelist /ini_ecogem_nml/ par_diatom_palatability_mod,par_diatom_vmax_mod ! Aaron Diatom 23
   real::par_beta_POCtoDOC
   namelist/ini_ecogem_nml/par_beta_POCtoDOC
   logical::ctrl_Tdep_POCtoDOC
@@ -263,6 +288,8 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::plankiso      !ckc isotopes in plankton (npmax,iomaxiso,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::uptake_flux   ! inorganic nutrient uptake flux for each plankton (iomax,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::export_flux   ! surface export flux for each plankton (iomax,npmax,i,j,k)    Fanny/Maria - Aug19
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::AP_flux   ! surface autotrophic flux for each plankton (iomax,npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::HP_flux   ! surface heterotrophic flux for each plankton (iomax,npmax,i,j,k)
   !ckc isotope uptake flux array, to trace full food web interaction
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::up_flux_iso   !ckc rate of upstake isotopes (iimaxiso,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carb      ! carbonate chemistry variables
@@ -270,7 +297,7 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carbalk   ! carbonate chemistry alkalinity
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carbisor  ! carbonate (carbon) isotopic properties array
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::phys_limit    ! growth limitation factors
-  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::zoo_limit     ! zoo food limitation factors
+!BAW: zoolimit should be optional  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::zoo_limit     ! zoo food limitation factors
   ! Size-dependent parameters (npmax)
   character(len=16),ALLOCATABLE,DIMENSION(:)    ::pft                                      ! Plankton functional type
   character(len=3) ,ALLOCATABLE,DIMENSION(:)    ::quotastrng                               ! Plankton biomass quota labels
@@ -340,6 +367,10 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::plankton_tser ! plankton biomass array (npmax,iomax,nsite,48)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::uptake_tser   ! inorganic nutrient uptake flux for each plankton (iomax,npmax,nsite,48)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::gamma_tser    ! limiting factors (iomax,npmax,nsite,48)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::export_tser    ! limiting factors (iomax,npmax,nsite,48)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::autotrophic_tser    ! limiting factors (iomax,npmax,nsite,48)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)::heterotrophic_tser    ! limiting factors (iomax,npmax,nsite,48)
+  
   REAL             ,ALLOCATABLE,DIMENSION(:)      ::time_tser     ! timestep # (48)
 
   ! ############################################################################################################################## !
@@ -350,8 +381,10 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_uptake_timeslice   !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_gamma_timeslice    !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_nutrient_timeslice !
-  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_zoogamma_timeslice !
+!BAW: zoolimit should be optional  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)   ::int_zoogamma_timeslice !
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_export_timeslice   ! Surface export flux for each plankton (iomax,npmax,i,j,k)  Fanny/Maria - Aug19
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_AP_timeslice   ! Surface autotrophic uptake flux for each plankton (iomax,npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_HP_timeslice   ! Surface heterotrophic uptake flux for each plankton (iomax,npmax,i,j,k)
 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
 

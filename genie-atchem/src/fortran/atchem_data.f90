@@ -54,11 +54,13 @@ CONTAINS
        print*,'Global cosmogenic production rate of 14C (mol yr-1) : ',par_atm_F14C
        ! --- ATMOSPHERIC PHOTOCHEMISTRY ------------------------------------------------------------------------------------------ !
        print*,'--- ATMOSPHERIC PHOTOCHEMISTRY ---------------------'
-       print*,'Atmospheric photochemistry scheme                   : ',par_atm_CH4_photochem
+       print*,'Atmospheric CH4 photochemistry scheme               : ',par_atm_CH4_photochem
        print*,'Baseline atmospheric pCH4                           : ',par_pCH4_oxidation_C0
        print*,'Baseline CH4 lifetime                               : ',par_pCH4_oxidation_tau0
        print*,'Exponent for CH4 lifetime                           : ',par_pCH4_oxidation_N
        print*,'Atmospheric pO2 for fixed scheme                    : ',par_atm_pO2_fixed
+       print*,'Atmospheric N2O photochemistry scheme               : ',opt_atm_N2O_photochem
+       print*,'Alternative O2 balance (to N2 fixation)?            : ',ctrl_atl_N2Oreduct_altO2balance
        ! --- EMISSIONS-TO-ATMOSPHERE --------------------------------------------------------------------------------------------- !
        print*,'--- EMISSIONS-TO-ATMOSPHERE ------------------------'
        print*,'Wetlands CH4 flux (mol yr-1)                        : ',par_atm_wetlands_FCH4
@@ -295,6 +297,39 @@ CONTAINS
     END DO
   END SUBROUTINE sub_init_slabbiosphere
   ! ****************************************************************************************************************************** !
+
+
+!!$  ! ****************************************************************************************************************************** !
+!!$  ! LOAD N2O LOOKUP TABLE
+!!$  SUBROUTINE sub_load_atm_lookup_N2O()
+!!$    USE genie_util, ONLY: check_unit, check_iostat
+!!$    ! local variables
+!!$    INTEGER::a,b,d,e
+!!$    CHARACTER(len=255)::loc_filename
+!!$    integer::ios ! for file checks
+!!$    ! *** read in calcite dissolution look-up data ***
+!!$    loc_filename = TRIM(par_indir_name)//'lookup_calcite_4.dat'
+!!$    call check_unit(in,__LINE__,__FILE__)
+!!$    OPEN(unit=in,file=loc_filename,action='read',iostat=ios)
+!!$    call check_iostat(ios,__LINE__,__FILE__)
+!!$    ! read in data
+!!$    DO a = lookup_i_D_min,lookup_i_D_max,1
+!!$       DO b = lookup_i_dCO3_min,lookup_i_dCO3_max,1
+!!$          DO d = lookup_i_frac_min,lookup_i_frac_max,1
+!!$             DO e = lookup_i_fCorg_min,lookup_i_fCorg_max,1
+!!$                READ(unit=in,FMT='(F7.3)',iostat=ios) lookup_sed_dis_cal(a,b,d,e)
+!!$                call check_iostat(ios,__LINE__,__FILE__)
+!!$             END DO
+!!$          END DO
+!!$       END DO
+!!$    END DO
+!!$    ! close file pipe
+!!$    CLOSE(unit=in,iostat=ios)
+!!$    call check_iostat(ios,__LINE__,__FILE__)
+!!$    ! change units from (umol cm-2 yr-1) to (mol cm-2 yr-1)
+!!$    lookup_sed_dis_cal(:,:,:,:) = conv_umol_mol*lookup_sed_dis_cal(:,:,:,:)
+!!$  END SUBROUTINE sub_load_atm_lookup_N2O
+!!$  ! ****************************************************************************************************************************** !
 
 
 END MODULE atchem_data
