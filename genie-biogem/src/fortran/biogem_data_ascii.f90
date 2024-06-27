@@ -2767,7 +2767,7 @@ CONTAINS
              OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
              call check_iostat(ios,__LINE__,__FILE__)
              if (int_diag_weather_sig(io_Os_188Os) > const_real_nullsmall) then
-                loc_sig = int_diag_weather_sig(io_Os_187Os)/loc_tot
+                loc_sig = int_diag_weather_sig(io_Os_187Os)/int_diag_weather_sig(io_Os_188Os)
              else
                 loc_sig = -999.9
              end if
@@ -3698,6 +3698,9 @@ CONTAINS
                    call sub_adj_carbconst(   &
                         & loc_ocn(io_Ca,i,j,k),  &
                         & loc_ocn(io_Mg,i,j,k),  &
+                        & ocn(io_S,i,j,k), &
+                        & ocn(io_T,i,j,k),&
+                        & loc_phys_ocn(ipo_Dmid,i,j,k), &
                         & loc_carbconst(:,i,j,k) &
                         & )
                 end if

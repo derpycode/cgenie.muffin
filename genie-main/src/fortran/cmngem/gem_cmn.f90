@@ -40,6 +40,8 @@ MODULE gem_cmn
   ! ------------------- GEOCHEM CONTROLS ----------------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_carbconstset_name                              ! carbonate dissociation constants set
   NAMELIST /ini_gem_nml/par_carbconstset_name
+  CHARACTER(len=63)::par_adj_carbconst_option                              ! adjustment of carbonate dissociation constants to Mg/Ca
+  NAMELIST /ini_gem_nml/par_adj_carbconst_option
   real::par_carbchem_pH_tolerance                                       ! pH solution tolerance
   integer::par_carbchem_pH_iterationmax                                 ! pH solution maximum number of iterations
   NAMELIST /ini_gem_nml/par_carbchem_pH_tolerance,par_carbchem_pH_iterationmax
@@ -817,7 +819,29 @@ MODULE gem_cmn
   ! Schmidt Number coefficients
   real,dimension(4,n_atm)::par_Sc_coef                                  ! 
   !  Bunsen Solubility Coefficient coefficients
-  real,dimension(6,n_atm)::par_bunsen_coef                              ! 
+  real,dimension(6,n_atm)::par_bunsen_coef    
+  ! *** look-up table dimenstions for carbonate constants ***
+  INTEGER,PARAMETER::lookup_i_Ca_min      = 1                   ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_Ca_max      = 60                  ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_Mg_min   = 1                      ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_Mg_max   = 60                     ! 1-60 mmol
+  INTEGER,PARAMETER::lookup_i_sal_min   = 30                     ! 30-45 PSU
+  INTEGER,PARAMETER::lookup_i_sal_max   = 45                    ! 30-45 PSU
+  INTEGER,PARAMETER::lookup_i_temp_min  = 271                     ! -2-50degC
+  INTEGER,PARAMETER::lookup_i_temp_max  = 323                    ! -2-50degC
+  REAL,PARAMETER::lookup_Ca_max      = 0.060                    ! 
+  REAL,PARAMETER::lookup_Mg_max   = 0.060                       ! 
+  REAL,PARAMETER::lookup_sal_max   = 45                         ! 
+  REAL,PARAMETER::lookup_temp_max  = 323.15                         ! 
+  ! -------------------- look-up tables ------------------------------------------------------------------------------------------ !
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kcal  ! equilibrium constant kspCal look-up table (Hain et al. 2015)
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_karg  ! equilibrium constant kspArg look-up table (Hain et al. 2015)
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k1   ! dissociation constant k1 look-up table (Hain et al. 2015)     
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k2   ! dissociation constant k2 look-up table (Hain et al. 2015)     
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kW   ! dissociation constant kW look-up table (Hain et al. 2015)    
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_k   ! equilibrium constant k look-up table (Hain et al. 2015) 
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kb   ! dissociation constant kb look-up table (Hain et al. 2015)               
+  REAL,ALLOCATABLE,DIMENSION(:,:,:,:)   :: lookup_gem_MyAMI_kSO4   ! carbonate constant kb look-up table (Hain et al. 2015)        
 
   ! *** miscellaneous - dummy values ***
   REAL,PARAMETER::const_real_null          = -0.999999E+19                 ! 

@@ -2151,6 +2151,9 @@ CONTAINS
           call sub_adj_carbconst(           &
                & ocn(io_Ca,dum_i,dum_j,k),  &
                & ocn(io_Mg,dum_i,dum_j,k),  &
+               & ocn(io_S,dum_i,dum_j,k), &
+               & ocn(io_T,dum_i,dum_j,k),&
+               & phys_ocn(ipo_Dmid,dum_i,dum_j,k), &
                & carbconst(:,dum_i,dum_j,k) &
                & )
        end if
