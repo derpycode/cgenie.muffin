@@ -178,7 +178,7 @@ CONTAINS
             &   fun_calc_lnk2_Hansson(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
             &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
-    case ('Roy/')
+    case ('Roy')
        dum_carbconst(icc_k1) = &
             & EXP( &
             &   fun_calc_lnk1_Roy(loc_rT,loc_T_ln,loc_S_p05,loc_S,loc_S_p15) + &
@@ -193,7 +193,7 @@ CONTAINS
             &   loc_conv_totaltoSWS + & 
             &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
-    case ('Luecker/')
+    case ('Luecker')
        dum_carbconst(icc_k1) = &
             & EXP( &
             &   fun_calc_lnk1_Luecker(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
