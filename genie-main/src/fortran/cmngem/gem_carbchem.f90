@@ -459,6 +459,9 @@ CONTAINS
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpBO3H3) &
             & )
+    case default
+       ! no change, e.g., 'NONE'
+       dum_carbconst(:) = dum_carbconst(:)
     end SELECT
   end SUBROUTINE sub_adj_carbconst
   ! ****************************************************************************************************************************** !
