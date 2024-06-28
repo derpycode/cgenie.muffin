@@ -1621,7 +1621,7 @@ CONTAINS
                 loc_sig_opn = int_carb_opn_sig(ic)/int_t_sig
                 call check_unit(out,__LINE__,__FILE__)
                 OPEN(unit=out,file=loc_filename,action='write',status='old',position='append',iostat=ios)
-                WRITE(unit=out,fmt='(f12.3,e15.7,f12.3)',iostat=ios) &
+                WRITE(unit=out,fmt='(f12.3,e15.7,f12.3,e15.7)',iostat=ios) &
                      & loc_t, &
                      & loc_sig_opn, &
                      & fun_calc_isotope_delta &
