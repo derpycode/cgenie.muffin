@@ -1956,6 +1956,16 @@ CONTAINS
        end SELECT
     end if
     
+    ! -------------------------------------------------------- !
+    ! HACKS FOR PLAYING (aka TESTING/DIAGNOSING)
+    ! -------------------------------------------------------- !
+    ! (1) set no biological O2 production
+    !     NOTE: by doing this, you are not conserving oxidants ...
+    if ((.NOT. ctrl_bio_prodO2) .AND. ocn_select(io_O2)) then
+       loc_bio_uptake(io_O2,n_k) = 0.0
+    end if
+    ! -------------------------------------------------------- !
+    
     ! *** WRITE DATA ***
     ! set modification of tracer concentrations
     ! NOTE: depletion of dissolved species as a result of biological productivity is implimented as negative remineralization

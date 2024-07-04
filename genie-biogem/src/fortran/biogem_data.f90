@@ -171,6 +171,7 @@ CONTAINS
        print*,'Coefficient for T-dep. uptake rate modifier         : ',par_bio_kT0
        print*,'e-folding temp. (K) for T-dep. uptake rate modifier : ',par_bio_kT_eT
        print*,'temperature offset for T-dependent bio schemes      : ',par_bio_kT_dT
+       print*,'Release O2 associated with photosysthesis?          : ',ctrl_bio_prodO2
        ! --- ORGANIC MATTER EXPORT RATIOS ---------------------------------------------------------------------------------------- !
        print*,'--- ORGANIC MATTER EXPORT RATIOS -------------------'
        print*,'N/P organic matter Redfield ratio                   : ',par_bio_red_POP_PON

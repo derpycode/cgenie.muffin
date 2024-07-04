@@ -5,9 +5,6 @@
 -START-OF-DATA-
  03  t  0.1  f  t  F   2  01  01  '[carbon dioxide (CO2) partial pressure (atm)]'
  04  t  0.1  f  t  F   2  01  01  '[d13C CO2 (o/oo)]'
- 05  t  0.1  f  t  F   2  01  01  '[d14C CO2 (o/oo)]'
- 18  t  0.1  f  t  F   2  01  01  '[CFC-11 partial pressure]'
- 19  t  0.1  f  t  F   2  01  01  '[CFC-12 partial pressure]'
 -END-OF-DATA-
 
   /\ /\ /\   /\ /\ /\ /\  /\  /\

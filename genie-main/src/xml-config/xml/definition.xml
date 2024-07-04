@@ -4337,6 +4337,10 @@
 			<value datatype="real">0.0</value>
                         <description>temperature offset for T-dependent bio schemes</description>
                     </param>
+                    <param name="ctrl_bio_prodO2">
+			<value datatype="boolean">.true.</value>
+                        <description>Release O2 associated with photosysthesis?</description>
+                    </param>
 <!-- ORGANIC MATTER EXPORT RATIOS  -->
                     <param name="par_bio_red_POP_PON">
 			<value datatype="real">16.0</value>

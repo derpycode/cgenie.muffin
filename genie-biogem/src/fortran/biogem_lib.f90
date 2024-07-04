@@ -174,6 +174,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_kT_dT
   real::par_bio_POC_CaCO3_target                                 ! target potential global mean CaCO3:POC export rain ratio
   NAMELIST /ini_biogem_nml/par_bio_POC_CaCO3_target
+  logical::ctrl_bio_prodO2                                       ! Release O2 associated with photosysthesis?
+  NAMELIST /ini_biogem_nml/ctrl_bio_prodO2
   ! ------------------- ORGANIC MATTER EXPORT RATIOS ----------------------------------------------------------------------------- !
   real::par_bio_red_POP_PON                                             ! N/P organic matter Redfield ratio
   real::par_bio_red_POP_POC                                             ! C/P organic matter Redfield ratio
