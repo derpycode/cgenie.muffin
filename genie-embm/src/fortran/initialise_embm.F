@@ -880,15 +880,24 @@ c             and to fit HadCM3 predictions
 c AR/170320 : added option of reading-from-file
       if (debug_init) print*,'climatological albedo, by latitude'
       if (par_albedo2d_name.ne.'NONE') then   
-c 2D ALBEDO    
-c          ccc NOTHING SO FAR cccccccccccccccccccccccccccccccccccccccc
-      elseif (par_albedo1d_name.ne.'NONE') then    
-c ZONAL (1D) ABLEDO   
-c         read zonal abledo from file 
-c         NOTE: count down in j value:
-c               N pole is the first element in file
+c 2D ALBEDO     
+c PV 29/04/24 add 2D (planetary) albedo field option
           open(35,file=indir_name(1:lenin)//
-     &     trim(par_albedo1d_name),iostat=ios)
+     &         trim(par_albedo2d_name),iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+          do j=jmax,1,-1
+              read(35,*) (albcl(i,j),i=1,imax)
+          enddo
+          if (debug_init) print*,j,albcl(1,j)
+          close(35,iostat=ios)
+          call check_iostat(ios,__LINE__,__FILE__)
+
+      elseif (par_albedo1d_name.ne.'NONE') then    
+c ZONAL (1D) ALBEDO   
+c   read zonal albedo from file 
+c   NOTE: count down in j value: N pole is first element in file
+          open(35,file=indir_name(1:lenin)//
+     &        trim(par_albedo1d_name),iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
           do j=jmax,1,-1
               read(35,*) albz(j)
