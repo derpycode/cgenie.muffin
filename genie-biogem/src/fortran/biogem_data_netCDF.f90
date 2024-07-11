@@ -1249,7 +1249,7 @@ CONTAINS
        ! NOTE: all is deliberately and tediously re-done behind ctrl_bio_preformed and then behind seperate 'ifs' 
        !       to make the code clearer and mroe transparent(?)
        if (ctrl_bio_preformed) then
-          ! (1) O2(sat)
+          ! (1) Saturated dissolved O2 concentration -- O2(sat)
           if (ocn_select(io_O2)) then
              loc_ijk(:,:,:) = const_real_null
              loc_name       = 'diag_reg_O2sat'
@@ -1272,10 +1272,11 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Saturated dissolved O2 concentration -- O2(sat)', &
+                  & trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
-          ! (2) AOU (from O2(sat) and O2)
+          ! (2) Apparent Oxygen Utilization (AOU) -- calculated from O2(sat) and O2
           ! NOTE: utilize the fact that loc_ijk already contains the value of O2(sat)
           ! NOTE: loop rather than manipulate the full arrays directly to preserve the null values for non ocean points
           !       (doing null minus null might be messy, and we don't like messy here)
@@ -1292,7 +1293,8 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Apparent Oxygen Utilization (AOU) -- from O2(sat) and O2', &
+                  & trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (3) AOU-regenP (regen P from AOU)
@@ -1312,7 +1314,8 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated PO4 concentration -- from AOU + P:O2 ratio', &
+                  & trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (4) AOU-regenC (regen C from regen P from AOU)
@@ -1332,7 +1335,8 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated DIC concentration -- from AOU + P:O2 + P:C ratio', &
+                  & trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (5) AOU-regen13C (regen 13C regen C from from regen P from AOU)
@@ -1359,7 +1363,8 @@ CONTAINS
                 END DO
              END DO
              ! write to netCDF
-             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated tracer',trim(loc_unitsname),loc_min,loc_max)
+             call sub_adddef_netcdf(loc_iou,4,trim(loc_name),'Regenerated d13C(DIC) -- from regenerated DIC (from ... AOU)', &
+                  & trim(loc_unitsname),loc_min,loc_max)
              call sub_putvar3d_g(trim(loc_name),loc_iou,n_i,n_j,n_k,loc_ntrec,loc_ijk(:,:,:),loc_mask)
           end if
           ! (6) real OU (preformed O2 minus actual O2)
