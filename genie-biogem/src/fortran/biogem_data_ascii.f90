@@ -332,23 +332,25 @@ CONTAINS
                      & 'surface mean (ice-free) '//TRIM(string_carb(ic))//' (mol kg-1) / ' //&
                      & 'surface '//TRIM(string_carb(ic))// ' d13C (o/oo) / ' //&
                      & 'surface '//TRIM(string_carb(ic))//' d14C (o/oo) / ' //&
-                     & 'surface mean '//TRIM(string_carb(ic))//' (mol kg-1)'
+                     & 'surface mean (total)  '//TRIM(string_carb(ic))//' (mol kg-1)'
              elseif (ocn_select(io_DIC_13C)) then
                 loc_string = '% time (yr) / ' //&
                      & 'surface mean (ice-free) '//TRIM(string_carb(ic))//' (mol kg-1) / ' //&
                      & 'surface '//TRIM(string_carb(ic))// ' d13C (o/oo) / ' //&
-                     & 'surface mean '//TRIM(string_carb(ic))//' (mol kg-1)'
+                     & 'surface mean (total) '//TRIM(string_carb(ic))//' (mol kg-1)'
              else
-                loc_string = '% time (yr) / surface '//TRIM(string_carb(ic))//' (mol kg-1)'
+             loc_string = '% time (yr) / ' //&
+                  & 'surface mean (ice-free) '//TRIM(string_carb(ic))//' (mol kg-1) / ' //&
+                  & 'surface mean (total) '//TRIM(string_carb(ic))//' (mol kg-1)'
              end if
           CASE (ic_fug_CO2)
              loc_string = '% time (yr) / ' //&
-                  & 'surface (ice-free) '//TRIM(string_carb(ic))//' (atm) / ' //&
-                  & 'surface '//TRIM(string_carb(ic))//' (atm)'
+                  & 'surface mean (ice-free) '//TRIM(string_carb(ic))//' (atm) / ' //&
+                  & 'surface mean (total) '//TRIM(string_carb(ic))//' (atm)'
           case default
              loc_string = '% time (yr) / ' //&
-                  & 'surface (ice-free) '//TRIM(string_carb(ic))//' (mol kg-1) / ' //&
-                  & 'surface '//TRIM(string_carb(ic))//' (mol kg-1)'
+                  & 'surface mean (ice-free) '//TRIM(string_carb(ic))//' (mol kg-1) / ' //&
+                  & 'surface mean (total) '//TRIM(string_carb(ic))//' (mol kg-1)'
           end SELECT
           call check_unit(out,__LINE__,__FILE__)
           OPEN(unit=out,file=loc_filename,action='write',status='replace',iostat=ios)
