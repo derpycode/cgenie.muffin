@@ -798,8 +798,16 @@ c     calculate coefficients
             tv1 = b01 + rq*(b11 + b21*rq)
             tv2 = b02 + rq*(b12 + b22*rq)
             tv3 = b03 + rq*(b13 + b23*rq)
+c     aAlow for the CH4 concentration to drive CO2 radiative forcing instead of actual CO2
+c     (allowing varying CO2 radiative forcing while allowing CO2 to independently vary and respond to climate feedbacks)
+c     If so: the CH4 term must be set to zero (and associated N2O term))
+            if(opt_co2ch4radfor) then
+               co2(i,j) = ch4(i,j)
+               ch4(i,j) = ch40
+               n2o(i,j) = n2o0
+            endif
 c     calculate CO2 contribution
-c MLI (16/09/20) State dependent climate sensitivity
+c     MLI (16/09/20) State dependent climate sensitivity
             if(opt_delf2x_cesm) then
                co2_t1 = co2(i,j)*1e6
                co2_t2 = (7.58434074655/1e10) * (co2_t1**(3.))
@@ -1409,7 +1417,6 @@ cmsw calculate new value of tqld(1,i,j)
        print*,'istep ',istep
        print*,' '
         
-                 
                  endif
 
               enddo

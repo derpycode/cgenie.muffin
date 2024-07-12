@@ -19,10 +19,10 @@ OUTPUTDIR=$HOMEDIR/cgenie_output
 # ensure rocks can find xsltproc
 export PATH=$PATH:/opt/rocks/bin:/usr/bin
 export PATH=$PATH:/share/apps/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/share/apps/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/share/apps/lib:/share/apps/netcdf/lib
 # also ifort ...
 export PATH=/state/partition1/apps/intel/bin:$PATH
-# ensure stack size is adequate
+# ensure stack size is adequate (could be ulimit -s unlimited ?)
 ulimit -s 20480
 #
 # (1) GET PASSED PARAMETERS
@@ -86,7 +86,14 @@ RESTARTNAME="rst.1"
 #
 echo ">> Checking parameters ..."
 #
+# NOTE: deal with ".config" being accidently included in the run command
 #
+if test -e $CONFIGPATH/$MODELID
+then
+    echo "   #0 Removing .config from base configuration name (before adding it back again later ...): "
+    echo $MODELID
+    MODELID=${MODELID::-7}
+fi
 if test -e $CONFIGPATH/$MODELID".config"
 then
     echo "   #1 Experiment base configuration: "
@@ -153,6 +160,7 @@ cp -f $CONFIGPATH/$MODELID".config" $CONFIGPATH/$CONFIGNAME
 # Set the experiment run name
 #echo EXPID=$MODELID.$RUNID >> $CONFIGPATH/$CONFIGNAME
 echo EXPID=$RUNID >> $CONFIGPATH/$CONFIGNAME
+echo ma_expid_name=$RUNID >> $CONFIGPATH/$CONFIGNAME
 #
 # (4) SET MODEL TIME-STEPPING
 # ---------------------------
@@ -292,6 +300,7 @@ echo el_24="rst.sland" >> $CONFIGPATH/$CONFIGNAME
 # => disable netCDF restart input flag
 # => set restart input number
 # => copy restart files to data directory
+# NOTE: always disable ECOGEM restart
 if [ -n "$5" ]; then
   echo ">> Checking whether restart directory $RESTARTPATH exists ..."
   if test -d $RESTARTPATH
@@ -309,7 +318,7 @@ if [ -n "$5" ]; then
   echo bg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
   echo sg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
   echo rg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
-  echo eg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
+  echo eg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo ea_30=n >> $CONFIGPATH/$CONFIGNAME
   echo go_18=n >> $CONFIGPATH/$CONFIGNAME
   echo gs_13=n >> $CONFIGPATH/$CONFIGNAME

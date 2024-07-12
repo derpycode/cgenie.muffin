@@ -35,28 +35,26 @@ SUBROUTINE atchem(    &
   ! fractional reduction factors for decaying isotopes
   loc_fracdecay_atm(:) = EXP(-loc_dtyr*const_lambda_atm(:))
 
-  ! *** OXIDIZE CH4 [NOTE: for schemes that initially homogenize atmospheric composition]***
-  select case (par_atm_CH4_photochem)
+  ! *** OXIDIZE CH4 ***
+  ! NOTE: these subrouotines will oxidize CH4 acorss the entire 2D tracer array
+  !       confusingly, later, in the grid point loop, there are further CH4 oxidation possibilities ...
+  ! NOTE: all implicitly deal with 13 and 14C
+  IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+     select case (par_atm_CH4_photochem)
      case ('claire06')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire06(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
+        CALL sub_calc_oxidize_CH4_claire06(loc_dtyr,loc_conv_atm_mol(:,:))
      case('claire06_fixed')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire06_fixed(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
+        CALL sub_calc_oxidize_CH4_claire06_fixed(loc_dtyr,loc_conv_atm_mol(:,:))
      case ('claire06H')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_claire06H(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
+        CALL sub_calc_oxidize_CH4_claire06H(loc_dtyr,loc_conv_atm_mol(:,:))
      case ('goldblatt06')
-      IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
-         CALL sub_calc_oxidize_CH4_goldblatt06(loc_dtyr,loc_conv_atm_mol(:,:))
-      END IF
-  case default
-  !!! NOTHING
-  end select
-  
+        CALL sub_calc_oxidize_CH4_goldblatt06(loc_dtyr,loc_conv_atm_mol(:,:))
+     case ('NONE') 
+        ! (no CH4 oxidation)
+     case default
+        ! (no 2D array oxidation selected, but CH4 oxidation might occur via a grid-point specific subroutine later ...)
+     end select
+  END IF  
   
   ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
   ! *** (i,j) GRID PT LOOP START *** !
@@ -75,31 +73,41 @@ SUBROUTINE atchem(    &
         end do
   
         ! *** OXIDIZE CH4 ***
-        select case (par_atm_CH4_photochem)
-        case ('default')      
-           IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+        ! NOTE: these are alternatives to the formulations and subroutines acting on the entire 2D tracer array (above)
+        ! NOTE: all implicitly deal with 13 and 14C
+        IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+           select case (par_atm_CH4_photochem)
+           case ('default')      
               CALL sub_calc_oxidize_CH4_default(i,j,loc_dtyr)
-           END IF
-        case ('snowball')      
-           IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+           case ('snowball')      
               if (sum(dum_sfcatm(ia_T,:,:))/size(dum_sfcatm(ia_T,:,:)) > 0.0) then
                  IF (atm(ia_pCH4,i,j) > 700.0E-9) THEN
                     CALL sub_calc_oxidize_CH4_default(i,j,loc_dtyr)
                  END if
               END IF
-           END IF
-        case ('schmidt03')
-           IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
+           case ('schmidt03')
               CALL sub_calc_oxidize_CH4_schmidt03(i,j,loc_dtyr)
-           END IF
-        case default
-            !!! NOTHING
-        end select
+           case ('NONE') 
+              ! (no CH4 oxidation)
+           end select
+        END IF
 
         ! *** ADD CH4 ***
         IF (atm_select(ia_pCH4) .AND. atm_select(ia_pCO2) .AND. atm_select(ia_pO2)) THEN
            CALL sub_calc_wetlands_CH4(loc_dtyr,locij_fatm(:,i,j))
         END IF
+        
+        ! *** REDUCE N2O ***
+        select case (opt_atm_N2O_photochem)
+        case ('lifetime')  
+           IF (atm_select(ia_pN2O) .AND. atm_select(ia_pN2) .AND. atm_select(ia_pO2)) THEN
+              CALL sub_calc_reduce_N2O_lifetime(i,j,loc_dtyr)
+           END IF    
+        case ('NONE')  
+            !!! NOTHING
+        case default
+            !!! NOTHING
+        end select    
         
         ! *** PRODUCE RADIOACTIVE TRACERS ***
         IF (atm_select(ia_pCO2_14C)) THEN

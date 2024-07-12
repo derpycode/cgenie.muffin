@@ -157,7 +157,6 @@ c land ice sheet mask
 c ENTS functionality
       logical flag_ents
       real deltq
-
       real qsat
 
 c     file access checks
@@ -215,7 +214,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/xu_wstress,yu_wstress,xv_wstress
       NAMELIST /ini_embm_nml/yv_wstress,u_wspeed,v_wspeed
       NAMELIST /ini_embm_nml/npstp,iwstp,itstp,ianav,ans
-      NAMELIST /ini_embm_nml/yearlen,nyear,ndta,scf
+      NAMELIST /ini_embm_nml/sodaylen,sidaylen,yearlen,nyear,ndta,scf
       NAMELIST /ini_embm_nml/diffamp,diffwid,difflin
       NAMELIST /ini_embm_nml/betaz,betam
       NAMELIST /ini_embm_nml/radfor_scl_co2,radfor_pc_co2_rise
@@ -236,6 +235,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/lin,atchem_radfor
       NAMELIST /ini_embm_nml/orbit_radfor
       NAMELIST /ini_embm_nml/t_orbit,norbit,orbitsteps,filenameorbit
+      NAMELIST /ini_embm_nml/opt_orbit_old
       NAMELIST /ini_embm_nml/t_co2,nco2,co2steps,filenameco2
       NAMELIST /ini_embm_nml/diffa_scl,diffa_len
       NAMELIST /ini_embm_nml/dosc,delf2x
@@ -279,7 +279,8 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/par_albedo1d_name,par_albedo2d_name
       NAMELIST /ini_embm_nml/par_orbit_osce,par_orbit_oscsob
       NAMELIST /ini_embm_nml/par_orbit_oscgam,par_orbit_osctau0
-      NAMELIST /ini_embm_nml/opt_delf2x_cesm
+      NAMELIST /ini_embm_nml/par_orbit_oscobl,par_orbit_osclonperi
+      NAMELIST /ini_embm_nml/opt_delf2x_cesm,opt_co2ch4radfor
 
 c ------------------------------------------------------------ c
 c INITIALIZE VARIABLES
@@ -429,6 +430,16 @@ c     New or continuing run
       if (debug_init) print*,'new or continuing run ?'
       if (debug_init) print*,ans
 
+c CL (01/15/24) : number of seconds per solar day
+c     sodaylen = 86400.0
+      if (debug_init) print*,'number of seconds per solar day'
+      if (debug_init) print*,sodaylen
+
+c CL (01/15/24) : number of seconds per sidereal day
+c     sidaylen = 86164.0
+      if (debug_init) print*,'number of seconds per sidereal day'
+      if (debug_init) print*,sidaylen
+
 c AY (05/05/04) : number of days per EMBM year (usually 365.25)
 c     yearlen = 365.25
       if (debug_init) print*,'number of days per EMBM year'
@@ -561,8 +572,8 @@ c v2 seasonality
       if (debug_init) print*,'timesteps per year and A/O dt ratio'
       if (debug_init) print*,nyear,ndta
       if(nyear.gt.maxnyr)stop 'embm : nyear > maxnyr' 
-      tv = 86400.0*yearlen/(nyear*tsc)
-      ryear = 1.0/(yearlen*86400)
+      tv = sodaylen*yearlen/(nyear*tsc)
+      ryear = 1.0/(yearlen*sodaylen)
 
       dtatm = tv/ndta
       if (debug_init) print*, 'embm timestep (s) =',dtatm*tsc
@@ -576,7 +587,7 @@ c initialize
 c        dzu(1,k) = 0
 c        dzu(2,k) = 0
       enddo
-      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/86400
+      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/sodaylen
       if (debug_init) print*,'dimensionless O/A timesteps',tv,dtatm
 
       rdtdim = 1.0/(tsc*dt(kmax))
@@ -1066,8 +1077,8 @@ c parameters for extra heat diffusion where pptn high
 
 c     diffmod0 = 60e6
       diffmod0 = 0.
-      ppmin = 2./(yearlen*86400.)
-      ppmax = 4./(yearlen*86400.)
+      ppmin = 2./(yearlen*sodaylen)
+      ppmax = 4./(yearlen*sodaylen)
 
 c nre simpler diffusivity
 
@@ -1227,7 +1238,7 @@ c useful constant proportional to inverse timscale for surface freezing
 c     rsictscsf = ch_ice*u_tau_ice*rho0sea*cpo_ice
       rsictscsf = ch_ice*u_tau_ice*rho0*cpo_ice
       if (debug_init) print*,'rsictscsf = ',rsictscsf
-      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*86400.0)
+      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*sodaylen)
       if (debug_init) print*,'rsictscsf = ',rsictscsf
 c minimum average sea-ice thickness over a grid cell
       hmin = 0.01
@@ -1710,28 +1721,54 @@ c AY (02/02/05) : read in observational data filenames
 c pbh read in time varying orbital forcing
 c AR (14/10/08) -- input format changed to 5 column format (time first)
 c AR (14/10/08) -- also re-order time(!)
+c PV (22/07/223) -- add option to swap old vs new radfor code (opt_orbit_old)
+c    if opt_orbit_old=true, use old 5-column orbit input file (t,ecc,sin(obl),gamma,tau)
+c    if opt_orbit_old=false, use 4-column orbit input file (t,ecc,obl,long.peri) format as per La2004
       if(orbit_radfor.eq."y".or.orbit_radfor.eq."Y") then
-        inquire(file=indir_name(1:lenin)//trim(filenameorbit),
-     $ exist=ioex)
-        if (ioex) then
-          open(unit=729,file=indir_name(1:lenin)//trim(filenameorbit),
-     $ iostat=ios)
-          do i=1,norbit
-             read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
-          enddo
-          close(729)
-          do i=1,norbit
-            orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
-            orbitobl_vect(norbit-i+1) = orbitall_vect(i,3)
-            orbitpre_vect(norbit-i+1) = orbitall_vect(i,4)
-            orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
-          enddo
-        else
-          print*,''
-          print*,' *** Missing file: '//
-     $ indir_name(1:lenin)//trim(filenameorbit)
-          stop
-        endif
+         if(opt_orbit_old) then
+            inquire(file=indir_name(1:lenin)//trim(filenameorbit), 
+     &       exist=ioex)
+           if (ioex) then
+             open(unit=729,file=indir_name(1:lenin)//
+     &        trim(filenameorbit),iostat=ios)
+             do i=1,norbit
+                read(729,*,iostat=ios)(orbitall_vect(i,n),n=1,5)
+             enddo
+             close(729)
+             do i=1,norbit
+               orbitecc_vect(norbit-i+1) = orbitall_vect(i,2)
+               orbitsob_vect(norbit-i+1) = orbitall_vect(i,3)
+               orbitgam_vect(norbit-i+1) = orbitall_vect(i,4)
+               orbittau_vect(norbit-i+1) = orbitall_vect(i,5)
+             enddo
+           else
+             print*,''
+             print*,' *** Missing file: '//
+     &         indir_name(1:lenin)//trim(filenameorbit)
+             stop
+           endif
+         else
+		    inquire(file=indir_name(1:lenin)//trim(filenameorbit),
+     &       exist=ioex)
+           if (ioex) then
+             open(unit=729,file=indir_name(1:lenin)//
+     &        trim(filenameorbit),iostat=ios)
+             do i=1,norbit
+                read(729,*,iostat=ios)(orbitla_vect(i,n),n=1,4)
+             enddo
+             close(729)
+             do i=1,norbit
+               orbitecc_vect(norbit-i+1) = orbitla_vect(i,2)
+               orbitobl_vect(norbit-i+1) = orbitla_vect(i,3)
+               orbitper_vect(norbit-i+1) = orbitla_vect(i,4)
+             enddo
+           else
+             print*,''
+             print*,' *** Missing file: '// 
+     &        indir_name(1:lenin)//trim(filenameorbit)
+             stop
+           endif
+         endif
       endif
 c end pbh
 

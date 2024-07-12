@@ -35,7 +35,7 @@ CONTAINS
        close(unit=in)
     end if
     ! set and report namelist data
-    par_carbconstset_name = trim(par_carbconstset_name)//'/'
+    par_carbconstset_name = trim(par_carbconstset_name)
     par_adj_carbconst_option = trim(par_adj_carbconst_option)
     par_gem_indir_name = trim(par_gem_indir_name)//'/'
  

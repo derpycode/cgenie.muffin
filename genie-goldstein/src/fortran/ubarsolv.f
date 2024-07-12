@@ -20,9 +20,10 @@ c solve Psi equation
 c
       do 10 i=1,n*m-1
          im=min(i+n+1,n*m)
-         do 10 j=i+1,im
+         do 11 j=i+1,im
             gb(j)=gb(j) - ratm(j,j-i)*gb(i)
-   10 continue
+ 11      continue
+ 10   continue
       gb(n*m)=gb(n*m)/gap(n*m,n+2)
       do 20 i=n*m-1,1,-1
          km=min(n+1,n*m-i)

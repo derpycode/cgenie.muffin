@@ -115,7 +115,10 @@ MODULE sedgem_lib
   logical::par_sed_huelse2017_sim_P_loss                         ! Simulate ocean Porg loss with buried sulf-OM?
   logical::par_sed_huelse2017_sim_P_loss_pres_fracC              ! Simulate ocean Porg loss related to Corg burial?
   logical::par_sed_huelse2017_sim_P_regeneration                 ! Simulate increased P-regeneration under anoxia?
-  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_remove_impl_sulALK,par_sed_huelse2017_sim_P_loss,par_sed_huelse2017_sim_P_loss_pres_fracC,par_sed_huelse2017_sim_P_regeneration
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_remove_impl_sulALK
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_sim_P_loss
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_sim_P_loss_pres_fracC
+  NAMELIST /ini_sedgem_nml/par_sed_huelse2017_sim_P_regeneration
   REAL::par_sed_huelse2017_k1                                    ! labile degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2                                    ! refractory degradation rate constant, units of 1/yr
   REAL::par_sed_huelse2017_k2_order                              ! k2 = k1/par_sed_huelse2017_k2_order
@@ -193,7 +196,7 @@ MODULE sedgem_lib
   real::par_sed_lowTalt_fLi_alpha                                ! Li low temperature alteration sink (mol yr-1) (Li/Ca normalized)
   real::par_sed_lowTalt_7Li_epsilon                              ! Li low temperature alteration sink 7Li epsilon (o/oo)           
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fLi_alpha,par_sed_lowTalt_7Li_epsilon
-  LOGICAL::ctrl_sed_lowTalt_7Li_epsilon_fixed                    ! fixed (non T-dependent) temperature alteration 7Li epsilon?           
+  LOGICAL::ctrl_sed_lowTalt_7Li_epsilon_fixed                    ! fixed (non T-dependent) temperature alteration 7Li epsilon?
   NAMELIST /ini_sedgem_nml/ctrl_sed_lowTalt_7Li_epsilon_fixed
   real::par_sed_lowTalt_7Li_epsilon_DT                           ! T-dependent D7Li sensitivity (o/oo K-1)             
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_7Li_epsilon_DT
@@ -212,13 +215,18 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fCa_alpha,par_sed_lowTalt_44Ca_epsilon
   real::par_sed_hydroip_fMg                                      ! hydrothermal Mg flux (mol yr-1) 
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fMg
+  character(len=63)::opt_sed_hydroip_MgtoCa                      ! option for linking Mg -> Ca
+  NAMELIST /ini_sedgem_nml/opt_sed_hydroip_MgtoCa
+  real::par_sed_hydroip_rMgCaREF                                 ! reference Mg/Ca
+  real::par_sed_hydroip_concMgREF                                ! reference Mg concentration (mol kg-1)
+  NAMELIST /ini_sedgem_nml/par_sed_hydroip_rMgCaREF,par_sed_hydroip_concMgREF
   real::par_sed_hydroip_fSr                                      ! hydrothermal Sr flux (mol yr-1) 
   real::par_sed_hydroip_fSr_r87Sr                                ! hydrothermal Sr flux r87Sr (87/86)   
   real::par_sed_hydroip_fSr_d88Sr                                ! hydrothermal Sr flux d88Sr (o/oo)                      
   NAMELIST /ini_sedgem_nml/par_sed_hydroip_fSr,par_sed_hydroip_fSr_r87Sr,par_sed_hydroip_fSr_d88Sr
   real::par_sed_lowTalt_fSr_alpha                                      ! Sr low-T alteration sink (mol yr-1)                   
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fSr_alpha
-  real::par_sed_lowTalt_fCO2                                     ! CO2 low-T alteration (weathering!) sink (mol yr-1)                   
+  real::par_sed_lowTalt_fCO2                                     ! CO2 low-T alteration (weathering!) sink (mol yr-1)
   NAMELIST /ini_sedgem_nml/par_sed_lowTalt_fCO2
   real::par_sed_hydroip_fDIC                                     ! hydrothermal CO2 outgassing (mol yr-1)    
   real::par_sed_hydroip_fDIC_d13C                                ! d13C                
@@ -229,7 +237,8 @@ MODULE sedgem_lib
   real::par_sed_Os_dep_suboxic                                   ! deposition rate of Os in suboxic bottom waters (mol m-2 yr-1)
   real::par_sed_Os_O2_threshold                                  ! oxygen threshold for oxic/suboxic deposition
   logical::ctrl_sed_Os_O2                                        ! switch to turn on oxygen dependent deposition
-  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic,par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
+  NAMELIST /ini_sedgem_nml/par_sed_Os_dep_oxic,par_sed_Os_dep_suboxic
+  NAMELIST /ini_sedgem_nml/par_sed_Os_depTOT,par_sed_Os_O2_threshold,ctrl_sed_Os_O2,par_sed_Os_dep 
   real::par_sed_hydroip_fOs                                      ! hydrothermal Os flux (mol yr-1)
   real::par_sed_hydroip_fOs_187Os_188Os                          ! 187Os/188Os ratio of hydrothermal Os flux
   real::par_sed_hydroip_fOs_188Os_192Os                          ! 188Os/192Os ratio of hydrothermal Os flux
@@ -256,6 +265,13 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_CaCO3
   logical::ctrl_force_sed_closedsystem_opal                      ! Set dissolution flux = rain flux for opal ONLY?
   NAMELIST /ini_sedgem_nml/ctrl_force_sed_closedsystem_opal
+  logical::ctrl_sed_Fdet_sedcore                                 ! apply alt sedimentation rates to sedcores?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_Fdet_sedcore
+  real::par_sed_diag_fracSiweath                                 ! assumed fraction of silicate vs. total weathering
+  real::par_sed_diag_volcanicd13C                                ! assumed d13C of volcanic emissions
+  NAMELIST /ini_sedgem_nml/par_sed_diag_fracSiweath,par_sed_diag_volcanicd13C
+  real::par_sed_diag_P2ALK                                       ! assumed implicit P:ALK (non zero makes no sense for weathering)
+  NAMELIST /ini_sedgem_nml/par_sed_diag_P2ALK
   ! ------------------- I/O: DIRECTORY DEFINITIONS ------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            ! 
   CHARACTER(len=255)::par_indir_name                             ! 
@@ -280,7 +296,6 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_Pcorg_name,par_sed_Pporg_name
   CHARACTER(len=127)::par_sed_Prr_name                           ! alt preservation (burial) rain ratio field file name
   NAMELIST /ini_sedgem_nml/par_sed_Prr_name
-  ! ------------------- I/O: MISC --------------------------------------------------
   ! ------------------- I/O: MISC ------------------------------------------------------------------------------------------------ !
   logical::ctrl_append_data                                      ! append data to output files on restart
   logical::ctrl_timeseries_output                                ! save timeseries output
@@ -758,7 +773,8 @@ CONTAINS
     ! DUMMY ARGUMENTS
     ! -------------------------------------------------------- !
     real,INTENT(in)::dum_FPOC                                  ! POC flux as timestep is yr (cm^3 cm-2 yr-1)
-    real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1] (Middelburg et al., Deep Sea Res. 1, 1997)
+    real,INTENT(in)::loc_sed_w                                 ! sediment accumulation rate - burial velocity [cm yr^-1]
+                                                               ! (Middelburg et al., Deep Sea Res. 1, 1997)
     real,INTENT(in)::dum_por                                   ! sediment porosity (cm3 cm-3)
     real,INTENT(in)::dum_den                                   ! sediment density (g cm-3)
     ! -------------------------------------------------------- !

@@ -37,8 +37,9 @@ SUBROUTINE sedgem(          &
   real::loc_87Sr,loc_88Sr
   real::loc_187Os,loc_188Os
   real::loc_alpha,loc_R,loc_delta
-  real::loc_depsilon                              ! 
-  real::loc_fsed                                               ! 
+  real::loc_depsilon                                           ! 
+  real::loc_fsed                                               !
+  real::loc_tot_Mg,loc_tot_Ca                                  ! mean (simply area-weighted) benthic cation concentrations
   real,DIMENSION(n_sed,n_i,n_j)::loc_sfxsumsed_OLD                      ! sediment rain flux interface array (COPY)
   real,DIMENSION(n_sed,n_i,n_j)::loc_sed_fsed_OLD                      ! 
   real,DIMENSION(n_ocn,n_sed)::loc_conv_sed_ocn                ! local (redox-dependent) sed -> ocn conversion
@@ -54,10 +55,12 @@ SUBROUTINE sedgem(          &
   sed_fdis(:,:,:)    = 0.0     ! 
   sedocn_fnet(:,:,:) = 0.0     !
 
-  ! *** INITIALIZE LOCAL ARRAYS ***
+  ! *** INITIALIZE LOCAL ARRAYS AND VARIABLES ***
   loc_fhydrothermal(:)           = 0.0
   loc_flowTalteration(:)         = 0.0
   loc_phys_sed_mask_deepsea(:,:) = 0.0
+  loc_tot_Mg = 0.0
+  loc_tot_Ca = 0.0
 
   ! *** CALCULATE SEDGEM TIME STEP ***
   IF (ctrl_misc_debug4) print*,'*** CALCULATE SEDGEM TIME ***'
@@ -135,6 +138,12 @@ SUBROUTINE sedgem(          &
      par_sed_Os_dep = par_sed_Os_depTOT/loc_tot_A
   end if
 
+  ! *** CALCULATE BENTHIC MEANS ***
+  if (ocn_select(io_Ca) .AND. ocn_select(io_Mg)) then
+     if (ocn_select(io_Mg)) loc_tot_Mg = sum(dum_sfcsumocn(io_Mg,:,:)*loc_phys_sed_mask_deepsea(:,:)*phys_sed(ips_A,:,:))/loc_tot_A
+     if (ocn_select(io_Ca)) loc_tot_Ca = sum(dum_sfcsumocn(io_Ca,:,:)*loc_phys_sed_mask_deepsea(:,:)*phys_sed(ips_A,:,:))/loc_tot_A
+  end if
+
   ! *** UPDATE CARBONATE CHEMSITRY ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE CARBONATE CHEMSITRY ***'
   ! NOTE: do not update carbonate chemsitry if it is not 'needed' -- i.e. mud cells when OMENSED is not used
@@ -202,11 +211,11 @@ SUBROUTINE sedgem(          &
   DO i=1,n_i
      DO j=1,n_j
         IF (sed_mask(i,j)) THEN
-           ! amend sediment rain flux according to prescribed detrital input
+           ! ammend sediment rain flux according to prescribed detrital input
            ! NOTE: convert units from (g cm-2 kyr-1) to (mol m-2 (per time-step))
            ! NOTE: add age tracer if selected
-           ! NOTE: assume that not both surface-derived flux and prescribed det fluxes are allowed ...
-           !       ... but allow prescribed (uniform) sed det flux PLUS spatial burial flux
+           ! NOTE: add a switch for excluding pelagic (dust) detrital flux reaching the seafloor
+           !       automatically combine prescribed (uniform) sed det flux PLUS a spatial burial flux
            ! NOTE: if an opal flux is provided but opal is not selected as a tracer, add to the detrital field
            if (sed_select(is_det)) then
               if (ctrl_sed_det_NOdust) then
@@ -214,7 +223,8 @@ SUBROUTINE sedgem(          &
                  dum_sfxsumsed(is_det,i,j) = 0.0
               endif
               if (ctrl_sed_Fdet) then
-                 dum_sfxsumsed(is_det,i,j) =  &
+                 ! add prescribed (uniform) sed det flux to prescribed spatial field plus whatever reaches the seafloor
+                 dum_sfxsumsed(is_det,i,j) =  dum_sfxsumsed(is_det,i,j) + &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*par_sed_fdet + &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*sed_Fsed_det(i,j)
                  if (.NOT. sed_select(is_opal) .AND. ctrl_sed_Fopal) then
@@ -223,6 +233,7 @@ SUBROUTINE sedgem(          &
                          & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*sed_Fsed_opal(i,j)
                  endif
               else
+                 ! add prescribed (uniform) sed det flux to whatever pelagic source reaches the seafloor
                  dum_sfxsumsed(is_det,i,j) = dum_sfxsumsed(is_det,i,j) + &
                       & conv_m2_cm2*conv_det_g_mol*(conv_yr_kyr*loc_dtyr)*par_sed_fdet              
               endif
@@ -251,7 +262,7 @@ SUBROUTINE sedgem(          &
               dum_sfxsumsed(is_opal,i,j) = conv_m2_cm2*conv_opal_g_mol*(conv_yr_kyr*loc_dtyr)*sed_Fsed_opal(i,j)
            endif
            ! tag CaCO3 'color'
-           if (sed_select(is_CaCO3_red)) dum_sfxsumsed(is_CaCO3_red,i,j) = par_sed_CaCO3_fred*dum_sfxsumsed(is_CaCO3,i,j)
+           if (sed_select(is_CaCO3_red)) dum_sfxsumsed(is_CaCO3_red,i,j)   = par_sed_CaCO3_fred*dum_sfxsumsed(is_CaCO3,i,j)
            if (sed_select(is_CaCO3_blue)) dum_sfxsumsed(is_CaCO3_blue,i,j) = par_sed_CaCO3_fblue*dum_sfxsumsed(is_CaCO3,i,j)
            ! account for clay formation
            If (ocn_select(io_Li)) then
@@ -480,21 +491,38 @@ SUBROUTINE sedgem(          &
      end if
   end if
   ! add Ca, remove Mg
-  ! NOTE: assumes that the prescribed Mg flux is negative
+  ! NOTE: assumes that the prescribed Mg flux (par_sed_hydroip_fMg) is negative in value when explicitly set
   ! NOTE: original code automatically balanced Ca input with Mg removal (par_sed_hydroip_fMg was not defined)
+  !       this is now option: 'tracking'
   If (ocn_select(io_Ca)) then
-     loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+     If (ocn_select(io_Mg)) then        
+        SELECT CASE (opt_sed_hydroip_MgtoCa)
+        CASE ('tracking')
+           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa
+           loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+        CASE ('fixed')
+           loc_fhydrothermal(io_Mg) = par_sed_hydroip_fMg
+           loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+        case ('rMgCa')
+           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa*(loc_tot_Mg/loc_tot_Ca)/par_sed_hydroip_rMgCaREF
+           loc_fhydrothermal(io_Ca) = -loc_fhydrothermal(io_Mg)
+        case ('concMg')
+           loc_fhydrothermal(io_Mg) = -par_sed_hydroip_fCa*(loc_tot_Mg/par_sed_hydroip_concMgREF)
+           loc_fhydrothermal(io_Ca) = -loc_fhydrothermal(io_Mg)
+        case default
+           loc_fhydrothermal(io_Mg) = par_sed_hydroip_fMg
+           loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+        end SELECT          
+     else
+        loc_fhydrothermal(io_Mg) = 0.0
+        loc_fhydrothermal(io_Ca) = par_sed_hydroip_fCa
+     end If
+     loc_fhydrothermal(io_ALK) = 2.0*loc_fhydrothermal(io_Mg) + 2.0*loc_fhydrothermal(io_Ca)
      if (ocn_select(io_Ca_44Ca)) then
         loc_tot = loc_fhydrothermal(io_Ca)
         loc_standard = const_standards(ocn_type(io_Ca_44Ca))
         loc_fhydrothermal(io_Ca_44Ca) = fun_calc_isotope_fraction(par_sed_hydroip_fCa_d44Ca,loc_standard)*loc_tot
      end if
-     If (ocn_select(io_Mg)) then
-        loc_fhydrothermal(io_Mg) = par_sed_hydroip_fMg
-        loc_fhydrothermal(io_ALK) = 2.0*par_sed_hydroip_fMg + 2.0*par_sed_hydroip_fCa
-     else
-        loc_fhydrothermal(io_ALK) = 2.0*par_sed_hydroip_fCa
-     end If
   end if
   ! Sr
   IF (ocn_select(io_Sr_87Sr) .AND. ocn_select(io_Sr_88Sr)) THEN
@@ -518,8 +546,10 @@ SUBROUTINE sedgem(          &
         loc_fhydrothermal(io_Os_187Os) = par_sed_hydroip_fOs_187Os_188Os
         loc_fhydrothermal(io_Os_188Os) = par_sed_hydroip_fOs_188Os_192Os
         ! initialization -- populate array with bulk flux and isotopic delta values
-        loc_fhydrothermal(io_Os_187Os) = 1000.0*(par_sed_hydroip_fOs_187Os_188Os*par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
-        loc_fhydrothermal(io_Os_188Os) = 1000.0*(par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
+        loc_fhydrothermal(io_Os_187Os) = 1000.0* &
+             & (par_sed_hydroip_fOs_187Os_188Os*par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_187Os)) - 1.0)
+        loc_fhydrothermal(io_Os_188Os) = 1000.0* &
+             & (par_sed_hydroip_fOs_188Os_192Os/const_standardsR(ocn_type(io_Os_188Os)) - 1.0)
         ! calculate Os ISOTOPES -- 187Os
         ! NOTE: do not update <loc_fhydrothermal> yet as it is needed for the d188Os calculation ...
         loc_187Os = fun_calc_isotope_abundanceR012ocn(io_Os_187Os,io_Os_188Os,loc_fhydrothermal(:),1)
@@ -561,7 +591,8 @@ SUBROUTINE sedgem(          &
            ! Os
            ! NOTE: deposition rates are given in mol m-2 s-1
            IF ((ocn_select(io_Os)) .AND. (dum_sfcsumocn(io_Os,i,j) > const_real_nullsmall)) then
-              ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018), else suboxic deposition rate
+              ! Apply oxic Os deposition rate if O2 concentration above threshold (10-100 microMolar, Sheen et al. 2018),
+              ! else suboxic deposition rate
               if ((ctrl_sed_Os_O2) .AND. (dum_sfcsumocn(io_O2,i,j) > par_sed_Os_O2_threshold)) then
                  loc_fsed = par_sed_Os_dep_oxic*dum_sfcsumocn(io_Os,i,j)
               elseif (ctrl_sed_Os_O2) then
@@ -722,29 +753,29 @@ SUBROUTINE sedgem(          &
           & )
   end if
 
-  ! *** RUN-TIME OUTPUT ***
-  ! GHC 20/05/09 - Save time-series output
-  IF (ctrl_timeseries_output) THEN
-     ! increment timestep counter  
-     tstep_count = tstep_count + 1  
-     ! if output due then change year  
-     CALL sub_output_year()  
-     IF (tstep_count.eq.output_tsteps_0d(output_counter_0d)) THEN
-        call sub_data_save_seddiag_GLOBAL(loc_dtyr,dum_sfcsumocn)  
-     ENDIF
-     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
-        ! save requested sediment cores as ASCII     
-        ! call sub_sedgem_save_sedcore()
-        ! save oecan-sediment interface properties
-        !if (ctrl_data_save_ascii) call sub_data_save_seddiag_2D(loc_dtyr,dum_sfcsumocn)
-        call sub_save_netcdf(year)
-        call sub_save_netcdf_sed2d(loc_dtyr,dum_sfcsumocn)
-        call sub_closefile(ntrec_siou)
-        ntrec_sout = ntrec_sout + 1  
-     ENDIF
-     ! if output then increment output counter  
-     CALL sub_output_counters()
-  ENDIF
+!!$  ! *** RUN-TIME OUTPUT ***
+!!$  ! GHC 20/05/09 - Save time-series output
+!!$  IF (ctrl_timeseries_output) THEN
+!!$     ! increment timestep counter  
+!!$     tstep_count = tstep_count + 1  
+!!$     ! if output due then change year  
+!!$     CALL sub_output_year()  
+!!$     IF (tstep_count.eq.output_tsteps_0d(output_counter_0d)) THEN
+!!$        call sub_data_save_seddiag_GLOBAL(loc_dtyr,dum_sfcsumocn)  
+!!$     ENDIF
+!!$     IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
+!!$        ! save requested sediment cores as ASCII     
+!!$        ! call sub_sedgem_save_sedcore()
+!!$        ! save oecan-sediment interface properties
+!!$        !if (ctrl_data_save_ascii) call sub_data_save_seddiag_2D(loc_dtyr,dum_sfcsumocn)
+!!$        call sub_save_netcdf(year)
+!!$        call sub_save_netcdf_sed2d(loc_dtyr,dum_sfcsumocn)
+!!$        call sub_closefile(ntrec_siou)
+!!$        ntrec_sout = ntrec_sout + 1  
+!!$     ENDIF
+!!$     ! if output then increment output counter  
+!!$     CALL sub_output_counters()
+!!$  ENDIF
 
   ! *** UPDATE SEDGEM TIME ***
   IF (ctrl_misc_debug4) print*,'*** UPDATE SEDGEM TIME ***'

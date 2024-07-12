@@ -141,8 +141,8 @@ CONTAINS
     real::loc_alpha_sa,loc_alpha_as
     real::loc_rho
     real::loc_TC
-    real::loc_r13C_ocn,loc_r14C_ocn,loc_r18O_ocn,loc_r34S_ocn
-    real::loc_r13C_atm,loc_r14C_atm,loc_r18O_atm,loc_r34S_atm
+    real::loc_r13C_ocn,loc_r14C_ocn,loc_r18O_ocn,loc_r34S_ocn,loc_r15N_ocn
+    real::loc_r13C_atm,loc_r14C_atm,loc_r18O_atm,loc_r34S_atm,loc_r15N_atm
     real::loc_R_atm,loc_R_ocn
     real::loc_ocn,loc_atm
     real::loc_A
@@ -311,6 +311,15 @@ CONTAINS
                 if (ocn(io_H2S,dum_i,dum_j,n_k) > const_real_nullsmall) then
                    loc_r34S_ocn = ocn(io_H2S_34S,dum_i,dum_j,n_k)/ocn(io_H2S,dum_i,dum_j,n_k)
                    loc_focnatm(ia_pH2S_34S) = loc_r34S_ocn*loc_focnatm(ia_pH2S)
+                end if
+             CASE (ia_pN2_15N)
+                if (dum_atm(ia_pN2) > const_real_nullsmall) then
+                   loc_r15N_atm = dum_atm(ia_pN2_15N)/dum_atm(ia_pN2)
+                   loc_fatmocn(ia_pN2_15N) = loc_r15N_atm*loc_fatmocn(ia_pN2)
+                end if
+                if (ocn(io_N2,dum_i,dum_j,n_k) > const_real_nullsmall) then
+                   loc_r15N_ocn = ocn(io_N2_15N,dum_i,dum_j,n_k)/ocn(io_N2,dum_i,dum_j,n_k)
+                   loc_focnatm((ia_pN2_15N)) = loc_r15N_ocn*loc_focnatm(ia_pN2)
                 end if
              case default
                 ! ### INSERT CODE TO DEAL WITH ADDITIONAL ISOTOPES ############################################################### !
@@ -874,7 +883,9 @@ CONTAINS
        ! prescribed POC flux
        ! NOTE: force_restore_docn_nuts has been assigned a negative sign (in the forcing update of the main biogem subroutine) ...
        ! NOTE: allow depletion of PO4 < 0.0 so as to force export production to the prescribed value
-       ! NOTE: DO NOT correct for DOM here
+       ! NOTE: there is no correction for DOM production (this occurs later)
+       !       hence at this point, loc_dPO4 is the PO4 uptake associated with POP, and not total production (POP+DOP)
+       !       (and hence idffers from the other biological scheme calculations of loc_dPO4) 
        loc_dPO4 = -force_restore_docn_nuts(io_PO4)
     CASE ( &
          & '2N2T_PN_Tdep' &
@@ -942,7 +953,6 @@ CONTAINS
        else
           loc_dPO4 = 0.0
        end if
-
     CASE ( &
          & '3N2T_PNFe_Tdep', &
          & 'bio_PNFe'        &
@@ -1522,14 +1532,13 @@ CONTAINS
     ! -------------------------------------------------------- ! establish POC currency
     ! NOTE: calculate export in currency of particulate carbon (rather than PO4)
     ! NOTE: put everything into particulate form initially, but re-scale later to account for DOM export
-    bio_part(is_POC,dum_i,dum_j,loc_k_mld:n_k) = bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4
+    bio_part(is_POC,dum_i,dum_j,n_k) = bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4
     ! -------------------------------------------------------- ! set bulk export (CaCO3, opal)
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        select case (sed_type(is))
        case (par_sed_type_bio)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,n_k)
        end select
     end DO
     ! -------------------------------------------------------- !
@@ -1540,14 +1549,14 @@ CONTAINS
        is = conv_iselected_is(l)
        select case (sed_type(is))
        case (par_sed_type_POM)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(is_POC,is,dum_i,dum_j)*bio_part(is_POC,dum_i,dum_j,n_k)
        case (par_sed_type_CaCO3)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_CaCO3,is,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(is_CaCO3,is,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,n_k)
        case (par_sed_type_opal)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(is_opal,is,dum_i,dum_j)*bio_part(is_opal,dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(is_opal,is,dum_i,dum_j)*bio_part(is_opal,dum_i,dum_j,n_k)
        end select
        ! ----------------------------------------------------- ! Correction for higher N:P ratio of N2 fixers
        ! NOTE: Fanny (June 2010)
@@ -1558,7 +1567,7 @@ CONTAINS
                & '3N2T_PNFe_Tdep', &
                & 'bio_PNFe'        &
                & )
-             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = loc_bio_NP*loc_dPO4_1 + par_bio_NPdiaz*loc_dPO4_2
+             bio_part(is,dum_i,dum_j,n_k) = loc_bio_NP*loc_dPO4_1 + par_bio_NPdiaz*loc_dPO4_2
           END select
        end if
        ! ----------------------------------------------------- ! Correction for higher Fe:P ratio for N2 fixers
@@ -1570,7 +1579,7 @@ CONTAINS
                &'3N2T_PNFe_Tdep', &
                & 'bio_PNFe'       &
                & )
-             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
+             bio_part(is,dum_i,dum_j,n_k) = &
                   & bio_part_red(is_POC,is_POFe,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)*loc_dPO4_1 &
                   & + par_bio_c0_Fe_Diaz/par_bio_c0_PO4*loc_dPO4_2
           END select
@@ -1584,8 +1593,15 @@ CONTAINS
           CASE ( &
                & '2N2T_PO4MM_NO3' &
                & )
-             bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = 0.0
+             bio_part(is,dum_i,dum_j,n_k) = 0.0
           END select
+       end if
+       ! ----------------------------------------------------- ! Correction for available [IO3]
+       ! NOTE: limit POI export to available [IO3]
+       ! NOTE: ensure that [IO3] is not less than zero is assigning a POI flux
+       if (is == is_POI) then
+          bio_part(is_POI,dum_i,dum_j,n_k) = min(bio_part(is_POI,dum_i,dum_j,n_k),ocn(io_IO3,dum_i,dum_j,n_k))
+          if (bio_part(is_POI,dum_i,dum_j,n_k) < const_rns) bio_part(is_POI,dum_i,dum_j,n_k) = 0.0
        end if
     end DO
     ! -------------------------------------------------------- !
@@ -1595,11 +1611,11 @@ CONTAINS
        is = conv_iselected_is(l)
        select case (sed_type(is))
        case (n_itype_min:n_itype_max)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,n_k)
        case (n_itype_minR:n_itype_maxR)
-          bio_part(is,dum_i,dum_j,loc_k_mld:n_k) = &
-               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,loc_k_mld:n_k)
+          bio_part(is,dum_i,dum_j,n_k) = &
+               & bio_part_red(sed_dep(is),is,dum_i,dum_j)*bio_part(sed_dep(is),dum_i,dum_j,n_k)
        end select
     end do
     ! -------------------------------------------------------- !
@@ -1611,8 +1627,7 @@ CONTAINS
        loc_tot_i = conv_sed_ocn_i(0,is)
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
-          loc_bio_uptake(io,loc_k_mld:n_k) = loc_bio_uptake(io,loc_k_mld:n_k) + &
-               & conv_sed_ocn(io,is)*bio_part(is,dum_i,dum_j,loc_k_mld:n_k)
+          loc_bio_uptake(io,n_k) = loc_bio_uptake(io,n_k) + conv_sed_ocn(io,is)*bio_part(is,dum_i,dum_j,n_k)
        end do
     end DO
     ! -------------------------------------------------------- !
@@ -1626,9 +1641,9 @@ CONTAINS
     !       becasue I- is going to be released when POI is remineralized.
     !       ... not ideal to have to have 'exceptions' like this :(
     if (ocn_select(io_IO3)) then
-       loc_bio_uptake(io_IO3,loc_k_mld:n_k) = loc_bio_uptake(io_IO3,loc_k_mld:n_k) + loc_bio_uptake(io_I,loc_k_mld:n_k)
-       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  - 1.5*loc_bio_uptake(io_I,loc_k_mld:n_k)
-       loc_bio_uptake(io_I,loc_k_mld:n_k)   = 0.0
+       loc_bio_uptake(io_IO3,n_k) = loc_bio_uptake(io_IO3,n_k) + loc_bio_uptake(io_I,n_k)
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - 1.5*loc_bio_uptake(io_I,n_k)
+       loc_bio_uptake(io_I,n_k)   = 0.0
     end if
     ! Fe cycle
     ! NOTE: when Fe3+ and Fe2+ are selected, we are taking them up in proportion to minimize numerical issues
@@ -1698,42 +1713,6 @@ CONTAINS
        loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) + loc_dNO3
        loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  - (5.0/4.0)*loc_dNO3
        loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) - loc_dNO3
-       ! isotopes
-       if (sed_select(is_PON_15N)) then
-          ! N2
-          if (ocn(io_N2,dum_i,dum_j,n_k) > const_real_nullsmall) then
-             loc_r15N = ocn(io_N2_15N,dum_i,dum_j,n_k)/ocn(io_N2,dum_i,dum_j,n_k)
-          else
-             loc_r15N = 0.0
-          end if
-          loc_alpha = 1.0 + par_bio_uptake_dN2_epsilon/1000.0
-          loc_R = loc_r15N/(1.0 - loc_r15N)
-          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
-          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dN2
-          loc_bio_uptake(io_N2_15N,n_k) = loc_bio_uptake(io_N2_15N,n_k) + 0.5*loc_red*loc_dN2
-          ! NH4
-          if (ocn(io_NH4,dum_i,dum_j,n_k) > const_real_nullsmall) then
-             loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,n_k)/ocn(io_NH4,dum_i,dum_j,n_k)
-          else
-             loc_r15N = 0.0
-          end if
-          loc_alpha = 1.0 + par_bio_uptake_dNH4_epsilon/1000.0
-          loc_R = loc_r15N/(1.0 - loc_r15N)
-          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
-          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dNH4
-          loc_bio_uptake(io_NH4_15N,n_k) = loc_bio_uptake(io_NH4_15N,n_k) + loc_red*loc_dNH4
-          ! NO3
-          if (ocn(io_NO3,dum_i,dum_j,n_k) > const_real_nullsmall) then
-             loc_r15N = ocn(io_NO3_15N,dum_i,dum_j,n_k)/ocn(io_NO3,dum_i,dum_j,n_k)
-          else
-             loc_r15N = 0.0
-          end if
-          loc_alpha = 1.0 + par_bio_uptake_dNO3_epsilon/1000.0
-          loc_R = loc_r15N/(1.0 - loc_r15N)
-          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
-          bio_part(is_PON_15N,dum_i,dum_j,n_k) = loc_red*loc_dNO3
-          loc_bio_uptake(io_NO3_15N,n_k) = loc_bio_uptake(io_NO3_15N,n_k) + loc_red*loc_dNO3
-       end if
     CASE ( &
          & '2N2T_PN_Tdep',   &
          & '3N2T_PNFe_Tdep', &
@@ -1748,23 +1727,75 @@ CONTAINS
        ! NOTE: assuemd stiochometry: 2NO3- + 2H+ <-> (5/2)O2 + N2 + H2O
        !                             NO3- + H2O + 2H+ <-> 2O2 + NH4+
        ! NOTE: because the N2 uptake (anomoly) is being used, no prior sources or sinks of N2 are assumed
-       loc_bio_uptake(io_N2,loc_k_mld:n_k) = &
-            & 0.5* &
-            & ( &
-            &   (par_bio_NPdiaz/loc_bio_NP) / ((1.0/loc_frac_N2fix - 1.0) + (par_bio_NPdiaz/loc_bio_NP)) &
-            & )* &
-            & loc_bio_uptake(io_NO3,loc_k_mld:n_k)
-       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  + (5.0/2.0)*loc_bio_uptake(io_N2,loc_k_mld:n_k)
-       loc_bio_uptake(io_ALK,loc_k_mld:n_k) = loc_bio_uptake(io_ALK,loc_k_mld:n_k) + 2.0*loc_bio_uptake(io_N2,loc_k_mld:n_k)
-       loc_bio_uptake(io_NO3,loc_k_mld:n_k) = loc_bio_uptake(io_NO3,loc_k_mld:n_k) - 2.0*loc_bio_uptake(io_N2,loc_k_mld:n_k)
+       If (loc_frac_N2fix > const_real_nullsmall) then
+          loc_bio_uptake(io_N2,n_k) = &
+               & 0.5* &
+               & ( &
+               &   (par_bio_NPdiaz/loc_bio_NP) / ((1.0/loc_frac_N2fix - 1.0) + (par_bio_NPdiaz/loc_bio_NP)) &
+               & )* &
+               & loc_bio_uptake(io_NO3,n_k)
+       else
+          loc_bio_uptake(io_N2,n_k) = 0.0
+       end if
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + (5.0/2.0)*loc_bio_uptake(io_N2,n_k)
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + 2.0*loc_bio_uptake(io_N2,n_k)
+       loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) - 2.0*loc_bio_uptake(io_N2,n_k)
        ! -------------------------------------------------------- ! adjustment due to NH4 uptake
        ! adjust default biological tracer uptake stoichiometry due to NH4 consumption (replacing some NO3 consumption)
        ! assuming: NH4 is consummed first (Fanny - July 2011)
-       loc_bio_uptake(io_NH4,loc_K_mld:n_k) = &
-            & min(loc_bio_uptake(io_NO3,loc_k_mld:n_k),ocn(io_NH4,dum_i,dum_j,loc_k_mld:n_k))
-       loc_bio_uptake(io_O2,loc_k_mld:n_k)  = loc_bio_uptake(io_O2,loc_k_mld:n_k)  + 2.0*loc_bio_uptake(io_NH4,loc_k_mld:n_k)
-       loc_bio_uptake(io_ALK,loc_k_mld:n_k) = loc_bio_uptake(io_ALK,loc_k_mld:n_k) + 2.0*loc_bio_uptake(io_NH4,loc_k_mld:n_k)
-       loc_bio_uptake(io_NO3,loc_k_mld:n_k) = loc_bio_uptake(io_NO3,loc_k_mld:n_k) - 1.0*loc_bio_uptake(io_NH4,loc_k_mld:n_k)
+!!$          loc_bio_uptake(io_NH4,n_k) = &
+!!$               & min(loc_bio_uptake(io_NO3,n_k),ocn(io_NH4,dum_i,dum_j,n_k))
+       ! if NO3 dominates, then limit NH4 uptake
+       ! if NH4 dominates, assume that in the uptake calculation, only a fraction of available N is going to be taken up
+       if (ocn(io_NO3,dum_i,dum_j,n_k) > ocn(io_NH4,dum_i,dum_j,n_k)) then
+          loc_bio_uptake(io_NH4,n_k) = &
+               & min(loc_bio_uptake(io_NO3,n_k),0.5*ocn(io_NH4,dum_i,dum_j,n_k))
+       else
+          loc_bio_uptake(io_NH4,n_k) = &
+               & min(loc_bio_uptake(io_NO3,n_k),ocn(io_NH4,dum_i,dum_j,n_k))
+       end if
+       loc_bio_uptake(io_O2,n_k)  = loc_bio_uptake(io_O2,n_k)  + 2.0*loc_bio_uptake(io_NH4,n_k)
+       loc_bio_uptake(io_ALK,n_k) = loc_bio_uptake(io_ALK,n_k) + 2.0*loc_bio_uptake(io_NH4,n_k)
+       loc_bio_uptake(io_NO3,n_k) = loc_bio_uptake(io_NO3,n_k) - 1.0*loc_bio_uptake(io_NH4,n_k)
+       ! isotopes
+       ! NOTE: add each update fraction to 15N particulate tracer
+       if (sed_select(is_PON_15N)) then
+          ! initialize 15N variables
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = 0.0
+          ! N2
+          if (ocn(io_N2,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_N2_15N,dum_i,dum_j,n_k)/ocn(io_N2,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dN2_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          loc_bio_uptake(io_N2_15N,n_k) = loc_red*loc_bio_uptake(io_N2,n_k)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = bio_part(is_PON_15N,dum_i,dum_j,n_k) + 2.0*loc_bio_uptake(io_N2_15N,n_k)
+          ! NH4
+          if (ocn(io_NH4,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_NH4_15N,dum_i,dum_j,n_k)/ocn(io_NH4,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dNH4_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          loc_bio_uptake(io_NH4_15N,n_k) = loc_red*loc_bio_uptake(io_NH4,n_k)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = bio_part(is_PON_15N,dum_i,dum_j,n_k) + loc_bio_uptake(io_NH4_15N,n_k)
+          ! NO3
+          if (ocn(io_NO3,dum_i,dum_j,n_k) > const_real_nullsmall) then
+             loc_r15N = ocn(io_NO3_15N,dum_i,dum_j,n_k)/ocn(io_NO3,dum_i,dum_j,n_k)
+          else
+             loc_r15N = 0.0
+          end if
+          loc_alpha = 1.0 + par_bio_uptake_dNO3_epsilon/1000.0
+          loc_R = loc_r15N/(1.0 - loc_r15N)
+          loc_red = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
+          loc_bio_uptake(io_NO3_15N,n_k) = loc_red*loc_bio_uptake(io_NO3,n_k)
+          bio_part(is_PON_15N,dum_i,dum_j,n_k) = bio_part(is_PON_15N,dum_i,dum_j,n_k) + loc_bio_uptake(io_NO3_15N,n_k)
+       end if
     END select
     ! -------------------------------------------------------- !
     ! RE-SCALE FOR DISSOLVED ORGANIC MATTER PRODUCTION
@@ -1789,9 +1820,9 @@ CONTAINS
              loc_r_POM_DOM = 1.0
           end select
           ! calculate decrease in particulate fraction
-          loc_bio_part_DOM(is,loc_k_mld:n_k) = loc_r_POM_DOM*loc_bio_red_DOMfrac*bio_part(is,dum_i,dum_j,loc_k_mld:n_k)
+          loc_bio_part_DOM(is,n_k) = loc_r_POM_DOM*loc_bio_red_DOMfrac*bio_part(is,dum_i,dum_j,n_k)
           ! create (and add) dissolved tracers
-          bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) + loc_bio_part_DOM(is,loc_k_mld:n_k)
+          bio_remin(io,dum_i,dum_j,n_k) = bio_remin(io,dum_i,dum_j,n_k) + loc_bio_part_DOM(is,n_k)
        end do
        ! create RDOM fraction
        loc_tot_i = conv_POM_RDOM_i(0,is)
@@ -1807,9 +1838,9 @@ CONTAINS
              loc_r_POM_RDOM = 1.0
           end select
           ! calculate decrease in particulate fraction
-          loc_bio_part_RDOM(is,loc_k_mld:n_k) = loc_r_POM_RDOM*loc_bio_red_RDOMfrac*bio_part(is,dum_i,dum_j,loc_k_mld:n_k)
+          loc_bio_part_RDOM(is,n_k) = loc_r_POM_RDOM*loc_bio_red_RDOMfrac*bio_part(is,dum_i,dum_j,n_k)
           ! create (and add) dissolved tracers
-          bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) + loc_bio_part_RDOM(is,loc_k_mld:n_k)
+          bio_remin(io,dum_i,dum_j,n_k) = bio_remin(io,dum_i,dum_j,n_k) + loc_bio_part_RDOM(is,n_k)
        end do
        ! save total DOM fraction [NOTE: not a global mean ... just this (i,j) location ...]
        if ((loc_r_POM_DOM + loc_r_POM_RDOM) > const_real_nullsmall) then
@@ -1819,8 +1850,8 @@ CONTAINS
        end if
     end do
     ! decrease particulate fraction
-    bio_part(:,dum_i,dum_j,loc_k_mld:n_k) = bio_part(:,dum_i,dum_j,loc_k_mld:n_k) - &
-         (loc_bio_part_DOM(:,loc_k_mld:n_k) + loc_bio_part_RDOM(:,loc_k_mld:n_k))
+    bio_part(:,dum_i,dum_j,n_k) = bio_part(:,dum_i,dum_j,n_k) - &
+         (loc_bio_part_DOM(:,n_k) + loc_bio_part_RDOM(:,n_k))
 
     ! *** INITIAL PARTICULATE FRACTION PARTITIONING ***
     ! set partitioning between differently remineralized particulate fluxes
@@ -1843,10 +1874,10 @@ CONTAINS
        end DO
     else
        loc_kPO4 = loc_PO4/(loc_PO4 + par_bio_remin_POC_c0frac2)
-       bio_part(is_POC_frac2,dum_i,dum_j,loc_k_mld:n_k) = (1.0-loc_kPO4)*par_bio_remin_POC_dfrac2 + par_bio_remin_POC_frac2
+       bio_part(is_POC_frac2,dum_i,dum_j,n_k) = (1.0-loc_kPO4)*par_bio_remin_POC_dfrac2 + par_bio_remin_POC_frac2
     end if
-    bio_part(is_CaCO3_frac2,dum_i,dum_j,loc_k_mld:n_k) = par_bio_remin_CaCO3_frac2
-    bio_part(is_opal_frac2,dum_i,dum_j,loc_k_mld:n_k)  = par_bio_remin_opal_frac2
+    bio_part(is_CaCO3_frac2,dum_i,dum_j,n_k) = par_bio_remin_CaCO3_frac2
+    bio_part(is_opal_frac2,dum_i,dum_j,n_k)  = par_bio_remin_opal_frac2
     ! set 'b' exponent in the Martin curve (if selected)
     if (par_bio_remin_fun == 'Henson2012') then
        par_bio_remin_b(dum_i,dum_j) = (0.024 * loc_TC) - 1.06
@@ -1873,8 +1904,8 @@ CONTAINS
        loc_alpha = 1.0 + loc_delta_CaCO3/1000.0
        loc_R = carbisor(ici_HCO3_r13C,dum_i,dum_j,n_k)/(1.0 - carbisor(ici_HCO3_r13C,dum_i,dum_j,n_k))
        bio_part_red(is_CaCO3,is_foram_p_13C,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
-       bio_part(is_foram_p_13C,dum_i,dum_j,loc_k_mld:n_k) = &
-            & bio_part_red(is_CaCO3,is_foram_p_13C,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,loc_k_mld:n_k)
+       bio_part(is_foram_p_13C,dum_i,dum_j,n_k) = &
+            & bio_part_red(is_CaCO3,is_foram_p_13C,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,n_k)
     end if
     if (sed_select(is_CaCO3) .AND. sed_select(is_CaCO3_18O)) then
        ! assume no fractionation for now
@@ -1888,8 +1919,8 @@ CONTAINS
        end if
        loc_R = loc_r18O/(1.0 - loc_r18O)
        bio_part_red(is_CaCO3,is_CaCO3_18O,dum_i,dum_j) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)
-       bio_part(is_CaCO3_18O,dum_i,dum_j,loc_k_mld:n_k) = &
-            & bio_part_red(is_CaCO3,is_CaCO3_18O,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,loc_k_mld:n_k)
+       bio_part(is_CaCO3_18O,dum_i,dum_j,n_k) = &
+            & bio_part_red(is_CaCO3,is_CaCO3_18O,dum_i,dum_j)*bio_part(is_CaCO3,dum_i,dum_j,n_k)
     end if
 
     ! *** Fe SCAVENGING ***
@@ -1930,7 +1961,7 @@ CONTAINS
     ! NOTE: depletion of dissolved species as a result of biological productivity is implimented as negative remineralization
     DO l=3,n_l_ocn
        io = conv_iselected_io(l)
-       bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) = bio_remin(io,dum_i,dum_j,loc_k_mld:n_k) - loc_bio_uptake(io,loc_k_mld:n_k)
+       bio_remin(io,dum_i,dum_j,n_k) = bio_remin(io,dum_i,dum_j,n_k) - loc_bio_uptake(io,n_k)
     end do
     ! record diagnostics
     ! NOTE: scale productivity modifiers by time-step to get correct average
@@ -2668,13 +2699,31 @@ CONTAINS
        dum_conv_ls_lo(:,:) = 0.0
     end if
     ! ---------------------------------------------------------- !
-    ! CORRECT FOR ISOTOPES (in SO4 and NO3)
+    ! CORRECT FOR ISOTOPES (in oxidants -- NO3, SO4, FeOOH)
     ! ---------------------------------------------------------- !
     ! test for N isotopes selected
     ! NOTE: value of loc_NO3 already determined
-    ! ### INSERT CODE TO DEAL WITH N ISOTOPES #################################################################################### !
-    !
-    ! ############################################################################################################################ !
+    if (ocn_select(io_NO3) .AND. ocn_select(io_NO3_15N)) then
+       if (loc_NO3 > const_real_nullsmall) then
+          loc_r15N  = dum_ocn(io2l(io_NO3_15N))/loc_NO3
+       else
+          loc_r15N  = 0.0
+       end if
+       loc_alpha = 1.0 + par_d15N_Corg_NO3_epsilon/1000.0
+       loc_R     = loc_r15N/(1.0 - loc_r15N)
+       dum_conv_ls_lo(io2l(io_NO3_15N),:)    = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NO3),:)
+       if (ocn_select(io_NO2) .AND. ocn_select(io_NO2_15N)) then
+          dum_conv_ls_lo(io2l(io_NO2_15N),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NO2),:)
+       elseif (ocn_select(io_N2O) .AND. ocn_select(io_N2O_15N)) then
+          dum_conv_ls_lo(io2l(io_N2O_15N),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_N2O),:)
+       elseif (ocn_select(io_N2) .AND. ocn_select(io_N2_15N)) then
+          dum_conv_ls_lo(io2l(io_N2_15N),:)  = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_N2),:)
+       elseif (ocn_select(io_NH4) .AND. ocn_select(io_NH4_15N)) then
+          dum_conv_ls_lo(io2l(io_NH4_15N),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_NH4),:)
+       else
+          ! [DEFAULT, oxic remin relationship]
+       endif
+    end if
     ! test for S isotopes selected
     ! NOTE: value of loc_SO4 already determined
     if (ocn_select(io_SO4_34S) .AND. ocn_select(io_H2S_34S)) then
@@ -2685,22 +2734,22 @@ CONTAINS
        end if
        loc_alpha = 1.0 + par_d34S_Corg_SO4_epsilon/1000.0
        loc_R     = loc_r34S/(1.0 - loc_r34S)
-       dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_SO4),:)!dum_conv_ls_lo(io2l(io_SO4_34S),:)
-       dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_H2S),:)!dum_conv_ls_lo(io2l(io_H2S_34S),:)
+       dum_conv_ls_lo(io2l(io_SO4_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_SO4),:)
+       dum_conv_ls_lo(io2l(io_H2S_34S),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_H2S),:)
     end if
     ! test for Fe isotopes selected
     ! NOTE: value of loc_FeOOH already determined
-    !if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe2_56Fe)) then
-    !   if (loc_FeOOH > const_real_nullsmall) then
-    !      loc_r56Fe  = dum_ocn(io2l(io_FeOOH_56Fe)) / loc_FeOOH
-    !   else
-    !      loc_r56Fe  = 0.0
-    !   end if
-    !   loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
-    !   loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
-    !   dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:)
-    !   dum_conv_ls_lo(io2l(io_Fe2_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe2_56Fe),:)
-    !end if
+    if (ocn_select(io_FeOOH_56Fe) .AND. ocn_select(io_Fe2_56Fe)) then
+       if (loc_FeOOH > const_real_nullsmall) then
+          loc_r56Fe  = dum_ocn(io2l(io_FeOOH_56Fe)) / loc_FeOOH
+       else
+          loc_r56Fe  = 0.0
+       end if
+       loc_alpha = 1.0 + par_d56Fe_Corg_FeOOH_epsilon/1000.0
+       loc_R     = loc_r56Fe/(1.0 - loc_r56Fe)
+       dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_FeOOH_56Fe),:)
+       dum_conv_ls_lo(io2l(io_Fe2_56Fe),:) = loc_alpha*loc_R/(1.0 + loc_alpha*loc_R)*dum_conv_ls_lo(io2l(io_Fe2_56Fe),:)
+    end if
     ! ---------------------------------------------------------- !
     ! END
     ! ---------------------------------------------------------- !
@@ -2914,7 +2963,7 @@ CONTAINS
     real::loc_bio_remin_opal_frac1,loc_bio_remin_opal_frac2
     real::loc_bio_part_opal_ratio
 !!!real::loc_bio_part_FeOOH_ratio,loc_bio_part_FeS2_ratio,loc_bio_part_FeCO3_ratio
-    real::loc_eL_size                                                   ! local efolding depth varying with ecosystem size structure JDW
+    real::loc_eL_size                                                   ! efolding depth varying with ecosystem size structure JDW
     real::loc_size0                                                     ! JDW
     real::loc_part_tot,loc_part_tot_mineral
     real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo            !
@@ -3578,14 +3627,14 @@ CONTAINS
                       end if
                       ! -------------------------------------- ! SPECIAL CASES EXAMPLE
                       ! (comes before generic detrital tracer handling)
-                      ! ### INSERT CODE ############################################################################################# !
+                      ! ### INSERT CODE ########################################################################################## !
                       ! else if ( &
                       !      & (is == is_xxx) .OR. &
                       !      & (sed_dep(is) == is_xxx) &
                       !      & ) then
                       !    loc_bio_part_TMP(l,kk) = loc_bio_part_TMP(l,kk+1)* &
                       !         & loc_bio_remin_layerratio*loc_bio_part_xxx_ratio
-                      ! ############################################################################################################# !
+                      ! ########################################################################################################## !
                       ! -------------------------------------- ! (remaining) detrital
                       ! (plus elemental components, particle-reactive scavenged elements)
                    else if ( &

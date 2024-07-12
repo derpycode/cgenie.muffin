@@ -48,7 +48,58 @@ CONTAINS
   END SUBROUTINE sub_calc_terrCO2exchange
   ! ****************************************************************************************************************************** !
 
-  ! *****************************************************************************************************************************!
+  
+  ! ****************************************************************************************************************************** !
+  ! REDUCE N2O -- DEFAULT (SIMPLE) SCHEME
+  SUBROUTINE sub_calc_reduce_N2O_lifetime(dum_i,dum_j,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    INTEGER,INTENT(in)::dum_i,dum_j
+    real,intent(in)::dum_dtyr
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    real::loc_fracdecay
+    real::loc_N2O
+    real::loc_N2O_reduction
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    loc_N2O = atm(ia_pN2O,dum_i,dum_j)
+    loc_fracdecay = dum_dtyr/par_N2O_reduction_tau
+    loc_N2O_reduction = 0.0
+    ! -------------------------------------------------------- !
+    ! REDUCE N2O
+    ! -------------------------------------------------------- !
+    ! NOTE: for consistency with N2 fixation (2NO3- + 2H+ -> (5/2)O2 + N2 + H2O):
+    !       N2O + 2 H+ + 2 e− ->N2 + H2O 
+    !       alternatively, simpler but requiring an O2 balancing fix associated with N2 fixation, is:
+    !       2N2O --> 2N2 + O2
+    !       with N2 fixation then being net: 2NO3- -> 3O2 + N2
+    !       (this requires parameter: ctrl_bio_N2fix_altO2balance=.true.)
+    if (loc_N2O > const_real_nullsmall) then
+       loc_N2O_reduction = loc_fracdecay*atm(ia_pN2O,dum_i,dum_j)
+       atm(ia_pN2O,dum_i,dum_j) = atm(ia_pN2O,dum_i,dum_j) - loc_N2O_reduction
+       atm(ia_pN2,dum_i,dum_j)  = atm(ia_pN2,dum_i,dum_j)  + loc_N2O_reduction
+       if (ctrl_atl_N2Oreduct_altO2balance) then
+          atm(ia_pO2,dum_i,dum_j)  = atm(ia_pO2,dum_i,dum_j)  + (1.0/2.0)*loc_N2O_reduction
+       end if
+       ! isotopes
+       ! NOTE: no fractionation
+       if (atm_select(ia_pN2O_15N) .AND. atm_select(ia_pN2_15N)) then
+          atm(ia_pN2_15N,dum_i,dum_j)  = atm(ia_pN2_15N,dum_i,dum_j)  + loc_fracdecay*atm(ia_pN2O_15N,dum_i,dum_j)
+          atm(ia_pN2O_15N,dum_i,dum_j) = atm(ia_pN2O_15N,dum_i,dum_j) - loc_fracdecay*atm(ia_pN2O_15N,dum_i,dum_j)
+       end if
+    end if
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  END SUBROUTINE sub_calc_reduce_N2O_lifetime
+  ! ****************************************************************************************************************************** !
+
+    
+  ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- DEFAULT (ORIGINAL) SCHEME
   SUBROUTINE sub_calc_oxidize_CH4_default(dum_i,dum_j,dum_dtyr)
     IMPLICIT NONE
@@ -82,7 +133,8 @@ CONTAINS
   END SUBROUTINE sub_calc_oxidize_CH4_default
   ! ****************************************************************************************************************************** !
 
-  ! *****************************************************************************************************************************!
+  
+  ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- FIT TO DATA FROM 2-D PHOTOCHEMISTRY MODEL IN SCHMIDT & SCHINDELL [2003] (CTR|12-2017)
   SUBROUTINE sub_calc_oxidize_CH4_schmidt03(dum_i,dum_j,dum_dtyr)
     IMPLICIT NONE
@@ -116,6 +168,7 @@ CONTAINS
   END SUBROUTINE sub_calc_oxidize_CH4_schmidt03
   ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], NO H ESCAPE (CTR|01-2018)
    SUBROUTINE sub_calc_oxidize_CH4_claire06(dum_dtyr,dum_conv_atm_mol)
@@ -247,6 +300,7 @@ CONTAINS
 
   END SUBROUTINE sub_calc_oxidize_CH4_claire06
   ! ****************************************************************************************************************************** !
+
   
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], NO H ESCAPE, FIXED ATMOSPHERIC O2 (CTR|09-2018)
@@ -374,7 +428,8 @@ CONTAINS
 
   END SUBROUTINE sub_calc_oxidize_CH4_claire06_fixed
   ! ****************************************************************************************************************************** !
- 
+
+  
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- PHOTOCHEMICAL SCHEME AFTER CLAIRE ET AL. [2006], H ESCAPE ENABLED (CTR|05-2017)
   SUBROUTINE sub_calc_oxidize_CH4_claire06H(dum_dtyr,dum_conv_atm_mol)
@@ -512,6 +567,7 @@ CONTAINS
   
   END SUBROUTINE sub_calc_oxidize_CH4_claire06H
   ! ****************************************************************************************************************************** !
+
   
   ! ****************************************************************************************************************************** !
   ! OXIDIZE CH4 -- UPDATED PHOTOCHEMICAL SCHEME AFTER GOLDBLATT ET AL. [2006] (SLO|2015, CTR|05-2017)
@@ -576,6 +632,7 @@ CONTAINS
   END SUBROUTINE sub_calc_oxidize_CH4_goldblatt06
   ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   ! WETLANDS CH4 FLUX
   SUBROUTINE sub_calc_wetlands_CH4(dum_dtyr,dum_fatm)
@@ -622,6 +679,7 @@ CONTAINS
   END SUBROUTINE sub_calc_wetlands_CH4
   ! ****************************************************************************************************************************** !
 
+  
   ! ****************************************************************************************************************************** !
   ! PRODUCE 14C
   SUBROUTINE sub_calc_generate_14C(dum_dtyr,dum_fatm)

@@ -1463,7 +1463,7 @@ CONTAINS
           call sub_putvar2d('fpres_'//trim(string_sed(is)),ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
        end SELECT
     END DO
-    ! save interface flux data - dust (log10)
+    ! save interface flux data -- detrital (log10)
     IF (sed_select(is_det)) THEN
        loc_ij(:,:) = const_real_zero
        loc_unitsname = 'mol cm-2 yr-1'
@@ -1475,9 +1475,25 @@ CONTAINS
              end if
           end do
        end do
-       call sub_adddef_netcdf(ntrec_siou,3,'fsed_'//trim(string_sed(is_det))//'_log10', &
-            & 'sediment rain flux - detrital material (log10)',trim(loc_unitsname),loc_c0,loc_c0)
-       call sub_putvar2d('fsed_'//trim(string_sed(is_det))//'_log10',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+       call sub_adddef_netcdf(ntrec_siou,3,'misc_fdet_log10', &
+            & 'detrital material sediment rain flux (log10) ',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('misc_fdet_log10',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+    END IF
+    ! save interface flux data -- detrital (g cm-2 kyr-1)
+    IF (sed_select(is_det)) THEN
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'g cm-2 kyr-1'
+       ! g cm-2 kyr-1 data
+       DO i=1,n_i
+          DO j=1,n_j
+             IF (sed_fsed(is_det,i,j) > 0.0) THEN
+                loc_ij(i,j) = conv_det_mol_g*sed_fsed(is_det,i,j)/conv_yr_kyr
+             end if
+          end do
+       end do
+       call sub_adddef_netcdf(ntrec_siou,3,'misc_fdet_gpercm2perkyr', &
+            & 'detrital material sediment rain flux ',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('misc_fdet_gpercm2perkyr',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
     END IF
     ! CaCO3:POC 'rain ratio'
     IF (sed_select(is_CaCO3) .AND. sed_select(is_POC)) THEN
@@ -1624,6 +1640,11 @@ CONTAINS
     call sub_putvar2d('muds_sed_'//trim(string_sed(is)),ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask_muds)
 
     ! MISCELLANEOUS FIELDS
+    ! ocean depth (rather than topography)
+    loc_unitsname = 'm'
+    loc_ij(:,:) = phys_sed(ips_mask_sed,:,:)*phys_sed(ips_D,:,:)
+    call sub_adddef_netcdf(ntrec_siou,3,'grid_depth','seafloor depth',trim(loc_unitsname),loc_c0,loc_c0)
+    call sub_putvar2d('grid_depth',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
     ! 
     loc_unitsname = 'cm3 cm-3'
     loc_ij(:,:) = phys_sed(ips_poros,:,:)

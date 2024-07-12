@@ -186,7 +186,7 @@ CONTAINS
             &   loc_conv_totaltoSWS + & 
             &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
-    case ('Luecker/')
+    case ('Luecker')
        dum_carbconst(icc_k1) = &
             & EXP( &
             &   fun_calc_lnk1_Luecker(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
@@ -453,6 +453,9 @@ CONTAINS
             & exp(loc_conv_totaltoSWS + &
             & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpBO3H3) &
             & )
+    case default
+       ! no change, e.g., 'NONE'
+       dum_carbconst(:) = dum_carbconst(:)
     end SELECT
   end SUBROUTINE sub_adj_carbconst
   ! ****************************************************************************************************************************** !
@@ -1382,6 +1385,34 @@ CONTAINS
   END FUNCTION fun_calc_lnk2_Roy
   ! ****************************************************************************************************************************** !
 
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE ln(K1) DISSOCIATION CONSTANT
+  FUNCTION fun_calc_lnk1_Luecker(dum_rT,dum_T_ln,dum_S,dum_S_p20)
+    ! result variable
+    REAL::fun_calc_lnk1_Luecker
+    ! dummy arguments
+    REAL,INTENT(IN)::dum_rT,dum_T_ln,dum_S,dum_S_p20
+    ! first carbonic acid apparent ionization constant [Luecker et al., 2000]
+    ! NOTE: total pH scale; [mol (kg-sol)-1]
+    fun_calc_lnk1_Luecker = LOG(10**(61.2172 - 3633.86*dum_rT - 9.67770*dum_T_ln &
+         & + 0.011555*dum_S - 0.0001152*dum_S_p20))
+  END FUNCTION fun_calc_lnk1_Luecker
+  ! ****************************************************************************************************************************** !
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE ln(K2) DISSOCIATION CONSTANT
+  FUNCTION fun_calc_lnk2_Luecker(dum_rT,dum_T_ln,dum_S,dum_S_p20)
+    ! result variable
+    REAL::fun_calc_lnk2_Luecker
+    ! dummy arguments
+    REAL,INTENT(IN)::dum_rT,dum_T_ln,dum_S,dum_S_p20
+    ! second carbonic acid apparent ionization constant [Luecker et al., 2000]
+    ! NOTE: total pH scale; [mol (kg-sol)-1]
+    fun_calc_lnk2_Luecker = LOG(10**(-25.9290 - 471.78*dum_rT + 3.16967*dum_T_ln &
+         & + 0.01781*dum_S - 0.0001122*dum_S_p20))
+  END FUNCTION fun_calc_lnk2_Luecker
+  ! ****************************************************************************************************************************** !
+
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ln(K1) DISSOCIATION CONSTANT
@@ -1654,5 +1685,3 @@ CONTAINS
 
 
 END MODULE gem_carbchem
-
-

@@ -70,7 +70,7 @@ c periodicity in i, j bdy points are ignored assuming no flow out
 c of north or south of domain.
 c
       do 70 j=1,jmax-1
-         do 70 i=1,imax
+         do 71 i=1,imax
             ip1=mod(i,imax) + 1
             l = i + j*n
             if(getj(i,j))then
@@ -117,7 +117,8 @@ c
             else
                gb(l) = gbold(l)
             endif
-   70 continue
+ 71      continue
+ 70   continue
 c don't currently need the following lines as gb already 
 c reset to zero at these boundaries by mains
 c     do i=1,imax

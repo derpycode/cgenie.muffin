@@ -59,11 +59,11 @@ subroutine ecogem(          &
   REAL,DIMENSION(iimaxiso,npmax)           ::up_inorgiso !ckc isotopes
   REAL,DIMENSION(iomax+iChl,npmax,npmax)   ::GrazMat
   REAL,DIMENSION(npmax)                    ::VLlimit,chlsynth
-  REAL                                     ::gamma_T,totPP
+  REAL                                     ::gamma_TP,gamma_TK,totPP
   REAL                                     ::mld,totchl,k_tot
   INTEGER                                  ::imld
-  REAL,DIMENSION(npmax)                    ::Totzoolimit
-  REAL,DIMENSION(npmax,npmax)                    ::zoolimit
+!BAW: zoolimit should be optional  REAL,DIMENSION(npmax)                    ::Totzoolimit
+!BAW: zoolimit should be optional  REAL,DIMENSION(npmax,npmax)                    ::zoolimit
 
   REAL,DIMENSION(iomax+iChl,npmax)         ::loc_biomass
   REAL,DIMENSION(iimax)                    ::loc_nuts
@@ -81,6 +81,8 @@ subroutine ecogem(          &
   REAL,DIMENSION(iimaxiso)                 ::dnutisodt    !ckc isotopes
   REAL,DIMENSION(iomaxiso,komax)           ::dorgmatisodt !ckc isotopes
   REAL,DIMENSION(iomax,npmax)              ::dorgmatdt_plankton ! POM export for each plankton    Fanny/Maria - Aug19
+  REAL,DIMENSION(iomax,npmax)              ::AP_uptake ! Auto uptake for each plankton 
+  REAL,DIMENSION(iomax,npmax)              ::HP_uptake ! Auto uptake for each plankton 
   !REAL,DIMENSION(npmax)                    ::diameter     !ckc for size dependent fractionation
 
   REAL,DIMENSION(npmax)                    ::mortality,respiration
@@ -136,8 +138,8 @@ subroutine ecogem(          &
   orgmatiso_flux(:,:,:,:,:) = 0.0 !ckc isotopes
   !
   phys_limit(:,:,:,:,:) = 0.0
-  zoo_limit(:,:,:,:) = 0.0
-  zoolimit(:,:)      = 0.0
+!BAW: zoolimit should be optional  zoo_limit(:,:,:,:) = 0.0
+!BAW: zoolimit should be optional  zoolimit(:,:)      = 0.0
   ! initialise subroutine returns to null values
   ! quota_status outputs
   quota(:,:)              = 0.0
@@ -149,7 +151,8 @@ subroutine ecogem(          &
   up_inorg(:,:)           = 0.0
   up_inorgiso(:,:)        = 0.0 !ckc isotopes
   ! t_limitation outputs
-  gamma_T                 = 0.0
+  gamma_TP                 = 0.0
+  gamma_TK                 = 0.0
   ! photosynthesis outputs
   chlsynth(:)             = 0.0
   totPP                   = 0.0
@@ -330,7 +333,8 @@ subroutine ecogem(          &
                  qreg_h(:,:) = 0.0 ! (iomax,npmax)
                  quota(:,:) = 0.0 ! (iomax,npmax)
                  VLlimit(:) = 0.0 ! (npmax)
-                 gamma_T = 0.0 !
+                 gamma_TP = 0.0 !
+                 gamma_TK = 0.0 !
                  PP(:) = 0.0 ! (npmax)
                  chlsynth(:) = 0.0 ! (npmax)
                  totPP = 0.0 !
@@ -345,13 +349,14 @@ subroutine ecogem(          &
 
                  call quota_limitation(quota,limit,VLlimit,qreg,qreg_h)
 
-                 call t_limitation(templocal,gamma_T)
+                 call t_limitation(templocal,gamma_TP,gamma_TK)
 
-                 call nutrient_uptake(qreg(:,:),loc_nuts(:),gamma_T,up_inorg(:,:))
+                 call nutrient_uptake(qreg(:,:),loc_nuts(:),gamma_TK,up_inorg(:,:))
 
-                 call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_T,up_inorg(iDIC,:),chlsynth,totPP)
+                 call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_TP,up_inorg(iDIC,:),chlsynth,totPP)
 
-                 call grazing(loc_biomass,gamma_T,zoolimit(:,:),GrazMat(:,:,:))
+!BAW: zoolimit should be optional                 call grazing(loc_biomass,gamma_TK,zoolimit(:,:),GrazMat(:,:,:))
+				call grazing(loc_biomass,gamma_TK,GrazMat(:,:,:))
 
                  !ckc isotopes uptake, from nutrient uptake, nutrient concentration and fractionation
                  if (c13trace) then
@@ -368,13 +373,13 @@ subroutine ecogem(          &
                  ! Stoopid calcification related moratlity
                  !mortality(:)   = mortality(:) + mortality(:) * calcify(:) / omega(i,j,k) ! Coccolithophores and Forams only
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                 ! mortality(:) = mortality(:)  * gamma_T ! temp adjusted?
+                 ! mortality(:) = mortality(:)  * gamma_TK ! temp adjusted?
 
                  ! calculate respiration
                  respiration(:) = respir(:) !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
 
                  ! calculate assimilation efficiency based on quota status
-                 Totzoolimit(:) = 0.0  !total food limitation - Maria May 2019 !!! Need to check if consistent!!!
+!BAW: zoolimit should be optional                 Totzoolimit(:) = 0.0  !total food limitation - Maria May 2019 !!! Need to check if consistent!!!
                  do io=1,iomax+iChl
                     ! Integrate grazing interactions
                     GrazPredEat(io,:)   = 0.0 ! Total prey biomass killed (pre-assimilation), summed by predator and by prey
@@ -383,9 +388,9 @@ subroutine ecogem(          &
                        do jprey=1,npmax
                           GrazPredEat(io,jpred) = GrazPredEat(io,jpred)   + BioC(jpred) * GrazMat(io,jpred,jprey)
                           GrazPreyEaten(io,jprey) = GrazPreyEaten(io,jprey) + BioC(jpred) * GrazMat(io,jpred,jprey)
-                          if (io.eq.iCarb) then  !calculate total food limitation - Maria May 2019 !!! Need to check if consistent!!!
-                             Totzoolimit(jpred) = zoolimit(jpred,jprey)
-                          endif
+!BAW: zoolimit should be optional                          if (io.eq.iCarb) then  !calculate total food limitation - Maria May 2019 !!! Need to check if consistent!!!
+!BAW: zoolimit should be optional                             Totzoolimit(jpred) = zoolimit(jpred,jprey)
+!BAW: zoolimit should be optional                          endif
                        enddo
                     enddo
 
@@ -396,6 +401,11 @@ subroutine ecogem(          &
                     elseif (io.eq.iChlo) then
                        assimilated(io,:) = 0.0                  ! don't assimilate chlorophyll
                     endif
+                    do jpred=1,npmax ! JDW - check do loop is needed
+                       if (io.eq.iSili .and. pft(jpred).eq.'zooplankton') then ! .and. silicify(:).eq.0.0) then
+                         assimilated(io,jpred) = 0.0                  ! don't assimilate Si if not selected - Scott April 2019
+                       endif
+                    enddo ! Aaron Diatom 23
                     unassimilated(:,:) = 1.0 - assimilated(:,:)
                  enddo
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -445,6 +455,15 @@ subroutine ecogem(          &
                     io=nut2quota(ii)
                     dbiomassdt(io,:) = dbiomassdt(io,:) + up_inorg(ii ,:) * BioC(:)
                  enddo
+                 ! Take into account nitrogen fixation here scaled with dbiomass in phosphorus - Fanny Jun20
+                 dbiomassdt(iNitr,:) = merge(dbiomassdt(iPhos,:)*40.0,dbiomassdt(iNitr,:),pft.eq.'diazotroph') ! Aaron Diatom 23
+                 if (eco_uptake_fluxes) then
+                    do io=1,iomax
+                       AP_uptake(io,:) = dbiomassdt(io,:)      
+                       HP_uptake(io,:) = GrazPredEat(io,:) * assimilated(io,:)
+                    enddo
+                 endif
+                    
 
                  ! CHLOROPHYLL A SYNTHESIS
                  if (chlquota) dbiomassdt(iChlo,:) = chlsynth(:)
@@ -518,25 +537,34 @@ subroutine ecogem(          &
                  dorgmatdt(:,:) = 0.0 ! initialise
 
                  dorgmatisodt(:,:) = 0.0
-                 dorgmatdt_plankton(:,:) = 0.0           ! Fanny/Maria Aug19
+                 if (eco_export_verbose) then
+                   dorgmatdt_plankton(:,:) = 0.0           ! Fanny/Maria Aug19
+                 end if
 
+
+                 
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  orgbGraz(:,:) = 0.0
-
-                 do io=1,iomax
+                 do io=1,iomax !! Be aware this calculates also for Si "OM" - Fanny/Jamie - Jun19
+                 
                     ! mortality
                     dorgmatdt(io,1) = dorgmatdt(io,1) + sum(loc_biomass(io,:) * mortality(:)        * beta_mort(:)  ) ! fraction to DOM
                     dorgmatdt(io,2) = dorgmatdt(io,2) + sum(loc_biomass(io,:) * mortality(:)        * beta_mort_1(:)) ! fraction to POM
                     orgbGraz(io,1) = dorgmatdt(io,1)
                     orgbGraz(io,2) = dorgmatdt(io,2)
-                    dorgmatdt_plankton(io,:) = dorgmatdt_plankton(io,:) + loc_biomass(io,:) * mortality(:) * beta_mort_1(:) ! POM source from mortality per plankton group - Fanny/Maria Aug19
 
                     ! unassimilated grazing
                     dorgmatdt(io,1) = dorgmatdt(io,1) + sum(GrazPredEat(io,:) * unassimilated(io,:) * beta_graz(:)  ) ! fraction to DOM
                     dorgmatdt(io,2) = dorgmatdt(io,2) + sum(GrazPredEat(io,:) * unassimilated(io,:) * beta_graz_1(:)) ! fraction to POM
                     ratioGraz(io,1) = dorgmatdt(io,1)/orgbGraz(io,1)
                     ratioGraz(io,2) = dorgmatdt(io,2)/orgbGraz(io,2)
-                    dorgmatdt_plankton(io,:) = dorgmatdt_plankton(io,:) + GrazPredEat(io,:) * unassimilated(io,:) * beta_graz_1(:) ! Total POM source per plankton group - Fanny/Maria Aug19
+                    
+                    if (eco_export_verbose) then
+                      dorgmatdt_plankton(io,:) = dorgmatdt_plankton(io,:) + loc_biomass(io,:) * mortality(:) * beta_mort_1(:) ! POM source from mortality per plankton group - Fanny/Maria Aug19
+                      dorgmatdt_plankton(io,:) = dorgmatdt_plankton(io,:) + GrazPredEat(io,:) * unassimilated(io,:) * beta_graz_1(:) ! Total POM source per plankton group - Fanny/Maria Aug19
+                    end if
+                                        
+
                     !end/start
                  enddo
                  ! no organic matter production in fundamental niche experiment
@@ -573,7 +601,6 @@ subroutine ecogem(          &
 		 ! calculate weighted mean size for size-dependent remineralisation scheme
 		 ! if(autotrophy) loop calculates weights for phytoplankton only. Comment out if(autotrophy) loop to calculate weights for all types!
                  if (sed_select(is_POC_size)) then
-
                         loc_weighted_mean_size=0.0
                         loc_total_weights=0.0
 
@@ -597,7 +624,13 @@ subroutine ecogem(          &
                  ! collect fluxes for output
                  do io=1,iomax
                     uptake_flux(io,:,i,j,k) = up_inorg(io,:) * BioC(:) ! mmol/m^3/s
-                    export_flux(io,:,i,j,k) = dorgmatdt_plankton(io,:) ! mmol/m^3/s   - Fanny/Maria Aug19
+                    if (eco_export_verbose) then
+                      export_flux(io,:,i,j,k) = dorgmatdt_plankton(io,:) ! mmol/m^3/s   - Fanny/Maria Aug19
+                    end if
+                    if (eco_uptake_fluxes) then
+                      AP_flux(io,:,i,j,k) = AP_uptake(io,:) ! mmol/m^3/s
+                      HP_flux(io,:,i,j,k) = HP_uptake(io,:) ! mmol/m^3/s
+                    end if
                  enddo
 
                  if (c13trace) then
@@ -635,9 +668,9 @@ subroutine ecogem(          &
                     phys_limit(io,:,i,j,k)    = limit(io,:)
                  enddo
                  phys_limit(iomax+1,:,i,j,k) = 0.0
-                 phys_limit(iomax+1,1,i,j,k) = gamma_T
+                 phys_limit(iomax+1,1,i,j,k) = gamma_TK
                  phys_limit(iomax+2,:,i,j,k) = 0.0
-                 zoo_limit(:,i,j,k) = Totzoolimit(:)
+!BAW: zoolimit should be optional                 zoo_limit(:,i,j,k) = Totzoolimit(:)
                  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  !ckc ISOTOPES POC as Biogem
                  if (.NOT.c13trace) then
@@ -694,10 +727,17 @@ subroutine ecogem(          &
      tstep=int((dum_genie_clock/dum_dts/1000.0)-48.*(ceiling((dum_genie_clock/dum_dts/1000.0)/48.)-1))
      time_tser(tstep)           = dum_genie_clock/dum_dts/1000.0
      do i_tser=1,n_tser
-        nutrient_tser(:,i_tser,tstep) =      nutrient(:,tser_i(i_tser),tser_j(i_tser),n_k)
-        plankton_tser(:,:,i_tser,tstep) =    plankton(:,:,tser_i(i_tser),tser_j(i_tser),n_k)
-        uptake_tser(:,:,i_tser,tstep) = uptake_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k) * pday
-        gamma_tser(:,:,i_tser,tstep) =  phys_limit(:,:,tser_i(i_tser),tser_j(i_tser),n_k)        ! mmol m^-3 d^-1
+        nutrient_tser(:,i_tser,tstep)        =     nutrient(:,tser_i(i_tser),tser_j(i_tser),n_k)
+        plankton_tser(:,:,i_tser,tstep)      =     plankton(:,:,tser_i(i_tser),tser_j(i_tser),n_k)
+        uptake_tser(:,:,i_tser,tstep)        =  uptake_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k) * pday
+        gamma_tser(:,:,i_tser,tstep)         =   phys_limit(:,:,tser_i(i_tser),tser_j(i_tser),n_k) 
+        if (eco_export_verbose) then
+           export_tser(:,:,i_tser,tstep)     =  export_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k)        
+        endif
+        if (eco_uptake_fluxes) then        
+          autotrophic_tser(:,:,i_tser,tstep)   =    AP_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k)       
+          heterotrophic_tser(:,:,i_tser,tstep) =    HP_flux(:,:,tser_i(i_tser),tser_j(i_tser),n_k)           
+        endif 
      enddo
   endif
 
@@ -730,6 +770,7 @@ subroutine ecogem(          &
   if (nquota)  dum_egbg_sfcpart(is_PON   ,:,:,:) = orgmat_flux(iNitr,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   if (pquota)  dum_egbg_sfcpart(is_POP   ,:,:,:) = orgmat_flux(iPhos,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
   if (fquota)  dum_egbg_sfcpart(is_POFe  ,:,:,:) = orgmat_flux(iIron,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
+  if (squota) dum_egbg_sfcpart(is_opal ,:,:,:) = (orgmat_flux(iSili,1,:,:,:) + orgmat_flux(iSili,2,:,:,:)) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1} ! FMM/JDW June 2019, "DOSi + POSi" Aaron Diatom 23
   !ckc Isotopes particulate
   dum_egbg_sfcpart(is_POC_13C,:,:,:) = orgmatiso_flux(iCarb13C,2,:,:,:) / 1.0e3 / conv_m3_kg ! convert back to mol kg^{-1} s^{-1}
 
@@ -765,10 +806,30 @@ subroutine ecogem(          &
      dum_egbg_sfcdiss(io_DIC_13C  ,:,:,:) = dum_egbg_sfcdiss(io_DIC_13C,:,:,:) - 1.0 * dum_egbg_sfcpart(is_CaCO3_13C,:,:,:)
   endif
 
-  ! set initial values for protected fraction of POM and CaCO3
-  dum_egbg_sfcpart(is_POC_frac2  ,:,:,n_k) = par_bio_remin_POC_frac2
-  dum_egbg_sfcpart(is_CaCO3_frac2,:,:,n_k) = par_bio_remin_CaCO3_frac2
+  ! set initial values for protected fraction of POM and CaCO3 Aaron Diatom 23
+  ! Added ballast parameterisation - Fanny, Aug20
+  ! NEED TO MAKE CARRYING COEF EXPLICIT (HARD CODING HERE BECAUSE WANT TO FIND A WAY TO DEFINE THEM ONLY ONE) - Fanny Aug20
+  ! Changed frac2 modification to be for imld:n_k rather than n_k
+  if (ctrl_bio_remin_POC_ballast_eco) then 
+     !dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+     !          &  ( par_bio_remin_kc(:,:)*dum_egbg_sfcpart(is_CaCO3,:,:,imld:n_k) + &
+     !          &    par_bio_remin_ko(:,:)*dum_egbg_sfcpart(is_opal,:,:,imld:n_k)  + &
+     !          &    par_bio_remin_kl(:,:)*dum_egbg_sfcpart(is_det,:,:,imld:n_k) )   &
+     !          &  /dum_egbg_sfcpart(is_POC,:,:,imld:n_k) ,                          &
+     !          &  0.0, dum_egbg_sfcpart(is_POC,:,:,imld:n_k) > const_real_nullsmall)
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+               &  ( 0.085*dum_egbg_sfcpart(is_CaCO3,:,:,imld:n_k) + &
+               &    0.025*dum_egbg_sfcpart(is_opal,:,:,imld:n_k)  + &
+               &    0.0*dum_egbg_sfcpart(is_det,:,:,imld:n_k) )   &
+               &  /dum_egbg_sfcpart(is_POC,:,:,imld:n_k) ,                          &
+               &  0.0, dum_egbg_sfcpart(is_POC,:,:,imld:n_k) > const_real_nullsmall)
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = MERGE(                           &
+              &  1.0,dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k), dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) > 1.0)
+  else
+     dum_egbg_sfcpart(is_POC_frac2,:,:,imld:n_k) = par_bio_remin_POC_frac2
+  endif
 
+  dum_egbg_sfcpart(is_CaCO3_frac2,:,:,imld:n_k) = par_bio_remin_CaCO3_frac2
   ! ---------------------------------------------------------- !
   ! END
   ! ---------------------------------------------------------- !
@@ -849,8 +910,14 @@ SUBROUTINE diag_ecogem_timeslice( &
      int_uptake_timeslice(:,:,:,:,:) =   int_uptake_timeslice(:,:,:,:,:) + loc_dtyr *   uptake_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1
      int_gamma_timeslice(:,:,:,:,:) =    int_gamma_timeslice(:,:,:,:,:) + loc_dtyr *    phys_limit(:,:,:,:,:)        ! mmol m^-3 d^-1
      int_nutrient_timeslice(:,:,:,:) =   int_nutrient_timeslice(:,:,:,:) + loc_dtyr *        nutrient(:,:,:,:)        ! mmol m^-3
-     int_zoogamma_timeslice(:,:,:,:) =   int_zoogamma_timeslice(:,:,:,:) + loc_dtyr * zoo_limit(:,:,:,:)              ! mmol m^-3
-     int_export_timeslice(:,:,:,:,:) =   int_export_timeslice(:,:,:,:,:) + loc_dtyr * export_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
+!BAW: zoolimit should be optional     int_zoogamma_timeslice(:,:,:,:) =   int_zoogamma_timeslice(:,:,:,:) + loc_dtyr * zoo_limit(:,:,:,:)              ! mmol m^-3
+     if (eco_export_verbose) then
+       int_export_timeslice(:,:,:,:,:) =   int_export_timeslice(:,:,:,:,:) + loc_dtyr * export_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  export calculation per plankton Fanny/Maria - Aug19
+     end if
+     if (eco_uptake_fluxes) then
+       int_AP_timeslice(:,:,:,:,:) =   int_AP_timeslice(:,:,:,:,:) + loc_dtyr * AP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  autotrophic flux in each plankton
+       int_HP_timeslice(:,:,:,:,:) =   int_HP_timeslice(:,:,:,:,:) + loc_dtyr * HP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  heterotrophic flux in each plankton
+     end if
   end if
 
   ! write time-slice data and re-set integration

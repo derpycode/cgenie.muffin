@@ -26,6 +26,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/ocn_dinit
   logical::ctrl_ocn_dinit                                               ! absolute (not relative) tracer re-start adjustment?
   NAMELIST /ini_biogem_nml/ctrl_ocn_dinit
+  logical::ctrl_ocn_rinit_ALL                                           ! adjust ALL tracers by some fraction w.r.t. a restart
+  NAMELIST /ini_biogem_nml/ctrl_ocn_rinit_ALL
+  REAL::par_ocn_rinit_ALL                                               ! fractional tracer change w.r.t. a restart
+  NAMELIST /ini_biogem_nml/par_ocn_rinit_ALL
   ! ------------------- RUN CONTROL ---------------------------------------------------------------------------------------------- !
   logical::ctrl_continuing                                              ! continuing run?
   NAMELIST /ini_biogem_nml/ctrl_continuing
@@ -168,6 +172,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_zc,par_bio_I_eL,par_bio_kT0,par_bio_kT_eT
   real::par_bio_kT_dT                                            ! temperature offset for T-dependent bio schemes
   NAMELIST /ini_biogem_nml/par_bio_kT_dT
+  real::par_bio_POC_CaCO3_target                                 ! target potential global mean CaCO3:POC export rain ratio
+  NAMELIST /ini_biogem_nml/par_bio_POC_CaCO3_target
   ! ------------------- ORGANIC MATTER EXPORT RATIOS ----------------------------------------------------------------------------- !
   real::par_bio_red_POP_PON                                             ! N/P organic matter Redfield ratio
   real::par_bio_red_POP_POC                                             ! C/P organic matter Redfield ratio
@@ -286,9 +292,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_remin_cthresh_O2,par_bio_remin_cthresh_NO3,par_bio_remin_cthresh_FeOOH,par_bio_remin_cthresh_SO4
   LOGICAL::ctrl_bio_remin_reminfix                               ! Catch mis-behaving rapidly-oxidizing species going < 0.0?
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_reminfix
-  CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
   CHARACTER(len=63)::opt_bio_remin_oxidize_H2StoSO4              ! H2S -> SO4 oxidation option
-  NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_NH4toNO3,opt_bio_remin_oxidize_H2StoSO4
+  NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_H2StoSO4
   CHARACTER(len=63)::opt_bio_remin_scavenge_H2StoPOMS            ! H2S -> POMS
   NAMELIST /ini_biogem_nml/opt_bio_remin_scavenge_H2StoPOMS
   LOGICAL::ctrl_scav_H2S_dt_old                                  ! Old local residence time in layer for H2S?
@@ -342,8 +347,10 @@ MODULE biogem_lib
   real::par_bio_remin_gammaPO4                                   ! Activity coefficient for aqueous PO43-
   NAMELIST /ini_biogem_nml/par_bio_remin_gammaPO4
   ! JDW size-dependent POC remineralisation
-  real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m) (for implicit exponential scheme)
-  real::par_bio_remin_POC_w0                                     ! sinking speed of smallest ecogem size class (m day-1) (for explicit scheme)
+  real::par_bio_remin_POC_eL0                                    ! e-folding depth of smallest ecogem size class (m)
+                                                                 ! (for implicit exponential scheme)
+  real::par_bio_remin_POC_w0                                     ! sinking speed of smallest ecogem size class (m day-1)
+                                                                 ! (for explicit scheme)
   real::par_bio_remin_POC_size0                                  ! diameter of smallest ecogem size class (um)
   real::par_bio_remin_POC_eta                                    ! exponent linking sinking speed and size (Stemmann et al., 2004)
   NAMELIST / ini_biogem_nml / par_bio_remin_POC_eL0,par_bio_remin_POC_size0,par_bio_remin_POC_eta,par_bio_remin_POC_w0
@@ -369,10 +376,17 @@ MODULE biogem_lib
   real::par_bio_remin_kH2StoPOMS
   NAMELIST /ini_biogem_nml/par_bio_remin_kH2StoSO4,par_bio_remin_kH2StoPOMS
   ! N
+  CHARACTER(len=63)::opt_bio_remin_oxidize_NH4toNO3              ! NH4 -> NO3 oxidation option
+  NAMELIST /ini_biogem_nml/opt_bio_remin_oxidize_NH4toNO3
+  CHARACTER(len=63)::opt_bio_remin_reduce_NO2toN2O               ! NO2 -> N2O reduction option
+  NAMELIST /ini_biogem_nml/opt_bio_remin_reduce_NO2toN2O
+  CHARACTER(len=63)::opt_bio_remin_reduce_N2OtoN2                ! N2O -> N2 reduction option
+  NAMELIST /ini_biogem_nml/opt_bio_remin_reduce_N2OtoN2
   real::par_bio_remin_kNH4toNO2
   real::par_bio_remin_kNO2toNO3
   real::par_bio_remin_kNO2toN2O
-  NAMELIST /ini_biogem_nml/par_bio_remin_kNH4toNO2,par_bio_remin_kNO2toNO3,par_bio_remin_kNO2toN2O
+  real::par_bio_remin_kN2OtoN2
+  NAMELIST /ini_biogem_nml/par_bio_remin_kNH4toNO2,par_bio_remin_kNO2toNO3,par_bio_remin_kNO2toN2O,par_bio_remin_kN2OtoN2
   real::par_bio_remin_cNH4_NH4toNO2
   real::par_bio_remin_cO2_NH4toNO2
   NAMELIST /ini_biogem_nml/par_bio_remin_cNH4_NH4toNO2,par_bio_remin_cO2_NH4toNO2
@@ -380,10 +394,11 @@ MODULE biogem_lib
   real::par_bio_remin_cO2_NO2toNO3
   NAMELIST /ini_biogem_nml/par_bio_remin_cNO2_NO2toNO3,par_bio_remin_cO2_NO2toNO3
   real::par_bio_remin_cNO2_NO2toN2O
-  real::par_bio_remin_cO2_NO2toN2O
-  NAMELIST /ini_biogem_nml/par_bio_remin_cNO2_NO2toN2O,par_bio_remin_cO2_NO2toN2O
-  real::par_bio_remin_fracN2O
-  NAMELIST /ini_biogem_nml/par_bio_remin_fracN2O
+  real::par_bio_remin_cN2O_N2OtoN2
+  NAMELIST /ini_biogem_nml/par_bio_remin_cNO2_NO2toN2O,par_bio_remin_cN2O_N2OtoN2
+  real::par_bio_remin_NO2lifetime
+  real::par_bio_remin_N2Olifetime
+  NAMELIST /ini_biogem_nml/par_bio_remin_NO2lifetime,par_bio_remin_N2Olifetime
   ! I
   CHARACTER(len=63)::opt_bio_remin_oxidize_ItoIO3              ! I -> IO3 oxidation option
   CHARACTER(len=63)::opt_bio_remin_reduce_IO3toI              ! IO3 -> I reduction option
@@ -393,15 +408,18 @@ MODULE biogem_lib
   real::par_bio_remin_kItoIO3
   real::par_bio_remin_kIO3toI
   NAMELIST /ini_biogem_nml/par_bio_remin_kItoIO3,par_bio_remin_kIO3toI
+  real::par_bio_remin_iO2_IO3toI
   real::par_bio_remin_cO2_IO3toI
   real::par_bio_remin_cO2_ItoIO3
   real::par_bio_remin_cIO3_IO3toI
-  NAMELIST /ini_biogem_nml/par_bio_remin_cO2_IO3toI,par_bio_remin_cO2_ItoIO3,par_bio_remin_cIO3_IO3toI
+  NAMELIST /ini_biogem_nml/par_bio_remin_iO2_IO3toI,par_bio_remin_cO2_IO3toI,par_bio_remin_cO2_ItoIO3,par_bio_remin_cIO3_IO3toI
   real::par_bio_remin_O2toI,par_bio_remin_O2toIlifetime
   real::par_bio_remin_SO4toIO3,par_bio_remin_SO4toIO3lifetime
   NAMELIST /ini_biogem_nml/par_bio_remin_O2toI,par_bio_remin_O2toIlifetime,par_bio_remin_SO4toIO3,par_bio_remin_SO4toIO3lifetime
   LOGICAL::ctrl_bio_remin_iodine_POConly                         ! (exclude DOC from iodine redox calculation)
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_iodine_POConly
+  real::par_bio_remin_r_IO3toI
+  NAMELIST /ini_biogem_nml/par_bio_remin_r_IO3toI                ! SO4 POC remin/O2 ratio for IO3 -> I 
   ! ECOGEM coupling
   LOGICAL::ctrl_bio_remin_ecogemMLD                              ! dilute tracers across the mixed layer
   NAMELIST /ini_biogem_nml/ctrl_bio_remin_ecogemMLD
@@ -435,6 +453,8 @@ MODULE biogem_lib
   real::par_d187Os_OsCO3_epsilon                                  ! 187/192Os fractionation between Os and OsCO3
   real::par_d188Os_OsCO3_epsilon                                  ! 188/192Os fractionation between Os and OsCO3
   namelist /ini_biogem_nml/par_d187Os_OsCO3_epsilon,par_d188Os_OsCO3_epsilon
+  real::par_d15N_Corg_NO3_epsilon                                ! nitrate reduction fractionation (in N isotopes)
+  namelist /ini_biogem_nml/par_d15N_Corg_NO3_epsilon
   real::par_d56Fe_Corg_FeOOH_epsilon                             ! dissimilatory iron reduction fractionation
   namelist /ini_biogem_nml/par_d56Fe_Corg_FeOOH_epsilon
   real::par_d13C_Corg_CH4_epsilon                                ! methanogenesis fractionation
@@ -449,6 +469,9 @@ MODULE biogem_lib
   real::par_bio_uptake_dNH4_epsilon                              ! NH4 assimilation 15N fractionation
   real::par_bio_uptake_dNO3_epsilon                              ! NO3 uptake 15N fractionation
   namelist /ini_biogem_nml/par_bio_uptake_dN2_epsilon,par_bio_uptake_dNH4_epsilon,par_bio_uptake_dNO3_epsilon
+  real::par_d15N_NO2toN2O_alpha
+  real::par_d15N_N2OtoN2_alpha
+  namelist /ini_biogem_nml/par_d15N_NO2toN2O_alpha,par_d15N_N2OtoN2_alpha
   ! ------------------- IRON CYCLING --------------------------------------------------------------------------------------------- !
   real::par_det_Fe_sol                                           ! fractional solubility of Fe in dust
   real::par_det_Fe_sol_exp                                       ! exponent for aeolian Fe solubility
@@ -569,13 +592,13 @@ MODULE biogem_lib
   real::par_bio_FeCO3precip_abioticohm_cte                       ! Ohmega constant for siderite formation
   real::par_bio_FeCO3precip_abioticohm_min                       ! Minimum ohmega threshold for precip
   NAMELIST /ini_biogem_nml/par_bio_FeCO3precip_abioticohm_min,par_bio_FeCO3precip_abioticohm_cte
-  real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe fractionation between Fe2 and FeCO3 (Guilbaud, 2011, Science)
+  real::par_d56Fe_FeCO3_alpha                                    ! 56/54Fe frac. between Fe2 and FeCO3 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeCO3_alpha
   real::par_bio_Fe3PO42precip_sf                                 ! Scale factor for Fe3PO42 precipitation
   real::par_bio_Fe3PO42precip_exp                                ! Rate law power for Fe3PO42 precipitation
   real::par_bio_Fe3PO42precip_eq                                 ! Thermodynamic const for Fe3PO42 precipitation
   NAMELIST /ini_biogem_nml/par_bio_Fe3PO42precip_sf,par_bio_Fe3PO42precip_exp,par_bio_Fe3PO42precip_eq
-  real::par_d56Fe_Fe3PO42_alpha                                  ! 56/54Fe fractionation between Fe2 and Fe3PO42 (not known currently: 2020)
+  real::par_d56Fe_Fe3PO42_alpha                                  ! 56/54Fe frac. between Fe2 and Fe3PO42 (not known currently: 2020)
   namelist /ini_biogem_nml/par_d56Fe_Fe3PO42_alpha
   real::par_d56Fe_Fe3Si2O4_alpha                                 ! 56/54Fe fractionation between Fe2 and greenalite
   namelist /ini_biogem_nml/par_d56Fe_Fe3Si2O4_alpha
@@ -588,7 +611,7 @@ MODULE biogem_lib
   real::par_bio_FeS_part_abioticohm_cte                          ! Ohmega constant for nanoparticulate FeS formation
   real::par_bio_FeS2precip_k                                     ! k-value for FeS2 precipitation (M-1 yr-1)
   NAMELIST /ini_biogem_nml/par_bio_FeS2precip_k,par_bio_FeS_part_abioticohm_cte
-  real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe fractionation between Fe2 and FeS2 (Guilbaud, 2011, Science)
+  real::par_d56Fe_FeS2_alpha                                     ! 56/54Fe frac. between Fe2 and FeS2 (Guilbaud, 2011, Science)
   namelist /ini_biogem_nml/par_d56Fe_FeS2_alpha
   real::par_d34S_FeS2_alpha                                      ! 34/32S fractionation between Fe2 and FeS2
   namelist /ini_biogem_nml/par_d34S_FeS2_alpha
@@ -614,7 +637,7 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_FeS_abioticohm_min,par_bio_FeS_abioticohm_cte
   LOGICAL::ctrl_bio_FeS2precip_explicit                          ! Explicit FeS2 precip stiochiometry?
   NAMELIST /ini_biogem_nml/ctrl_bio_FeS2precip_explicit
-  real::par_bio_Kd_PO4_FeOOH                                     ! first order constant for PO4 adsorption on FeOOH (and POM associated FeOOH)
+  real::par_bio_Kd_PO4_FeOOH                                     ! 1st order const. PO4 adsorption on FeOOH (+ POM associated FeOOH)
   NAMELIST /ini_biogem_nml/par_bio_Kd_PO4_FeOOH
   ! ------------------- I/O DIRECTORY DEFINITIONS -------------------------------------------------------------------------------- !
   CHARACTER(len=255)::par_pindir_name                            !
@@ -625,6 +648,8 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_indir_name,par_outdir_name,par_rstdir_name,par_fordir_name,par_pindir_name
   CHARACTER(len=127)::par_infile_name,par_outfile_name           !
   NAMELIST /ini_biogem_nml/par_infile_name,par_outfile_name
+  LOGICAL::ctrl_ncout_expid_name                                 ! align netCDF filenames with experiment name?
+  NAMELIST /ini_biogem_nml/ctrl_ncout_expid_name
   ! ------------------- DATA SAVING: TIME-SLICES --------------------------------------------------------------------------------- !
   LOGICAL::ctrl_data_save_slice_ocnatm                           ! time-slice data save: Atmospheric (interface) composition (2D)?
   LOGICAL::ctrl_data_save_slice_ocn                              ! time-slice data save: Ocean composition (3D)?
@@ -1320,6 +1345,7 @@ MODULE biogem_lib
   REAL,DIMENSION(n_atm)::int_diag_forcing_atm_sig                ! forcing diagnostics
   REAL,DIMENSION(n_ocn)::int_diag_forcing_ocn_sig                ! forcing diagnostics
   REAL,DIMENSION(n_diag_misc_2D)::int_diag_misc_2D_sig           !
+  real::int_diag_bio_red_POC_CaCO3
   ! misc
   real::int_misc_ocn_solfor_sig,int_misc_opn_solfor_sig          !
   real::int_misc_ocn_fxsw_sig,int_misc_opn_fxsw_sig              !
@@ -1411,6 +1437,7 @@ MODULE biogem_lib
   real,DIMENSION(:),ALLOCATABLE::orb_pts_time                ! orbital point time
   ! global means
   REAL,DIMENSION(n_sed)::int_fracdom                         !
+  real::int_SLT
 
   ! *** forcing ***
   ! forcing - restoring
