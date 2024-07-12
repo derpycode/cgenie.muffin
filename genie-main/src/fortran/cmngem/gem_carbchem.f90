@@ -171,7 +171,7 @@ CONTAINS
             &   fun_calc_lnk2_Hansson(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
             &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
             & )
-    case ('Roy/')
+    case ('Roy')
        dum_carbconst(icc_k1) = &
             & EXP( &
             &   fun_calc_lnk1_Roy(loc_rT,loc_T_ln,loc_S_p05,loc_S,loc_S_p15) + &
@@ -302,156 +302,162 @@ CONTAINS
        & dum_Mg,                &
        & dum_sal,               &
        & dum_temp,              &
-       & dum_D,              &
+       & dum_D,                 &
        & dum_carbconst)
     ! dummy variables
     REAL,INTENT(in)::dum_Ca,dum_Mg,dum_sal,dum_temp,dum_D
+    REAL,DIMENSION(n_carbconst),intent(inout)::dum_carbconst
+    ! local variables
     real::loc_conv_molaritytoconc,loc_conv_freetoSWS,loc_conv_freetototal,loc_conv_totaltoSWS
     real::loc_Ftot,loc_SO4tot,loc_T,loc_S
     REAL::loc_P ! pressure (bar)
     real::loc_rRtimesT, loc_TC
-    REAL,DIMENSION(n_carbconst),intent(inout)::dum_carbconst
-    ! local variables
     real::loc_alpha
     real::loc_ratio
     real::loc_k0,loc_kSO4
-    if (dum_Ca > const_real_nullsmall) loc_ratio = dum_Mg/dum_Ca
+    ! make correction to K values
     select case ((par_adj_carbconst_option))
     case ('TyrrellZeebe2004')
-      ! (1a) adjust Ksp
-      !      NOTE: following Tyrrell and Zeebe [2004]
-      dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) - loc_alpha*(const_conc_MgtoCa - loc_ratio)
-      ! (1b) adjust K1 and K2
-      dum_carbconst(icc_k1) = (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
-      dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
+       ! initialize local variables
+       if (dum_Ca > const_real_nullsmall) then
+          loc_ratio = dum_Mg/dum_Ca
+       else
+          loc_ratio = 1.0
+       end if
+       loc_alpha = 3.655E-8
+       ! (1a) adjust Ksp
+       !      NOTE: following Tyrrell and Zeebe [2004]
+       dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) - loc_alpha*(const_conc_MgtoCa - loc_ratio)
+       ! (1b) adjust K1 and K2
+       dum_carbconst(icc_k1) = (1.0 + 0.155*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k1)
+       dum_carbconst(icc_k2) = (1.0 + 0.422*(dum_Mg - const_conc_Mg)/const_conc_Mg)*dum_carbconst(icc_k2)
     case ('Hain2015')
-    ! initialize local variables
-      if (dum_temp <  (par_carbchem_Tmin + const_zeroC))  then
-         loc_T = par_carbchem_Tmin + const_zeroC
-      elseif (dum_temp > (par_carbchem_Tmax + const_zeroC)) then
-         loc_T = par_carbchem_Tmax + const_zeroC
-      else
-         loc_T = dum_temp
-      endif
-      if (dum_sal < par_carbchem_Smin) then
-         loc_S = par_carbchem_Smin
-      elseif (dum_sal > par_carbchem_Smax) then
-         loc_S = par_carbchem_Smax
-      else
-         loc_S = dum_sal
-      endif
-      loc_alpha = 3.655E-8
-      loc_ratio = 1.0
-      loc_SO4tot = fun_calc_SO4tot(dum_sal)
-      loc_Ftot   = fun_calc_Ftot(dum_sal)
-      loc_P        = dum_D/10.0
-      loc_TC       = dum_temp - const_zeroC
-      loc_rRtimesT = 1.0/(const_R*dum_temp)
-      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       ! initialize local variables
+       if (dum_temp <  (par_carbchem_Tmin + const_zeroC))  then
+          loc_T = par_carbchem_Tmin + const_zeroC
+       elseif (dum_temp > (par_carbchem_Tmax + const_zeroC)) then
+          loc_T = par_carbchem_Tmax + const_zeroC
+       else
+          loc_T = dum_temp
+       endif
+       if (dum_sal < par_carbchem_Smin) then
+          loc_S = par_carbchem_Smin
+       elseif (dum_sal > par_carbchem_Smax) then
+          loc_S = par_carbchem_Smax
+       else
+          loc_S = dum_sal
+       endif
+       loc_SO4tot   = fun_calc_SO4tot(dum_sal)
+       loc_Ftot     = fun_calc_Ftot(dum_sal)
+       loc_P        = dum_D/10.0
+       loc_TC       = dum_temp - const_zeroC
+       loc_rRtimesT = 1.0/(const_R*dum_temp)
+       ! calculate pH scale conversions
+       dum_carbconst(icc_kHSO4) = fun_interp_4D(                            &
+            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T,              &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
-      loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
-      loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
-      ! (1a) adjust Ks via a look-up table based on MyAMI (downloaded 10/01/2021)
-      !      NOTE: following Hain et al. [2015,2018]
-      ! Ks in the look-up tables are on the total pH scale,so convert to SWS scale for cGENIE
-      dum_carbconst(icc_kHSO4) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       loc_conv_freetototal = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4))
+       loc_conv_freetoSWS   = log(1.0 + loc_SO4tot/dum_carbconst(icc_kHSO4) + loc_Ftot/dum_carbconst(icc_kHF))
+       loc_conv_totaltoSWS  = -loc_conv_freetototal + loc_conv_freetoSWS
+       ! (1a) adjust Ks via a look-up table based on MyAMI (downloaded 10/01/2021)
+       !      NOTE: following Hain et al. [2015,2018]
+       ! Ks in the look-up tables are on the total pH scale,so convert to SWS scale for cGENIE
+       dum_carbconst(icc_kHSO4) = fun_interp_4D(                            &
+            & lookup_gem_MyAMI_kSO4,dum_Ca,dum_Mg,loc_S,loc_T,              &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_kHSO4) = dum_carbconst(icc_kHSO4) * &
-            & exp(loc_conv_freetoSWS + & 
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHSO4) &
+       dum_carbconst(icc_kHSO4) = dum_carbconst(icc_kHSO4) *                &
+            & exp(loc_conv_freetoSWS +                                      & 
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHSO4)         &
             & )
-      dum_carbconst(icc_kcal) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       dum_carbconst(icc_kcal) = fun_interp_4D(                             &
+            & lookup_gem_MyAMI_kcal,dum_Ca,dum_Mg,loc_S,loc_T,              &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) * &
+       dum_carbconst(icc_kcal) = dum_carbconst(icc_kcal) *                  &
             & exp(fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3cal) &
             & )
-      dum_carbconst(icc_karg) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       dum_carbconst(icc_karg) = fun_interp_4D(                             &
+            & lookup_gem_MyAMI_karg,dum_Ca,dum_Mg,loc_S,loc_T,              &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_karg) = dum_carbconst(icc_karg) * &
+       dum_carbconst(icc_karg) = dum_carbconst(icc_karg) *                  &
             & exp(fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpCaCO3arg) &
             & )
-      dum_carbconst(icc_QCO2) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       dum_carbconst(icc_QCO2) = fun_interp_4D(                             &
+            & lookup_gem_MyAMI_k,dum_Ca,dum_Mg,loc_S,loc_T,                 &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_k1) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       dum_carbconst(icc_k1) = fun_interp_4D(                               &
+            & lookup_gem_MyAMI_k1,dum_Ca,dum_Mg,loc_S,loc_T,                &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_k1) = 10**(log10(dum_carbconst(icc_k1))) * &
-            & exp(loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+       dum_carbconst(icc_k1) = 10**(log10(dum_carbconst(icc_k1))) *         &
+            & exp(loc_conv_totaltoSWS +                                     &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3)        &
             & )
-      dum_carbconst(icc_k2) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       dum_carbconst(icc_k2) = fun_interp_4D(                               &
+            & lookup_gem_MyAMI_k2,dum_Ca,dum_Mg,loc_S,loc_T,                &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_k2) = dum_carbconst(icc_k2) * &
-            & exp(loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
+       dum_carbconst(icc_k2) = dum_carbconst(icc_k2) *                      &
+            & exp(loc_conv_totaltoSWS +                                     & 
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3)         &
             & )
-      dum_carbconst(icc_k) = &
-         & dum_carbconst(icc_k1)/dum_carbconst(icc_k2)
-      dum_carbconst(icc_kW) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kW,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       dum_carbconst(icc_k) =                                               &
+            & dum_carbconst(icc_k1)/dum_carbconst(icc_k2)
+       dum_carbconst(icc_kW) = fun_interp_4D(                               &
+            & lookup_gem_MyAMI_kW,dum_Ca,dum_Mg,loc_S,loc_T,                &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_kW) = dum_carbconst(icc_kW) * &
-            & exp(loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2O) &
+       dum_carbconst(icc_kW) = dum_carbconst(icc_kW) *                      &
+            & exp(loc_conv_totaltoSWS +                                     &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2O)          &
             & )
-      dum_carbconst(icc_kB) = fun_interp_4D(                                                  &
-            & lookup_gem_MyAMI_kb,dum_Ca,dum_Mg,loc_S,loc_T, &
-            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,     &
-            & lookup_i_Ca_min,lookup_i_Ca_max,                                     &
-            & lookup_i_Mg_min,lookup_i_Mg_max,                               &
-            & lookup_i_sal_min,lookup_i_sal_max,                               &
-            & lookup_i_temp_min,lookup_i_temp_max                              &
+       dum_carbconst(icc_kB) = fun_interp_4D(                               &
+            & lookup_gem_MyAMI_kb,dum_Ca,dum_Mg,loc_S,loc_T,                &
+            & lookup_Ca_max,lookup_Mg_max,lookup_sal_max,lookup_temp_max,   &
+            & lookup_i_Ca_min,lookup_i_Ca_max,                              &
+            & lookup_i_Mg_min,lookup_i_Mg_max,                              &
+            & lookup_i_sal_min,lookup_i_sal_max,                            &
+            & lookup_i_temp_min,lookup_i_temp_max                           &
             & )
-      dum_carbconst(icc_kB) = dum_carbconst(icc_kB) * &
-            & exp(loc_conv_totaltoSWS + &
-            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpBO3H3) &
+       dum_carbconst(icc_kB) = dum_carbconst(icc_kB) *                      &
+            & exp(loc_conv_totaltoSWS +                                     &
+            & fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpBO3H3)        &
             & )
     case default
        ! no change, e.g., 'NONE'
@@ -1385,34 +1391,6 @@ CONTAINS
   END FUNCTION fun_calc_lnk2_Roy
   ! ****************************************************************************************************************************** !
 
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE ln(K1) DISSOCIATION CONSTANT
-  FUNCTION fun_calc_lnk1_Luecker(dum_rT,dum_T_ln,dum_S,dum_S_p20)
-    ! result variable
-    REAL::fun_calc_lnk1_Luecker
-    ! dummy arguments
-    REAL,INTENT(IN)::dum_rT,dum_T_ln,dum_S,dum_S_p20
-    ! first carbonic acid apparent ionization constant [Luecker et al., 2000]
-    ! NOTE: total pH scale; [mol (kg-sol)-1]
-    fun_calc_lnk1_Luecker = LOG(10**(61.2172 - 3633.86*dum_rT - 9.67770*dum_T_ln &
-         & + 0.011555*dum_S - 0.0001152*dum_S_p20))
-  END FUNCTION fun_calc_lnk1_Luecker
-  ! ****************************************************************************************************************************** !
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE ln(K2) DISSOCIATION CONSTANT
-  FUNCTION fun_calc_lnk2_Luecker(dum_rT,dum_T_ln,dum_S,dum_S_p20)
-    ! result variable
-    REAL::fun_calc_lnk2_Luecker
-    ! dummy arguments
-    REAL,INTENT(IN)::dum_rT,dum_T_ln,dum_S,dum_S_p20
-    ! second carbonic acid apparent ionization constant [Luecker et al., 2000]
-    ! NOTE: total pH scale; [mol (kg-sol)-1]
-    fun_calc_lnk2_Luecker = LOG(10**(-25.9290 - 471.78*dum_rT + 3.16967*dum_T_ln &
-         & + 0.01781*dum_S - 0.0001122*dum_S_p20))
-  END FUNCTION fun_calc_lnk2_Luecker
-  ! ****************************************************************************************************************************** !
-
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ln(K1) DISSOCIATION CONSTANT
@@ -1427,7 +1405,6 @@ CONTAINS
          & + 0.011555*dum_S - 0.0001152*dum_S_p20))
   END FUNCTION fun_calc_lnk1_Luecker
   ! ****************************************************************************************************************************** !
-
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE ln(K2) DISSOCIATION CONSTANT
@@ -1604,8 +1581,8 @@ CONTAINS
     fun_find_ALK_from_dCO3 = loc_ALK
   END function fun_find_ALK_from_dCO3
   ! ****************************************************************************************************************************** !
-  
-  
+
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE Corg d13C (/d14C)
   FUNCTION fun_Corg_Rfrac(dum_T,dum_conc_CO2,dum_CO2_r13C,dum_Corg_ef,dum_14C)
@@ -1644,8 +1621,8 @@ CONTAINS
     ! -------------------------------------------------------- !
   END FUNCTION fun_Corg_Rfrac
   ! ****************************************************************************************************************************** !
-  
-  
+
+
   ! ****************************************************************************************************************************** !
   ! CALCULATE Corg d13C (/d14C) [Popp et al. fractionation scheme]
   FUNCTION fun_Corg_Rfrac_Poppetal(dum_conc_CO2,dum_CO2_r13C,dum_Corg_ef,dum_Corg_b,dum_14C)
