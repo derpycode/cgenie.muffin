@@ -888,6 +888,12 @@ CONTAINS
        par_bio_red_O2_NO3 = 0.0
     end if
 
+    ! *** load prescribed insolation field (if requested) ***
+    if (ctrl_force_insol) then
+       loc_filename = TRIM(par_indir_name)//TRIM(par_insol_file)
+       CALL sub_load_data_ij(loc_filename,n_i,n_j,par_bio_insol(:,:))
+    end if
+
     ! *** load prescribed CaCO3:POC field (if requested) ***
     if (ctrl_force_CaCO3toPOCrainratio) then
        loc_filename = TRIM(par_indir_name)//TRIM(par_CaCO3toPOCrainratio_file)

@@ -626,7 +626,6 @@ CONTAINS
          & '2N1T_PFe_Tdep',     &
          & '3N2T_PNFe_Tdep'     &
          & )
-       loc_kI = phys_ocnatm(ipoa_solfor,dum_i,dum_j)/phys_solar_constant
     case (                         &
          & 'Payal_Cd',             &
          & 'bio_P',                &
@@ -658,8 +657,13 @@ CONTAINS
        !        & (1.0 - exp(-phys_ocnatm(ipoa_mld,dum_i,dum_j)/par_bio_I_eL))/phys_ocnatm(ipoa_mld,dum_i,dum_j)
        !end If
        ! assume zero MLD
-       loc_intI = phys_ocnatm(ipoa_fxsw,dum_i,dum_j)*par_bio_I_eL* &
-            & (1.0 - exp(-phys_ocn(ipo_Dbot,dum_i,dum_j,n_k)/par_bio_I_eL))/phys_ocn(ipo_Dbot,dum_i,dum_j,n_k)
+       if (ctrl_force_insol) then
+          loc_intI = par_bio_insol(dum_i,dum_j)*par_bio_I_eL* &
+               & (1.0 - exp(-phys_ocn(ipo_Dbot,dum_i,dum_j,n_k)/par_bio_I_eL))/phys_ocn(ipo_Dbot,dum_i,dum_j,n_k)
+       else
+          loc_intI = phys_ocnatm(ipoa_fxsw,dum_i,dum_j)*par_bio_I_eL* &
+               & (1.0 - exp(-phys_ocn(ipo_Dbot,dum_i,dum_j,n_k)/par_bio_I_eL))/phys_ocn(ipo_Dbot,dum_i,dum_j,n_k)
+       end if
        ! ### temp code ########################################################################################################### !
        loc_kI = loc_intI/(loc_intI + par_bio_c0_I)
     case default

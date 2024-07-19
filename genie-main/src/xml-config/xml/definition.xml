@@ -4240,6 +4240,14 @@
 			<value datatype="string">NONE.dat</value>
                         <description>Filename for virtual grid</description>
                     </param>
+                    <param name="ctrl_force_insol">
+			<value datatype="boolean">.false.</value>
+                        <description>Replace internal insolation field?</description>
+                    </param>
+                    <param name="par_insol_file">
+			<value datatype="string">NONE.dat</value>
+                        <description></description>
+                    </param>
 <!-- BIOLOGICAL NEW PRODUCTION  -->
                     <param name="par_bio_prodopt">
 			<value datatype="string">1N1T_PO4MM</value>
