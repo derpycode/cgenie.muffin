@@ -4325,6 +4325,10 @@
 			<value datatype="real">20.0</value>
                         <description>Light e-folding depth (m) (OCMIP-2)</description>
                     </param>
+                    <param name="par_bio_c0_I">
+			<value datatype="real">20.0</value>
+                        <description>half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])</description>
+                    </param>
                     <param name="par_bio_kT0">
 			<value datatype="real">0.59</value>
                         <description>coefficient for temperature-dependent uptake rate modifier</description>
