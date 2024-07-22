@@ -168,6 +168,7 @@ CONTAINS
        print*,'Biological production time-scale -- non-siliceous   : ',par_bio_tau_nsp
        print*,'Fract. prod. of si. phytop. in Si/Fe-replete cond.  : ',par_bio_relprod_sp
        print*,'Light e-folding depth (m) (OCMIP-2)                 : ',par_bio_I_eL
+       print*,'half sat. for light (W m-2) [Doney et al., 2006]    : ',par_bio_c0_I       
        print*,'Coefficient for T-dep. uptake rate modifier         : ',par_bio_kT0
        print*,'e-folding temp. (K) for T-dep. uptake rate modifier : ',par_bio_kT_eT
        print*,'temperature offset for T-dependent bio schemes      : ',par_bio_kT_dT
@@ -584,7 +585,7 @@ CONTAINS
     par_misc_debug_i = 1
     par_misc_debug_j = 3
     opt_force(iopt_force_freshwater) = .FALSE.
-    par_bio_c0_I = 20.0 ! half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])
+    !!!par_bio_c0_I = 20.0 ! half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])
     par_det_Fe_frac = 0.035 ! mass fraction of Fe in dust
     par_K_FeL = 10**par_K_FeL_pP ! conditional stability constant of ligand-bound Fe [Parekth et al., 2005]
     par_scav_Fe_exp = 0.58 ! (see: Parekth et al. [2005])
