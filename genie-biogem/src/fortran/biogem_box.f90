@@ -82,29 +82,44 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! CALCULATE PISTON VELOCITY
   SUBROUTINE sub_calc_pv(dum_i,dum_j)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER::dum_i,dum_j
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,ia
     REAL::loc_Sc
     REAL::loc_TC,loc_TC2,loc_TC3
     real::loc_u2
-    ! set local variables
-    ! temperature powers
-    ! NOTE: temeprature must be converted to the correct units (degrees C)
+    real::loc_Tmin                                             ! minimum temperature limit
+    real::loc_Tmax                                             ! maximum temperature limit
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    ! set temperature limits
     ! NOTE: original valid temperature range was 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]
-    if (ocn(io_T,dum_i,dum_j,n_k) <  (const_zeroC +  par_geochem_Tmin))  then
+    ! NOTE: now in place of par_geochem_Tmin and par_geochem_Tmax
+    loc_Tmin =  0.0
+    loc_Tmax = 30.0
+    ! limit temperature range
+    ! NOTE: temeprature must be converted to the correct units (degrees C)
+    if (ocn(io_T,dum_i,dum_j,n_k) <  (const_zeroC +  loc_Tmin))  then
        loc_TC = par_geochem_Tmin
-    elseif (ocn(io_T,dum_i,dum_j,n_k) > (const_zeroC + par_geochem_Tmax)) then
+    elseif (ocn(io_T,dum_i,dum_j,n_k) > (const_zeroC + loc_Tmax)) then
        loc_TC = par_geochem_Tmax
     else
        loc_TC = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
     endif
+    ! temperature powers
     loc_TC2 = loc_TC*loc_TC
     loc_TC3 = loc_TC2*loc_TC
     ! wind speed^2
     loc_u2 = phys_ocnatm(ipoa_wspeed,dum_i,dum_j)**2
-    !  calculate piston velocity
+    ! -------------------------------------------------------- !
+    ! CALCULATE PISTON VELOCITY
+    ! -------------------------------------------------------- !
     DO l=3,n_l_atm
        ia = conv_iselected_ia(l)
        IF (atm_type(ia) == 1) then
@@ -121,6 +136,9 @@ CONTAINS
           ocnatm_airsea_pv(ia,dum_i,dum_j) = conv_cm_m*conv_yr_hr*par_gastransfer_a*loc_u2*(loc_Sc*1.515E-3)**(-0.5)
        end if
     end do
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
   END SUBROUTINE sub_calc_pv
   ! ****************************************************************************************************************************** !
 
