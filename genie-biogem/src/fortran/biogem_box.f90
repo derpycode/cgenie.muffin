@@ -98,24 +98,24 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! INITIALIZE LOCAL VARIABLES
     ! -------------------------------------------------------- !
-    ! set temperature limits
+    ! -------------------------------------------------------- ! set temperature limits
     ! NOTE: original valid temperature range was 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]
     ! NOTE: now in place of par_geochem_Tmin and par_geochem_Tmax
     loc_Tmin =  0.0
     loc_Tmax = 30.0
-    ! limit temperature range
+    ! -------------------------------------------------------- ! limit temperature range
     ! NOTE: temeprature must be converted to the correct units (degrees C)
     if (ocn(io_T,dum_i,dum_j,n_k) <  (const_zeroC +  loc_Tmin))  then
-       loc_TC = par_geochem_Tmin
+       loc_TC = loc_Tmin
     elseif (ocn(io_T,dum_i,dum_j,n_k) > (const_zeroC + loc_Tmax)) then
-       loc_TC = par_geochem_Tmax
+       loc_TC = loc_Tmax
     else
        loc_TC = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
     endif
-    ! temperature powers
+    ! -------------------------------------------------------- ! temperature powers
     loc_TC2 = loc_TC*loc_TC
     loc_TC3 = loc_TC2*loc_TC
-    ! wind speed^2
+    ! -------------------------------------------------------- ! wind speed^2
     loc_u2 = phys_ocnatm(ipoa_wspeed,dum_i,dum_j)**2
     ! -------------------------------------------------------- !
     ! CALCULATE PISTON VELOCITY

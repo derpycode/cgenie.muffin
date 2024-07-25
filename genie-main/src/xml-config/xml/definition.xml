@@ -1376,20 +1376,20 @@
                         <description>Ignore H3SiO4 in the calculation of carbonate ALK?</description>
                     </param>
                     <param name="par_geochem_Tmin">
-                        <value datatype="real">0.0</value>
-                        <description>minimum T used in empirical geochem calculations [default: 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]]</description>
+                        <value datatype="real">2.0</value>
+                        <description>minimum T used in empirical geochem calculations [default from Mehrbach for back-compatability]</description>
                     </param>
                     <param name="par_geochem_Tmax">
-                        <value datatype="real">30.0</value>
-                        <description>maximum T used in empirical geochem calculations [default: 0 - 30 C for the Schmidt number empirical fit - see: Wanninkhof et al. [1992]]</description>
+                        <value datatype="real">35.0</value>
+                        <description>maximum T used in empirical geochem calculations [default from Mehrbach for back-compatability]</description>
                     </param>
                     <param name="par_geochem_Smin">
                         <value datatype="real">26.0</value>
-                        <description>minimum S used in empirical geochem calculations [not (yet) used -- set as per par_carbchem_Smin]</description>
+                        <description>minimum S used in empirical geochem calculations [default from Mehrbach for back-compatability]</description>
                     </param>
                     <param name="par_geochem_Smax">
                         <value datatype="real">43.0</value>
-                        <description>maximum S used in empirical geochem calculations [not (yet) used -- set as per par_carbchem_Smax]</description>
+                        <description>maximum S used in empirical geochem calculations [default from Mehrbach for back-compatability]</description>
                     </param>
                     <param name="par_carbchem_Tmin">
                         <value datatype="real">2.0</value>

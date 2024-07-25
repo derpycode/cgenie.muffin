@@ -105,39 +105,49 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! CALCULATE SOLUBILITY COEFFICIENT
   function fun_calc_solconst(dum_ia,dum_T,dum_S,dum_rho)
-    ! result variable
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
     REAL::fun_calc_solconst
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     integer,INTENT(in)::dum_ia
     real,INTENT(in)::dum_T,dum_S,dum_rho
-    ! local variables
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     REAL::loc_T,loc_rT,loc_Tr100,loc_S
-    ! calculate local constants
+    ! -------------------------------------------------------- !
+    ! INITIALIZE LOCAL VARIABLES
+    ! -------------------------------------------------------- ! 
     ! NOTE: pressure in units of (bar) (1 m depth approx = 1 dbar pressure)
     ! NOTE: temperature in K
     ! NOTE: restrict valid T,S range for empirical fit
     ! NOTE: original default was the same as for Mehrbach K1, K2 CONSTANTS:
     !       2.0  <= T <= 35 C
     !       26.0 <= S <= 43 PSU
-    ! NOTE: hence carbchem_*, rather than geochem_* parameter set (logically: geochem_* as per air-sea gas exchange ...)
-    if (dum_T <  (const_zeroC +  par_carbchem_Tmin))  then
-       loc_T = const_zeroC +  par_carbchem_Tmin
-    elseif (dum_T > (const_zeroC + par_carbchem_Tmax)) then
-       loc_T = const_zeroC + par_carbchem_Tmax
+    ! NOTE: changed from carbchem_* to geochem_*, retaining Mehrbach K1, K2 default range for geochem_*
+    if (dum_T <  (const_zeroC +  par_geochem_Tmin))  then
+       loc_T = const_zeroC +  par_geochem_Tmin
+    elseif (dum_T > (const_zeroC + par_geochem_Tmax)) then
+       loc_T = const_zeroC + par_geochem_Tmax
     else
        loc_T = dum_T
     endif
-    if (dum_S < par_carbchem_Smin) then
-       loc_S = par_carbchem_Smin
-    elseif (dum_S > par_carbchem_Smax) then
-       loc_S = par_carbchem_Smax
+    if (dum_S < par_geochem_Smin) then
+       loc_S = par_geochem_Smin
+    elseif (dum_S > par_geochem_Smax) then
+       loc_S = par_geochem_Smax
     else
        loc_S = dum_S
     endif
-    ! set local constants
+    ! -------------------------------------------------------- ! derived local constants
     loc_rT    = 1.0/loc_T
     loc_Tr100 = loc_T/100.0
-    ! calculate Solubility Coefficients (mol/(kg atm)) and return function value
+    ! -------------------------------------------------------- !
+    ! CALCULATE Solubility Coefficients (mol/(kg atm)) and return function value
+    ! -------------------------------------------------------- !
     ! NOTE: for CO2 and N2O, the soluability coefficient is in units of mol/(kg atm)
     !       rather than as a Bunsen Solubility Coefficient (see Wanninkohf [1992])
     !       => convert units for others
@@ -165,6 +175,9 @@ CONTAINS
             &  )/ &
             & (dum_rho*const_V)
     END SELECT
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
   end function fun_calc_solconst
   ! ****************************************************************************************************************************** !
 
@@ -198,12 +211,13 @@ CONTAINS
     ! -------------------------------------------------------- ! solve reduced Fe speciation equation
     ! 
     ! calculate solution for equilibrium:
+    !
     ! Fe2_eq*H2S_eq/FeS_eq = K
     ! Fe2_eq = Fe2_in - x; H2S_eq = H2S_in - x; FeS_eq = FeS_in + x
     ! (Fe2_in - x)(H2S_in - x) = K*FeS_in + K*x
     ! Fe_in*H2S_in - H2S_in*x - Fe_in*x + x^2 = K*FeS_in + K*x
     ! x^2 - (H2S_in + Fe_in + K) + (Fe_in*H2S_in - K*FeS_in) = 0
-    
+    !
     ! K = Fe2_eq*H2S_eq/FeS_eq 
     ! => Fe2_eq*H2S_eq = K*FeS_eq
     !    conservation relations:
