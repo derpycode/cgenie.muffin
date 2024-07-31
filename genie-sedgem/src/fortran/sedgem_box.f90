@@ -109,6 +109,10 @@ CONTAINS
 
     IF (ctrl_misc_debug3) print*,'(b) calculate Archer et al. [2002] bioturbation intensity profile (if selected)'
     ! *** (b) calculate bioturbation intensity
+    !         NOTE: the vector par_sed_mix_k is not populated if ctrl_sed_bioturb is false
+    !         NOTE: phys_sed(ips_mix_k0,dum_i,dum_j) is only used for passing to the Archer scheme
+    !               => even if ctrl_sed_bioturb is false, a non-zero bioturbation rate needs to be specified in the Archer scheme
+    !                  otherwise CaCO3 dissolution is reduced (Corg cannot be mixed down)
     IF (ctrl_sed_bioturb) then
        if (ctrl_sed_bioturb_Archer) then
           call sub_calc_sed_mix(               &
@@ -120,7 +124,12 @@ CONTAINS
        end if
        phys_sed(ips_mix_k0,dum_i,dum_j) = par_sed_mix_k(par_n_sed_mix)
     else
-       phys_sed(ips_mix_k0,dum_i,dum_j) = 0.0
+       select case (par_sed_diagen_CaCO3opt)
+       case ('archer1991explicit')
+          phys_sed(ips_mix_k0,dum_i,dum_j) = par_sed_mix_k_sur_max
+       case default
+          phys_sed(ips_mix_k0,dum_i,dum_j) = 0.0
+       end select
     end if
 
     IF (ctrl_misc_debug3) print*,'(c) calculate new sedimenting material to be added to the sediment top layer'
