@@ -149,6 +149,17 @@ CONTAINS
     ! calculate carbonate system constants; SWS [H] scale; [mol (kg-sol)-1]
     ! NOTE: the Mehrbach et al. [1973] carbonate dissociation constant choice is the default
     select case (trim(par_carbconstset_name))
+    case ('Mehrbach')
+       dum_carbconst(icc_k1) = &
+            & EXP( &
+            &   fun_calc_lnk1_Mehrbach(loc_rT,loc_T_ln,loc_S,loc_S_p20) + &
+            &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpH2CO3) &
+            & )
+       dum_carbconst(icc_k2)= &
+            & EXP( &
+            &   fun_calc_lnk2_Mehrbach(loc_rT,loc_S,loc_S_p20) + &
+            &   fun_corr_p(loc_TC,loc_P,loc_rRtimesT,carbchem_dpHCO3) &
+            & )
     case ('DicksonMillero')
        dum_carbconst(icc_k1) = &
             & EXP( &
