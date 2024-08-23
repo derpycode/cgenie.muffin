@@ -52,24 +52,24 @@ RUNNING THE EXPERIMENTS [command lines, broken down in sub-sections for spinups,
 
 # Main experiments
 1. pre-industrial spinup (0-10000)
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL PUBS/published/Ying_et_al.2024 muffin.CBE.worlg4.BASESFeTDTL.SPIN 10000
 
 
 2. Historical (1765-2022)
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.historical 257 muffin.CBE.worlg4.BASESFeTDTL.SPIN `
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL PUBS/published/Ying_et_al.2024 muffin.CBE.worlg4.BASESFeTDTL.historical 257 muffin.CBE.worlg4.BASESFeTDTL.SPIN `
 
 3. Future (2022-2100)
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL FORAMECOGEM muffin.CBE.worlg4.BASESFeTDTL.2100.[XXX]deg 78 muffin.CBE.worlg4.BASESFeTDTL.historical
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.worlg4.BASESFeTDTL PUBS/published/Ying_et_al.2024 muffin.CBE.worlg4.BASESFeTDTL.2100.[XXX]deg 78 muffin.CBE.worlg4.BASESFeTDTL.historical
 
 
 4. LGM spin up
-qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.GIteiiva.BASESFeTDTL_rb FORAMECOGEM muffin.CBE.GIteiiva.BASESFeTDTL_rb.SPIN 10000
+qsub -j y -o cgenie_log -V -S /bin/bash runmuffin.sh muffin.CBE.GIteiiva.BASESFeTDTL_rb PUBS/published/Ying_et_al.2024 muffin.CBE.GIteiiva.BASESFeTDTL_rb.SPIN 10000
 
 
 # SI model runs
 1. LGM spinup with seasonal output: muffin.CBE.GIteiiva.BASESFeTDTL_rb.seasonal (same command of running as above)
 2. Future warming under different rates: muffin.CBE.worlg4.BASESFeTDTL.{2100, 3000, 4000, 5000}.4deg
-3. one might also reproduce the carbon uptake flux and calculate turnover time by adding 'eg_eco_uptake_fluxes=.true.'
+3. one might also reproduce the PFT-based carbon uptake flux and calculate turnover time by adding 'eg_eco_uptake_fluxes=.true.'
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
