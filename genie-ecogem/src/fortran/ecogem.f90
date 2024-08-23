@@ -84,8 +84,8 @@ subroutine ecogem(          &
   REAL,DIMENSION(iomax,npmax)              ::AP_uptake ! Auto uptake for each plankton 
   REAL,DIMENSION(iomax,npmax)              ::HP_uptake ! Auto uptake for each plankton 
   !REAL,DIMENSION(npmax)                    ::diameter     !ckc for size dependent fractionation
-
   REAL,DIMENSION(npmax)                    ::mortality,respiration
+  REAL,DIMENSION(npmax)                    ::mort_loss, respir_loss, eaten_loss ! real-time carbon biomass loss
   REAL,DIMENSION(npmax)                    ::beta_mort_1,beta_graz_1
   REAL,DIMENSION(iomax+iChl,npmax)         ::assimilated,unassimilated
   REAL,DIMENSION(npmax)                    ::BioC,PP
@@ -323,7 +323,7 @@ subroutine ecogem(          &
                     PAR_out   = PAR_in * exp(-k_tot*layerthick) ! light leaving bottom of layer
                     PAR_in    = PAR_out
                  endif
-
+                 
                  ! ?
                  up_inorg(:,:) = 0.0 ! (iomax,npmax)
                  qreg(:,:) = 0.0 ! (iomax,npmax)
@@ -347,7 +347,7 @@ subroutine ecogem(          &
                  call quota_limitation(quota,limit,VLlimit,qreg,qreg_h)
 
                  call t_limitation(templocal,gamma_TP,gamma_TK)
-
+                 
                  call nutrient_uptake(qreg(:,:),loc_nuts(:),gamma_TK,up_inorg(:,:))
 
                  call photosynthesis(PAR_layer,loc_biomass,limit,VLlimit,up_inorg,gamma_TP,up_inorg(iDIC,:),chlsynth,totPP)
@@ -373,7 +373,7 @@ subroutine ecogem(          &
                  ! mortality(:) = mortality(:)  * gamma_TK ! temp adjusted?
 
                  ! calculate respiration
-                 respiration(:) = respir(:) !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
+                 respiration(:) = respir(:) * gamma_TK !* (1.0 - exp(-1.0e10 * loc_biomass(iCarb,:))) ! reduce respiration at very low biomass
 
                  ! calculate assimilation efficiency based on quota status
 !BAW: zoolimit should be optional                 Totzoolimit(:) = 0.0  !total food limitation - Maria May 2019 !!! Need to check if consistent!!!
@@ -458,6 +458,9 @@ subroutine ecogem(          &
                     do io=1,iomax
                        AP_uptake(io,:) = dbiomassdt(io,:)      
                        HP_uptake(io,:) = GrazPredEat(io,:) * assimilated(io,:)
+                       mort_loss(:) = mortality(:) * BioC(:)
+                       respir_loss(:) = respiration(:) * BioC(:)
+                       eaten_loss(:)= GrazPreyEaten(iCarb, :)
                     enddo
                  endif
                     
@@ -627,6 +630,10 @@ subroutine ecogem(          &
                     if (eco_uptake_fluxes) then
                       AP_flux(io,:,i,j,k) = AP_uptake(io,:) ! mmol/m^3/s
                       HP_flux(io,:,i,j,k) = HP_uptake(io,:) ! mmol/m^3/s
+                      ! save the global biomass loss fluxes
+                      plankton_mort(:,i,j,k) = mort_loss(:)
+                      plankton_eaten(:,i,j,k) = eaten_loss(:)
+                      plankton_respir(:,i,j,k) = respir_loss(:)
                     end if
                  enddo
 
@@ -914,6 +921,9 @@ SUBROUTINE diag_ecogem_timeslice( &
      if (eco_uptake_fluxes) then
        int_AP_timeslice(:,:,:,:,:) =   int_AP_timeslice(:,:,:,:,:) + loc_dtyr * AP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  autotrophic flux in each plankton
        int_HP_timeslice(:,:,:,:,:) =   int_HP_timeslice(:,:,:,:,:) + loc_dtyr * HP_flux(:,:,:,:,:) * pday ! mmol m^-3 d^-1  heterotrophic flux in each plankton
+       int_pmort_timeslice(:,:,:,:) =   int_pmort_timeslice(:,:,:,:) + loc_dtyr * plankton_mort(:,:,:,:) * pday ! mmol C m^-3 d^-1  plankton mortality flux in each plankton
+       int_peaten_timeslice(:,:,:,:) =   int_peaten_timeslice(:,:,:,:) + loc_dtyr * plankton_eaten(:,:,:,:) * pday ! mmol C m^-3 d^-1  plankton grazing flux in each plankton
+       int_prespir_timeslice(:,:,:,:) =   int_prespir_timeslice(:,:,:,:) + loc_dtyr * plankton_respir(:,:,:,:) * pday ! mmol C m^-3 d^-1  plankton respiration flux in each plankton
      end if
   end if
 

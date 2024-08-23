@@ -150,6 +150,18 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(HP_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    ! Hetero flux per plankton type
   call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(plankton_eaten(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(plankton_mort(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(plankton_respir(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_pmort_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_prespir_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_peaten_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
 
   ! ecogem time-slice arrays
   ALLOCATE(int_plankton_timeslice(iomax+iChl,npmax,n_i,n_j,n_k),STAT=alloc_error)
@@ -324,6 +336,28 @@ SUBROUTINE initialise_ecogem(    &
   if (useFe )   rsrcstrng(iFe)   = 'Fe'
   if (useSiO2 ) rsrcstrng(iSiO2) = 'SiO2'
 
+  ! foramecogenie arrays allocation
+  if (ctrl_use_foramecogenie) then
+     
+     ALLOCATE(respir_cost(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     
+     ALLOCATE(auto_volume(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)     
+     
+     ALLOCATE(spine_esd_scale(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+
+     ALLOCATE(symbiont_esd_scale(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     
+     ALLOCATE(symbiont_auto_cost(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+
+     ALLOCATE(symbiont_hetero_cost(npmax),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+  endif
+
   ! ---------------------------------------------------------- !
   ! OPEN ASCII FILES !---------------------------------------- !
   ! ---------------------------------------------------------- !
@@ -338,13 +372,17 @@ SUBROUTINE initialise_ecogem(    &
   enddo
 
   ! get explicit grazing parameters from input file
-  if(ctrl_grazing_explicit)then
-    CALL sub_init_explicit_grazing_params()
+  if(ctrl_grazing_explicit .AND. .NOT. ctrl_use_foramecogenie)then
+     CALL sub_init_explicit_grazing_params()
+  else if (ctrl_grazing_explicit .AND. ctrl_use_foramecogenie) then
+     CALL sub_init_explicit_rich_grazing_params()
   endif
+
+  if (ctrl_use_foramecogenie .AND. ctrl_debug_init > 0) call sub_debug_foramecogem()
 
   ! *** initialise plankton biomass array
   call sub_init_plankton()
-
+  
   ! JDW: allocate and load temperature forcing dataset
   if(ctrl_force_T)then
         allocate(T_input(n_i,n_j),STAT=alloc_error)
