@@ -9263,23 +9263,51 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="string">temperature.dat</value>
 		     			<description>Input file for forcing temperature in ecogem</description>
                     </param>
-<!-- Misc -->
-                   <param name="par_cocco_palatability_mod">
-      <value datatype="real">1.0</value>
-              <description>modifier for coccolithophore palatability</description>
+		    <!-- Misc -->
+                    <param name="par_cocco_palatability_mod">
+		      <value datatype="real">1.0</value>
+		      <description>modifier for coccolithophore palatability</description>
                     </param>
                     <param name="par_cocco_vmax_mod">
-      <value datatype="real">1.0</value>
-              <description>modifier for coccolithophore uptake rate</description>
+		      <value datatype="real">1.0</value>
+		      <description>modifier for coccolithophore uptake rate</description>
                     </param>
                     <param name="par_diatom_palatability_mod">
-      <value datatype="real">1.0</value>
-              <description>Modifier for diatom palatability</description>
+		      <value datatype="real">1.0</value>
+		      <description>Modifier for diatom palatability</description>
                     </param>
                     <param name="par_diatom_vmax_mod">
-      <value datatype="real">1.0</value>
-              <description>Modifier for diatom uptake and growth</description>    ! Aaron Diatom 23                
-                   </param>
+		      <value datatype="real">1.0</value>
+		      <description>Modifier for diatom uptake and growth</description>    ! Aaron Diatom 23                
+                    </param>
+		   <!---->
+		   <!-- *******************************************************************-->
+		   <!-- FORAMECOGENIE -->
+		   <!-- *******************************************************************-->
+		   <param name="ctrl_use_foramecogenie">
+		     <value datatype="boolean">.FALSE.</value>
+		     <description>enable foramecogenie</description>
+		   </param>
+
+		   <param name="foram_symbiont_esd_scale">
+		     <value datatype="real">1.0</value>
+		     <description>symbiont/foraminifera host size ratio</description>
+		   </param>
+
+		   <param name="foram_spine_scale">
+		     <value datatype="real">1.0</value>
+		     <description>stronger "grazing volume" for spinose foraminifera</description>
+		   </param>
+
+		   <param name="foram_auto_cost">
+		     <value datatype="real">1.0</value>
+		     <description>Auto trade-off parameter</description>
+		   </param>
+
+		   <param name="foram_hetero_cost">
+		     <value datatype="real">1.0</value>
+		     <description>Auto trade-off parameter</description>
+		   </param>		   
                 </namelist>
             </file>
         </model>
