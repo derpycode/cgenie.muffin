@@ -79,9 +79,9 @@ RUNNING THE EXPERIMENTS
 All experiments are run for 10 kyr from cold (no restart).
 (Note that this methodlogy is very slightly different from how the full ensembles were generated in the paper, which were run for 2 kyr from a re-start.)
 
-For modern:
+For modern (see above for the explanation of the codes: YYY and ZZZ):
 
-./runmuffin.sh muffin.CB.p_worjh2.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024 muffin.CB.p_worjh2.BASESI.YYY.XXX.SPIN 10000
+./runmuffin.sh muffin.CB.p_worjh2.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024 muffin.CB.p_worjh2.BASESI.YYY.ZZZ.SPIN 10000
 
 e.g.,
 
@@ -90,11 +90,9 @@ e.g.,
 
 which is the first listed tuned configuration in Table 2
 
-(see above for the explanation of the codes: YYY and XXX)
+For the Cretaceous, the general form of the experiment is:
 
-For the Cretaceous:
-
-./runmuffin.sh muffin.CB.p_p0093k.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024 muffin.CB.p_p0093k.BASESI.YYY.XXX.SPIN 10000
+./runmuffin.sh muffin.CB.p_p0093k.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024 muffin.CB.p_p0093k.BASESI.YYY.ZZZ.SPIN 10000
 
 e.g., 
 
@@ -102,10 +100,10 @@ e.g.,
 
 which corresponds to the x0.6 ocean PO4, 'reminO2lifetime-threshold' configuration (3rd row) in Figure 8 and the bottom panel in Figure 9.
 
-And for the supplimental parameterizations-combinations:
+And for the supplimental parameterizations-combinations, the general form of the experiment (one for modern, one for Cretaceous) is:
 
-./runmuffin.sh muffin.CB.p_worjh2.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024/EXTRA muffin.CB.p_worjh2.BASESI.YYY.XXX.SPIN 10000
-./runmuffin.sh muffin.CB.p_p0093k.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024/EXTRA muffin.CB.p_p0093k.BASESI.YYY.XXX.SPIN 10000
+./runmuffin.sh muffin.CB.p_worjh2.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024/EXTRA muffin.CB.p_worjh2.BASESI.YYY.ZZZ.SPIN 10000
+./runmuffin.sh muffin.CB.p_p0093k.BASESI PUBS/published/Cheng_et_al.Biogeosciences.2024/EXTRA muffin.CB.p_p0093k.BASESI.YYY.ZZZ.SPIN 10000
 
 e.g.,
 
