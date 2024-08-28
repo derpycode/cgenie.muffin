@@ -12,7 +12,7 @@ echo ""
 # CHANGE THIS FOR INSTALLATIONS OTHER THAN IN $HOME
 # SET THE SAME AS IN user.mak AND user.sh
 # set home directory
-HOMEDIR=$HOME
+HOMEDIR=/work/crct/al1966po
 #####################################################################
 # set output directory
 OUTPUTDIR=$HOMEDIR/cgenie_output

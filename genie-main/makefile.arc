@@ -343,6 +343,7 @@ ifeq ($(F77),gfortran)
     FFLAGS += -funroll-loops 
     FFLAGS += -msse
     FFLAGS += -fno-automatic
+    FFLAGS += -mcmodel=large
   endif
   ifeq ($(BUILD),DEBUG)
     FFLAGS += -g -ffpe-trap=zero,overflow,invalid -O0 -Wall -fbounds-check
@@ -572,7 +573,7 @@ endif
 #NETCDF=$(LIB_SEARCH_FLAG)$(PATH_QUOTE)$(NETCDF_DIR)/lib$(PATH_QUOTE) $(LIB_FLAG)$(NETCDF_NAME)
 ### FOR SEPERATE C AND FORTRAN NETCDF LIBRARIES ###
 NETCDF_NAMEF=$(NETCDF_NAME)f
-NETCDF= $(LIB_SEARCH_FLAG)$(PATH_QUOTE)$(NETCDF_DIR)/lib$(PATH_QUOTE) $(LIB_FLAG)$(NETCDF_NAME) $(LIB_FLAG)$(NETCDF_NAMEF)
+NETCDF= $(LIB_SEARCH_FLAG)$(PATH_QUOTE)$(NETCDF_DIR)/lib$(PATH_QUOTE) $(LIB_FLAG)$(NETCDF_NAMEF) $(LIB_FLAG)$(NETCDF_NAME)
 ###################################################
 NETCDF_INC=$(INC_FLAG)$(PATH_QUOTE)$(NETCDF_DIR)/include$(PATH_QUOTE)
 ifeq ($(F77),f95)

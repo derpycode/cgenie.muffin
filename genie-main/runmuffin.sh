@@ -12,7 +12,7 @@ echo ""
 # CHANGE THIS FOR INSTALLATIONS OTHER THAN IN $HOME
 # SET THE SAME AS IN user.mak AND user.sh
 # set home directory
-HOMEDIR=$HOME
+HOMEDIR=/work/crct/al1966po
 #####################################################################
 # set output directory
 OUTPUTDIR=$HOMEDIR/cgenie_output
@@ -199,6 +199,9 @@ elif [ $LONS -eq 36 ] && [ $LEVS -eq 32 ]; then
     let dbiostp=1
 elif [ $LONS -eq 48 ] && [ $LEVS -eq 16 ]; then
     let N_TIMESTEPS=96
+    let dbiostp=2
+elif [ $LONS -eq 72 ]; then
+    let N_TIMESTEPS=192
     let dbiostp=2
 else
     let N_TIMESTEPS=96
