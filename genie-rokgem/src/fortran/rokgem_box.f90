@@ -446,11 +446,12 @@ CONTAINS
     REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)                            ! run-off array (taken from EMBM)
     REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                            ! photosythesis from land veg module (ENTS)
     REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)            ! vegetation respiration from land veg module (ENTS)
-    REAL,INTENT(inout)              :: dum_sfxrok(n_ocn,n_i,n_j)                                ! ocean flux interface array (same no of tracers as used in biogem ocean)
-    REAL,INTENT(inout)              :: dum_sfxatm1(n_atm,n_io,n_jo)                             ! atmosphere flux interface array
+    REAL,INTENT(inout)              :: dum_sfxrok(n_ocn,n_i,n_j)  ! ocean flux interface array (same # tracers as biogem)
+    REAL,INTENT(inout)              :: dum_sfxatm1(n_atm,n_io,n_jo)                           ! atmosphere flux interface array
 
     ! local variables
-    INTEGER                         :: i, j, k
+    INTEGER                         :: i, j
+    INTEGER                         :: ia,io ! NOTE: use ia,io as tracer indeces rather than k in the original code ,,,
     REAL                            :: n, m
     REAL                            :: loc_avSLT
     REAL                            :: loc_SLT(n_i,n_j)
@@ -1364,29 +1365,33 @@ CONTAINS
     ! -------------------------------------------------------- !
     
     ! Spread out atmosphere variables' fluxes onto land
-    DO k=3,n_atm
-       loc_force_flux_weather_a_percell(k)  = loc_force_flux_weather_a(k)/nlandcells
-       loc_force_flux_weather_a_land(k,:,:) = landmask(:,:) * loc_force_flux_weather_a_percell(k)
+    DO ia=3,n_atm
+       loc_force_flux_weather_a_percell(ia)  = loc_force_flux_weather_a(ia)/nlandcells
+       loc_force_flux_weather_a_land(ia,:,:) = landmask(:,:) * loc_force_flux_weather_a_percell(ia)
     END DO
-    ! no need to route to the atmosphere - just take it straight from the cells above the land (assuming same grid)
-    ! convert from Mol/yr to Mol/sec/m^2 and put it into passing array (only take variable altered here - pCO2)
-    dum_sfxatm1(ia_PCO2,:,:)     =  loc_force_flux_weather_a_land(ia_PCO2,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
-    dum_sfxatm1(ia_PCO2_13C,:,:) =  loc_force_flux_weather_a_land(ia_PCO2_13C,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
+    ! set atmosphere exchange fluxes
+    ! convert from Mol/yr to Mol/sec/m^2 and put it into passing array
+    ! NOTE: do for all gases even though only CO2, d13C CO2, and O2 likely to be set
+    ! NOTE: CO2 is radiocarbon dead unless otherwise set
+    DO ia=3,n_atm
+       dum_sfxatm1(ia,:,:) = loc_force_flux_weather_a_land(ia,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
+    end do
     ! Spread out ocean variables' fluxes onto land
-    DO k=3,n_ocn
+    ! NOTE: opt_weather_runoff scales with runoff rather than an equal weighting to cell area
+    DO io=3,n_ocn
        IF (opt_weather_runoff) THEN
-          loc_force_flux_weather_o_percell(k)  = loc_force_flux_weather_o(k)/loc_totR
-          loc_force_flux_weather_o_land(k,:,:) = landmask(:,:) * dum_runoff(:,:) * loc_force_flux_weather_o_percell(k)
+          loc_force_flux_weather_o_percell(io)  = loc_force_flux_weather_o(io)/loc_totR
+          loc_force_flux_weather_o_land(io,:,:) = landmask(:,:) * dum_runoff(:,:) * loc_force_flux_weather_o_percell(io)
        else
-          loc_force_flux_weather_o_percell(k)  = loc_force_flux_weather_o(k)/nlandcells
-          loc_force_flux_weather_o_land(k,:,:) = landmask(:,:) * loc_force_flux_weather_o_percell(k)
+          loc_force_flux_weather_o_percell(io)  = loc_force_flux_weather_o(io)/nlandcells
+          loc_force_flux_weather_o_land(io,:,:) = landmask(:,:) * loc_force_flux_weather_o_percell(io)
        end if
     END DO
     ! route it into the coastal ocean cells (to pass to biogem in coupled model) and save the output to file
-    DO k=3,n_ocn
-       CALL sub_coastal_output(  loc_force_flux_weather_o_land(k,:,:),             &
+    DO io=3,n_ocn
+       CALL sub_coastal_output(  loc_force_flux_weather_o_land(io,:,:),             &
             &  runoff_drainto(:,:,:),runoff_detail(:,:),                           &
-            &  loc_force_flux_weather_o_ocean(k,:,:)                               )
+            &  loc_force_flux_weather_o_ocean(io,:,:)                               )
     END DO
     ! convert from Mol/yr to Mol/sec and put it into passing array 
     dum_sfxrok(:,:,:) = loc_force_flux_weather_o_ocean(:,:,:)/conv_yr_s
@@ -1418,14 +1423,14 @@ CONTAINS
        ENDIF
 
        IF (opt_2d_ascii_output) THEN
-          DO k=1,n_ocn
-             IF ((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C)) THEN
+          DO io=1,n_ocn
+             IF ((io.EQ.io_ALK).OR.(io.EQ.io_DIC).OR.(io.EQ.io_Ca).OR.(io.EQ.io_DIC_13C).OR.(io.EQ.io_DIC_14C)) THEN
                 CALL sub_save_data_ij( &
-                     & TRIM(par_outdir_name)//'globavg_land_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
-                     n_i,n_j,loc_force_flux_weather_o_land(k,:,:))                                   
+                     & TRIM(par_outdir_name)//'globavg_land_'//TRIM(globtracer_names(io))//'_year_'//TRIM(year_text)//'.dat', &
+                     n_i,n_j,loc_force_flux_weather_o_land(io,:,:))                                   
                 CALL sub_save_data_ij( &
-                     & TRIM(par_outdir_name)//'globavg_ocean_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
-                     n_i,n_j,loc_force_flux_weather_o_ocean(k,:,:))  
+                     & TRIM(par_outdir_name)//'globavg_ocean_'//TRIM(globtracer_names(io))//'_year_'//TRIM(year_text)//'.dat', &
+                     n_i,n_j,loc_force_flux_weather_o_ocean(io,:,:))  
              ENDIF
           END DO
           CALL sub_save_data_ij(TRIM(par_outdir_name)//'globavg_atm_PCO2_year_'//TRIM(year_text)//'.dat', &
