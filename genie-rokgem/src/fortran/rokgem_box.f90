@@ -1128,7 +1128,7 @@ CONTAINS
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
-    ! ORGANIC MATTER / NUTRIENTS (KEROGEN)
+    ! ORGANIC MATTER / NUTRIENTS (KEROGEN) / O2 CONSUMPTION
     ! NOTE: granitic IS NOT distinguished from basaltic weathering
     ! NOTE: no carbonate weathering component
     ! NOTE: fixed vs. climate-modified (adjusted) option implemented for each kerogen elemental component
@@ -1145,12 +1145,19 @@ CONTAINS
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracC_d13C,loc_standard)*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ! O2 consumption associated with Corg weathering (and conversion of C -> dissolved CO2)
     ! NOTE: currently, this assumes an oxic atmosphere
-    ! NOTE: opt_short_circuit_atm is .true. by default
-    ! NOTE: H2S is dealt with later
+    ! NOTE: opt_short_circuit_atm is .true. by default (but this should be assumed .false. by default in the future)
+    ! NOTE: C:O2 stoichiometry needs to be derived form the Redfiel ratio and adjusted for whether N is included or not ...
+    !       ... all of which are set in BIOGEM and not accessible ... so we define par_weather_kerogen_fracO2
+    !       par_weather_kerogen_fracO2 needs to be set equal to the BIOGEM par_bio_red_POP_PO2/par_bio_red_POP_POC
+    !       minus the O2 demand associated with P (-> PO4) == 4.0/2.0 * par_bio_red_POP_POC (nominally, 106)
+    !      e.g., -138/106 (C:O2 from P:O2 and C:P) + 2/106 (less P oxidation) = -136/106 = 1.283018868
+    ! NOTE: we are assuming no N content of kerogen (and hence no O2 associated with PON)
     IF (opt_short_circuit_atm) THEN
-       loc_force_flux_weather_o(io_O2)  = loc_force_flux_weather_o(io_O2)  - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+       loc_force_flux_weather_o(io_O2)  = loc_force_flux_weather_o(io_O2)  + &
+            & par_weather_kerogen_fracO2*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ELSE
-       loc_force_flux_weather_a(ia_pO2) = loc_force_flux_weather_a(ia_pO2) - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+       loc_force_flux_weather_a(ia_pO2) = loc_force_flux_weather_a(ia_pO2) + &
+            & par_weather_kerogen_fracO2*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ENDIF
     ! (2) associated P flux -- kerogen
     ! NOTE: plus (silicate) associated P flux -- retained for backwards compatability
@@ -1364,14 +1371,14 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- !
     
-    ! Spread out atmosphere variables' fluxes onto land
+    ! Distribute global total atmosphere flux onto the land grid
     DO ia=3,n_atm
        loc_force_flux_weather_a_percell(ia)  = loc_force_flux_weather_a(ia)/nlandcells
        loc_force_flux_weather_a_land(ia,:,:) = landmask(:,:) * loc_force_flux_weather_a_percell(ia)
     END DO
     ! set atmosphere exchange fluxes
     ! convert from Mol/yr to Mol/sec/m^2 and put it into passing array
-    ! NOTE: do for all gases even though only CO2, d13C CO2, and O2 likely to be set
+    ! NOTE: do for all gases even though only CO2, d13C CO2, and O2 are likely to be non-zero
     ! NOTE: CO2 is radiocarbon dead unless otherwise set
     DO ia=3,n_atm
        dum_sfxatm1(ia,:,:) = loc_force_flux_weather_a_land(ia,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
@@ -1389,9 +1396,9 @@ CONTAINS
     END DO
     ! route it into the coastal ocean cells (to pass to biogem in coupled model) and save the output to file
     DO io=3,n_ocn
-       CALL sub_coastal_output(  loc_force_flux_weather_o_land(io,:,:),             &
-            &  runoff_drainto(:,:,:),runoff_detail(:,:),                           &
-            &  loc_force_flux_weather_o_ocean(io,:,:)                               )
+       CALL sub_coastal_output(loc_force_flux_weather_o_land(io,:,:), &
+            &  runoff_drainto(:,:,:),runoff_detail(:,:),              &
+            &  loc_force_flux_weather_o_ocean(io,:,:))
     END DO
     ! convert from Mol/yr to Mol/sec and put it into passing array 
     dum_sfxrok(:,:,:) = loc_force_flux_weather_o_ocean(:,:,:)/conv_yr_s

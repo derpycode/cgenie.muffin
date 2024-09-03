@@ -8398,6 +8398,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="real">0.0</value>
 			      <description>global kerogen S d34S (o/oo)</description>
                     </param>
+                    <param name="par_weather_kerogen_fracO2">
+			<value datatype="real">-1.283018868</value>
+			      <description>global kerogen oxidation O2 demand (should be negative!), e.g., -138/106 (C:O2 from P:O2 and C:P) + 2/106 (less P oxidation) = -136/106</description>
+                    </param>
                     <param name="opt_calibrate_T_0D">
 			<value datatype="boolean">.FALSE.</value>
 	                  <description>calibrate temperature fields to data</description>
