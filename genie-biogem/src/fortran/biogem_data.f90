@@ -1304,6 +1304,7 @@ CONTAINS
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
     !       (and as implemented, per mol N, this ends up as (5/2)/2 = 5.0/4.0
+    ! NOTE: if N is not selected we are implicitly assuming a slightly different O2 demand for oxidation of the C and H in POM
     if (ocn_select(io_NO3)) then
        conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
     else
