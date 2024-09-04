@@ -184,8 +184,13 @@ MODULE biogem_lib
   real::par_bio_red_PC_alpha1                                           ! scaling of C/P flexible stoichiometry
   real::par_bio_red_PC_alpha2                                           ! offset of C/P flexible stoichiometry
   NAMELIST /ini_biogem_nml/par_bio_red_PC_flex,par_bio_red_PC_alpha1,par_bio_red_PC_alpha2
-  real::par_bio_red_PC_max                                              ! maximum C/P
+  real::par_bio_red_PC_max                                     ! maximum C/P
   NAMELIST /ini_biogem_nml/par_bio_red_PC_max
+  integer::opt_bio_red_PC_flex                                 ! option for C/P organic matter (e.g., flexible stoichiometry == 3)
+  real::par_bio_red_PC_flex_min                                ! scaling of C/P value in flexible stoichiometry
+  NAMELIST /ini_biogem_nml/opt_bio_red_PC_flex,par_bio_red_PC_flex_min
+  real::par_bio_red_PC_flex_scale                              ! minimum C/P
+  NAMELIST /ini_biogem_nml/par_bio_red_PC_flex_scale
   real::par_bio_red_DOMfrac                                             ! production fraction of dissolved organic matter
   NAMELIST /ini_biogem_nml/par_bio_red_DOMfrac
   real::par_bio_red_RDOMfrac                                            ! production fraction of R-dissolved organic matter

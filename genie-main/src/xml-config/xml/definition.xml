@@ -4373,7 +4373,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">1.8182e-02</value>
                         <description>maximum C/P (1.8182e-02 == 1.0/55.0 -- see Galbraith and Martiny, 2015)</description>
                     </param>
-<!-- malod: flexible stoichiometry  end -->
+                    <param name="opt_bio_red_PC_flex">
+                        <value datatype="integer">0</value>
+                        <description>[REVISED] C/P organic matter fixed or flexible stoichiometry option</description>
+                    </param>
+                    <param name="par_bio_red_PC_flex_min">
+                        <value datatype="real">62.0</value>
+                        <description>[REVISED] minimum C/P == 1 / 0.016 -- P/C of 0.016 is about the max -- see Figure 1, S3 Galbraith and Martiny, 2015</description>
+                    </param>
+                    <param name="par_bio_red_PC_flex_scale">
+                        <value datatype="real">1.0</value>
+                        <description>[REVISED] scaling of C/P to e.g., align with a global flux-weighted mean value of 106.0</description>
+                    </param>
+<!-- malod: flexible stoichiometry end -->
                     <param name="par_bio_red_POP_PO2">
 			<value datatype="real">-138.0</value>
                         <description>O2/P organic matter pseudo-Redfield ratio</description>
