@@ -608,8 +608,7 @@ CONTAINS
     ! NOTE: opt_bio_red_PC_flex == par_bio_red_PC_flex
     select case (opt_bio_red_PC_flex)
     case (-1)
-       bio_part_red(is_POC,is_POP,:,:) = par_bio_red_PC_max
-       bio_part_red(is_POP,is_POC,:,:) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = par_bio_red_PC_flex_min
     case (0)
        bio_part_red(is_POP,is_POC,dum_i,dum_j) = par_bio_red_POP_POC
     case (1,2)
