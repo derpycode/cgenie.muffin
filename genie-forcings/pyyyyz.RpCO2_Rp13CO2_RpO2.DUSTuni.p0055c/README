@@ -1,0 +1,49 @@
+A. Pohl
+8 Nov 2023
+
+Adapting 'pyyyyz.RpCO2_Rp13CO2_RpO2.DUST' for base-config 'p0055c'to generate unform dust field with total flux equal to Modern (i.e., accounting for different paleo-ocean surface area)
+
+See muffin.pdf, section 'HOW-TO ... iron (and dust)', subtitle 'Fake dust'
+
+Modern (worjh2) ocean area: 0.3674774E+15 m2
+Eocene (p0055c) ocean area: 0.3560675E+15 m2
+
+Modern total flux (as per original file): 0.1660401E+14 (mol yr-1)
+Eocene calculation: 0.1660401E+14 * (0.3560675E+15/0.3674774E+15) = 1.608847E+13 (mol yr-1)
+
+CHECKING:
+
+In output file 'biogem_series_misc_det_Fe_tot.res', I obtain 0.6034E+12 (Fe) mol/yr.
+According to Andy's calculations (see email copied below):
+1.608847E+13 mol/yr of dust
+1.608847E+13 * 60 (molar mass SiO2 in GENIE)  = 9.653082E+14 g/yr of dust
+9.653082E+14 * 0.035 (mass fraction Fe in detritic material) = 3.378579E+13 g/yr of Fe
+3.378579E+13 * 1E-3 (g to kg) * 17.86 (conv_Fe_kg_mol) = 603414209400 mol/yr Fe or equivalently 0.6034142E+12 (Fe) mol/yr, well in line with '0.6034E+12' !
+=> all good :)
+
+
+
+
+___________________________________
+
+Mail Andy 9 Nov 2023
+___________________________________
+
+The units of BIOGEM are mol ...
+
+... and hence dust is mol yr-1...
+
+Of dust, only 3.5% by mass is assumed Fe (I assume dust has the molecular weight of
+quartz).
+
+So I convert from mol dust ... to mass dust ... to mass fraction iron ... back to mol iron ...
+and that should work out OK.
+
+mol kg-2 of SiO2 is very close to that of Fe and so the number you see is not quite
+0.035*1.608847E+13
+
+The soluable amount is of course way lower again.
+
+
+/andy
+
