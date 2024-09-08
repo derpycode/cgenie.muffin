@@ -127,14 +127,20 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE AIR-SEA GAS EXCHANGE
-  FUNCTION fun_calc_ocnatm_flux(dum_i,dum_j,dum_atm,dum_dt)
-    ! result variable
+  FUNCTION fun_calc_ocnatm_flux(dum_i,dum_j,dum_atm,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
     REAL,dimension(n_atm)::fun_calc_ocnatm_flux ! units of (mol yr-1)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j
     REAL,dimension(n_atm),INTENT(in)::dum_atm
-    REAL,INTENT(in)::dum_dt
-    ! local variables
+    REAL,INTENT(in)::dum_dtyr                                  ! time-step (years)
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,ia,io
     REAL,dimension(n_atm)::loc_focnatm,loc_fatmocn
     real::loc_alpha_k,loc_alpha_alpha
@@ -150,19 +156,22 @@ CONTAINS
     real::loc_buff
     REAL,dimension(n_atm)::loc_dflux
     REAL,dimension(n_ocn)::loc_deqm
-
-    ! *** INITIALIZE VARIABLES ***
-    !
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     loc_alpha_as = 0.0
-    !
     loc_focnatm(:) = 0.0
     loc_fatmocn(:) = 0.0
     loc_rho = phys_ocn(ipo_rho,dum_i,dum_j,n_k)
     loc_TC = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
     ! area available for air-sea gas transfer
     loc_A = (1.0 - phys_ocnatm(ipoa_seaice,dum_i,dum_j))*phys_ocnatm(ipoa_A,dum_i,dum_j)
-
-    ! *** calculate air-sea gas exchange fluxes ***
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! calculate air-sea gas exchange fluxes
+    ! -------------------------------------------------------- !
     DO l=3,n_l_atm
        ia = conv_iselected_ia(l)
        if (.NOT. ocnatm_airsea_eqm(ia)) then
@@ -199,6 +208,17 @@ CONTAINS
                    loc_atm  = 0.0
                    loc_buff = 1.0
                 endif
+             elseif (io == io_H2S) then
+                ! make special case of H2S if it is being implicitly oxidized in the atmosphere
+                loc_ocn = ocn(io,dum_i,dum_j,n_k)
+                 select case (opt_ocnatmH2S_fix)
+                 case ('KMM','KMM_lowO2') ! default
+                    ! set 'buffer' to maximum fraction allowed in a geochem reaction
+                    ! (becasue we are implicitly allowing an oxidation reaction to occur in the atmosphere)
+                    loc_buff = loc_f                
+                 case default
+                    loc_buff = 1.0
+                 end select
              else
                 loc_ocn = ocn(io,dum_i,dum_j,n_k)
                 loc_buff = 1.0
@@ -219,7 +239,7 @@ CONTAINS
              ! calculate the molar magnitude of ocean deficit or surfit w.r.t. the atmosphere
              loc_deqm(io) = phys_ocn(ipo_dD,dum_i,dum_j,n_k)*phys_ocnatm(ipoa_A,dum_i,dum_j)*loc_rho*loc_buff*abs(loc_atm - loc_ocn)
              ! calculate the molar transfer that would normally then be applied
-             loc_dflux(ia) = dum_dt*abs(loc_focnatm(ia) - loc_fatmocn(ia))
+             loc_dflux(ia) = dum_dtyr*abs(loc_focnatm(ia) - loc_fatmocn(ia))
              ! ensure that molar transfer does not exceed the current disequilibrium
              ! (i.e., ensure that a +ve disequilibrium is not turned into a larger -ve disequilibrium at the next time-step)
              If (loc_deqm(io) > const_real_nullsmall) then
@@ -232,6 +252,9 @@ CONTAINS
                            & ' prevented at (',fun_conv_num_char_n(2,dum_i),',',fun_conv_num_char_n(2,dum_j),')'
                    end IF
                 end if
+             else
+                loc_focnatm(ia) = 0.0
+                loc_fatmocn(ia) = 0.0
              end If
           case default
              ! calculate bulk gas exchange
@@ -331,7 +354,9 @@ CONTAINS
           fun_calc_ocnatm_flux(ia) = loc_focnatm(ia) - loc_fatmocn(ia)
        end if
     end do
-
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
   END FUNCTION fun_calc_ocnatm_flux
   ! ****************************************************************************************************************************** !
 

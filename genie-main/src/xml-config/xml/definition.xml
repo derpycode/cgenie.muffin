@@ -2701,6 +2701,10 @@
 			<value datatype="boolean">.true.</value>
                         <description>Toggle between isopycnal/diapycnal (.true.) and horizontal/vertical (.false.) mixing schemes</description>
                     </param>
+                    <param name="ctrl_diso_TSonly">
+			<value datatype="boolean">.false.</value>
+                        <description>Restrict isopycnal/diapycnal mixing scheme to T and S only</description>
+                    </param>
                     <param name="ssmaxsurf">
                         <value datatype="real">10.</value>
                         <description>Isopycnal slope limiting vertical flux due to isopycnal mixing. This is NOT a tunable parameter; reducing it is a quick fix for unwanted negative tracers</description>
