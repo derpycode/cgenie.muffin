@@ -157,6 +157,8 @@ echo ""
 echo ">> Configuring ..."
 # Copy template config file
 cp -f $CONFIGPATH/$MODELID".config" $CONFIGPATH/$CONFIGNAME
+# add a return character just in case the base-config has no linux final line end ...
+echo '\n' >> $CONFIGPATH/$CONFIGNAME
 # Set the experiment run name
 #echo EXPID=$MODELID.$RUNID >> $CONFIGPATH/$CONFIGNAME
 echo EXPID=$RUNID >> $CONFIGPATH/$CONFIGNAME
