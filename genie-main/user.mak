@@ -74,9 +74,9 @@ MODEXT=mod
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
 ### DEFAULT ###
-NETCDF_DIR=/usr/local
+#NETCDF_DIR=/usr/local
 ### sterling ###
-#NETCDF_DIR=/share/apps
+NETCDF_DIR=/share/apps
 ### eevee ###
 #NETCDF_DIR=/share/apps/netcdf
 ### iwan ###
