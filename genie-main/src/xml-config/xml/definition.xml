@@ -1510,6 +1510,14 @@
 			<value datatype="string">n</value>
                         <description>new/continuing embm</description>
                     </param>
+		    <param name="sodaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of solar day in embm</description>
+                    </param>
+		    <param name="sidaylen">
+                        <value datatype="real">86164.0</value>
+                        <description>length of sidereal day in embm</description>
+                    </param>
                     <param name="yearlen">
                         <value datatype="real">365.25</value>
                         <description>number of days per year embm</description>
@@ -2471,6 +2479,14 @@
 			<value datatype="string">n</value>
                         <description>new/continuing goldstein</description>
                     </param>
+		    <param name="sodaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of solar day in goldstein</description>
+                    </param>
+		    <param name="sidaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of sidereal day in goldstein -- 86400.0 is for backwards compatablity; 86164.0 is the 'real' value</description>
+                    </param>
                     <param name="yearlen">
                         <value datatype="real">365.25</value>
                         <description>number of days per year goldstein</description>
@@ -2792,6 +2808,14 @@
                     <param name="ans">
 			<value datatype="string">n</value>
                         <description>new/continuing seaice</description>
+                    </param>
+		    <param name="sodaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of solar day in goldsteinseaice</description>
+                    </param>
+		    <param name="sidaylen">
+                        <value datatype="real">86400.0</value>
+                        <description>length of sidereal day in goldsteinseaice -- 86400.0 is for backwards compatablity; 86164.0 is the 'real' value</description>
                     </param>
                     <param name="yearlen">
                         <value datatype="real">365.25</value>
@@ -4301,6 +4325,10 @@
 			<value datatype="real">20.0</value>
                         <description>Light e-folding depth (m) (OCMIP-2)</description>
                     </param>
+                    <param name="par_bio_c0_I">
+			<value datatype="real">20.0</value>
+                        <description>half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])</description>
+                    </param>
                     <param name="par_bio_kT0">
 			<value datatype="real">0.59</value>
                         <description>coefficient for temperature-dependent uptake rate modifier</description>
@@ -4771,10 +4799,6 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_POC_eta">
 						<value datatype="real">1.17</value>
                         <description>exponent relating e-folding depth to ecogem size class [Stemmann et al 2004]</description>
-                    </param>
-                    <param name="ctrl_bio_remin_iodine_POConly">
-                       <value datatype="boolean">.false.</value>
-                        <description>exclude DOC from iodine redox calculation?</description>
                     </param>
                     <param name="ctrl_bio_remin_ecogemMLD">
                        <value datatype="boolean">.false.</value>
@@ -5275,6 +5299,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_bio_remin_r_IO3toI">
 			<value datatype="real">0.01</value>
                         <description>SO4 POC remin/O2 ratio for IO3 -> I [for option thresholdflex]</description>
+                    </param>
+                    <param name="ctrl_bio_remin_iodine_POConly">
+                       <value datatype="boolean">.false.</value>
+                        <description>exclude DOC from iodine redox calculation? [NOW ALWAYS EXCLUDED ... THIS PARAMETER TO BE REMOVED IN COOKIE RELEASE]</description>
                     </param>
 <!-- ABIOTIC PRECIPITATION  -->
                     <param name="par_bio_CaCO3precip_sf">

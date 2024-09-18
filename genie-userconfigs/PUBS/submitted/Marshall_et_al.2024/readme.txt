@@ -15,17 +15,19 @@ PUBLICATION DETAILS [summary of manuscript/publication]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Extreme ocean methane cycling during the early Phanerozoic
-Nathan Marshall1, Megan Rohrssen1,2, Andy Ridgwell1, Alexandre Pohl3, Bradley D. Cramer4, Woodward W. Fischer5, Olle Hints6, Chris Holmden7, Pavel Kabanov8, Alison Kuhl9, Carina Lee1,10, Michael J. Melchin11, Christopher T. Reinhard12, Richard D. Pancost13, Gordon D    . Love1
+
+Nathan L. Marshall1, Megan Rohrssen1,2, Andy Ridgwell1, Alexandre Pohl3, Bradley D. Cramer4, Woodward W. Fischer5, Olle Hints6, Chris Holmden7, Pavel Kabanov8, Alison Kuhl9, Carina Lee1,10, Michael J. Melchin11, Christopher T. Reinhard12, Richard D. Pancost13, Gordon D. Love1
+
 1Department of Earth Sciences, University of California, Riverside, CA, 92521, USA.
 2Department of Earth and Atmospheric Sciences, Central Michigan University, Mt. Pleasant, MI 48859, USA.
 3Biogéosciences, UMR 6282 CNRS, Université de Bourgogne, 6 Boulevard Gabriel, 21000 Dijon, France.
 4Department of Earth and Environmental Sciences, University of Iowa, Iowa City, IA 52242, USA.
 5Division of Geological & Planetary Sciences, California Institute of Technology, Pasadena, CA 91125, USA.
-6Institute of Geology at Tallinn University of Technology, Ehitajate tee 5, 19086 Tallinn, Estonia.
+6Department of Geology, Tallinn University of Technology, Ehitajate tee 5, 19086 Tallinn, Estonia.
 7Department of Geological Sciences, University of Saskatchewan, Saskatoon, Saskatchewan S7N 5E2, Canada.
 8Geological Survey of Canada Calgary, Calgary, AB T2L 2A7, Canada.
 9School of Chemistry, University of Bristol, Cantock’s Close, Bristol BS8 1TS, UK.
-10Lunar & Planetary Institute, Universities Space Research Association, Houston, TX 77058, USA.
+10Texas State University, Jacobs JETS II, NASA Johnson Space Center, Houston, TX 77058, USA.
 11Department of Earth Sciences, St. Francis Xavier University, Antigonish, NS, Canada B2G 2W5.
 12School of Earth and Atmospheric Sciences, Georgia Institute of Technology, Atlanta, GA, 30332, USA.
 13School of Chemistry, School of Earth Sciences, Cabot Institute for the Environment, University of Bristol, BS8 1TS Bristol, UK.
@@ -35,16 +37,7 @@ EDITING LOG [list of changes made to this file, when, and by who]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 2023/12/05 -- README.txt file created by [AR]
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-IMPORTANT!
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-In this initial release, all the files are on a development branch.
-
-To aceess and run -- from cgenie.muffin, type:
-
-git checkout _DEV_FeNIP2_masterupdated
+2024/02/20 -- updated for submisson
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 SUMMARY OF EXPERIMENTS [summerize experiments detailed and in which e.g. figures they appear]
