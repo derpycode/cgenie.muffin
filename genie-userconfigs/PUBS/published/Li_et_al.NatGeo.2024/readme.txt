@@ -44,7 +44,12 @@ preEECO03.ID.1.*		--	pre- and peak-PETM ENSEMBLE					[run from cold]
 RUNNING THE EXPERIMENTS PLUS FURTHER DETAILS
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-NOTE: the forcing definition folders provided in the genie-forcings.copyme MUST be copied to the genie-forcings directory of your model installation.
+The different dirctories of user-config files need to be unpacked before any ensemble experiments can be run.
+For example, for ensemble ML.petm016:
+tar xzf ML.petm016.tar.gz
+
+Also -- in addition to unpacking the archive file containing forcing definition folders (genie-forcings.copyme.tar.gz)
+the individual forcings folders inside genie-forcings.copyme MUST be copied to the genie-forcings directory of your model installation.
 These are required by both the ML.petm038.ID.* AND ML.petm043.ID.* ensembles.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
