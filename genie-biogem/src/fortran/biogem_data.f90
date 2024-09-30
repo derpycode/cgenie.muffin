@@ -168,6 +168,7 @@ CONTAINS
        print*,'Biological production time-scale -- non-siliceous   : ',par_bio_tau_nsp
        print*,'Fract. prod. of si. phytop. in Si/Fe-replete cond.  : ',par_bio_relprod_sp
        print*,'Light e-folding depth (m) (OCMIP-2)                 : ',par_bio_I_eL
+       print*,'half sat. for light (W m-2) [Doney et al., 2006]    : ',par_bio_c0_I       
        print*,'Coefficient for T-dep. uptake rate modifier         : ',par_bio_kT0
        print*,'e-folding temp. (K) for T-dep. uptake rate modifier : ',par_bio_kT_eT
        print*,'temperature offset for T-dependent bio schemes      : ',par_bio_kT_dT
@@ -179,6 +180,9 @@ CONTAINS
        print*,'PC_alpha1, scaling of flexible C/P ratio            : ',par_bio_red_PC_alpha1
        print*,'PC_alpha2, offset of flexible C/P ratio             : ',par_bio_red_PC_alpha2
        print*,'maximum C/P                                         : ',par_bio_red_PC_max
+       print*,'option for C/P organic matter (flexible == 3)       : ',opt_bio_red_PC_flex
+       print*,'scaling of C/P                                      : ',par_bio_red_PC_flex_scale
+       print*,'minimum C/P                                         : ',par_bio_red_PC_flex_min
        print*,'O2/P organic matter pseudo-Redfield ratio           : ',par_bio_red_POP_PO2
        print*,'ALK/N alkalinty correction factor                   : ',par_bio_red_PON_ALK
        print*,'Production fraction of dissolved organic matter     : ',par_bio_red_DOMfrac
@@ -201,6 +205,7 @@ CONTAINS
        print*,'Ridgwell [2001] -- opal:POC KSp for FeT (mol kg-1)  : ',par_part_red_opal_FeTKSp
        print*,'Ridgwell [2001] -- opal:POC offset, FeT (mol kg-1)  : ',par_part_red_opal_FeToff
        print*,'opal:POC rain ratio option ID string                : ',opt_bio_red_SitoC
+       print*,'target potential global mean CaCO3:POC rain ratio   : ',par_bio_POC_CaCO3_target
        ! --- REMINERALIZATION ---------------------------------------------------------------------------------------------------- !
        print*,'--- REMINERALIZATION -------------------------------'
        print*,'Fraction of POM remin concverted to RDOM            : ',par_bio_remin_RDOMfrac
@@ -582,7 +587,7 @@ CONTAINS
     par_misc_debug_i = 1
     par_misc_debug_j = 3
     opt_force(iopt_force_freshwater) = .FALSE.
-    par_bio_c0_I = 20.0 ! half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])
+    !!!par_bio_c0_I = 20.0 ! half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])
     par_det_Fe_frac = 0.035 ! mass fraction of Fe in dust
     par_K_FeL = 10**par_K_FeL_pP ! conditional stability constant of ligand-bound Fe [Parekth et al., 2005]
     par_scav_Fe_exp = 0.58 ! (see: Parekth et al. [2005])
@@ -604,6 +609,10 @@ CONTAINS
     if (par_bio_remin_sinkingrate_physical < const_real_nullsmall) then
        par_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate
        par_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_scav
+    end if
+    ! flexible C:P
+    if (par_bio_red_PC_flex > 0) then
+       opt_bio_red_PC_flex = par_bio_red_PC_flex
     end if
     ! -------------------------------------------------------- !
     ! adjust units
@@ -1302,6 +1311,7 @@ CONTAINS
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
     !       (and as implemented, per mol N, this ends up as (5/2)/2 = 5.0/4.0
+    ! NOTE: if N is not selected we are implicitly assuming a slightly different O2 demand for oxidation of the C and H in POM
     if (ocn_select(io_NO3)) then
        conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
     else
@@ -1494,7 +1504,7 @@ CONTAINS
           conv_sed_ocn_N(io_ALK,is_POC) = -2.0*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
        else
-          ! [DEFAULT, oxic remin relationship]
+          ! (this should not occur)
        endif
        ! > N isotopes (from denitrification) [placeholder values -- corrected for local d15N in sub_box_remin_redfield]
        if (ocn_select(io_NO3_15N)) then
@@ -1837,6 +1847,7 @@ CONTAINS
     int_diag_redox_sig(:)   = 0.0
     int_diag_ecogem_part    = 0.0
     int_diag_ecogem_remin   = 0.0
+    int_diag_bio_red_POC_CaCO3  = 0.0
     ! high resolution 3D! (an exception to the time-series concept that rather spoils things)
     if (ctrl_data_save_3d_sig) int_misc_3D_sig(:,:,:,:) = 0.0
     ! ### ADD ADDITIONAL TIME-SERIES ARRAY INITIALIZATIONS HERE ################################################################## !
@@ -2176,7 +2187,8 @@ CONTAINS
                       elseif (io == io_Sr_88Sr) then
                          ocn(io,i,j,k) = fun_calc_isotope_abundanceR012ocn(io_Sr_87Sr,io_Sr_88Sr,ocn_init(:),2)
                       elseif (io == io_Os_187Os) then
-                         ocn(io,i,j,k) = ocn_init(io)*ocn_init(io_Os_188Os)*(ocn_init(io_Os)/(1.0+ocn_init(io_Os_188Os)+ocn_init(io)*ocn_init(io_Os_188Os)))
+                         ocn(io,i,j,k) = ocn_init(io)*ocn_init(io_Os_188Os)*(ocn_init(io_Os)/ &
+                              & (1.0+ocn_init(io_Os_188Os)+ocn_init(io)*ocn_init(io_Os_188Os)))
                       elseif (io == io_Os_188Os) then
                          ocn(io,i,j,k) = ocn_init(io)*(ocn_init(io_Os)/(1.0+ocn_init(io)+ocn_init(io_Os_187Os)*ocn_init(io)))
                       end if
@@ -2899,6 +2911,22 @@ CONTAINS
             & )
     ENDIF
 
+    ! *** parameter consistency check - selected tracers and redox pairs ***
+    IF (ocn_select(io_NO3) .AND. (.NOT. ocn_select(io_NH4))) THEN
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par','A reduced N species (e.g. NH4) tracer must be selected along with NO3 ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
+    IF (ocn_select(io_SO4) .AND. (.NOT. ocn_select(io_H2S))) THEN
+       CALL sub_report_error( &
+            & 'biogem_data','sub_check_par','The H2S tracer must be selected along with SO4 ', &
+            & 'STOPPING', &
+            & (/const_real_null/),.true. &
+            & )
+    ENDIF
+
     ! *** parameter consistency check - selected tracers and sediment-sediment option combinations ***
     do is=1,n_sed
        if (sed_type(is) == par_sed_type_frac) then
@@ -2915,7 +2943,7 @@ CONTAINS
     end do
     IF (sed_select(is_CaCO3) .AND. (.NOT. sed_select(is_POC))) THEN
        CALL sub_report_error( &
-            & 'biogem_data','sub_check_par','The POC tracer must be selected with CaCO3 in biogem_config_sed.par ', &
+            & 'biogem_data','sub_check_par','The POC tracer must be selected with CaCO3 ', &
             & 'STOPPING', &
             & (/const_real_null/),.true. &
             & )
@@ -2997,7 +3025,7 @@ CONTAINS
                       CALL sub_report_error( &
                            & 'biogem_data','sub_check_par', &
                            & 'Particulate tracer '//TRIM(loc_string2)// &
-                           & ' does does not have *all possible* corresponding ocean tracers selected, such as '//TRIM(loc_string1)// &
+                           & ' does not have *all possible* corresponding ocean tracers selected, e.g. '//TRIM(loc_string1)// &
                            & ' (BUT may not need them, esp. if involving the Fe sytem ...)', &
                            & 'CONTINUING', &
                            & (/const_real_null/),.false. &
@@ -3056,7 +3084,7 @@ CONTAINS
        if((par_data_TM_start+n_k).gt.par_misc_t_runtime.and.(par_data_TM_start-n_k).gt.0.0)then
           call sub_report_error( &
                & 'biogem_data','sub_check_par', &
-               & 'Diagnosing transport matrix will take longer than the run. par_data_TM_start has been set to finish at end of run', &
+               & 'Diagnosing transport matrix will take longer than the run.', &
                & '[par_data_TM_start] HAS BEEN CHANGED TO ALLOW MATRIX DIAGNOSIS TO FINISH', &
                & (/const_real_null/),.false. &
                & )
@@ -3100,6 +3128,7 @@ CONTAINS
     end if
     
     ! *** redox-requiring schemes ***
+    ! NOTE: also set ctrl_data_save_slice_diag_geochem + ctrl_data_save_sig_diag_geochem to ensure that redox data is saved
     if (.NOT. ctrl_bio_remin_redox_save) THEN
        SELECT CASE (opt_bio_remin_oxidize_ItoIO3)
        case ('reminO2','reminO2lifetime')
@@ -3109,7 +3138,9 @@ CONTAINS
                & '... making this change for you.', &
                & (/const_real_null/),.false. &
                & )
-          ctrl_bio_remin_redox_save = .true.
+          ctrl_bio_remin_redox_save         = .true.
+          ctrl_data_save_slice_diag_geochem = .true.
+          ctrl_data_save_sig_diag_geochem   = .true.
        end select
        SELECT CASE (opt_bio_remin_reduce_IO3toI)
        case ('reminSO4','reminSO4lifetime','thresholdflex')
@@ -3119,7 +3150,9 @@ CONTAINS
                & '... making this change for you.', &
                & (/const_real_null/),.false. &
                & )
-          ctrl_bio_remin_redox_save = .true.
+          ctrl_bio_remin_redox_save         = .true.
+          ctrl_data_save_slice_diag_geochem = .true.
+          ctrl_data_save_sig_diag_geochem   = .true.
        end select
     end if
 

@@ -127,14 +127,20 @@ CONTAINS
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE AIR-SEA GAS EXCHANGE
-  FUNCTION fun_calc_ocnatm_flux(dum_i,dum_j,dum_atm,dum_dt)
-    ! result variable
+  FUNCTION fun_calc_ocnatm_flux(dum_i,dum_j,dum_atm,dum_dtyr)
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
     REAL,dimension(n_atm)::fun_calc_ocnatm_flux ! units of (mol yr-1)
-    ! dummy arguments
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
     INTEGER,INTENT(in)::dum_i,dum_j
     REAL,dimension(n_atm),INTENT(in)::dum_atm
-    REAL,INTENT(in)::dum_dt
-    ! local variables
+    REAL,INTENT(in)::dum_dtyr                                  ! time-step (years)
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
     integer::l,ia,io
     REAL,dimension(n_atm)::loc_focnatm,loc_fatmocn
     real::loc_alpha_k,loc_alpha_alpha
@@ -150,19 +156,22 @@ CONTAINS
     real::loc_buff
     REAL,dimension(n_atm)::loc_dflux
     REAL,dimension(n_ocn)::loc_deqm
-
-    ! *** INITIALIZE VARIABLES ***
-    !
+    real::loc_f
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
     loc_alpha_as = 0.0
-    !
     loc_focnatm(:) = 0.0
     loc_fatmocn(:) = 0.0
     loc_rho = phys_ocn(ipo_rho,dum_i,dum_j,n_k)
     loc_TC = ocn(io_T,dum_i,dum_j,n_k) - const_zeroC
     ! area available for air-sea gas transfer
     loc_A = (1.0 - phys_ocnatm(ipoa_seaice,dum_i,dum_j))*phys_ocnatm(ipoa_A,dum_i,dum_j)
-
-    ! *** calculate air-sea gas exchange fluxes ***
+    ! maximum fraction consumed in any given geochemical reaction
+    loc_f = dum_dtyr/par_bio_geochem_tau
+    ! -------------------------------------------------------- !
+    ! calculate air-sea gas exchange fluxes
+    ! -------------------------------------------------------- !
     DO l=3,n_l_atm
        ia = conv_iselected_ia(l)
        if (.NOT. ocnatm_airsea_eqm(ia)) then
@@ -199,6 +208,17 @@ CONTAINS
                    loc_atm  = 0.0
                    loc_buff = 1.0
                 endif
+             elseif (io == io_H2S) then
+                ! make special case of H2S if it is being implicitly oxidized in the atmosphere
+                loc_ocn = ocn(io,dum_i,dum_j,n_k)
+                 select case (opt_ocnatmH2S_fix)
+                 case ('KMM','KMM_lowO2') ! default
+                    ! set 'buffer' to maximum fraction allowed in a geochem reaction
+                    ! (becasue we are implicitly allowing an oxidation reaction to occur in the atmosphere)
+                    loc_buff = loc_f                
+                 case default
+                    loc_buff = 1.0
+                 end select
              else
                 loc_ocn = ocn(io,dum_i,dum_j,n_k)
                 loc_buff = 1.0
@@ -219,7 +239,7 @@ CONTAINS
              ! calculate the molar magnitude of ocean deficit or surfit w.r.t. the atmosphere
              loc_deqm(io) = phys_ocn(ipo_dD,dum_i,dum_j,n_k)*phys_ocnatm(ipoa_A,dum_i,dum_j)*loc_rho*loc_buff*abs(loc_atm - loc_ocn)
              ! calculate the molar transfer that would normally then be applied
-             loc_dflux(ia) = dum_dt*abs(loc_focnatm(ia) - loc_fatmocn(ia))
+             loc_dflux(ia) = dum_dtyr*abs(loc_focnatm(ia) - loc_fatmocn(ia))
              ! ensure that molar transfer does not exceed the current disequilibrium
              ! (i.e., ensure that a +ve disequilibrium is not turned into a larger -ve disequilibrium at the next time-step)
              If (loc_deqm(io) > const_real_nullsmall) then
@@ -232,6 +252,9 @@ CONTAINS
                            & ' prevented at (',fun_conv_num_char_n(2,dum_i),',',fun_conv_num_char_n(2,dum_j),')'
                    end IF
                 end if
+             else
+                loc_focnatm(ia) = 0.0
+                loc_fatmocn(ia) = 0.0
              end If
           case default
              ! calculate bulk gas exchange
@@ -331,7 +354,9 @@ CONTAINS
           fun_calc_ocnatm_flux(ia) = loc_focnatm(ia) - loc_fatmocn(ia)
        end if
     end do
-
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
   END FUNCTION fun_calc_ocnatm_flux
   ! ****************************************************************************************************************************** !
 
@@ -460,33 +485,6 @@ CONTAINS
     !
     loc_ocn = 0.0
 
-    ! *** APPLY VARIABLE P:C RATIO ? ***
-    ! par_bio_red_PC_flex = 1 --> activate variable stoichiometry
-    ! par_bio_red_PC_flex = 2 --> activate variable stoichiometry with limit at high PO4
-    ! par_bio_red_PC_flex = 0 --> default fixed Redfield stoichiometry
-    if (par_bio_red_PC_flex > 0) then
-       ! default par_bio_red_PC_alpha1 = 1.0
-       ! default par_bio_red_PC_alpha2 = 1.0
-       ! to achieve average P:C more similar to fixed Redfield modern run, use  PC_alpha1 = 1.1643
-       ! an alternative is to scale only PC_alpha2 = 1.16
-       bio_part_red(is_POC,is_POP,dum_i,dum_j) = &
-            & par_bio_red_PC_alpha1 * (6.9e-3 * ocn(io_PO4,dum_i,dum_j,n_k)*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
-       if (par_bio_red_PC_flex == 2) then   ! limit C:P at high PO4 (because no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
-          if (bio_part_red(is_POC,is_POP,dum_i,dum_j) > par_bio_red_PC_max) then
-             bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
-          end if
-       end if
-       bio_part_red(is_POP,is_POC,dum_i,dum_j) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
-    elseif (par_bio_red_PC_flex == -1) then
-       bio_part_red(is_POC,is_POP,:,:) = par_bio_red_PC_max
-       bio_part_red(is_POP,is_POC,:,:) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
-    else
-       bio_part_red(is_POP,is_POC,:,:) = par_bio_red_POP_POC
-       bio_part_red(is_POC,is_POP,:,:) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
-    end if
-    ! set local N:P
-    loc_bio_NP = bio_part_red(is_POC,is_PON,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)
-
     ! *** CALCULATE MIXED LAYER PROPERTIES ***
     ! NOTE: MLD is stored as a POSITIVE depth below the surface
     ! ### temp code ############################################################################################################## !
@@ -609,6 +607,48 @@ CONTAINS
        loc_IO3 = ocn(io_IO3,dum_i,dum_j,n_k)
     end if
 
+    ! *** APPLY VARIABLE P:C RATIO ***
+    ! par_bio_red_PC_flex = 1 --> activate variable stoichiometry
+    ! par_bio_red_PC_flex = 2 --> activate variable stoichiometry with limit at high PO4
+    ! par_bio_red_PC_flex = 0 --> default fixed Redfield stoichiometry
+    ! NOTE: original if ... code structure replaced
+    ! NOTE: opt_bio_red_PC_flex == par_bio_red_PC_flex
+    select case (opt_bio_red_PC_flex)
+    case (-1)
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = par_bio_red_PC_flex_min
+    case (0)
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = par_bio_red_POP_POC
+    case (1,2)
+       ! default par_bio_red_PC_alpha1 = 1.0
+       ! default par_bio_red_PC_alpha2 = 1.0
+       ! to achieve average P:C more similar to fixed Redfield modern run, use PC_alpha1 = 1.1643
+       ! an alternative is to scale only PC_alpha2 = 1.16
+       bio_part_red(is_POC,is_POP,dum_i,dum_j) = &
+            & par_bio_red_PC_alpha1 * (6.9e-3 * loc_PO4*1.0e6 + par_bio_red_PC_alpha2*6.0e-3)
+       if (par_bio_red_PC_flex == 2) then   ! limit C:P at high PO4 (because no data for PO4 > 1.7 uM in Galbraith & Martiny, 2015)
+          if (bio_part_red(is_POC,is_POP,dum_i,dum_j) > par_bio_red_PC_max) then
+             bio_part_red(is_POC,is_POP,dum_i,dum_j) = par_bio_red_PC_max
+          end if
+       end if
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = 1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
+    case (3)
+       ! Galbraith & Martiny, 2015 ... corrected for uM being umol l-1 rather than umol kg-1 in cGENIE (6.9 o/oo -> 7.06 o/oo)
+       ! NOTE: assumes upper limit of C/P
+       ! NOTE: applies scaling factor (default value == 1.0)
+       bio_part_red(is_POC,is_POP,dum_i,dum_j) = 6.0E-3 + 7.06E-3*1.0E6*loc_PO4
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = par_bio_red_PC_flex_scale*1.0/bio_part_red(is_POC,is_POP,dum_i,dum_j)
+       ! set minimum C/P:
+       if (bio_part_red(is_POP,is_POC,dum_i,dum_j) < par_bio_red_PC_flex_min) then
+          bio_part_red(is_POP,is_POC,dum_i,dum_j) = par_bio_red_PC_flex_min
+       end if
+    case default
+       bio_part_red(is_POP,is_POC,dum_i,dum_j) = par_bio_red_POP_POC
+    end select
+    ! re-calculate P/C for completeness
+    bio_part_red(is_POC,is_POP,dum_i,dum_j) = 1.0/bio_part_red(is_POP,is_POC,dum_i,dum_j)
+    ! set local N:P
+    loc_bio_NP = bio_part_red(is_POC,is_PON,dum_i,dum_j)*bio_part_red(is_POP,is_POC,dum_i,dum_j)
+    
     ! *** CALCULATE PRODUCTIVITY MODIFIERS ***
     ! fractional ice-free coverage
     loc_ficefree = (1.0 - phys_ocnatm(ipoa_seaice,dum_i,dum_j))
@@ -883,10 +923,10 @@ CONTAINS
        ! prescribed POC flux
        ! NOTE: force_restore_docn_nuts has been assigned a negative sign (in the forcing update of the main biogem subroutine) ...
        ! NOTE: allow depletion of PO4 < 0.0 so as to force export production to the prescribed value
-       ! NOTE: correct for DOM (given that force_restore_docn_nuts has been devied from a prescribed particulate flux)
-       ! NOTE: assume par_bio_red_DOMfrac for the DOM fraction 
-       !       (loc_bio_red_DOMtotal has not been set to a non-zero value yet because the code that did it was moved back ...)
-       loc_dPO4 = -force_restore_docn_nuts(io_PO4)/(1.0 - par_bio_red_DOMfrac)
+       ! NOTE: there is no correction for DOM production (this occurs later)
+       !       hence at this point, loc_dPO4 is the PO4 uptake associated with POP, and not total production (POP+DOP)
+       !       (and hence idffers from the other biological scheme calculations of loc_dPO4) 
+       loc_dPO4 = -force_restore_docn_nuts(io_PO4)
     CASE ( &
          & '2N2T_PN_Tdep' &
          & )
