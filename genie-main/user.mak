@@ -74,13 +74,18 @@ MODEXT=mod
 # and include directories onto this stem.
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
-### DEFAULT ###
-NETCDF_DIR=/usr/local
-### sterling cluster ###
-#NETCDF_DIR=/share/apps
-### eevee cluster ###
-#NETCDF_DIR=/share/apps/netcdf
-### Mac (example) ###
-#NETCDF_DIR=/usr/local/Cellar/netcdf/4.9.2_1
+FNETCDF=$(shell hostname -s)
+ifeq ($(FNETCDF),sterling)
+  ### sterling cluster ###
+  NETCDF_DIR=/share/apps
+else ifeq ($(FNETCDF),eevee)
+  ### eevee cluster ###
+  NETCDF_DIR=/share/apps/netcdf
+else
+  ### DEFAULT ###
+  NETCDF_DIR=/usr/local
+  ### Mac (example) ###
+  #NETCDF_DIR=/usr/local/Cellar/netcdf/4.9.2_1
+endif
 
 NETCDF_NAME=netcdf

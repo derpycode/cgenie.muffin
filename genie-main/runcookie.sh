@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #
 #####################################################################
-### SCIPT TO META-CONFIGURE AND RUN CGENIE.MUFFIN ###################
+### SCIPT TO META-CONFIGURE AND RUN CGENIE.cookie ###################
 #####################################################################
 #
 echo ""
@@ -39,7 +39,7 @@ if [ -z "$2" ]; then
     echo "Usage: '$2' 2nd parameter must be the user (experiment) configuration file directory"
     exit 65
   else
-    GOINDIR=$HOMEDIR/cgenie.muffin/genie-userconfigs/"$2"
+    GOINDIR=$HOMEDIR/cgenie.cookie/genie-userconfigs/"$2"
 fi
 # [3] set run ID (input run ID (= user configuration file name))
 if [ -z "$3" ]; then
@@ -76,9 +76,9 @@ OMP_NUM_THREADS=2
 export OMP_NUM_THREADS
 #
 OUTPUTPATH=$OUTPUTDIR/$RUNID
-CONFIGPATH=$HOMEDIR/cgenie.muffin/genie-main/configs
+CONFIGPATH=$HOMEDIR/cgenie.cookie/genie-main/configs
 CONFIGNAME=$RUNID".config"
-BINARYPATH=$HOMEDIR/cgenie.muffin/genie-main
+BINARYPATH=$HOMEDIR/cgenie.cookie/genie-main
 RESTARTNAME="rst.1"
 #
 # (3) CHECK PARAMETERS
