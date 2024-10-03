@@ -98,7 +98,7 @@ runtests () {
     OK="FALSE"
     if [ $COMPARE_AGAINST_ASSUMEDGOOD = "TRUE" ] ; then
 	REF_DIR=$OUTROOT/$ASSUMEDGOOD_NAME
-	DIFF_OPTS="-v -a 6e-15 -r2"
+	DIFF_OPTS="-v -a 6e-15 -r 2"
     elif [ $COMPARE_AGAINST_KNOWNGOOD = "TRUE" ] ; then
 	REF_DIR=$CODEDIR/genie-knowngood/$KNOWNGOOD_NAME
 	DIFF_OPTS="-v -a 6e-15 -r 35"
