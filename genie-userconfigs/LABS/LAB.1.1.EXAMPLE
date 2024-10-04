@@ -19,8 +19,8 @@ bg_par_bio_prodopt='NONE'
 #
 # *** DATA SAVING ******************************************************
 #
-# Preformed diagnostics option == physics only
-bg_par_data_save_level=1
+# Preformed diagnostics option == BASIC
+bg_par_data_save_level=2
 # force time-slice save at run end only
 bg_par_infile_slice_name='save_timeslice_NONE.dat'
 # Include experiment name in BIOGEM netCDF filenames? 
