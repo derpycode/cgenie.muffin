@@ -27,11 +27,12 @@ bg_ctrl_ncout_expid_name=.false.
 # *** FORCINGS *********************************************************
 #
 # apply numerical dye circulation tracer
+# NOTE: flux set to ZERO
 bg_par_forcing_name="pyyyyz.Fblue"
 bg_par_force_point_i=22
 bg_par_force_point_j=33
 bg_par_force_point_k=8
-bg_par_ocn_force_scale_val_49=1.0E12
+bg_par_ocn_force_scale_val_49=0.0
 #
 # *** MISC *************************************************************
 #
