@@ -76,7 +76,7 @@ MODULE genie_control
 #define GOLDSTEINNTRACS 2
 #endif
 #ifndef GOLDSTEINMAXISLES
-#define GOLDSTEINMAXISLES 5
+#define GOLDSTEINMAXISLES 9
 #endif
 
       parameter(ilon1_ocn=GOLDSTEINNLONS,ilat1_ocn=GOLDSTEINNLATS)
