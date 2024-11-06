@@ -115,7 +115,7 @@ c-DJL 21/9/05 (for reading IGCM grid), inserted by RMA
       NAMELIST /ini_sic_nml/indir_name,outdir_name,rstdir_name
       NAMELIST /ini_sic_nml/igrid,world
       NAMELIST /ini_sic_nml/npstp,iwstp,itstp,ianav,conserv_per
-      NAMELIST /ini_sic_nml/ans,yearlen,nyear,diffsic,lout
+      NAMELIST /ini_sic_nml/ans,sodaylen,sidaylen,yearlen,nyear,diffsic,lout
       NAMELIST /ini_sic_nml/netin,netout,ascout,filenetin
       NAMELIST /ini_sic_nml/dirnetout,lin
       NAMELIST /ini_sic_nml/dosc,impsic,debug_init,debug_end,debug_loop
@@ -217,6 +217,16 @@ c     New or continuing run
       if (debug_init) print*,'new or continuing run ?'
       if (debug_init) print*,ans
 
+c CL (01/15/24) : number of seconds per solar day
+c     sodaylen = 86400.0
+      if (debug_init) print*,'number of seconds per solar day'
+      if (debug_init) print*,sodaylen
+
+c CL (01/15/24) : number of seconds per sidereal day
+c     sidaylen = 86164.0
+      if (debug_init) print*,'number of seconds per sidereal day'
+      if (debug_init) print*,sidaylen
+
 c AY (05/05/04) : number of days per GOLDSTEIN sea-ice year (usually 365.25)
 c     yearlen = 365.25
       if (debug_init) print*,'number of days per GOLDSTEIN sea-ice year'
@@ -235,6 +245,13 @@ c dimensional scale values
       usc = 0.05
       rsc = 6.37e6
       dsc = 5e3
+c CL (01/15/24) : used sidereal day length for Coriolis effect scaling factor
+c     AR (24/03/03) : check for sidereal and solar days being different, otherwise use original code for backwards compatabilty
+      if (abs(sodaylen-sidaylen).gt.0.001)then
+         fsc = 4*pi/sidaylen
+      else
+         fsc = 2*7.2921e-5
+      endif
       fsc = 2*7.2921e-5
       gsc = 9.81
       rh0sc = 1e3
@@ -334,11 +351,11 @@ c     &,180/pi*asin(ds(j)),sv(j),s(j),ds(j)
 c v2 seasonality
       if (debug_init) print*,'timesteps per year'
       if (debug_init) print*,nyear
-      tv = 86400.0*yearlen/(nyear*tsc)
+      tv = sodaylen*yearlen/(nyear*tsc)
 
 c AY (13/01/04) : oops!  left this out
       dtsic = tv  
-      if (debug_init) print*,'sea-ice timestep in days',tv*tsc/86400
+      if (debug_init) print*,'sea-ice timestep in days',tv*tsc/sodaylen
 
       rdtdim = 1.0/(tsc*dtsic)
       if (debug_init) print*,'rdtdim = ',rdtdim
@@ -425,7 +442,7 @@ cc EMBM stuff follows...
 c read some scalings
 
 c AY (11/12/03) : year length inconsistent here - corrected to 365.25
-      ryear = 1.0/(yearlen*86400)
+      ryear = 1.0/(yearlen*sodaylen)
 
 c more constants
 

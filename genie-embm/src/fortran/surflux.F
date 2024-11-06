@@ -807,14 +807,11 @@ c     If so: the CH4 term must be set to zero (and associated N2O term))
                n2o(i,j) = n2o0
             endif
 c     calculate CO2 contribution
-c     MLI (16/09/20) State dependent climate sensitivity
-            if(opt_delf2x_cesm) then
-               co2_t1 = co2(i,j)*1e6
-               co2_t2 = (7.58434074655/1e10) * (co2_t1**(3.))
-               co2_t3 = (3.25968011260/1e6) * (co2_t1**(2.))
-               co2_t4 = 0.0054526683 * co2_t1 + 4.446262989
-               co2_t5 = co2_t2 - co2_t3 + co2_t4
-               co2_term = co2_t5 * log(co2(i,j)/co20)
+c     MLI (16/09/20 & 17/09/24) State dependent climate sensitivity
+            if (opt_delf2x_cesm) then
+               co2_t1 = co2(i,j) * 1e6
+               co2_t2 = 0.0015223 * co2_t1 + 5.59383568
+               co2_term = co2_t2 * log(co2(i,j)/co20)
             else
                co2_term = delf2x*log(co2(i,j)/co20)
             endif

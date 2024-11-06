@@ -160,9 +160,17 @@ c adjustable freshwater forcing parameters
       real extra0,range0,extra1a,extra1b,extra1c
       common /embm_fwf_real/ extra0,range0,extra1a,extra1b,extra1c
 
+c CL (01/15/24) : seconds per solar day (necessary for GENIE)
+      real sodaylen
+      common /embm_sodaylen/sodaylen
+
+c CL (01/15/24) : seconds per sidereal day (necessary for GENIE)
+      real sidaylen
+      common /embm_sidaylen/sidaylen
+
 c AY (08/04/04) : days per year (necessary for GENIE)
       real yearlen
-      common /ocn_yearlen/yearlen
+      common /embm_yearlen/yearlen
 
 c v2 seasonal diagnostics
 c AP (03/08/06) : Addition of avg precipitated atm. humidity

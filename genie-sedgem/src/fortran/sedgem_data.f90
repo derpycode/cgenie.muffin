@@ -2105,9 +2105,7 @@ CONTAINS
     ! write out mean global detrital flux in units of g cm-2 kyr-1 as a check 
     ! NOTE: local fluxes (loc_fsed) in units of mol cm-2 yr-1
     loc_mean_sedgrid = sum(loc_mask(:,:)*loc_area(:,:)*loc_fsed(is_det,:,:))/loc_tot_mask_area
-    print*,loc_mean_sedgrid
     loc_mean_sedgrid = loc_mean_sedgrid/(conv_det_g_mol*conv_yr_kyr)
-    print*,loc_mean_sedgrid
     write(unit=out,fmt='(A28,f7.3,A13)',iostat=ios) &
          & ' Mean detrital flux        :',loc_mean_sedgrid,' g cm-2 kyr-1'
     call check_iostat(ios,__LINE__,__FILE__)

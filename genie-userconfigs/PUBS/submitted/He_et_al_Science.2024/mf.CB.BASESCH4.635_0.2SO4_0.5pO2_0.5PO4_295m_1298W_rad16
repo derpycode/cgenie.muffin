@@ -1,0 +1,128 @@
+# *******************************************************************
+# *** USERCONFIG.MODERN.BIOGEM.PO4.SPIN *****************************
+# *******************************************************************
+#
+# *** CLIMATE *******************************************************
+#
+# set NO climate feedback (climate NOT responding to changing pCH4)
+ea_36=n
+# solar constant
+ma_genie_solar_constant=1298.
+#
+# *** ATMOSPHERIC PHOTOCHEMISTRY ************************************
+#
+# atmospheric photochemical scheme ID string
+ac_par_atm_CH4_photochem="claire06"
+#
+# *** BIOLOGICAL NEW PRODUCTION *************************************
+#
+# *** optional changes to align with PALEO recommendations **********
+bg_par_bio_prodopt="bio_P"
+bg_par_bio_tau=63.3827
+bg_par_bio_c0_PO4=0.10E-06
+#
+# *** ORGANIC MATTER EXPORT RATIOS **********************************
+#
+# production fraction of dissolved organic matter
+bg_par_bio_red_DOMfrac=0.66
+#
+# *** INORGANIC MATTER EXPORT RATIOS ********************************
+#
+# SET NO PELAGIC CARBONATE PRODUCTION
+bg_par_bio_red_POC_CaCO3=0.0
+bg_par_bio_red_POC_CaCO3_pP=0.0
+#
+# *** REMINERALIZATION **********************************************
+#
+# set remineralization scheme [e.g., hard thresholds 'true' // 'false']
+bg_ctrl_bio_remin_thresh=.false.
+# half-saturation constant for oxic remin
+bg_par_bio_remin_c0_O2=1.0E-07
+# inhibition constant for oxic remin
+bg_par_bio_remin_ci_O2=1.0E-06
+# half-saturation constant for sulphate reduction
+bg_par_bio_remin_c0_SO4=5.0E-04
+# inhibition constant for sulphate reduction
+bg_par_bio_remin_ci_SO4=5.0E-04
+# DOC lifetime (yrs)
+bg_par_bio_remin_DOMlifetime=0.5
+# initial fractional abundance of POC component #2
+bg_par_bio_remin_POC_frac2=0.0557
+# depth of remineralization or particulate organic matter
+bg_par_bio_remin_POC_eL1=294.9726
+# remineralization length #2 for POC
+bg_par_bio_remin_POC_eL2=1000000.0
+# initial fractional abundance of CaCO3 component #2
+bg_par_bio_remin_CaCO3_frac2=0.45
+# depth of remineralization or CaCO3
+bg_par_bio_remin_CaCO3_eL1=1.8905e+003
+# remineralization length #2 for CaCO3
+bg_par_bio_remin_CaCO3_eL2=1000000.0
+# sulfide oxidation rate form
+bg_opt_bio_remin_oxidize_H2StoSO4="OLD"
+# sulfide oxidation rate constant [only used if rate law is linear]
+#bg_par_bio_remin_kH2StoSO4=1.0E07
+# rate constant for aerobic methanotrophy
+bg_par_bio_remin_AER_kAER=0.10
+# O2 half-saturation constant for aerobic methanotrophy
+bg_par_bio_remin_AER_Km_O2=20.E-06
+# rate constant for AOM
+bg_par_bio_remin_AOM_kAOM=0.01
+# SO4 half-saturation constant for AOM
+bg_par_bio_remin_AOM_Km_SO4=500.0E-06
+# enable/disable thermodynamic terms
+bg_par_bio_remin_AER_thermo="on"
+bg_par_bio_remin_AOM_thermo="on"
+# biological energy quanta (BEQ) for CH4 oxidation
+bg_par_bio_remin_AER_BEQ=15.0
+bg_par_bio_remin_AOM_BEQ=15.0
+# methanogenesis 13C fractionation
+bg_par_d13C_Corg_CH4_epsilon=-35.0
+#
+# *** DATA SAVING ***************************************************
+#
+# BASIC + biology + FULL (inc. redox) geochem diagnostics
+bg_par_data_save_level=7
+# force time-slice save at run end only
+bg_par_infile_slice_name='save_timeslice_NONE.dat'
+#
+# *** FORCINGS ******************************************************
+#
+bg_par_forcing_name="pyyyyz.RpO2"
+bg_par_atm_force_scale_val_6=0.105
+#
+# *** MISC **********************************************************
+#
+# *** optional changes to align with PALEO recommendations **********
+# set 'instantaneous' water column remineralziation
+bg_par_bio_remin_sinkingrate_physical=9.9E9
+bg_par_bio_remin_sinkingrate_reaction=125.0
+# maximum time-scale to geochemical reaction completion (days)
+bg_par_bio_geochem_tau=45.0
+# extend solubility and geochem constant T range (leave S range as default)
+gm_par_geochem_Tmin  = -2.0
+gm_par_geochem_Tmax  = 45.0
+gm_par_carbchem_Tmin = -2.0
+gm_par_carbchem_Tmax = 45.0
+#
+# *** INITIAL CONDITIONS ********************************************
+#
+# set initial carbonate chemsitry state
+ac_atm_init_3=2224.0E-06    #   pCO2 -- 'carbon dioxide (CO2)'
+ac_atm_init_4=0.0           #   pCO2_13C -- 'd13C CO2'
+bg_ocn_init_3=5259.186E-6   #   DIC -- 'dissolved inorganic carbon (DIC)'
+bg_ocn_init_4=0.0           #   DIC_13C -- 'd13C of DIC'
+bg_ocn_init_12=5227.416E-6  #   ALK -- 'alkalinity (ALK)'
+# mean ocean PO4
+bg_ocn_init_8=1.0795E-06
+#
+# *******************************************************************
+# *** END ***********************************************************
+# *******************************************************************
+#
+# >>> ADDED BY MATLAB 
+# scaling for atmospheric CO2 radiative forcing, relative to 278 ppm 
+ea_radfor_scl_co2=16.
+# ADJUST REDOX
+# ocean SO4 (mol kg-1) -- modern default = 0.28
+bg_ocn_init_38=0.005600000000000001

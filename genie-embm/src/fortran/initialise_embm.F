@@ -214,7 +214,7 @@ c declare a namelist to store EMBM's initialisation vars
       NAMELIST /ini_embm_nml/xu_wstress,yu_wstress,xv_wstress
       NAMELIST /ini_embm_nml/yv_wstress,u_wspeed,v_wspeed
       NAMELIST /ini_embm_nml/npstp,iwstp,itstp,ianav,ans
-      NAMELIST /ini_embm_nml/yearlen,nyear,ndta,scf
+      NAMELIST /ini_embm_nml/sodaylen,sidaylen,yearlen,nyear,ndta,scf
       NAMELIST /ini_embm_nml/diffamp,diffwid,difflin
       NAMELIST /ini_embm_nml/betaz,betam
       NAMELIST /ini_embm_nml/radfor_scl_co2,radfor_pc_co2_rise
@@ -430,6 +430,16 @@ c     New or continuing run
       if (debug_init) print*,'new or continuing run ?'
       if (debug_init) print*,ans
 
+c CL (01/15/24) : number of seconds per solar day
+c     sodaylen = 86400.0
+      if (debug_init) print*,'number of seconds per solar day'
+      if (debug_init) print*,sodaylen
+
+c CL (01/15/24) : number of seconds per sidereal day
+c     sidaylen = 86164.0
+      if (debug_init) print*,'number of seconds per sidereal day'
+      if (debug_init) print*,sidaylen
+
 c AY (05/05/04) : number of days per EMBM year (usually 365.25)
 c     yearlen = 365.25
       if (debug_init) print*,'number of days per EMBM year'
@@ -562,8 +572,8 @@ c v2 seasonality
       if (debug_init) print*,'timesteps per year and A/O dt ratio'
       if (debug_init) print*,nyear,ndta
       if(nyear.gt.maxnyr)stop 'embm : nyear > maxnyr' 
-      tv = 86400.0*yearlen/(nyear*tsc)
-      ryear = 1.0/(yearlen*86400)
+      tv = sodaylen*yearlen/(nyear*tsc)
+      ryear = 1.0/(yearlen*sodaylen)
 
       dtatm = tv/ndta
       if (debug_init) print*, 'embm timestep (s) =',dtatm*tsc
@@ -577,7 +587,7 @@ c initialize
 c        dzu(1,k) = 0
 c        dzu(2,k) = 0
       enddo
-      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/86400
+      if (debug_init) print*,'dimensional ocean timestep',tv*tsc/sodaylen
       if (debug_init) print*,'dimensionless O/A timesteps',tv,dtatm
 
       rdtdim = 1.0/(tsc*dt(kmax))
@@ -1067,8 +1077,8 @@ c parameters for extra heat diffusion where pptn high
 
 c     diffmod0 = 60e6
       diffmod0 = 0.
-      ppmin = 2./(yearlen*86400.)
-      ppmax = 4./(yearlen*86400.)
+      ppmin = 2./(yearlen*sodaylen)
+      ppmax = 4./(yearlen*sodaylen)
 
 c nre simpler diffusivity
 
@@ -1228,7 +1238,7 @@ c useful constant proportional to inverse timscale for surface freezing
 c     rsictscsf = ch_ice*u_tau_ice*rho0sea*cpo_ice
       rsictscsf = ch_ice*u_tau_ice*rho0*cpo_ice
       if (debug_init) print*,'rsictscsf = ',rsictscsf
-      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*86400.0)
+      rsictscsf = dsc*dz(kmax)*rho0*cpo_ice/(17.5*sodaylen)
       if (debug_init) print*,'rsictscsf = ',rsictscsf
 c minimum average sea-ice thickness over a grid cell
       hmin = 0.01
