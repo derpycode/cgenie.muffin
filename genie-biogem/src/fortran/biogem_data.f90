@@ -3477,6 +3477,7 @@ CONTAINS
   SUBROUTINE sub_init_carb()
     ! local variables
     INTEGER::i,j,k
+    real,dimension(2)::loc_carb_RF0_SF0
     ! zero arrays
     ! NOTE: leave carb_TSn array at its initialized state
     !       so that a full update of carb constants etc is ALWAYS performed upon the first call to tstep_biogem
@@ -3514,6 +3515,7 @@ CONTAINS
                 carb(ic_H,i,j,k) = 10**(-7.8)
                 ! calculate carbonate chemistry
                 CALL sub_calc_carb(        &
+                     & par_carbchem_pH_tolerance, &
                      & ocn(io_DIC,i,j,k),  &
                      & ocn(io_ALK,i,j,k),  &
                      & ocn(io_Ca,i,j,k),   &
@@ -3528,10 +3530,11 @@ CONTAINS
                      & carb(:,i,j,k),      &
                      & carbalk(:,i,j,k)    &
                      & )
-                ! estimate Revelle factor
-                CALL sub_calc_carb_RF0(      &
+                ! surface-only properties -- estimate Revelle (and 'sensitivity') factor
+                loc_carb_RF0_SF0(:) = fun_calc_carb_RF0_SF0( &
                      & ocn(io_DIC,i,j,k),  &
                      & ocn(io_ALK,i,j,k),  &
+                     & ocn(io_Ca,i,j,k),   &
                      & ocn(io_PO4,i,j,k),  &
                      & ocn(io_SiO2,i,j,k), &
                      & ocn(io_B,i,j,k),    &
@@ -3542,6 +3545,8 @@ CONTAINS
                      & carbconst(:,i,j,k), &
                      & carb(:,i,j,k)    &
                      & )
+                carb(ic_RF0,i,j,n_k)        = loc_carb_RF0_SF0(1)
+                carb(ic_RdfCO2dDIC,i,j,n_k) = loc_carb_RF0_SF0(2)
                 ! calculate carbonate system isotopic properties
                 if (ocn_select(io_DIC_13C)) then
                    call sub_calc_carb_r13C(      &

@@ -323,10 +323,12 @@ CONTAINS
   ! NOTE: the potential for rapidly oxidzing species such as NH4 and esp. H2S to have a negative concentration is tested for
   !       + also saves unnecessary calculation when NH4 and H2S are not selected as tracers (and have zero concentrations)
   SUBROUTINE sub_calc_carb( &
+       & dum_pHtol, &
        & dum_DIC,dum_ALK,dum_Ca, &
        & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
        & dum_carbconst,dum_carb,dum_carbalk)
     ! dummy variables
+    REAL,INTENT(in)::dum_pHtol
     REAL,INTENT(in)::dum_DIC,dum_ALK,dum_Ca
     REAL,INTENT(in)::dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot
     REAL,DIMENSION(n_carbconst),intent(in)::dum_carbconst
@@ -486,7 +488,12 @@ CONTAINS
        ! the implicit bit!
        loc_H = SQRT(loc_H1*loc_H2)
        ! test for the relative change in [H] falling below some criterion (at which point the solution is assumed stable)
-       IF (ABS(1.0 - loc_H/loc_H_old) < (1.0E-8/loc_H)*par_carbchem_pH_tolerance) then
+       ! NOTE: the old code criteria simply adjusted the pH tolerance according to the [H] compared to ~modern (pH 8):
+       !       ABS(1.0 - loc_H/loc_H_old) < (1.0E-8/loc_H)*par_carbchem_pH_tolerance
+       !       i.e., at higher pH and lower [H], pH was considered solved for, for a larger relative change in [H]
+       ! NOTE: in the calculation of RF0, the pH tolerance was not scaled
+!!$       IF (ABS(1.0 - loc_H/loc_H_old) < (1.0E-8/loc_H)*par_carbchem_pH_tolerance) then
+       IF ( ABS(log10(loc_H_old)-log10(loc_H)) < dum_pHtol ) then
           ! calculate result variables
           dum_carb(ic_conc_CO2)  = loc_conc_CO2
           dum_carb(ic_conc_CO3)  = loc_conc_CO3
@@ -496,6 +503,7 @@ CONTAINS
           dum_carb(ic_ohm_arg)   = dum_Ca*loc_conc_CO3/dum_carbconst(icc_karg)  
           dum_carb(ic_H)         = loc_H 
           dum_carb(ic_pHsws)     = -log10(loc_H)
+          dum_carb(ic_pH_n)      = n
           ! calculate value of [CO3--] at calcite and aragonite saturation
           ! NOTE: this assumes that the value of omega is unity at saturation (definition!)
           loc_sat_cal = dum_carbconst(icc_kcal) * 1.0/dum_Ca
@@ -562,246 +570,6 @@ CONTAINS
 
   END SUBROUTINE sub_calc_carb
   ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE REVELLE FACTOR
-  ! NOTE: as per sub_calc_carb
-  SUBROUTINE sub_calc_carb_RF0( &
-       & dum_DIC,dum_ALK, &
-       & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
-       & dum_carbconst,dum_carb)
-    ! dummy variables
-    REAL,INTENT(in)::dum_DIC,dum_ALK
-    REAL,INTENT(in)::dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot
-    REAL,DIMENSION(n_carbconst),intent(in)::dum_carbconst
-    REAL,DIMENSION(n_carb),INTENT(inout)::dum_carb
-    ! local variables
-    INTEGER::n
-    real::loc_OH,loc_H3SiO4,loc_H4BO4,loc_HSO4,loc_HF,loc_H3PO4,loc_H2PO4,loc_HPO4,loc_PO4,loc_HS,loc_NH3
-    REAL::loc_zed
-    REAL::loc_ALK_DIC,loc_conc_CO2,loc_conc_CO3,loc_conc_HCO3
-    REAL::loc_H,loc_H_old,loc_H1,loc_H2,loc_H_p2,loc_H_p3,loc_H_free,loc_H_total
-    real::loc_DIC_RFO
-    ! initialize loop variables
-    n = 1
-    loc_H = dum_carb(ic_H)
-    loc_HF = 0.0
-    loc_HS = 0.0
-    loc_NH3 = 0.0
-
-    ! perturb DIC
-    loc_DIC_RFO = dum_DIC + 1.0e-6
-
-    block_solvehloop: DO
-
-       ! make a copy of the [H] value from the previous iteration (or seeded value if first iteration)
-       loc_H_old = loc_H
-       ! local pre-calculated powers
-       loc_H_p2 = loc_H*loc_H
-       loc_H_p3 = loc_H*loc_H_p2
-       ! [H+] on alternative pH scales
-       loc_H_free = loc_H/(1.0 + dum_SO4tot/dum_carbconst(icc_kHSO4) + dum_Ftot/dum_carbconst(icc_kHF))
-       loc_H_total = loc_H_free*(1.0 + dum_SO4tot/dum_carbconst(icc_kHSO4))
-       ! ion product of water; H2O <-kW-> H+ + OH-
-       loc_OH = dum_carbconst(icc_kW)/loc_H
-       ! boric acid; B(OH)3 + H2O <-kB-> B(OH)4- + H+
-       loc_H4BO4 = dum_Btot/(1.0 + loc_H/dum_carbconst(icc_kB))
-       ! SiO2 + 2H2O <-kSi-> H+ + Si(OH)3O-
-       loc_H3SiO4 = dum_SiO2tot/(1.0 + loc_H/dum_carbconst(icc_kSi))
-       ! bisulphate; HSO4- <-kHSO4-> H+ + SO42-
-       loc_HSO4 = dum_SO4tot/(1.0 + dum_carbconst(icc_kHSO4)/loc_H)
-       ! hydrogen floride; HF <-kHF-> H+ + F-
-       loc_HF = dum_Ftot/(1.0 + dum_carbconst(icc_kHF)/loc_H)
-       ! hydrogen sulphide; H2S <-kH2S-> H+ + HS-
-       if (dum_H2Stot > const_real_nullsmall) loc_HS = dum_H2Stot/(1.0 + loc_H/dum_carbconst(icc_kH2S))
-       ! ammonium; NH4+ <-kNH4-> H+ + NH3
-       if (dum_NH4tot > const_real_nullsmall) loc_NH3 = dum_NH4tot/(1.0 + loc_H/dum_carbconst(icc_kNH4))
-       ! phosphoric acid
-       loc_H3PO4 = dum_PO4tot/( &
-            & 1.0 + &
-            & dum_carbconst(icc_kP1)/loc_H + &
-            & (dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2))/loc_H_p2 + &
-            & (dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3))/loc_H_p3 &
-            & )
-       loc_H2PO4 = dum_PO4tot/( &
-            & 1.0 + &
-            & loc_H/dum_carbconst(icc_kP1) + &
-            & dum_carbconst(icc_kP2)/loc_H + &
-            & (dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3))/loc_H_p2 &
-            & )
-       loc_HPO4 = dum_PO4tot/( &
-            & 1.0 + &
-            & loc_H/dum_carbconst(icc_kP2) + &
-            & loc_H_p2/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)) + &
-            & dum_carbconst(icc_kP3)/loc_H &
-            & )
-       loc_PO4 = dum_PO4tot/( &
-            & 1.0 + &
-            & loc_H/dum_carbconst(icc_kP3) + &
-            & loc_H_p2/(dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) + &
-            & loc_H_p3/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) &
-            & )
-       ! calculate carbonate alkalinity
-       if (ctrl_carbchem_noH3SiO4) then
-          loc_ALK_DIC = dum_ALK &
-               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_NH3 - loc_HS &
-               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
-       else
-          loc_ALK_DIC = dum_ALK &
-               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
-               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
-       end if
-       ! estimate the partitioning between the aqueous carbonate species, and then make two independent estimates of [H]
-       loc_zed = ( &
-            &   (4.0*loc_ALK_DIC + loc_DIC_RFO*dum_carbconst(icc_k) - loc_ALK_DIC*dum_carbconst(icc_k))**2 + &
-            &   4.0*(dum_carbconst(icc_k) - 4.0)*loc_ALK_DIC**2 &
-            & )**0.5
-       loc_conc_HCO3 = (loc_DIC_RFO*dum_carbconst(icc_k) - loc_zed)/(dum_carbconst(icc_k) - 4.0)
-       loc_conc_CO3 = &
-            & ( &
-            &   loc_ALK_DIC*dum_carbconst(icc_k) - loc_DIC_RFO*dum_carbconst(icc_k) - &
-            &   4.0*loc_ALK_DIC + loc_zed &
-            & ) &
-            & /(2.0*(dum_carbconst(icc_k) - 4.0))
-       loc_conc_CO2 = loc_DIC_RFO - loc_ALK_DIC + &
-            & ( &
-            &   loc_ALK_DIC*dum_carbconst(icc_k) - loc_DIC_RFO*dum_carbconst(icc_k) - &
-            &   4.0*loc_ALK_DIC + loc_zed &
-            & ) &
-            & /(2.0*(dum_carbconst(icc_k) - 4.0))        
-       loc_H1 = dum_carbconst(icc_k1)*loc_conc_CO2/loc_conc_HCO3
-       loc_H2 = dum_carbconst(icc_k2)*loc_conc_HCO3/loc_conc_CO3
-       ! the implicit bit!
-       loc_H = SQRT(loc_H1*loc_H2)
-       IF (ABS(1.0 - loc_H/loc_H_old) < par_carbchem_pH_tolerance) then
-          ! calcualate and return Revelle factor
-          dum_carb(ic_RF0) = (loc_conc_CO2/dum_carb(ic_conc_CO2) - 1.0)/(loc_DIC_RFO/dum_DIC - 1.0)
-          EXIT
-       else
-          n = n + 1
-       end if
-       if ((loc_H1 < const_real_nullsmall) .OR. (loc_H2 < const_real_nullsmall) .OR. (n > par_carbchem_pH_iterationmax)) THEN
-          ! set null Revelle factor
-          dum_carb(ic_RF0) = 0.0
-          exit
-       end if
-
-    END DO block_solvehloop
-
-  END SUBROUTINE sub_calc_carb_RF0
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE CARBONATE SYSTEM ISOTOPIC RATIOS (r13C)
-  ! NOTE: fractonation factors after Zhang et al. [1995]
-  ! NOTE: all equations following Zeebe and Wolf-Gladrow [2001] (section 3.2)
-  subroutine sub_calc_carb_r13C(dum_T,dum_DIC,dum_DIC_13C,dum_carb,dum_carbisor)
-    ! dummy variables
-    REAL,INTENT(in)::dum_T,dum_DIC,dum_DIC_13C
-    REAL,DIMENSION(n_carb),INTENT(in)::dum_carb 
-    REAL,DIMENSION(n_carbisor),INTENT(inout)::dum_carbisor
-    ! local variables
-    real::loc_TC
-    real::loc_epsilon_bg,loc_epsilon_dg,loc_epsilon_cg,loc_epsilon_cb,loc_epsilon_db
-    real::loc_DIC_r13C,loc_CO2_r13C,loc_HCO3_r13C,loc_CO3_r13C
-    real::loc_DIC_d13C,loc_CO2_d13C,loc_HCO3_d13C,loc_CO3_d13C
-    ! initialize local variables
-    loc_TC = dum_T - const_zeroC
-    loc_DIC_d13C = fun_calc_isotope_delta(dum_DIC,dum_DIC_13C,const_standards(11),.FALSE.,const_real_null)
-    ! calculate local fractionation factors
-    ! epsilon_bg = epsilon(HCO3- - CO2(G))
-    ! epsilon_dg = epsilon(CO2 - CO2(g))
-    ! epsilon_cg = epsilon(CO32- - CO2(g))
-    ! epsilon_cb = epsilon(CO32- - HCO3-)
-    ! epsilon_db = epsilon(CO2 - HCO3-)
-    loc_epsilon_bg = -0.1141*loc_TC + 10.78
-    loc_epsilon_dg = +0.0049*loc_TC - 1.31
-    loc_epsilon_cg = -0.052*loc_TC + 7.22
-    loc_epsilon_cb = loc_epsilon_cg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
-    loc_epsilon_db = loc_epsilon_dg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
-    ! calculate aqueous system deltas
-    loc_HCO3_d13C = &
-         & (loc_DIC_d13C*dum_DIC - (loc_epsilon_db*dum_carb(ic_conc_CO2) + loc_epsilon_cb*dum_carb(ic_conc_CO3)))/ &
-         & ( &
-         &   (1.0 + loc_epsilon_db*1.0E-3)*dum_carb(ic_conc_CO2) + &
-         &   dum_carb(ic_conc_HCO3) + &
-         &   (1.0 + loc_epsilon_cb*1.0E-3)*dum_carb(ic_conc_CO3) &
-         & )
-    loc_CO2_d13C = loc_epsilon_db + loc_HCO3_d13C*(1.0 + loc_epsilon_db*1.0E-3)
-    loc_CO3_d13C = loc_epsilon_cb + loc_HCO3_d13C*(1.0 + loc_epsilon_cb*1.0E-3)
-    ! check - calculate d13C of DIC from component isotopic values
-    loc_CO2_r13C  = fun_calc_isotope_fraction(loc_CO2_d13C,const_standards(11))
-    loc_HCO3_r13C = fun_calc_isotope_fraction(loc_HCO3_d13C,const_standards(11))
-    loc_CO3_r13C  = fun_calc_isotope_fraction(loc_CO3_d13C,const_standards(11))
-    loc_DIC_r13C  = &
-         & (loc_CO2_r13C*dum_carb(ic_conc_CO2) + loc_HCO3_r13C*dum_carb(ic_conc_HCO3) + loc_CO3_r13C*dum_carb(ic_conc_CO3))/ &
-         dum_DIC
-    loc_DIC_d13C = fun_calc_isotope_delta(dum_DIC,loc_DIC_r13C*dum_DIC,const_standards(11),.FALSE.,const_real_null)
-    ! write to results variable
-    dum_carbisor(ici_DIC_r13C)  = loc_DIC_r13C
-    dum_carbisor(ici_CO2_r13C)  = loc_CO2_r13C
-    dum_carbisor(ici_HCO3_r13C) = loc_HCO3_r13C
-    dum_carbisor(ici_CO3_r13C)  = loc_CO3_r13C
-  end subroutine sub_calc_carb_r13C
-  ! ****************************************************************************************************************************** !
-
-
-  ! ****************************************************************************************************************************** !
-  ! CALCULATE CARBONATE SYSTEM ISOTOPIC RATIOS (r14C)
-  ! NOTE: fractonation factors after Zhang et al. [1995]
-  ! NOTE: all equations following Zeebe and Wolf-Gladrow [2001] (section 3.2)
-  subroutine sub_calc_carb_r14C(dum_T,dum_DIC,dum_DIC_14C,dum_carb,dum_carbisor)
-    ! dummy variables
-    REAL,INTENT(in)::dum_T,dum_DIC,dum_DIC_14C
-    REAL,DIMENSION(n_carb),INTENT(in)::dum_carb 
-    REAL,DIMENSION(n_carbisor),INTENT(inout)::dum_carbisor
-    ! local variables
-    real::loc_TC
-    real::loc_epsilon_bg,loc_epsilon_dg,loc_epsilon_cg,loc_epsilon_cb,loc_epsilon_db
-    real::loc_DIC_r14C,loc_CO2_r14C,loc_HCO3_r14C,loc_CO3_r14C
-    real::loc_DIC_d14C,loc_CO2_d14C,loc_HCO3_d14C,loc_CO3_d14C
-    ! initialize local variables
-    loc_TC = dum_T - const_zeroC
-    loc_DIC_d14C = fun_calc_isotope_delta(dum_DIC,dum_DIC_14C,const_standards(12),.FALSE.,const_real_null)
-    ! calculate local fractionation factors
-    ! epsilon_bg = epsilon(HCO3- - CO2(G))
-    ! epsilon_dg = epsilon(CO2 - CO2(g))
-    ! epsilon_cg = epsilon(CO32- - CO2(g))
-    ! epsilon_cb = epsilon(CO32- - HCO3-)
-    ! epsilon_db = epsilon(CO2 - HCO3-)
-    loc_epsilon_bg = 2.0*(-0.1141*loc_TC + 10.78)
-    loc_epsilon_dg = 2.0*(+0.0049*loc_TC - 1.31)
-    loc_epsilon_cg = 2.0*(-0.052*loc_TC + 7.22)
-    loc_epsilon_cb = loc_epsilon_cg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
-    loc_epsilon_db = loc_epsilon_dg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
-    ! calculate aqueous system deltas
-    loc_HCO3_d14C = &
-         & (loc_DIC_d14C*dum_DIC - (loc_epsilon_db*dum_carb(ic_conc_CO2) + loc_epsilon_cb*dum_carb(ic_conc_CO3)))/ &
-         & ( &
-         &   (1.0 + loc_epsilon_db*1.0E-3)*dum_carb(ic_conc_CO2) + &
-         &   dum_carb(ic_conc_HCO3) + &
-         &   (1.0 + loc_epsilon_cb*1.0E-3)*dum_carb(ic_conc_CO3) &
-         & )
-    loc_CO2_d14C = loc_epsilon_db + loc_HCO3_d14C*(1.0 + loc_epsilon_db*1.0E-3)
-    loc_CO3_d14C = loc_epsilon_cb + loc_HCO3_d14C*(1.0 + loc_epsilon_cb*1.0E-3)
-    ! check - calculate d14C of DIC from component isotopic values
-    loc_CO2_r14C  = fun_calc_isotope_fraction(loc_CO2_d14C,const_standards(12))
-    loc_HCO3_r14C = fun_calc_isotope_fraction(loc_HCO3_d14C,const_standards(12))
-    loc_CO3_r14C  = fun_calc_isotope_fraction(loc_CO3_d14C,const_standards(12))
-    loc_DIC_r14C  = &
-         & (loc_CO2_r14C*dum_carb(ic_conc_CO2) + loc_HCO3_r14C*dum_carb(ic_conc_HCO3) + loc_CO3_r14C*dum_carb(ic_conc_CO3))/ &
-         dum_DIC
-    loc_DIC_d14C = fun_calc_isotope_delta(dum_DIC,loc_DIC_r14C*dum_DIC,const_standards(12),.FALSE.,const_real_null)
-    ! write to results variable
-    dum_carbisor(ici_DIC_r14C)  = loc_DIC_r14C
-    dum_carbisor(ici_CO2_r14C)  = loc_CO2_r14C
-    dum_carbisor(ici_HCO3_r14C) = loc_HCO3_r14C
-    dum_carbisor(ici_CO3_r14C)  = loc_CO3_r14C
-  end subroutine sub_calc_carb_r14C
-  ! ****************************************************************************************************************************** !
-
 
   ! ****************************************************************************************************************************** !
   ! CALCULATE CHLORINITY
@@ -1284,7 +1052,278 @@ CONTAINS
   END FUNCTION fun_calc_logkarg
   ! ****************************************************************************************************************************** !
 
+  
+  ! ****************************************************************************************************************************** !
+  ! DIAGNOSTICS
+  ! ****************************************************************************************************************************** !
 
+  
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE REVELLE FACTOR
+  ! NOTE: as per sub_calc_carb
+  ! NOTE: carb chem is re-solved at the outset to the same accuracy as needed for the perturbation
+  function fun_calc_carb_RF0_SF0( &
+       & dum_DIC,dum_ALK,dum_Ca, &
+       & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
+       & dum_carbconst,dum_carb)
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    REAL,DIMENSION(2)::fun_calc_carb_RF0_SF0
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    REAL,INTENT(in)::dum_DIC,dum_ALK,dum_Ca
+    REAL,INTENT(in)::dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot
+    REAL,DIMENSION(n_carbconst),intent(in)::dum_carbconst
+    REAL,DIMENSION(n_carb),INTENT(in)::dum_carb
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    INTEGER::n
+    real::loc_OH,loc_H3SiO4,loc_H4BO4,loc_HSO4,loc_HF,loc_H3PO4,loc_H2PO4,loc_HPO4,loc_PO4,loc_HS,loc_NH3
+    REAL::loc_zed
+    REAL::loc_ALK_DIC,loc_conc_CO2,loc_conc_CO3,loc_conc_HCO3
+    REAL::loc_H,loc_H_old,loc_H1,loc_H2,loc_H_p2,loc_H_p3,loc_H_free,loc_H_total
+    real::loc_DIC_RFO,loc_pH_tolerance,loc_dDIC
+    REAL,DIMENSION(n_carb)::loc_carb
+    REAL,DIMENSION(n_carbalk)::loc_carbalk
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    !
+    loc_HF = 0.0
+    loc_HS = 0.0
+    loc_NH3 = 0.0
+    ! set pH solution tolerance
+    loc_pH_tolerance = 0.001*par_carbchem_pH_tolerance
+    ! define DIC perturbion
+    loc_dDIC = 1.0E-6;
+    ! copy dum_carb -> loc_carb (needed becasue pH is used to seed 
+    loc_carb = dum_carb
+    ! -------------------------------------------------------- !
+    ! INITIAL CARB CHEM SOLUTION
+    ! -------------------------------------------------------- !
+    call sub_calc_carb(                                                               &
+         & loc_pH_tolerance,                                                          &
+         & dum_DIC,dum_ALK,dum_Ca,                                                    &
+         & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
+         & dum_carbconst,loc_carb,loc_carbalk)
+    loc_H = loc_carb(ic_H)
+    ! -------------------------------------------------------- !
+    ! RE_SOLVE pH
+    ! -------------------------------------------------------- !
+    n = 1
+    ! perturb DIC
+    loc_DIC_RFO = dum_DIC + loc_dDIC
+    ! LOOP
+    block_solvehloop: DO
+       ! make a copy of the [H] value from the previous iteration (or seeded value if first iteration)
+       loc_H_old = loc_H
+       ! local pre-calculated powers
+       loc_H_p2 = loc_H*loc_H
+       loc_H_p3 = loc_H*loc_H_p2
+       ! [H+] on alternative pH scales
+       loc_H_free = loc_H/(1.0 + dum_SO4tot/dum_carbconst(icc_kHSO4) + dum_Ftot/dum_carbconst(icc_kHF))
+       loc_H_total = loc_H_free*(1.0 + dum_SO4tot/dum_carbconst(icc_kHSO4))
+       ! ion product of water; H2O <-kW-> H+ + OH-
+       loc_OH = dum_carbconst(icc_kW)/loc_H
+       ! boric acid; B(OH)3 + H2O <-kB-> B(OH)4- + H+
+       loc_H4BO4 = dum_Btot/(1.0 + loc_H/dum_carbconst(icc_kB))
+       ! SiO2 + 2H2O <-kSi-> H+ + Si(OH)3O-
+       loc_H3SiO4 = dum_SiO2tot/(1.0 + loc_H/dum_carbconst(icc_kSi))
+       ! bisulphate; HSO4- <-kHSO4-> H+ + SO42-
+       loc_HSO4 = dum_SO4tot/(1.0 + dum_carbconst(icc_kHSO4)/loc_H)
+       ! hydrogen floride; HF <-kHF-> H+ + F-
+       loc_HF = dum_Ftot/(1.0 + dum_carbconst(icc_kHF)/loc_H)
+       ! hydrogen sulphide; H2S <-kH2S-> H+ + HS-
+       if (dum_H2Stot > const_real_nullsmall) loc_HS = dum_H2Stot/(1.0 + loc_H/dum_carbconst(icc_kH2S))
+       ! ammonium; NH4+ <-kNH4-> H+ + NH3
+       if (dum_NH4tot > const_real_nullsmall) loc_NH3 = dum_NH4tot/(1.0 + loc_H/dum_carbconst(icc_kNH4))
+       ! phosphoric acid
+       loc_H3PO4 = dum_PO4tot/( &
+            & 1.0 + &
+            & dum_carbconst(icc_kP1)/loc_H + &
+            & (dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2))/loc_H_p2 + &
+            & (dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3))/loc_H_p3 &
+            & )
+       loc_H2PO4 = dum_PO4tot/( &
+            & 1.0 + &
+            & loc_H/dum_carbconst(icc_kP1) + &
+            & dum_carbconst(icc_kP2)/loc_H + &
+            & (dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3))/loc_H_p2 &
+            & )
+       loc_HPO4 = dum_PO4tot/( &
+            & 1.0 + &
+            & loc_H/dum_carbconst(icc_kP2) + &
+            & loc_H_p2/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)) + &
+            & dum_carbconst(icc_kP3)/loc_H &
+            & )
+       loc_PO4 = dum_PO4tot/( &
+            & 1.0 + &
+            & loc_H/dum_carbconst(icc_kP3) + &
+            & loc_H_p2/(dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) + &
+            & loc_H_p3/(dum_carbconst(icc_kP1)*dum_carbconst(icc_kP2)*dum_carbconst(icc_kP3)) &
+            & )
+       ! calculate carbonate alkalinity
+       if (ctrl_carbchem_noH3SiO4) then
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       else
+          loc_ALK_DIC = dum_ALK &
+               & - loc_H4BO4 - loc_OH - loc_HPO4 - 2.0*loc_PO4 - loc_H3SiO4 - loc_NH3 - loc_HS &
+               & + loc_H + loc_HSO4 + loc_HF + loc_H3PO4
+       end if
+       ! estimate the partitioning between the aqueous carbonate species, and then make two independent estimates of [H]
+       loc_zed = ( &
+            &   (4.0*loc_ALK_DIC + loc_DIC_RFO*dum_carbconst(icc_k) - loc_ALK_DIC*dum_carbconst(icc_k))**2 + &
+            &   4.0*(dum_carbconst(icc_k) - 4.0)*loc_ALK_DIC**2 &
+            & )**0.5
+       loc_conc_HCO3 = (loc_DIC_RFO*dum_carbconst(icc_k) - loc_zed)/(dum_carbconst(icc_k) - 4.0)
+       loc_conc_CO3 = &
+            & ( &
+            &   loc_ALK_DIC*dum_carbconst(icc_k) - loc_DIC_RFO*dum_carbconst(icc_k) - &
+            &   4.0*loc_ALK_DIC + loc_zed &
+            & ) &
+            & /(2.0*(dum_carbconst(icc_k) - 4.0))
+       loc_conc_CO2 = loc_DIC_RFO - loc_ALK_DIC + &
+            & ( &
+            &   loc_ALK_DIC*dum_carbconst(icc_k) - loc_DIC_RFO*dum_carbconst(icc_k) - &
+            &   4.0*loc_ALK_DIC + loc_zed &
+            & ) &
+            & /(2.0*(dum_carbconst(icc_k) - 4.0))        
+       loc_H1 = dum_carbconst(icc_k1)*loc_conc_CO2/loc_conc_HCO3
+       loc_H2 = dum_carbconst(icc_k2)*loc_conc_HCO3/loc_conc_CO3
+       ! the implicit bit!
+       loc_H = SQRT(loc_H1*loc_H2)
+       IF (ABS(1.0 - loc_H/loc_H_old) < par_carbchem_pH_tolerance) then
+!!$       IF ( ABS(log10(loc_H_old)-log10(loc_H)) < dum_pHtol) then
+          EXIT
+       else
+          n = n + 1
+       end if
+       if ((loc_H1 < const_real_nullsmall) .OR. (loc_H2 < const_real_nullsmall) .OR. (n > par_carbchem_pH_iterationmax)) THEN
+          ! create negative (null) Revelle factor
+          loc_DIC_RFO = 0.0
+          exit
+       end if
+    END DO block_solvehloop
+    ! -------------------------------------------------------- !
+    ! RETURN FUNCTION VALUE
+    ! -------------------------------------------------------- !
+    ! NOTE: == ((loc_conc_CO2-dum_carb(ic_conc_CO2)/dum_carb(ic_conc_CO2)) / ((loc_DIC_RFO-dum_DIC)/dum_DIC)
+    ! NOTE: dum_carb(ic_fug_CO2)   = loc_conc_CO2/dum_carbconst(icc_QCO2) 
+    fun_calc_carb_RF0_SF0(1) = (loc_conc_CO2/dum_carb(ic_conc_CO2) - 1.0)/(loc_DIC_RFO/dum_DIC - 1.0)
+    fun_calc_carb_RF0_SF0(2) = (loc_conc_CO2 - dum_carb(ic_conc_CO2))/dum_carbconst(icc_QCO2)/loc_dDIC
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  END function fun_calc_carb_RF0_SF0
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! ESTIMATE OAE EFFICIENCY FACTOR -- dDIC from dALK at constant [CO2(aq)] 
+  function fun_calc_carb_EF0(                                                       &
+       & dum_DIC,dum_ALK,dum_Ca,                                                    &
+       & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
+       & dum_carbconst,dum_carb)
+    ! -------------------------------------------------------- !
+    ! RESULT VARIABLE
+    ! -------------------------------------------------------- !
+    REAL::fun_calc_carb_EF0
+    ! -------------------------------------------------------- !
+    ! DUMMY ARGUMENTS
+    ! -------------------------------------------------------- !
+    REAL,INTENT(in)::dum_DIC,dum_ALK,dum_Ca
+    REAL,INTENT(in)::dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot
+    REAL,DIMENSION(n_carbconst),intent(in)::dum_carbconst
+    REAL,DIMENSION(n_carb),INTENT(in)::dum_carb
+    ! -------------------------------------------------------- !
+    ! DEFINE LOCAL VARIABLES
+    ! -------------------------------------------------------- !
+    REAL::loc_ALK,loc_dALK,loc_DIC,loc_DIC_low,loc_DIC_high,loc_CO2_init
+    REAL,DIMENSION(n_carb)::loc_carb
+    REAL,DIMENSION(n_carbalk)::loc_carbalk
+    real::loc_pH_tolerance,nmax,n
+    ! -------------------------------------------------------- !
+    ! INITIALIZE VARIABLES
+    ! -------------------------------------------------------- !
+    ! define ALK perturbion
+    loc_dALK = 1.0E-6;
+    ! initialize DIC search limits
+    loc_DIC_low  = dum_DIC
+    loc_DIC_high = dum_DIC + 2.0*loc_dALK
+    ! initialize [H]
+    loc_carb(ic_H) = dum_carb(ic_H)
+    ! initialize pH tolerance
+    loc_pH_tolerance = 0.001*par_carbchem_pH_tolerance
+    ! max iterations allowed
+    nmax = 100
+    ! -------------------------------------------------------- !
+    ! INITIAL CARB CHEM SOLUTION
+    ! -------------------------------------------------------- !
+    ! calculate and save initial [CO2] value
+    call sub_calc_carb(                                                               &
+         & loc_pH_tolerance,                                                          &
+         & dum_DIC,dum_ALK,dum_Ca,                                                    &
+         & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
+         & dum_carbconst,loc_carb,loc_carbalk)
+    loc_CO2_init = loc_carb(ic_conc_CO2)
+    ! -------------------------------------------------------- !
+    ! SEARCH FOR dDIC SOLUTION
+    ! -------------------------------------------------------- !
+    n = 0
+    loc_ALK = dum_ALK + loc_dALK
+    DO
+       n = n+1
+       ! guess DIC value as mean of current limits
+       loc_DIC = (loc_DIC_low + loc_DIC_high)/2.0
+       ! solve for pH and [CO2] ... request a 1000x finer pH tolorence than default
+       call sub_calc_carb(                                                               &
+            & loc_pH_tolerance,                                                          &
+            & loc_DIC,loc_ALK,dum_Ca,                                                    &
+            & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
+            & dum_carbconst,loc_carb,loc_carbalk)
+       ! test for [CO2] estimate getting 'sufficiently' close to target value
+       IF (ABS(loc_carb(ic_conc_CO2) - loc_CO2_init) < 0.0001*loc_dALK) then
+          EXIT
+       end if
+       ! test for upper or lower bounds of search limit being approached
+       ! and return a non plausible EF0 value via setting loc_DIC = dum_DIC
+       if ( ((dum_DIC + 2.0*loc_dALK) - loc_DIC_low) < 0.01*loc_dALK ) then
+          loc_DIC = dum_DIC
+          exit
+       end if
+       if ( (loc_DIC_high - dum_DIC) < 0.01*loc_dALK ) then
+          loc_DIC = dum_DIC
+          exit
+       end if
+       ! test for n exceeding max iterations allowed
+       if (n >= nmax) then
+          loc_DIC = dum_DIC
+          exit
+       end if
+       ! update DIC bounds
+       IF (loc_carb(ic_conc_CO2) < loc_CO2_init) THEN
+          loc_DIC_low  = loc_DIC
+       ELSE
+          loc_DIC_high = loc_DIC
+       ENDIF
+    ENDDO
+    ! -------------------------------------------------------- !
+    ! RETURN FUNCTION VALUE
+    ! -------------------------------------------------------- !
+    ! NOTE: dDIC / dALK
+    fun_calc_carb_EF0 = (loc_DIC - dum_DIC)/loc_dALK
+    ! -------------------------------------------------------- !
+    ! END
+    ! -------------------------------------------------------- !
+  END function fun_calc_carb_EF0
+  ! ****************************************************************************************************************************** !
+
+  
   ! ****************************************************************************************************************************** !
   ! ESTIMATE DIC GIVEN dCO3 AND ALK
   function fun_find_DIC_from_dCO3(                                                  &
@@ -1308,6 +1347,7 @@ CONTAINS
     DO
        loc_DIC = (loc_DIC_low + loc_DIC_high)/2.0
        call sub_calc_carb(                                                               &
+            & par_carbchem_pH_tolerance,                                                 &
             & loc_DIC,dum_ALK,dum_Ca,                                                    &
             & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
             & dum_carbconst,loc_carb,loc_carbalk)
@@ -1357,6 +1397,7 @@ CONTAINS
     DO
        loc_ALK = (loc_ALK_low + loc_ALK_high)/2.0
        call sub_calc_carb(                                                               &
+            & par_carbchem_pH_tolerance,                                                 &
             & dum_DIC,loc_ALK,dum_Ca,                                                    &
             & dum_PO4tot,dum_SiO2tot,dum_Btot,dum_SO4tot,dum_Ftot,dum_H2Stot,dum_NH4tot, &
             & dum_carbconst,loc_carb,loc_carbalk)
@@ -1381,7 +1422,122 @@ CONTAINS
     fun_find_ALK_from_dCO3 = loc_ALK
   END function fun_find_ALK_from_dCO3
   ! ****************************************************************************************************************************** !
+
   
+  ! ****************************************************************************************************************************** !
+  ! ISOTOPES
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE CARBONATE SYSTEM ISOTOPIC RATIOS (r13C)
+  ! NOTE: fractonation factors after Zhang et al. [1995]
+  ! NOTE: all equations following Zeebe and Wolf-Gladrow [2001] (section 3.2)
+  subroutine sub_calc_carb_r13C(dum_T,dum_DIC,dum_DIC_13C,dum_carb,dum_carbisor)
+    ! dummy variables
+    REAL,INTENT(in)::dum_T,dum_DIC,dum_DIC_13C
+    REAL,DIMENSION(n_carb),INTENT(in)::dum_carb 
+    REAL,DIMENSION(n_carbisor),INTENT(inout)::dum_carbisor
+    ! local variables
+    real::loc_TC
+    real::loc_epsilon_bg,loc_epsilon_dg,loc_epsilon_cg,loc_epsilon_cb,loc_epsilon_db
+    real::loc_DIC_r13C,loc_CO2_r13C,loc_HCO3_r13C,loc_CO3_r13C
+    real::loc_DIC_d13C,loc_CO2_d13C,loc_HCO3_d13C,loc_CO3_d13C
+    ! initialize local variables
+    loc_TC = dum_T - const_zeroC
+    loc_DIC_d13C = fun_calc_isotope_delta(dum_DIC,dum_DIC_13C,const_standards(11),.FALSE.,const_real_null)
+    ! calculate local fractionation factors
+    ! epsilon_bg = epsilon(HCO3- - CO2(G))
+    ! epsilon_dg = epsilon(CO2 - CO2(g))
+    ! epsilon_cg = epsilon(CO32- - CO2(g))
+    ! epsilon_cb = epsilon(CO32- - HCO3-)
+    ! epsilon_db = epsilon(CO2 - HCO3-)
+    loc_epsilon_bg = -0.1141*loc_TC + 10.78
+    loc_epsilon_dg = +0.0049*loc_TC - 1.31
+    loc_epsilon_cg = -0.052*loc_TC + 7.22
+    loc_epsilon_cb = loc_epsilon_cg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
+    loc_epsilon_db = loc_epsilon_dg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
+    ! calculate aqueous system deltas
+    loc_HCO3_d13C = &
+         & (loc_DIC_d13C*dum_DIC - (loc_epsilon_db*dum_carb(ic_conc_CO2) + loc_epsilon_cb*dum_carb(ic_conc_CO3)))/ &
+         & ( &
+         &   (1.0 + loc_epsilon_db*1.0E-3)*dum_carb(ic_conc_CO2) + &
+         &   dum_carb(ic_conc_HCO3) + &
+         &   (1.0 + loc_epsilon_cb*1.0E-3)*dum_carb(ic_conc_CO3) &
+         & )
+    loc_CO2_d13C = loc_epsilon_db + loc_HCO3_d13C*(1.0 + loc_epsilon_db*1.0E-3)
+    loc_CO3_d13C = loc_epsilon_cb + loc_HCO3_d13C*(1.0 + loc_epsilon_cb*1.0E-3)
+    ! check - calculate d13C of DIC from component isotopic values
+    loc_CO2_r13C  = fun_calc_isotope_fraction(loc_CO2_d13C,const_standards(11))
+    loc_HCO3_r13C = fun_calc_isotope_fraction(loc_HCO3_d13C,const_standards(11))
+    loc_CO3_r13C  = fun_calc_isotope_fraction(loc_CO3_d13C,const_standards(11))
+    loc_DIC_r13C  = &
+         & (loc_CO2_r13C*dum_carb(ic_conc_CO2) + loc_HCO3_r13C*dum_carb(ic_conc_HCO3) + loc_CO3_r13C*dum_carb(ic_conc_CO3))/ &
+         dum_DIC
+    loc_DIC_d13C = fun_calc_isotope_delta(dum_DIC,loc_DIC_r13C*dum_DIC,const_standards(11),.FALSE.,const_real_null)
+    ! write to results variable
+    dum_carbisor(ici_DIC_r13C)  = loc_DIC_r13C
+    dum_carbisor(ici_CO2_r13C)  = loc_CO2_r13C
+    dum_carbisor(ici_HCO3_r13C) = loc_HCO3_r13C
+    dum_carbisor(ici_CO3_r13C)  = loc_CO3_r13C
+  end subroutine sub_calc_carb_r13C
+  ! ****************************************************************************************************************************** !
+
+
+  ! ****************************************************************************************************************************** !
+  ! CALCULATE CARBONATE SYSTEM ISOTOPIC RATIOS (r14C)
+  ! NOTE: fractonation factors after Zhang et al. [1995]
+  ! NOTE: all equations following Zeebe and Wolf-Gladrow [2001] (section 3.2)
+  subroutine sub_calc_carb_r14C(dum_T,dum_DIC,dum_DIC_14C,dum_carb,dum_carbisor)
+    ! dummy variables
+    REAL,INTENT(in)::dum_T,dum_DIC,dum_DIC_14C
+    REAL,DIMENSION(n_carb),INTENT(in)::dum_carb 
+    REAL,DIMENSION(n_carbisor),INTENT(inout)::dum_carbisor
+    ! local variables
+    real::loc_TC
+    real::loc_epsilon_bg,loc_epsilon_dg,loc_epsilon_cg,loc_epsilon_cb,loc_epsilon_db
+    real::loc_DIC_r14C,loc_CO2_r14C,loc_HCO3_r14C,loc_CO3_r14C
+    real::loc_DIC_d14C,loc_CO2_d14C,loc_HCO3_d14C,loc_CO3_d14C
+    ! initialize local variables
+    loc_TC = dum_T - const_zeroC
+    loc_DIC_d14C = fun_calc_isotope_delta(dum_DIC,dum_DIC_14C,const_standards(12),.FALSE.,const_real_null)
+    ! calculate local fractionation factors
+    ! epsilon_bg = epsilon(HCO3- - CO2(G))
+    ! epsilon_dg = epsilon(CO2 - CO2(g))
+    ! epsilon_cg = epsilon(CO32- - CO2(g))
+    ! epsilon_cb = epsilon(CO32- - HCO3-)
+    ! epsilon_db = epsilon(CO2 - HCO3-)
+    loc_epsilon_bg = 2.0*(-0.1141*loc_TC + 10.78)
+    loc_epsilon_dg = 2.0*(+0.0049*loc_TC - 1.31)
+    loc_epsilon_cg = 2.0*(-0.052*loc_TC + 7.22)
+    loc_epsilon_cb = loc_epsilon_cg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
+    loc_epsilon_db = loc_epsilon_dg - loc_epsilon_bg/(1.0 + loc_epsilon_bg*1.0E-3)
+    ! calculate aqueous system deltas
+    loc_HCO3_d14C = &
+         & (loc_DIC_d14C*dum_DIC - (loc_epsilon_db*dum_carb(ic_conc_CO2) + loc_epsilon_cb*dum_carb(ic_conc_CO3)))/ &
+         & ( &
+         &   (1.0 + loc_epsilon_db*1.0E-3)*dum_carb(ic_conc_CO2) + &
+         &   dum_carb(ic_conc_HCO3) + &
+         &   (1.0 + loc_epsilon_cb*1.0E-3)*dum_carb(ic_conc_CO3) &
+         & )
+    loc_CO2_d14C = loc_epsilon_db + loc_HCO3_d14C*(1.0 + loc_epsilon_db*1.0E-3)
+    loc_CO3_d14C = loc_epsilon_cb + loc_HCO3_d14C*(1.0 + loc_epsilon_cb*1.0E-3)
+    ! check - calculate d14C of DIC from component isotopic values
+    loc_CO2_r14C  = fun_calc_isotope_fraction(loc_CO2_d14C,const_standards(12))
+    loc_HCO3_r14C = fun_calc_isotope_fraction(loc_HCO3_d14C,const_standards(12))
+    loc_CO3_r14C  = fun_calc_isotope_fraction(loc_CO3_d14C,const_standards(12))
+    loc_DIC_r14C  = &
+         & (loc_CO2_r14C*dum_carb(ic_conc_CO2) + loc_HCO3_r14C*dum_carb(ic_conc_HCO3) + loc_CO3_r14C*dum_carb(ic_conc_CO3))/ &
+         dum_DIC
+    loc_DIC_d14C = fun_calc_isotope_delta(dum_DIC,loc_DIC_r14C*dum_DIC,const_standards(12),.FALSE.,const_real_null)
+    ! write to results variable
+    dum_carbisor(ici_DIC_r14C)  = loc_DIC_r14C
+    dum_carbisor(ici_CO2_r14C)  = loc_CO2_r14C
+    dum_carbisor(ici_HCO3_r14C) = loc_HCO3_r14C
+    dum_carbisor(ici_CO3_r14C)  = loc_CO3_r14C
+  end subroutine sub_calc_carb_r14C
+  ! ****************************************************************************************************************************** !
+
   
   ! ****************************************************************************************************************************** !
   ! CALCULATE Corg d13C (/d14C)

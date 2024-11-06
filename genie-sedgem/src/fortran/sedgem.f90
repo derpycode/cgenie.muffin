@@ -165,6 +165,7 @@ SUBROUTINE sedgem(          &
                    & )
            end if
            call sub_calc_carb(                &
+                & par_carbchem_pH_tolerance,  &
                 & dum_sfcsumocn(io_DIC,i,j),  &
                 & dum_sfcsumocn(io_ALK,i,j),  &
                 & dum_sfcsumocn(io_Ca,i,j),   &

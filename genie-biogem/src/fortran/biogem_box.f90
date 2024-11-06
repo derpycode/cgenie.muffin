@@ -2200,7 +2200,8 @@ CONTAINS
        IF (.NOT. ocn_select(io_SO4)) ocn(io_SO4,dum_i,dum_j,k) = fun_calc_SO4tot(ocn(io_S,dum_i,dum_j,k))
        IF (.NOT. ocn_select(io_F))   ocn(io_F,dum_i,dum_j,k)   = fun_calc_Ftot(ocn(io_S,dum_i,dum_j,k))
        ! re-calculate surface ocean carbonate chemistry
-       CALL sub_calc_carb(             &
+       CALL sub_calc_carb(                &
+            & par_carbchem_pH_tolerance,  &
             & ocn(io_DIC,dum_i,dum_j,k),  &
             & ocn(io_ALK,dum_i,dum_j,k),  &
             & ocn(io_Ca,dum_i,dum_j,k),   &

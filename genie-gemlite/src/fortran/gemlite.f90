@@ -189,6 +189,7 @@ subroutine gemlite(    &
                  if (carb(ic_H,i,j) <= const_real_nullsmall) carb(ic_H,i,j) = 10**(-7.8)
                  ! re-calculate surface ocean carbonate chemistry
                  CALL sub_calc_carb(                            &
+                      & par_carbchem_pH_tolerance,              &
                       & ocn(conv_io_lselected(io_DIC),i,j,n_k), &
                       & ocn(conv_io_lselected(io_ALK),i,j,n_k), &
                       & loc_Ca,                                 &
