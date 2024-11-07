@@ -1253,10 +1253,13 @@ CONTAINS
     ! define ALK perturbion
     loc_dALK = 1.0E-6;
     ! initialize DIC search limits
-    loc_DIC_low  = dum_DIC
-    loc_DIC_high = dum_DIC + 2.0*loc_dALK
-    ! initialize [H]
-    loc_carb(ic_H) = dum_carb(ic_H)
+    ! NOTE: assuming dALK is carbonate alkalinity, then
+    !       (a) dDIC cannot be > dALK (low CO32- limit)
+    !       (b) dDIC cannot be < 0.5*ALK (high CO32- limit)
+    loc_DIC_low  = dum_DIC + 0.5*loc_dALK
+    loc_DIC_high = dum_DIC + 1.0*loc_dALK
+    ! initialize carb chem (esp. [H])
+    loc_carb = dum_carb
     ! initialize pH tolerance
     loc_pH_tolerance = 0.001*par_carbchem_pH_tolerance
     ! max iterations allowed
