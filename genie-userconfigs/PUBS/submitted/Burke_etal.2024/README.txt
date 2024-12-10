@@ -45,51 +45,51 @@ Sensitivity analysis:
 
 1) Preindustrial CO2 (280ppm) scenario: 
 
-runmuffin.sh muffin.CB.p_worjh2.BASESI JB.TDEP.00p0a.BASESI.280_0p0.SPIN 10000
+./runmuffin.sh muffin.CB.p_worjh2.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.00p0a.BASESI.280_0p0.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ02p5a.BASESI JB.TDEP.02p5a.BASESI.CASopen.280_0p3.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ02p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.02p5a.BASESI.CASopen.280_0p3.SPIN 10000 
 
-runmuffin.sh muffin.CB.umQ02p5b.BASESI JB.TDEP.02p5b.BASESI.CASclosed.280_0p1.SPIN 10000
+./runmuffin.sh muffin.CB.umQ02p5b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.02p5b.BASESI.CASclosed.280_0p1.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ04p5a.BASESI JB.TDEP.04p5a.BASESI.CASopen.280_0p5.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ04p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.04p5a.BASESI.CASopen.280_0p5.SPIN 10000 
 
-runmuffin.sh muffin.CB.umQ04p5b.BASESI JB.TDEP.04p5b.BASESI.CASclosed.280_0p2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ04p5b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.04p5b.BASESI.CASclosed.280_0p2.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ07p5a.BASESI JB.TDEP.07p5a.BASESI.CASopen.280_0p4.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ07p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.07p5a.BASESI.CASopen.280_0p4.SPIN 10000 
 
-runmuffin.sh muffin.CB.umQ07p5b.BASESI JB.TDEP.07p5b.BASESI.CASclosed.280_0p3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ07p5b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.07p5b.BASESI.CASclosed.280_0p3.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ10p0a.BASESI JB.TDEP.10p0a.BASESI.CASopen.280_0p4.SPIN 10000
+./runmuffin.sh muffin.CB.umQ10p0a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.10p0a.BASESI.CASopen.280_0p4.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ10p0b.BASESI JB.TDEP.10p0b.BASESI.CASclosed.280_0p3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ10p0b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.10p0b.BASESI.CASclosed.280_0p3.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ12p5a.BASESI JB.TDEP.12p5a.BASESI.CASopen.280_0p2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ12p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.12p5a.BASESI.CASopen.280_0p2.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ15p0a.BASESI JB.TDEP.15p0a.BASESI.CASopen.280_0p1.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ15p0a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.15p0a.BASESI.CASopen.280_0p1.SPIN 10000 
 
 2) High CO2 (560ppm) scenario: 
 
-runmuffin.sh muffin.CB.p_worjh2.BASESI JB.TDEP.00p0a.BASESI.560_0p0.SPIN 10000
+./runmuffin.sh muffin.CB.p_worjh2.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.00p0a.BASESI.560_0p0.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ02p5a.BASESI JB.TDEP.02p5a.BASESI.CASopen.560_0p3.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ02p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.02p5a.BASESI.CASopen.560_0p3.SPIN 10000 
 
-runmuffin.sh muffin.CB.umQ02p5b.BASESI JB.TDEP.02p5b.BASESI.CASclosed.560_0p1.SPIN 10000
+./runmuffin.sh muffin.CB.umQ02p5b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.02p5b.BASESI.CASclosed.560_0p1.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ04p5a.BASESI JB.TDEP.04p5a.BASESI.CASopen.560_0p5.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ04p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.04p5a.BASESI.CASopen.560_0p5.SPIN 10000 
 
-runmuffin.sh muffin.CB.umQ04p5b.BASESI JB.TDEP.04p5b.BASESI.CASclosed.560_0p2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ04p5b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.04p5b.BASESI.CASclosed.560_0p2.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ07p5a.BASESI JB.TDEP.07p5a.BASESI.CASopen.560_0p4.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ07p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.07p5a.BASESI.CASopen.560_0p4.SPIN 10000 
 
-runmuffin.sh muffin.CB.umQ07p5b.BASESI JB.TDEP.07p5b.BASESI.CASclosed.560_0p3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ07p5b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.07p5b.BASESI.CASclosed.560_0p3.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ10p0a.BASESI JB.TDEP.10p0a.BASESI.CASopen.560_0p4.SPIN 10000
+./runmuffin.sh muffin.CB.umQ10p0a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.10p0a.BASESI.CASopen.560_0p4.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ10p0b.BASESI JB.TDEP.10p0b.BASESI.CASclosed.560_0p3.SPIN 10000
+./runmuffin.sh muffin.CB.umQ10p0b.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.10p0b.BASESI.CASclosed.560_0p3.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ12p5a.BASESI JB.TDEP.12p5a.BASESI.CASopen.560_0p2.SPIN 10000
+./runmuffin.sh muffin.CB.umQ12p5a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.12p5a.BASESI.CASopen.560_0p2.SPIN 10000
 
-runmuffin.sh muffin.CB.umQ15p0a.BASESI JB.TDEP.15p0a.BASESI.CASopen.560_0p1.SPIN 10000 
+./runmuffin.sh muffin.CB.umQ15p0a.BASESI PUBS/submitted/Burke_etal.2024 JB.TDEP.15p0a.BASESI.CASopen.560_0p1.SPIN 10000 
 
 ################################################################
 ################################################################
