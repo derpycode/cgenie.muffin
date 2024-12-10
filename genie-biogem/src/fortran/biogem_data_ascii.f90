@@ -3714,7 +3714,8 @@ CONTAINS
                 ! seed default initial ocean pH
                 loc_carb(ic_H,i,j,k) = 10**(-7.8)
                 ! calculate carbonate chemistry
-                CALL sub_calc_carb(        &
+                CALL sub_calc_carb(            &
+                     & par_carbchem_pH_tolerance,  &
                      & loc_ocn(io_DIC,i,j,k),  &
                      & loc_ocn(io_ALK,i,j,k),  &
                      & loc_ocn(io_Ca,i,j,k),   &
@@ -4352,9 +4353,12 @@ CONTAINS
     REAL,DIMENSION(n_j,n_k)::loc_ou,loc_zu
     REAL,DIMENSION(0:n_j,0:n_k)::loc_opsi,loc_opsia,loc_opsip,loc_zpsi
     ! initialize arrays
+    loc_ou(:,:)    = 0.0
+    loc_zu(:,:)    = 0.0
     loc_opsi(:,:)  = 0.0
     loc_opsia(:,:) = 0.0
     loc_opsip(:,:) = 0.0
+    loc_zpsi(:,:)  = 0.0
     ! Calculate global meridional overturning streamfunction opsi (on C grid only)
     DO j=1,n_j-1
        DO k=1,n_k-1
@@ -4409,6 +4413,12 @@ CONTAINS
           loc_zpsi(i,k) = loc_zpsi(i,k-1) - goldstein_dz(k)*loc_zu(i,k)
        ENDDO
     ENDDO
+    ! initalize results arrays
+    ! NOTE: otherwise you risk passing a NaN at index 0 ... !!! (it has happened!)
+    dum_opsi(:,:)  = 0.0
+    dum_opsia(:,:) = 0.0
+    dum_opsip(:,:) = 0.0
+    dum_zpsi(:,:)  = 0.0
     ! set results arrays
     dum_opsi(1:n_j,1:n_k)  = loc_opsi(1:n_j,1:n_k)
     dum_opsia(1:n_j,1:n_k) = loc_opsia(1:n_j,1:n_k)

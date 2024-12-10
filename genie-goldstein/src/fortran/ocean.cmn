@@ -22,7 +22,7 @@
 #define GOLDSTEINNTRACS 2
 #endif
 #ifndef GOLDSTEINMAXISLES
-#define GOLDSTEINMAXISLES 10
+#define GOLDSTEINMAXISLES 9
 #endif
 
       implicit none
@@ -53,7 +53,8 @@ crma      real dt(maxk),dphi,dphi2,ds,ds2,dz(maxk),u(3,0:maxi,0:maxj,maxk)
 crma     1 ,ts(maxl,0:maxi+1,0:maxj+1,0:maxk+1),s(0:maxj),c(0:maxj)
 crma     2 ,dzu(2,maxk)
 crma      real dt(maxk),dphi,ds(maxj),dsv(1:maxj-1),rds2(1:maxj),dz(maxk)
-      real dt(maxk),phi0,dphi,ds(maxj),dsv(1:maxj-1),rds2(2:maxj-1),
+car      real dt(maxk),phi0,dphi,ds(maxj),dsv(1:maxj-1),rds2(2:maxj-1),
+      real dt(maxk),phi0,dphi,ds(maxj),dsv(1:maxj),rds2(2:maxj-1),
      1 dz(maxk),u(3,0:maxi,0:maxj,maxk),
      2 ts(maxl,0:maxi+1,0:maxj+1,0:maxk+1),s(0:maxj),c(0:maxj),
      2 dzu(2,maxk),tau(2,maxi,maxj),drag(2,maxi+1,maxj),
@@ -319,11 +320,12 @@ c AR (14/11/02) : option to reset ocean T
 c AR (17/11/30) : option to diagnose (only) MLD
 c AR (19/01/29) : added ocean depth (max)
 c AR (20/03/09) : added number of additional deep ocean levels
+c AR (24/09/07) : added option to restrict iso miaxing to T and S only
 
       logical dosc,diso,ctrl_diagend,debug_init,debug_end,debug_loop,
-     1 rst_reset_T,ctrl_diagmld
+     1 rst_reset_T,ctrl_diagmld,ctrl_diso_TSonly
       common /goldstein_ctrl/dosc,diso,ctrl_diagend,
      : debug_init,debug_end,debug_loop,
-     : rst_reset_T,ctrl_diagmld
+     : rst_reset_T,ctrl_diagmld,ctrl_diso_TSonly
       real par_dsc,par_dk
       common /goldstein_ctrl/par_dsc,par_dk

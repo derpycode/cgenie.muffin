@@ -3822,6 +3822,9 @@ CONTAINS
     REAL::loc_scale
     real,DIMENSION(0:n_j,0:n_k)::loc_mask,loc_tmp_jk
     real,DIMENSION(1:n_i,0:n_j)::loc_mask_surf,loc_tmp_ij
+
+
+    integer::j,k
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------

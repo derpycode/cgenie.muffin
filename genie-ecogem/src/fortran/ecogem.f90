@@ -228,6 +228,7 @@ subroutine ecogem(          &
               IF (.NOT. ocn_select(io_SO4)) loc_ocn(io_SO4,i,j,n_k) = fun_calc_SO4tot(loc_ocn(io_S,i,j,n_k))
               IF (.NOT. ocn_select(io_F))   loc_ocn(io_F,i,j,n_k)   = fun_calc_Ftot(loc_ocn(io_S,i,j,n_k))
               call sub_calc_carb(           &
+                   & par_carbchem_pH_tolerance, &
                    & loc_ocn(io_DIC ,i,j,k), &
                    & loc_ocn(io_ALK ,i,j,k), &
                    & loc_ocn(io_Ca  ,i,j,k), &

@@ -168,6 +168,7 @@ CONTAINS
        print*,'Biological production time-scale -- non-siliceous   : ',par_bio_tau_nsp
        print*,'Fract. prod. of si. phytop. in Si/Fe-replete cond.  : ',par_bio_relprod_sp
        print*,'Light e-folding depth (m) (OCMIP-2)                 : ',par_bio_I_eL
+       print*,'half sat. for light (W m-2) [Doney et al., 2006]    : ',par_bio_c0_I       
        print*,'Coefficient for T-dep. uptake rate modifier         : ',par_bio_kT0
        print*,'e-folding temp. (K) for T-dep. uptake rate modifier : ',par_bio_kT_eT
        print*,'temperature offset for T-dependent bio schemes      : ',par_bio_kT_dT
@@ -179,6 +180,9 @@ CONTAINS
        print*,'PC_alpha1, scaling of flexible C/P ratio            : ',par_bio_red_PC_alpha1
        print*,'PC_alpha2, offset of flexible C/P ratio             : ',par_bio_red_PC_alpha2
        print*,'maximum C/P                                         : ',par_bio_red_PC_max
+       print*,'option for C/P organic matter (flexible == 3)       : ',opt_bio_red_PC_flex
+       print*,'scaling of C/P                                      : ',par_bio_red_PC_flex_scale
+       print*,'minimum C/P                                         : ',par_bio_red_PC_flex_min
        print*,'O2/P organic matter pseudo-Redfield ratio           : ',par_bio_red_POP_PO2
        print*,'ALK/N alkalinty correction factor                   : ',par_bio_red_PON_ALK
        print*,'Production fraction of dissolved organic matter     : ',par_bio_red_DOMfrac
@@ -583,7 +587,7 @@ CONTAINS
     par_misc_debug_i = 1
     par_misc_debug_j = 3
     opt_force(iopt_force_freshwater) = .FALSE.
-    par_bio_c0_I = 20.0 ! half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])
+    !!!par_bio_c0_I = 20.0 ! half saturatin value for light (W m-2) [Doney et al., 2006] (30.0 in Parekth et al. [2005])
     par_det_Fe_frac = 0.035 ! mass fraction of Fe in dust
     par_K_FeL = 10**par_K_FeL_pP ! conditional stability constant of ligand-bound Fe [Parekth et al., 2005]
     par_scav_Fe_exp = 0.58 ! (see: Parekth et al. [2005])
@@ -605,6 +609,10 @@ CONTAINS
     if (par_bio_remin_sinkingrate_physical < const_real_nullsmall) then
        par_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate
        par_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_scav
+    end if
+    ! flexible C:P
+    if (par_bio_red_PC_flex > 0) then
+       opt_bio_red_PC_flex = par_bio_red_PC_flex
     end if
     ! -------------------------------------------------------- !
     ! adjust units
@@ -1303,6 +1311,7 @@ CONTAINS
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
     !       (and as implemented, per mol N, this ends up as (5/2)/2 = 5.0/4.0
+    ! NOTE: if N is not selected we are implicitly assuming a slightly different O2 demand for oxidation of the C and H in POM
     if (ocn_select(io_NO3)) then
        conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
     else
@@ -3468,6 +3477,7 @@ CONTAINS
   SUBROUTINE sub_init_carb()
     ! local variables
     INTEGER::i,j,k
+    real,dimension(2)::loc_carb_RF0_SF0
     ! zero arrays
     ! NOTE: leave carb_TSn array at its initialized state
     !       so that a full update of carb constants etc is ALWAYS performed upon the first call to tstep_biogem
@@ -3508,6 +3518,7 @@ CONTAINS
                 carb(ic_H,i,j,k) = 10**(-7.8)
                 ! calculate carbonate chemistry
                 CALL sub_calc_carb(        &
+                     & par_carbchem_pH_tolerance, &
                      & ocn(io_DIC,i,j,k),  &
                      & ocn(io_ALK,i,j,k),  &
                      & ocn(io_Ca,i,j,k),   &
@@ -3522,10 +3533,11 @@ CONTAINS
                      & carb(:,i,j,k),      &
                      & carbalk(:,i,j,k)    &
                      & )
-                ! estimate Revelle factor
-                CALL sub_calc_carb_RF0(      &
+                ! surface-only properties -- estimate Revelle (and 'sensitivity') factor
+                loc_carb_RF0_SF0(:) = fun_calc_carb_RF0_SF0( &
                      & ocn(io_DIC,i,j,k),  &
                      & ocn(io_ALK,i,j,k),  &
+                     & ocn(io_Ca,i,j,k),   &
                      & ocn(io_PO4,i,j,k),  &
                      & ocn(io_SiO2,i,j,k), &
                      & ocn(io_B,i,j,k),    &
@@ -3536,6 +3548,8 @@ CONTAINS
                      & carbconst(:,i,j,k), &
                      & carb(:,i,j,k)    &
                      & )
+                carb(ic_RF0,i,j,n_k)        = loc_carb_RF0_SF0(1)
+                carb(ic_RdfCO2dDIC,i,j,n_k) = loc_carb_RF0_SF0(2)
                 ! calculate carbonate system isotopic properties
                 if (ocn_select(io_DIC_13C)) then
                    call sub_calc_carb_r13C(      &

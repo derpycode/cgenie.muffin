@@ -30,7 +30,7 @@ RESTARTREAD="FALSE"
 REMAKE="TRUE"
 OLD_CONFIG="FALSE"
 EXPID=genie_test
-TRANSLATE_CONFIG="python ./translate_config.py"
+TRANSLATE_CONFIG="python3 ./translate_config.py"
 MAKE=make
 
 # == USER ded=faults read from file: user.sh ==
@@ -98,10 +98,10 @@ runtests () {
     OK="FALSE"
     if [ $COMPARE_AGAINST_ASSUMEDGOOD = "TRUE" ] ; then
 	REF_DIR=$OUTROOT/$ASSUMEDGOOD_NAME
-	DIFF_OPTS="-v -a 6e-15 -r2"
+	DIFF_OPTS="-v -a 6e-15 -r 2"
     elif [ $COMPARE_AGAINST_KNOWNGOOD = "TRUE" ] ; then
 	REF_DIR=$CODEDIR/genie-knowngood/$KNOWNGOOD_NAME
-	DIFF_OPTS="-v -a 6e-15 -r35"
+	DIFF_OPTS="-v -a 6e-15 -r 35"
     # nothing to be done for preservation checks in setup
     else
 	echo "ERROR: must choose to compare against assumedgoods, knowngoods or preserve fluxes"
@@ -115,7 +115,7 @@ runtests () {
     
     # choose comparison tool based on file suffix--not over the moon about this..
     if [ "${TESTFILE##*.}" = "nc" ] ; then
-	DIFFTOOL="$RUNTIME_ROOT/genie-main/src/c/nccompare.exe $DIFF_OPTS"
+	DIFFTOOL="$RUNTIME_ROOT/genie-main/src/fortran/nccompare.exe $DIFF_OPTS"
     else
 	DIFFTOOL="diff --strip-trailing-cr"
     fi

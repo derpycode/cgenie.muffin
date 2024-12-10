@@ -167,9 +167,10 @@ MODULE biogem_lib
   NAMELIST /ini_biogem_nml/par_bio_tau,par_bio_tau_sp,par_bio_tau_nsp,par_bio_relprod_sp
   real::par_bio_zc                                               ! biological production zone depth (m) (OCMIP-2)
   real::par_bio_I_eL                                             ! light e-folding depth (m) (OCMIP-2)
+  real::par_bio_c0_I                                             ! half sat. for light (W m-2) [Doney et al., 2006]
   real::par_bio_kT0                                              ! coefficient for temperature-dependent uptake rate modifier
   real::par_bio_kT_eT                                            ! e-folding temp (K) for temp-dependent uptake rate modifier
-  NAMELIST /ini_biogem_nml/par_bio_zc,par_bio_I_eL,par_bio_kT0,par_bio_kT_eT
+  NAMELIST /ini_biogem_nml/par_bio_zc,par_bio_I_eL,par_bio_c0_I,par_bio_kT0,par_bio_kT_eT
   real::par_bio_kT_dT                                            ! temperature offset for T-dependent bio schemes
   NAMELIST /ini_biogem_nml/par_bio_kT_dT
   real::par_bio_POC_CaCO3_target                                 ! target potential global mean CaCO3:POC export rain ratio
@@ -184,8 +185,13 @@ MODULE biogem_lib
   real::par_bio_red_PC_alpha1                                           ! scaling of C/P flexible stoichiometry
   real::par_bio_red_PC_alpha2                                           ! offset of C/P flexible stoichiometry
   NAMELIST /ini_biogem_nml/par_bio_red_PC_flex,par_bio_red_PC_alpha1,par_bio_red_PC_alpha2
-  real::par_bio_red_PC_max                                              ! maximum C/P
+  real::par_bio_red_PC_max                                     ! maximum C/P
   NAMELIST /ini_biogem_nml/par_bio_red_PC_max
+  integer::opt_bio_red_PC_flex                                 ! option for C/P organic matter (e.g., flexible stoichiometry == 3)
+  real::par_bio_red_PC_flex_min                                ! scaling of C/P value in flexible stoichiometry
+  NAMELIST /ini_biogem_nml/opt_bio_red_PC_flex,par_bio_red_PC_flex_min
+  real::par_bio_red_PC_flex_scale                              ! minimum C/P
+  NAMELIST /ini_biogem_nml/par_bio_red_PC_flex_scale
   real::par_bio_red_DOMfrac                                             ! production fraction of dissolved organic matter
   NAMELIST /ini_biogem_nml/par_bio_red_DOMfrac
   real::par_bio_red_RDOMfrac                                            ! production fraction of R-dissolved organic matter
@@ -1580,7 +1586,7 @@ MODULE biogem_lib
   logical::ctrl_data_save_inversion
 
   ! *** MISC ***
-  real::par_bio_c0_I                                             !
+  !!!real::par_bio_c0_I                                             !
   real::par_bio_c0_Cd                                            !
   real::par_det_Fe_frac                                          ! mass abundance of Fe in dust
   real::par_K_FeL                                                !

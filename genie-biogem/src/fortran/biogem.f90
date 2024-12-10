@@ -78,6 +78,7 @@ subroutine biogem(        &
   real::loc_M
   real,dimension(1:n_l_ocn)::loc_vocn                            !
   real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                !
+  real,dimension(2)::loc_carb_RF0_SF0
 
   loc_debug_ij = .FALSE.
 
@@ -812,6 +813,7 @@ subroutine biogem(        &
            ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
 
            IF (n_k >= loc_k1) THEN
+              
               n = n + 1
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -850,6 +852,7 @@ subroutine biogem(        &
                     IF (.NOT. ocn_select(io_F))   ocn(io_F,i,j,k)   = fun_calc_Ftot(ocn(io_S,i,j,k))
                     ! re-calculate surface ocean carbonate chemistry
                     CALL sub_calc_carb(        &
+                         & par_carbchem_pH_tolerance, &
                          & ocn(io_DIC,i,j,k),  &
                          & ocn(io_ALK,i,j,k),  &
                          & ocn(io_Ca,i,j,k),   &
@@ -884,11 +887,11 @@ subroutine biogem(        &
                             & )
                     end IF
                  end do
-                 ! estimate Revelle factor
-                 ! NOTE: surface only property
-                 CALL sub_calc_carb_RF0(      &
+                 ! surface-only properties -- estimate Revelle (and 'sensitivity') factor
+                 loc_carb_RF0_SF0(:) = fun_calc_carb_RF0_SF0( &
                       & ocn(io_DIC,i,j,n_k),  &
                       & ocn(io_ALK,i,j,n_k),  &
+                      & ocn(io_Ca,i,j,n_k),   &
                       & ocn(io_PO4,i,j,n_k),  &
                       & ocn(io_SiO2,i,j,n_k), &
                       & ocn(io_B,i,j,n_k),    &
@@ -899,6 +902,26 @@ subroutine biogem(        &
                       & carbconst(:,i,j,n_k), &
                       & carb(:,i,j,n_k)       &
                       & )
+                 carb(ic_RF0,i,j,n_k)        = loc_carb_RF0_SF0(1)
+                 carb(ic_RdfCO2dDIC,i,j,n_k) = loc_carb_RF0_SF0(2)
+                 ! surface-only properties -- estimate ALK addition efficiency factor
+                 ! NOTE: only user in time-series diagnostics ...
+                 if (ctrl_data_save_sig_carb_sur) then
+                    carb(ic_RdDICdALK,i,j,n_k) = fun_calc_carb_EF0( &
+                         & ocn(io_DIC,i,j,n_k),  &
+                         & ocn(io_ALK,i,j,n_k),  &
+                         & ocn(io_Ca,i,j,n_k),   &
+                         & ocn(io_PO4,i,j,n_k),  &
+                         & ocn(io_SiO2,i,j,n_k), &
+                         & ocn(io_B,i,j,n_k),    &
+                         & ocn(io_SO4,i,j,n_k),  &
+                         & ocn(io_F,i,j,n_k),    &
+                         & ocn(io_H2S,i,j,n_k),  &
+                         & ocn(io_NH4,i,j,n_k),  &
+                         & carbconst(:,i,j,n_k), &
+                         & carb(:,i,j,n_k)       &
+                         & )
+                 end if
               end if
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -1727,7 +1750,7 @@ subroutine biogem(        &
                           locij_focnatm(ia_pH2S_34S,i,j)  = 0.0
                        end IF
                     end IF
-                 case ('KMM_lowO2')
+                 case ('KMM_lowO2') ! NOTE: currently this does nothing different from 'KMM' ...
                     IF (                                                       &
                          & (locij_focnatm(ia_pH2S,i,j) > const_real_nullsmall) &
                          & ) THEN
@@ -1739,10 +1762,15 @@ subroutine biogem(        &
                        ! update flux reporting
                        locij_focnatm(ia_pO2,i,j)   = locij_focnatm(ia_pO2,i,j)   - 2.0*locij_focnatm(ia_pH2S,i,j)
                        locij_focnatm(ia_pH2S,i,j)  = 0.0
-                       ! ### INSERT CODE FOR ISOTOPES ############################################################################ !
-                       !
-                       ! ######################################################################################################### !
+                       ! update isotope mass balance and reporting
+                       if (atm_select(ia_pH2S_34S)) then
+                          locijk_focn(io_SO4_34S,i,j,n_k) = locijk_focn(io_SO4_34S,i,j,n_k) + locij_focnatm(ia_pH2S_34S,i,j)
+                          locij_fatm(ia_pH2S_34S,i,j)     = 0.0
+                          locij_focnatm(ia_pH2S_34S,i,j)  = 0.0
+                       end IF
                     end IF
+                 case ('NONE')
+                    ! allow H2S exchange with atmosphere
                  case default
                     ! no flux to atmosphere
                     locij_fatm(ia_pH2S,i,j)    = 0.0
@@ -3246,6 +3274,7 @@ SUBROUTINE diag_biogem_timeslice( &
   integer::n,nloc,nvar
   CHARACTER(len=255)::loc_filename                           ! filename string
   CHARACTER(len=6)::loc_locstr                               !
+  real,dimension(2)::loc_carb_RF0_SF0
 
   ! *** TIME-SLICE DATA UPDATE ***
   IF (ctrl_debug_lvl1) print*, '*** TIME-SLICE DATA UPDATE ***'
@@ -3327,8 +3356,9 @@ SUBROUTINE diag_biogem_timeslice( &
                        IF (.NOT. ocn_select(io_B))   ocn(io_B,i,j,k)   = fun_calc_Btot(ocn(io_S,i,j,k))
                        IF (.NOT. ocn_select(io_SO4)) ocn(io_SO4,i,j,k) = fun_calc_SO4tot(ocn(io_S,i,j,k))
                        IF (.NOT. ocn_select(io_F))   ocn(io_F,i,j,k)   = fun_calc_Ftot(ocn(io_S,i,j,k))
-                       ! re-calculate surface ocean carbonate chemistry
+                       ! re-calculate ocean carbonate chemistry
                        CALL sub_calc_carb(        &
+                            & par_carbchem_pH_tolerance, &
                             & ocn(io_DIC,i,j,k),  &
                             & ocn(io_ALK,i,j,k),  &
                             & ocn(io_Ca,i,j,k),   &
@@ -3342,20 +3372,6 @@ SUBROUTINE diag_biogem_timeslice( &
                             & carbconst(:,i,j,k), &
                             & carb(:,i,j,k),      &
                             & carbalk(:,i,j,k)    &
-                            & )
-                       ! estimate Revelle factor
-                       CALL sub_calc_carb_RF0(      &
-                            & ocn(io_DIC,i,j,n_k),  &
-                            & ocn(io_ALK,i,j,n_k),  &
-                            & ocn(io_PO4,i,j,n_k),  &
-                            & ocn(io_SiO2,i,j,n_k), &
-                            & ocn(io_B,i,j,n_k),    &
-                            & ocn(io_SO4,i,j,n_k),  &
-                            & ocn(io_F,i,j,n_k),    &
-                            & ocn(io_H2S,i,j,n_k),  &
-                            & ocn(io_NH4,i,j,n_k),  &
-                            & carbconst(:,i,j,n_k), &
-                            & carb(:,i,j,n_k)       &
                             & )
                        ! re-calculate carbonate system isotopic properties
                        if (ocn_select(io_DIC_13C)) then
@@ -3377,6 +3393,41 @@ SUBROUTINE diag_biogem_timeslice( &
                                & )
                        end IF
                     end do
+                    ! surface-ocean properties
+                    IF (n_k >= loc_k1) THEN
+                       ! surface-only properties -- estimate Revelle (and 'sensitivity') factor
+                       loc_carb_RF0_SF0(:) = fun_calc_carb_RF0_SF0( &
+                            & ocn(io_DIC,i,j,n_k),  &
+                            & ocn(io_ALK,i,j,n_k),  &
+                            & ocn(io_Ca,i,j,n_k),   &
+                            & ocn(io_PO4,i,j,n_k),  &
+                            & ocn(io_SiO2,i,j,n_k), &
+                            & ocn(io_B,i,j,n_k),    &
+                            & ocn(io_SO4,i,j,n_k),  &
+                            & ocn(io_F,i,j,n_k),    &
+                            & ocn(io_H2S,i,j,n_k),  &
+                            & ocn(io_NH4,i,j,n_k),  &
+                            & carbconst(:,i,j,n_k), &
+                            & carb(:,i,j,n_k)       &
+                            & )
+                       carb(ic_RF0,i,j,n_k)        = loc_carb_RF0_SF0(1)
+                       carb(ic_RdfCO2dDIC,i,j,n_k) = loc_carb_RF0_SF0(2)
+                       ! estimate ALK addition efficiency factor
+                       carb(ic_RdDICdALK,i,j,n_k) = fun_calc_carb_EF0( &
+                            & ocn(io_DIC,i,j,n_k),  &
+                            & ocn(io_ALK,i,j,n_k),  &
+                            & ocn(io_Ca,i,j,n_k),   &
+                            & ocn(io_PO4,i,j,n_k),  &
+                            & ocn(io_SiO2,i,j,n_k), &
+                            & ocn(io_B,i,j,n_k),    &
+                            & ocn(io_SO4,i,j,n_k),  &
+                            & ocn(io_F,i,j,n_k),    &
+                            & ocn(io_H2S,i,j,n_k),  &
+                            & ocn(io_NH4,i,j,n_k),  &
+                            & carbconst(:,i,j,n_k), &
+                            & carb(:,i,j,n_k)       &
+                            & )
+                    end if
                  end DO
               end DO
            end IF

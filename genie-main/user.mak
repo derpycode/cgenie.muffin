@@ -23,13 +23,13 @@
 # ====================================================================
 
 ## === Compre the values below to those in user.sh ===
-GENIE_ROOT        = $(HOME)/cgenie.muffin
+GENIE_ROOT        = $(HOME)/cgenie.cookie
 OUT_DIR           = $(HOME)/cgenie_output
-RUNTIME_ROOT      = ../../cgenie.muffin
+RUNTIME_ROOT      = ../../cgenie.cookie
 
 # === Fortran compiler (ifc/ifort/f90/pgf90) ===
 F77=gfortran
-###F77=ifort
+#F77=ifort
 #F77=ifc
 #F77=f90
 #F77=f95
@@ -58,7 +58,8 @@ MACHINE=LINUX
 #MACHINE=SGI
 #MACHINE=SOLARIS
 #MACHINE=WIN32
-#MACHINE=OSX
+#MACHINE=OSX	# Intel processor
+#MACHINE=OSX_M	# Apple silicon (M1, M2 etc.)
 
 # === Extension for module files ===
 MODEXT=mod
@@ -73,21 +74,18 @@ MODEXT=mod
 # and include directories onto this stem.
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
-### DEFAULT ###
-NETCDF_DIR=/usr/local
-### sterling ###
-#NETCDF_DIR=/share/apps
-### eevee ###
-#NETCDF_DIR=/share/apps/netcdf
-### iwan ###
-#NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.4
-### sprout ###
-#NETCDF_DIR=/share/apps/netcdf/4.0/gnu_fc_4.4.6
-### almond ###
-#NETCDF_DIR=/share/apps/netcdf-4.0/gcc-4.4.7
-### VM ###
-#NETCDF_DIR=/home/mushroom/netcdf/ifort
-### Ben Mac Pro ###
-#NETCDF_DIR=/opt/local
+FNETCDF=$(shell hostname -s)
+ifeq ($(FNETCDF),sterling)
+  ### sterling cluster ###
+  NETCDF_DIR=/share/apps
+else ifeq ($(FNETCDF),eevee)
+  ### eevee cluster ###
+  NETCDF_DIR=/share/apps/netcdf
+else
+  ### DEFAULT ###
+  NETCDF_DIR=/usr/local
+  ### Mac (example) ###
+  #NETCDF_DIR=/usr/local/Cellar/netcdf/4.9.2_1
+endif
 
 NETCDF_NAME=netcdf
