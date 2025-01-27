@@ -40,6 +40,8 @@ MODULE genie_control
       integer :: ilon1_sed,ilat1_sed
 ! weathering
       integer :: ilon1_rok,ilat1_rok
+! weathering 2
+      integer :: ilon1_reg,ilat1_reg      
 !     
 ! ======================================================================
 ! Assigning grid sizes (add your own [commented] entries below)
@@ -120,6 +122,16 @@ MODULE genie_control
 
       parameter(ilon1_rok=ROKGEMNLONS,ilat1_rok=ROKGEMNLATS)
 
+! For weathering 2
+#ifndef REGGEMNLONS
+#define REGGEMNLONS 36
+#endif
+#ifndef REGGEMNLATS
+#define REGGEMNLATS 36
+#endif
+
+      parameter(ilon1_reg=REGGEMNLONS,ilat1_reg=REGGEMNLATS)      
+
 !
 ! ======================================================================
 ! Miscellaneous control variables
@@ -138,6 +150,7 @@ MODULE genie_control
       integer(kind=8) :: conv_kocn_ksedgem  !< sedgem loop modifier (relative to ocean loop)
       integer(kind=8) :: conv_kocn_kbiogem  !< biogem loop modifier (relative to ocean loop)
       integer(kind=8) :: conv_kocn_krokgem  !< rokgem loop modifier (relative to ocean loop)
+      integer(kind=8) :: conv_kocn_kreggem  !< reggem loop modifier (relative to ocean loop)
       integer(kind=8) :: conv_kocn_kgoldlite  !< goldlite loop modifier (relative to ocean loop)
       integer(kind=8) :: conv_kocn_kocnlite  !< goldlite loop modifier (relative to ocean loop)
       integer(kind=8) :: conv_kocn_kecogem  !< ecogem loop modifier (relative to ocean loop)
@@ -166,6 +179,7 @@ MODULE genie_control
       logical :: flag_biogem
       logical :: flag_sedgem
       logical :: flag_rokgem
+      logical :: flag_reggem
       logical :: flag_ecogem
       logical :: flag_goldlite
       logical :: flag_ocnlite

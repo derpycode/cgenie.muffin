@@ -65,6 +65,11 @@ contains
     call end_rokgem()
   end subroutine end_rokgem_wrapper
 
+    subroutine end_reggem_wrapper
+    implicit none
+    call end_reggem()
+  end subroutine end_reggem_wrapper
+
   !!
   subroutine end_gemlite_wrapper
     implicit none

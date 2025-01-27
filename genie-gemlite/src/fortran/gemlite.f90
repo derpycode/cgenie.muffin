@@ -10,6 +10,7 @@ subroutine gemlite(    &
      & dum_sfxsumsed1, &
      & dum_sfxocn1,    &
      & dum_sfxsumrok1_gem, &
+     & dum_sfxsumreg1_gem, &
      & dum_sfxsumatm1_gem  &
      & )
   use gem_cmn
@@ -22,6 +23,7 @@ subroutine gemlite(    &
   real,DIMENSION(n_sed,n_i,n_j),intent(in)::dum_sfxsumsed1              ! sediment rain flux (mol m-2 per time-step)
   real,DIMENSION(n_ocn,n_i,n_j),intent(in)::dum_sfxocn1                 ! sediment dissolution flux (mol m-2 s-1)
   real,dimension(n_ocn,n_i,n_j),intent(inout)::dum_sfxsumrok1_gem       ! coastal (weathering) flux (mol per time-step)
+  real,dimension(n_ocn,n_i,n_j),intent(inout)::dum_sfxsumreg1_gem       ! regional (weathering) flux (mol per time-step)
   real,dimension(n_atm,n_i,n_j),intent(inout)::dum_sfxsumatm1_gem       ! atmospheric fluxes: outgassing and weathering
   ! LOCAL VARIABLES
   INTEGER::i,j,k                                                        ! counting indices
@@ -386,7 +388,12 @@ subroutine gemlite(    &
            ! NOTE: units of: (mol per integrating time-step) with the assumption made of an *annual* time-step (hence (mol yr-1))
            DO l=3,n_l_ocn
               io = conv_iselected_io(l)
-              loc_tot_fwea(l) = loc_tot_fwea(l) + dum_sfxsumrok1_gem(io,i,j)
+              if (flag_rokgem) then
+               loc_tot_fwea(l) = loc_tot_fwea(l) + dum_sfxsumrok1_gem(io,i,j)
+              end if
+              if (flag_reggem) then
+               loc_tot_fwea(l) = loc_tot_fwea(l) + dum_sfxsumreg1_gem(io,i,j)
+              end if
            end do
         end if
      END DO
@@ -503,16 +510,19 @@ end subroutine gemlite_cycleinit
 ! ******************************************************************************************************************************** !
 ! GEMLITE LOOP SUBROUTINE - INITIALIZATION
      subroutine gemlite_cycleclean( &
-     & dum_sfxsumrok1_gem      &
+     & dum_sfxsumrok1_gem,      &
+     & dum_sfxsumreg1_gem      &     
      & )
   USE gemlite_lib
   IMPLICIT NONE
   ! dummy arguments
   REAL,dimension(n_ocn,n_i,n_j),intent(inout)::dum_sfxsumrok1_gem       ! 
+  REAL,dimension(n_ocn,n_i,n_j),intent(inout)::dum_sfxsumreg1_gem       ! 
 
   ! *** RE-INITIALIZE VARIABLES ***
   ! reset cumulative (annual average) weathering array (<dum_sfxsumrok1_gem>)
   dum_sfxsumrok1_gem(:,:,:) = 0.0
+  dum_sfxsumreg1_gem(:,:,:) = 0.0
 
 end subroutine gemlite_cycleclean
 ! ******************************************************************************************************************************** !

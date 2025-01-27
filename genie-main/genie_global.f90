@@ -247,7 +247,7 @@ MODULE genie_global
   real, dimension(ilon1_atm,ilat1_atm) :: merwind_atm
   real, dimension(ilon1_ocn,ilat1_ocn) :: runoff_ocn
   ! GHC 29/10/09 added runoff_land which is runoff on land 
-  ! before routing to ocean, for use in rokgem
+  ! before routing to ocean, for use in rokgem and reggem
   real, dimension(ilon1_ocn,ilat1_ocn) :: runoff_land
   real, dimension(ilon1_atm,ilat1_atm) :: runoff_sic
   !
@@ -809,7 +809,7 @@ MODULE genie_global
  real,dimension(ilon1_lnd,ilat1_lnd)::land_temp_lnd
  real,dimension(ilon1_lnd,ilat1_lnd)::land_moisture_lnd
 
-! carbon variables from var_ents (for rokgem)
+! carbon variables from var_ents (for rokgem and reggemtemp)
 ! prefix denotes module name - ENTS Land
   real el_leaf(ilon1_ocn,ilat1_ocn)         ! leaf litter (kgC/m2/yr) 
   real el_respveg(ilon1_ocn,ilat1_ocn)      ! vegetation respiration (kgC/m2/yr)
@@ -830,7 +830,12 @@ MODULE genie_global
   real,dimension(intrac_ocn_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumrok1! rock-surface(coastal ocean) fluxes; integrated ocn grid
   real,dimension(intrac_ocn_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumrok1_gem ! (version of above for GEMlite)
   real,dimension(intrac_atm_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumatm1_gem ! 
-  ! atmosphere-rock tracer interface arrays (for purposes of getting temp and runoff into rokgem)
+  ! ocean-reg tracer interface arrays (for purposes of getting weathering flux from reggem grid into biogem)
+  real,dimension(intrac_ocn_max,ilon1_reg,ilat1_reg) :: genie_sfxreg    ! rock-surface(coastal ocean) fluxes; reg grid
+  real,dimension(intrac_ocn_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumreg1! rock-surface(coastal ocean) fluxes; integrated ocn grid
+  real,dimension(intrac_ocn_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumreg1_gem ! (version of above for GEMlite)
+  !real,dimension(intrac_atm_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsumatm1_gem   
+  ! atmosphere-rock tracer interface arrays (for purposes of getting temp and runoff into rokgem and reggemtemp)
   ! ocean-sediment tracer interface arrays
   real,dimension(intrac_sed_max,ilon1_sed,ilat1_sed) :: genie_sfcsed    ! sediment-surface sediment composition; sed grid
   real,dimension(intrac_sed_max,ilon1_sed,ilat1_sed) :: genie_sfxsumsed ! sediment-surface (ocn->sed) fluxes; integrated, sed grid

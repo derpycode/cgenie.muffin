@@ -23,6 +23,7 @@ configflags = {
     "ma_flag_atchem" : ["atchem",".FALSE.","ac"],
     "ma_flag_sedgem" : ["sedgem",".FALSE.","sg"],
     "ma_flag_rokgem" : ["rokgem",".FALSE.","rg"],
+    "ma_flag_reggem" : ["reggem",".FALSE.","gg"],
     "ma_flag_ecogem" : ["ecogem",".FALSE.","eg"],
     "ma_flag_ichem" : ["ichem",".FALSE.","ci"]
     "gl_flag_gemlite" : ["gemlite",".TRUE.","gl"],
@@ -849,6 +850,7 @@ macrolist = macrolist + ["SEAICEOPTS"]
 macrolist = macrolist + ["IGCMNWJ2OPTS","IGCMNNOPTS","IGCMMMOPTS","IGCMPQSATTESTOPTS"]
 macrolist = macrolist + ["SEDGEMNLONSOPTS","SEDGEMNLATSOPTS","SEDGEMNLONSOPTS","SEDGEMNLATSOPTS"]
 macrolist = macrolist + ["ROKGEMNLONSOPTS","ROKGEMNLATSOPTS"]
+macrolist = macrolist + ["REGGEMNLONSOPTS","REGGEMNLATSOPTS"]
 testing = {}
 testlist = ["TESTFILE","ASSUMEDGOOD_NAME"]
 testlist = testlist + ["TEST_NAME","KNOWNGOOD_NAME","CHECKFLUXES"]

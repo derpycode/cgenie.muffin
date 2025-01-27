@@ -61,7 +61,8 @@ c     Initialise land-surface scheme
       endif
 c     ==================================================================
 c     *** GEM model - START
-      if (flag_atchem.or.flag_biogem.or.flag_sedgem.or.flag_rokgem) then
+      if (flag_atchem .or. flag_biogem .or. flag_sedgem .or.
+     &     flag_rokgem .or. flag_reggem) then
          call initialise_gem_wrapper
       endif
 c     ==================================================================
@@ -106,6 +107,12 @@ c     *** ROKGEM model - START
          call initialise_rokgem_wrapper
 c     call cpl_flux_rokocn_wrapper
       endif
+c     ==================================================================
+c     *** REGGEM model - START
+      if (flag_reggem) then
+         call initialise_reggem_wrapper
+c     call cpl_flux_rokocn_wrapper
+      endif      
 c     ==================================================================
 c     *** GEMlite model - START
       if (flag_gemlite) then
@@ -228,7 +235,7 @@ c     (<dum_sfxsumrok1_gem>)
 c     + atm fluxes (outgassing, weathering CO2 consumption)
 ccc   call gemlite_cycleclean_wrapper
                   call reinit_flux_rokocn_gem_wrapper
-                  call reinit_flux_rokatm_gem_wrapper
+                  call reinit_flux_regocn_gem_wrapper
 c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 c     *** TRIP CYCLE PHASE CHANGE **************************************
 c     ensure that the experiment ends on a 'normal' year in order that
@@ -480,6 +487,35 @@ c            as fluxes passed from ROKGEM are re-set ...
                endif
             endif
 c     $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+c     *** REGGEM model - UPDATE
+            if (flag_reggem) then
+               if (mod(koverall,conv_kocn_kreggem*kocn_loop).eq.0)
+     &              then
+                  if (debug_loop.gt.2) PRINT*,'>>> REGEGM @ ',
+     &                 koverall,conv_kocn_kreggem*kocn_loop
+                  call reggem_wrapper
+                  if (debug_loop.gt.2) PRINT*,'<<<'
+c     If GEMlite: test for the end of the 1st (normal) part of cycle
+c     => create annual averages of weathering <dum_sfxsumrok1_gem>
+c        + atm exchnage (outgassing and weathering CO2 consumption)
+                  if (flag_gemlite) then
+                     if(istep_gem.eq.(gem_notyr)) then
+                        if (debug_loop.gt.3) PRINT*,'* cpl_flux_reggem'
+                        call cpl_flux_regatm_gem_wrapper
+                        call cpl_flux_regocn_gem_wrapper
+                     endif
+                  endif
+c      Couple ocean and atmosphere REGGEM fluxes
+c      NOTE: carry out after possible pre-GEMlite integration step,
+c            as fluxes passed from REGGEM are re-set ...
+                  if (debug_loop.gt.3) 
+     &                 PRINT*,'* cpl_flux_regatm_wrapper'
+                  call cpl_flux_regatm_wrapper
+                  if (debug_loop.gt.3) 
+     &                 PRINT*,'* cpl_flux_regocn_wrapper'
+                  call cpl_flux_regocn_wrapper
+               endif
+            endif
 
 c$$$  c$$$!$omp parallel private(nthreads,thread_id)
 c$$$  
@@ -569,6 +605,7 @@ ccc THIS MOSTLY FIXES THE INITIAL LACK-OF-INSOLATION PROBLEM
                   call cpl_flux_ocnsed_wrapper
                   call cpl_comp_ocnsed_wrapper
                   if (flag_rokgem) call reinit_flux_rokocn_wrapper
+                  if (flag_reggem) call reinit_flux_regocn_wrapper
                   if (debug_loop.gt.0) call diag_biogem_wrapper
 c     If GEMlite: test for the end of the 1st (normal) part of cycle
 c     => create annual averages of <ocn> (for later transfer to GEMlite)
@@ -718,6 +755,20 @@ c     'short-cut' situation is not currently handled
 c     call cpl_flux_rokatm_wrapper
                endif
             endif
+c     ##################################################################
+c     *** REGGEM model - UPDATE (GEMlite)
+            if (flag_reggem) then
+               if (mod(koverall,conv_kocn_kreggem*kocn_loop).eq.0)
+     &              then
+c     nothing(!)
+c     NOTE: REGGEM not called so as to preserve the annual mean
+c     of what might be a highly seasonal weathering flux
+c     NOTE: in any case, climate is invarient (and so too weathering)
+c     NOTE: removal of tracers from the atmosphere in a non
+c     'short-cut' situation is not currently handled
+c     call cpl_flux_rokatm_wrapper
+               endif
+            endif            
 c     ##################################################################
 c     *** ECOGEM model - UPDATE (GEMlite)
             if (flag_ecogem) then
@@ -914,6 +965,12 @@ c     *** ROKGEM model - RESTARTS
          call rokgem_save_restart_wrapper
       endif
 c     ==================================================================
+c     *** REGGEM model - RESTARTS
+      if (flag_reggem) then
+         if (debug_loop.gt.1) PRINT*,'>>> SAVING REGGEM RESTART <<<'
+         call reggem_save_restart_wrapper
+      endif
+c     ==================================================================
 
 c     ******************************************************************
 c     *** SHUTDOWN *****************************************************
@@ -948,7 +1005,8 @@ c     *** GOLDSTEIN sea-ice - END
       endif
 c     ==================================================================
 c     *** GEM model - END
-      if (flag_atchem.or.flag_biogem.or.flag_sedgem.or.flag_rokgem) then
+      if (flag_atchem .or. flag_biogem .or. flag_sedgem .or.
+     &     flag_rokgem .or. flag_reggem) then
 ccc   
       endif
 c     ==================================================================
@@ -987,13 +1045,19 @@ c     *** ROKGEM model - END
          call end_rokgem_wrapper
       endif
 c     ==================================================================
+c     *** REGGEM model - END
+      if (flag_reggem) then
+         call end_reggem_wrapper
+      endif      
+c     ==================================================================
 c     *** GEMlite model - END
       if (flag_gemlite) then
          call end_gemlite_wrapper
       endif
 c     ==================================================================
 c     *** GEM model - END
-      if (flag_atchem.or.flag_biogem.or.flag_sedgem.or.flag_rokgem) then
+      if (flag_atchem .or. flag_biogem .or. flag_sedgem .or.
+     &     flag_rokgem .or. flag_reggem) then
          call end_gem_wrapper
       endif
 c     ==================================================================

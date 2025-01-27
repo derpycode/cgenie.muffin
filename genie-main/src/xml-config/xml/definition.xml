@@ -70,6 +70,7 @@
         <model name="atchem" type="chem" flagname="flag_atchem" state="off"/>
         <model name="sedgem" type="chem" flagname="flag_sedgem" state="off"/>
         <model name="rokgem" type="chem" flagname="flag_rokgem" state="off"/>
+        <model name="reggem" type="chem" flagname="flag_reggem" state="off"/>
         <model name="gemlite" type="chem" flagname="flag_gemlite" state="off"/>
         <model name="ecogem" type="chem" flagname="flag_ecogem" state="off"/>
     </config>
@@ -160,6 +161,14 @@
         <identifier>ROKGEMNLATS</identifier>
         <replacement>36</replacement>
       </macro>
+        <macro handle="REGGEMNLONSOPTS" status="undefined">
+        <identifier>REGGEMNLONS</identifier>
+        <replacement>36</replacement>
+      </macro>
+      <macro handle="REGGEMNLATSOPTS" status="undefined">
+        <identifier>REGGEMNLATS</identifier>
+        <replacement>36</replacement>
+      </macro>
     </build>
 
     <testing>
@@ -219,6 +228,10 @@
                         <description></description>
                     </param>
                     <param name="conv_kocn_krokgem">
+                        <value datatype="integer">5</value>
+                        <description></description>
+                    </param>
+                    <param name="conv_kocn_kreggem">
                         <value datatype="integer">5</value>
                         <description></description>
                     </param>
@@ -8608,6 +8621,679 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="weath_regimes">
 			<value datatype="string">landmask_orogens.dat</value>
                         <description>File containging orogeny land mask for use with rg_opt_weath_regimes=.true. (see above)</description>
+                    </param>
+                </namelist>
+            </file>
+        </model>
+
+        <model name="reggem">
+            <!---->
+            <!-- *******************************************************************-->
+            <!--     REGGEM WEATHERING MODULE.-->
+            <!-- *******************************************************************-->
+
+            <!-- namelist outdir="$OUTDIR" -->
+            <file name="data_REGGEM">
+                <namelist name="INI_REGGEM_NML">
+	            <!-- *** RUN CONTROL ******************************************** -->
+	          <param name="ctrl_continuing">
+			<value datatype="boolean">.FALSE.</value>
+                        <description>new/continuing reggem (.FALSE./.TRUE.)</description>
+                    </param>
+	          <param name="start_year">
+			<value datatype="real">0.0</value>
+                        <description>Simulation start year [REAL]</description>
+                    </param>
+	            <!-- *** I/O: DEFINITIONS *************************************** -->
+                    <param name="par_pindir_name">
+			<value datatype="string"></value>
+                        <description>alternative data input directory (zero length by default -- this is detected)</description>
+                    </param>
+                    <param name="par_indir_name">
+			<value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-reggem<sep/>data<sep/>input</value>
+                        <description>REGGEM data input directory</description>
+                    </param>
+                    <param name="par_outdir_name">
+			<value datatype="string"><varref>RUNTIME_OUTDIR</varref><sep/>reggem</value>
+                        <description>REGGEM results output directory</description>
+                    </param>
+                    <param name="par_rstdir_name">
+			<value datatype="string"><varref>RUNTIME_OUTDIR</varref><sep/>reggem</value>
+                        <description>REGGEM restart (input) directory</description>
+                    </param>
+                    <param name="par_infile_name">
+			<value datatype="string">reggem</value>
+                        <description>input restart filename</description>
+                    </param>
+                    <param name="par_outfile_name">
+			<value datatype="string">reggem</value>
+                        <description>output restart filename</description>
+                    </param>
+                    <param name="opt_screen_output">
+			<value datatype="boolean">.FALSE.</value>
+                        <description>output to screen (.FALSE./.TRUE.)</description>
+                    </param>
+                    <param name="par_output_years_file_0d">
+			<value datatype="string">reggem_output_years_0d.dat</value>
+                        <description>file containing years for 0D output to be generated (to screen and file)</description>
+                    </param>
+                    <param name="par_output_years_file_2d">
+			<value datatype="string">reggem_output_years_2d.dat</value>
+                        <description>file containing years for 2D output to be generated (to file)</description>
+                    </param>
+	           <param name="opt_2d_ascii_output">
+			<value datatype="boolean">.FALSE.</value>
+                        <description>output 2d fields to .dat files (.FALSE./.TRUE.)</description>
+                    </param>
+                    <param name="opt_2d_netcdf_output">
+			<value datatype="boolean">.FALSE.</value>
+                        <description>output 2d fields fields_reggem_2d.nc (.FALSE./.TRUE.)</description>
+                    </param>
+                    <param name="opt_append_data">
+			<value datatype="boolean">.false.</value>
+                        <description>append data to output files on restart
+                                     (if the same run - i.e. if gg_par_outdir_name = gg_par_rstdir_name) (.FALSE./.TRUE.)</description>
+                    </param>
+	            <!-- *** RIVER ROUTING PARAMETERS ******************************** -->
+	          <param name="routing_scheme">
+			<value datatype="integer">1</value>
+                        <description>routing scheme to use: 1 = 'roof' routing using k1 file;
+                                     2 = intermediate using detailed map, but roof for stuff that ends up on genie land grid (about half)
+                                     3 = detailed scheme using only flux that reaches the ocean
+                                     for 2 and 3, the coastal ocean flux is scaled to match the total number of genie land cells
+                                     (minus antarctica, as that isn't included in the data)</description>
+                    </param>
+                    <param name="topo">
+			<value datatype="string">worbe2.k1</value>
+                        <description>file containing basic (roof) river routing to read (k1 file)</description>
+                    </param>
+	          <param name="routing">
+			<value datatype="string">routing</value>
+                        <description>prefix of file containing detailed river routing to read (based on detailed topographic data) -
+                                     suffix is grid dimensions (n_i_n_j.dat)</description>
+                    </param>
+	          <param name="max_drain_cells">
+			<value datatype="integer">7</value>
+                        <description>maximum number of ocean cells a single land cell routes to</description>
+                    </param>
+                      <!-- *** WEATHERING PARAMETERS *********************************** -->
+		  <param name="ctrl_force_sed_closedsystem">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>close system (populate unit weathering fluxes)?</description>
+                    </param>
+		  <param name="opt_short_circuit_atm">
+			<value datatype="boolean">.TRUE.</value>
+	                  <description>short circuit atmosphere by not taking CO2 directly, instead have less DIC put into ocean.</description>
+                    </param>
+	           <param name="opt_weather_runoff">
+			<value datatype="boolean">.FALSE.</value>
+                        <description>scale (global) weathering with runoff</description>
+                    </param>
+	           <param name="par_weathopt">
+			<value datatype="string">Global_avg</value>
+                        <description>weathering scheme ID string ('Global_avg','GKWM',or 'GEM-CO2')</description>
+                    </param>
+	           <param name="opt_weather_CaCO3">
+			<value datatype="string">""</value>
+                        <description>global CaCO3 weathering scheme ID string ('BLAG','WalkerKasting')</description>
+                    </param>
+	           <param name="opt_weather_CaSiO3">
+			<value datatype="string">""</value>
+                        <description>global CaSiO3 weathering scheme ID string ('Brady_approx','Brady_FULL','WalkerKasting','linear')</description>
+                    </param>
+		  <param name="opt_weather_T_Ca">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>CaCO3 weathering - temperature feedback</description>
+                    </param>
+		  <param name="opt_weather_T_Si">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>CaSiO3 weathering - temperature feedback</description>
+                    </param>
+		  <param name="opt_weather_Talt_Si">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>alt CaSiO3 weathering - temperature feedback</description>
+                    </param>
+                    <param name="opt_weather_R_explicit">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>if true then R/R_0 is used rather than the 1 + 0.045(T-T_0) parameterisation from GEOCARB</description>
+                    </param>
+                    <param name="opt_weather_R_Ca">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>CaCO3 weathering - runoff feedback
+                      (if either gg_opt_weather_R_Ca or gg_opt_weather_R_Si is .false. then 2D runoff feedback is effectively switched off.)</description>
+                    </param>
+                    <param name="opt_weather_R_Si">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>CaSiO3 weathering - runoff feedback
+                      (if either gg_opt_weather_R_Ca or gg_opt_weather_R_Si is .false. then 2D runoff feedback is effectively switched off.)</description>
+                    </param>
+                    <param name="opt_weather_P_explicit">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>if true then P/P_0 is used rather than the [2RCO2/(1+RCO2)]^0.4 parameterisation from GEOCARB</description>
+                    </param>
+                    <param name="opt_weather_P_Ca">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>CaCO3 weathering - productivity feedback</description>
+                    </param>
+                    <param name="opt_weather_P_Si">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>CaSiO3 weathering - productivity feedback</description>
+                    </param>
+                    <param name="opt_weather_C_Ca">
+                        <value datatype="boolean">.FALSE.</value>
+                          <description>CaCO3 weathering-CO2 feedback</description>
+                    </param>
+                    <param name="opt_weather_C_Si">
+                        <value datatype="boolean">.FALSE.</value>
+                          <description>CaSiO3 weathering-CO2 feedback</description>
+                    </param>
+                    <param name="opt_weather_C_Si_bg">
+                        <value datatype="boolean">.FALSE.</value>
+                          <description>Distinguish between basalt and granite weathering?</description>
+                    </param>
+                    <param name="par_nCa">
+                        <value datatype="real">0.5</value>
+                          <description>exponent for CO2-carbonate weathering feedback</description>
+                    </param>
+                    <param name="par_nSi">
+                        <value datatype="real">0.3</value>
+                          <description>exponent for CO2-silicate weathering feedback</description>
+                    </param>
+                    <param name="par_prodopt">
+			<value datatype="string">GPP</value>
+	                  <description>prodictivity to use ("GPP" or "NPP")</description>
+                    </param>
+                    <param name="par_k_Ca">
+			<value datatype="real">0.049</value>
+                        <description>constant for temperature-carbonate weathering feedback</description>
+                    </param>
+                    <param name="par_k_Si">
+			<value datatype="real">0.0</value>
+                        <description>constant for temperature-silicate weathering feedback</description>
+                    </param>
+                    <param name="par_E_a">
+			<value datatype="real">74.0</value>
+                        <description>Activation energy for silicate weathering (kJ/Mol)</description>
+                    </param>
+                    <param name="par_k_Tb">
+			<value datatype="real">0.072</value>
+                        <description>Exponent for basalt weathering [Wallmann]</description>
+                    </param>
+                    <param name="par_k_Tg">
+			<value datatype="real">0.061</value>
+                        <description>Exponent for granite weathering [Wallmann]</description>
+                    </param>
+                    <param name="par_k_run">
+			<value datatype="real">0.024</value>
+                        <description>constant for temperature-runoff linear correlation</description>
+                    </param>
+                    <param name="par_beta">
+			<value datatype="real">0.8</value>
+                        <description>fractional power of explicit weathering-runoff dependence</description>
+                    </param>
+                    <param name="par_ref_T0">
+			<value datatype="real">8.4777</value>
+                        <description>weathering reference mean global land surface temperature (deg C)</description>
+                    </param>
+                    <param name="par_ref_R0">
+			<value datatype="real">177.32</value>
+                        <description>weathering reference mean global runoff (mm/yr)</description>
+                    </param>
+                    <param name="par_ref_P0">
+			<value datatype="real">1.2585</value>
+                        <description>weathering reference mean global land productivity (kgC m-2 yr-1)</description>
+                    </param>
+                    <param name="par_ref_CO20">
+			<value datatype="real">278.0</value>
+                        <description>weathering reference mean atmospheric CO2 level (ppm)</description>
+                    </param>
+                    <param name="opt_outgas_eq_Si">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>set volcanic outgassing equal to silicate weathering</description>
+                    </param>
+                    <param name="par_outgas_CO2">
+			<value datatype="real">0.0</value>
+                        <description>CO2 outgassing rate (mol C yr-1) [5.0E12]</description>
+                    </param>
+                    <param name="par_outgas_CO2_d13C">
+			<value datatype="real">-5.0</value>
+			      <description>mean volcanic/metamorphic d13C - o/oo</description>
+                    </param>
+		   <!-- *** GLOBAL AVERAGE WEATHERING PARAMETERS ******************** -->
+                    <param name="par_weather_CaSiO3">
+				<value datatype="real">0.0</value>
+                        <description>global silicate weathering rate (mol Ca2+ yr-1) [10.0E12]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3b">
+				<value datatype="real">0.0</value>
+                        <description>basaltic silicate weathering rate (mol Ca2+ yr-1) [10.0E12]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3g">
+				<value datatype="real">0.0</value>
+                        <description>granitic silicate weathering rate (mol Ca2+ yr-1) [10.0E12]</description>
+                    </param>
+                    <param name="par_weather_CaCO3">
+			<value datatype="real">0.0</value>
+			      <description>global carbonate weathering rate (mol Ca2+ yr-1)</description>
+                    </param>
+                    <param name="par_weather_CaCO3_d13C">
+			<value datatype="real">0.0</value>
+                        <description>mean carbonate d13C (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracMg">
+			<value datatype="real">0.0</value>
+			      <description>global (Ca-Mg silicate) Mg abundance</description>
+                    </param>
+                    <param name="par_weather_CaSiO3b_fracMg">
+			<value datatype="real">0.0</value>
+			      <description>basaltic (Ca-Mg silicate) Mg abundance</description>
+                    </param>
+                    <param name="par_weather_CaSiO3g_fracMg">
+			<value datatype="real">0.0</value>
+			      <description>granitic (Ca-Mg silicate) Mg abundance</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracC">
+			<value datatype="real">0.0</value>
+			      <description>global (silicate) kerogen abundance</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracC_d13C">
+			<value datatype="real">-22.0</value>
+			      <description>global (silicate) kerogen d13C (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracP">
+			<value datatype="real">0.0</value>
+			      <description>global (silicate) phosphate abundance</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracSi">
+			<value datatype="real">1.0</value>
+			      <description>global silicate Si abundance</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracSi_d30Si">
+			<value datatype="real">0.0</value>
+			      <description>global silicate d30Si (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracFeS2">
+			<value datatype="real">0.0</value>
+			      <description>global silicate pyrite abundance; a reasonable value woudl be to assume an S:Si ratio in the crust of 420:270000, and all S is pyrite (FeS2), i.e. 0.5*420/270000 = 7.8E-4</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracFeS2_d34S">
+			<value datatype="real">0.0</value>
+			      <description>global pyrite d34S (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracFeS2_d56Fe">
+			<value datatype="real">0.0</value>
+			      <description>global pyrite d56Fe (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracCaSO4">
+			<value datatype="real">0.0</value>
+			      <description>global carbonate gypsum abundance</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracCaSO4_d34S">
+			<value datatype="real">0.0</value>
+			      <description>global gypsum d34S (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracCaSO4_d44Ca">
+			<value datatype="real">0.0</value>
+			      <description>global gypsum d44Ca (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracFeCO3">
+			<value datatype="real">0.0</value>
+			      <description>global carbonate siderite abundance</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracFeCO3_d56Fe">
+			<value datatype="real">0.0</value>
+			      <description>global siderite d56Fe (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracFeCO3_d13C">
+			<value datatype="real">0.0</value>
+			      <description>global siderite d13C (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracLi">
+			<value datatype="real">10.00E-6</value>
+			      <description>global silicate Li abundance</description>
+                    </param>
+			<param name="par_weather_Li_Rscale">
+			<value datatype="real">10.000</value>
+                        <description>global silicate Li weathering scaling</description>
+                    </param>
+                    <param name="par_weather_Li_Roffset">
+			<value datatype="real">1.400</value>
+                        <description>global silicate Li weathering offset</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_Li_d7Li">
+			<value datatype="real">0.000</value>
+                        <description>global silicate (bulk Earth) d7Li (o/oo)</description>
+                    </param>
+                    <param name="par_weather_Li_7Li_epsilon">
+			<value datatype="real">-16.000</value>
+                        <description>secondary clay fractionation (o/oo)</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_d44Ca">
+			<value datatype="real">0.8</value>
+                        <description>mean silicate d44Ca (o/oo) -- consistent with mean riverine weathering input of Blattler et al. [2011]</description>
+                    </param>
+                    <param name="par_weather_CaCO3_d44Ca">
+			<value datatype="real">0.8</value>
+                        <description>mean carbonate d44Ca (o/oo) -- consistent with mean riverine weathering input of Blattler et al. [2011]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracSr">
+			<value datatype="real">0.00532</value>
+                        <description>global silicate Sr abundance (as a proportion of [Ca+Mg]) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3b_fracSr">
+			<value datatype="real">0.0057471</value>
+                        <description>basaltic silicate Sr abundance (as a proportion of [Ca+Mg]) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3g_fracSr">
+			<value datatype="real">0.0050847</value>
+                        <description>granitic silicate Sr abundance (as a proportion of [Ca+Mg]) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracSr">
+			<value datatype="real">0.002</value>
+                        <description>global carbonate Sr abundance (as a proportion of [Ca(+Mg)]) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_r87Sr">
+			<value datatype="real">0.714124875207987</value>
+                        <description>mean silicate r87Ca [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3b_r87Sr">
+			<value datatype="real">0.705</value>
+                        <description>basaltic silicate r87Ca [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3g_r87Sr">
+			<value datatype="real">0.71914</value>
+                        <description>granitic silicate r87Ca [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaCO3_r87Sr">
+			<value datatype="real">0.7077</value>
+                        <description>mean carbonate r87Ca [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_d88Sr">
+			<value datatype="real">0.36</value>
+                        <description>mean silicate d88Sr (o/oo) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3b_d88Sr">
+			<value datatype="real">0.36</value>
+                        <description>basaltic silicate d88Sr (o/oo) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3g_d88Sr">
+			<value datatype="real">0.36</value>
+                        <description>granitic silicate d88Sr (o/oo) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaCO3_d88Sr">
+			<value datatype="real">0.16</value>
+                        <description>mean carbonate d88Sr (o/oo) [Wallmann]</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracOs">
+			<value datatype="real">0.0</value>
+                        <description>mean Os:Ca2+ ratio of silicate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaCO3_fracOs">
+			<value datatype="real">0.0</value>
+                        <description>mean Os:Ca2+ ratio of carbonate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 187Os/188Os ratio of silicate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaCO3_187Os_188Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 187Os/188Os ratio of carbonate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of silicate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaCO3_188Os_192Os">
+			<value datatype="real">0.0</value>
+                        <description>mean 188Os/192Os ratio of carbonate weathering flux</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracCa5PO43">
+			<value datatype="real">0.0</value>
+			      <description>global silicate apatite abundance</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_fracCa5PO43_d44Ca">
+			<value datatype="real">0.0</value>
+			      <description>global apatite d44Ca (o/oo)</description>
+                    </param>
+                    <param name="par_weather_Ca0PO41">
+				<value datatype="real">0.0</value>
+                        <description>global apatite weathering rate (mol PO4 yr-1) (NB: no Ca or ALK component)</description>
+                    </param>
+                    <param name="par_weather_SiO2">
+				<value datatype="real">0.0E12</value>
+                        <description>global quartz weathering rate (mol Si yr-1) </description>
+                    </param>
+                    <param name="par_weather_SiO2_d30Si">
+				<value datatype="real">0.0</value>
+                        <description>global quartz d30Si (o/oo) </description>
+                    </param>
+                    <param name="par_weather_kerogen_fracP">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen P (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracALK">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen ALK (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracS">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen S (relative to C) abundance</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracS_d34S">
+			<value datatype="real">0.0</value>
+			      <description>global kerogen S d34S (o/oo)</description>
+                    </param>
+                    <param name="opt_calibrate_T_0D">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>calibrate temperature fields to data</description>
+                    </param>
+                    <param name="opt_calibrate_R_0D">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>calibrate runoff fields to data</description>
+                    </param>
+                    <param name="opt_calibrate_P_0D">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>calibrate productivity fields to data</description>
+                    </param>
+                    <param name="par_data_T_0D">
+			<value datatype="real">9.530</value>
+                        <description>mean global land surface temperature (C) to calibrate to</description>
+                    </param>
+                    <param name="par_data_R_0D">
+			<value datatype="real">241.9</value>
+                        <description>mean global runoff (mm/s) to calibrate to
+                                     (417 from GKWM; 374.24 from GEM_CO2)</description>
+                    </param>
+                    <param name="par_n_max_CaCO3">
+			<value datatype="real">999.0</value>
+                        <description>imposed maximum carbonate weathering enhancement</description>
+                    </param>
+                    <param name="par_n_max_CaSiO3">
+			<value datatype="real">999.0</value>
+                        <description>imposed maximum silicate weathering enhancement</description>
+                    </param>
+                    <param name="par_weather_CaCO3_enh_n">
+			<value datatype="real">0.0</value>
+                        <description>enhanced CaCO3 weathering scale factor</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_enh_n">
+			<value datatype="real">0.0</value>
+                        <description>enhanced CaSiO3 weathering scale factor</description>
+                    </param>
+                    <param name="par_weather_CaCO3_enh_nt">
+			<value datatype="real">0.0</value>
+                        <description>enhanced CaCO3 weathering total inventory -- as years x enhancement factor</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_enh_nt">
+			<value datatype="real">0.0</value>
+                        <description>enhanced CaSiO3 weathering total inventory -- as years x enhancement factor</description>
+                    </param>
+	           <param name="opt_weather_CaSiO3_fracLi">
+			<value datatype="string">""</value>
+                        <description>Li weathering scheme ('OLD','Pogge') -- '' is the fixed fractionation default</description>
+                    </param>
+                    <param name="ctrl_weather_CaSiO3_7Li_epsilon_fixed">
+                        <value datatype="boolean">.true.</value>
+                          <description>Fixed (non T-dep) clay fractionation?</description>
+                    </param>
+                    <param name="par_weather_CaSiO3_7Li_epsilon_DT">
+                        <value datatype="real">-0.15</value>
+                          <description>T-dependent D7Li sensitivity (o/oo K-1)</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaCO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix bulk carbonate weathering</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaSiO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix bulk silicate  weathering</description>
+                    </param>
+                    <param name="opt_weather_fixed_Li">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Li fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Sr">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Sr fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Os">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Os fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenC">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen C fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenP">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen P fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_kerogenS">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated kerogen S fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_FeS2">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated FeS2 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_CaSO4">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated CaSO4 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_FeCO3">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated FeCO3 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_Ca5PO43">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated Ca5PO43 fluxes</description>
+                    </param>
+                    <param name="opt_weather_fixed_SiO2">
+                        <value datatype="boolean">.false.</value>
+                        <description>Fix associated SiO2 fluxes</description>
+                    </param>
+                      <!-- *** 2D WEATHERING PARAMETERS ********************************* -->
+                    <param name="par_lith_data">
+			<value datatype="string">GEM_CO2</value>
+                        <description>name of lithological data set - corresponding to directory
+                                     genie-reggem/data/input/lithologies_par_lith_datapar_lith_data2par_lith_data3_036_036</description>
+                    </param>
+                    <param name="par_lith_data2">
+			<value datatype="string"></value>
+                        <description>name of lithological data set - corresponding to directory
+                                     genie-reggem/data/input/lithologies_par_lith_datapar_lith_data2par_lith_data3_036_036</description>
+                    </param>
+                    <param name="par_lith_data3">
+			<value datatype="string"></value>
+                        <description>name of lithological data set - corresponding to directory
+                                     genie-reggem/data/input/lithologies_par_lith_datapar_lith_data2par_lith_data3_036_036</description>
+                    </param>
+                    <param name="truncate_to_land">
+			<value datatype="boolean">.TRUE.</value>
+                        <description>truncate lithological maps to genie land-mask -
+                                     if option is set to false than flux from land in genie ocean, goes direct to ocean</description>
+                    </param>
+                    <param name="scale_to_landarea">
+			<value datatype="boolean">.TRUE.</value>
+                        <description>scale lithological areas to total the land surface area
+                                     (switch off if altering lithological areas e.g. for enhanced weathering)</description>
+                    </param>
+                    <param name="calibrate_weath">
+			<value datatype="boolean">.FALSE.</value>
+                        <description>calibrate 2D weathering - if .true. use values below</description>
+                    </param>
+                    <param name="calibrate_weather_GKWM_CaCO3">
+			<value datatype="real">1.583</value>
+                        <description>calibratation value for 2D CaCO3 weathering for GKWM scheme - to avoid drift, set equal to
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
+                                     (e.g. 1.583 for spun-up model)</description>
+                    </param>
+                    <param name="calibrate_weather_GEM_CO2_CaCO3">
+			<value datatype="real">1.178</value>
+                        <description>calibratation value for 2D CaCO3 weathering for GEM-CO2 scheme - to avoid drift, set equal to
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
+                                     (e.g. 1.178 for spun-up model)</description>
+                    </param>
+                    <param name="calibrate_weather_GKWM_CaSiO3">
+			<value datatype="real">0.8548</value>
+                        <description>alibration value for 2D CaSiO3 weathering for GKWM scheme - to avoid drift, set equal to
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
+                                     (e.g. 0.8548 for spun-up model)</description>
+                    </param>
+                    <param name="calibrate_weather_GEM_CO2_CaSiO3">
+			<value datatype="real">0.8878</value>
+                        <description>calibration value for 2D CaSiO3 weathering for GEM-CO2 scheme - to avoid drift, set equal to
+                                     (half of CaCO3 sediment burrial flux)/(original uncorrected flux)
+                                     (e.g. 0.8878 for spun-up model)</description>
+                    </param>
+                    <param name="opt_calibrate_T_2D">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>calibrate temperature fields to data</description>
+                    </param>
+                    <param name="opt_calibrate_R_2D">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>calibrate runoff fields to data</description>
+                    </param>
+                    <param name="opt_calibrate_P_2D">
+			<value datatype="boolean">.FALSE.</value>
+	                  <description>calibrate productivity fields to data</description>
+                    </param>
+	                <param name="par_ref_T0_2D">
+			<value datatype="string">T0_036_036.dat</value>
+                        <description>land surface temperature (C) calibration file containing base pattern for calibration
+                                     (model field is scaled by gg_par_data_T_2D divided by this if gg_opt_calibrate_T_2D=.true.)</description>
+                    </param>
+	                <param name="par_ref_R0_2D">
+			<value datatype="string">R0_036_036.dat</value>
+                        <description>land surface runoff (mm/yr) calibration file containing base pattern for calibration
+                                     (model field is scaled by gg_par_data_R_2D divided by this if gg_opt_calibrate_R_2D=.true.)</description>
+                    </param>
+	                <param name="par_ref_P0_2D">
+			<value datatype="string">P0.dat</value>
+                        <description>land surface productivity (kgC m-2 yr-1) calibration file containing base pattern for calibration
+                                     (model field is scaled by gg_par_data_P_2D divided by this if gg_opt_calibrate_P_2D=.true.)</description>
+                    </param>
+                    <param name="par_data_T_2D">
+			<value datatype="string">data_temp_036_036.dat</value>
+                        <description>file containing weathering reference land surface productivity (mm/yr) data field to calibrate to</description>
+                    </param>
+	                <param name="par_data_R_2D">
+			<value datatype="string">data_roff_036_036.dat</value>
+                        <description>rfile containing weathering reference land surface runoff (mm/yr) data field to calibrate to</description>
+                    </param>
+	                <param name="par_data_P_2D">
+			<value datatype="string">data_prod_036_036.dat</value>
+                        <description>file containing weathering reference land surface productivity (kgC m-2 yr-1) data field to calibrate to</description>
+                    </param>
+	                <param name="opt_weath_regimes">
+			<value datatype="boolean">.FALSE.</value>
+                        <description>Apply orogeny mask, so that only active mountain building areas have interactive weathering
+                        (marked by a 2 on the landmask specified by gg_weath_regimes).</description>
+                    </param>
+                    <param name="weath_regimes">
+			<value datatype="string">landmask_orogens.dat</value>
+                        <description>File containging orogeny land mask for use with gg_opt_weath_regimes=.true. (see above)</description>
                     </param>
                 </namelist>
             </file>

@@ -10,7 +10,8 @@ subroutine biogem(        &
      & dum_sfxocn1,       &
      & dum_sfcsed1,       &
      & dum_sfxsed1,       &
-     & dum_sfxsumrok1     &
+     & dum_sfxsumrok1,    &
+     & dum_sfxsumreg1     &
      & )
   use omp_lib
   use gem_carbchem
@@ -31,6 +32,7 @@ subroutine biogem(        &
   real,intent(in),dimension(n_sed,n_i,n_j)::dum_sfcsed1          ! sediment-interface sediment composition; ocn grid
   real,intent(inout),dimension(n_sed,n_i,n_j)::dum_sfxsed1       ! ocean -> sediment flux; ocn grid
   real,intent(inout),dimension(n_ocn,n_i,n_j)::dum_sfxsumrok1    ! coastal (weathering) -> ocean flux; ocn grid
+  real,intent(inout),dimension(n_ocn,n_i,n_j)::dum_sfxsumreg1    ! coastal (weathering2) -> ocean flux; ocn grid
 
   ! LOCAL VARIABLES
   INTEGER::i,j,k,l,io,ia,is,n,id                                 ! counting indices
@@ -59,6 +61,7 @@ subroutine biogem(        &
   REAL,DIMENSION(n_sed,n_i,n_j)::locij_focnsed                   ! local ocn->sed change (sed tracer currency), units (mol)
   REAL,DIMENSION(n_ocn,n_i,n_j)::locij_fsedocn                   ! local sed->ocean change (ocn tracer currency), units (mol)
   REAL,DIMENSION(n_ocn,n_i,n_j)::locij_frokocn                   ! local rok->ocean change (ocn tracer currency), units (mol)
+  REAL,DIMENSION(n_ocn,n_i,n_j)::locij_fregocn                   ! local reg->ocean change (ocn tracer currency), units (mol)
   REAL,DIMENSION(n_ocn)::loc_ocnsed_audit                        ! temporary ocn->sed auditing array, units (mol)
   REAL,DIMENSION(n_ocn)::loc_fracdecay_ocn                       ! local reduction factor for decaying ocanic tracers
   REAL,DIMENSION(n_sed)::loc_fracdecay_sed                       ! local reduction factor for decaying sediment tracers
@@ -115,6 +118,7 @@ subroutine biogem(        &
      locijk_focn(io,:,:,:) = 0.0
      locij_fsedocn(io,:,:) = 0.0
      locij_frokocn(io,:,:) = 0.0
+     locij_fregocn(io,:,:) = 0.0
   end do
   DO l=1,n_l_sed
      is = conv_iselected_is(l)
@@ -243,7 +247,12 @@ subroutine biogem(        &
               ! total global weathering (mol per time step)
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
-                 loc_fweather_tot(io) = loc_fweather_tot(io) + dum_sfxsumrok1(io,i,j)
+                 if (flag_rokgem) then
+                  loc_fweather_tot(io) = loc_fweather_tot(io) + dum_sfxsumrok1(io,i,j)
+                 endif
+                 if (flag_reggem) then
+                  loc_fweather_tot(io) = loc_fweather_tot(io) + dum_sfxsumreg1(io,i,j)
+                 end if
               end DO
               ! sedimentary dissolution (mol per time step)
               DO l=3,n_l_ocn
@@ -501,6 +510,7 @@ subroutine biogem(        &
               ! modify remineralization array according to dissolution input from sediments
               ! NOTE: <dum_sfxocn1> in units of (mol m-2 s-1) - needs to be converted to (mol per time step)
               !       <dum_sfxsumrok1> in units of (mol) (per time-step)
+              !       <dum_sfxsumreg1> in units of (mol) (per time-step)
               !       <bio_settle> in units of (mol) (per time-step)
               !       <bio_remin> in units of (mol kg-1) (per time-step)
               ! NOTE: if the model is configured as a 'closed' system, test for whether SEDGEM is coupled
@@ -525,13 +535,18 @@ subroutine biogem(        &
                        io = conv_iselected_io(l)
                        locij_fsedocn(io,i,j) = locij_fsedocn(io,i,j) + &
                             & loc_dts*phys_ocn(ipo_A,i,j,loc_k1)*dum_sfxocn1(io,i,j)
-                       if (loc_fweather_tot(io) > const_real_nullsmall) &
+                       if (flag_rokgem .AND. loc_fweather_tot(io) > const_real_nullsmall) &
                             & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)
-                       if (abs(loc_fsedpres_tot(io)) < const_real_nullsmall) &
+                       if (flag_rokgem .AND. abs(loc_fsedpres_tot(io)) < const_real_nullsmall) &
                             & dum_sfxsumrok1(io,i,j) = 0.0
+                       if (flag_reggem .AND. loc_fweather_tot(io) > const_real_nullsmall) &
+                            & dum_sfxsumreg1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumreg1(io,i,j)
+                       if (flag_reggem .AND. abs(loc_fsedpres_tot(io)) < const_real_nullsmall) &
+                            & dum_sfxsumreg1(io,i,j) = 0.0                            
                        select case (trim(string_ocn(io)))
                        case ('Fe','Fe_56Fe','Fe2','Fe2_56Fe','TDFe','TDFe_56Fe')
                           dum_sfxsumrok1(io,i,j) = 0.0
+                          dum_sfxsumreg1(io,i,j) = 0.0
                        end SELECT
                     end do
                  else ! [not (flag_sedgem)]
@@ -633,12 +648,16 @@ subroutine biogem(        &
                     call sub_box_remin_redfield(loc_vocn,loc_conv_ls_lo(:,:))
                     ! POP --> PO4
                     loc_remin = loc_conv_ls_lo(io2l(io_PO4),is2l(is_POP))*bio_settle(is_POP,i,j,loc_k1)
-                    dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
-                         &  (loc_remin - locij_fsedocn(io_PO4,i,j))
+                     dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
+                          &  (loc_remin - locij_fsedocn(io_PO4,i,j))
+                     dum_sfxsumreg1(io_PO4,i,j) = dum_sfxsumreg1(io_PO4,i,j) + &
+                          &  (loc_remin - locij_fsedocn(io_PO4,i,j))
                     if (ctrl_bio_red_ALKwithPOC) then
                        ! do nothing -- ALK with POC
                     else
                        dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
+                            & conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
+                       dum_sfxsumreg1(io_ALK,i,j) = dum_sfxsumreg1(io_ALK,i,j) + &
                             & conv_sed_ocn(io_ALK,is_POP)*(loc_remin - locij_fsedocn(io_PO4,i,j))
                     end if
                     ! POP --> POM_FeOOH_PO4
@@ -646,13 +665,27 @@ subroutine biogem(        &
                     loc_remin = loc_conv_ls_lo(io2l(io_PO4),is2l(is_POM_FeOOH_PO4))*bio_settle(is_POM_FeOOH_PO4,i,j,loc_k1)
                     dum_sfxsumrok1(io_PO4,i,j) = dum_sfxsumrok1(io_PO4,i,j) + &
                          & loc_remin
+                    dum_sfxsumreg1(io_PO4,i,j) = dum_sfxsumreg1(io_PO4,i,j) + &
+                         & loc_remin
                  elseif (ctrl_force_sed_closed_P_weather) then
                     io = io_PO4
-                    if (loc_fweather_tot(io) > const_real_nullsmall) &
+
+                    if (flag_rokgem) then
+                     if (loc_fweather_tot(io) > const_real_nullsmall) &
                          & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)
-                    if (.NOT. ctrl_bio_red_ALKwithPOC) &  
+                     if (.NOT. ctrl_bio_red_ALKwithPOC) &  
                          dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
                          & conv_sed_ocn(io_ALK,is_POP)*dum_sfxsumrok1(io,i,j)
+                    end if
+
+                    if (flag_reggem) then
+                     if (loc_fweather_tot(io) > const_real_nullsmall) &
+                         & dum_sfxsumreg1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumreg1(io,i,j)
+                     if (.NOT. ctrl_bio_red_ALKwithPOC) &  
+                         dum_sfxsumreg1(io_ALK,i,j) = dum_sfxsumreg1(io_ALK,i,j) + &
+                         & conv_sed_ocn(io_ALK,is_POP)*dum_sfxsumreg1(io,i,j)
+                    end if
+
                  end if
                  if (ctrl_force_sed_closed_C) then
                     ! special case of partial closure -- calculate theoretical DIC remin flux required for closure
@@ -666,8 +699,12 @@ subroutine biogem(        &
                     loc_remin = loc_conv_ls_lo(io2l(io_DIC),is2l(is_POC))*bio_settle(is_POC,i,j,loc_k1)
                     dum_sfxsumrok1(io_DIC,i,j) = dum_sfxsumrok1(io_DIC,i,j) + &
                          & (loc_remin - locij_fsedocn(io_DIC,i,j))
+                    dum_sfxsumreg1(io_DIC,i,j) = dum_sfxsumreg1(io_DIC,i,j) + &
+                         & (loc_remin - locij_fsedocn(io_DIC,i,j))
                     if (ctrl_bio_red_ALKwithPOC) then
                        dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
+                            & conv_sed_ocn(io_ALK,is_POC)*(loc_remin - locij_fsedocn(io_DIC,i,j))
+                       dum_sfxsumreg1(io_ALK,i,j) = dum_sfxsumreg1(io_ALK,i,j) + &
                             & conv_sed_ocn(io_ALK,is_POC)*(loc_remin - locij_fsedocn(io_DIC,i,j))
                     else
                        ! do nothing -- ALK with POP
@@ -676,16 +713,25 @@ subroutine biogem(        &
                     loc_remin = loc_conv_ls_lo(io2l(io_DIC_13C),is2l(is_POC_13C))*bio_settle(is_POC_13C,i,j,loc_k1)
                     dum_sfxsumrok1(io_DIC_13C,i,j) = dum_sfxsumrok1(io_DIC_13C,i,j) + &
                          &  (loc_remin - locij_fsedocn(io_DIC_13C,i,j))
+                    dum_sfxsumreg1(io_DIC_13C,i,j) = dum_sfxsumreg1(io_DIC_13C,i,j) + &
+                         &  (loc_remin - locij_fsedocn(io_DIC_13C,i,j))
                  elseif (ctrl_force_sed_closed_C_weather) then
                     io = io_DIC
-                    if (loc_fweather_tot(io) > const_real_nullsmall) &
-                         & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)                    
-                    if (ctrl_bio_red_ALKwithPOC) & 
+                    if (flag_rokgem .AND. loc_fweather_tot(io) > const_real_nullsmall) &
+                         & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j)                
+                    if (flag_rokgem .AND. ctrl_bio_red_ALKwithPOC) & 
                          dum_sfxsumrok1(io_ALK,i,j) = dum_sfxsumrok1(io_ALK,i,j) + &
-                         & conv_sed_ocn(io_ALK,is_POC)*dum_sfxsumrok1(io,i,j)                 
+                         & conv_sed_ocn(io_ALK,is_POC)*dum_sfxsumrok1(io,i,j)          
+                    if (flag_reggem .AND. loc_fweather_tot(io) > const_real_nullsmall) &
+                         & dum_sfxsumreg1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumreg1(io,i,j)                
+                    if (flag_reggem .AND. ctrl_bio_red_ALKwithPOC) & 
+                         dum_sfxsumreg1(io_ALK,i,j) = dum_sfxsumreg1(io_ALK,i,j) + &
+                         & conv_sed_ocn(io_ALK,is_POC)*dum_sfxsumreg1(io,i,j)           
                     io = io_DIC_13C
-                    if (loc_fweather_tot(io) > const_real_nullsmall) &
+                    if (flag_rokgem .AND. loc_fweather_tot(io) > const_real_nullsmall) &
                          & dum_sfxsumrok1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumrok1(io,i,j) 
+                    if (flag_reggem .AND. loc_fweather_tot(io) > const_real_nullsmall) &
+                         & dum_sfxsumreg1(io,i,j) = (loc_fsedpres_tot(io)/loc_fweather_tot(io))*dum_sfxsumreg1(io,i,j)                          
                  end if
               end if ! [(ctrl_force_sed_closedsystem)]
               ! convert fluxes to remin (mol kg-1) (per time-step)
@@ -1767,15 +1813,22 @@ subroutine biogem(        &
               ! *** TERRESTRIAL WEATHERING INPUT ***
               ! modify remineralization array according to terrestrial weathering input
               ! NOTE: <dum_sfxsumrok1> in units of (mol) (per time-step)
+              ! NOTE: <dum_sfxsumreg1> in units of (mol) (per time-step)
               ! NOTE: no screening for a 'closed system' is made as subtractions are made appropriately from
               !       'SEDIMENT DISSOLUTION INPUT' if a weathering flux exists
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
                  locij_frokocn(io,i,j) = locij_frokocn(io,i,j) + dum_sfxsumrok1(io,i,j)
+                 locij_fregocn(io,i,j) = locij_fregocn(io,i,j) + dum_sfxsumreg1(io,i,j)
               end do
               DO l=3,n_l_ocn
                  io = conv_iselected_io(l)
-                 bio_remin(io,i,j,n_k) = bio_remin(io,i,j,n_k) + phys_ocn(ipo_rM,i,j,n_k)*locij_frokocn(io,i,j)
+                 if (flag_rokgem) then
+                  bio_remin(io,i,j,n_k) = bio_remin(io,i,j,n_k) + phys_ocn(ipo_rM,i,j,n_k)*locij_frokocn(io,i,j)
+                 end if
+                 if (flag_reggem) then
+                 bio_remin(io,i,j,n_k) = bio_remin(io,i,j,n_k) + phys_ocn(ipo_rM,i,j,n_k)*locij_fregocn(io,i,j)
+                 end if
               end do
 
               IF (ctrl_debug_lvl1 .AND. loc_debug_ij) print*, &
@@ -1985,7 +2038,12 @@ subroutine biogem(        &
               IF (ctrl_audit) THEN
                  ! update net integrated fluxes into the ocean for tracer inventory auditing (if selected)
                  ! NOTE: take into account any sediment tracer flux forcing
-                 loc_ocnsed_audit(:) = -locij_fsedocn(:,i,j) - locij_frokocn(:,i,j)
+                 if (flag_rokgem) then
+                  loc_ocnsed_audit(:) = -locij_fsedocn(:,i,j) - locij_frokocn(:,i,j)
+                 end if
+                 if (flag_reggem) then
+                  loc_ocnsed_audit(:) = -locij_fsedocn(:,i,j) - locij_fregocn(:,i,j)
+                 end if
                  DO l=1,n_l_sed
                     is = conv_iselected_is(l)
                     loc_tot_i = conv_sed_ocn_i(0,is)
@@ -2085,6 +2143,7 @@ subroutine biogem(        &
           & dum_sfcsed1,         &
           & dum_sfxsed1,         &
           & dum_sfxsumrok1,      &
+          & dum_sfxsumreg1,      &          
           & .false.,             &
           & .true.               &
           & )     
@@ -3209,6 +3268,7 @@ SUBROUTINE diag_biogem_timeslice( &
      & dum_sfcsed1,               &
      & dum_sfxsed1,               &
      & dum_sfxsumrok1,            &
+     & dum_sfxsumreg1,            &     
      & dum_save,                  &
      & dum_gemlite                &
      & )
@@ -3226,6 +3286,7 @@ SUBROUTINE diag_biogem_timeslice( &
   REAL,DIMENSION(n_sed,n_i,n_j),INTENT(in)::dum_sfcsed1          ! sediment composition interface array
   REAL,DIMENSION(n_sed,n_i,n_j),INTENT(in)::dum_sfxsed1          ! sediment rain flux interface array
   real,dimension(n_ocn,n_i,n_j),intent(in)::dum_sfxsumrok1       ! coastal (weathering) -> ocean flux; ocn grid
+  real,dimension(n_ocn,n_i,n_j),intent(in)::dum_sfxsumreg1       ! coastal (weathering2) -> ocean flux; ocn grid
   logical,INTENT(IN)::dum_save                                   ! average and save data?
   logical,intent(in)::dum_gemlite                                ! in GEMlite phase of cycle?
   ! local variables
@@ -3522,9 +3583,19 @@ SUBROUTINE diag_biogem_timeslice( &
            int_diag_iron_timeslice(:,:,:,:)        = int_diag_iron_timeslice(:,:,:,:)        + loc_dtyr*diag_iron(:,:,:,:)
            ! gemlite
            if (dum_gemlite) then
-              int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + loc_dtyr*dum_sfxsumrok1(:,:,:)
+              if (flag_rokgem) then
+               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + loc_dtyr*dum_sfxsumrok1(:,:,:)
+              end if
+              if (flag_reggem) then
+               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + loc_dtyr*dum_sfxsumreg1(:,:,:)
+              end if
            else
-              int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + dum_sfxsumrok1(:,:,:)
+              if (flag_rokgem) then           
+               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + dum_sfxsumrok1(:,:,:)
+              end if
+              if (flag_reggem) then              
+               int_diag_weather_timeslice(:,:,:)   = int_diag_weather_timeslice(:,:,:) + dum_sfxsumreg1(:,:,:)
+              end if
            end if
            int_diag_airsea_timeslice(:,:,:)    = int_diag_airsea_timeslice(:,:,:)     + loc_dtyr*diag_airsea(:,:,:)
            ! eceogem
@@ -3670,6 +3741,7 @@ SUBROUTINE diag_biogem_timeseries( &
      & dum_sfcsed1,                &
      & dum_sfxsed1,                &
      & dum_sfxsumrok1,             &
+     & dum_sfxsumreg1,             &     
      & dum_save,                   &
      & dum_forcesave,              &
      & dum_gemlite                 &
@@ -3687,6 +3759,7 @@ SUBROUTINE diag_biogem_timeseries( &
   REAL,DIMENSION(n_sed,n_i,n_j),INTENT(in)::dum_sfcsed1          ! sediment composition interface array
   REAL,DIMENSION(n_sed,n_i,n_j),INTENT(in)::dum_sfxsed1          ! sediment rain flux interface array
   real,dimension(n_ocn,n_i,n_j),intent(in)::dum_sfxsumrok1       ! coastal (weathering) -> ocean flux; ocn grid
+  real,dimension(n_ocn,n_i,n_j),intent(in)::dum_sfxsumreg1       ! coastal (weathering) -> ocean flux; ocn grid
   logical,INTENT(IN)::dum_save                                   ! average and save data?
   logical,INTENT(IN)::dum_forcesave                              ! force data saving?
   logical,intent(in)::dum_gemlite                                ! in GEMlite phase of cycle?
@@ -4166,9 +4239,19 @@ SUBROUTINE diag_biogem_timeseries( &
               DO l=1,n_l_ocn
                  io = conv_iselected_io(l)
                  if (dum_gemlite) then
-                    int_diag_weather_sig(io) = int_diag_weather_sig(io) + loc_dtyr*SUM(dum_sfxsumrok1(io,:,:))
+                    if (flag_rokgem) then
+                     int_diag_weather_sig(io) = int_diag_weather_sig(io) + loc_dtyr*SUM(dum_sfxsumrok1(io,:,:))
+                    end if
+                    if (flag_reggem) then
+                     int_diag_weather_sig(io) = int_diag_weather_sig(io) + loc_dtyr*SUM(dum_sfxsumreg1(io,:,:))
+                    end if
                  else
-                    int_diag_weather_sig(io) = int_diag_weather_sig(io) + SUM(dum_sfxsumrok1(io,:,:))
+                    if (flag_rokgem) then
+                     int_diag_weather_sig(io) = int_diag_weather_sig(io) + SUM(dum_sfxsumrok1(io,:,:))
+                    end if
+                    if (flag_reggem) then
+                     int_diag_weather_sig(io) = int_diag_weather_sig(io) + SUM(dum_sfxsumreg1(io,:,:))
+                    end if
                  end if
               END DO
               DO l=1,n_l_atm

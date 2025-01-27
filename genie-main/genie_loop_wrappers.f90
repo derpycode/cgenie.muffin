@@ -361,7 +361,7 @@ contains
          go_dsc,go_saln0,go_dz,go_ec,go_rho, &
          eb_fx0a,eb_fx0o,eb_fxsen,eb_fxlw, &
          eb_evap,eb_pptn,eb_relh,go_istep0, &
-         el_photo,el_respveg,el_respsoil,el_leaf, & ! GHC - added these for use with rokgem
+         el_photo,el_respveg,el_respsoil,el_leaf, & ! GHC - added these for use with rokgem and reggemtemp
          landice_slicemask_lic, &
          albs_atm, &
          land_albs_snow_lnd, &
@@ -511,6 +511,20 @@ contains
   end subroutine rokgem_wrapper
 
   !!
+  subroutine reggem_wrapper
+    implicit none
+    call reggem(              &
+         & real(conv_kocn_kreggem*kocn_loop)*genie_timestep, & ! input
+         & genie_sfcatm1,     & ! input
+         & runoff_land,       & ! input
+         & el_photo,          & ! input
+         & el_respveg,        & ! input
+         & genie_sfxreg,      & ! input/output
+         & genie_sfxatm1      & ! input/output
+         & )
+  end subroutine reggem_wrapper  
+
+  !!
   subroutine cpl_flux_rokatm_wrapper
     implicit none
     call cpl_flux_rokatm(       &
@@ -525,18 +539,45 @@ contains
   end subroutine cpl_flux_rokatm_wrapper
 
   !!
+  subroutine cpl_flux_regatm_wrapper
+    implicit none
+    call cpl_flux_regatm(       &
+         & real(conv_kocn_kreggem*kocn_loop)*genie_timestep,&
+         & intrac_atm_max,      & ! input
+         & ilon1_reg,ilat1_reg, & ! input
+         & ilon1_atm,ilat1_atm, & ! input
+         & genie_sfxatm1,       & ! input/output
+         & genie_sfxsumatm,     & ! input/output
+         & .false.              & ! input
+         & )
+  end subroutine cpl_flux_regatm_wrapper  
+
+  !!
   subroutine cpl_flux_rokatm_gem_wrapper
     implicit none
     call cpl_flux_rokatm(       &
          & real(conv_kocn_krokgem*kocn_loop)*genie_timestep,&
          & intrac_atm_max,       & ! input
-         & ilon1_rok,ilat1_rok,  & ! input
+         & ilon1_rok,ilat1_rok,  & ! input      
          & ilon1_atm,ilat1_atm,  & ! input
          & genie_sfxatm1,        & ! input/output
          & genie_sfxsumatm1_gem, & ! input/output
          & .true.                & ! input
          & )
   end subroutine cpl_flux_rokatm_gem_wrapper
+
+  subroutine cpl_flux_regatm_gem_wrapper
+    implicit none
+    call cpl_flux_regatm(       &
+         & real(conv_kocn_kreggem*kocn_loop)*genie_timestep,&
+         & intrac_atm_max,       & ! input
+         & ilon1_reg,ilat1_reg,  & ! input      
+         & ilon1_atm,ilat1_atm,  & ! input
+         & genie_sfxatm1,        & ! input/output
+         & genie_sfxsumatm1_gem, & ! input/output
+         & .true.                & ! input
+         & )
+  end subroutine cpl_flux_regatm_gem_wrapper  
 
 !!$  !!
 !!$  subroutine reinit_flux_rokatm_wrapper
@@ -554,19 +595,40 @@ contains
          & )
   end subroutine reinit_flux_rokatm_gem_wrapper
 
+  subroutine reinit_flux_regatm_gem_wrapper
+    implicit none
+    call reinit_flux_regatm(                                 &
+         & genie_sfxsumatm1_gem                              & ! input/output
+         & )
+  end subroutine reinit_flux_regatm_gem_wrapper
+
+
   !!
   subroutine cpl_flux_rokocn_wrapper
     implicit none
     call cpl_flux_rokocn(       &
          & real(conv_kocn_krokgem*kocn_loop)*genie_timestep,&
          & intrac_ocn_max,      & ! input
-         & ilon1_rok,ilat1_rok, & ! input
+         & ilon1_rok,ilat1_rok, & ! input 
          & ilon1_ocn,ilat1_ocn, & ! input
          & genie_sfxrok,        & ! input
          & genie_sfxsumrok1,    & ! input/output
          & .false.              & ! input
          & )
   end subroutine cpl_flux_rokocn_wrapper
+
+  subroutine cpl_flux_regocn_wrapper
+    implicit none
+    call cpl_flux_regocn(       &
+         & real(conv_kocn_kreggem*kocn_loop)*genie_timestep,&
+         & intrac_ocn_max,      & ! input
+         & ilon1_reg,ilat1_reg, & ! input 
+         & ilon1_ocn,ilat1_ocn, & ! input
+         & genie_sfxreg,        & ! input
+         & genie_sfxsumreg1,    & ! input/output
+         & .false.              & ! input
+         & )
+  end subroutine cpl_flux_regocn_wrapper
 
   !!
   subroutine cpl_flux_rokocn_gem_wrapper
@@ -582,6 +644,20 @@ contains
          & )
   end subroutine cpl_flux_rokocn_gem_wrapper
 
+   !!
+  subroutine cpl_flux_regocn_gem_wrapper
+    implicit none
+    call cpl_flux_regocn(                                    &
+         & real(conv_kocn_kreggem*kocn_loop)*genie_timestep, &
+         & intrac_ocn_max,                                   & ! input
+         & ilon1_reg,ilat1_reg,                              & ! input
+         & ilon1_ocn,ilat1_ocn,                              & ! input
+         & genie_sfxreg,                                     & ! input
+         & genie_sfxsumreg1_gem,                             & ! input/output
+         & .true.                                            & ! input
+         & )
+  end subroutine cpl_flux_regocn_gem_wrapper 
+
   !!
   subroutine reinit_flux_rokocn_wrapper
     implicit none
@@ -589,6 +665,14 @@ contains
          & genie_sfxsumrok1     & ! input/output
          & )
   end subroutine reinit_flux_rokocn_wrapper
+
+  !!
+  subroutine reinit_flux_regocn_wrapper
+    implicit none
+    call reinit_flux_regocn(    &
+         & genie_sfxsumreg1     & ! input/output
+         & )
+  end subroutine reinit_flux_regocn_wrapper  
 
   !!
   subroutine reinit_flux_rokocn_gem_wrapper
@@ -599,16 +683,36 @@ contains
   end subroutine reinit_flux_rokocn_gem_wrapper
 
   !!
+  subroutine reinit_flux_regocn_gem_wrapper
+    implicit none
+    call reinit_flux_regocn(                                 &
+         & genie_sfxsumreg1_gem                              & ! input/output
+         & )
+  end subroutine reinit_flux_regocn_gem_wrapper  
+
+  !!
   subroutine cpl_comp_rokEMBM_wrapper
     !    call cpl_comp_rokEMBM(      &
     !         & )
   end subroutine cpl_comp_rokEMBM_wrapper
 
   !!
+  subroutine cpl_comp_regEMBM_wrapper
+    !    call cpl_comp_regEMBM(      &
+    !         & )
+  end subroutine cpl_comp_regEMBM_wrapper  
+
+  !!
   subroutine rokgem_save_restart_wrapper
     implicit none
     call rest_rokgem()
   end subroutine rokgem_save_restart_wrapper
+
+  !!
+  subroutine reggem_save_restart_wrapper
+    implicit none
+    call rest_reggem()
+  end subroutine reggem_save_restart_wrapper  
 
 
 ! ******************************************************************************************************************************** !
@@ -633,7 +737,8 @@ contains
          & genie_sfxocn1,                                    & ! input/output
          & genie_sfcsed1,                                    & ! input/output
          & genie_sfxsed1,                                    & ! input/output
-         & genie_sfxsumrok1                                  & ! input/output
+         & genie_sfxsumrok1,                                  & ! input/output
+         & genie_sfxsumreg1                                  & ! input/output         
          )
   end subroutine biogem_wrapper
 
@@ -753,6 +858,7 @@ contains
          & genie_sfcsed1,                                    & ! input
          & genie_sfxsed1,                                    & ! input
          & genie_sfxsumrok1,                                 & ! input
+         & genie_sfxsumreg1,                                 & ! input         
          & .true.,                                           & ! input
          & .false.                                           & ! input
          )
@@ -770,6 +876,7 @@ contains
          & genie_sfcsed1,                                    & ! input
          & genie_sfxsed1,                                    & ! input
          & genie_sfxsumrok1_gem,                             & ! input
+         & genie_sfxsumreg1_gem,                             & ! input         
          & gem_adapt_diag_biogem_full,                       & ! input
          & .true.                                            & ! input
          )
@@ -787,6 +894,7 @@ contains
          & genie_sfcsed1,                                    & ! input
          & genie_sfxsed1,                                    & ! input
          & genie_sfxsumrok1,                                 & ! input
+         & genie_sfxsumreg1,                                 & ! input         
          & .true.,                                           & ! input
          & .false.,                                          & ! input
          & .false.                                           & ! input
@@ -805,6 +913,7 @@ contains
          & genie_sfcsed1,                                    & ! input
          & genie_sfxsed1,                                    & ! input
          & genie_sfxsumrok1,                                 & ! input
+         & genie_sfxsumreg1,                                 & ! input         
          & .true.,                                           & ! input
          & .true.,                                           & ! input
          & .false.                                           & ! input
@@ -823,6 +932,7 @@ contains
          & genie_sfcsed1,                                    & ! input
          & genie_sfxsed1,                                    & ! input
          & genie_sfxsumrok1_gem,                             & ! input
+         & genie_sfxsumreg1_gem,                             & ! input
          & gem_adapt_diag_biogem_full,                       & ! input
          & .false.,                                          & ! input
          & .true.                                            & ! input
@@ -1112,6 +1222,7 @@ contains
          & genie_sfxsumsed1, &                                          ! input
          & genie_sfxocn1,    &                                          ! input
          & genie_sfxsumrok1_gem, &                                      ! input
+         & genie_sfxsumreg1_gem, &                                      ! input
          & genie_sfxsumatm1_gem  &                                      ! input
          )
   end subroutine gemlite_wrapper
@@ -1136,6 +1247,7 @@ contains
     implicit none
     call gemlite_cycleclean( &
          & genie_sfxsumrok1_gem                  &                      ! 
+!         & genie_sfxsumreg1_gem                  &                      ! might be useless for reggem as well as for rokgem (tkv)
          )
   end subroutine gemlite_cycleclean_wrapper
 

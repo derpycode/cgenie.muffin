@@ -230,6 +230,16 @@ contains
    end subroutine initialise_rokgem_wrapper
 
   !!
+  subroutine initialise_reggem_wrapper
+    implicit none
+    call initialise_reggem ( &
+         & genie_timestep,   & 
+         & genie_sfxreg,     &
+         & genie_sfxsumreg1  &
+         & )
+   end subroutine initialise_reggem_wrapper
+
+  !!
   subroutine initialise_gemlite_wrapper
     implicit none
     call initialise_gemlite(                     &                      ! 
@@ -239,6 +249,7 @@ contains
          & go_sv(0:ilat1_ocn),                   &                      ! 
          & genie_sfxsumsed,                      &                      !
          & genie_sfxsumrok1_gem,                 &
+         & genie_sfxsumreg1_gem,                 &  
          & genie_sfxsumatm1_gem                  &
          & )
   end subroutine initialise_gemlite_wrapper

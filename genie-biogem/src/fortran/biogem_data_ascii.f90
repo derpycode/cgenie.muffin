@@ -436,7 +436,7 @@ CONTAINS
        end if
     end if
     ! estimted mineral weathering flux
-    IF (ctrl_data_save_sig_diag .AND. flag_rokgem) THEN
+    IF (ctrl_data_save_sig_diag .AND. flag_rokgem .OR. flag_reggem) THEN
        IF (ocn_select(io_DIC) .AND. ocn_select(io_Ca) .AND. ocn_select(io_SiO2)) THEN
           ! (1) silicate weathering
           loc_filename=fun_data_timeseries_filename(loc_t, &
@@ -785,7 +785,7 @@ CONTAINS
 !!$          CLOSE(unit=out,iostat=ios)
 !!$          call check_iostat(ios,__LINE__,__FILE__)
           end IF
-          if (flag_rokgem) then
+          if (flag_rokgem .OR. flag_reggem) then
              loc_filename=fun_data_timeseries_filename(loc_t, &
                   & par_outdir_name,trim(par_outfile_name)//'_series','misc_Sr_weather_Sr',string_results_ext)
              loc_string = '% time (yr) / Sr (mol yr-1) / 86Sr (mol yr-1) / 87Sr (mol yr-1) / 88Sr (mol yr-1)'
@@ -840,7 +840,7 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
-          if (flag_rokgem) then
+          if (flag_rokgem .OR. flag_reggem) then
              loc_filename=fun_data_timeseries_filename(loc_t, &
                   & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_Os',string_results_ext)
              loc_string = '% time (yr) / Os (mol yr-1) / 188Os (mol yr-1) / 187Os (mol yr-1) / 192Os (mol yr-1)'
@@ -996,7 +996,7 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end DO
     end if
-    IF (ctrl_data_save_sig_diag .AND. flag_rokgem) THEN
+    IF (ctrl_data_save_sig_diag .AND. flag_rokgem .OR. flag_reggem) THEN
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
           loc_filename=fun_data_timeseries_filename(loc_t, &
@@ -2150,7 +2150,7 @@ CONTAINS
     ! NOTE: for the net carbon flux, the calculation is:
     !       DIC (from CaCO3 and Corg) minus CaCO3 burial minus Corg burial
     !       so a negative net flux indicates sinks > sources (but not accounting for volcanic emissions)
-    IF (ctrl_data_save_sig_diag .AND. flag_rokgem) THEN
+    IF (ctrl_data_save_sig_diag .AND. flag_rokgem .OR. flag_reggem) THEN
        IF (ocn_select(io_DIC) .AND. ocn_select(io_Ca) .AND. ocn_select(io_SiO2)) THEN
           ! (1) silicate weathering
           loc_filename=fun_data_timeseries_filename(loc_t, &
@@ -2744,7 +2744,7 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
           CLOSE(unit=out,iostat=ios)
           call check_iostat(ios,__LINE__,__FILE__)
-          if (flag_rokgem) then
+          if (flag_rokgem .OR. flag_reggem) then
              ! all Os species
              loc_filename=fun_data_timeseries_filename(loc_t, &
                   & par_outdir_name,trim(par_outfile_name)//'_series','misc_Os_weather_Os',string_results_ext)
@@ -2906,7 +2906,7 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end DO
     end if
-    IF (ctrl_data_save_sig_diag .AND. flag_rokgem) THEN
+    IF (ctrl_data_save_sig_diag .AND. flag_rokgem .OR. flag_reggem) THEN
        DO l=1,n_l_ocn
           io = conv_iselected_io(l)
           loc_filename=fun_data_timeseries_filename(dum_t, &

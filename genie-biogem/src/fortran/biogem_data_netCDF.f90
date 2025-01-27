@@ -2459,7 +2459,7 @@ CONTAINS
     !              <diag_*>
     !       save diagnostics data
     !----------------------------------------------------------------
-    If (ctrl_data_save_slice_diag_geochem .AND. flag_rokgem) then
+    If (ctrl_data_save_slice_diag_geochem .AND. flag_rokgem .OR. flag_reggem) then
        loc_unitsname = 'mol kg-1 yr-1'
        DO ib=1,n_diag_bio
           loc_ij(:,:) = int_diag_bio_timeslice(ib,:,:)/int_t_timeslice

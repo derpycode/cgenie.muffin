@@ -9,6 +9,7 @@ SUBROUTINE initialise_gemlite( &
      & dum_sv,                 &
      & dum_sfxsumsed1,         &
      & dum_sfxsumrok1_gem,     &
+     & dum_sfxsumreg1_gem,     &
      & dum_sfxsumatm1_gem      &
      & )
   USE gemlite_lib
@@ -21,6 +22,7 @@ SUBROUTINE initialise_gemlite( &
   REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv                              ! 
   real,DIMENSION(n_sed,n_i,n_j),intent(inout)::dum_sfxsumsed1           ! 
   REAL,dimension(n_ocn,n_i,n_j),intent(inout)::dum_sfxsumrok1_gem       ! 
+  REAL,dimension(n_ocn,n_i,n_j),intent(inout)::dum_sfxsumreg1_gem       !
   REAL,dimension(n_atm,n_i,n_j),intent(inout)::dum_sfxsumatm1_gem       ! 
   ! local variables
 !!!
@@ -98,6 +100,7 @@ SUBROUTINE initialise_gemlite( &
   ! initialize interface arrays
   dum_sfxsumsed1(:,:,:) = 0.0
   dum_sfxsumrok1_gem(:,:,:) = 0.0
+  dum_sfxsumreg1_gem(:,:,:) = 0.0
   dum_sfxsumatm1_gem(:,:,:) = 0.0
 
   ! *** initialize GEMlite ***

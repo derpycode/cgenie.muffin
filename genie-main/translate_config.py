@@ -114,6 +114,7 @@ def translate_config(config_filename,script_name='translate_config.py'):
     # ATCHEM:             'ac_'
     # SEDGEM:             'sg_'
     # ROKGEM:             'rg_'
+    # REGGEM:             'gg_'    
     # ECOGEM:             'eg_'
     # wind:               'wi_'
     #
@@ -258,7 +259,7 @@ def translate_config(config_filename,script_name='translate_config.py'):
     #     ents_restart_file->ents_24
     #     ents_offlineswitch->ents_25
     
-    prefixes = {'genie' : 'ma', 'embm' : 'ea', 'goldstein' : 'go', 'goldsteinseaice' : 'gs', 'plasim' : 'pl', 'ents' : 'el', 'GEM' : 'gm', 'biogem' : 'bg', 'ecogem' : 'eg', 'atchem' : 'ac', 'sedgem' : 'sg', 'rokgem' : 'rg', 'wind' : 'wi', 'gemlite' : 'gl', 'goldlite' : 'gi'}
+    prefixes = {'genie' : 'ma', 'embm' : 'ea', 'goldstein' : 'go', 'goldsteinseaice' : 'gs', 'plasim' : 'pl', 'ents' : 'el', 'GEM' : 'gm', 'biogem' : 'bg', 'ecogem' : 'eg', 'atchem' : 'ac', 'sedgem' : 'sg', 'rokgem' : 'rg', 'reggem' : 'gg', 'wind' : 'wi', 'gemlite' : 'gl', 'goldlite' : 'gi'}
     array_conventions = {'gm': '_',
                          'bg': '_',
                          'eg': '_',

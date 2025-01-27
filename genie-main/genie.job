@@ -308,6 +308,7 @@ fi
 [ ! -d $OUTDIR/atchem ]    &&   mkdir -p $OUTDIR/atchem
 [ ! -d $OUTDIR/sedgem ]    &&   mkdir -p $OUTDIR/sedgem
 [ ! -d $OUTDIR/rokgem ]    &&   mkdir -p $OUTDIR/rokgem
+[ ! -d $OUTDIR/reggem ]    &&   mkdir -p $OUTDIR/reggem
 [ ! -d $OUTDIR/ecogem ]    &&   mkdir -p $OUTDIR/ecogem
 [ ! -d $OUTDIR/goldlite ]    &&   mkdir -p $OUTDIR/goldlite
 [ ! -d $OUTDIR/ocnlite ]    &&   mkdir -p $OUTDIR/ocnlite

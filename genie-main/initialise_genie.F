@@ -25,6 +25,7 @@ c
      :      conv_kocn_kbiogem,
      :      conv_kocn_ksedgem,
      :      conv_kocn_krokgem,
+     :      conv_kocn_kreggem,     
      :      conv_kocn_kgoldlite,
      :      conv_kocn_kocnlite,
      :      conv_kocn_kecogem,
@@ -38,6 +39,7 @@ c
      :      flag_atchem,
      :      flag_sedgem,
      :      flag_rokgem,
+     :      flag_reggem,     
      :      flag_ecogem,
      :      flag_goldlite,
      :      flag_ocnlite,
@@ -70,6 +72,7 @@ c
       conv_kocn_ksedgem=-1
       conv_kocn_kbiogem=-1
       conv_kocn_krokgem=-1
+      conv_kocn_kreggem=-1      
       conv_kocn_kgoldlite=-1
       conv_kocn_kocnlite=-1
       conv_kocn_kecogem=-1
@@ -91,6 +94,7 @@ c
       flag_atchem=.false.
       flag_sedgem=.false.
       flag_rokgem=.false.
+      flag_reggem=.false.      
       flag_ecogem=.false.
       flag_gemlite=.false.
 c

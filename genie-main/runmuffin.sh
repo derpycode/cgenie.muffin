@@ -12,7 +12,7 @@ echo ""
 # CHANGE THIS FOR INSTALLATIONS OTHER THAN IN $HOME
 # SET THE SAME AS IN user.mak AND user.sh
 # set home directory
-HOMEDIR=$HOME
+HOMEDIR=/work/crct/tr9323va
 #####################################################################
 # set output directory
 OUTPUTDIR=$HOMEDIR/cgenie_output
@@ -237,6 +237,7 @@ echo ma_conv_kocn_katchem=$dbiostp >> $CONFIGPATH/$CONFIGNAME
 echo ma_conv_kocn_kbiogem=$dbiostp >> $CONFIGPATH/$CONFIGNAME
 echo ma_conv_kocn_ksedgem=$N_TIMESTEPS >> $CONFIGPATH/$CONFIGNAME
 echo ma_conv_kocn_krokgem=$dbiostp >> $CONFIGPATH/$CONFIGNAME
+echo ma_conv_kocn_kreggem=$dbiostp >> $CONFIGPATH/$CONFIGNAME
 echo ma_kgemlite=$N_TIMESTEPS >> $CONFIGPATH/$CONFIGNAME
 # set BIOGEM run length
 echo bg_par_misc_t_runtime=$RUNLENGTH >> $CONFIGPATH/$CONFIGNAME
@@ -318,6 +319,7 @@ if [ -n "$5" ]; then
   echo bg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
   echo sg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
   echo rg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
+  echo gg_ctrl_continuing=t >> $CONFIGPATH/$CONFIGNAME
   echo eg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo ea_30=n >> $CONFIGPATH/$CONFIGNAME
   echo go_18=n >> $CONFIGPATH/$CONFIGNAME
@@ -336,6 +338,7 @@ if [ -n "$5" ]; then
   echo bg_par_rstdir_name=$RESTARTPATH"/biogem" >> $CONFIGPATH/$CONFIGNAME
   echo sg_par_rstdir_name=$RESTARTPATH"/sedgem" >> $CONFIGPATH/$CONFIGNAME
   echo rg_par_rstdir_name=$RESTARTPATH"/rokgem" >> $CONFIGPATH/$CONFIGNAME
+  echo gg_par_rstdir_name=$RESTARTPATH"/reggem" >> $CONFIGPATH/$CONFIGNAME  
   echo eg_par_rstdir_name=$RESTARTPATH"/ecogem" >> $CONFIGPATH/$CONFIGNAME
 else
   echo ea_7=n >> $CONFIGPATH/$CONFIGNAME
@@ -346,6 +349,7 @@ else
   echo bg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo sg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo rg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
+  echo gg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
   echo eg_ctrl_continuing=f >> $CONFIGPATH/$CONFIGNAME
 fi
 # Set netCDF format biogeochem restart files
