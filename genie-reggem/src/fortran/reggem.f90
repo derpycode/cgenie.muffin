@@ -66,20 +66,20 @@ subroutine reggem (dum_dts,dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxr
   case ('Global_avg')
      ! global average weathering
      CALL sub_glob_avg_weath(dum_dts,dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
-     ! Gibbs et al (1999) 2D lithology-dependent weathering
-  case ('GKWM')
-     CALL sub_GKWM(dum_runoff,lithology,calcium_flux)
-     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
-          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
-          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
-     CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
-     ! Amiotte-Suchet et al (2003) 2D lithology-dependent weathering
-  case ('GEM_CO2')
-     CALL sub_GEM_CO2(dum_runoff,lithology,calcium_flux)
-     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
-          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
-          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
-     CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
+!!!     ! Gibbs et al (1999) 2D lithology-dependent weathering
+!!!  case ('GKWM')
+!!!     CALL sub_GKWM(dum_runoff,lithology,calcium_flux)
+!!!     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
+!!!          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
+!!!          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
+!!!     CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
+!!!     ! Amiotte-Suchet et al (2003) 2D lithology-dependent weathering
+!!!  case ('GEM_CO2')
+!!!     CALL sub_GEM_CO2(dum_runoff,lithology,calcium_flux)
+!!!     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
+!!!          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
+!!!          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
+!!!     CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
   end SELECT
 
   ! if output then increment output counter
@@ -117,25 +117,25 @@ SUBROUTINE rest_reggem()
   !        Conditionals commented out because no calibration is done for stage 1 spin-up 
   ! and files are needed to be written for stage 2.
   !        IF (opt_calibrate_T_2D) THEN
-  if (debug_init > 1) PRINT*,'saving 2D temperature reference field for calibration: ',TRIM(par_ref_T0_2D)
-  OPEN(20,status='replace',file=TRIM(par_outdir_name)//'gg_par_ref_T0_2D',form='formatted',action='write',iostat=ios)
-  WRITE(20,fmt='(A100)') par_ref_T0_2D
-  CLOSE(20)
-  CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(par_ref_T0_2D),n_i,n_j,ref_T0_2D(:,:))   
+!!!  if (debug_init > 1) PRINT*,'saving 2D temperature reference field for calibration: ',TRIM(par_ref_T0_2D)
+!!!  OPEN(20,status='replace',file=TRIM(par_outdir_name)//'gg_par_ref_T0_2D',form='formatted',action='write',iostat=ios)
+!!!  WRITE(20,fmt='(A100)') par_ref_T0_2D
+!!!  CLOSE(20)
+!!!  CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(par_ref_T0_2D),n_i,n_j,ref_T0_2D(:,:))   
   !        ENDIF
   !        IF (opt_calibrate_R_2D) THEN
-  if (debug_init > 1) PRINT*,'saving 2D runoff reference field for calibration: ',TRIM(par_ref_R0_2D)
-  OPEN(20,status='replace',file=TRIM(par_outdir_name)//'gg_par_ref_R0_2D',form='formatted',action='write',iostat=ios)
-  WRITE(20,fmt='(A100)') par_ref_R0_2D
-  CLOSE(20)
-  CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(par_ref_R0_2D),n_i,n_j,ref_R0_2D(:,:))   
+!!!  if (debug_init > 1) PRINT*,'saving 2D runoff reference field for calibration: ',TRIM(par_ref_R0_2D)
+!!!  OPEN(20,status='replace',file=TRIM(par_outdir_name)//'gg_par_ref_R0_2D',form='formatted',action='write',iostat=ios)
+!!!  WRITE(20,fmt='(A100)') par_ref_R0_2D
+!!!  CLOSE(20)
+!!!  CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(par_ref_R0_2D),n_i,n_j,ref_R0_2D(:,:))   
   !        ENDIF
   !        IF (opt_calibrate_P_2D) THEN
-  if (debug_init > 1) PRINT*,'saving 2D productivity reference field for calibration: ',TRIM(par_ref_P0_2D)
-  OPEN(20,status='replace',file=TRIM(par_outdir_name)//'gg_par_ref_P0_2D',form='formatted',action='write',iostat=ios)
-  WRITE(20,fmt='(A100)') par_ref_P0_2D
-  CLOSE(20)
-  CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(par_ref_P0_2D),n_i,n_j,ref_P0_2D(:,:))   
+!!!  if (debug_init > 1) PRINT*,'saving 2D productivity reference field for calibration: ',TRIM(par_ref_P0_2D)
+!!!  OPEN(20,status='replace',file=TRIM(par_outdir_name)//'gg_par_ref_P0_2D',form='formatted',action='write',iostat=ios)
+!!!  WRITE(20,fmt='(A100)') par_ref_P0_2D
+!!!  CLOSE(20)
+!!!  CALL sub_save_data_ij(TRIM(par_outdir_name)//TRIM(par_ref_P0_2D),n_i,n_j,ref_P0_2D(:,:))   
   !        ENDIF
 
 END SUBROUTINE rest_reggem

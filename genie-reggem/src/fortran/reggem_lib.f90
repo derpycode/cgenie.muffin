@@ -236,7 +236,7 @@ MODULE reggem_lib
   NAMELIST /ini_reggem_nml/opt_weather_fixed_kerogenC,opt_weather_fixed_kerogenP,opt_weather_fixed_kerogenS
   NAMELIST /ini_reggem_nml/opt_weather_fixed_FeS2,opt_weather_fixed_CaSO4,opt_weather_fixed_FeCO3,opt_weather_fixed_Ca5PO43
   NAMELIST /ini_reggem_nml/opt_weather_fixed_SiO2
-  ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------- !
+!!!  ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------- !
   CHARACTER(len=63)::par_lith_data 
   CHARACTER(len=63)::par_lith_data2 
   CHARACTER(len=63)::par_lith_data3
@@ -244,32 +244,32 @@ MODULE reggem_lib
   LOGICAL:: truncate_to_land                                                             ! truncate lithological maps to genie land-mask - if option is set to false than flux from land in genie ocean, goes direct to ocean
   LOGICAL:: scale_to_landarea                                                            ! scale lithological areas to total the land surface area (switch off if altering lithological areas e.g. for enhanced weathering)
   NAMELIST /ini_reggem_nml/truncate_to_land,scale_to_landarea
-  LOGICAL:: calibrate_weath                                                              ! calibrate 2D weathering - if .true. use values below
-  NAMELIST /ini_reggem_nml/calibrate_weath  
-  REAL:: calibrate_weather_GKWM_CaCO3                                                    ! calibration values for 2D CaCO3 weathering - to avoid drift, set equal to (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
-  REAL:: calibrate_weather_GEM_CO2_CaCO3                                                 ! (e.g. 1.5754 for Gi, 1.0505 for Am)
-  NAMELIST /ini_reggem_nml/calibrate_weather_GKWM_CaCO3,calibrate_weather_GEM_CO2_CaCO3
-  REAL:: calibrate_weather_GKWM_CaSiO3                                                   ! calibration values for 2D CaSiO3 weathering - to avoid drift, set equal to (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
-  REAL:: calibrate_weather_GEM_CO2_CaSiO3                                                ! (e.g. 0.8510 for Gi, 0.7917 for Am) or leave as 1.0 for uncalibrated.
-  NAMELIST /ini_reggem_nml/calibrate_weather_GKWM_CaSiO3,calibrate_weather_GEM_CO2_CaSiO3
-  LOGICAL:: opt_calibrate_T_2D                                                           ! calibrate temperature fields to data (recreate real world patterns)
-  LOGICAL:: opt_calibrate_R_2D                                                           ! calibrate runoff fields to data (recreate real world patterns)
-  LOGICAL:: opt_calibrate_P_2D                                                           ! calibrate productivity fields to data (recreate real world patterns)
-  NAMELIST /ini_reggem_nml/opt_calibrate_T_2D,opt_calibrate_R_2D,opt_calibrate_P_2D
-  CHARACTER(len=63)::par_ref_T0_2D                                                       ! land surface temperature (C) calibration file containing base pattern for 
-  ! (model field is scaled by gg_par_data_T_2D divided by this if gg_opt_calibrate_T_2D=.true.)
-  CHARACTER(len=63)::par_ref_R0_2D                                                       ! land surface runoff (mm/yr) calibration file containing base pattern for calibration
-  ! (model field is scaled by gg_par_data_R_2D divided by this if gg_opt_calibrate_R_2D=.true.)
-  CHARACTER(len=63)::par_ref_P0_2D                                                       ! land surface productivity (kgC m-2 yr-1) calibration file containing base pattern for calibration 
-  ! (model field is scaled by gg_par_data_P_2D divided by this if gg_opt_calibrate_P_2D=.true.)
-  NAMELIST /ini_reggem_nml/par_ref_T0_2D,par_ref_R0_2D,par_ref_P0_2D
-  CHARACTER(len=63)::par_data_T_2D                                                       ! file containing weathering reference land surface temperature (C) data field to calibrate to
-  CHARACTER(len=63)::par_data_R_2D                                                       ! file containing weathering reference land surface runoff (mm/yr) data field to calibrate to
-  CHARACTER(len=63)::par_data_P_2D                                                       ! file containing weathering reference land surface productivity (kgC m-2 yr-1) data field to calibrate to
-  NAMELIST /ini_reggem_nml/par_data_T_2D,par_data_R_2D,par_data_P_2D
-  LOGICAL:: opt_weath_regimes                                                            ! separate kinetic and transport limited regimes?
-  CHARACTER(len=63)::weath_regimes                                                       ! orogeny landmask file
-  NAMELIST /ini_reggem_nml/opt_weath_regimes,weath_regimes
+!!!  LOGICAL:: calibrate_weath                                                              ! calibrate 2D weathering - if .true. use values below
+!!!  NAMELIST /ini_reggem_nml/calibrate_weath  
+!!!  REAL:: calibrate_weather_GKWM_CaCO3                                                    ! calibration values for 2D CaCO3 weathering - to avoid drift, set equal to (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
+!!!  REAL:: calibrate_weather_GEM_CO2_CaCO3                                                 ! (e.g. 1.5754 for Gi, 1.0505 for Am)
+!!!  NAMELIST /ini_reggem_nml/calibrate_weather_GKWM_CaCO3,calibrate_weather_GEM_CO2_CaCO3
+!!!  REAL:: calibrate_weather_GKWM_CaSiO3                                                   ! calibration values for 2D CaSiO3 weathering - to avoid drift, set equal to (half of CaCO3 sediment burrial flux)/(original uncorrected flux) 
+!!!  REAL:: calibrate_weather_GEM_CO2_CaSiO3                                                ! (e.g. 0.8510 for Gi, 0.7917 for Am) or leave as 1.0 for uncalibrated.
+!!!  NAMELIST /ini_reggem_nml/calibrate_weather_GKWM_CaSiO3,calibrate_weather_GEM_CO2_CaSiO3
+!!!  LOGICAL:: opt_calibrate_T_2D                                                           ! calibrate temperature fields to data (recreate real world patterns)
+!!!  LOGICAL:: opt_calibrate_R_2D                                                           ! calibrate runoff fields to data (recreate real world patterns)
+!!!  LOGICAL:: opt_calibrate_P_2D                                                           ! calibrate productivity fields to data (recreate real world patterns)
+!!!  NAMELIST /ini_reggem_nml/opt_calibrate_T_2D,opt_calibrate_R_2D,opt_calibrate_P_2D
+!!!  CHARACTER(len=63)::par_ref_T0_2D                                                       ! land surface temperature (C) calibration file containing base pattern for 
+!!!  ! (model field is scaled by gg_par_data_T_2D divided by this if gg_opt_calibrate_T_2D=.true.)
+!!!  CHARACTER(len=63)::par_ref_R0_2D                                                       ! land surface runoff (mm/yr) calibration file containing base pattern for calibration
+!!!  ! (model field is scaled by gg_par_data_R_2D divided by this if gg_opt_calibrate_R_2D=.true.)
+!!!  CHARACTER(len=63)::par_ref_P0_2D                                                       ! land surface productivity (kgC m-2 yr-1) calibration file containing base pattern for calibration 
+!!!  ! (model field is scaled by gg_par_data_P_2D divided by this if gg_opt_calibrate_P_2D=.true.)
+!!!  NAMELIST /ini_reggem_nml/par_ref_T0_2D,par_ref_R0_2D,par_ref_P0_2D
+!!!  CHARACTER(len=63)::par_data_T_2D                                                       ! file containing weathering reference land surface temperature (C) data field to calibrate to
+!!!  CHARACTER(len=63)::par_data_R_2D                                                       ! file containing weathering reference land surface runoff (mm/yr) data field to calibrate to
+!!!  CHARACTER(len=63)::par_data_P_2D                                                       ! file containing weathering reference land surface productivity (kgC m-2 yr-1) data field to calibrate to
+!!!  NAMELIST /ini_reggem_nml/par_data_T_2D,par_data_R_2D,par_data_P_2D
+!!!  LOGICAL:: opt_weath_regimes                                                            ! separate kinetic and transport limited regimes?
+!!!  CHARACTER(len=63)::weath_regimes                                                       ! orogeny landmask file
+!!!  NAMELIST /ini_reggem_nml/opt_weath_regimes,weath_regimes
   ! ############################################################################################################################## !
 
 
@@ -414,9 +414,9 @@ MODULE reggem_lib
   REAL                                           :: calibrate_P_2D(n_i,n_j)
 
   ! conversion factors to speed up numerics
-  REAL                                           :: conv_GKWM
-  REAL                                           :: conv_GKWM_runoff 
-  REAL                                           :: conv_GEM_CO2
+!!!  REAL                                           :: conv_GKWM
+!!!  REAL                                           :: conv_GKWM_runoff 
+!!!  REAL                                           :: conv_GEM_CO2
   REAL                                           :: k_T                                            ! constant factor for temperature-silicate weathering feedback = 1000*E_a/(R*T_0^2)
 
 contains

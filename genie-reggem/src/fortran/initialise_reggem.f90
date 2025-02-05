@@ -176,16 +176,16 @@ subroutine initialise_reggem( &
   if (debug_init > 1) print*,'calibrate_T_0D = ',calibrate_T_0D
 
   IF (opt_calibrate_R_0D) THEN
-     conv_GKWM_runoff = conv_GKWM_runoff * ( par_data_R_0D / par_ref_R0 )
-     conv_GEM_CO2 = conv_GEM_CO2 * ( par_data_R_0D / par_ref_R0 )
+!!!     conv_GKWM_runoff = conv_GKWM_runoff * ( par_data_R_0D / par_ref_R0 )
+!!!     conv_GEM_CO2 = conv_GEM_CO2 * ( par_data_R_0D / par_ref_R0 )
      calibrate_R_0D = par_data_R_0D / par_ref_R0
   ELSE
      calibrate_R_0D=1.0
   ENDIF
   if (debug_init > 1) print*,'calibrate_R_0D = ',calibrate_R_0D
 
-  if (debug_init > 1) print*,'conv_GKWM_runoff = ',conv_GKWM_runoff
-  if (debug_init > 1) print*,'conv_GEM_CO2 = ',conv_GEM_CO2
+!!!  if (debug_init > 1) print*,'conv_GKWM_runoff = ',conv_GKWM_runoff
+!!!  if (debug_init > 1) print*,'conv_GEM_CO2 = ',conv_GEM_CO2
 
   IF (opt_calibrate_P_0D) THEN
      calibrate_P_0D = par_data_P_0D / par_ref_P0
@@ -195,15 +195,15 @@ subroutine initialise_reggem( &
   if (debug_init > 1) print*,'calibrate_P_0D = ',calibrate_P_0D
 
   ! 2D calibration
-  IF (opt_calibrate_T_2D) THEN
-     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_ref_T0_2D),n_i,n_j,ref_T0_2D)
-     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_data_T_2D),n_i,n_j,data_T_2D)
-     DO i=1,n_i
-        DO j=1,n_j
-           calibrate_T_2D(i,j) = ( data_T_2D(i,j) + 273.15 ) / ( ref_T0_2D(i,j) + 273.15 )
-        END DO
-     END DO
-  ENDIF
+!!!  IF (opt_calibrate_T_2D) THEN
+!!!     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_ref_T0_2D),n_i,n_j,ref_T0_2D)
+!!!     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_data_T_2D),n_i,n_j,data_T_2D)
+!!!     DO i=1,n_i
+!!!        DO j=1,n_j
+!!!           calibrate_T_2D(i,j) = ( data_T_2D(i,j) + 273.15 ) / ( ref_T0_2D(i,j) + 273.15 )
+!!!        END DO
+!!!     END DO
+!!!  ENDIF
 
   if (debug_init > 2) then
      print*, data_T_2D(:,1)
@@ -211,33 +211,33 @@ subroutine initialise_reggem( &
      print*, calibrate_T_2D(:,1)
   end if
 
-  IF (opt_calibrate_R_2D) THEN
-     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_ref_R0_2D),n_i,n_j,ref_R0_2D)
-     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_data_R_2D),n_i,n_j,data_R_2D)
-     DO i=1,n_i
-        DO j=1,n_j
-           IF (ref_R0_2D(i,j).eq.0.0) THEN
-              calibrate_R_2D(i,j) = 1.0
-           ELSE
-              calibrate_R_2D(i,j) = data_R_2D(i,j) / ref_R0_2D(i,j)
-           ENDIF
-        END DO
-     END DO
-  ENDIF
+!!!  IF (opt_calibrate_R_2D) THEN
+!!!     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_ref_R0_2D),n_i,n_j,ref_R0_2D)
+!!!     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_data_R_2D),n_i,n_j,data_R_2D)
+!!!     DO i=1,n_i
+!!!        DO j=1,n_j
+!!!           IF (ref_R0_2D(i,j).eq.0.0) THEN
+!!!              calibrate_R_2D(i,j) = 1.0
+!!!           ELSE
+!!!              calibrate_R_2D(i,j) = data_R_2D(i,j) / ref_R0_2D(i,j)
+!!!           ENDIF
+!!!        END DO
+!!!     END DO
+!!!  ENDIF
 
-  IF (opt_calibrate_P_2D) THEN
-     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_ref_P0_2D),n_i,n_j,ref_P0_2D)
-     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_data_P_2D),n_i,n_j,data_P_2D)
-     DO i=1,n_i
-        DO j=1,n_j
-           IF (ref_P0_2D(i,j).eq.0.0) THEN
-              calibrate_P_2D(i,j) = 1.0
-           ELSE
-              calibrate_P_2D(i,j) = data_P_2D(i,j) / ref_P0_2D(i,j)
-           ENDIF
-        END DO
-     END DO
-  ENDIF
+!!!  IF (opt_calibrate_P_2D) THEN
+!!!     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_ref_P0_2D),n_i,n_j,ref_P0_2D)
+!!!     CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(par_data_P_2D),n_i,n_j,data_P_2D)
+!!!     DO i=1,n_i
+!!!        DO j=1,n_j
+!!!           IF (ref_P0_2D(i,j).eq.0.0) THEN
+!!!              calibrate_P_2D(i,j) = 1.0
+!!!           ELSE
+!!!              calibrate_P_2D(i,j) = data_P_2D(i,j) / ref_P0_2D(i,j)
+!!!           ENDIF
+!!!        END DO
+!!!     END DO
+!!!  ENDIF
 
 
   ! ======= 2D WEATHERING =================================================================!
@@ -247,35 +247,35 @@ subroutine initialise_reggem( &
      if (debug_init > 1) print*,'--- 2D WEATHERING ---'
      gridcell_area = phys_reg(ipr_A,1,1)/1.0E6         ! factor of 1E6 to convert from m^2 to km^2
      if (debug_init > 1) print*,'gridcell area = ',gridcell_area
-     conv_GKWM = 0.5*gridcell_area                     ! Formula is for Flux of bicarbonate produced, and we want riverine flux of Ca2+ 
+!!!     conv_GKWM = 0.5*gridcell_area                     ! Formula is for Flux of bicarbonate produced, and we want riverine flux of Ca2+ 
      ! (in line with global average formulation inputs), these are in ratio of 2:1 so factor of 0.5.
      ! And fluxes are calculated per km^2 so multiply by gridcell_area
-     conv_GKWM_runoff = 0.1 * conv_yr_s                ! Have separate constant for runoff as it is raised to a power in the formula;
+!!!     conv_GKWM_runoff = 0.1 * conv_yr_s                ! Have separate constant for runoff as it is raised to a power in the formula;
      ! runoff units are mm/s in EMBM but cm/yr in Gibbs' formula.         
      ! normalise to annual average runoff used by Gibbs (41.8 cm/yr = 1.32E-05 mm/s)
      !  - number is divided by annual average runoff during calculation in sub_GKWM
 
-     conv_GEM_CO2 = 1.0E3 * conv_yr_s * gridcell_area  ! Runoff units are mm/s in EMBM but l*km^-2*s-1 in the GEM-CO2 formula. (factor 1E6).
+!!!     conv_GEM_CO2 = 1.0E3 * conv_yr_s * gridcell_area  ! Runoff units are mm/s in EMBM but l*km^-2*s-1 in the GEM-CO2 formula. (factor 1E6).
      ! Fluxes are calculated per km^2 so multiply by gridcell_area.
      ! Formula is for Flux of CO2 consumed, and we want riverine flux of Ca2+ 
      ! (in line with global average formulation inputs), these are in ratio of 1:1 so OK.
      ! Factor of 10^-3 * conv_yr_s as formula calculates quantites in 10^-3 mol/s and we want mol/yr.
 
-     SELECT case (par_weathopt)
-     case ('GKWM')
-        par_nliths = 6
-     case ('GEM_CO2')
-        par_nliths = 7
-     end SELECT
+!!!     SELECT case (par_weathopt)
+!!!     case ('GKWM')
+!!!        par_nliths = 6
+!!!     case ('GEM_CO2')
+!!!        par_nliths = 7
+!!!     end SELECT
      if (debug_init > 1) print*,'number of rock types (no. of files listed in x_lithologies.txt) = ',par_nliths
      CALL define_2D_arrays()
      CALL sub_load_weath(lithology_names,lithology)
 
-     IF (opt_weath_regimes) THEN
-        if (debug_init > 1) print*,'Erosion/transport limited weathering on; reading in orogeny landmask'
-        ! Read basic landmask file with locations of different weathering regimes
-        CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(weath_regimes),n_i,n_j,orogeny)
-     ENDIF
+!!!     IF (opt_weath_regimes) THEN
+!!!        if (debug_init > 1) print*,'Erosion/transport limited weathering on; reading in orogeny landmask'
+!!!        ! Read basic landmask file with locations of different weathering regimes
+!!!        CALL sub_load_data_ij(TRIM(par_indir_name)//TRIM(weath_regimes),n_i,n_j,orogeny)
+!!!     ENDIF
 
   ENDIF
 

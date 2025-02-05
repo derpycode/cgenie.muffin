@@ -539,11 +539,11 @@ CONTAINS
              loc_SLT(i,j) = loc_SLT(i,j) * calibrate_T_0D
              loc_SLT(i,j) = loc_SLT(i,j) - 273.15
           ENDIF
-          IF (opt_calibrate_T_2D) THEN
-             loc_SLT(i,j) = loc_SLT(i,j) + 273.15
-             loc_SLT(i,j) = loc_SLT(i,j) * calibrate_T_2D(i,j)
-             loc_SLT(i,j) = loc_SLT(i,j) - 273.15
-          ENDIF
+!!!          IF (opt_calibrate_T_2D) THEN
+!!!             loc_SLT(i,j) = loc_SLT(i,j) + 273.15
+!!!             loc_SLT(i,j) = loc_SLT(i,j) * calibrate_T_2D(i,j)
+!!!             loc_SLT(i,j) = loc_SLT(i,j) - 273.15
+!!!          ENDIF
        END DO
     END DO
 
@@ -598,9 +598,9 @@ CONTAINS
           END DO
        END DO
     ENDIF
-    IF (opt_calibrate_R_2D) THEN
-       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
-    ENDIF
+!!!    IF (opt_calibrate_R_2D) THEN
+!!!       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
+!!!    ENDIF
 
     ! calculate mean runoff (mm s-1)
     ! for equal area grid:
@@ -666,9 +666,9 @@ CONTAINS
           END DO
        END DO
     ENDIF
-    IF (opt_calibrate_P_2D) THEN
-       loc_P(:,:) = loc_P(:,:) * calibrate_P_2D(:,:)
-    ENDIF
+!!!    IF (opt_calibrate_P_2D) THEN
+!!!       loc_P(:,:) = loc_P(:,:) * calibrate_P_2D(:,:)
+!!!    ENDIF
 
     ! for equal area grid:
     loc_avP = 0.0
@@ -1440,314 +1440,314 @@ CONTAINS
 
     ! for outputting calibrate 2D reference files
     ! should really only do at the end to save computation, i.e. export loc_SLT
-    IF (opt_calibrate_T_2D) THEN
-       ref_T0_2D(:,:) = loc_SLT(:,:)
-    ENDIF
-    IF (opt_calibrate_R_2D) THEN
-       ref_R0_2D(:,:) = loc_runoff(:,:)*conv_yr_s
-    ENDIF
-    IF (opt_calibrate_P_2D) THEN
-       ref_P0_2D(:,:) = loc_P(:,:)
-    ENDIF
+!!!    IF (opt_calibrate_T_2D) THEN
+!!!       ref_T0_2D(:,:) = loc_SLT(:,:)
+!!!    ENDIF
+!!!    IF (opt_calibrate_R_2D) THEN
+!!!       ref_R0_2D(:,:) = loc_runoff(:,:)*conv_yr_s
+!!!    ENDIF
+!!!    IF (opt_calibrate_P_2D) THEN
+!!!       ref_P0_2D(:,:) = loc_P(:,:)
+!!!    ENDIF
 
   END SUBROUTINE sub_glob_avg_weath
 
 
-  !======= 2D LITHOLOGY DEPENDENT WEATHERING ==============================================!
-
-  ! Subroutine: sub_GKWM
-  !
-  ! Subroutine for spatially-explicit weathering based on Gibbs et al. (1999)
-  !
-  ! Uses:
-  !
-  ! <genie_util>, ONLY: <check_unit>, <check_iostat>
-  !
-  !
-  ! Calls:
-  !
-  ! - <sub_save_data_ij>
-  !
-  ! Input:
-  !
-  ! dum__runoff - run-off read in from exernal module (EMBM, or ENTS)
-  ! dum_lithology - array containing proportions of each type of lithology in each land cell
-  !
-  ! Output:
-  !
-  ! dum_calcium_flux - array containing fluxes of calcium for each lithological type
-
-  subroutine sub_GKWM       (                                  &
-       & dum_runoff,                      &
-       & dum_lithology,                   &
-       & dum_calcium_flux                  )
-
-    USE genie_util, ONLY: check_unit, check_iostat
-
-
-    IMPLICIT NONE
-
-    ! dummy variables
-    REAL, intent(in)                :: dum_runoff(n_i,n_j)
-    REAL, intent(in)                :: dum_lithology(par_nliths,n_i,n_j)
-    REAL, intent(inout)             :: dum_calcium_flux(par_nliths,n_i,n_j)            ! F_HCO_3- is sum of this
-
-    ! local variables
-    REAL                            :: loc_runoff(n_i,n_j)
-    REAL                            :: avg_runoff
-    REAL                            :: r_avg_runoff
-    REAL                            :: conv_factor(par_nliths)
-    REAL                            :: rescale_runoff
-    INTEGER                         :: i, j, k, ios
-
-    ! Put runoff into local array
-    loc_runoff(:,:) = dum_runoff(:,:)
-
-    ! Do calibrations if requested
-    IF (opt_calibrate_R_0D) THEN
-       DO i=1,n_i
-          DO j=1,n_j
-             loc_runoff(i,j) = loc_runoff(i,j) * calibrate_R_0D
-          END DO
-       END DO
-    ENDIF
-    IF (opt_calibrate_R_2D) THEN
-       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
-    ENDIF
-
-    ! Calculate average runoff and reciprocal
-    avg_runoff=sum(landmask(:,:) * loc_runoff(:,:))/nlandcells
-    if (avg_runoff.eq.0.0) then
-       r_avg_runoff = 1E12
-    else
-       r_avg_runoff = 1.0/avg_runoff
-    endif
-
-    ! Divide weathering up into transport and kinetic limited regimes if requested     
-    IF (opt_weath_regimes) THEN
-
-       DO i=1,n_i
-          DO j=1,n_j
-             IF (orogeny(i,j).eq.1) THEN
-                IF (opt_calibrate_R_0D) THEN
-                   regimes_calib(i,j) = par_data_R_0D
-                ELSE
-                   regimes_calib(i,j) = par_ref_R0
-                ENDIF
-             ENDIF
-             IF (orogeny(i,j).eq.2) THEN
-                regimes_calib(i,j) = avg_runoff
-             ENDIF
-          END DO
-       END DO
-
-       ! Speed up numerics by combining conversion factor, calibration with average runoff, and k
-       do k = 1, par_nliths
-          ! see initialise_reggem.f90 for info on conversion factors conv_*
-          conv_factor(k) = weath_consts(k,1) * conv_GKWM * ((conv_GKWM_runoff*r_avg_runoff) ** weath_consts(k,2)) 
-       end do
-
-       ! Calculate F_HCO_3- (calcium_flux)       
-       DO k = 1, par_nliths
-          DO i = 1, n_i
-             DO j = 1, n_j
-                dum_calcium_flux(k,i,j) = conv_factor(k) * regimes_calib(i,j)*&              
-                     &                                dum_lithology(k,i,j) *               &
-                     &                                (loc_runoff(i,j) ** weath_consts(k,2))
-             END DO
-          END DO
-       END DO
-
-    ELSE
-
-       ! Set calibration factor if option is set
-       ! If runoff feedback is off, then runoff is scaled to initially chosen reference point R0
-       ! (R0 is set equal to the average runoff after each spin-up stage)
-       ! This reference point is different if it is calibrated (to data) using opt_calibrate_R_0D.
-       IF (opt_weather_R_Ca.or.opt_weather_R_Si) THEN
-          rescale_runoff = avg_runoff
-       ELSE
-          IF (opt_calibrate_R_0D) THEN
-             rescale_runoff = par_data_R_0D
-          ELSE
-             rescale_runoff = par_ref_R0
-          ENDIF
-       ENDIF
-
-       ! Speed up numerics by combining conversion factor, calibration with average runoff, and k
-       do k = 1, par_nliths
-          ! see initialise_reggem.f90 for info on conversion factors conv_*
-          conv_factor(k) = weath_consts(k,1) * conv_GKWM * ((conv_GKWM_runoff*rescale_runoff*r_avg_runoff) ** weath_consts(k,2))
-       end do
-
-       ! Calculate F_HCO_3- (calcium_flux)       
-       DO k = 1, par_nliths
-          DO i = 1, n_i
-             DO j = 1, n_j
-                dum_calcium_flux(k,i,j) = conv_factor(k) *                   &              
-                     &                                dum_lithology(k,i,j) *              &
-                     &                                (loc_runoff(i,j) ** weath_consts(k,2))
-             END DO
-          END DO
-       END DO
-
-    ENDIF
-
-    ! Save data to files calcium_lith.dat where 'lith' is the lithology
-    IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
-       IF (opt_2d_ascii_output) THEN
-          DO k = 1,par_nliths
-             call check_unit(17,__LINE__,__FILE__)
-             OPEN(17,file=TRIM(par_outdir_name)// &  
-                  & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_'//       &
-                  TRIM(year_text)//'.dat',iostat=ios)
-             call check_iostat(ios,__LINE__,__FILE__)
-             DO j=n_j,1,-1
-                WRITE(17,*,iostat=ios)(dum_calcium_flux(k,i,j),i=1,n_i)
-                call check_iostat(ios,__LINE__,__FILE__)
-             END DO
-             CLOSE(17,iostat=ios)
-             call check_iostat(ios,__LINE__,__FILE__)
-          END DO
-       ENDIF
-    ENDIF
-
-  END SUBROUTINE sub_GKWM
+!!!  !======= 2D LITHOLOGY DEPENDENT WEATHERING ==============================================!
+!!!
+!!!  ! Subroutine: sub_GKWM
+!!!  !
+!!!  ! Subroutine for spatially-explicit weathering based on Gibbs et al. (1999)
+!!!  !
+!!!  ! Uses:
+!!!  !
+!!!  ! <genie_util>, ONLY: <check_unit>, <check_iostat>
+!!!  !
+!!!  !
+!!!  ! Calls:
+!!!  !
+!!!  ! - <sub_save_data_ij>
+!!!  !
+!!!  ! Input:
+!!!  !
+!!!  ! dum__runoff - run-off read in from exernal module (EMBM, or ENTS)
+!!!  ! dum_lithology - array containing proportions of each type of lithology in each land cell
+!!!  !
+!!!  ! Output:
+!!!  !
+!!!  ! dum_calcium_flux - array containing fluxes of calcium for each lithological type
+!!!
+!!!  subroutine sub_GKWM       (                                  &
+!!!       & dum_runoff,                      &
+!!!       & dum_lithology,                   &
+!!!       & dum_calcium_flux                  )
+!!!
+!!!    USE genie_util, ONLY: check_unit, check_iostat
 
 
-  !========================================================================================!
+!!!    IMPLICIT NONE
 
-  ! Subroutine: sub_GEM_CO2 
-  !
-  ! Subroutine for spatially-explicit weathering based on Amiotte-Suchet et al. (2003)
-  !
-  ! Uses:
-  !
-  ! <genie_util>, ONLY: <check_unit>, <check_iostat>
-  !
-  !
-  ! Calls:
-  !
-  ! - <sub_save_data_ij>
-  !
-  ! Input:
-  !
-  ! dum__runoff - run-off read in from exernal module (EMBM, or ENTS)
-  ! dum_lithology - array containing proportions of each type of lithology in each land cell
-  !
-  ! Output:
-  !
-  ! dum_calcium_flux - array containing fluxes of calcium for each lithological type
+!!!    ! dummy variables
+!!!    REAL, intent(in)                :: dum_runoff(n_i,n_j)
+!!!    REAL, intent(in)                :: dum_lithology(par_nliths,n_i,n_j)
+!!!    REAL, intent(inout)             :: dum_calcium_flux(par_nliths,n_i,n_j)            ! F_HCO_3- is sum of this
+!!!
+!!!    ! local variables
+!!!    REAL                            :: loc_runoff(n_i,n_j)
+!!!    REAL                            :: avg_runoff
+!!!    REAL                            :: r_avg_runoff
+!!!    REAL                            :: conv_factor(par_nliths)
+!!!    REAL                            :: rescale_runoff
+!!!    INTEGER                         :: i, j, k, ios
 
-  SUBROUTINE sub_GEM_CO2     (                                  &
-       & dum_runoff,                      &
-       & dum_lithology,                   &
-       & dum_calcium_flux                  )
+!!!    ! Put runoff into local array
+!!!    loc_runoff(:,:) = dum_runoff(:,:)
 
-    USE genie_util, ONLY: check_unit, check_iostat
+!!!    ! Do calibrations if requested
+!!!    IF (opt_calibrate_R_0D) THEN
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             loc_runoff(i,j) = loc_runoff(i,j) * calibrate_R_0D
+!!!          END DO
+!!!       END DO
+!!!    ENDIF
+!!!    IF (opt_calibrate_R_2D) THEN
+!!!       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
+!!!    ENDIF
 
-    IMPLICIT NONE
+!!!    ! Calculate average runoff and reciprocal
+!!!    avg_runoff=sum(landmask(:,:) * loc_runoff(:,:))/nlandcells
+!!!    if (avg_runoff.eq.0.0) then
+!!!       r_avg_runoff = 1E12
+!!!    else
+!!!       r_avg_runoff = 1.0/avg_runoff
+!!!    endif
 
-    ! dummy variables
-    REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)
-    REAL, INTENT(in)                :: dum_lithology(par_nliths,n_i,n_j)
-    REAL, INTENT(inout)             :: dum_calcium_flux(par_nliths,n_i,n_j)            ! F_HCO_3- is sum of this
+!!!    ! Divide weathering up into transport and kinetic limited regimes if requested     
+!!!    IF (opt_weath_regimes) THEN
 
-    ! local variables
-    REAL                            :: loc_runoff(n_i,n_j)
-    REAL                            :: avg_runoff
-    REAL                            :: rescale_runoff
-    REAL                            :: r_avg_runoff
-    REAL                            :: conv_factor(par_nliths)
-    INTEGER                         :: i, j, k, ios
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             IF (orogeny(i,j).eq.1) THEN
+!!!                IF (opt_calibrate_R_0D) THEN
+!!!                   regimes_calib(i,j) = par_data_R_0D
+!!!                ELSE
+!!!                   regimes_calib(i,j) = par_ref_R0
+!!!                ENDIF
+!!!             ENDIF
+!!!             IF (orogeny(i,j).eq.2) THEN
+!!!                regimes_calib(i,j) = avg_runoff
+!!!             ENDIF
+!!!          END DO
+!!!       END DO
 
-    ! Put runoff into local array
-    loc_runoff(:,:) = dum_runoff(:,:)
+!!!       ! Speed up numerics by combining conversion factor, calibration with average runoff, and k
+!!!       do k = 1, par_nliths
+!!!          ! see initialise_reggem.f90 for info on conversion factors conv_*
+!!!          conv_factor(k) = weath_consts(k,1) * conv_GKWM * ((conv_GKWM_runoff*r_avg_runoff) ** weath_consts(k,2)) 
+!!!       end do
 
-    ! Do calibrations if requested
-    IF (opt_calibrate_R_0D) THEN
-       DO i=1,n_i
-          DO j=1,n_j
-             loc_runoff(i,j) = loc_runoff(i,j) * calibrate_R_0D
-          END DO
-       END DO
-    ENDIF
-    IF (opt_calibrate_R_2D) THEN
-       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
-    ENDIF
+!!!       ! Calculate F_HCO_3- (calcium_flux)       
+!!!       DO k = 1, par_nliths
+!!!          DO i = 1, n_i
+!!!             DO j = 1, n_j
+!!!                dum_calcium_flux(k,i,j) = conv_factor(k) * regimes_calib(i,j)*&              
+!!!                     &                                dum_lithology(k,i,j) *               &
+!!!                     &                                (loc_runoff(i,j) ** weath_consts(k,2))
+!!!             END DO
+!!!          END DO
+!!!       END DO
 
-    ! Calculate average runoff and reciprocal
-    avg_runoff=sum(landmask(:,:) * loc_runoff(:,:))/nlandcells
-    if (avg_runoff.eq.0.0) then
-       r_avg_runoff = 1E12
-    else
-       r_avg_runoff = 1.0/avg_runoff
-    endif
+!!!    ELSE
 
-    ! Set calibration factor if option is set
-    ! If runoff feedback is off, then runoff is scaled to initially chosen reference point R0
-    ! (R0 is set equal to the average runoff after each spin-up stage)
-    ! This reference point is different if it is calibrated (to data) using opt_calibrate_R_0D.
-    IF (opt_weather_R_Ca.or.opt_weather_R_Si) THEN
-       rescale_runoff = avg_runoff
-    ELSE
-       IF (opt_calibrate_R_0D) THEN
-          rescale_runoff = par_data_R_0D
-       ELSE
-          rescale_runoff = par_ref_R0
-       ENDIF
-    ENDIF
+!!!       ! Set calibration factor if option is set
+!!!       ! If runoff feedback is off, then runoff is scaled to initially chosen reference point R0
+!!!       ! (R0 is set equal to the average runoff after each spin-up stage)
+!!!       ! This reference point is different if it is calibrated (to data) using opt_calibrate_R_0D.
+!!!       IF (opt_weather_R_Ca.or.opt_weather_R_Si) THEN
+!!!          rescale_runoff = avg_runoff
+!!!       ELSE
+!!!          IF (opt_calibrate_R_0D) THEN
+!!!             rescale_runoff = par_data_R_0D
+!!!          ELSE
+!!!             rescale_runoff = par_ref_R0
+!!!          ENDIF
+!!!       ENDIF
 
-    ! Speed up numerics by combining conversion factor, calibration with average runoff, and k
-    do k = 1, par_nliths
-       ! see initialise_reggem.f90 for info on conversion factors conv_GEM_CO2
-       conv_factor(k) = weath_consts(k,1) * conv_GEM_CO2 * rescale_runoff * r_avg_runoff
-    end do
+!!!       ! Speed up numerics by combining conversion factor, calibration with average runoff, and k
+!!!       do k = 1, par_nliths
+!!!          ! see initialise_reggem.f90 for info on conversion factors conv_*
+!!!          conv_factor(k) = weath_consts(k,1) * conv_GKWM * ((conv_GKWM_runoff*rescale_runoff*r_avg_runoff) ** weath_consts(k,2))
+!!!       end do
 
-    ! Calculate F_HCO_3- (calcium_flux)    
-    DO k = 1, par_nliths
-       DO i = 1, n_i
-          DO j = 1, n_j
-             dum_calcium_flux(k,i,j) = conv_factor(k) * dum_lithology(k,i,j) * loc_runoff(i,j)
-          END DO
-       END DO
-    END DO
+!!!       ! Calculate F_HCO_3- (calcium_flux)       
+!!!       DO k = 1, par_nliths
+!!!          DO i = 1, n_i
+!!!             DO j = 1, n_j
+!!!                dum_calcium_flux(k,i,j) = conv_factor(k) *                   &              
+!!!                     &                                dum_lithology(k,i,j) *              &
+!!!                     &                                (loc_runoff(i,j) ** weath_consts(k,2))
+!!!             END DO
+!!!          END DO
+!!!      END DO
 
-    ! Divide weathering up into transport and kinetic limited regimes if requested     
-    IF (opt_weath_regimes) THEN  
-       DO k = 1, par_nliths
-          DO i=1,n_i
-             DO j=1,n_j
-                IF (orogeny(i,j).eq.1) THEN
-                   dum_calcium_flux(k,i,j) = dum_calcium_flux(k,i,j) * r_avg_runoff
-                ENDIF
-             END DO
-          END DO
-       ENDDO
-    ENDIF
+!!!    ENDIF
 
-    ! Save data to files calcium_lith.dat where 'lith' is the lithology
-    IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
-       IF (opt_2d_ascii_output) THEN
-          DO k = 1,par_nliths
-             call check_unit(17,__LINE__,__FILE__)
-             OPEN(17,file=TRIM(par_outdir_name)// &
-                  & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_year_'// &
-                  TRIM(year_text)//'.dat',iostat=ios)
-             call check_iostat(ios,__LINE__,__FILE__)
-             DO j=n_j,1,-1
-                WRITE(17,*,iostat=ios)(dum_calcium_flux(k,i,j),i=1,n_i)
-                call check_iostat(ios,__LINE__,__FILE__)
-             END DO
-             CLOSE(17,iostat=ios)
-             call check_iostat(ios,__LINE__,__FILE__)
-          END DO
-       ENDIF
-    ENDIF
+!!!    ! Save data to files calcium_lith.dat where 'lith' is the lithology
+!!!    IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
+!!!       IF (opt_2d_ascii_output) THEN
+!!!          DO k = 1,par_nliths
+!!!             call check_unit(17,__LINE__,__FILE__)
+!!!             OPEN(17,file=TRIM(par_outdir_name)// &  
+!!!                  & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_'//       &
+!!!                  TRIM(year_text)//'.dat',iostat=ios)
+!!!             call check_iostat(ios,__LINE__,__FILE__)
+!!!             DO j=n_j,1,-1
+!!!                WRITE(17,*,iostat=ios)(dum_calcium_flux(k,i,j),i=1,n_i)
+!!!                call check_iostat(ios,__LINE__,__FILE__)
+!!!             END DO
+!!!             CLOSE(17,iostat=ios)
+!!!             call check_iostat(ios,__LINE__,__FILE__)
+!!!          END DO
+!!!       ENDIF
+!!!    ENDIF
 
+!!!  END SUBROUTINE sub_GKWM
 
 
-  END SUBROUTINE sub_GEM_CO2
+!!!  !========================================================================================!
+!!!
+!!!  ! Subroutine: sub_GEM_CO2 
+!!!  !
+!!!  ! Subroutine for spatially-explicit weathering based on Amiotte-Suchet et al. (2003)
+!!!  !
+!!!  ! Uses:
+!!!  !
+!!!  ! <genie_util>, ONLY: <check_unit>, <check_iostat>
+!!!  !
+!!!  !
+!!!  ! Calls:
+!!!  !
+!!!  ! - <sub_save_data_ij>
+!!!  !
+!!!  ! Input:
+!!!  !
+!!!  ! dum__runoff - run-off read in from exernal module (EMBM, or ENTS)
+!!!  ! dum_lithology - array containing proportions of each type of lithology in each land cell
+!!!  !
+!!!  ! Output:
+!!!  !
+!!!  ! dum_calcium_flux - array containing fluxes of calcium for each lithological type
+
+!!!  SUBROUTINE sub_GEM_CO2     (                                  &
+!!!       & dum_runoff,                      &
+!!!       & dum_lithology,                   &
+!!!       & dum_calcium_flux                  )
+
+!!!    USE genie_util, ONLY: check_unit, check_iostat
+
+!!!    IMPLICIT NONE
+
+!!!    ! dummy variables
+!!!    REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)
+!!!    REAL, INTENT(in)                :: dum_lithology(par_nliths,n_i,n_j)
+!!!    REAL, INTENT(inout)             :: dum_calcium_flux(par_nliths,n_i,n_j)            ! F_HCO_3- is sum of this
+
+!!!    ! local variables
+!!!    REAL                            :: loc_runoff(n_i,n_j)
+!!!    REAL                            :: avg_runoff
+!!!    REAL                            :: rescale_runoff
+!!!    REAL                            :: r_avg_runoff
+!!!    REAL                            :: conv_factor(par_nliths)
+!!!    INTEGER                         :: i, j, k, ios
+
+!!!    ! Put runoff into local array
+!!!    loc_runoff(:,:) = dum_runoff(:,:)
+
+!!!    ! Do calibrations if requested
+!!!    IF (opt_calibrate_R_0D) THEN
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             loc_runoff(i,j) = loc_runoff(i,j) * calibrate_R_0D
+!!!          END DO
+!!!       END DO
+!!!    ENDIF
+!!!    IF (opt_calibrate_R_2D) THEN
+!!!       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
+!!!    ENDIF
+
+!!!    ! Calculate average runoff and reciprocal
+!!!    avg_runoff=sum(landmask(:,:) * loc_runoff(:,:))/nlandcells
+!!!    if (avg_runoff.eq.0.0) then
+!!!       r_avg_runoff = 1E12
+!!!    else
+!!!       r_avg_runoff = 1.0/avg_runoff
+!!!    endif
+
+!!!    ! Set calibration factor if option is set
+!!!    ! If runoff feedback is off, then runoff is scaled to initially chosen reference point R0
+!!!    ! (R0 is set equal to the average runoff after each spin-up stage)
+!!!    ! This reference point is different if it is calibrated (to data) using opt_calibrate_R_0D.
+!!!    IF (opt_weather_R_Ca.or.opt_weather_R_Si) THEN
+!!!       rescale_runoff = avg_runoff
+!!!    ELSE
+!!!       IF (opt_calibrate_R_0D) THEN
+!!!          rescale_runoff = par_data_R_0D
+!!!       ELSE
+!!!          rescale_runoff = par_ref_R0
+!!!       ENDIF
+!!!    ENDIF
+
+!!!    ! Speed up numerics by combining conversion factor, calibration with average runoff, and k
+!!!    do k = 1, par_nliths
+!!!       ! see initialise_reggem.f90 for info on conversion factors conv_GEM_CO2
+!!!       conv_factor(k) = weath_consts(k,1) * conv_GEM_CO2 * rescale_runoff * r_avg_runoff
+!!!    end do
+
+!!!    ! Calculate F_HCO_3- (calcium_flux)    
+!!!    DO k = 1, par_nliths
+!!!       DO i = 1, n_i
+!!!          DO j = 1, n_j
+!!!             dum_calcium_flux(k,i,j) = conv_factor(k) * dum_lithology(k,i,j) * loc_runoff(i,j)
+!!!          END DO
+!!!      END DO
+!!!    END DO
+
+!!!    ! Divide weathering up into transport and kinetic limited regimes if requested     
+!!!    IF (opt_weath_regimes) THEN  
+!!!       DO k = 1, par_nliths
+!!!          DO i=1,n_i
+!!!             DO j=1,n_j
+!!!                IF (orogeny(i,j).eq.1) THEN
+!!!                   dum_calcium_flux(k,i,j) = dum_calcium_flux(k,i,j) * r_avg_runoff
+!!!                ENDIF
+!!!             END DO
+!!!          END DO
+!!!       ENDDO
+!!!    ENDIF
+
+!!!    ! Save data to files calcium_lith.dat where 'lith' is the lithology
+!!!    IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
+!!!       IF (opt_2d_ascii_output) THEN
+!!!          DO k = 1,par_nliths
+!!!             call check_unit(17,__LINE__,__FILE__)
+!!!             OPEN(17,file=TRIM(par_outdir_name)// &
+!!!                  & 'calcium_'//lithology_names(k)(1:LEN(TRIM(lithology_names(k)))-4)//'_year_'// &
+!!!                  TRIM(year_text)//'.dat',iostat=ios)
+!!!             call check_iostat(ios,__LINE__,__FILE__)
+!!!             DO j=n_j,1,-1
+!!!                WRITE(17,*,iostat=ios)(dum_calcium_flux(k,i,j),i=1,n_i)
+!!!                call check_iostat(ios,__LINE__,__FILE__)
+!!!             END DO
+!!!             CLOSE(17,iostat=ios)
+!!!             call check_iostat(ios,__LINE__,__FILE__)
+!!!          END DO
+!!!       ENDIF
+!!!    ENDIF
+
+
+
+!!!  END SUBROUTINE sub_GEM_CO2
 
 
   ! ======= SUM UP THE WEATHERING FLUX ====================================================!
@@ -1947,391 +1947,391 @@ CONTAINS
   END SUBROUTINE sum_calcium_flux_CaSiOs
 
 
-  !========================================================================================!
+!!!  !========================================================================================!
+!!!
+!!!  ! Subroutine: sub_2D_weath
+!!!  !
+!!!  ! Subroutine to calculate spatially-explicit weathering
+!!!  !
+!!!  ! Calls:
+!!!  !
+!!!  ! - <sub_init_phys_ocnreg>
+!!!  ! - <calc_P>
+!!!  ! - <sub_coastal_output>
+!!!  ! - <sub_save_data_ij>
+!!!  !
+!!!  ! Input:
+!!!  !
+!!!  ! dum_sfcatm1 - atmosphere composition interface array (to get temperature from)
+!!!  ! dum__runoff - run-off read in from exernal module (EMBM, or ENTS)
+!!!  ! dum_photo(n_i,n_j) - photosynthesis array
+!!!  ! dum_respveg(n_i,n_j) - vegetation respiration array
+!!!  !
+!!!  ! Output:
+!!!  !
+!!!  ! dum_sfxreg - ocean flux interface array (same no of tracers as used in biogem ocean)
+!!!  ! dum_sfxatm1 - atmosphere flux interface array (same no of tracers as used in atchem atmosphere)
+!!!
+!!!  SUBROUTINE sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
+!!!
+!!!    ! Based on SUBROUTINE sub_glob_avg_weath - see above
+!!!
+!!!    ! dummy variables
+!!!    REAL,INTENT(in)                 :: dum_sfcatm1(n_atm,n_io,n_jo)      ! atmosphere composition interface array
+!!!    REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)
+!!!    REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                ! photosythesis from land veg module (ENTS)
+!!!    REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)              ! vegetation respiration from land veg module (ENTS)
+!!!    REAL,INTENT(inout)              :: dum_sfxreg(n_ocn,n_i,n_j)                                ! ocean flux interface array (same no of tracers as used in biogem ocean)
+!!!    REAL,INTENT(inout)              :: dum_sfxatm1(n_atm,n_io,n_jo)      ! atmosphere flux interface array
 
-  ! Subroutine: sub_2D_weath
-  !
-  ! Subroutine to calculate spatially-explicit weathering
-  !
-  ! Calls:
-  !
-  ! - <sub_init_phys_ocnreg>
-  ! - <calc_P>
-  ! - <sub_coastal_output>
-  ! - <sub_save_data_ij>
-  !
-  ! Input:
-  !
-  ! dum_sfcatm1 - atmosphere composition interface array (to get temperature from)
-  ! dum__runoff - run-off read in from exernal module (EMBM, or ENTS)
-  ! dum_photo(n_i,n_j) - photosynthesis array
-  ! dum_respveg(n_i,n_j) - vegetation respiration array
-  !
-  ! Output:
-  !
-  ! dum_sfxreg - ocean flux interface array (same no of tracers as used in biogem ocean)
-  ! dum_sfxatm1 - atmosphere flux interface array (same no of tracers as used in atchem atmosphere)
+!!!    ! local variables
+!!!    INTEGER                         :: i, j, k
+!!!    REAL                            :: loc_SLT(n_i,n_j)
+!!!    REAL                            :: loc_SLT0
+!!!    REAL                            :: loc_runoff(n_i,n_j)
+!!!    REAL                            :: loc_P(n_i,n_j)
+!!!    REAL                            :: loc_P0
+!!!    REAL                            :: loc_CO2(n_i,n_j)
+!!!    REAL                            :: loc_CO20
+!!!    REAL                            :: loc_weather_ratio_CaSiO3(n_i,n_j)
+!!!    REAL                            :: loc_weather_ratio_CaCO3(n_i,n_j)
+!!!    REAL                            :: n
+!!!    REAL                            :: loc_standard
 
-  SUBROUTINE sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
+!!!    REAL                            :: loc_force_flux_weather_a_land(n_atm,n_i,n_j) ! fluxes shared over land (atmosphere variables)
+!!!    REAL                            :: loc_force_flux_weather_o_land(n_ocn,n_i,n_j) ! fluxes shared over land (ocean variables)
+!!!    REAL                            :: loc_force_flux_weather_o_ocean(n_ocn,n_i,n_j)              ! fluxes into coastal positions in ocean (ocean variables)      
 
-    ! Based on SUBROUTINE sub_glob_avg_weath - see above
+!!!    CHARACTER(LEN=7),DIMENSION(n_ocn)       :: globtracer_names
+!!!
+!!!    ! initialise tracer names       
+!!!    globtracer_names(io_ALK)                  = 'ALK    '
+!!!    globtracer_names(io_DIC)                  = 'DIC    '
+!!!    globtracer_names(io_Ca)                   = 'Ca     '
+!!!    globtracer_names(io_DIC_13C)              = 'DIC_13C'
+!!!    globtracer_names(io_DIC_14C)              = 'DIC_14C'
 
-    ! dummy variables
-    REAL,INTENT(in)                 :: dum_sfcatm1(n_atm,n_io,n_jo)      ! atmosphere composition interface array
-    REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)
-    REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                ! photosythesis from land veg module (ENTS)
-    REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)              ! vegetation respiration from land veg module (ENTS)
-    REAL,INTENT(inout)              :: dum_sfxreg(n_ocn,n_i,n_j)                                ! ocean flux interface array (same no of tracers as used in biogem ocean)
-    REAL,INTENT(inout)              :: dum_sfxatm1(n_atm,n_io,n_jo)      ! atmosphere flux interface array
+!!!    ! initialise arrays   
+!!!    loc_force_flux_weather_a_land(:,:,:)        = 0.0           
+!!!    loc_force_flux_weather_o_land(:,:,:)        = 0.0       
+!!!    loc_force_flux_weather_o_ocean(:,:,:)       = 0.0
 
-    ! local variables
-    INTEGER                         :: i, j, k
-    REAL                            :: loc_SLT(n_i,n_j)
-    REAL                            :: loc_SLT0
-    REAL                            :: loc_runoff(n_i,n_j)
-    REAL                            :: loc_P(n_i,n_j)
-    REAL                            :: loc_P0
-    REAL                            :: loc_CO2(n_i,n_j)
-    REAL                            :: loc_CO20
-    REAL                            :: loc_weather_ratio_CaSiO3(n_i,n_j)
-    REAL                            :: loc_weather_ratio_CaCO3(n_i,n_j)
-    REAL                            :: n
-    REAL                            :: loc_standard
+!!!    ! set reference surface land (air) temperature and productivity
+!!!    loc_SLT0 = par_ref_T0
+!!!    loc_P0 = par_ref_P0
+!!!    loc_CO20 = par_ref_CO20
+!!!
+!!!    ! Initialise ocean array for temperature
+!!!    CALL sub_init_phys_ocnreg()  
+!!!
+!!!    ! Put runoff into local array
+!!!    loc_runoff(:,:) = dum_runoff(:,:)
+!!!
+!!!    ! Do calibrations if requested
+!!!    IF (opt_calibrate_R_0D) THEN
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             loc_runoff(i,j) = loc_runoff(i,j) * calibrate_R_0D
+!!!          END DO
+!!!       END DO
+!!!    ENDIF
+!!!    IF (opt_calibrate_R_2D) THEN
+!!!       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
+!!!    ENDIF
 
-    REAL                            :: loc_force_flux_weather_a_land(n_atm,n_i,n_j) ! fluxes shared over land (atmosphere variables)
-    REAL                            :: loc_force_flux_weather_o_land(n_ocn,n_i,n_j) ! fluxes shared over land (ocean variables)
-    REAL                            :: loc_force_flux_weather_o_ocean(n_ocn,n_i,n_j)              ! fluxes into coastal positions in ocean (ocean variables)      
+!!!    ! extract temperature to local array to please intel compilers
+!!!    DO i=1,n_i
+!!!       DO j=1,n_j
+!!!          loc_SLT(i,j) = dum_sfcatm1(ia_T,i,j)
+!!!          ! do calibrations if requested
+!!!          IF (opt_calibrate_T_0D) THEN
+!!!             loc_SLT(i,j) = loc_SLT(i,j) + 273.15
+!!!             loc_SLT(i,j) = loc_SLT(i,j) * calibrate_T_0D
+!!!             loc_SLT(i,j) = loc_SLT(i,j) - 273.15
+!!!          ENDIF
+!!!          IF (opt_calibrate_T_2D) THEN
+!!!             loc_SLT(i,j) = loc_SLT(i,j) + 273.15
+!!!             loc_SLT(i,j) = loc_SLT(i,j) * calibrate_T_2D(i,j)
+!!!             loc_SLT(i,j) = loc_SLT(i,j) - 273.15
+!!!          ENDIF
+!!!       END DO
+!!!    END DO
 
-    CHARACTER(LEN=7),DIMENSION(n_ocn)       :: globtracer_names
+!!!    ! calculate mean surface productivity (kgC m-2 yr-1)
+!!!    SELECT case (par_prodopt)
+!!!       ! Global Primary Productivity
+!!!    case ('GPP')
+!!!       loc_P(:,:) = dum_photo(:,:)
+!!!       ! Net Primary Productivity
+!!!    case ('NPP')
+!!!       loc_P(:,:) = dum_photo(:,:) - dum_respveg(:,:)
+!!!    end SELECT
 
-    ! initialise tracer names       
-    globtracer_names(io_ALK)                  = 'ALK    '
-    globtracer_names(io_DIC)                  = 'DIC    '
-    globtracer_names(io_Ca)                   = 'Ca     '
-    globtracer_names(io_DIC_13C)              = 'DIC_13C'
-    globtracer_names(io_DIC_14C)              = 'DIC_14C'
+!!!    ! Do calibrations if requested
+!!!    IF (opt_calibrate_P_0D) THEN
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             loc_P(i,j) = loc_P(i,j) * calibrate_P_0D
+!!!          END DO
+!!!       END DO
+!!!    ENDIF
+!!!    ! calculate mean surface productivity (kgC m-2 yr-1)
+!!!    SELECT case (par_prodopt)
+!!!       ! Global Primary Productivity
+!!!    case ('GPP')
+!!!       loc_P(:,:) = dum_photo(:,:)
+!!!       ! Net Primary Productivity
+!!!    case ('NPP')
+!!!       loc_P(:,:) = dum_photo(:,:) - dum_respveg(:,:)
+!!!    end SELECT
+!!!    IF (opt_calibrate_P_2D) THEN
+!!!       loc_P(:,:) = loc_P(:,:) * calibrate_P_2D(:,:)
+!!!    ENDIF
 
-    ! initialise arrays   
-    loc_force_flux_weather_a_land(:,:,:)        = 0.0           
-    loc_force_flux_weather_o_land(:,:,:)        = 0.0       
-    loc_force_flux_weather_o_ocean(:,:,:)       = 0.0
+!!!    ! convert atm pCO2 to ppm
+!!!    DO i=1,n_i
+!!!       DO j=1,n_j
+!!!          loc_CO2(i,j) = 1.0E+06*dum_sfcatm1(ia_PCO2,i,j)
+!!!       END DO
+!!!    END DO
 
-    ! set reference surface land (air) temperature and productivity
-    loc_SLT0 = par_ref_T0
-    loc_P0 = par_ref_P0
-    loc_CO20 = par_ref_CO20
+!!!    ! Do calculations
 
-    ! Initialise ocean array for temperature
-    CALL sub_init_phys_ocnreg()  
+!!!    loc_weather_ratio_CaCO3(:,:) = 1.0
+!!!    IF (opt_weather_T_Ca) THEN
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             ! make sure that numbers stay positive
+!!!             n = 1.0 + par_k_Ca*(dum_sfcatm1(ia_T,i,j) - loc_SLT0)
+!!!             IF (n.lt.0.0) THEN
+!!!                n = 0
+!!!             ENDIF
+!!!             loc_weather_ratio_CaCO3(i,j) = n
+!!!          END DO
+!!!       END DO
+!!!    ENDIF
+!!!    IF (opt_weather_P_Ca) THEN
+!!!       IF (opt_weather_P_explicit) THEN
+!!!          loc_weather_ratio_CaCO3(:,:) = (loc_P(:,:)/loc_P0)*loc_weather_ratio_CaCO3(:,:)  ! From Lenton & Britton (2006)
+!!!       ELSE
+!!!          loc_weather_ratio_CaCO3(:,:) = loc_weather_ratio_CaCO3(:,:)* &
+!!!               & (2*(loc_CO2(:,:)/loc_CO20)/(1+(loc_CO2(:,:)/loc_CO20)))**0.4 ! From GEOCARB
+!!!       ENDIF
+!!!    ENDIF
 
-    ! Put runoff into local array
-    loc_runoff(:,:) = dum_runoff(:,:)
+!!!    loc_weather_ratio_CaSiO3(:,:) = 1.0
+!!!    IF (opt_weather_T_Si) THEN
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             loc_weather_ratio_CaSiO3(i,j) = exp(k_T*(dum_sfcatm1(ia_T,i,j) - loc_SLT0)) 
+!!!          END DO
+!!!       END DO
+!!!    ENDIF
+!!!    IF (opt_weather_P_Si) THEN
+!!!       IF (opt_weather_P_explicit) THEN
+!!!          loc_weather_ratio_CaSiO3(:,:) = (loc_P(:,:)/loc_P0)*loc_weather_ratio_CaSiO3(:,:)  ! From Lenton & Britton (2006)
+!!!       ELSE
+!!!          loc_weather_ratio_CaSiO3(:,:) = loc_weather_ratio_CaSiO3(:,:)* &
+!!!               & (2*(loc_CO2(:,:)/loc_CO20)/(1+(loc_CO2(:,:)/loc_CO20)))**0.4 ! From GEOCARB
+!!!       ENDIF
+!!!    ENDIF
 
-    ! Do calibrations if requested
-    IF (opt_calibrate_R_0D) THEN
-       DO i=1,n_i
-          DO j=1,n_j
-             loc_runoff(i,j) = loc_runoff(i,j) * calibrate_R_0D
-          END DO
-       END DO
-    ENDIF
-    IF (opt_calibrate_R_2D) THEN
-       loc_runoff(:,:) = loc_runoff(:,:) * calibrate_R_2D(:,:)
-    ENDIF
+!!!    ! Divide weathering up into transport and kinetic limited regimes if requested     
+!!!    IF (opt_weath_regimes) THEN       
+!!!       DO i=1,n_i
+!!!          DO j=1,n_j
+!!!             IF (orogeny(i,j).eq.1) THEN
+!!!                loc_weather_ratio_CaCO3(i,j) = 1.0
+!!!                loc_weather_ratio_CaSiO3(i,j) = 1.0
+!!!             ENDIF
+!!!          END DO
+!!!       END DO
+!!!    ENDIF
 
-    ! extract temperature to local array to please intel compilers
-    DO i=1,n_i
-       DO j=1,n_j
-          loc_SLT(i,j) = dum_sfcatm1(ia_T,i,j)
-          ! do calibrations if requested
-          IF (opt_calibrate_T_0D) THEN
-             loc_SLT(i,j) = loc_SLT(i,j) + 273.15
-             loc_SLT(i,j) = loc_SLT(i,j) * calibrate_T_0D
-             loc_SLT(i,j) = loc_SLT(i,j) - 273.15
-          ENDIF
-          IF (opt_calibrate_T_2D) THEN
-             loc_SLT(i,j) = loc_SLT(i,j) + 273.15
-             loc_SLT(i,j) = loc_SLT(i,j) * calibrate_T_2D(i,j)
-             loc_SLT(i,j) = loc_SLT(i,j) - 273.15
-          ENDIF
-       END DO
-    END DO
+!!!    ! calibrations
+!!!    IF (calibrate_weath) THEN
+!!!       SELECT case (par_weathopt)
+!!!       case ('GKWM')
+!!!          weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
+!!!          weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
+!!!          weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
+!!!          weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
+!!!          weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
+!!!          weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
+!!!          weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
+!!!          weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
+!!!       case ('GEM_CO2')
+!!!          weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
+!!!          weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
+!!!          weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
+!!!          weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
+!!!          weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
+!!!          weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
+!!!          weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
+!!!          weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
+!!!       end SELECT
+!!!    ELSE
+!!!       weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)
+!!!       weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)
+!!!       weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)
+!!!       weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)
+!!!       weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)
+!!!       weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)
+!!!       weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)
+!!!       weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)
+!!!    ENDIF
 
-    ! calculate mean surface productivity (kgC m-2 yr-1)
-    SELECT case (par_prodopt)
-       ! Global Primary Productivity
-    case ('GPP')
-       loc_P(:,:) = dum_photo(:,:)
-       ! Net Primary Productivity
-    case ('NPP')
-       loc_P(:,:) = dum_photo(:,:) - dum_respveg(:,:)
-    end SELECT
+!!!    loc_force_flux_weather_o_land(io_Ca,:,:) = weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)
+!!!    loc_force_flux_weather_o_land(io_ALK,:,:) = 2.0*weather_fCaSiO3_2D(:,:) + 2.0*weather_fCaCO3_2D(:,:)
+!!!    IF (opt_short_circuit_atm.eqv..true.) THEN
+!!!       IF (opt_outgas_eq_Si.eqv..true.) THEN
+!!!          loc_force_flux_weather_o_land(io_DIC,:,:) = weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)
+!!!       ELSE
+!!!          loc_force_flux_weather_o_land(io_DIC,:,:) = landmask(:,:)*par_outgas_CO2/nlandcells + weather_fCaCO3_2D(:,:)
+!!!       ENDIF
+!!!    ELSE
+!!!       IF (opt_outgas_eq_Si.eqv..true.) THEN
+!!!         loc_force_flux_weather_a_land(ia_PCO2,:,:) = & 
+!!!               & - 1.0*(weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)) !'-' because coming out of atmosphere
+!!!       ELSE
+!!!          loc_force_flux_weather_a_land(ia_PCO2,:,:) = landmask(:,:)*par_outgas_CO2/nlandcells - &
+!!!               & 1.0*(2.0*weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)) !'-' because coming out of atmosphere
+!!!       ENDIF
+!!!       loc_force_flux_weather_o_land(io_DIC,:,:) = 2.0*weather_fCaSiO3_2D(:,:) + 2.0*weather_fCaCO3_2D(:,:)
+!!!    ENDIF
 
-    ! Do calibrations if requested
-    IF (opt_calibrate_P_0D) THEN
-       DO i=1,n_i
-          DO j=1,n_j
-             loc_P(i,j) = loc_P(i,j) * calibrate_P_0D
-          END DO
-       END DO
-    ENDIF
-    ! calculate mean surface productivity (kgC m-2 yr-1)
-    SELECT case (par_prodopt)
-       ! Global Primary Productivity
-    case ('GPP')
-       loc_P(:,:) = dum_photo(:,:)
-       ! Net Primary Productivity
-    case ('NPP')
-       loc_P(:,:) = dum_photo(:,:) - dum_respveg(:,:)
-    end SELECT
-    IF (opt_calibrate_P_2D) THEN
-       loc_P(:,:) = loc_P(:,:) * calibrate_P_2D(:,:)
-    ENDIF
-
-    ! convert atm pCO2 to ppm
-    DO i=1,n_i
-       DO j=1,n_j
-          loc_CO2(i,j) = 1.0E+06*dum_sfcatm1(ia_PCO2,i,j)
-       END DO
-    END DO
-
-    ! Do calculations
-
-    loc_weather_ratio_CaCO3(:,:) = 1.0
-    IF (opt_weather_T_Ca) THEN
-       DO i=1,n_i
-          DO j=1,n_j
-             ! make sure that numbers stay positive
-             n = 1.0 + par_k_Ca*(dum_sfcatm1(ia_T,i,j) - loc_SLT0)
-             IF (n.lt.0.0) THEN
-                n = 0
-             ENDIF
-             loc_weather_ratio_CaCO3(i,j) = n
-          END DO
-       END DO
-    ENDIF
-    IF (opt_weather_P_Ca) THEN
-       IF (opt_weather_P_explicit) THEN
-          loc_weather_ratio_CaCO3(:,:) = (loc_P(:,:)/loc_P0)*loc_weather_ratio_CaCO3(:,:)  ! From Lenton & Britton (2006)
-       ELSE
-          loc_weather_ratio_CaCO3(:,:) = loc_weather_ratio_CaCO3(:,:)* &
-               & (2*(loc_CO2(:,:)/loc_CO20)/(1+(loc_CO2(:,:)/loc_CO20)))**0.4 ! From GEOCARB
-       ENDIF
-    ENDIF
-
-    loc_weather_ratio_CaSiO3(:,:) = 1.0
-    IF (opt_weather_T_Si) THEN
-       DO i=1,n_i
-          DO j=1,n_j
-             loc_weather_ratio_CaSiO3(i,j) = exp(k_T*(dum_sfcatm1(ia_T,i,j) - loc_SLT0)) 
-          END DO
-       END DO
-    ENDIF
-    IF (opt_weather_P_Si) THEN
-       IF (opt_weather_P_explicit) THEN
-          loc_weather_ratio_CaSiO3(:,:) = (loc_P(:,:)/loc_P0)*loc_weather_ratio_CaSiO3(:,:)  ! From Lenton & Britton (2006)
-       ELSE
-          loc_weather_ratio_CaSiO3(:,:) = loc_weather_ratio_CaSiO3(:,:)* &
-               & (2*(loc_CO2(:,:)/loc_CO20)/(1+(loc_CO2(:,:)/loc_CO20)))**0.4 ! From GEOCARB
-       ENDIF
-    ENDIF
-
-    ! Divide weathering up into transport and kinetic limited regimes if requested     
-    IF (opt_weath_regimes) THEN       
-       DO i=1,n_i
-          DO j=1,n_j
-             IF (orogeny(i,j).eq.1) THEN
-                loc_weather_ratio_CaCO3(i,j) = 1.0
-                loc_weather_ratio_CaSiO3(i,j) = 1.0
-             ENDIF
-          END DO
-       END DO
-    ENDIF
-
-    ! calibrations
-    IF (calibrate_weath) THEN
-       SELECT case (par_weathopt)
-       case ('GKWM')
-          weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
-          weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
-          weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
-          weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
-          weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)*calibrate_weather_GKWM_CaCO3
-          weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
-          weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
-          weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)*calibrate_weather_GKWM_CaSiO3
-       case ('GEM_CO2')
-          weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
-          weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
-          weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
-          weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
-          weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)*calibrate_weather_GEM_CO2_CaCO3
-          weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
-          weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
-          weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)*calibrate_weather_GEM_CO2_CaSiO3
-       end SELECT
-    ELSE
-       weather_fCaCO3_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_calcium_flux_Ca(:,:)
-       weather_fCaSiO3_2D(:,:) = loc_weather_ratio_CaSiO3(:,:)*total_calcium_flux_Si(:,:)
-       weather_fCaCO3_Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_osmium_flux_Ca(:,:)
-       weather_fCaCO3_187Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_187osmium_flux_Ca(:,:)
-       weather_fCaCO3_188Os_2D(:,:)  = loc_weather_ratio_CaCO3(:,:)*total_188osmium_flux_Ca(:,:)
-       weather_fCaSiO3_Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_osmium_flux_Si(:,:)
-       weather_fCaSiO3_187Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_187osmium_flux_Si(:,:)
-       weather_fCaSiO3_188Os_2D(:,:)  = loc_weather_ratio_CaSiO3(:,:)*total_188osmium_flux_Si(:,:)
-    ENDIF
-
-    loc_force_flux_weather_o_land(io_Ca,:,:) = weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)
-    loc_force_flux_weather_o_land(io_ALK,:,:) = 2.0*weather_fCaSiO3_2D(:,:) + 2.0*weather_fCaCO3_2D(:,:)
-    IF (opt_short_circuit_atm.eqv..true.) THEN
-       IF (opt_outgas_eq_Si.eqv..true.) THEN
-          loc_force_flux_weather_o_land(io_DIC,:,:) = weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)
-       ELSE
-          loc_force_flux_weather_o_land(io_DIC,:,:) = landmask(:,:)*par_outgas_CO2/nlandcells + weather_fCaCO3_2D(:,:)
-       ENDIF
-    ELSE
-       IF (opt_outgas_eq_Si.eqv..true.) THEN
-          loc_force_flux_weather_a_land(ia_PCO2,:,:) = & 
-               & - 1.0*(weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)) !'-' because coming out of atmosphere
-       ELSE
-          loc_force_flux_weather_a_land(ia_PCO2,:,:) = landmask(:,:)*par_outgas_CO2/nlandcells - &
-               & 1.0*(2.0*weather_fCaSiO3_2D(:,:) + weather_fCaCO3_2D(:,:)) !'-' because coming out of atmosphere
-       ENDIF
-       loc_force_flux_weather_o_land(io_DIC,:,:) = 2.0*weather_fCaSiO3_2D(:,:) + 2.0*weather_fCaCO3_2D(:,:)
-    ENDIF
-
-    loc_standard = const_standards(ocn_type(io_DIC_13C))
-    IF (opt_short_circuit_atm.eqv..true.) THEN
-       IF (opt_outgas_eq_Si.eqv..true.) THEN
-          loc_force_flux_weather_o_land(io_DIC_13C,:,:) =  &
-               & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
-               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)
-       ELSE
-          loc_force_flux_weather_o_land(io_DIC_13C,:,:) =  &
-               & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*landmask(:,:)*par_outgas_CO2/nlandcells + &
-               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)
-       ENDIF
-    ELSE
-       loc_standard = const_standards(atm_type(ia_pCO2_13C ))
-       !'-' because coming out of atmosphere
-       loc_force_flux_weather_a_land(ia_pCO2_13C,:,:) = &
-            fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*landmask(:,:)*par_outgas_CO2/nlandcells - & 
-            1.0*(2.0*fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
-            fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)) 
-       IF (opt_outgas_eq_Si.eqv..true.) THEN
-          loc_force_flux_weather_a_land(ia_pCO2_13C,:,:) = &
-               - 1.0*(fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
-               fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)) 
-       ELSE
-          !'-' because coming out of atmosphere
-          loc_force_flux_weather_a_land(ia_pCO2_13C,:,:) = &
-               fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*landmask(:,:)*par_outgas_CO2/nlandcells - & 
-               1.0*(2.0*fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
-               fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)) 
-       ENDIF
-       loc_standard = const_standards(ocn_type(io_DIC_13C))
-       loc_force_flux_weather_o_land(io_DIC,:,:) = &
-            2.0*fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
-            2.0*fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)
-    ENDIF
-    loc_force_flux_weather_o_land(io_DIC_14C,:,:) = 0.0
+!!!    loc_standard = const_standards(ocn_type(io_DIC_13C))
+!!!    IF (opt_short_circuit_atm.eqv..true.) THEN
+!!!       IF (opt_outgas_eq_Si.eqv..true.) THEN
+!!!          loc_force_flux_weather_o_land(io_DIC_13C,:,:) =  &
+!!!               & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
+!!!               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)
+!!!       ELSE
+!!!          loc_force_flux_weather_o_land(io_DIC_13C,:,:) =  &
+!!!               & fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*landmask(:,:)*par_outgas_CO2/nlandcells + &
+!!!               & fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)
+!!!       ENDIF
+!!!    ELSE
+!!!       loc_standard = const_standards(atm_type(ia_pCO2_13C ))
+!!!       !'-' because coming out of atmosphere
+!!!       loc_force_flux_weather_a_land(ia_pCO2_13C,:,:) = &
+!!!            fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*landmask(:,:)*par_outgas_CO2/nlandcells - & 
+!!!            1.0*(2.0*fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
+!!!            fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)) 
+!!!       IF (opt_outgas_eq_Si.eqv..true.) THEN
+!!!          loc_force_flux_weather_a_land(ia_pCO2_13C,:,:) = &
+!!!               - 1.0*(fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
+!!!               fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)) 
+!!!       ELSE
+!!!         !'-' because coming out of atmosphere
+!!!          loc_force_flux_weather_a_land(ia_pCO2_13C,:,:) = &
+!!!               fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*landmask(:,:)*par_outgas_CO2/nlandcells - & 
+!!!               1.0*(2.0*fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
+!!!               fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)) 
+!!!       ENDIF
+!!!       loc_standard = const_standards(ocn_type(io_DIC_13C))
+!!!       loc_force_flux_weather_o_land(io_DIC,:,:) = &
+!!!            2.0*fun_calc_isotope_fraction(par_outgas_CO2_d13C,loc_standard)*weather_fCaSiO3_2D(:,:) + &
+!!!            2.0*fun_calc_isotope_fraction(par_weather_CaCO3_d13C,loc_standard)*weather_fCaCO3_2D(:,:)
+!!!    ENDIF
+!!!    loc_force_flux_weather_o_land(io_DIC_14C,:,:) = 0.0
 
     ! Osmium flux
-    loc_force_flux_weather_o_land(io_Os,:,:) = weather_fCaCO3_Os_2D(:,:) + weather_fCaSiO3_Os_2D(:,:)
-    loc_force_flux_weather_o_land(io_Os_187Os,:,:) = weather_fCaCO3_187Os_2D(:,:) + weather_fCaSiO3_187Os_2D(:,:)
-    loc_force_flux_weather_o_land(io_Os_188Os,:,:) = weather_fCaCO3_188Os_2D(:,:) + weather_fCaSiO3_188Os_2D(:,:)
+!!!    loc_force_flux_weather_o_land(io_Os,:,:) = weather_fCaCO3_Os_2D(:,:) + weather_fCaSiO3_Os_2D(:,:)
+!!!    loc_force_flux_weather_o_land(io_Os_187Os,:,:) = weather_fCaCO3_187Os_2D(:,:) + weather_fCaSiO3_187Os_2D(:,:)
+!!!    loc_force_flux_weather_o_land(io_Os_188Os,:,:) = weather_fCaCO3_188Os_2D(:,:) + weather_fCaSiO3_188Os_2D(:,:)
 
     ! route fluxes into the coastal ocean cells (to pass to biogem in coupled model) and save the output to file
-    DO k=1,n_ocn
-       IF((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C).OR.(k.EQ.io_Os).OR.(k.EQ.io_Os_187Os).OR.(k.EQ.io_Os_188Os)) THEN
-          CALL sub_coastal_output( loc_force_flux_weather_o_land(k,:,:), &
-               runoff_drainto(:,:,:),runoff_detail(:,:), &
-               loc_force_flux_weather_o_ocean(k,:,:))
-       ENDIF
-    END DO
+!!!    DO k=1,n_ocn
+!!!       IF((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C).OR.(k.EQ.io_Os).OR.(k.EQ.io_Os_187Os).OR.(k.EQ.io_Os_188Os)) THEN
+!!!          CALL sub_coastal_output( loc_force_flux_weather_o_land(k,:,:), &
+!!!               runoff_drainto(:,:,:),runoff_detail(:,:), &
+!!!               loc_force_flux_weather_o_ocean(k,:,:))
+!!!       ENDIF
+!!!    END DO
 
-    dum_sfxatm1(ia_PCO2,:,:) =  loc_force_flux_weather_a_land(ia_PCO2,:,:)/(phys_reg(ipr_A,:,:)*conv_yr_s)
-    dum_sfxatm1(ia_pCO2_13C,:,:) =  loc_force_flux_weather_a_land(ia_pCO2_13C,:,:)/(phys_reg(ipr_A,:,:)*conv_yr_s)
+!!!    dum_sfxatm1(ia_PCO2,:,:) =  loc_force_flux_weather_a_land(ia_PCO2,:,:)/(phys_reg(ipr_A,:,:)*conv_yr_s)
+!!!    dum_sfxatm1(ia_pCO2_13C,:,:) =  loc_force_flux_weather_a_land(ia_pCO2_13C,:,:)/(phys_reg(ipr_A,:,:)*conv_yr_s)
 
-    dum_sfxreg(:,:,:) = loc_force_flux_weather_o_ocean(:,:,:)
-    ! convert from Mol/yr to Mol/sec for passing out
-    dum_sfxreg(:,:,:) = dum_sfxreg(:,:,:)/conv_yr_s
+!!!    dum_sfxreg(:,:,:) = loc_force_flux_weather_o_ocean(:,:,:)
+!!!    ! convert from Mol/yr to Mol/sec for passing out
+!!!    dum_sfxreg(:,:,:) = dum_sfxreg(:,:,:)/conv_yr_s
 
-    ! Output
+!!!    ! Output
+!!!
+!!!    IF (tstep_count.eq.output_tsteps_0d(output_counter_0d)) THEN
 
-    IF (tstep_count.eq.output_tsteps_0d(output_counter_0d)) THEN
+!!!       outputs = (/sum(landmask(:,:)*loc_SLT(:,:))/nlandcells, &
+!!!            & maxval(landmask(:,:)*loc_SLT(:,:)),minval(landmask(:,:)*loc_SLT(:,:)), &
+!!!            & sum(landmask(:,:)*loc_runoff(:,:))/nlandcells*conv_yr_s, &
+!!!            & maxval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s,minval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s, &
+!!!            & sum(landmask(:,:)*loc_P(:,:))/nlandcells,maxval(landmask(:,:)*loc_P(:,:)),minval(landmask(:,:)*loc_P(:,:)), &
+!!!            & sum(landmask(:,:)*loc_CO2(:,:))/nlandcells,maxval(landmask(:,:)*loc_CO2(:,:)),minval(landmask(:,:)*loc_CO2(:,:)), &
+!!!            & sum(loc_weather_ratio_CaCO3(:,:)*landmask(:,:))/nlandcells, &
+!!!            & sum(loc_weather_ratio_CaSiO3(:,:)*landmask(:,:))/nlandcells, &
+!!!            & sum(weather_fCaCO3_2D(:,:))/1.0E12,sum(weather_fCaSiO3_2D(:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_a_land(ia_PCO2,:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_o_land(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC_13C,:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_o_land(io_Os,:,:)),sum(loc_force_flux_weather_o_land(io_Os_187Os,:,:)), &
+!!!            & sum(loc_force_flux_weather_o_land(io_Os_188Os,:,:)), &
+!!!            & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_o_land(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC_13C,:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_o_land(io_Os,:,:)),sum(loc_force_flux_weather_o_land(io_Os_187Os,:,:)), &
+!!!            & sum(loc_force_flux_weather_o_land(io_Os_188Os,:,:)), &
+!!!            & sum(loc_force_flux_weather_o_ocean(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC,:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_o_ocean(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC_13C,:,:))/1.0E12, &
+!!!            & sum(loc_force_flux_weather_o_ocean(io_Os,:,:)),sum(loc_force_flux_weather_o_ocean(io_Os_187Os,:,:)), &
+!!!            & sum(loc_force_flux_weather_o_ocean(io_Os_188Os,:,:))/)
 
-       outputs = (/sum(landmask(:,:)*loc_SLT(:,:))/nlandcells, &
-            & maxval(landmask(:,:)*loc_SLT(:,:)),minval(landmask(:,:)*loc_SLT(:,:)), &
-            & sum(landmask(:,:)*loc_runoff(:,:))/nlandcells*conv_yr_s, &
-            & maxval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s,minval(landmask(:,:)*loc_runoff(:,:))*conv_yr_s, &
-            & sum(landmask(:,:)*loc_P(:,:))/nlandcells,maxval(landmask(:,:)*loc_P(:,:)),minval(landmask(:,:)*loc_P(:,:)), &
-            & sum(landmask(:,:)*loc_CO2(:,:))/nlandcells,maxval(landmask(:,:)*loc_CO2(:,:)),minval(landmask(:,:)*loc_CO2(:,:)), &
-            & sum(loc_weather_ratio_CaCO3(:,:)*landmask(:,:))/nlandcells, &
-            & sum(loc_weather_ratio_CaSiO3(:,:)*landmask(:,:))/nlandcells, &
-            & sum(weather_fCaCO3_2D(:,:))/1.0E12,sum(weather_fCaSiO3_2D(:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_a_land(ia_PCO2,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_land(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC_13C,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_land(io_Os,:,:)),sum(loc_force_flux_weather_o_land(io_Os_187Os,:,:)), &
-            & sum(loc_force_flux_weather_o_land(io_Os_188Os,:,:)), &
-            & sum(loc_force_flux_weather_o_land(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_land(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_land(io_DIC_13C,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_land(io_Os,:,:)),sum(loc_force_flux_weather_o_land(io_Os_187Os,:,:)), &
-            & sum(loc_force_flux_weather_o_land(io_Os_188Os,:,:)), &
-            & sum(loc_force_flux_weather_o_ocean(io_ALK,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_ocean(io_Ca,:,:))/1.0E12,sum(loc_force_flux_weather_o_ocean(io_DIC_13C,:,:))/1.0E12, &
-            & sum(loc_force_flux_weather_o_ocean(io_Os,:,:)),sum(loc_force_flux_weather_o_ocean(io_Os_187Os,:,:)), &
-            & sum(loc_force_flux_weather_o_ocean(io_Os_188Os,:,:))/)
+!!!       call sub_output_0d(n_outputs,(/12,22,29/),outputs,output_descriptions,time_series_names)
 
-       call sub_output_0d(n_outputs,(/12,22,29/),outputs,output_descriptions,time_series_names)
+!!!    ENDIF
 
-    ENDIF
+!!!    IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
 
-    IF (tstep_count.eq.output_tsteps_2d(output_counter_2d)) THEN
+!!!       IF (opt_2d_netcdf_output) THEN
+!!!          call reggem_netcdf(loc_SLT,loc_CO2,loc_runoff,dum_photo,dum_respveg,loc_P,&
+!!!               & loc_force_flux_weather_a_land,loc_force_flux_weather_o_land,loc_force_flux_weather_o_ocean)
+!!!       ENDIF
 
-       IF (opt_2d_netcdf_output) THEN
-          call reggem_netcdf(loc_SLT,loc_CO2,loc_runoff,dum_photo,dum_respveg,loc_P,&
-               & loc_force_flux_weather_a_land,loc_force_flux_weather_o_land,loc_force_flux_weather_o_ocean)
-       ENDIF
+!!!       IF (opt_2d_ascii_output) THEN
+!!!          DO k=1,n_ocn
+!!!             IF ((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C).OR.(k.EQ.io_Os)) THEN
+!!!                CALL sub_save_data_ij( &
+!!!                     & TRIM(par_outdir_name)//'spatial_land_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
+!!!                     & n_i,n_j,loc_force_flux_weather_o_land(k,:,:))                                 
+!!!                CALL sub_save_data_ij( &
+!!!                     & TRIM(par_outdir_name)//'spatial_ocean_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
+!!!                     & n_i,n_j,loc_force_flux_weather_o_ocean(k,:,:)) 
+!!!             ENDIF
+!!!          END DO
+!!!          CALL sub_save_data_ij(TRIM(par_outdir_name)//'temperature_year_'//TRIM(year_text)//'.dat', &
+!!!               & n_i,n_j,loc_SLT)
+!!!          CALL sub_save_data_ij(TRIM(par_outdir_name)//'runoff_year_'//TRIM(year_text)//'.dat',n_i,n_j,loc_runoff(:,:)*conv_yr_s) 
+!!!          CALL sub_save_data_ij(TRIM(par_outdir_name)//'productivity_year_'//TRIM(year_text)//'.dat',n_i,n_j,loc_P(:,:))    
+!!!          CALL sub_save_data_ij(TRIM(par_outdir_name)//'CO2_year_'//TRIM(year_text)//'.dat',n_i,n_j,loc_CO2(:,:))
+!!!          CALL sub_save_data_ij(TRIM(par_outdir_name)//'loc_weather_ratio_CaSiO3_year_'//TRIM(year_text)//'.dat', &
+!!!               n_i,n_j,loc_weather_ratio_CaSiO3(:,:))                                         
+!!!          CALL sub_save_data_ij(TRIM(par_outdir_name)//'loc_weather_ratio_CaCO3_year_'//TRIM(year_text)//'.dat', &
+!!!               n_i,n_j,loc_weather_ratio_CaCO3(:,:))       
+!!!       ENDIF
 
-       IF (opt_2d_ascii_output) THEN
-          DO k=1,n_ocn
-             IF ((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C).OR.(k.EQ.io_Os)) THEN
-                CALL sub_save_data_ij( &
-                     & TRIM(par_outdir_name)//'spatial_land_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
-                     & n_i,n_j,loc_force_flux_weather_o_land(k,:,:))                                 
-                CALL sub_save_data_ij( &
-                     & TRIM(par_outdir_name)//'spatial_ocean_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
-                     & n_i,n_j,loc_force_flux_weather_o_ocean(k,:,:)) 
-             ENDIF
-          END DO
-          CALL sub_save_data_ij(TRIM(par_outdir_name)//'temperature_year_'//TRIM(year_text)//'.dat', &
-               & n_i,n_j,loc_SLT)
-          CALL sub_save_data_ij(TRIM(par_outdir_name)//'runoff_year_'//TRIM(year_text)//'.dat',n_i,n_j,loc_runoff(:,:)*conv_yr_s) 
-          CALL sub_save_data_ij(TRIM(par_outdir_name)//'productivity_year_'//TRIM(year_text)//'.dat',n_i,n_j,loc_P(:,:))    
-          CALL sub_save_data_ij(TRIM(par_outdir_name)//'CO2_year_'//TRIM(year_text)//'.dat',n_i,n_j,loc_CO2(:,:))
-          CALL sub_save_data_ij(TRIM(par_outdir_name)//'loc_weather_ratio_CaSiO3_year_'//TRIM(year_text)//'.dat', &
-               n_i,n_j,loc_weather_ratio_CaSiO3(:,:))                                         
-          CALL sub_save_data_ij(TRIM(par_outdir_name)//'loc_weather_ratio_CaCO3_year_'//TRIM(year_text)//'.dat', &
-               n_i,n_j,loc_weather_ratio_CaCO3(:,:))       
-       ENDIF
+!!!    ENDIF
 
-    ENDIF
+!!!    ! for outputting calibrate 2D reference files
+!!!    ! should really only do at the end to save computation, i.e. export loc_SLT
+!!!    IF (opt_calibrate_T_2D) THEN
+!!!       ref_T0_2D(:,:) = loc_SLT(:,:)
+!!!    ENDIF
+!!!    IF (opt_calibrate_R_2D) THEN
+!!!       ref_R0_2D(:,:) = loc_runoff(:,:)*conv_yr_s
+!!!    ENDIF
+!!!    IF (opt_calibrate_P_2D) THEN
+!!!       ref_P0_2D(:,:) = loc_P(:,:)
+!!!    ENDIF
 
-    ! for outputting calibrate 2D reference files
-    ! should really only do at the end to save computation, i.e. export loc_SLT
-    IF (opt_calibrate_T_2D) THEN
-       ref_T0_2D(:,:) = loc_SLT(:,:)
-    ENDIF
-    IF (opt_calibrate_R_2D) THEN
-       ref_R0_2D(:,:) = loc_runoff(:,:)*conv_yr_s
-    ENDIF
-    IF (opt_calibrate_P_2D) THEN
-       ref_P0_2D(:,:) = loc_P(:,:)
-    ENDIF
-
-  END SUBROUTINE sub_2D_weath
+!!!  END SUBROUTINE sub_2D_weath
 
   !========================================================================================!
 

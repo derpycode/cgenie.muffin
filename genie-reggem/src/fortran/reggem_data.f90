@@ -207,29 +207,29 @@ CONTAINS
        print*,'Fix associated FeCO3 fluxes                         : ',opt_weather_fixed_FeCO3
        print*,'Fix associated Ca5PO43 fluxes                       : ',opt_weather_fixed_Ca5PO43
        print*,'Fix associated SiO2 fluxes                          : ',opt_weather_fixed_SiO2
-       ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
+!!!       ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
        print*,'--- 2D WEATHERING PARAMETERS ---'
        print*,'name of lithological data set (part 1)              : ',par_lith_data
        print*,'name of lithological data set (part 2)              : ',par_lith_data2
        print*,'name of lithological data set (part 3)              : ',par_lith_data3
        print*,'truncate lithological maps to genie land-mask       : ',truncate_to_land
        print*,'scale lithological maps to genie land-mask area     : ',scale_to_landarea
-       print*,'calibrate 2D weathering - if .true. use values below: ',calibrate_weath
-       print*,'calibration value for CaCO3 weath in GKWM scheme    : ',calibrate_weather_GKWM_CaCO3
-       print*,'calibration value for CaCO3 weath in GEM_CO2 scheme : ',calibrate_weather_GEM_CO2_CaCO3
-       print*,'calibration value for CaSiO3 weath in GKWM scheme   : ',calibrate_weather_GKWM_CaSiO3
-       print*,'calibration value for CaSiO3 weath in GEM_CO2 scheme: ',calibrate_weather_GEM_CO2_CaSiO3
-       print*,'calibrate temperature fields to data                : ',opt_calibrate_T_2D
-       print*,'calibrate runoff fields to data                     : ',opt_calibrate_R_2D
-       print*,'calibrate productivity fields to data               : ',opt_calibrate_P_2D 
-       print*,'land surface temp (C) reference scaling field       : ',par_ref_T0_2D
-       print*,'land surface runoff (mm/yr) reference scaling field : ',par_ref_R0_2D
-       print*,'land surface prod (kgC m-2 yr-1) ref. scaling field : ',par_ref_P0_2D
-       print*,'land surface temperature (C) calibration datafile   : ',par_data_T_2D
-       print*,'runoff (mm/s) calibration datafile                  : ',par_data_R_2D
-       print*,'land productivity (kgC m-2 yr-1) calib. datafile    : ',par_data_P_2D
-       print*,'separate kinetic and transport limited regimes?     : ',opt_weath_regimes
-       print*,'orogeny landmask file                               : ',weath_regimes
+!!!       print*,'calibrate 2D weathering - if .true. use values below: ',calibrate_weath
+!!!       print*,'calibration value for CaCO3 weath in GKWM scheme    : ',calibrate_weather_GKWM_CaCO3
+!!!       print*,'calibration value for CaCO3 weath in GEM_CO2 scheme : ',calibrate_weather_GEM_CO2_CaCO3
+!!!       print*,'calibration value for CaSiO3 weath in GKWM scheme   : ',calibrate_weather_GKWM_CaSiO3
+!!!       print*,'calibration value for CaSiO3 weath in GEM_CO2 scheme: ',calibrate_weather_GEM_CO2_CaSiO3
+!!!       print*,'calibrate temperature fields to data                : ',opt_calibrate_T_2D
+!!!       print*,'calibrate runoff fields to data                     : ',opt_calibrate_R_2D
+!!!       print*,'calibrate productivity fields to data               : ',opt_calibrate_P_2D 
+!!!       print*,'land surface temp (C) reference scaling field       : ',par_ref_T0_2D
+!!!       print*,'land surface runoff (mm/yr) reference scaling field : ',par_ref_R0_2D
+!!!       print*,'land surface prod (kgC m-2 yr-1) ref. scaling field : ',par_ref_P0_2D
+!!!       print*,'land surface temperature (C) calibration datafile   : ',par_data_T_2D
+!!!       print*,'runoff (mm/s) calibration datafile                  : ',par_data_R_2D
+!!!       print*,'land productivity (kgC m-2 yr-1) calib. datafile    : ',par_data_P_2D
+!!!       print*,'separate kinetic and transport limited regimes?     : ',opt_weath_regimes
+!!!       print*,'orogeny landmask file                               : ',weath_regimes
        ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ############################################################################# !
        !
        ! ############################################################################################################################ !
