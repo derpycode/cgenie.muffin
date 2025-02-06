@@ -497,6 +497,18 @@ contains
   end subroutine cpl_comp_sedocn_wrapper
 
   !!
+  subroutine cpl_conv_ocnsed_wrapper
+    implicit none
+    call cpl_conv_ocnsed(       &
+         & intrac_ocn_max,      & ! input
+         & intrac_sed_max,      & ! input
+         & ilon1_sed,ilat1_sed, & ! input
+         & genie_sfcsumocn,     & ! input
+         & genie_sfcsumconv     & ! output
+         )
+  end subroutine cpl_conv_ocnsed_wrapper
+
+  !!
   subroutine rokgem_wrapper
     implicit none
     call rokgem(              &
@@ -1062,6 +1074,7 @@ contains
          & genie_sfcsumocn,                                  &          ! input
          & genie_sfcsed,                                     &          ! output
          & genie_sfxocn,                                     &          ! output
+         & genie_sfcsumconv,                                 &          ! input
          & .true.                                            &          ! input
          & )
   end subroutine sedgem_wrapper
@@ -1075,6 +1088,7 @@ contains
          & genie_sfcsumocn,                                  &          ! input
          & genie_sfcsed,                                     &          ! output
          & genie_sfxocn,                                     &          ! output
+         & genie_sfcsumconv,                                 &          ! input
          & .false.                                           &          ! input
          & )
   end subroutine sedgem_glt_wrapper

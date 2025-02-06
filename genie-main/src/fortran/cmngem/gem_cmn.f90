@@ -453,6 +453,8 @@ MODULE gem_cmn
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_Fe                          ! tracer conversion array for FeOOH-reduction
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_S                           ! tracer conversion array for S-reduction redox conditions
   real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_meth                        ! tracer conversion array for methanogenesis
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N_NH4                       ! sed denitrification specific array (Bohlen et al. [2012]
+  real,DIMENSION(n_ocn,n_sed)::conv_sed_ocn_N_N2                        ! sed denitrification specific array (Bohlen et al. [2012]
   real,DIMENSION(n_sed,n_ocn)::conv_DOM_POM
   real,DIMENSION(n_ocn,n_sed)::conv_POM_DOM
   real,DIMENSION(n_sed,n_ocn)::conv_RDOM_POM
@@ -468,6 +470,8 @@ MODULE gem_cmn
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_Fe                          ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_S                           ! 
   real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_meth                        ! 
+  real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_N_NH4                       ! 
+  real,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_N_N2                        ! 
   ! tracer conversion - indices for non-zero transformation ratio values
   ! NOTE: the zero index place in the array is used in algorithms identifying null relationships (or something)
   integer,DIMENSION(0:n_ocn,0:n_atm)::conv_atm_ocn_i
@@ -477,6 +481,8 @@ MODULE gem_cmn
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_Fe                 ! tracer conversion array for FeOOH-reduction
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_S                  ! tracer conversion array for S-reduction redox conditions
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_meth               ! tracer conversion array for methanogenesis
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N_NH4              ! sed denitrification specific array (Bohlen et al. [2012])
+  integer,DIMENSION(0:n_ocn,0:n_sed)::conv_sed_ocn_i_N_N2               ! sed denitrification specific array (Bohlen et al. [2012])
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_DOM_POM_i
   integer,DIMENSION(0:n_ocn,0:n_sed)::conv_POM_DOM_i
   integer,DIMENSION(0:n_sed,0:n_ocn)::conv_RDOM_POM_i
@@ -492,6 +498,8 @@ MODULE gem_cmn
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_Fe             ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_S              ! 
   integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_meth           ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_N_NH4          ! 
+  integer,DIMENSION(:,:),ALLOCATABLE::conv_ls_lo_i_N_N2           ! 
   ! carbonate chemistry
   CHARACTER(len=16),DIMENSION(n_carb),PARAMETER::string_carb = (/ &
        & 'H               ', &

@@ -650,11 +650,13 @@ c     *** SEDGEM model - UPDATE
                   if(istep_gem.ne.gem_notyr) then
                      if (debug_loop.gt.2) PRINT*,'>>> SEDGEM @ ',
      &                    koverall,conv_kocn_ksedgem*kocn_loop
+                     call cpl_conv_ocnsed_wrapper
                      call sedgem_wrapper
                      if (debug_loop.gt.2) PRINT*,'<<<'
                   else
                      if (debug_loop.gt.2) PRINT*,'>>> SEDEGM_GEM @ ',
      &                    koverall,conv_kocn_ksedgem*kocn_loop
+                     call cpl_conv_ocnsed_wrapper
                      call sedgem_glt_wrapper
                      if (debug_loop.gt.2) PRINT*,'<<<'
                   endif
@@ -854,11 +856,13 @@ c     main SEDGEM routine
                   if(istep_gem.eq.(gem_notyr+gem_yr)) then
                      if (debug_loop.gt.2) PRINT*,'>>> SEDEGM @ ',
      &                    koverall,conv_kocn_ksedgem*kocn_loop
+                     call cpl_conv_ocnsed_wrapper
                      call sedgem_wrapper
                      if (debug_loop.gt.2) PRINT*,'<<<'
                   else
                      if (debug_loop.gt.2) PRINT*,'>>> SEDEGM_GLT @ ',
      &                    koverall,conv_kocn_ksedgem*kocn_loop
+                     call cpl_conv_ocnsed_wrapper
                      call sedgem_glt_wrapper
                      if (debug_loop.gt.2) PRINT*,'<<<'
                   endif

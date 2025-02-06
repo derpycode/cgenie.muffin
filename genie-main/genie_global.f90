@@ -841,6 +841,7 @@ MODULE genie_global
   real,dimension(intrac_ocn_max,ilon1_ocn,ilat1_ocn) :: genie_sfcocn1   ! sediment-surface ocean tracer composition; ocn grid
   real,dimension(intrac_sed_max,ilon1_ocn,ilat1_ocn) :: genie_sfcsed1   ! sediment-surface sediment composition; ocn grid
   real,dimension(intrac_sed_max,ilon1_ocn,ilat1_ocn) :: genie_sfxsed1   ! sediment-surface (ocn->sed) fluxes; ocn grid
+  real,dimension(intrac_ocn_max,intrac_sed_max,ilon1_sed,ilat1_sed) :: genie_sfcsumconv  ! sed-ocn transformation matrix; sed grid
   ! ocean-ecology tracer interface arrays
   ! ecology-interface arrays
   real,dimension(intrac_sed_max,ilon1_ocn,ilat1_ocn,inl1_ocn) :: egbg_sfcpart  ! ecology-interface: particulate composition change; ocn grid

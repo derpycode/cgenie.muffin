@@ -3637,6 +3637,7 @@ CONTAINS
     real::loc_tot,loc_frac,loc_standard
     real::loc_atm_ave,loc_ocn_ave,loc_sed_ave
     real::loc_ocn_tot_M,loc_ocn_tot_A,loc_ocnatm_tot_A
+    real::loc_sig
     CHARACTER(len=255)::loc_filename
     REAL,DIMENSION(n_phys_ocn,n_i,n_j,n_k)::loc_phys_ocn       !
     REAL,DIMENSION(n_ocn,n_i,n_j,n_k)::loc_ocn                 !
@@ -3785,10 +3786,10 @@ CONTAINS
          & phys_ocnatm(ipoa_A,:,:)*int_phys_ocn_timeslice(ipo_mask_ocn,:,:,n_k)* &
          & (1.0 - int_phys_ocnatm_timeslice(ipoa_seaice,:,:)) &
          & )
-    Write(unit=out,fmt='(A52,f8.6,A24)',iostat=ios) &
+    Write(unit=out,fmt='(A52,f10.6,A25)',iostat=ios) &
          & ' Global mean air-sea coefficient, K(CO2) ........ : ', &
          & loc_K, &
-         & '     mol m-2 yr-1 uatm-1'
+         & '      mol m-2 yr-1 uatm-1'
     call check_iostat(ios,__LINE__,__FILE__)
 
     ! *** save data - ATMOSPHERIC TRACER PROPERTIES ***
@@ -3894,6 +3895,74 @@ CONTAINS
           call check_iostat(ios,__LINE__,__FILE__)
        end SELECT
     END DO
+    
+    ! *** save data - WATER COLUMN REDOX AND REMINERALIZATION ***
+    ! NOTE: indexing of the remin array is: conv_lslo2idP(ls,lo) = n
+    !       time-series saving is: int_diag_redox_sig(id)/int_t_sig / loc_ocn_tot_M*loc_sig
+    ! write ocean data
+    Write(unit=out,fmt=*) ' '
+    Write(unit=out,fmt=*) '--------------------------'
+    Write(unit=out,fmt=*) 'WATER COLUMN REDOX AND REMINERALIZATION'
+    Write(unit=out,fmt=*) ' '
+    if (ctrl_bio_remin_redox_save) then
+       if (ocn_select(io_O2)) then
+          loc_tot = sum ( loc_phys_ocn(ipo_M,:,:,:)* ( &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POC),io2l(io_O2)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POP),io2l(io_O2)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POC),io2l(io_O2)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POP),io2l(io_O2)),:,:,:) &
+               & ))/int_t_timeslice
+          Write(unit=out,fmt='(A52,E15.7,A24)',iostat=ios) &
+               & ' Global total O2 consumtpion rate ............... : ', &
+               & -loc_tot, &
+               & '     mol yr-1           '
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       if (ocn_select(io_NO3)) then
+          loc_tot = sum ( loc_phys_ocn(ipo_M,:,:,:)* ( &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POC),io2l(io_NO3)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POP),io2l(io_NO3)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POC),io2l(io_NO3)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POP),io2l(io_NO3)),:,:,:) &
+               & ))/int_t_timeslice
+          Write(unit=out,fmt='(A52,E15.7,A24)',iostat=ios) &
+               & ' Global total NO3 consumtpion rate .............. : ', &
+               & -loc_tot, &
+               & '     mol yr-1           '
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       if (ocn_select(io_SO4)) then
+          loc_tot = sum ( loc_phys_ocn(ipo_M,:,:,:)* ( &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POC),io2l(io_SO4)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POP),io2l(io_SO4)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POC),io2l(io_SO4)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POP),io2l(io_SO4)),:,:,:) &
+               & ))/int_t_timeslice
+          Write(unit=out,fmt='(A52,E15.7,A24)',iostat=ios) &
+               & ' Global total SO4 consumtpion rate .............. : ', &
+               & -loc_tot, &
+               & '     mol yr-1           '
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+       if (ocn_select(io_CH4)) then
+          loc_tot = sum ( loc_phys_ocn(ipo_M,:,:,:)* ( &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POC),io2l(io_CH4)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idP(is2l(is_POP),io2l(io_CH4)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POC),io2l(io_CH4)),:,:,:) + &
+               & int_diag_redox_timeslice(conv_lslo2idD(is2l(is_POP),io2l(io_CH4)),:,:,:) &
+               & ))/int_t_timeslice
+          Write(unit=out,fmt='(A52,E15.7,A24)',iostat=ios) &
+               & ' Global total CH4 production rate ............... : ', &
+               & loc_tot, &
+               & '     mol yr-1           '
+          call check_iostat(ios,__LINE__,__FILE__)
+       end if
+    else
+       Write(unit=out,fmt=*) 'No remineralization summary output saved -- choose a save option that includes redox saving:'
+       Write(unit=out,fmt=*) 'bg_par_data_save_level=[14,15,16,99]'
+       Write(unit=out,fmt=*) 'or set:'
+       Write(unit=out,fmt=*) 'bg_ctrl_bio_remin_redox_save=.true.'
+    end if
 
     ! *** save data - BIOLOGICAL EXPLORT ***
     ! write export data
@@ -3906,7 +3975,7 @@ CONTAINS
        SELECT CASE (sed_type(is))
        CASE (1:7)
           ! NOTE:
-          !      '1' -> assigned to primary biogenic phases; POM (represented by POC), CaCO3, opal (all contributing to bulk composition)
+          !      '1' -> assigned to primary biogenic phases; POM (POC), CaCO3, opal (all contributing to bulk composition)
           !      '2' -> assigned to abiotic material (contributing to bulk composition); det, ash
           !      '3' -> assigned to elemental components associated with POC; P, N, Cd, Fe
           !      '4' -> assigned to elemental components associated with CaCO3; Cd
@@ -3947,7 +4016,7 @@ CONTAINS
        SELECT CASE (sed_type(is))
        CASE (1:7)
           ! NOTE:
-          !      '1' -> assigned to primary biogenic phases; POM (represented by POC), CaCO3, opal (all contributing to bulk composition)
+          !      '1' -> assigned to primary biogenic phases; POM (POC), CaCO3, opal (all contributing to bulk composition)
           !      '2' -> assigned to abiotic material (contributing to bulk composition); det, ash
           !      '3' -> assigned to elemental components associated with POC; P, N, Cd, Fe
           !      '4' -> assigned to elemental components associated with CaCO3; Cd
@@ -4057,8 +4126,8 @@ CONTAINS
             & 1.0E-12*conv_C_mol_kg*SUM(int_bio_settle_timeslice(is_POC,:,:,n_k))/int_t_timeslice, &
             & ' PgC yr-1'
     end select
-
-    !
+    
+    ! END
     Write(unit=out,fmt=*) ' '
     Write(unit=out,fmt=*) '=========================='
     ! *** save data - CLOSE FILE ***

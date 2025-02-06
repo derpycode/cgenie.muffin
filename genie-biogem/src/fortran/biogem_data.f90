@@ -1421,6 +1421,8 @@ CONTAINS
     ! NH4+ + NO2− → N2 + 2 H2O
     ! NOTE: will have to assume NO2- as part of the ALK balance ... ?
     !       (then this must be taken inot account when NO or N2O is formed)
+    ! NOTE: conv_sed_ocn_N_NH4 and conv_sed_ocn_N_N2 are specific to the empirical sediemntary denitrification scheme of
+    !       Bohlen et al. [2012]
     !
     ! For N2O ... simple would be: O2 == (4/5)NO3- - (2/5)N2O
     ! However ... this would mean:
@@ -1436,7 +1438,9 @@ CONTAINS
     ! => O2 = (4/5)NO3- - (2/5)N2O
     !
     if (ocn_select(io_NO3)) then
-       conv_sed_ocn_N(:,:)  = conv_sed_ocn(:,:)
+       conv_sed_ocn_N(:,:)      = conv_sed_ocn(:,:)
+       conv_sed_ocn_N_NH4(:,:)  = conv_sed_ocn(:,:)
+       conv_sed_ocn_N_N2(:,:)   = conv_sed_ocn(:,:)
        ! > N
        if (ocn_select(io_NH4)) then
           ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
@@ -1484,6 +1488,7 @@ CONTAINS
           conv_sed_ocn_N(io_N2,is_POC)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
+          conv_sed_ocn_N_N2(:,:)        = conv_sed_ocn_N(:,:)
        elseif (ocn_select(io_NH4)) then
           ! NOTE: simple NO3 + NH4 scheme
           ! in the back-reaction: NH4+ + 2O2 -> NO3- + 2H+ + H2O => O2 == (1/2)NO3
@@ -1495,6 +1500,7 @@ CONTAINS
           conv_sed_ocn_N(io_NH4,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -2.0*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
+          conv_sed_ocn_N_NH4(:,:)       = conv_sed_ocn_N(:,:)
        else
           ! (this should not occur)
        endif
@@ -3429,7 +3435,13 @@ CONTAINS
     case default
        ! [leave user-specified settings]
     end select
-
+    
+    ! ensure redox diagnostics are saved if calculated
+    if (ctrl_bio_remin_redox_save) then
+       ctrl_data_save_slice_diag_geochem = .true.
+       ctrl_data_save_sig_diag_geochem = .true.
+    end if
+    
     ! detrmine whether to save inversion diagnostics
     ctrl_data_save_inversion = .false.
     IF ( &

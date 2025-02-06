@@ -127,3 +127,50 @@ SUBROUTINE cpl_comp_gematm1(    &
 end SUBROUTINE cpl_comp_gematm1
 ! ******************************************************************************************************************************** !
 
+
+! ******************************************************************************************************************************** !
+! COUPLE TRACER CONVERSION MATRIX: OCN->SED
+SUBROUTINE cpl_conv_ocnsed(      &
+     & dum_n_ocn,dum_n_sed,      &
+     & dum_n_i_sed,dum_n_j_sed,  &
+     & dum_sfcsumocn,            &
+     & dum_sfcsumconv            &
+     & )
+  use biogem_box
+  IMPLICIT NONE
+  ! dummy arguments
+  integer,intent(in)::dum_n_ocn,dum_n_sed
+  integer,intent(in)::dum_n_i_sed,dum_n_j_sed                                          ! 
+  real,dimension(dum_n_ocn,dum_n_i_sed,dum_n_j_sed),intent(in)::dum_sfcsumocn          !
+  real,dimension(dum_n_ocn,dum_n_sed,dum_n_i_sed,dum_n_j_sed),intent(out)::dum_sfcsumconv !
+  ! local variables
+  integer::i,j,l                                                 ! 
+  real,dimension(1:n_l_ocn)::loc_vocn                            !
+  real,dimension(n_l_ocn,n_l_sed)::loc_conv_ls_lo                !
+  ! ---------------------------------------------------------- !
+  ! INITIALIZE LOCAL VARIABLES
+  ! ---------------------------------------------------------- !
+  dum_sfcsumconv = 0.0
+  ! ---------------------------------------------------------- !
+  ! START
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '*** COUPLE TRACER CONVERSION MATRIX: OCN->SED ***'
+  IF (ctrl_debug_lvl1) print*, '    >>>'
+  ! ---------------------------------------------------------- !
+  DO i=1,dum_n_i_sed
+     DO j=1,dum_n_j_sed
+        DO l=1,n_l_ocn
+           loc_vocn(l) = dum_sfcsumocn(l2io(l),i,j)
+        end DO
+        call sub_box_remin_redfield(loc_vocn(:),loc_conv_ls_lo(:,:))
+        dum_sfcsumconv(:,:,i,j) = fun_conv_lslo2sedocn(loc_conv_ls_lo(:,:))
+     end DO
+  end DO
+  ! ---------------------------------------------------------- !
+  ! END
+  ! ---------------------------------------------------------- !
+  IF (ctrl_debug_lvl1) print*, '    <<<'
+  ! ---------------------------------------------------------- !
+end SUBROUTINE cpl_conv_ocnsed
+! ******************************************************************************************************************************** !
+

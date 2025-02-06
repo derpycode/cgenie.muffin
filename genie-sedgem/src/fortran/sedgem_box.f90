@@ -829,6 +829,7 @@ CONTAINS
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
           sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
+!!$          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_ls_lo(lo,ls)*sed_fdis(l2is(ls),dum_i,dum_j)
        end do
     end DO
 
@@ -2100,9 +2101,10 @@ CONTAINS
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
           sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
+!!$          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_ls_lo(lo,ls)*sed_fdis(l2is(ls),dum_i,dum_j)
        end do
     end DO
-
+       
   END SUBROUTINE sub_update_sed_mud
   ! ****************************************************************************************************************************** !
 

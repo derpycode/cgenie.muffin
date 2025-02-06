@@ -2154,11 +2154,11 @@ CONTAINS
     ! create simple mass balance if no organic carbon cycle is active
     ! NOTE: loc_FCaCO3_d13C*(1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3 + par_sed_diag_volcanicd13C*loc_Foutgassing = 
     !       loc_tot_FCaCO3_d13C*loc_tot_FCaCO3
-    if (loc_tot_FPOC > const_real_nullsmall) then
-       loc_FCaCO3_d13C = loc_tot_FCaCO3_d13C
-    else
+    if (loc_tot_FCaCO3 > const_real_nullsmall) then
        loc_FCaCO3_d13C = (loc_tot_FCaCO3_d13C*loc_tot_FCaCO3 - par_sed_diag_volcanicd13C*loc_Foutgassing)/ &
             & ((1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3)
+    else
+       loc_FCaCO3_d13C = loc_tot_FCaCO3_d13C
     end if
     ! write out data
     Write(unit=out,fmt=*) ' '
@@ -2190,11 +2190,11 @@ CONTAINS
     write(unit=out,fmt='(A28,e14.6,A9)',iostat=ios) &
          & ' kerogen weathering        :',loc_Fkerogen,' mol yr-1'
     Write(unit=out,fmt=*) '---------------------------------'
-    if (loc_tot_FCaCO3 > const_real_nullsmall) then
+    if ((loc_tot_FCaCO3 > const_real_nullsmall) .AND. (par_sed_diag_fracSiweath > const_real_nullsmall)) then
        write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
             & ' kerogen C/silicate ratio  =',loc_Fkerogen/(par_sed_diag_fracSiweath*loc_tot_FCaCO3)
     end if
-    if (loc_tot_FCaCO3 > const_real_nullsmall) then
+    if ((loc_tot_FCaCO3 > const_real_nullsmall) .AND. (par_sed_diag_fracSiweath > const_real_nullsmall)) then
        write(unit=out,fmt='(A28,e14.6)',iostat=ios) &
             & ' kerogen P/silicate ratio  =',loc_tot_FPOP/(par_sed_diag_fracSiweath*loc_tot_FCaCO3)
     end if

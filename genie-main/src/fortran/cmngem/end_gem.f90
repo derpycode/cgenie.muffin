@@ -20,6 +20,8 @@ SUBROUTINE end_gem()
   DEALLOCATE(conv_ls_lo_Fe,STAT=alloc_error)
   DEALLOCATE(conv_ls_lo_S,STAT=alloc_error)
   DEALLOCATE(conv_ls_lo_meth,STAT=alloc_error)
+  DEALLOCATE(conv_ls_lo_N_NH4,STAT=alloc_error)
+  DEALLOCATE(conv_ls_lo_N_N2,STAT=alloc_error)
   DEALLOCATE(conv_ls_lo_i,STAT=alloc_error)
   DEALLOCATE(conv_lD_lP_i,STAT=alloc_error)
   DEALLOCATE(conv_lP_lD_i,STAT=alloc_error)
@@ -29,6 +31,8 @@ SUBROUTINE end_gem()
   DEALLOCATE(conv_ls_lo_i_Fe,STAT=alloc_error)
   DEALLOCATE(conv_ls_lo_i_S,STAT=alloc_error)
   DEALLOCATE(conv_ls_lo_i_meth,STAT=alloc_error)
+  DEALLOCATE(conv_ls_lo_i_N_NH4,STAT=alloc_error)
+  DEALLOCATE(conv_ls_lo_i_N_N2,STAT=alloc_error)
   !- --------------------------------------------------------- !
 
   print*,' <<< Shutdown complete'
