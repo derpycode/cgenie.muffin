@@ -160,9 +160,17 @@ c adjustable freshwater forcing parameters
       real extra0,range0,extra1a,extra1b,extra1c
       common /embm_fwf_real/ extra0,range0,extra1a,extra1b,extra1c
 
+c CL (01/15/24) : seconds per solar day (necessary for GENIE)
+      real sodaylen
+      common /embm_sodaylen/sodaylen
+
+c CL (01/15/24) : seconds per sidereal day (necessary for GENIE)
+      real sidaylen
+      common /embm_sidaylen/sidaylen
+
 c AY (08/04/04) : days per year (necessary for GENIE)
       real yearlen
-      common /ocn_yearlen/yearlen
+      common /embm_yearlen/yearlen
 
 c v2 seasonal diagnostics
 c AP (03/08/06) : Addition of avg precipitated atm. humidity
@@ -270,17 +278,16 @@ c SG (16/02/2K7) : added orbital parameters for albedo calculation
       real par_orbit_oscgam
       real par_orbit_osctau0
       real par_orbit_oscobl
-      real par_orbit_osclonperi  
-	  
+      real par_orbit_osclonperi     
+
       common/orbit_vary/
      &                  orbitecc_vect,
      &                  orbitsob_vect,
      &                  orbitgam_vect,
      &                  orbittau_vect,
-     &                  orbitall_vect,
-     &                  orbitobl_vect,
+     &                  orbitall_vect,orbitla_vect,
      &                  orbitper_vect,
-     &                  orbitla_vect,
+     &                  orbitobl_vect,
      &                  t_orbit,norbit,orbitsteps,
      &                  opt_orbit_old,
      &                  filenameorbit
@@ -316,6 +323,9 @@ c AR (18/01/08) : run-time seasonality option
 c AR : radiative forcing by CH4 and N2O
       real alphach4,alphan2o
       common /embm_greenhouse/alphach4,alphan2o
+      logical opt_delf2x_cesm
+      logical opt_co2ch4radfor
+      common /embm_greenhouse/opt_delf2x_cesm,opt_co2ch4radfor
 
 c orography
       real lapse_rate

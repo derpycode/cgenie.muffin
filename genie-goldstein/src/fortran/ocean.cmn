@@ -127,6 +127,14 @@ c AY (29/11/04) : ASURF grid cell area
       real asurf(maxj)
       common /ocn_asurf/asurf
 
+c CL (01/15/24) : seconds per solar day (necessary for GENIE)
+      real sodaylen
+      common /ocn_sodaylen/sodaylen
+
+c CL (01/15/24) : seconds per sidereal day (necessary for GENIE)
+      real sidaylen
+      common /ocn_sidaylen/sidaylen
+
 c AY (08/04/04) : days per year (necessary for GENIE)
       real yearlen
       common /ocn_yearlen/yearlen

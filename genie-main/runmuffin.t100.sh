@@ -19,7 +19,7 @@ OUTPUTDIR=$HOMEDIR/cgenie_output
 # ensure rocks can find xsltproc
 export PATH=$PATH:/opt/rocks/bin:/usr/bin
 export PATH=$PATH:/share/apps/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/share/apps/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/share/apps/lib:/share/apps/netcdf/lib
 # also ifort ...
 export PATH=/state/partition1/apps/intel/bin:$PATH
 # ensure stack size is adequate
@@ -156,16 +156,20 @@ echo EXPID=$RUNID >> $CONFIGPATH/$CONFIGNAME
 #
 # (4) SET MODEL TIME-STEPPING
 # ---------------------------
-# extract ocean (lon,lat,lev) dimensions
+# extract ocean (lon,lat) dimension
 LONS=$(grep -o '$(DEFINE)GOLDSTEINNLONS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
 LATS=$(grep -o '$(DEFINE)GOLDSTEINNLATS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
+# extract ocean depth dimentsion
+# NOTE: test for empty as a single digit ... then try 2
+# NOTE: if the first digit is a zero ... remove it ...
 LEVS=$(grep -o '$(DEFINE)GOLDSTEINNLEVS=..\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
-IGRID=$(grep -o 'go_grid=.' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
-# filter single digit format level ('8' vs. '08')
-###if [ "$LEVS" == "8\'" ] || [ "$LEVS" == "8\"" ]; then
-if [ "$LEVS" != "32" ] && [ "$LEVS" != "24" ] && [ "$LEVS" != "16" ] && [ "$LEVS" != "08" ]; then
-    let LEVS=8
+if [ -z "$LEVS" ]; then
+    LEVS=$(grep -o '$(DEFINE)GOLDSTEINNLEVS=.\>' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
+else
+    if [[ ${LEVS:0:1} == "0" ]]; then LEVS=${LEVS:1:2}; fi
 fi
+# report
+echo "   Requested model resolution: "$LONS"x"$LATS"x"$LEVS
 # define relative biogeochem time-stepping
 if [ $LONS -eq 36 ] && [ $LEVS -eq 16 ]; then
     let N_TIMESTEPS=100
@@ -192,14 +196,22 @@ else
     let N_TIMESTEPS=100
     let dbiostp=1
 fi
-if [ $IGRID -eq 1 ]; then
-    echo "   Making non-equal area grid modifications to time-stepping, igrid: " $IGRID
-    N_TIMESTEPS="$(echo "4*$N_TIMESTEPS" | bc -l)"
-    dbiostp="$(echo "4*$dbiostp" | bc -l)"
-    let datmstp=5
+# non equal area grid options
+# NOTE: first test for option not being included in the config file
+IGRID=$(grep -o 'go_grid=.' $CONFIGPATH/$MODELID".config" | sed -e s/.*=//)
+if [ -n "$IGRID" ]; then
+    if [ $IGRID -eq 1 ]; then
+        echo "   Making non-equal area grid modifications to time-stepping, igrid: " $IGRID
+        N_TIMESTEPS="$(echo "4*$N_TIMESTEPS" | bc -l)"
+        dbiostp="$(echo "4*$dbiostp" | bc -l)"
+        let datmstp=5
+    else
+        let datmstp=5
+    fi
 else
     let datmstp=5
 fi
+# report final time-stepping settings
 echo "   Setting time-stepping [GOLDSTEIN, BIOGEM:GOLDSTEIN]: " $N_TIMESTEPS $dbiostp
 # define primary model time step
 # c-goldstein; e.g. ma_genie_timestep = 365.25*24.0/(5*96) * 3600.0 (GOLDSTEIN year length)

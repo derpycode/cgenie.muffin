@@ -1,0 +1,46 @@
+ 
+ 01                 02    03
+ \/                 \/    \/
+
+-START-OF-DATA-
+ Phytoplankton     0.60   1
+ Phytoplankton     1.90   1
+ Phytoplankton     6.00   1
+ Phytoplankton    19.00   1
+ Phytoplankton    60.00   1
+ Phytoplankton   190.00   1
+ Phytoplankton   600.00   1
+ Phytoplankton  1900.00   1
+ Zooplankton    1900.00   1
+ Zooplankton       1.90   1
+ Zooplankton       6.00   1
+ Zooplankton      19.00   1
+ Zooplankton      60.00   1
+ Zooplankton     190.00   1
+ Zooplankton     600.00   1
+ Foram	       190.00   1
+-END-OF-DATA-
+
+ /\                 /\    /\
+ 01                 02    03
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #01: plankton functional type name
+COLUMN #02: plankton diameter (micrometers)
+COLUMN #03: number of randomised replicates
+
+INFO: TRACER ASSIGNMENT RULES
+-----------------------------
+Plankton functional type one of: Prochlorococcus
+                                 Synechococcus
+                                 Picoeukaryote
+                                 Diatom
+                                 Coccolithophore
+                                 Diazotroph
+                                 Zooplankton
+                                 Mixotroph
+                                 
+
+

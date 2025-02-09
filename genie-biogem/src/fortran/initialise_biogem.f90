@@ -258,6 +258,10 @@ SUBROUTINE initialise_biogem(                       &
   if (ctrl_force_Fgeothermal2D) then
      call sub_init_force_Fgeothermal()
   end if
+  ! initialize virtual grid (for remin)
+  if (ctrl_force_Vgrid) then
+     call sub_init_force_Vgrid()
+  end if
   ! calculate all the tracer relationship indices
   IF (ctrl_debug_lvl2) print*, 'calculate all the primary tracer relationship indices'
   call sub_calc_tracerrelationships_i()
@@ -283,6 +287,7 @@ SUBROUTINE initialise_biogem(                       &
      CALL sub_data_init_lookup_4D_Fe()
   end SELECT
   ! ---------------------------------------------------------- ! set up redox save/reporting
+  IF (ctrl_debug_lvl2) print*, 'initialize redox arrays'
   CALL sub_init_redox()
   ! ---------------------------------------------------------- ! initialize arrays (2)
   IF (ctrl_debug_lvl2) print*, 'initialize data saving arrays'
@@ -319,12 +324,21 @@ SUBROUTINE initialise_biogem(                       &
   ! *** INITILAIZE NETCDF  ***
   IF (ctrl_debug_lvl2) print*, 'initialize netCDF'
   ! set filenames
-  string_ncout2d    = TRIM(par_outdir_name)//'fields_biogem_2d.nc'
-  string_ncout3d    = TRIM(par_outdir_name)//'fields_biogem_3d.nc'
-  string_nctsint    = TRIM(par_outdir_name)//'timeseries_biogem.nc'
-  string_nctsi      = TRIM(par_outdir_name)//'ts_biogem_int.nc'
-  string_nctsglob   = TRIM(par_outdir_name)//'ts_biogem_glob.nc'
-  string_ncout3dsig = TRIM(par_outdir_name)//'fields_biogem_3dts.nc'
+  if (ctrl_ncout_expid_name) then
+     string_ncout2d    = TRIM(par_outdir_name)//trim(expid_name)//'.2d.nc'
+     string_ncout3d    = TRIM(par_outdir_name)//trim(expid_name)//'.3d.nc'
+!!$     string_nctsint    = TRIM(par_outdir_name)//trim(expid_name)//'.ts.nc'
+!!$     string_nctsi      = TRIM(par_outdir_name)//trim(expid_name)//'.ts_int.nc'
+!!$     string_nctsglob   = TRIM(par_outdir_name)//trim(expid_name)//'.ts_glob.nc'
+!!$     string_ncout3dsig = TRIM(par_outdir_name)//trim(expid_name)//'.3dts.nc'
+  else
+     string_ncout2d    = TRIM(par_outdir_name)//'fields_biogem_2d.nc'
+     string_ncout3d    = TRIM(par_outdir_name)//'fields_biogem_3d.nc'
+!!$     string_nctsint    = TRIM(par_outdir_name)//'timeseries_biogem.nc'
+!!$     string_nctsi      = TRIM(par_outdir_name)//'ts_biogem_int.nc'
+!!$     string_nctsglob   = TRIM(par_outdir_name)//'ts_biogem_glob.nc'
+!!$     string_ncout3dsig = TRIM(par_outdir_name)//'fields_biogem_3dts.nc'
+  end if
   ! initialise 2d and 3d netcdf files
   IF (ctrl_continuing.AND.opt_append_data) THEN
      OPEN(unit=in,status='old',file=TRIM(par_rstdir_name)//'netcdf_record_numbers',form='formatted',action='read')
@@ -337,25 +351,24 @@ SUBROUTINE initialise_biogem(                       &
      call sub_init_netcdf(trim(string_ncout3d),loc_iou,3)
      ncout3d_iou = loc_iou
      ncout3d_ntrec = 0
-     if (ctrl_data_save_3d_sig) then
-        call sub_init_netcdf(trim(string_ncout3dsig),loc_iou,4)
-        ncout3dsig_iou = loc_iou
-        ncout3dsig_ntrec = 0
-     end if
+!!$     if (ctrl_data_save_3d_sig) then
+!!$        call sub_init_netcdf(trim(string_ncout3dsig),loc_iou,4)
+!!$        ncout3dsig_iou = loc_iou
+!!$        ncout3dsig_ntrec = 0
+!!$     end if
   ENDIF
-
   ! JDW: initialise matrix netcdf output
   if(ctrl_data_diagnose_TM)THEN
-    ! find number of wet grid-points
-    n_wet_grid=0
-    do n=1,n_vocn,1
-      loc_k1 = vocn(n)%k1
+     ! find number of wet grid-points
+     n_wet_grid=0
+     do n=1,n_vocn,1
+        loc_k1 = vocn(n)%k1
         do k=n_k,loc_k1,-1
-          n_wet_grid=n_wet_grid+1
+           n_wet_grid=n_wet_grid+1
         end do
-    end do
-    ! initialise matrix netcdf file
-    call sub_init_netcdf_TM(n_wet_grid)
+     end do
+     ! initialise matrix netcdf file
+     call sub_init_netcdf_TM(n_wet_grid)
   end if
 
   ! *** load restart information ***
@@ -377,12 +390,13 @@ SUBROUTINE initialise_biogem(                       &
   if (ctrl_force_GOLDSTEInTS) call sub_biogem_copy_ocntotsTS(dum_ts,dum_ts1)
 
   ! ############################################################################################################################# !
-  !!! *** TESTING ***
+  ! *** TESTING ***
+  ! (it will not currently compile without this ... !)
   vocn(:)=fun_lib_conv_ocnTOvocn(ocn(:,:,:,:))
   ocn = 0.0
   ocn(:,:,:,:)=fun_lib_conv_vocnTOocn(vocn(:))
   ! ############################################################################################################################# !
-
+  
   ! *** enable BioGeM ***
   par_misc_t_go = .TRUE.
 

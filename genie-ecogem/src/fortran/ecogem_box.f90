@@ -35,7 +35,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     integer :: io
-    !
+        !
     ! *****************************************************************
     ! ******************** Evaluate Quota Status **********************
     ! *****************************************************************
@@ -80,6 +80,7 @@ CONTAINS
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
     integer :: io
+    real,dimension(iomax,npmax) :: denom ! JDW Aaron Diatom 23   
     !
     ! *****************************************************************
     ! ******************** Evaluate Limitation ***********************
@@ -100,21 +101,30 @@ CONTAINS
     VLlimit(:)       = 0.0 ! (npmax)
     qreg(:,:)        = 0.0 ! (iomax,npmax)
     qreg_h(:,:)      = 0.0 ! (iomax,npmax)
-
+    ! JDW: precalculate qmin-qmax to avoid divide by zero errorss
+    denom = merge(1.0/(qmax - qmin),0.0,qmax.gt.0.0) ! JDW: calculate 1.0/denominator and take care of instances of 1.0/0.0 Aaron Diatom 23
     ! Calculate quota limitation terms
     ! N and Si take linear form
-    if (nquota) limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) / ( qmax(iNitr,:) - qmin(iNitr,:))
-    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:))
+    ! Modified to take into account no N limitation by diazotrophs - Fanny Jun20
+    if (nquota) then
+      limit(iNitr,:) = (quota(iNitr,:) - qmin(iNitr,:)) * denom(iNitr,:)
+      limit(iNitr,:) = merge(1.0,limit(iNitr,:),pft.eq.'diazotroph')
+    endif
+    if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) * denom(iSili,:) ! JDW
+    !if (squota) limit(iSili,:) = (quota(iSili,:) - qmin(iSili,:)) / ( qmax(iSili,:) - qmin(iSili,:)) ! original Aaron Diatom 23
     ! P and Fe take normalised Droop form
     if (pquota) limit(iPhos,:) = (1.0 - qmin(iPhos,:)/quota(iPhos,:)) / (1.0 - qmin(iPhos,:)/qmax(iPhos,:) )
     if (fquota) limit(iIron,:) = (1.0 - qmin(iIron,:)/quota(iIron,:)) / (1.0 - qmin(iIron,:)/qmax(iIron,:) )
 
     ! Set Von Leibig limitation according to most limiting nutrient (excluding iCarb=1)
-    VLlimit(:) = minval(limit(2:iomax,:),1)
+    ! VLlimit(:) = minval(limit(2:iomax,:),1) ! original
+    VLlimit(:) = minval(limit(2:max(iNitr,iPhos,iIron),:),1) ! JDW: calculate limitation for N,P,Fe only
+    VLlimit = merge(minval(limit(2:iomax,:),1),minval(limit(2:max(iNitr,iPhos,iIron),:),1),silicify.eq.1.0) ! JDW: in case of diatom reset taking into account SiO2 Aaron Diatom 23
 
     do io = 2,iomax ! skip carbon index; quota = X:C biomass ratio
        ! Calculate linear regulation term
-       qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) )
+       qreg(io,:) = (qmax(io,:) - quota(io,:)) * denom(io,:) ! JDW
+       !qreg(io,:) = (qmax(io,:) - quota(io,:)) / (qmax(io,:) - qmin(io,:) ) ! original Aaron Diatom 23
        ! Transform regulation term using hill number
        qreg_h(io,:) = qreg(io,:) ** hill
     enddo
@@ -188,8 +198,9 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! Temperature dependence functions set by control namelist parameter ctrl_tdep_form
   SUBROUTINE t_limitation( &
-       & Tlocal,             &
-       & gamma               &
+       & Tlocal,           &
+       & gamma_TP,         &
+       & gamma_TK          &
        & )
 
     IMPLICIT NONE
@@ -197,16 +208,25 @@ CONTAINS
     ! DUMMY ARGUMENTS
     ! ---------------------------------------------------------- !
     real,intent(in)  :: Tlocal
-    real,intent(out) :: gamma
-
+    real,intent(out) :: gamma_TP, gamma_TK
+    
     if     (ctrl_tdep_form.eq.'Default')   then ! Ward, Dutkiewicz, Jahn & Follows - L&O (2012) 57(6), 1877-1891
-       gamma=exp(temp_A*(Tlocal-273.15-temp_T0))
+    											! originally Laws et al. - GBC (2000) 14/4, 1231-1246
+       gamma_TP=exp(temp_A*(Tlocal-273.15-temp_T0))
+       gamma_TK=gamma_TP
+       
+    elseif (ctrl_tdep_form.eq.'Laws')    then ! Laws et al. - GBC (2000) 14/4, 1231-1246
+       gamma_TP = exp(temp_P*(Tlocal-273.15-temp_T0))
+       gamma_TK = exp(temp_K*(Tlocal-273.15-temp_T0))
     elseif (ctrl_tdep_form.eq.'Eppley')    then ! Eppley - Fish. Bull. (1972) 70, 1063-1085
-       gamma=0.59*exp(0.0633*(Tlocal-273.15))
+       gamma_TP=0.59*exp(0.0633*(Tlocal-273.15))
+       gamma_TK=gamma_TP
     elseif (ctrl_tdep_form.eq.'MEDUSA')    then ! Eppley - Fish. Bull. (1972) 70, 1063-1085
-       gamma=1.066**(Tlocal-273.15)
+       gamma_TP=1.066**(Tlocal-273.15)
+       gamma_TK=gamma_TP
     elseif (ctrl_tdep_form.eq.'Bissinger') then ! Bissinger, Montagnes, Sharples and Atkinson - L&O (2008) 53(2), 487-493
-       gamma=0.81*exp(0.0631*(Tlocal-273.15))
+       gamma_TP=0.81*exp(0.0631*(Tlocal-273.15))
+       gamma_TK=gamma_TP
     else
        print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
        print*,"ERROR: ctrl_tdep_form = '"//trim(ctrl_tdep_form)//"' is not a valid temperature dependence function."
@@ -215,7 +235,7 @@ CONTAINS
        STOP
     endif
 
-    if (gamma.le.0.0) then
+    if (gamma_TP.le.0.0.or.gamma_TK.le.0.0) then
        print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
        print*,"ERROR: T-dependence function yields gamma_T<=0."
        print*,"Stopped in SUBROUTINE t_limitation (ecogem_box)."
@@ -285,7 +305,9 @@ CONTAINS
              if (useNO3)  VCN(:) = VCN(:) + up_inorg(iNO3,:)
              if (useNO2)  VCN(:) = VCN(:) + up_inorg(iNO2,:)
              if (useNH4)  VCN(:) = VCN(:) + up_inorg(iNH4,:)
-          elseif (pquota) then
+          ! To account for nitrogen fixation ! Fanny - June 2020 - Still need to check Moore et al (2002) + parameterise N:P_diazo (=40.0) - probably should scale with nitrogen fixation rate!!
+             VCN(:) = merge(up_inorg(iPO4,:) * 40.0,VCN(:),pft.eq.'diazotroph') ! Aaron Diatom 23
+         elseif (pquota) then
              VCN(:) = up_inorg(iPO4,:) * 16.0
           else
              print*,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -322,6 +344,7 @@ CONTAINS
           ! Output variables
           chlsynth(:) =  chlsynth(:) * isautotrophic
           PP(:)       = (PCPhot(:) - costbiosynth(:)) * isautotrophic
+          if (fundamental) PP(:) = PCPhot(:) * isautotrophic ! ignore cost of biosynthesis in fund. niche experiment
           totPP       =  sum(PCPhot(:) * Cbiomass(:) * isautotrophic) ! does not include cost of biosynthesis
           !-----------------------------------------------------------------
        else ! else if it is extremely dark
@@ -348,6 +371,7 @@ CONTAINS
   SUBROUTINE grazing(          &
        &                  biomass,  &
        &                  gamma_T,  &
+!BAW: zoolimit should be optional &                  zoolimit,  &
        &                  GrazingMat &
        &                 )
 
@@ -358,6 +382,7 @@ CONTAINS
     real,                                  intent(in)  :: gamma_T
     real,dimension(iomax+iChl,npmax)      ,intent(in)  :: biomass
     real,dimension(iomax+iChl,npmax,npmax),intent(out) :: GrazingMat
+!BAW: zoolimit should be optional     real,dimension(npmax,npmax),intent(out)            :: zoolimit
     ! ---------------------------------------------------------- !
     ! DEFINE LOCAL VARIABLES
     ! ---------------------------------------------------------- !
@@ -415,7 +440,7 @@ CONTAINS
           do jprey=1,npmax ! sum all the prey carbon of predator, weighted by availability (preference)
              if (gkernel(jpred,jprey).gt.0.0) then
                 food1 = food1 +  gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey)      ! available food
-                food2 = food2 + (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns ! available food ^ ns
+                food2 = food2 + (gkernel(jpred,jprey)*palatability(jprey) * biomass(iCarb,jprey))**ns_array(jpred) ! available food ^ ns
              endif
           enddo
           ! calculate grazing effort
@@ -426,12 +451,13 @@ CONTAINS
           ! loop prey to calculate grazing rates on each prey and element
           do jprey=1,npmax
              if (biomass(iCarb,jprey).gt.0.0.and.food2.gt.0.0) then ! if any prey food available
-                GrazingMat(iCarb,jpred,jprey) = tmp1 * gamma_T * graz(jpred) &                        ! total grazing rate
-                     &             * (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns/food2 ! * switching
+                GrazingMat(iCarb,jpred,jprey) = tmp1 * gamma_T * graz(jpred)   &                        ! total grazing rate
+                     &             * (gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! * switching
+!BAW: zoolimit should be optional zoolimit(jpred,jprey) = tmp1 *(gkernel(jpred,jprey)*palatability(jprey)*biomass(iCarb,jprey))**ns_array(jpred)/food2 ! food limitation calulation for zooplankton - Maria May 2019
                 ! other organic elements (+ chlorophyll) are grazed in stoichiometric relation to carbon
                 do io=2,iomax+iChl
                    if (biomass(iCarb,jprey).gt.0.0) then
-                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) & 
+                      GrazingMat(io,jpred,jprey) = GrazingMat(iCarb,jpred,jprey) &
                            &                                      * biomass(io,jprey)/biomass(iCarb,jprey)
                    endif
                 enddo ! io
@@ -439,6 +465,7 @@ CONTAINS
           enddo ! jprey
        endif  ! endif non-zero max grazing rate
     enddo ! jpred
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -449,7 +476,7 @@ CONTAINS
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
   ! ****************************************************************************************************************************** !
-  ! ****************************************************************************************************************************** !  
+  ! ****************************************************************************************************************************** !
   !ckc fractiontion to calculate nutrient isotopes uptake rates based on up_inorg
   SUBROUTINE nut_fractionation (           &
        up_inorg,    &
@@ -518,11 +545,11 @@ CONTAINS
        errmsg=errmsg(1:nstr)//'PO4, '
        nstr=nstr+5
     endif
-    !  if (useFe  .and. .not. ocn_select(io_???) ) then
-    !    errflag=.true.
-    !    errmsg=errmsg(1:nstr)//'PO4, '
-    !    nstr=nstr+5
-    !  endif
+    if (useFe  .and. .not. ocn_select(io_TDFe) ) then
+      errflag=.true.
+      errmsg=errmsg(1:nstr)//'TDFe), '
+      nstr=nstr+6
+    endif
     if (useSiO2 .and. .not. ocn_select(io_SiO2)) then
        errflag=.true.
        errmsg=errmsg(1:nstr)//'SiO2  '
@@ -554,4 +581,3 @@ CONTAINS
   ! ****************************************************************************************************************************** !
 
 END MODULE ecogem_box
-

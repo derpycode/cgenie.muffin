@@ -1,0 +1,822 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.8
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GCM == foam (OK)
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+       - Axis info read.
+>   4. READING MASK & TOPO GRIDS ...
+       - Mask & topo info read.
+>   5. RE-GRIDING MASK ...
+       - Mask re-gridded.
+       * Original land area fraction    = 0.16118
+       * Re-gridded land area fraction  = 0.15201
+>   6. FILTERING MASK ...
+       - Single cell embayments filtered out.
+       - Polar connections cleaned up.
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.15895
+>   7. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (2, 24) now land
+         -> Cell at (6, 23) now land
+         -> Cell at (6, 21) now land
+         -> Cell at (6, 20) now land
+         -> Cell at (6, 19) now land
+         -> Cell at (6, 18) now land
+         -> Cell at (5, 17) now land
+         -> Cell at (6, 17) now land
+         -> Cell at (27, 20) now ocean
+         -> Cell at (29, 26) now land
+         -> Cell at (28, 12) now land
+         -> Cell at (29, 12) now land
+         -> Cell at (30, 12) now land
+         -> Cell at (31, 10) now land
+         -> Cell at (31, 11) now land
+         -> Cell at (30, 9) now ocean
+         -> Cell at (27, 14) now ocean
+         -> Cell at (28, 13) now land
+         -> Cell at (28, 14) now land
+         -> Cell at (28, 15) now land
+         -> Cell at (28, 16) now land
+         -> Cell at (28, 17) now land
+         -> Cell at (28, 18) now land
+         -> Cell at (30, 19) now ocean
+         -> Cell at (27, 13) now land
+       - Out of grid range
+       * Mask alteration complete
+       * Revised land area fraction = 0.17207
+       - User-editing complete.
+>   8. CREATE FINAL MASK ...
+       - .mask_out.FINAL.dat saved
+       * Final land area fraction   = 0.17207
+>   9. RE-GRIDING TOPOGRAPHY ...
+       - Topography re-gridded.
+>   10. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  11. FILTERING BATHYMETRY ...
+         -> MAKE SHALLOWER :: Loop count = 1 @ (1,11,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (1,14,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (1,16,8); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (2,11,9); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (2,14,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (2,15,6); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (2,18,15); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (3,17,10); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (4,20,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (5,13,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (5,22,14); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (6,13,12); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (6,21,6); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (7,13,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (7,15,8); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (7,17,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (7,18,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (7,19,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (7,20,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (7,21,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (8,16,5); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (8,23,15); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (9,11,15); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (10,8,6); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (10,10,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (10,15,15); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (11,13,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (11,14,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (11,15,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (11,17,14); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (12,14,8); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (12,16,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (12,18,4); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (12,22,15); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (13,18,7); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (13,27,15); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (14,28,15); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (15,29,14); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,29,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (16,30,7); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (17,28,9); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,30,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,31,3); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (18,32,3); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (19,33,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,33,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (25,22,8); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (25,36,15); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (28,12,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (28,26,15); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (28,28,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (28,29,15); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (29,9,15); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (29,12,5); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (29,13,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (29,27,4); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (29,36,7); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (30,10,15); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (30,13,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (30,15,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (30,18,4); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (30,26,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (31,15,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (31,20,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (31,22,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (31,23,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (31,29,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (32,13,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (32,14,11); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (32,17,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (33,13,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (33,17,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (33,26,15); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (34,25,6); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (36,15,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (36,16,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (1,11,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (1,14,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (1,16,7); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (2,11,8); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (2,14,4); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (2,18,14); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (4,19,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (5,22,13); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (6,21,5); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (7,12,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (7,13,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (7,17,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (7,18,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (7,19,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (7,20,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (8,15,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (8,16,6); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (8,23,14); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (9,11,14); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (10,8,5); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (10,9,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (10,15,14); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (11,14,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (11,15,5); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (11,17,13); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (12,14,7); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (12,16,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (12,17,4); s = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (12,18,5); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (12,22,14); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (13,27,14); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (14,28,14); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (15,29,13); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,28,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,29,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (17,31,4); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (18,32,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (18,33,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (19,33,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,32,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (25,22,9); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (25,36,14); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (28,26,14); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (28,29,14); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (29,9,14); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (29,27,5); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (30,10,14); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (30,18,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (30,26,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (31,14,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (31,19,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (31,23,4); s = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (32,14,10); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (33,26,14); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (36,15,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (36,16,4); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (1,16,6); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (2,11,7); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (2,18,13); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (4,18,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (5,22,12); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (7,11,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (7,12,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (7,18,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (7,19,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (7,20,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (8,14,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (8,15,6); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (10,15,13); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (11,14,5); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (11,17,12); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (13,27,13); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (14,28,13); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (15,29,12); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,28,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (17,31,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (17,32,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (18,32,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (18,33,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (19,33,5); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (25,36,13); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 3 @ (28,26,13); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (28,27,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (28,28,5); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (28,29,13); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (30,10,13); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (31,13,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (33,26,13); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (2,11,6); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 4 @ (2,18,12); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (4,17,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 4 @ (5,22,11); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (7,14,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (7,19,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (7,20,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (8,14,6); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 4 @ (10,15,12); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (11,17,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (13,27,12); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (14,28,12); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (15,29,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (28,26,12); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 4 @ (28,29,12); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 4 @ (30,10,12); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (31,12,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 4 @ (33,26,12); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (4,16,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 5 @ (5,22,10); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (7,13,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 5 @ (7,14,6); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 5 @ (11,17,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (14,28,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (15,29,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (28,26,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 5 @ (28,29,11); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 5 @ (30,10,11); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (31,11,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 5 @ (33,26,11); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 6 @ (5,22,9); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (7,12,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 6 @ (7,13,6); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 6 @ (11,17,9); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 6 @ (14,28,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 6 @ (28,26,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 6 @ (28,29,10); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 6 @ (31,10,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 6 @ (33,26,10); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 7 @ (5,22,8); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (7,12,6); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 7 @ (11,17,8); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 7 @ (28,26,9); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 7 @ (28,29,9); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 8 @ (5,22,7); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 8 @ (28,26,8); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 9 @ (5,22,6); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 9 @ (28,26,7); d = 2; l = 2
+       - Topography filtered.
+>  12. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button, or clickoutside the grid, to finish
+         -> Deepening cell at (18, 6) to k=12
+         -> Deepening cell at (18, 6) to k=11
+         -> Deepening cell at (18, 6) to k=10
+         -> Deepening cell at (18, 6) to k=9
+         -> Deepening cell at (18, 6) to k=8
+         -> Deepening cell at (18, 7) to k=7
+         -> Deepening cell at (18, 6) to k=7
+         -> Deepening cell at (19, 6) to k=12
+         -> Deepening cell at (19, 6) to k=11
+         -> Deepening cell at (19, 6) to k=10
+         -> Deepening cell at (19, 6) to k=9
+         -> Deepening cell at (19, 6) to k=8
+         -> Deepening cell at (19, 6) to k=7
+         -> Deepening cell at (19, 6) to k=6
+         -> Deepening cell at (19, 6) to k=5
+         -> Deepening cell at (18, 7) to k=6
+         -> Deepening cell at (16, 9) to k=5
+         -> Shallowing cell at (16, 9) to k=6
+         -> Deepening cell at (17, 9) to k=7
+         -> Deepening cell at (17, 9) to k=6
+         -> Deepening cell at (17, 9) to k=5
+         -> Deepening cell at (17, 8) to k=7
+         -> Deepening cell at (17, 8) to k=6
+         -> Deepening cell at (17, 8) to k=5
+         -> Deepening cell at (18, 7) to k=5
+         -> Deepening cell at (17, 10) to k=3
+         -> Deepening cell at (17, 9) to k=4
+         -> Deepening cell at (17, 9) to k=3
+         -> Deepening cell at (16, 9) to k=5
+         -> Deepening cell at (16, 9) to k=4
+         -> Deepening cell at (15, 9) to k=8
+         -> Deepening cell at (15, 9) to k=7
+         -> Deepening cell at (15, 9) to k=6
+         -> Deepening cell at (15, 9) to k=5
+         -> Deepening cell at (14, 10) to k=6
+         -> Deepening cell at (14, 10) to k=5
+         -> Deepening cell at (18, 6) to k=6
+         -> Deepening cell at (17, 6) to k=5
+         -> Deepening cell at (17, 6) to k=4
+         -> Shallowing cell at (17, 6) to k=5
+         -> Shallowing cell at (17, 6) to k=6
+         -> Deepening cell at (18, 6) to k=5
+         -> Deepening cell at (19, 6) to k=4
+         -> Deepening cell at (18, 7) to k=4
+         -> Deepening cell at (17, 8) to k=4
+         -> Deepening cell at (17, 7) to k=5
+         -> Deepening cell at (16, 8) to k=5
+         -> Deepening cell at (19, 5) to k=5
+         -> Deepening cell at (20, 6) to k=3
+         -> Deepening cell at (21, 3) to k=14
+         -> Deepening cell at (21, 3) to k=13
+         -> Deepening cell at (21, 3) to k=12
+         -> Deepening cell at (21, 3) to k=11
+         -> Deepening cell at (21, 3) to k=10
+         -> Deepening cell at (21, 3) to k=9
+         -> Deepening cell at (21, 3) to k=8
+         -> Deepening cell at (21, 3) to k=7
+         -> Deepening cell at (21, 3) to k=6
+         -> Deepening cell at (22, 3) to k=9
+         -> Deepening cell at (22, 3) to k=8
+         -> Deepening cell at (22, 3) to k=7
+         -> Deepening cell at (22, 3) to k=6
+         -> Deepening cell at (22, 3) to k=5
+         -> Deepening cell at (23, 3) to k=3
+         -> Deepening cell at (20, 3) to k=14
+         -> Deepening cell at (20, 3) to k=13
+         -> Deepening cell at (20, 3) to k=12
+         -> Deepening cell at (20, 3) to k=11
+         -> Deepening cell at (20, 3) to k=10
+         -> Deepening cell at (20, 3) to k=9
+         -> Deepening cell at (20, 3) to k=8
+         -> Deepening cell at (20, 3) to k=7
+         -> Deepening cell at (20, 3) to k=6
+         -> Deepening cell at (19, 3) to k=14
+         -> Deepening cell at (19, 3) to k=13
+         -> Deepening cell at (19, 3) to k=12
+         -> Deepening cell at (19, 3) to k=11
+         -> Deepening cell at (19, 3) to k=10
+         -> Deepening cell at (19, 3) to k=9
+         -> Deepening cell at (19, 3) to k=8
+         -> Deepening cell at (18, 3) to k=14
+         -> Deepening cell at (18, 3) to k=13
+         -> Deepening cell at (18, 3) to k=12
+         -> Deepening cell at (18, 3) to k=11
+         -> Deepening cell at (18, 3) to k=10
+         -> Deepening cell at (18, 3) to k=9
+         -> Deepening cell at (18, 3) to k=8
+         -> Deepening cell at (17, 4) to k=12
+         -> Deepening cell at (17, 4) to k=11
+         -> Deepening cell at (17, 4) to k=10
+         -> Deepening cell at (17, 4) to k=9
+         -> Deepening cell at (17, 4) to k=8
+         -> Deepening cell at (17, 4) to k=7
+         -> Deepening cell at (17, 4) to k=6
+         -> Deepening cell at (18, 4) to k=5
+         -> Deepening cell at (18, 4) to k=4
+         -> Deepening cell at (18, 4) to k=3
+         -> Shallowing cell at (18, 4) to k=4
+         -> Shallowing cell at (18, 4) to k=5
+         -> Shallowing cell at (18, 4) to k=6
+         -> Deepening cell at (19, 4) to k=5
+         -> Deepening cell at (18, 5) to k=5
+         -> Deepening cell at (19, 5) to k=4
+         -> Deepening cell at (18, 6) to k=4
+         -> Deepening cell at (18, 7) to k=3
+         -> Deepening cell at (19, 6) to k=3
+         -> Deepening cell at (20, 5) to k=3
+         -> Deepening cell at (21, 4) to k=3
+         -> Deepening cell at (21, 3) to k=5
+         -> Deepening cell at (22, 3) to k=4
+         -> Deepening cell at (22, 3) to k=3
+         -> Deepening cell at (21, 3) to k=4
+         -> Deepening cell at (20, 3) to k=5
+         -> Deepening cell at (19, 3) to k=7
+         -> Deepening cell at (27, 14) to k=14
+         -> Deepening cell at (27, 15) to k=14
+         -> Deepening cell at (27, 16) to k=14
+         -> Deepening cell at (27, 17) to k=14
+         -> Deepening cell at (27, 18) to k=14
+         -> Deepening cell at (27, 19) to k=14
+         -> Deepening cell at (28, 19) to k=14
+         -> Deepening cell at (29, 19) to k=14
+         -> Deepening cell at (29, 20) to k=14
+         -> Deepening cell at (29, 20) to k=13
+         -> Deepening cell at (28, 20) to k=14
+         -> Deepening cell at (28, 20) to k=13
+         -> Deepening cell at (27, 20) to k=14
+         -> Deepening cell at (27, 20) to k=13
+         -> Deepening cell at (26, 18) to k=14
+         -> Deepening cell at (26, 18) to k=13
+         -> Deepening cell at (26, 17) to k=14
+         -> Deepening cell at (26, 17) to k=13
+         -> Deepening cell at (26, 16) to k=14
+         -> Deepening cell at (26, 16) to k=13
+         -> Deepening cell at (26, 15) to k=14
+         -> Deepening cell at (26, 15) to k=13
+         -> Deepening cell at (26, 14) to k=14
+         -> Deepening cell at (26, 14) to k=13
+         -> Deepening cell at (26, 13) to k=14
+         -> Deepening cell at (26, 13) to k=13
+         -> Deepening cell at (27, 21) to k=14
+         -> Deepening cell at (27, 21) to k=13
+         -> Deepening cell at (27, 21) to k=12
+         -> Deepening cell at (28, 21) to k=14
+         -> Deepening cell at (28, 21) to k=13
+         -> Deepening cell at (28, 21) to k=12
+         -> Deepening cell at (29, 21) to k=14
+         -> Deepening cell at (29, 21) to k=13
+         -> Deepening cell at (29, 21) to k=12
+         -> Deepening cell at (27, 22) to k=12
+         -> Deepening cell at (27, 22) to k=11
+         -> Deepening cell at (27, 22) to k=10
+         -> Deepening cell at (27, 22) to k=9
+         -> Deepening cell at (28, 22) to k=14
+         -> Deepening cell at (28, 22) to k=13
+         -> Deepening cell at (28, 22) to k=12
+         -> Deepening cell at (28, 22) to k=11
+         -> Deepening cell at (28, 22) to k=10
+         -> Shallowing cell at (27, 22) to k=10
+         -> Deepening cell at (29, 22) to k=10
+         -> Deepening cell at (28, 23) to k=14
+         -> Deepening cell at (28, 23) to k=13
+         -> Deepening cell at (28, 23) to k=12
+         -> Deepening cell at (28, 23) to k=11
+         -> Deepening cell at (28, 23) to k=10
+         -> Deepening cell at (28, 23) to k=9
+         -> Deepening cell at (28, 23) to k=8
+         -> Deepening cell at (28, 23) to k=7
+         -> Deepening cell at (28, 23) to k=6
+         -> Deepening cell at (27, 23) to k=7
+         -> Deepening cell at (27, 23) to k=6
+         -> Deepening cell at (27, 14) to k=13
+         -> Deepening cell at (26, 14) to k=12
+         -> Deepening cell at (25, 14) to k=9
+         -> Deepening cell at (27, 16) to k=13
+         -> Deepening cell at (26, 16) to k=12
+         -> Deepening cell at (25, 16) to k=9
+         -> Deepening cell at (27, 18) to k=13
+         -> Deepening cell at (26, 18) to k=12
+         -> Deepening cell at (25, 18) to k=4
+         -> Deepening cell at (27, 19) to k=13
+         -> Deepening cell at (27, 20) to k=12
+         -> Deepening cell at (27, 21) to k=11
+         -> Deepening cell at (29, 19) to k=13
+         -> Deepening cell at (29, 20) to k=12
+         -> Deepening cell at (29, 21) to k=11
+         -> Deepening cell at (29, 22) to k=9
+         -> Deepening cell at (27, 22) to k=9
+         -> Deepening cell at (27, 23) to k=5
+         -> Deepening cell at (27, 23) to k=4
+         -> Deepening cell at (28, 23) to k=5
+         -> Deepening cell at (32, 17) to k=11
+         -> Deepening cell at (32, 17) to k=10
+         -> Deepening cell at (32, 17) to k=9
+         -> Deepening cell at (32, 17) to k=8
+         -> Deepening cell at (32, 17) to k=7
+         -> Deepening cell at (32, 17) to k=6
+         -> Deepening cell at (32, 17) to k=5
+         -> Deepening cell at (32, 17) to k=4
+         -> Deepening cell at (32, 16) to k=14
+         -> Deepening cell at (32, 16) to k=13
+         -> Deepening cell at (32, 16) to k=12
+         -> Deepening cell at (32, 16) to k=11
+         -> Deepening cell at (32, 16) to k=10
+         -> Deepening cell at (32, 16) to k=9
+         -> Deepening cell at (32, 16) to k=8
+         -> Deepening cell at (32, 16) to k=7
+         -> Deepening cell at (32, 16) to k=6
+         -> Deepening cell at (32, 16) to k=5
+         -> Deepening cell at (32, 16) to k=4
+         -> Deepening cell at (32, 15) to k=14
+         -> Deepening cell at (32, 15) to k=13
+         -> Deepening cell at (32, 15) to k=12
+         -> Deepening cell at (32, 15) to k=11
+         -> Deepening cell at (32, 15) to k=10
+         -> Deepening cell at (32, 15) to k=9
+         -> Deepening cell at (32, 15) to k=8
+         -> Deepening cell at (32, 15) to k=7
+         -> Deepening cell at (32, 15) to k=6
+         -> Deepening cell at (32, 15) to k=5
+         -> Deepening cell at (32, 15) to k=4
+         -> Deepening cell at (32, 14) to k=14
+         -> Deepening cell at (32, 14) to k=13
+         -> Deepening cell at (32, 14) to k=12
+         -> Deepening cell at (32, 14) to k=11
+         -> Deepening cell at (32, 14) to k=10
+         -> Deepening cell at (32, 14) to k=9
+         -> Deepening cell at (32, 14) to k=8
+         -> Deepening cell at (32, 14) to k=7
+         -> Deepening cell at (32, 14) to k=6
+         -> Deepening cell at (32, 14) to k=5
+         -> Deepening cell at (32, 14) to k=4
+         -> Deepening cell at (33, 14) to k=11
+         -> Deepening cell at (33, 14) to k=10
+         -> Deepening cell at (33, 14) to k=9
+         -> Deepening cell at (33, 14) to k=8
+         -> Deepening cell at (33, 14) to k=7
+         -> Deepening cell at (33, 14) to k=6
+         -> Deepening cell at (33, 14) to k=5
+         -> Deepening cell at (33, 14) to k=4
+         -> Deepening cell at (33, 14) to k=3
+         -> Deepening cell at (33, 15) to k=6
+         -> Deepening cell at (33, 15) to k=5
+         -> Deepening cell at (33, 15) to k=4
+         -> Deepening cell at (33, 15) to k=3
+         -> Deepening cell at (33, 15) to k=2
+         -> Shallowing cell at (33, 15) to k=3
+         -> Deepening cell at (33, 16) to k=3
+         -> Deepening cell at (33, 16) to k=2
+         -> Shallowing cell at (33, 16) to k=3
+         -> Deepening cell at (25, 12) to k=9
+         -> Deepening cell at (5, 14) to k=3
+         -> Deepening cell at (6, 16) to k=3
+         -> Deepening cell at (7, 16) to k=3
+         -> Deepening cell at (8, 16) to k=7
+         -> Deepening cell at (8, 16) to k=6
+         -> Deepening cell at (8, 16) to k=5
+         -> Deepening cell at (8, 16) to k=4
+         -> Deepening cell at (7, 17) to k=6
+         -> Deepening cell at (7, 17) to k=5
+         -> Deepening cell at (7, 17) to k=4
+         -> Deepening cell at (7, 17) to k=3
+         -> Shallowing cell at (7, 17) to k=4
+         -> Deepening cell at (7, 18) to k=6
+         -> Deepening cell at (7, 18) to k=5
+         -> Deepening cell at (7, 19) to k=6
+         -> Shallowing cell at (7, 20) to k=8
+         -> Shallowing cell at (7, 21) to k=8
+         -> Deepening cell at (7, 22) to k=6
+         -> Shallowing cell at (7, 22) to k=7
+         -> Deepening cell at (7, 23) to k=6
+         -> Deepening cell at (7, 24) to k=6
+         -> Deepening cell at (7, 24) to k=5
+         -> Deepening cell at (7, 25) to k=6
+         -> Deepening cell at (7, 25) to k=5
+         -> Deepening cell at (7, 25) to k=4
+         -> Deepening cell at (7, 25) to k=3
+         -> Deepening cell at (7, 25) to k=2
+         -> Shallowing cell at (7, 25) to k=3
+         -> Shallowing cell at (7, 25) to k=4
+         -> Deepening cell at (7, 26) to k=3
+         -> Deepening cell at (8, 26) to k=5
+         -> Deepening cell at (8, 26) to k=4
+         -> Deepening cell at (8, 25) to k=7
+         -> Deepening cell at (8, 25) to k=6
+         -> Shallowing cell at (8, 25) to k=7
+         -> Deepening cell at (8, 25) to k=6
+         -> Deepening cell at (8, 25) to k=5
+         -> Deepening cell at (8, 25) to k=4
+         -> Shallowing cell at (8, 25) to k=5
+         -> Deepening cell at (8, 24) to k=7
+         -> Deepening cell at (8, 24) to k=6
+         -> Deepening cell at (8, 24) to k=5
+         -> Shallowing cell at (8, 24) to k=6
+         -> Deepening cell at (8, 23) to k=6
+         -> Deepening cell at (8, 23) to k=5
+         -> Shallowing cell at (8, 23) to k=6
+         -> Shallowing cell at (8, 23) to k=7
+         -> Deepening cell at (8, 22) to k=6
+         -> Shallowing cell at (8, 22) to k=7
+         -> Deepening cell at (8, 22) to k=6
+         -> Shallowing cell at (8, 22) to k=7
+         -> Shallowing cell at (8, 22) to k=8
+         -> Deepening cell at (8, 21) to k=6
+         -> Deepening cell at (8, 21) to k=5
+         -> Shallowing cell at (8, 21) to k=6
+         -> Shallowing cell at (8, 21) to k=7
+         -> Deepening cell at (8, 20) to k=6
+         -> Deepening cell at (8, 19) to k=7
+         -> Deepening cell at (8, 19) to k=6
+         -> Deepening cell at (8, 19) to k=5
+         -> Shallowing cell at (8, 21) to k=8
+         -> Shallowing cell at (8, 20) to k=7
+         -> Shallowing cell at (8, 20) to k=8
+         -> Deepening cell at (8, 19) to k=4
+         -> Shallowing cell at (8, 19) to k=5
+         -> Deepening cell at (8, 19) to k=4
+         -> Deepening cell at (8, 19) to k=3
+         -> Deepening cell at (8, 19) to k=2
+         -> Shallowing cell at (8, 19) to k=3
+         -> Shallowing cell at (8, 19) to k=4
+         -> Shallowing cell at (8, 19) to k=5
+         -> Shallowing cell at (8, 19) to k=6
+         -> Deepening cell at (8, 19) to k=5
+         -> Shallowing cell at (8, 19) to k=6
+         -> Shallowing cell at (8, 19) to k=7
+         -> Deepening cell at (8, 18) to k=7
+         -> Deepening cell at (8, 18) to k=6
+         -> Deepening cell at (8, 17) to k=7
+         -> Deepening cell at (8, 17) to k=6
+         -> Deepening cell at (8, 17) to k=5
+         -> Deepening cell at (8, 16) to k=3
+         -> Shallowing cell at (8, 16) to k=4
+         -> Shallowing cell at (7, 20) to k=9
+         -> Shallowing cell at (8, 20) to k=9
+         -> Shallowing cell at (7, 21) to k=9
+         -> Deepening cell at (7, 20) to k=8
+         -> Deepening cell at (13, 21) to k=4
+         -> Deepening cell at (13, 20) to k=4
+         -> Deepening cell at (13, 19) to k=5
+         -> Deepening cell at (12, 22) to k=5
+         -> Deepening cell at (12, 23) to k=5
+         -> Deepening cell at (12, 24) to k=3
+         -> Deepening cell at (11, 28) to k=4
+         -> Deepening cell at (11, 27) to k=4
+         -> Deepening cell at (11, 28) to k=3
+         -> Deepening cell at (11, 27) to k=3
+         -> Deepening cell at (10, 29) to k=3
+         -> Deepening cell at (34, 21) to k=14
+         -> Deepening cell at (34, 22) to k=14
+         -> Deepening cell at (34, 23) to k=14
+         -> Deepening cell at (34, 22) to k=13
+         -> Deepening cell at (34, 21) to k=13
+         -> Deepening cell at (34, 21) to k=12
+         -> Deepening cell at (35, 22) to k=12
+         -> Deepening cell at (35, 22) to k=11
+         -> Deepening cell at (35, 23) to k=14
+         -> Deepening cell at (35, 24) to k=14
+         -> Deepening cell at (35, 25) to k=14
+         -> Deepening cell at (35, 27) to k=14
+         -> Deepening cell at (35, 28) to k=14
+         -> Deepening cell at (35, 28) to k=13
+         -> Deepening cell at (33, 27) to k=14
+         -> Deepening cell at (33, 27) to k=13
+         -> Deepening cell at (33, 26) to k=14
+         -> Deepening cell at (33, 25) to k=14
+         -> Deepening cell at (33, 25) to k=13
+         -> Deepening cell at (29, 28) to k=12
+         -> Deepening cell at (29, 29) to k=12
+         -> Deepening cell at (29, 29) to k=11
+         -> Deepening cell at (29, 29) to k=10
+         -> Deepening cell at (30, 9) to k=14
+         -> Deepening cell at (30, 9) to k=13
+         -> Deepening cell at (30, 9) to k=12
+         -> Deepening cell at (30, 9) to k=11
+         -> Deepening cell at (30, 9) to k=10
+         -> Deepening cell at (30, 9) to k=9
+         -> Deepening cell at (31, 9) to k=14
+         -> Deepening cell at (31, 9) to k=13
+         -> Deepening cell at (31, 9) to k=12
+         -> Deepening cell at (31, 9) to k=11
+         -> Deepening cell at (31, 9) to k=10
+         -> Deepening cell at (31, 9) to k=9
+         -> Deepening cell at (32, 9) to k=14
+         -> Deepening cell at (32, 9) to k=13
+         -> Deepening cell at (32, 9) to k=12
+         -> Deepening cell at (32, 9) to k=11
+         -> Deepening cell at (32, 9) to k=10
+         -> Deepening cell at (32, 9) to k=9
+         -> Deepening cell at (32, 8) to k=4
+         -> Deepening cell at (29, 8) to k=7
+         -> Deepening cell at (29, 8) to k=6
+         -> Deepening cell at (29, 8) to k=5
+         -> Deepening cell at (29, 8) to k=4
+         -> Deepening cell at (28, 8) to k=7
+         -> Deepening cell at (28, 8) to k=6
+         -> Deepening cell at (28, 8) to k=5
+         -> Deepening cell at (28, 8) to k=4
+         -> Deepening cell at (28, 7) to k=6
+         -> Deepening cell at (27, 7) to k=3
+         -> Deepening cell at (28, 7) to k=5
+         -> Deepening cell at (28, 7) to k=4
+         -> Deepening cell at (28, 7) to k=3
+         -> Deepening cell at (27, 8) to k=3
+         -> Deepening cell at (26, 10) to k=5
+         -> Deepening cell at (26, 10) to k=4
+         -> Deepening cell at (25, 12) to k=8
+         -> Deepening cell at (25, 12) to k=7
+         -> Deepening cell at (25, 12) to k=6
+         -> Deepening cell at (25, 12) to k=5
+         -> Deepening cell at (25, 13) to k=9
+         -> Deepening cell at (25, 13) to k=8
+         -> Deepening cell at (25, 13) to k=7
+         -> Deepening cell at (26, 13) to k=12
+         -> Deepening cell at (33, 25) to k=12
+         -> Deepening cell at (33, 25) to k=11
+         -> Deepening cell at (33, 26) to k=13
+         -> Deepening cell at (33, 27) to k=12
+         -> Deepening cell at (33, 27) to k=11
+         -> Deepening cell at (34, 23) to k=13
+         -> Deepening cell at (34, 22) to k=12
+         -> Deepening cell at (34, 21) to k=11
+         -> Deepening cell at (12, 16) to k=12
+         -> Deepening cell at (12, 16) to k=11
+         -> Deepening cell at (12, 15) to k=12
+         -> Deepening cell at (17, 3) to k=14
+         -> Deepening cell at (17, 3) to k=13
+         -> Deepening cell at (17, 3) to k=12
+         -> Deepening cell at (17, 3) to k=11
+         -> Deepening cell at (19, 2) to k=14
+         -> Deepening cell at (18, 2) to k=14
+         -> Deepening cell at (19, 2) to k=13
+       - Out of grid range
+       * Mask alteration complete
+       - User-editing complete.
+>  13. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  14. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+       * found 5 land masses
+       * found 6 land masses
+       * found 7 land masses
+       * found 8 land masses
+>  15. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * updated find: 3 islands
+       * updated find: 4 islands
+       * updated find: 5 islands
+       * updated find: 6 islands
+       * updated find: N pole island (currently uncounted)
+       * updated find: 7 islands
+       * total # true islands = 7
+       * Borders alteration procedure :
+         (1) left button to increase border #
+         (2) right button to decrease border # (0 == no border)
+         (3) middle button, or clickoutside the grid, to finish
+         [exit (middle button) if unsure WTF]
+       - Out of grid range
+       * Mask alteration complete
+>  16. GENERATING .paths FILE ...
+       * Creating raw path #1 ...
+       * Creating raw path #2 ...
+       * Creating raw path #3 ...
+       * Creating raw path #4 ...
+       * Creating raw path #5 ...
+       * Creating raw path #6 ...
+       * Creating raw path #7 ...
+       * Creating raw path #8 ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (3,22)
+         -> SE corner :: Add additional path entry @ (1,19)
+       * Building path #3 ...
+         -> NE corner :: Skip path entry @ (7,24)
+         -> SE corner :: Add additional path entry @ (4,15)
+       * Building path #4 ...
+         -> NE corner :: Skip path entry @ (31,19)
+         -> SE corner :: Add additional path entry @ (31,14)
+         -> NE corner :: Skip path entry @ (34,14)
+         -> SE corner :: Add additional path entry @ (30,9)
+         -> NE corner :: Skip path entry @ (30,11)
+         -> SE corner :: Add additional path entry @ (25,10)
+       * Building path #5 ...
+         -> NE corner :: Skip path entry @ (30,28)
+         -> SE corner :: Add additional path entry @ (28,25)
+       * Building path #6 ...
+         -> NE corner :: Skip path entry @ (35,28)
+         -> SE corner :: Add additional path entry @ (35,27)
+         -> NE corner :: Skip path entry @ (36,27)
+         -> SE corner :: Add additional path entry @ (33,23)
+       * Building path #7 ...
+         -> NE corner :: Skip path entry @ (3,26)
+         -> SE corner :: Add additional path entry @ (1,23)
+       * Building path #8 ...
+       - .paths file saved
+>  17. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  18. GENERATING SEDIMENT TOPO ...
+       - Converted k1 file data (nothing to re-grid).
+       - .depth.dat saved
+       - template file .sedcoremask.dat saved
+       - template file .reefmask.dat saved
+>  19. SWITCH GRIDS ...
+         (Nothing to re-read.)
+>  19. CREATING WIND PRODUCTS ...
+       - Regridding wind stress (x) to GOLDSTEIN u-grid
+       - Regridding wind stress (y) to GOLDSTEIN u-grid
+       - Regridding wind stress (x) to GOLDSTEIN v-grid
+       - Regridding wind stress (y) to GOLDSTEIN v-grid
+       - Regridding wind velocity (x) to GOLDSTEIN c-grid
+       - Regridding wind velocity (y) to GOLDSTEIN c-grid
+       - Regridding wind speed to GOLDSTEIN c-grid
+       - Written tau u (u point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen_initial/OUTPUT/440bug__/440bug__.taux_u.dat
+       - Written tau u (v point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen_initial/OUTPUT/440bug__/440bug__.taux_v.dat
+       - Written tau v (u point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen_initial/OUTPUT/440bug__/440bug__.tauy_u.dat
+       - Written tau v (v point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen_initial/OUTPUT/440bug__/440bug__.tauy_v.dat
+       - Written u wind speed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen_initial/OUTPUT/440bug__/440bug__.wvelx.dat
+       - Written v wind speed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen_initial/OUTPUT/440bug__/440bug__.wvely.dat
+       - Written BIOGEM windspeed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen_initial/OUTPUT/440bug__/440bug__.windspeed_uvma.dat
+       - Re-grided GCM wind products.
+>  20. LOADING ALBEDO DATA ...
+       - Read GCM albedo data.
+>  21. CREATING ALBEDO DATA ...
+       - Re-gridded GCM albedo data.
+       - 2D albedo file saved
+       - Generated zonal mean albedo profile.
+       - .albd.dat file saved
+>  22. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

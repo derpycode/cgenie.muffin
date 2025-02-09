@@ -57,8 +57,6 @@ Also, frequent time-slice saving was necessary in order to automatically identif
 The '# --- DATA SAVING ---' section used in the experiments in the paper is actually:
 
 bg_par_data_save_level=7
-bg_ctrl_debug_lvl0=.true.
-ma_debug_loop=1
 # reduce output
 bg_ctrl_data_save_2d=.true.
 bg_ctrl_data_save_3d=.false.
@@ -69,8 +67,6 @@ bg_par_infile_sig_name='save_timeseries_EVERY000100.dat'
 However, a more 'normal' output, under '# --- DATA SAVING ---', is given in the user-config files provided here:
 
 bg_par_data_save_level=15
-bg_ctrl_debug_lvl0=.true.
-ma_debug_loop=1
 
 The salinity forcing, to contorl the AMOC strength, 
 is applied by means of a 2D forcing that is generic across all the reconstructions:

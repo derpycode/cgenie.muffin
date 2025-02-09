@@ -35,7 +35,6 @@ CONTAINS
        close(unit=in)
     end if
     ! set and report namelist data
-    par_carbconstset_name = trim(par_carbconstset_name)//'/'
     par_gem_indir_name = trim(par_gem_indir_name)//'/'
 if (ctrl_debug_init > 0) then
     ! --- TRACER SELECTION  ------------------------------------------------------------------------------------------------------ !

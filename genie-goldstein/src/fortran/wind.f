@@ -16,7 +16,7 @@ c calculate constant wind stress part of forcing
 c noting that tau not currently defined outside domain
 
       do 50 i=1,imax
-         do 50 j=0,jmax
+         do 51 j=0,jmax
 
             ip1=mod(i,imax) + 1
             k = i + j*n
@@ -32,6 +32,7 @@ c noting that tau not currently defined outside domain
             endif
 
             gbold(k) = gb(k)
-   50 continue
+ 51      continue
+ 50   continue
 
       end

@@ -69,12 +69,16 @@ subroutine rokgem (dum_dts,dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxr
      ! Gibbs et al (1999) 2D lithology-dependent weathering
   case ('GKWM')
      CALL sub_GKWM(dum_runoff,lithology,calcium_flux)
-     CALL sum_calcium_flux_CaSi(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si)
+     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
+          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
+          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
      CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxrok,dum_sfxatm1)
      ! Amiotte-Suchet et al (2003) 2D lithology-dependent weathering
   case ('GEM_CO2')
      CALL sub_GEM_CO2(dum_runoff,lithology,calcium_flux)
-     CALL sum_calcium_flux_CaSi(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si)
+     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
+          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
+          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
      CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxrok,dum_sfxatm1)
   end SELECT
 
@@ -109,7 +113,6 @@ SUBROUTINE rest_rokgem()
   !call check_iostat(ios,__LINE__,__FILE__)
   WRITE(20,fmt='(i6)') ncout2d_ntrec_rg                             
   close(20)
-
 
   !        Conditionals commented out because no calibration is done for stage 1 spin-up 
   ! and files are needed to be written for stage 2.

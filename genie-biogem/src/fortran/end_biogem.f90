@@ -1,10 +1,17 @@
 
 ! ******************************************************************************************************************************** !
 ! END BioGeM
-SUBROUTINE end_biogem()
+SUBROUTINE end_biogem( &
+     & dum_SLT         &
+     & )
   USE biogem_lib
   USE biogem_data
   USE genie_util, ONLY: check_iostat
+  ! ---------------------------------------------------------- !
+  ! DEFINE DUMMY ARGUMENTS
+  ! ---------------------------------------------------------- !
+  REAL,INTENT(out)::dum_SLT
+  ! ---------------------------------------------------------- !
 
   print*,'======================================================='
   print*,' >>> Initialising BIOGEM module shutdown ...'
@@ -81,14 +88,20 @@ SUBROUTINE end_biogem()
   DEALLOCATE(diag_redox,STAT=alloc_error)
   DEALLOCATE(int_diag_redox_timeslice,STAT=alloc_error)
   DEALLOCATE(int_diag_redox_sig,STAT=alloc_error)
+  DEALLOCATE(conv_lslo2idP,STAT=alloc_error)
+  DEALLOCATE(conv_lslo2idD,STAT=alloc_error)
   !- --------------------------------------------------------- ! misc
   DEALLOCATE(orb_pts,STAT=alloc_error)
   DEALLOCATE(orb_pts_loc,STAT=alloc_error)
   DEALLOCATE(orb_pts_var,STAT=alloc_error)
   DEALLOCATE(orb_pts_time,STAT=alloc_error)
-  ! -------------------------------------------------------- !
+  ! ---------------------------------------------------------- !
+  ! SET OUTPUT VARIABLES
+  ! ---------------------------------------------------------- !
+  dum_SLT = int_SLT
+  ! ---------------------------------------------------------- !
   ! END
-  ! -------------------------------------------------------- !
+  ! ---------------------------------------------------------- !
   print*,' <<< Shutdown complete'
   print*,'======================================================='
 END SUBROUTINE end_biogem

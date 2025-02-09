@@ -39,9 +39,9 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_lonm,loc_id_latm,loc_id_lon_e,loc_id_lat_e
     integer::loc_id_zt,loc_id_zt_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
-    integer,dimension(1:4)::loc_it_3
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
+    integer,dimension(1:3)::loc_it_3
     character(127)::loc_title,loc_timunit
     character(7)::loc_string_year
     real::loc_c0,loc_c1
@@ -72,10 +72,10 @@ CONTAINS
     loc_title = 'SEDGEM restart @ year '//loc_string_year
     call sub_putglobal(loc_iou,dum_name,loc_title,string_ncrunid,loc_timunit)
     ! -------------------------------------------------------- ! define dimensions
-    call sub_defdim ('lon',loc_iou,n_i,loc_id_lonm)
-    call sub_defdim ('lat',loc_iou,n_j,loc_id_latm)
-    call sub_defdim ('lon_edges',loc_iou,n_i+1,loc_id_lon_e)
-    call sub_defdim ('lat_edges',loc_iou,n_j+1,loc_id_lat_e)
+    call sub_defdim('lon',loc_iou,n_i,loc_id_lonm)
+    call sub_defdim('lat',loc_iou,n_j,loc_id_latm)
+    call sub_defdim('lon_edges',loc_iou,n_i+1,loc_id_lon_e)
+    call sub_defdim('lat_edges',loc_iou,n_j+1,loc_id_lat_e)
     call sub_defdim('zt',loc_iou,n_sed_tot,loc_id_zt)
     call sub_defdim('zt_edges',loc_iou,n_sed_tot+1,loc_id_zt_e)
     ! -------------------------------------------------------- ! define 1d data (t)
@@ -222,8 +222,8 @@ CONTAINS
     integer::loc_ntrec,loc_iou
     integer::loc_id_latm,loc_id_lat_e
     integer::loc_id_zt,loc_id_zt_e
-    integer,dimension(1:2)::loc_it_1
-    integer,dimension(1:3)::loc_it_2
+    integer,dimension(1:1)::loc_it_1
+    integer,dimension(1:2)::loc_it_2
     character(127)::loc_title,loc_timunit
     character(127)::loc_string,loc_string_longname
     character(7)::loc_string_year
@@ -406,6 +406,7 @@ CONTAINS
        ! load sedcore stack top information (this is the stack top state at the time of restart (run beginning)
        ! and hence allows the layers in the sedcore restart that equate to actively used layers implicitly included in the
        ! current stack or sedcore store, to be omitted) (did anypony get all that?)
+       ! (i.e. DO NOT double count restart layers)
        call sub_getvar1d_I(loc_ncid,'grid_nrst',loc_nv_sedcore_rst,loc_m_in(:))
        loc_nv_sed_stack_top_rst(:) = loc_m_in(:)
        ! -------------------------------------------------------- ! load and apply sediment tracers that are selected
@@ -499,11 +500,17 @@ CONTAINS
     ! -------------------------------------------------------- !
     IF (ctrl_misc_debug4) print*,'*** CONSTRUCT SEDCORE ARRAY FOR WRITING ***'
     ! -------------------------------------------------------- ! set number of layers required
+    ! NOTE: loc_n_sedcore_store_tot == maximum number of layers used in the sedcore store
+    !       loc_n_sed_stack_tot     == maximum number of layers used in the (i,j) sed stack (for sedcore locations)
     ! NOTE: 1 (additional) layer is required for the sedtop
     ! NOTE: include sedcore restart, BUT, remove maximum # discarded layers
+    !       (loc_n_sedcore_tot_rst minus minval of the to-be-discarded number of sed restart layers,
+    !        gives the maximum number of sedcore restart layers NOT to be discarded)
+    ! NOTE: loc_nv_sed_stack_top_rst == sed restart layers that will already have been counted in a sedcore array 
+    !       loc_n_sedcore_tot_rst    == dimension of sedcore restart array
     IF (ctrl_continuing) then
        loc_n_sedcore_tot = loc_n_sedcore_store_tot + loc_n_sed_stack_tot + 1 + &
-            & loc_n_sedcore_tot_rst - maxval(loc_nv_sed_stack_top_rst(:))
+            & loc_n_sedcore_tot_rst - minval(loc_nv_sed_stack_top_rst(:))
     else
        loc_n_sedcore_tot = loc_n_sedcore_store_tot + loc_n_sed_stack_tot + 1
     end if
@@ -1347,7 +1354,7 @@ CONTAINS
           DO j=1,n_j
              SELECT CASE (sed_type(is))
              CASE (par_sed_type_bio,par_sed_type_abio, &
-               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det)
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det,par_sed_type_scavenged)
                 loc_ij(i,j) = sed_fsed(is,i,j)/dum_dtyr
                 loc_unitsname = 'mol cm-2 yr-1'
              case (n_itype_min:n_itype_max)
@@ -1364,7 +1371,7 @@ CONTAINS
        end do
        SELECT CASE (sed_type(is))
           CASE (par_sed_type_bio,par_sed_type_abio, &
-               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det, &
+               & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det,par_sed_type_scavenged, &
                & n_itype_min:n_itype_max, &
                & par_sed_type_frac)
             call sub_adddef_netcdf(ntrec_siou,3,'fsed_'//trim(string_sed(is)), &
@@ -1451,12 +1458,12 @@ CONTAINS
        CASE (par_sed_type_bio,par_sed_type_abio, &
                & par_sed_type_POM,par_sed_type_CaCO3,par_sed_type_opal,par_sed_type_det)
           call sub_adddef_netcdf(ntrec_siou,3,'fpres_'//trim(string_sed(is)), &
-               & 'sediment burial (preservation) flux - '//trim(string_sed(is)), &
+               & 'sediment burial (% preservation) - '//trim(string_sed(is)), &
                & trim(loc_unitsname),sed_mima(is2l(is),1),sed_mima(is2l(is),2))
           call sub_putvar2d('fpres_'//trim(string_sed(is)),ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
        end SELECT
     END DO
-    ! save interface flux data - dust (log10)
+    ! save interface flux data -- detrital (log10)
     IF (sed_select(is_det)) THEN
        loc_ij(:,:) = const_real_zero
        loc_unitsname = 'mol cm-2 yr-1'
@@ -1465,14 +1472,28 @@ CONTAINS
           DO j=1,n_j
              IF (sed_fsed(is_det,i,j) > 0.0) THEN
                 loc_ij(i,j) = log10(sed_fsed(is_det,i,j)/dum_dtyr)
-             else
-                loc_ij(i,j) = const_real_null
              end if
           end do
        end do
-       call sub_adddef_netcdf(ntrec_siou,3,'fsed_'//trim(string_sed(is_det))//'_log10', &
-            & 'sediment rain flux - detrital material (log10)',trim(loc_unitsname),loc_c0,loc_c0)
-       call sub_putvar2d('fsed_'//trim(string_sed(is_det))//'_log10',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+       call sub_adddef_netcdf(ntrec_siou,3,'misc_fdet_log10', &
+            & 'detrital material sediment rain flux (log10) ',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('misc_fdet_log10',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+    END IF
+    ! save interface flux data -- detrital (g cm-2 kyr-1)
+    IF (sed_select(is_det)) THEN
+       loc_ij(:,:) = const_real_zero
+       loc_unitsname = 'g cm-2 kyr-1'
+       ! g cm-2 kyr-1 data
+       DO i=1,n_i
+          DO j=1,n_j
+             IF (sed_fsed(is_det,i,j) > 0.0) THEN
+                loc_ij(i,j) = conv_det_mol_g*sed_fsed(is_det,i,j)/conv_yr_kyr
+             end if
+          end do
+       end do
+       call sub_adddef_netcdf(ntrec_siou,3,'misc_fdet_gpercm2perkyr', &
+            & 'detrital material sediment rain flux ',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('misc_fdet_gpercm2perkyr',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
     END IF
     ! CaCO3:POC 'rain ratio'
     IF (sed_select(is_CaCO3) .AND. sed_select(is_POC)) THEN
@@ -1488,6 +1509,43 @@ CONTAINS
        call sub_adddef_netcdf(ntrec_siou,3,'fsed_CaCO3toPOC', &
             & 'sediment rain flux - CaCO3 to POC rain ratio',trim(loc_unitsname),loc_c0,loc_c0)
        call sub_putvar2d('fsed_CaCO3toPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+    end if
+    ! POP:POC Redfield rain ratio data
+    IF (sed_select(is_POC) .AND. sed_select(is_POP)) THEN
+       loc_unitsname = 'n/a'
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             if (sed_fsed(is_POP,i,j) > const_real_nullsmall) then
+                loc_ij(i,j) = sed_fsed(is_POC,i,j)/sed_fsed(is_POP,i,j)
+             end if
+          END DO
+       END DO
+       call sub_adddef_netcdf(ntrec_siou,3,'fsed_POPtoPOC', &
+            & 'sediment rain flux - POP to POC (C/P) Redfield ratio',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('fsed_POPtoPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             if (loc_sed_burial(is_POP,i,j) > const_real_nullsmall) then
+                loc_ij(i,j) = loc_sed_burial(is_POC,i,j)/loc_sed_burial(is_POP,i,j)
+             end if
+          END DO
+       END DO
+       call sub_adddef_netcdf(ntrec_siou,3,'fburial_POPtoPOC', &
+            & 'sediment burial flux - POP to POC (C/P) Redfield ratio',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('fburial_POPtoPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
+       loc_ij(:,:) = const_real_zero
+       DO i=1,n_i
+          DO j=1,n_j
+             if (sed_fdis(is_POP,i,j) > const_real_nullsmall) then
+                loc_ij(i,j) = sed_fdis(is_POC,i,j)/sed_fdis(is_POP,i,j)
+             end if
+          END DO
+       END DO
+       call sub_adddef_netcdf(ntrec_siou,3,'fdis_POPtoPOC', &
+            & 'sediment dissolution flux - POP to POC (C/P) Redfield ratio',trim(loc_unitsname),loc_c0,loc_c0)
+       call sub_putvar2d('fdis_POPtoPOC',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
     end if
     ! diagnostics
     IF (sed_select(is_POC) .AND. par_sed_diagen_Corgopt == 'huelse2016') THEN
@@ -1582,6 +1640,11 @@ CONTAINS
     call sub_putvar2d('muds_sed_'//trim(string_sed(is)),ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask_muds)
 
     ! MISCELLANEOUS FIELDS
+    ! ocean depth (rather than topography)
+    loc_unitsname = 'm'
+    loc_ij(:,:) = phys_sed(ips_mask_sed,:,:)*phys_sed(ips_D,:,:)
+    call sub_adddef_netcdf(ntrec_siou,3,'grid_depth','seafloor depth',trim(loc_unitsname),loc_c0,loc_c0)
+    call sub_putvar2d('grid_depth',ntrec_siou,n_i,n_j,ntrec_sout,loc_ij(:,:),loc_mask)
     ! 
     loc_unitsname = 'cm3 cm-3'
     loc_ij(:,:) = phys_sed(ips_poros,:,:)

@@ -1,0 +1,24 @@
+
+  00 01 02   03 04 05 06  07  08
+  \/ \/ \/   \/ \/ \/ \/  \/  \/
+
+-START-OF-DATA-
+ 03  f  0.1  t  t  F   2  01  01  '[carbon dioxide (CO2) partial pressure (atm)]'
+ 04  f  0.1  t  t  F   2  01  01  '[d13C CO2 (o/oo)]'
+-END-OF-DATA-
+
+  /\ /\ /\   /\ /\ /\ /\  /\  /\
+  00 01 02   03 04 05 06  07  08
+
+DATA FORMAT AND ORDER:
+
+COLUMN #00: TRACER NUMBER
+COLUMN #01: include restoring forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #02: time constant of restoring forcing (years) [DATA FORMAT: real]
+COLUMN #03: include flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #04: scale flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #05: force ocean surface in equilibrium with atmosphere? (needs ocean restoring forcing set) [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #06: make forcing uniform over this dimension (2 = 2D, 0 = point, ELSE spatially explicit forcing) [DATA FORMAT: interger]
+COLUMN #07: i grid location of point forcing [DATA FORMAT: interger]
+COLUMN #08: j grid location of point forcing [DATA FORMAT: interger]
+COLUMN END: TRACER DESCRIPTION

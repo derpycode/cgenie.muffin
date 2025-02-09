@@ -26,8 +26,8 @@ SUBROUTINE initialise_ecogem(    &
   real,intent(inout),dimension(n_ocn ,n_i,n_j,n_k)::dum_egbg_sfcocn   ! ecology-interface ocean tracer composition; ocn grid
   real,intent(in)                                 ::dum_dsc           !
   integer,DIMENSION(n_i,n_j),INTENT(in)::dum_k1                  !
-  REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 ! 
-  REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv    ! 
+  REAL,DIMENSION(n_k),INTENT(in)::dum_dz,dum_dza                 !
+  REAL,DIMENSION(0:n_j),INTENT(in)::dum_sv    !
   integer :: stat
   CHARACTER(len=64)::site_string
   ! ---------------------------------------------------------- !
@@ -39,7 +39,7 @@ SUBROUTINE initialise_ecogem(    &
   print*,' >>> Initialising ECOGEM ocean ecology module ...'
 
   ! *** load goin information ***
-  call sub_load_goin_ecogem()  
+  call sub_load_goin_ecogem()
   ! ---------------------------------------------------------- ! set time
   ! NOTE: modify 'par_misc_t_start' according to the run-time accumulated in any requested restart,
   !       so that the time that EcoGeM starts with is the same as the requested start time
@@ -67,26 +67,24 @@ SUBROUTINE initialise_ecogem(    &
   CALL sub_init_phys_ocn()
 
   ! check required nutrients are carried by BIOGEM!
-  call check_egbg_compatible() 
+  call check_egbg_compatible()
 
   ! get specifications of plankton populations from input file
-  CALL sub_init_populations()    
-  ! get names and locations of time-series sites for output
-  CALL sub_init_timeseries()
-
+  CALL sub_init_populations()
+  
   if (ctrl_debug_eco_init) then
-     write(*,*),' ---------------------------------------------------'
-     write(*,*),'- Plankton population specifications from input file'
+     write(*,*) ' ---------------------------------------------------'
+     write(*,*) '- Plankton population specifications from input file'
      print '(a32,i5)','- number of plankton:          ',npmax
      print '(a37)','   PFT                diameter      n'
      do jp=1,npmax
-        write(*,'(a3,a16,a4,F7.1,a2,i5)'),'     ',pft(jp),"  ",diameter(jp),"  ",random_n(jp)
+        write(*,'(a3,a16,a4,F7.1,a2,i5)') '     ',pft(jp),"  ",diameter(jp),"  ",random_n(jp)
      enddo
-     write(*,*),' ---------------------------------------------------'
+     write(*,*) ' ---------------------------------------------------'
   endif
-  ! calculate other indices dependent on goin information 
+  ! calculate other indices dependent on goin information
   !order and indices for nutrient elements (unused elements to zero)
-  iDIC  = 1 ! Mandatory                                                  ! index for dissolved inorganic carbon 
+  iDIC  = 1 ! Mandatory                                                  ! index for dissolved inorganic carbon
   iNO3  = (    iDIC                           +1) * MERGE(1,0,useNO3)    ! index for nitrate
   iNO2  = (MAX(iDIC,iNO3,iNO2)                +1) * MERGE(1,0,useNO2)    ! index for nitrite
   iNH4  = (MAX(iDIC,iNO3,iNO2)                +1) * MERGE(1,0,useNH4)    ! index for ammonium
@@ -137,12 +135,20 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(phys_limit(iomax+2,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+!BAW: zoolimit should be optional  ALLOCATE(zoo_limit(npmax,n_i,n_j,n_k),STAT=alloc_error)
+!BAW: zoolimit should be optional  call check_iostat(alloc_error,__LINE__,__FILE__)
   !ckc ISOTOPES
   ALLOCATE(nutiso(iimaxiso,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(plankiso(iomaxiso,npmax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(up_flux_iso(iomaxiso,npmax,n_i,n_j,n_k),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(export_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(AP_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    ! Auto flux per plankton type
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(HP_flux(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    ! Hetero flux per plankton type
   call check_iostat(alloc_error,__LINE__,__FILE__)
 
   ! ecogem time-slice arrays
@@ -154,6 +160,14 @@ SUBROUTINE initialise_ecogem(    &
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(int_nutrient_timeslice(iimax,n_i,n_j,n_k),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
+!BAW: zoolimit should be optional  ALLOCATE(int_zoogamma_timeslice(npmax,n_i,n_j,n_k),STAT=alloc_error)
+!BAW: zoolimit should be optional  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_export_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !export flux per plankton type    Fanny/Maria - Aug19
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_AP_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !autotrophic flux per plankton type
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(int_HP_timeslice(iomax,npmax,n_i,n_j,n_k),STAT=alloc_error)    !heterotrophic flux per plankton type
+  call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Time-series storage arrays
   if (n_tser.gt.0) then
      ALLOCATE(nutrient_tser(iimax,n_tser,48),STAT=alloc_error)
@@ -163,6 +177,12 @@ SUBROUTINE initialise_ecogem(    &
      ALLOCATE(uptake_tser(iomax,npmax,n_tser,48),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
      ALLOCATE(gamma_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(export_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(autotrophic_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
+     call check_iostat(alloc_error,__LINE__,__FILE__)
+     ALLOCATE(heterotrophic_tser(iomax+2,npmax,n_tser,48),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
      ALLOCATE(time_tser(48),STAT=alloc_error)
      call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -183,7 +203,7 @@ SUBROUTINE initialise_ecogem(    &
   eco_carb(ic_H,:,:,:)   = 1.0e-7   !
   eco_carbconst(:,:,:,:) = 0.0   !
   ! *** dimension parameter vectors (for npmax plankton) ***
-  ! Size 
+  ! Size
   ALLOCATE(volume(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(logvol(npmax),STAT=alloc_error)
@@ -194,6 +214,9 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(autotrophy(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(heterotrophy(npmax),STAT=alloc_error)
+  ALLOCATE(herbivory(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(carnivory(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(palatability(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
@@ -204,6 +227,20 @@ SUBROUTINE initialise_ecogem(    &
   ALLOCATE(calcify(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ALLOCATE(silicify(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(prey_refuge(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  !ALLOCATE(grazing_protect(npmax),STAT=alloc_error)
+  !call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(pp_opt_a_array(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(pp_sig_a_array(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(ns_array(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(mort_protect(npmax),STAT=alloc_error)
+  call check_iostat(alloc_error,__LINE__,__FILE__)
+  ALLOCATE(growthcost_factor(npmax),STAT=alloc_error)
   call check_iostat(alloc_error,__LINE__,__FILE__)
   ! Nutrient and nutrient quota parameters
   ALLOCATE(qmin(iomax,npmax),STAT=alloc_error)
@@ -292,22 +329,27 @@ SUBROUTINE initialise_ecogem(    &
   ! ---------------------------------------------------------- !
   open(301,File=TRIM(par_outdir_name)//"/Plankton_params.txt"       ,Status="Replace",Action="Write")
   open(302,File=TRIM(par_outdir_name)//"/Plankton_params_nohead.dat",Status="Replace",Action="Write")
-  open(303,File=TRIM(par_outdir_name)//"/Plankton_grazing.dat"      ,Status="Replace",Action="Write")
-
+!  open(303,File=TRIM(par_outdir_name)//"/Plankton_grazing.dat"      ,Status="Replace",Action="Write")
+  open(304,File=TRIM(par_outdir_name)//"/Ecogem_properties.dat"      ,Status="Replace",Action="Write")
   ! make wet mask for ocean cells
   wet_mask_ij(:,:) = MERGE(1,0,goldstein_k1.le.n_k)
   do k=1,n_k
      wet_mask_ijk(:,:,k) = MERGE(1,0,goldstein_k1.le.k)
   enddo
 
+  ! get explicit grazing parameters from input file
+  if(ctrl_grazing_explicit)then
+    CALL sub_init_explicit_grazing_params()
+  endif
+
   ! *** initialise plankton biomass array
   call sub_init_plankton()
-  
+
   ! JDW: allocate and load temperature forcing dataset
   if(ctrl_force_T)then
-  	allocate(T_input(n_i,n_j),STAT=alloc_error)
-	T_input(:,:)=0.0
-	call sub_init_load_forceT()
+        allocate(T_input(n_i,n_j),STAT=alloc_error)
+        T_input(:,:)=0.0
+        call sub_init_load_forceT()
   end if
 
   ! ---------------------------------------------------------- ! INITIALIZE netCDF OUTPUT
@@ -315,7 +357,7 @@ SUBROUTINE initialise_ecogem(    &
   string_ncout2d = TRIM(par_outdir_name)//'fields_ecogem_2d.nc'
   string_ncout3d = TRIM(par_outdir_name)//'fields_ecogem_3d.nc'
   string_nctsint = TRIM(par_outdir_name)//'timeseries_ecogem.nc'
-  string_nctsi   = TRIM(par_outdir_name)//'ts_ecogem_int.nc'  
+  string_nctsi   = TRIM(par_outdir_name)//'ts_ecogem_int.nc'
 
 
   ALLOCATE(ncout1d_iou(n_tser),STAT=alloc_error)
@@ -335,9 +377,10 @@ SUBROUTINE initialise_ecogem(    &
   call sub_init_netcdf(trim(string_ncout2d),loc_iou,2)
   ncout2d_iou = loc_iou
   ncout2d_ntrec = 0
-  call sub_init_netcdf(trim(string_ncout3d),loc_iou,3)
-  ncout3d_iou = loc_iou
-  ncout3d_ntrec = 0
+  ! NOTE: 3D data is not currently saved, so disable nc file creation
+  !call sub_init_netcdf(trim(string_ncout3d),loc_iou,3)
+  !ncout3d_iou = loc_iou
+  !ncout3d_ntrec = 0
   ! ---------------------------------------------------------- ! LOAD RE-START
   IF (ctrl_continuing) then
      IF (ctrl_debug_init > 0) print*,'LOAD RE-START'
@@ -353,4 +396,3 @@ SUBROUTINE initialise_ecogem(    &
 
 END SUBROUTINE initialise_ecogem
 ! ******************************************************************************************************************************** !
-

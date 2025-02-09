@@ -231,6 +231,9 @@ c JDA adding some variables relating to the forcing
       real co2lev,solar,vol,aero
       character header*40
 c     radiative forcing terms
+      real co2_term
+c ML  state dependent climate sensitivity
+      real co2_t1, co2_t2, co2_t3, co2_t4, co2_t5
       real ch4_term,n2o_term
       real ch4_func
 
@@ -805,6 +808,23 @@ c     calculate coefficients
             tv1 = b01 + rq*(b11 + b21*rq)
             tv2 = b02 + rq*(b12 + b22*rq)
             tv3 = b03 + rq*(b13 + b23*rq)
+c     aAlow for the CH4 concentration to drive CO2 radiative forcing instead of actual CO2
+c     (allowing varying CO2 radiative forcing while allowing CO2 to independently vary and respond to climate feedbacks)
+c     If so: the CH4 term must be set to zero (and associated N2O term))
+            if(opt_co2ch4radfor) then
+               co2(i,j) = ch4(i,j)
+               ch4(i,j) = ch40
+               n2o(i,j) = n2o0
+            endif
+c     calculate CO2 contribution
+c     MLI (16/09/20 & 17/09/24) State dependent climate sensitivity
+            if (opt_delf2x_cesm) then
+               co2_t1 = co2(i,j) * 1e6
+               co2_t2 = 0.0015223 * co2_t1 + 5.59383568
+               co2_term = co2_t2 * log(co2(i,j)/co20)
+            else
+               co2_term = delf2x*log(co2(i,j)/co20)
+            endif
 c     calculate CH4 and N2O contributions
 c     NOTE units are ppb for CH4 and N2O calculation
             ch4_term = 
@@ -825,16 +845,14 @@ c    OLR is a function of surface temp so should include lapse rate dependance (
                fxplw(i,j) = tv0 + talt*(tv1 
      1              + talt*(tv2 
      2              + talt*tv3))
-     3              - delf2x*log(co2(i,j)/co20)
-     4              - ch4_term - n2o_term
+     3              - co2_term - ch4_term - n2o_term
      5              + olr_adj*(meantemp-t_eqm)
      6              - olr_adj0
             else
                fxplw(i,j) = tv0 + atemp(i,j)*(tv1 
      1              + atemp(i,j)*(tv2 
      2              + atemp(i,j)*tv3))
-     3              - delf2x*log(co2(i,j)/co20)
-     4              - ch4_term - n2o_term
+     3              - co2_term - ch4_term - n2o_term
      5              + olr_adj*(meantemp-t_eqm)
      6              - olr_adj0
             endif
@@ -1410,7 +1428,6 @@ cmsw calculate new value of tqld(1,i,j)
        print*,'istep ',istep
        print*,' '
         
-                 
                  endif
 
               enddo
