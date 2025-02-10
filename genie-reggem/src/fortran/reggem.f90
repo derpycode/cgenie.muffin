@@ -66,20 +66,6 @@ subroutine reggem (dum_dts,dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxr
   case ('Global_avg')
      ! global average weathering
      CALL sub_glob_avg_weath(dum_dts,dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
-!!!     ! Gibbs et al (1999) 2D lithology-dependent weathering
-!!!  case ('GKWM')
-!!!     CALL sub_GKWM(dum_runoff,lithology,calcium_flux)
-!!!     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
-!!!          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
-!!!          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
-!!!     CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
-!!!     ! Amiotte-Suchet et al (2003) 2D lithology-dependent weathering
-!!!  case ('GEM_CO2')
-!!!     CALL sub_GEM_CO2(dum_runoff,lithology,calcium_flux)
-!!!     CALL sum_calcium_flux_CaSiOs(calcium_flux,total_calcium_flux_Ca,total_calcium_flux_Si, &
-!!!          & total_osmium_flux_Ca,total_187osmium_flux_Ca,total_188osmium_flux_Ca, &
-!!!          & total_osmium_flux_Si,total_187osmium_flux_Si,total_188osmium_flux_Si)
-!!!     CALL sub_2D_weath(dum_sfcatm1,dum_runoff,dum_photo,dum_respveg,dum_sfxreg,dum_sfxatm1)
   end SELECT
 
   ! if output then increment output counter
