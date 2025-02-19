@@ -99,8 +99,9 @@ MODULE sedgem_lib
   NAMELIST /ini_sedgem_nml/par_sed_diagen_fracC2Ppres_off,par_sed_diagen_fracC2Ppres_c0_O2
   LOGICAL::ctrl_sed_dunne2007_remin_POP                          ! Force return of PO4 to ocean in Dunne 2007 scheme
   NAMELIST /ini_sedgem_nml/ctrl_sed_dunne2007_remin_POP
-  LOGICAL::ctrl_sed_conv_sed_ocn_old                             ! Retain original (biological production) 'Redfield' remin
-  NAMELIST /ini_sedgem_nml/ctrl_sed_conv_sed_ocn_old
+  LOGICAL::ctrl_sed_conv_sedocn_redox                            ! Use redox-dependent remin transformation?
+  LOGICAL::ctrl_sed_conv_sedocn_bohlen2012                       ! Use Bohlen 2012 denitrification remin?
+  NAMELIST /ini_sedgem_nml/ctrl_sed_conv_sedocn_redox,ctrl_sed_conv_sedocn_bohlen2012
   REAL::par_sed_diagen_O2thresh                                  ! [O2] threshold for switching redox transformtion arrays
   REAL::par_sed_diagen_NO3thresh                                 ! [NO3] threshold for switching redox transformtion arrays
   REAL::par_sed_diagen_SO4thresh                                 ! [SO4] threshold for switching redox transformtion arrays

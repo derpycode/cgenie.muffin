@@ -337,6 +337,12 @@ ifeq ($(F77),gfortran)
   #       If the variable is never accessed concurrently, this warning can be ignored, and the variable could also be declared with the SAVE attribute. 
   #       [warning occurs in biogem.f90]
 ###  F90FLAGS += -frecursive
+ # -fmax-stack-var-size=n
+ # NOTE: This option specifies the size in bytes of the largest array that is put on the stack
+ #       The default value for n is 65535
+ #       2^16-1 = 65535 / 2^18-1 = 262143 / 2^20-1 = 1048575 / 2^22-1 = 4194303
+ #       2^24-1 = 16777215 or unlimited leads to core dump
+  FFLAGS += -fmax-stack-var-size=4194303
   ifeq ($(BUILD),SHIP)
     FFLAGS += -O2
     FFLAGS += -O3 

@@ -338,40 +338,15 @@ SUBROUTINE sedgem(          &
         ! NOTE: <dum_sfxsumsed> in units of (mol m-2)
         sed_fsed(:,i,j)         = conv_cm2_m2*dum_sfxsumsed(:,i,j)
         loc_sed_fsed_OLD(:,i,j) = conv_cm2_m2*loc_sfxsumsed_OLD(:,i,j)
-
-        
         ! set loc_conv_sed_ocn
-        ! NOTE: conv_sed_ocn was the original (fixed) conversion
-!!$        ! NOTE: this is a crude redox switch-over between different electron acceptors based on a simple threshold
-!!$        !       (i.e. unlike the more complex BIOGEM half-sat and inhinitition scheme)
-!!$        if (.NOT. ctrl_sed_conv_sed_ocn_old) then
-!!$           if (ocn_select(io_CH4) .AND. (dum_sfcsumocn(io_SO4,i,j) < par_sed_diagen_SO4thresh)) then
-!!$              loc_conv_sed_ocn = conv_sed_ocn_meth
-!!$           elseif ((ocn_select(io_SO4) .AND. ocn_select(io_NO3)) .AND. (dum_sfcsumocn(io_NO3,i,j) < par_sed_diagen_NO3thresh)) then
-!!$              loc_conv_sed_ocn = conv_sed_ocn_S
-!!$           elseif ((ocn_select(io_SO4) .AND. ocn_select(io_NO3)) .AND. (dum_sfcsumocn(io_O2,i,j) < par_sed_diagen_O2thresh)) then
-!!$              loc_conv_sed_ocn = conv_sed_ocn_N
-!!$           elseif (ocn_select(io_SO4) .AND. (dum_sfcsumocn(io_O2,i,j) < par_sed_diagen_O2thresh)) then
-!!$              loc_conv_sed_ocn = conv_sed_ocn_S
-!!$           elseif (ocn_select(io_NO3) .AND. (dum_sfcsumocn(io_O2,i,j) < par_sed_diagen_O2thresh)) then
-!!$              loc_conv_sed_ocn = conv_sed_ocn_N
-!!$           else
-!!$              loc_conv_sed_ocn = conv_sed_ocn_O
-!!$           end if
-!!$        else
-!!$           loc_conv_sed_ocn = conv_sed_ocn
-!!$        end if
+        ! NOTE: conv_sed_ocn=conv_sed_ocn_O was the original (fixed) conversion
+        if (.NOT. ctrl_sed_conv_sedocn_redox) then
+           loc_conv_sed_ocn(:,:) = dum_sfcsumconv(:,:,i,j)
+        else
+           ! !!! DEFAULT !!!
+           loc_conv_sed_ocn(:,:) = conv_sed_ocn(:,:)
+        end if
         IF (sed_mask(i,j)) THEN
-
-loc_conv_sed_ocn(:,:) = dum_sfcsumconv(:,:,i,j)
-           
-!!$           print*,' ---------------------------------------------- '
-!!$           print*,sum(conv_ls_lo_O),sum(conv_ls_lo_S)
-!!$print*,i,j,dum_sfcsumocn(io_O2,i,j)*1.0E6,sum(dum_sfcsumconv(:,:,i,j))
-
-
-
-           
            ! call sediment composition update
            ! NOTE: the values in both <sed_fsed> and <ocnsed_fnet> are updated by this routine
            if (sed_mask_reef(i,j)) then

@@ -76,18 +76,20 @@ CONTAINS
     real::loc_r_sed_por                                        ! thickness ratio due to porosity differences (stack / surface layer)
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
-    real::loc_fPOC,loc_fFe
+    real::loc_fPOC,loc_fFe,loc_fNO3,loc_fDIC
     real::loc_new_sed_Fe,loc_dis_sed_Fe                        ! 
     real::loc_sed_pres_fracC,loc_sed_pres_fracP  
     real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
+    real::loc_sed_remin_fracC                                  ! 
     real::loc_C2P_rain,loc_C2P_remin
     REAL,DIMENSION(n_sed)::loc_new_sed                         ! new (sedimenting) top layer material
     REAL,DIMENSION(n_sed)::loc_dis_sed                         ! remineralized top layer material
     REAL,DIMENSION(n_sed)::loc_exe_sed                         ! top layer material to be exchanged with stack
     REAL,DIMENSION(n_ocn)::loc_exe_ocn                         ! flux of dissolved solutes to be exchanged with ocean
+    real,DIMENSION(n_ocn,n_sed)::loc_conv_sed_ocn              ! local (redox-dependent) sed -> ocn conversion
     logical::loc_flag_stackgrow,loc_flag_stackshrink           ! growing or shrinking of stack occurs (by a 1 cm layer)
 
     ! *** (a) initialize variables
@@ -818,56 +820,68 @@ CONTAINS
        sed_top_h(dum_i,dum_j) = sed_top_h(dum_i,dum_j) - REAL(n_sed_tot_drop)
        loc_n_sed_stack_top = INT(sed_top_h(dum_i,dum_j)) + 1
     ENDIF
-
+    
     IF (ctrl_misc_debug3) print*,'(g) calculate sediment dissolution flux to ocean'
     ! *** (g) calculate sediment dissolution flux to ocean
-    !         NOTE: first, convert flux units from cm3 cm-2 to mol cm-2
+    !         first, convert flux units from cm3 cm-2 to mol cm-2 per time-step (typically: per year)
     sed_fdis(:,dum_i,dum_j) = conv_sed_cm3_mol(:)*loc_dis_sed(:)
+    !         second -- test for empirical sed denitrification (Bohlen 2012) request
+    !         NOTE: does not require that water-column redox-dependent remin is used (can be combined with the oxic-only default)
+    !         NOTE: Bohlen 2012 is in units of mmol C m-2 d-1, O2-NO3 in units of uM
+    !         NOTE: Bohlen 2012: LNO3 = a + b x c^(O2-NO3)bw x RRPOC
+    !               RRPOC == carbon rain flux -- mmol C m-2 d-1
+    !               LNO3  == NO3 consumption flux -- mmol N m-2 d-1
+    !               a = 0.083 / b = 0.21 / c = 0.98
+    if (ctrl_sed_conv_sedocn_bohlen2012) then
+       ! calculate empirical NO3 consumption
+       ! NOTE: 1000.0/10000.0 == convert mol cm-2 -> mmol m-2
+       loc_fPOC = (1000.0/10000.0)*conv_sed_cm3_mol(is_POC)*sed_fsed(is_POC,dum_i,dum_j)/conv_yr_d
+       loc_fNO3 = 0.083 + 0.21 * 0.98**(conv_mol_umol*(dum_sfcsumocn(io_O2) - dum_sfcsumocn(io_NO3))) * loc_fPOC
+       ! calculate equivalent POC remin flux -- loc_fDIC
+       ! NOTE: fNO3 = -loc_conv_sed_ocn(io_NO3,is_POC)*loc_fDIC
+       ! NOTE: ignore loc_conv_sed_ocn(io_NO3,is_POP)*loc_fPOP
+       loc_fDIC = -loc_fNO3/conv_sed_ocn_N_N2(io_NO3,is_POC)
+       ! test loc_fDIC against POC flus available for remin (sed_fdis(is_POC,dum_i,dum_j))
+       ! NOTE: re-used/calculate loc_fPOC now as the SEDGEM C remin flux
+       loc_fPOC = (1000.0/10000.0)*conv_sed_cm3_mol(is_POC)*sed_fdis(is_POC,dum_i,dum_j)/conv_yr_d
+       if (loc_fDIC >= loc_fPOC) then
+          ! apply denitrification to the entire POC dissolution flux
+          ! test for shallow environment
+          if (dum_D > 1000.0) then
+             loc_conv_sed_ocn(:,:) = 0.73*conv_sed_ocn_N_N2(:,:) + 0.27*conv_sed_ocn_N_NH4(:,:)
+          else
+             loc_conv_sed_ocn(:,:) = conv_sed_ocn_N_N2(:,:)
+          end if
+       else
+          ! calculate proportion of denitrification vs. redox remin (loc_sed_remin_fracC) and create blended array
+          loc_sed_remin_fracC = (loc_fPOC - loc_fDIC)/loc_fPOC
+          ! test for shallow environment
+          if (dum_D > 1000.0) then
+             loc_conv_sed_ocn(:,:) = loc_sed_remin_fracC*dum_conv_sed_ocn(:,:) + &
+                  & (1.0 - loc_sed_remin_fracC)*( 0.73*conv_sed_ocn_N_N2(:,:) + 0.27*conv_sed_ocn_N_NH4(:,:) )
+          else
+             loc_conv_sed_ocn(:,:) = loc_sed_remin_fracC*dum_conv_sed_ocn(:,:) + &
+                  & (1.0 - loc_sed_remin_fracC)*conv_sed_ocn_N_N2(:,:)
+          end if
+       end if
+       ! deal with 15N
+       ! ######################################################################################################################### !
+       
+       ! ######################################################################################################################### !
+    else
+       ! follow water-column redox-dependent remin (only)
+       loc_conv_sed_ocn(:,:) = dum_conv_sed_ocn(:,:)
+    end if
+    ! now carry out the actual solid -> dissolved tracer conversions
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        loc_tot_i = conv_sed_ocn_i(0,is)
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
-          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
+          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + loc_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
 !!$          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_ls_lo(lo,ls)*sed_fdis(l2is(ls),dum_i,dum_j)
        end do
     end DO
-
-!!$    ! ############################################################################################################################ !
-!!$    ! ### FIX THIS UP!!! ######################################################################################################### !
-!!$    ! ############################################################################################################################ !
-!!$    IF (ctrl_misc_debug3) print*,'(g) deal with low bottom-water [O2]'
-!!$    ! *** (g) deal with low bottom-water [O2]
-!!$    !         NOTE: because SEDGEM knows nothing about the geometry of the overlying ocean,
-!!$    !               the only criterion that can be applied in deciding whether there is sufficient O2 for oxidizing organic matter
-!!$    !               is to test whether [O2] is above zero or not.
-!!$    !               => if [O2] is zero (or rather, very close to it) then do NO3 then SO4 reduction
-!!$    !               => replacement of O2 (oxidation) deficit must be done in its entirety, by either NO3 OR SO4,
-!!$    !                  because there is no way of knowing how much NO3 is available in the ocean befoer SO4 has to be used ...
-!!$    !         NOTE: because consumption of NO3 of SO4 diffusing into the sediments must be complete,
-!!$    !               no fractionation w.r.t. 15N or 34S can occur
-!!$    !         NOTE: all fluxes in units of mol cm-2
-!!$    If (ocn_select(io_O2) .AND. (dum_sfcsumocn(io_O2) < const_real_nullsmall)) then
-!!$       loc_potO2def = -sedocn_fnet(io_O2,dum_i,dum_j)
-!!$       if (ocn_select(io_NO3) .AND. (dum_sfcsumocn(io_NO3) > const_real_nullsmall)) then
-!!$          loc_r15N = dum_sfcsumocn(io_NO3_15N)/dum_sfcsumocn(io_NO3)
-!!$          sedocn_fnet(io_NO3,dum_i,dum_j) = -(2.0/3.0)*loc_potO2def
-!!$          sedocn_fnet(io_N2,dum_i,dum_j)  = 0.5*(2.0/3.0)*loc_potO2def
-!!$          sedocn_fnet(io_O2,dum_i,dum_j)  = 0.0
-!!$          sedocn_fnet(io_NO3_15N,dum_i,dum_j) = -loc_r15N*(2.0/3.0)*loc_potO2def
-!!$          sedocn_fnet(io_N2_15N,dum_i,dum_j)  = loc_r15N*0.5*(2.0/3.0)*loc_potO2def
-!!$       else if (ocn_select(io_SO4) .AND. (dum_sfcsumocn(io_SO4) > const_real_nullsmall)) then
-!!$          loc_r34S = dum_sfcsumocn(io_SO4_34S)/dum_sfcsumocn(io_SO4)
-!!$          sedocn_fnet(io_SO4,dum_i,dum_j) = -0.5*loc_potO2def
-!!$          sedocn_fnet(io_H2S,dum_i,dum_j) = 0.5*loc_potO2def
-!!$          sedocn_fnet(io_O2,dum_i,dum_j)  = 0.0
-!!$          sedocn_fnet(io_SO4_34S,dum_i,dum_j) = -loc_r34S*0.5*loc_potO2def
-!!$          sedocn_fnet(io_H2S_34S,dum_i,dum_j) = loc_r34S*0.5*loc_potO2def
-!!$       end if
-!!$    end If
-!!$    ! ############################################################################################################################ !
-!!$    ! ############################################################################################################################ !
-!!$    ! ############################################################################################################################ !
 
     ! *** DEBUG ***
     ! finally ... print some dull debugging info if 'iopt_sed_debug2' option is selected
@@ -1471,18 +1485,20 @@ CONTAINS
     ! (sediment stack / surface layer)
     real::loc_frac_CaCO3                                       ! 
     real::loc_frac_CaCO3_top                                   ! 
-    real::loc_fPOC,loc_fFe
+    real::loc_fPOC,loc_fFe,loc_fNO3,loc_fDIC
     real::loc_dis_sed_Fe,loc_new_sed_Fe
     real::loc_sed_pres_fracC,loc_sed_pres_fracP                ! 
     real::loc_O2                                               ! 
     real::loc_sed_mean_OM_top                                  ! mean OM wt% in upper mixed layer (5cm at the moment)
     real::loc_sed_mean_OM_bot                                  ! 
     real::loc_sed_dis_frac_max                                 ! maximum fraction that can be remineralized
+    real::loc_sed_remin_fracC                                  ! 
     real::loc_C2P_rain,loc_C2P_remin
     REAL,DIMENSION(n_sed)::loc_new_sed                         ! new (sedimenting) top layer material
     REAL,DIMENSION(n_sed)::loc_dis_sed                         ! remineralized top layer material
     REAL,DIMENSION(n_sed)::loc_exe_sed                         ! top layer material to be exchanged with stack
     REAL,DIMENSION(n_ocn)::loc_exe_ocn                         ! flux of dissolved solutes to be exchanged with ocean
+    real,DIMENSION(n_ocn,n_sed)::loc_conv_sed_ocn              ! local (redox-dependent) sed -> ocn conversion
     real::loc_delta_Corg
     real::loc_alpha                                            ! 
     real::loc_R                                                ! local isotope R, local (isotope specific) r's
@@ -2093,18 +2109,66 @@ CONTAINS
     ENDIF
 
     ! *** CALCULATE SEDIMENT DISSOLUTION FLUX TO THE OCEAN ************************************************************************
-    !     NOTE: convert <sed_fdis> flux units from cm3 cm-2 to mol cm-2
+    !     NOTE: first, convert flux units from cm3 cm-2 to mol cm-2 per time-step (typically: per year)
     sed_fdis(:,dum_i,dum_j) = conv_sed_cm3_mol(:)*loc_dis_sed(:)
+    !         second -- test for empirical sed denitrification (Bohlen 2012) request
+    !         NOTE: does not require that water-column redox-dependent remin is used (can be combined with the oxic-only default)
+    !         NOTE: Bohlen 2012 is in units of mmol C m-2 d-1, O2-NO3 in units of uM
+    !         NOTE: Bohlen 2012: LNO3 = a + b x c^(O2-NO3)bw x RRPOC
+    !               RRPOC == carbon rain flux -- mmol C m-2 d-1
+    !               LNO3  == NO3 consumption flux -- mmol N m-2 d-1
+    !               a = 0.083 / b = 0.21 / c = 0.98
+    if (ctrl_sed_conv_sedocn_bohlen2012) then
+       ! calculate empirical NO3 consumption
+       ! NOTE: 1000.0/10000.0 == convert mol cm-2 -> mmol m-2
+       loc_fPOC = (1000.0/10000.0)*conv_sed_cm3_mol(is_POC)*sed_fsed(is_POC,dum_i,dum_j)/conv_yr_d
+       loc_fNO3 = 0.083 + 0.21 * 0.98**(conv_mol_umol*(dum_sfcsumocn(io_O2) - dum_sfcsumocn(io_NO3))) * loc_fPOC
+       ! calculate equivalent POC remin flux -- loc_fDIC
+       ! NOTE: fNO3 = -loc_conv_sed_ocn(io_NO3,is_POC)*loc_fDIC
+       ! NOTE: ignore loc_conv_sed_ocn(io_NO3,is_POP)*loc_fPOP
+       loc_fDIC = -loc_fNO3/conv_sed_ocn_N_N2(io_NO3,is_POC)
+       ! test loc_fDIC against POC flus available for remin (sed_fdis(is_POC,dum_i,dum_j))
+       ! NOTE: re-used/calculate loc_fPOC now as the SEDGEM C remin flux
+       loc_fPOC = (1000.0/10000.0)*conv_sed_cm3_mol(is_POC)*sed_fdis(is_POC,dum_i,dum_j)/conv_yr_d
+       if (loc_fDIC >= loc_fPOC) then
+          ! apply denitrification to the entire POC dissolution flux
+          ! test for shallow environment
+          if (dum_D > 1000.0) then
+             loc_conv_sed_ocn(:,:) = 0.73*conv_sed_ocn_N_N2(:,:) + 0.27*conv_sed_ocn_N_NH4(:,:)
+          else
+             loc_conv_sed_ocn(:,:) = conv_sed_ocn_N_N2(:,:)
+          end if
+       else
+          ! calculate proportion of denitrification vs. redox remin (loc_sed_remin_fracC) and create blended array
+          loc_sed_remin_fracC = (loc_fPOC - loc_fDIC)/loc_fPOC
+          ! test for shallow environment
+          if (dum_D > 1000.0) then
+             loc_conv_sed_ocn(:,:) = loc_sed_remin_fracC*dum_conv_sed_ocn(:,:) + &
+                  & (1.0 - loc_sed_remin_fracC)*( 0.73*conv_sed_ocn_N_N2(:,:) + 0.27*conv_sed_ocn_N_NH4(:,:) )
+          else
+             loc_conv_sed_ocn(:,:) = loc_sed_remin_fracC*dum_conv_sed_ocn(:,:) + &
+                  & (1.0 - loc_sed_remin_fracC)*conv_sed_ocn_N_N2(:,:)
+          end if
+       end if
+       ! deal with 15N
+       ! ######################################################################################################################### !
+       
+       ! ######################################################################################################################### !
+    else
+       ! follow water-column redox-dependent remin (only)
+       loc_conv_sed_ocn(:,:) = dum_conv_sed_ocn(:,:)
+    end if
+    ! now carry out the actual solid -> dissolved tracer conversions
     DO l=1,n_l_sed
        is = conv_iselected_is(l)
        loc_tot_i = conv_sed_ocn_i(0,is)
        do loc_i=1,loc_tot_i
           io = conv_sed_ocn_i(loc_i,is)
-          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
+          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + loc_conv_sed_ocn(io,is)*sed_fdis(is,dum_i,dum_j)
 !!$          sedocn_fnet(io,dum_i,dum_j) = sedocn_fnet(io,dum_i,dum_j) + dum_conv_ls_lo(lo,ls)*sed_fdis(l2is(ls),dum_i,dum_j)
        end do
     end DO
-       
+    
   END SUBROUTINE sub_update_sed_mud
   ! ****************************************************************************************************************************** !
 

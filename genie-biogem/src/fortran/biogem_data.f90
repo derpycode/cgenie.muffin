@@ -1439,8 +1439,8 @@ CONTAINS
     !
     if (ocn_select(io_NO3)) then
        conv_sed_ocn_N(:,:)      = conv_sed_ocn(:,:)
-       conv_sed_ocn_N_NH4(:,:)  = conv_sed_ocn(:,:)
        conv_sed_ocn_N_N2(:,:)   = conv_sed_ocn(:,:)
+       conv_sed_ocn_N_NH4(:,:)  = conv_sed_ocn(:,:)
        ! > N
        if (ocn_select(io_NH4)) then
           ! PON + (3/2)H2O + H+ --> NH4+ + (3/4)O2
@@ -1488,7 +1488,6 @@ CONTAINS
           conv_sed_ocn_N(io_N2,is_POC)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
-          conv_sed_ocn_N_N2(:,:)        = conv_sed_ocn_N(:,:)
        elseif (ocn_select(io_NH4)) then
           ! NOTE: simple NO3 + NH4 scheme
           ! in the back-reaction: NH4+ + 2O2 -> NO3- + 2H+ + H2O => O2 == (1/2)NO3
@@ -1500,7 +1499,6 @@ CONTAINS
           conv_sed_ocn_N(io_NH4,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_ALK,is_POC) = -2.0*conv_sed_ocn_N(io_NO3,is_POC)
           conv_sed_ocn_N(io_O2,is_POC)  = 0.0
-          conv_sed_ocn_N_NH4(:,:)       = conv_sed_ocn_N(:,:)
        else
           ! (this should not occur)
        endif
@@ -1537,6 +1535,52 @@ CONTAINS
        end if
     else
        conv_sed_ocn_N(:,:) = 0.0
+    end if
+    ! C (sedimentary denitrification end-member arrays)
+    ! NOTE: for now, conv_sed_ocn_N_N2 and conv_sed_ocn_N_NH4 do not oxidize P using NO3 (only C)
+    !       (P is oxidized with the default stiochiometry with O2)
+    ! NOTE: assume that if io_NO3_15N is selected, all the corresponding N isotopes are ...
+    if (ocn_select(io_N2) .AND. ocn_select(io_NH4)) then
+       ! N2 end-member
+       conv_sed_ocn_N_N2(io_NO3,is_PON) = 0.0
+       conv_sed_ocn_N_N2(io_NH4,is_PON) = 1.0
+       conv_sed_ocn_N_N2(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
+       conv_sed_ocn_N_N2(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_N(io_NH4,is_PON)
+       conv_sed_ocn_N_N2(io_NO3,is_POC) = (4.0/5.0)*conv_sed_ocn_N(io_O2,is_POC)
+       conv_sed_ocn_N_N2(io_N2,is_POC)  = -(1.0/2.0)*conv_sed_ocn_N(io_NO3,is_POC)
+       conv_sed_ocn_N_N2(io_ALK,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
+       conv_sed_ocn_N_N2(io_O2,is_POC)  = 0.0
+       if (ocn_select(io_NO3_15N)) then
+          conv_sed_ocn_N_N2(io_NO3_15N,is_POC) = conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N_N2(io_N2_15N,is_POC)  = conv_sed_ocn_N(io_N2,is_POC)
+       end if
+       if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+          conv_sed_ocn_N_N2(io_Fe,is_POFe)  = 1.0
+          conv_sed_ocn_N_N2(io_Fe2,is_POFe) = 0.0
+          conv_sed_ocn_N_N2(io_Fe_56Fe,is_POFe_56Fe)  = 1.0
+          conv_sed_ocn_N_N2(io_Fe2_56Fe,is_POFe_56Fe) = 0.0
+          conv_sed_ocn_N_N2(io_O2,is_POFe) = -1.0/4.0
+       end if
+       ! NH4 end-member
+       conv_sed_ocn_N_NH4(io_NO3,is_PON) = 0.0
+       conv_sed_ocn_N_NH4(io_NH4,is_PON) = 1.0
+       conv_sed_ocn_N_NH4(io_ALK,is_PON) = conv_sed_ocn_N(io_NH4,is_PON)
+       conv_sed_ocn_N_NH4(io_O2,is_PON)  = (3.0/4.0)*conv_sed_ocn_N(io_NH4,is_PON)
+       conv_sed_ocn_N_NH4(io_NO3,is_POC) = (1.0/2.0)*conv_sed_ocn_N(io_O2,is_POC)
+       conv_sed_ocn_N_NH4(io_NH4,is_POC) = -conv_sed_ocn_N(io_NO3,is_POC)
+       conv_sed_ocn_N_NH4(io_ALK,is_POC) = -2.0*conv_sed_ocn_N(io_NO3,is_POC)
+       conv_sed_ocn_N_NH4(io_O2,is_POC)  = 0.0
+       if (ocn_select(io_NO3_15N)) then
+          conv_sed_ocn_N_NH4(io_NO3_15N,is_POC) = conv_sed_ocn_N(io_NO3,is_POC)
+          conv_sed_ocn_N_NH4(io_NH4_15N,is_POC) = conv_sed_ocn_N(io_NH4,is_POC)
+       end if
+       if (ocn_select(io_Fe) .AND. ocn_select(io_Fe2)) then
+          conv_sed_ocn_N_NH4(io_Fe,is_POFe)  = 1.0
+          conv_sed_ocn_N_NH4(io_Fe2,is_POFe) = 0.0
+          conv_sed_ocn_N_NH4(io_Fe_56Fe,is_POFe_56Fe)  = 1.0
+          conv_sed_ocn_N_NH4(io_Fe2_56Fe,is_POFe_56Fe) = 0.0
+          conv_sed_ocn_N_NH4(io_O2,is_POFe) = -1.0/4.0
+       end if
     end if
     ! -------------------------------------------------------- ! Modify for FeOOH-reducing(!) conditions
     ! NOTE: Fe3 (io_Fe) is associated with 1/4 O2 (comapred to Fe2 (io_Fe2))

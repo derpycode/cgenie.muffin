@@ -7372,9 +7372,13 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
 			<value datatype="boolean">.false.</value>
                         <description>Cap Fe2+ dissolution at POM_FeOOH rain flux?</description>
                     </param>
-                    <param name="ctrl_sed_conv_sed_ocn_old">
-			<value datatype="boolean">.true.</value>
-                        <description>etain original (Redfield) remin transformation? </description>
+                    <param name="ctrl_sed_conv_sedocn_redox">
+			<value datatype="boolean">.false.</value>
+                        <description>Use redox-dependent remin transformation?</description>
+                    </param>
+                    <param name="ctrl_sed_conv_sedocn_bohlen2012">
+			<value datatype="boolean">.false.</value>
+                        <description>Use Bohlen 2012 denitrification remin?</description>
                     </param>
                     <param name="par_sed_diagen_O2thresh">
 			<value datatype="real">20.0E-6</value>

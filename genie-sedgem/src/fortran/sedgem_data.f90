@@ -107,7 +107,8 @@ CONTAINS
        print*,'C:P remin [O2] threshold (mol kg-1)                 : ',par_sed_diagen_fracC2Ppres_c0_O2 
        print*,'Return of PO4 to ocean in Dunne 2007 scheme?        : ',ctrl_sed_dunne2007_remin_POP
        print*,'Cap Fe2+ dissolution at POM_FeOOH rain flux?        : ',ctrl_sed_diagen_POM_FeOOH_cap
-       print*,'Retain original (Redfield) remin transformation?    : ',ctrl_sed_conv_sed_ocn_old
+       print*,'Use redox-dependent remin transformation?           : ',ctrl_sed_conv_sedocn_redox
+       print*,'Use Bohlen 2012 denitrification remin?              : ',ctrl_sed_conv_sedocn_bohlen2012
        print*,'[O2] thresh for switching redox arrays (mol kg-1)   : ',par_sed_diagen_O2thresh
        print*,'[NO3] thresh for switching redox arrays (mol kg-1)  : ',par_sed_diagen_NO3thresh
        print*,'[SO4] thresh for switching redox arrays (mol kg-1)  : ',par_sed_diagen_SO4thresh
