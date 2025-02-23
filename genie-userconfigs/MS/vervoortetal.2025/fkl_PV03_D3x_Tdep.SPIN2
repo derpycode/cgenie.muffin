@@ -124,6 +124,7 @@ bg_par_atm_force_scale_val_6=0.209099
 bg_par_gastransfer_a=0.715813093980993
 # choose average orbit configuration
 # mean ecc, mean obl (rad), equinox at perihelion/aphelion so hemispheres receive the same amount of sun
+ea_opt_orbit_old=.false.
 ea_par_orbit_osce=0.026735
 ea_par_orbit_oscsob=0.40420
 ea_par_orbit_osclonperi=3.1416

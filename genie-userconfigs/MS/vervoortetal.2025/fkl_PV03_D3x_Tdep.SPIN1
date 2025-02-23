@@ -97,6 +97,7 @@ bg_par_atm_force_scale_val_3=834.0E-06
 bg_par_atm_force_scale_val_4=-4.9
 #re-scale gas transfer coeff to give ~0.058 mol m-2 yr-1 uatm-1 global mean air-sea coefficient (original: 0.310)
 bg_par_gastransfer_a=0.715813093980993
+ea_opt_orbit_old=.false.
 # choose average orbit configuration
 # mean ecc, mean obl (rad), equinox at perihelion/aphelion so hemispheres receive the same amount of sun
 ea_par_orbit_osce=0.026735

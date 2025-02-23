@@ -118,6 +118,8 @@ bg_par_forcing_name="pyyyyz.RpO2"
 bg_par_atm_force_scale_val_6=0.209415
 #re-scale gas transfer coeff to give ~0.058 mol m-2 yr-1 uatm-1 global mean air-sea coefficient (original: 0.310)
 bg_par_gastransfer_a=0.715813093980993
+# use correct orbit code
+ea_opt_orbit_old=.false.
 # Call orbit_radfor
 ea_38="y"
 # Specify the type of orbital forcing default (0), time-varying (1), alternative config (2)
