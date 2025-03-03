@@ -2157,7 +2157,9 @@ c land (no ice)
             enddo
           enddo
        else
-c PV (15/01/2023) check if orog input file is 1D or 2D
+c PV (19/01/2024) check if file input is 2D (lat X lon) or 1D (lat X lon X month)
+c NOTE: if 1D, provide input in appended one-column array 
+c NOTE: if 2D, duplicate albedo in 3D matrix, i.e. same atm albedo each month
           if (orogswitch.ge.1) then
              open(77,file=indir_name(1:lenin)//filenameorog(1:len_orog))
 	         if (filename_ents2d) then
@@ -2230,7 +2232,9 @@ c land
           enddo
         enddo
       else
-c PV (15/01/2023) check if lice input file is 1D or 2D
+c PV (19/01/2024) check if file input is 2D (lat X lon) or 1D (lat X lon X month)
+c NOTE: if 1D, provide input in appended one-column array 
+c NOTE: if 2D, duplicate albedo in 3D matrix, i.e. same atm albedo each month
          if (flag_ents) then
             open(77,file=indir_name(1:lenin)//filenamelice(1:len_lice))
 	        if (filename_ents2d) then
@@ -2285,7 +2289,8 @@ cmsw Read in offline NCEP fields if offline version selected
 cmsw Create atmospheric albedo fields
 
          open(77,file=indir_name(1:lenin)//filenamealba(1:len_alba))
-c PV (19/01/2024) check if file input is 2D (lat X lon) or 3D (lat X lon X month)
+c PV (19/01/2024) check if file input is 2D (lat X lon) or 1D (lat X lon X month)
+c NOTE: if 1D, provide input in appended one-column array 
 c NOTE: if 2D, duplicate albedo in 3D matrix, i.e. same atm albedo each month
          if (filename_ents2d) then
             do j = jmax,1,-1
@@ -2330,6 +2335,9 @@ c PV [22/01/2024] else assign empty arrays to be overwritten by EMBM winds (velo
 		 
 cmsw read in wind speeds for use in radiation/evap calc.
 c PV [22/01/2024] if unify_winds=0 or =2, use full-grid windspeed file (recommended)
+c PV (19/01/2024) check if file input is 2D (lat X lon) or 1D (lat X lon X month)
+c NOTE: if 1D, provide input in appended one-column array 
+c NOTE: if 2D, duplicate albedo in 3D matrix, i.e. same atm albedo each month
         if (unify_winds .ne. 1) then
            open(35,file=indir_name(1:lenin)//filename_wspeed)
            if (filename_ents2d) then

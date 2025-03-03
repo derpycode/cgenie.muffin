@@ -1989,7 +1989,7 @@
                         <description>Name of 2D planetary albedo file</description>
                     </param>
 					<param name="filenamealba">
-                        <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>atm_albedo_monthly.dat</value>
+                        <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>atm_albedo_annual_2D.dat</value>
                         <description>atmospheric (cloud) albedo filename</description>
                     </param>
 		            <param name="lapse_rate">
@@ -1997,20 +1997,26 @@
 			             <description>lapse rate (K/km)</description>
 		            </param>
                     <param name="orogswitch">
-                        <value datatype="integer">0</value>
-                        <description>switch (0/1/2) to take into account orography (=2: orography only affects surface processes)</description>
+                        <value datatype="integer">2</value>
+						<description>switch to take into account orography
+                        0 - do NOT consider orography in surface and atmopsheric processes
+                        1 - consider orography in surface and atmospheric processes
+                        2 - consider orography in surface processes only 
+						Option 2 recommended; parameterized atmospheric processes are integrated from sealevel to TOA</description>
                     </param>
                     <param name="t_orog">
                         <value datatype="integer">0</value>
                         <description>switch (0/1) to take into account time-varying orography</description>
                     </param>
                     <param name="filenameorog">
-                        <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>orography.dat</value>
+                        <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>orography_2D.dat</value>
                         <description>orography filename</description>
                     </param>
 		            <param name="filename_ents2d">
-                        <value datatype="logical">.false.</value>
-                        <description>true if orography, land ice mask, and atm albedo are in 2D (lat-lon) format</description>
+                        <value datatype="logical">.true.</value>
+                        <description>format of ENTS input fields (orography, land-ice mask, windspeed, atmospheric albedo)
+						true - provide ENTS fields in 2D (lat-lon) format (annual mean)
+						false - provide ENTS fields in 1D format (allows seasonal fields)</description>
                     </param>
                     <param name="norog">
                         <value datatype="integer">0</value>
@@ -2033,7 +2039,7 @@
                         <description></description>
                     </param>
                     <param name="filenamelice">
-                        <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>icemask.dat</value>
+                        <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>icemask_2D.dat</value>
                         <description>land ice mask input filename</description>
                     </param>
                     <param name="lice_k9">
@@ -2124,8 +2130,8 @@
                         </description>
                     </param>
                     <param name="filename_wspeed">
-					    <value datatype="string">monthly_windspd.silo</value>
-                        <description>windspeed (full grid for ENTS)</description>
+					    <value datatype="string"><varref>RUNTIME_ROOT</varref><sep/>genie-embm<sep/>data<sep/>input<sep/>windspeed_2D.dat</value>
+                        <description>windspeed (full grid for ENTS to calc heat-moisture advection)</description>
                     </param>
                     <param name="debug_init">
 			<value datatype="boolean">.false.</value>

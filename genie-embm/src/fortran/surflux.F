@@ -709,6 +709,8 @@ c pptn (over land and ocean)
 c - need saturation vapour pressure, relative humidity
 
 c pbh no orography for precipitation (orography only affects surface processes if orogswitch=2)
+c PV i.e. orography does not affect atmopsheric processes (RH, pptn, LH) but does affect 
+c    surface (land) processes (temp, OLR, evap, SH)
             if((orogswitch.lt.2).and.(flag_ents)) then
                qsata(i,j) = const1*exp(const4*talt
      1              /(talt+const5))
@@ -763,8 +765,7 @@ c pbh surface specific humidity, derived at talt assuming vertically constant re
 
 c use climatological albedo in calculating incoming shortwave radiation
 c shortwave radiation NB modified later over ice
-c PV [30/03/2023] What is climatological albedo? Only atmopshere? Or atmophsere and surface?
-c                 atm_alb(i,j,imth) is the montly ATMOSPHERIC albedo
+c PV [30/03/2023] atm_alb(i,j,imth) is the montly ATMOSPHERIC albedo
 c                 albcl is the PLANETARY (atm+surface) albedo 
             if (flag_ents) then
 c SG Modded for ENTS
