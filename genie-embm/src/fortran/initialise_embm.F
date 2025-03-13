@@ -2086,6 +2086,7 @@ c SG > Dummy variables for ENTS
        eb_rdtdim = real(rdtdim)
 c SG <
 
+       if (flag_ents) then
 c pbh read in orography even if orogswitch is off (so orography
 c can be used for ice sheet melwater as well as climatology)
        if (t_orog.eq.1) then
@@ -2266,7 +2267,7 @@ c NOTE: if 2D, duplicate albedo in 3D matrix, i.e. same atm albedo each month
 
 cmsw Read in offline NCEP fields if offline version selected
 
-      if (flag_ents) then
+c      if (flag_ents) then
          if(ents_offlineswitch.eq.1)then
             open(77,file=indir_name(1:lenin)//'NCEP_airt_monthly.dat')
             open(78,file=indir_name(1:lenin)//'NCEP_pptn_monthly.dat')
@@ -2357,7 +2358,7 @@ c PV [22/01/2024] if unify_winds=1, EMBM (tau) will be used to convert wind stre
 c    to windspeed but note that the windstress-to-speed conversion is only valid 
 c    over ocean (NOT recommended)
             usurfl(i,j,l)=0.
-          endif
+        endif
 
 cmsw preprocess for use in tsetpa/tstipa
 c conditional zonal average

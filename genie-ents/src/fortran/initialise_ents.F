@@ -34,7 +34,6 @@ c      include 'var.cmn'
 
 c Variable declaration
       character dum_lin*13
-      
       real dum_rsc
       real dum_syr
       integer :: dum_nyear
@@ -54,27 +53,20 @@ c Variable declaration
 
 c land ice mask
       real,dimension(maxi,maxj),intent(in)::landice_slicemask_lic
-
-c surface falbedo
+c surface albedo
       real,dimension(maxi,maxj),intent(inout)::albs_lnd
       real,dimension(maxi,maxj),intent(out)::land_albs_snow_lnd
       real,dimension(maxi,maxj),intent(out)::land_albs_nosnow_lnd
-
 c land snow cover
       real,dimension(maxi,maxj),intent(inout)::land_snow_lnd
-
 c bucket capacity
       real,dimension(maxi,maxj),intent(out)::land_bcap_lnd
-
 c roughness length
       real,dimension(maxi,maxj),intent(out)::land_z0_lnd
-
 c land temperature
       real,dimension(maxi,maxj),intent(inout)::land_temp_lnd
-
 c land moisture content
       real,dimension(maxi,maxj),intent(inout)::land_moisture_lnd
-
 c atmospheric tracer concentrations and land-atmosphere fluxes
       integer,intent(in)::ntrac_atm
       real,intent(out),dimension(ntrac_atm,maxi,maxj)::sfcatm_lnd
@@ -84,13 +76,14 @@ c atmospheric tracer concentrations and land-atmosphere fluxes
 
 c file check flag
       integer ios
-
+	  
 c SG > namelist declaration for ENTS goin variables
       NAMELIST /ents_control/indir_name,outdir_name,condir_name
       NAMELIST /ents_control/ents_igrid
       NAMELIST /ents_control/ents_npstp,ents_iwstp
       NAMELIST /ents_control/ents_itstp,ents_ianav
       NAMELIST /ents_control/ents_restart,ents_yearlen
+      NAMELIST /ents_control/par_opt_13Cfrac_veg
       NAMELIST /ents_control/topt,copt
       NAMELIST /ents_control/k7,k8,k9,k10,k11,k11a,k12
       NAMELIST /ents_control/k13,k14,k16,k17,k18,k20,k24,k26

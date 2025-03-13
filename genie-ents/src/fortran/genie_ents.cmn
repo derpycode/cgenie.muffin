@@ -19,7 +19,7 @@
       parameter (maxnyr=220)
       parameter ( imax = GOLDSTEINNLONS , jmax = GOLDSTEINNLATS)
       integer ents_k1(maxi,maxj),ents_kmax,ents_nyear
-        real ents_lat(maxj)
+      real ents_lat(maxj)
 c      common /ocn_grid/maxi,maxj,maxnyr
       common /ocn_grid/ents_k1,ents_kmax,ents_nyear,ents_lat
 
@@ -71,4 +71,7 @@ c MAF : genie-main/src/xml-config/xml/definition.xml
 
       logical debug_init,debug_end,debug_loop
       common /ents_ctrl/debug_init,debug_end,debug_loop
+
+      character par_opt_13Cfrac_veg*200
+	  common /ents_ctrl/par_opt_13Cfrac_veg
       

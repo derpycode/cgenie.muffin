@@ -77,10 +77,20 @@ c     SKT Constant photosynthetic carbon isotope discrimination from Farquhar (1
 c     SKT This is from epsilon from CO2 to Cbio
 c     NOTE: sign convention changed to align with BIOGEM
 c     NOE: set loc_delta_photo to zero for testing/debugging
-               loc_delta_photo=-20.1
+c               loc_delta_photo=-20.1
 c     SKT CO2-dependent fractionation from Schubert and Jahren 2012
 c     loc_delta_photo=-(28.26*0.35*(pco2ld+15))/(28.26+0.35*(pco2ld+15))
 
+               select case (trim(par_opt_13Cfrac_veg))
+               case ('schubert2012')
+                   loc_delta_photo=-(28.26*0.35*(pco2ld+15))/
+     &                   (28.26+0.35*(pco2ld+15))
+               case ('fixed')
+                   loc_delta_photo=-20.1
+               case default
+                   loc_delta_photo=-20.1
+               end SELECT
+	 
 c     Calculate alpha, ratio R, and fractional abundance, r
 c     NOTE: using BIOGEM notation (and sign convention) for converting R to r
 c     13C

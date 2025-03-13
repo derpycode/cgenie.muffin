@@ -2965,6 +2965,13 @@
                         <value datatype="real">365.25</value>
                         <description>number of days per year ents</description>
                     </param>
+                    <param name="par_opt_13Cfrac_veg">
+                        <value datatype="string">schubert2012</value>
+                        <description>Stable carbon isotope fractionation scheme in land plants.
+						             schubert2012: CO2-dependent fractionation (Schubert and Jahren, 2012)
+									        fixed: fixed -20.1 permill fractionation (Farquhar,1989)
+                        </description>
+                    </param>
                     <param name="topt">
                         <value datatype="real">298.15</value>
                         <description>
