@@ -38,10 +38,13 @@ c      include '../genie-simpleland/var_ents.cmn'
       integer i,j,m,istep,l
 
 cmsw Read in inverse of linear interpolation matrix. Calculation
-cmsw of this matrix and its inverse is assuming equal month
-cmsw length
+cmsw of this matrix and its inverse assumes equal month length
 
-      open(1,file=indir_name(1:lenin)//'inv_linterp_matrix.dat')
+c      open(1,file=indir_name(1:lenin)//'inv_linterp_matrix.dat')
+c PV: search for file in genie-embm, not genie-paleo
+      open(1,file='../../cgenie.muffin/'//
+     &    'genie-embm/data/input/inv_linterp_matrix.dat')
+ 
       do j=1,nmth
          do i=1,nmth
             read(1,*)invmat(i,j)
