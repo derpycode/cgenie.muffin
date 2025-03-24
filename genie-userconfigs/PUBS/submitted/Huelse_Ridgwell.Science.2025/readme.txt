@@ -85,8 +85,8 @@ For the individual experiments, the sequence of 4 parts for each is:
 ALL feedbacks:
 ./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN1 20000
 ./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN2 50000 muffin.CBSR.fkl_pp51.BASESw.SPIN1
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.NONE.EXPT 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.NONE.CTRL 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.EXPT 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.CTRL 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
 
 (and similarly for: CPhigh. CPlow, modernpCO2MgCa, modernMgCa, seasonal)
 
