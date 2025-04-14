@@ -23,8 +23,8 @@
 # ====================================================================
 
 ## === Compre the values below to those in user.sh ===
-GENIE_ROOT        = $(HOME)/cgenie.muffin
-OUT_DIR           = $(HOME)/cgenie_output
+GENIE_ROOT        = /work/crct/CCUBlogin/cgenie.muffin
+OUT_DIR           = /work/crct/CCUBlogin/cgenie_output
 RUNTIME_ROOT      = ../../cgenie.muffin
 
 # === Fortran compiler (ifc/ifort/f90/pgf90) ===
@@ -74,7 +74,7 @@ MODEXT=mod
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
 ### DEFAULT ###
-NETCDF_DIR=/usr/local
+NETCDF_DIR=/user1/crct/al1966po/NetCDF_for_GENIE
 ### sterling ###
 #NETCDF_DIR=/share/apps
 ### eevee ###

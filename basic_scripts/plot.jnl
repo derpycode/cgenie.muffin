@@ -1,0 +1,33 @@
+! ===== CLEAN =====
+
+sp rm -f ferret*
+sp rm -f *plt*
+
+! ===== DATA =====
+
+use "../../cgenie_output/EXP1/biogem/fields_biogem_3d.nc"
+use "../../cgenie_output/EXP2/biogem/fields_biogem_3d.nc"
+
+! ===== PLOTTIGN AND LISTING =====
+
+show data
+
+show grid/Z OCN_O2[d=1]
+
+set w 1
+shade/title="[O2] at 128 m for EXP2" OCN_O2[d=2,l=1,k=2]*1E6 ! /lev=(-INF)(0,250,25)(INF)
+contour/o/lev
+frame/file=O2_128m_EXP2.pdf
+
+set w 2
+shade/pal=light_centered/lev=c/title="[O2] changes at 128 m" (OCN_O2[d=2,l=1,k=2]-OCN_O2[d=1,l=1,k=2])*1E6
+contour/o/lev
+frame/file=O2_128m_DIFF.pdf
+
+LIST OCN_O2[X=@ave,Y=@ave,d=2,l=1,k=2]*1E6
+
+! ===== CLEAN =====
+
+sp rm -f ferret*
+sp rm -f *plt*
+
