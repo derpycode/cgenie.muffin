@@ -1,4 +1,4 @@
-CCUBlogin='al1966po'
+CCUBlogin='al1966po' # to be replaced with your own CCUB login
 
 # creating required directories
 mkdir ../cgenie_archive
@@ -12,8 +12,7 @@ sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/runmuffin_nocleanall.sh
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/user.sh
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" kshrc.txt
 
-# placing .kshrc file at right location
-#mv kshrc.txt /user1/crct/$CCUBlogin/.kshrc
-mv kshrc.txt ../.kshrc
+# placing .kshrc file at right location (and renaming)
+mv kshrc.txt /user1/crct/$CCUBlogin/.kshrc
 
 
