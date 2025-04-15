@@ -10,5 +10,10 @@ sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/user.mak
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/runmuffin.sh
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/runmuffin_nocleanall.sh
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/user.sh
+sed -i -e "s/CCUBlogin/$CCUBlogin/g" kshrc.txt
+
+# placing .kshrc file at right location
+#mv kshrc.txt /user1/crct/$CCUBlogin/.kshrc
+mv kshrc.txt ../.kshrc
 
 
