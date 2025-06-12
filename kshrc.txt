@@ -1,0 +1,30 @@
+alias l="ls -ltr"
+alias rm="rm -i"
+alias mv="mv -i"
+alias howmany="ls ./* | wc -l"
+alias cp="cp -i"
+alias qs="qstat | grep CCUBlogin | wc -l"
+alias qstatt="qstat -u  CCUBlogin |grep  CCUBlogin |wc -l" # number of jobs running (counts lines without headers)
+alias geniemod="module purge; module load gcc/9.1.0 python/2.7/intel/2018 intel/2018"
+<<<<<<< HEAD
+alias cda="cd /archive/c-ccub/CCUBlogin/."
+alias cdw="cd /work/c-ccub/CCUBlogin/."
+alias pyferretmod"module purge; module load pyferret"
+=======
+alias cda="cd /archive/crct/CCUBlogin/."
+alias cdw="cd /work/crct/CCUBlogin/."
+alias pyferretmod="module purge; module load pyferret"
+>>>>>>> 0fb790005fe80b089d2e0bb31a53eaad82cd7d0f
+alias pyferret='python -c "import pyferret; pyferret.start(); (errval, errmsg) = pyferret.run()"'
+
+export PS1='[$(logname)@$(hostname -s)] '
+export COLUMNS=180
+
+# accents
+export LANG=$LANG.UTF-8
+
+module purge
+#module load python/3.6/intel/2019
+module load pyferret
+module load nco cdo intel
+module load imagemagick
