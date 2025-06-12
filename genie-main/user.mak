@@ -23,8 +23,8 @@
 # ====================================================================
 
 ## === Compre the values below to those in user.sh ===
-GENIE_ROOT        = /work/crct/CCUBlogin/cgenie.muffin
-OUT_DIR           = /work/crct/CCUBlogin/cgenie_output
+GENIE_ROOT        = /work/c-ccub/CCUBlogin/cgenie.muffin
+OUT_DIR           = /work/c-ccub/CCUBlogin/cgenie_output
 RUNTIME_ROOT      = ../../cgenie.muffin
 
 # === Fortran compiler (ifc/ifort/f90/pgf90) ===

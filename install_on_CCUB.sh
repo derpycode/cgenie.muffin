@@ -13,6 +13,6 @@ sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/user.sh
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" kshrc.txt
 
 # placing .kshrc file at right location (and renaming)
-mv kshrc.txt /user1/crct/$CCUBlogin/.kshrc
+mv kshrc.txt /user2/c-ccub/$CCUBlogin/.kshrc
 
 
