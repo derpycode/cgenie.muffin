@@ -74,7 +74,7 @@ MODEXT=mod
 # (http://www.unidata.ucar.edu/packages/netcdf/index.html)
 
 ### DEFAULT ###
-NETCDF_DIR=/user1/crct/al1966po/NetCDF_for_GENIE
+NETCDF_DIR=/user2/c-ccub/apv25599/NetCDF_for_GENIE
 ### sterling ###
 #NETCDF_DIR=/share/apps
 ### eevee ###
