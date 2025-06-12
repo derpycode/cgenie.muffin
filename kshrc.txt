@@ -8,7 +8,7 @@ alias qstatt="qstat -u  CCUBlogin |grep  CCUBlogin |wc -l" # number of jobs runn
 alias geniemod="module purge; module load gcc/9.1.0 python/2.7/intel/2018 intel/2018"
 alias cda="cd /archive/c-ccub/CCUBlogin/."
 alias cdw="cd /work/c-ccub/CCUBlogin/."
-alias pyferretmod"module purge; module load pyferret"
+alias pyferretmod="module purge; module load pyferret; module load gcc"
 alias pyferret='python -c "import pyferret; pyferret.start(); (errval, errmsg) = pyferret.run()"'
 
 export PS1='[$(logname)@$(hostname -s)] '
