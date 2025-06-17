@@ -14,7 +14,7 @@ v0.9.50	--	N/A									DOI: 10.5281/zenodo.10798347	-- includes sideral vs. sola
 *** /PUBS/manuscript/ *****************************************
 *** (releases associated with manuscripts) ********************
 ***************************************************************
-
+--
 ***************************************************************
 *** /PUBS/submitted/ ******************************************
 *** (releases associated with submitted papers) ***************
@@ -36,6 +36,10 @@ v0.9.49 --  Marshall_et_al.2024       			DOI: 10.5281/zenodo.10685309 -- Marshal
 v0.9.52 --  Huelse_Ridgwell.Science.2024		DOI: 10.5281/zenodo.12192935 -- Hülse and Ridgwell, revised for Science
 v0.9.53 --  Behrooz_et_al.Paleoceano.2024		DOI: 10.5281/zenodo.13363191 -- Behrooz et al. submitted to Paleoceanography & Paleoclimatology
 v0.9.55 --  He_et_al_Science.2024     			DOI: 10.5281/zenodo.13394828 -- He et al., submitted to Science
+v0.9.57 --  Burke_etal.2024     				DOI: 10.5281/zenodo.14366137 -- Burke et al., submitted to Nature
+v0.9.58 --  Keane_et_al.PhysicaD.2025     		DOI: 10.5281/zenodo.14606515 -- Keane at al. submitted to Physica D
+v0.9.60 --  Vervoort_et_al.Paleoceano.2025     	DOI: 10.5281/zenodo.14920191 -- Vervoort et al. submitted to Paleoceanography & Paleoclimatology
+v0.9.62 --  Huelse_Ridgwell.Science.2025		DOI: 10.5281/zenodo.15073802 -- Hülse and Ridgwell, re-revised for Science
 ***************************************************************
 *** /PUBS/published/ (published papers) ***********************
 *** (releases associated with accepted/published papers) ******
@@ -48,6 +52,9 @@ v0.9.42 --  Barrett_et_al.2023                  DOI: 10.5281/zenodo.8049100 --  
 v0.9.48 --  vervoortetal.2024       			DOI: 10.5281/zenodo.10668485 -- Vervoort et al. [2024] (Paleoceanography & Paleoclimatology)
 v0.9.51 --  KirtlandTurner_et_al.2024           DOI: 10.5281/zenodo.11189394 -- Kirtland Turner et al. [2024] (PNAS)
 v0.9.54 --  Cheng_et_al.Biogeosciences.2024     DOI: 10.5281/zenodo.13376310 -- Cheng et al. [2024] (Biogeosciences)
+v0.9.56 --  Li_et_al.NatGeo.2024     			DOI: 10.5281/zenodo.13839281 -- Li et al. [2024] (Nat. Geo.)
+v0.9.59 --  Gerard_et_al_2024     				DOI: 10.5281/zenodo.14680971 -- Gerard et al. [2024] (Climate of the Past)
+v0.9.61 --  Laridon_et_al_2025     				DOI: 10.5281/zenodo.15021902 --	Laridon et al. [2025] 'Connecting complex and simplified models of tipping elements: a nonlinear two-forcing emulator for the Atlantic meridional overturning circulation'
 ***************************************************************
 *** /MS/ (old directory structure) ****************************
 *** (reverse order -- newest first) ***************************

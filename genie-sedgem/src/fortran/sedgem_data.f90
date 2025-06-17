@@ -2156,6 +2156,8 @@ CONTAINS
     !       loc_tot_FCaCO3_d13C*loc_tot_FCaCO3
     if (loc_tot_FPOC > const_real_nullsmall) then
        loc_FCaCO3_d13C = loc_tot_FCaCO3_d13C
+    elseif ((1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3 < const_real_nullsmall) then
+       loc_FCaCO3_d13C = 0.0
     else
        loc_FCaCO3_d13C = (loc_tot_FCaCO3_d13C*loc_tot_FCaCO3 - par_sed_diag_volcanicd13C*loc_Foutgassing)/ &
             & ((1.0-par_sed_diag_fracSiweath)*loc_tot_FCaCO3)
