@@ -84,36 +84,36 @@ All experiments consist of:
 For the individual experiments, the sequence of 4 parts for each is:
 
 ALL feedbacks:
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN1 20000
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN2 50000 muffin.CBSR.fkl_pp51.BASESw.SPIN1
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.EXPT 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.CTRL 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN1 20000
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN2 50000 muffin.CBSR.fkl_pp51.BASESw.SPIN1
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.EXPT 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.CTRL 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
 
 (and similarly for: CPhigh. CPlow, modernpCO2MgCa, modernMgCa, seasonal)
 
 silicate weathering only uses the same SPIN1 and SPIN2 as for ALL feedbacks:
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN1 20000
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN2 50000 muffin.CBSR.fkl_pp51.BASESw.SPIN1
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.fixedCorg.EXPT 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.fixedCorg.CTRL 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN1 20000
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.SPIN2 50000 muffin.CBSR.fkl_pp51.BASESw.SPIN1
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.fixedCorg.EXPT 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025 muffin.CBSR.fkl_pp51.BASESw.fixedCorg.CTRL 500000 muffin.CBSR.fkl_pp51.BASESw.SPIN2
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 For the ensemble, the sequence of 4 parts is:
 
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.yz 20000
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.yz 50000 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.yz
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.EXPT.ENS.pO2PO4.5x5.yz 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.yz
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.CTRL.ENS.pO2PO4.5x5.yz 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.yz
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.yz 20000
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.yz 50000 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.yz
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.EXPT.ENS.pO2PO4.5x5.yz 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.yz
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.CTRL.ENS.pO2PO4.5x5.yz 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.yz
 
 where yz is a 2-digit code corresponding to the specific combinations of values of pO2 and ocean [PO4] as described above.
 
 For the specific ensemble member shown in Figure 2, the sequence is:
 
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.23 20000
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.23 50000 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.23
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.EXPT.ENS.pO2PO4.5x5.23 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.23
-./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/submitted/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.CTRL.ENS.pO2PO4.5x5.23 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.23
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.23 20000
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.23 50000 240910.BASESw.SPIN1.ENS.pO2PO4.5x5.23
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.EXPT.ENS.pO2PO4.5x5.23 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.23
+./runmuffin.sh muffin.CBSR.fkl_pp51.BASESw /PUBS/published/Huelse_Ridgwell.Science.2025/ENSEMBLE 240912.BASESw.CTRL.ENS.pO2PO4.5x5.23 500000 240910.BASESw.SPIN2.ENS.pO2PO4.5x5.23
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
