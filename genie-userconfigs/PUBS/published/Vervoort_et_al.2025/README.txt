@@ -98,8 +98,8 @@ Experiment 4-8 correspond to the numbering as described in the manuscript
 ./runmuffin.sh muffin.CBSRG.fkl_PV01.BASES PUBS/published/Vervoort_et_al.2025 fkl_PV01_D3x_EXP7.4Ma 4000000 fkl_PV01_D3x.SPIN2
 ./runmuffin.sh muffin.CBSRG.fkl_PV03.BASES PUBS/published/Vervoort_et_al.2025 fkl_PV03_D3x_EXP7.4Ma 4000000 fkl_PV03_D3x.SPIN2
 
-./runmuffin.sh muffin.CBSRG.fkl_PV01.BASES PUBS/published/Vervoort_et_al.2025 fkl_PV01_D3x_EXP7_Tdep.4Ma 4000000 fkl_PV01_D3x.SPIN2
-./runmuffin.sh muffin.CBSRG.fkl_PV03.BASES PUBS/published/Vervoort_et_al.2025 fkl_PV03_D3x_EXP7_Tdep.4Ma 4000000 fkl_PV03_D3x.SPIN2
+./runmuffin.sh muffin.CBSRG.fkl_PV01.BASES PUBS/published/Vervoort_et_al.2025 fkl_PV01_D3x_Tdep_EXP7.4Ma 4000000 fkl_PV01_D3x.SPIN2
+./runmuffin.sh muffin.CBSRG.fkl_PV03.BASES PUBS/published/Vervoort_et_al.2025 fkl_PV03_D3x_Tdep_EXP7.4Ma 4000000 fkl_PV03_D3x.SPIN2
 
 (2e) For EXPERIMENT 8, EXPERIMENT 7 + kerogen weathering feedback:
 
