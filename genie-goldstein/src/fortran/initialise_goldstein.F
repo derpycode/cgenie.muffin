@@ -204,7 +204,8 @@ c     namelist for reading initialisation data
       NAMELIST /ini_gold_nml/indir_name,outdir_name,rstdir_name
       NAMELIST /ini_gold_nml/igrid,world
       NAMELIST /ini_gold_nml/npstp,iwstp,itstp,ianav
-      NAMELIST /ini_gold_nml/conserv_per,ans,sodaylen,sidaylen,yearlen,nyear
+      NAMELIST /ini_gold_nml/conserv_per,ans
+      NAMELIST /ini_gold_nml/sodaylen,sidaylen,yearlen,nyear
       NAMELIST /ini_gold_nml/temp0,temp1,rel,scf,diff,adrag
       NAMELIST /ini_gold_nml/hosing,hosing_trend,nyears_hosing
       NAMELIST /ini_gold_nml/fwanomin,cmip_model,albocn
@@ -223,7 +224,7 @@ c     namelist for reading initialisation data
       NAMELIST /ini_gold_nml/tsinterp,lout,netin
       NAMELIST /ini_gold_nml/netout,ascout,filenetin,dirnetout,lin
       NAMELIST /ini_gold_nml/dosc,diso,debug_init,debug_end,debug_loop
-      NAMELIST /ini_gold_nml/ctrl_diagend,ctrl_diagmld
+      NAMELIST /ini_gold_nml/ctrl_diagend,ctrl_diagmld,ctrl_diso_TSonly
       NAMELIST /ini_gold_nml/saln0
       NAMELIST /ini_gold_nml/rst_reset_T
       NAMELIST /ini_gold_nml/par_dsc,par_dk
