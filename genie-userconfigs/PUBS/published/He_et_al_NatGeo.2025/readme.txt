@@ -39,6 +39,7 @@ alexandre.pohl@u-bourgogne.fr, xzhang69@nwu.edu.cn, zunlilu@syr.edu
 EDITING LOG [list of changes made to this file, when, and by who]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+2025/10/16 -- readme.txt modified with correct figure numbers
 2025/04/08 -- files modified following revisions for NatGeo (notably adding
 simulations for 825, 780 and 720 Ma)
 2024/08/28 -- readme.txt file created by AP
@@ -47,7 +48,7 @@ simulations for 825, 780 and 720 Ma)
 SUMMARY OF EXPERIMENTS [summerize experiments detailed and in which e.g. figures they appear]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Total of 576 experiments used in Figs. 3, S3–S6
+Total of 576 experiments used in Figs. 3, S6–S9
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 RUNNING THE EXPERIMENTS [command lines, broken down in sub-sections for spinups, main experiments, SI, etc where appropriate]
@@ -92,11 +93,11 @@ RUNNING THE EXPERIMENTS [command lines, broken down in sub-sections for spinups,
 ./runmuffin.sh muffin.CB.fm0635ca.BASESCH4 PUBS/published/He_et_al_NatGeo.2025 mf.CB.BASESCH4.635_0.5SO4_1.0pO2_0.75PO4_590m_1298W_rad16 20000
 ./runmuffin.sh muffin.CB.fm0635ca.BASESCH4 PUBS/published/He_et_al_NatGeo.2025 mf.CB.BASESCH4.635_0.5SO4_1.0pO2_1.0PO4_590m_1298W_rad16 20000
 
-#################### Experiments for Fig. S3 ####################
+#################### Experiments for Fig. S6 ####################
 
 Same as Fig. 3.
 
-#################### Experiments for Fig. S4 ####################
+#################### Experiments for Fig. S7 ####################
 
 [panel a]
 
@@ -219,7 +220,7 @@ Same as Fig. 3.
 ./runmuffin.sh muffin.CB.fm0635ca.BASESCH4 PUBS/published/He_et_al_NatGeo.2025 mf.CB.BASESCH4.635_0.5SO4_1.0pO2_0.75PO4_590m_1368W_rad16 20000
 ./runmuffin.sh muffin.CB.fm0635ca.BASESCH4 PUBS/published/He_et_al_NatGeo.2025 mf.CB.BASESCH4.635_0.5SO4_1.0pO2_1.0PO4_590m_1368W_rad16 20000
 
-#################### Experiments for Fig. S5 ####################
+#################### Experiments for Fig. S8 ####################
 
 [panel a]
 
@@ -420,7 +421,7 @@ Same as Fig. 3.
 ./runmuffin.sh muffin.CB.fm0635ca.BASESCH4 PUBS/published/He_et_al_NatGeo.2025 mf.CB.BASESCH4.635_1.0SO4_1.0pO2_0.75PO4_295m_1298W_rad16 20000
 ./runmuffin.sh muffin.CB.fm0635ca.BASESCH4 PUBS/published/He_et_al_NatGeo.2025 mf.CB.BASESCH4.635_1.0SO4_1.0pO2_1.0PO4_295m_1298W_rad16 20000
 
-#################### Experiments for Fig. S6 ####################
+#################### Experiments for Fig. S9 ####################
 
 [panels a-b]
 
