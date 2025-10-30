@@ -1,0 +1,478 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.9.26
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GCM == foam (OK)
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+       - Axis info read.
+>   4. READING MASK & TOPO GRIDS ...
+       - Mask & topo info read.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 650)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 651)] 
+>   5. RE-GRIDING MASK ...
+       - Mask re-gridded.
+       * Original land area fraction    = 0.24513
+       * Re-gridded land area fraction  = 0.24614
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 722)] 
+>   6. FILTERING MASK ...
+       - Single cell embayments filtered out.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 761)] 
+       - Polar connections cleaned up.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 779)] 
+       * found 1 water masses
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 789)] 
+       - Small water bodies cleaned up.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 797)] 
+       * Revised land area fraction = 0.26003
+>   7. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (25, 32) now ocean
+         -> Cell at (12, 21) now ocean
+         -> Cell at (12, 20) now ocean
+         -> Cell at (9, 20) now ocean
+         -> Cell at (10, 21) now ocean
+       - WARNING: there is no ocean depth information available at cell (14, 25)
+         -> Cell at (14, 25) now ocean
+       - WARNING: there is no ocean depth information available at cell (14, 25)
+         -> Cell at (14, 25) now land
+         -> Cell at (13, 25) now ocean
+         -> Cell at (13, 24) now ocean
+       - WARNING: there is no ocean depth information available at cell (13, 23)
+         -> Cell at (13, 23) now ocean
+       - WARNING: there is no ocean depth information available at cell (13, 22)
+         -> Cell at (13, 22) now ocean
+       - WARNING: there is no ocean depth information available at cell (13, 21)
+         -> Cell at (13, 21) now ocean
+       - WARNING: there is no ocean depth information available at cell (13, 20)
+         -> Cell at (13, 20) now ocean
+         -> Cell at (12, 26) now land
+         -> Cell at (12, 27) now land
+         -> Cell at (12, 28) now land
+         -> Cell at (12, 29) now land
+         -> Cell at (13, 29) now land
+         -> Cell at (13, 28) now land
+         -> Cell at (12, 19) now ocean
+       - WARNING: there is no ocean depth information available at cell (13, 19)
+         -> Cell at (13, 19) now ocean
+       - WARNING: there is no ocean depth information available at cell (12, 18)
+         -> Cell at (12, 18) now ocean
+       - Out of grid range
+       * Mask alteration complete
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 820)] 
+       * Revised land area fraction = 0.25386
+       - User-editing complete.
+>   8. CREATE FINAL MASK ...
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 850)] 
+       - .mask_out.FINAL.dat saved
+       * Final land area fraction   = 0.25386
+>   9. RE-GRIDING TOPOGRAPHY ...
+       - Topography re-gridded.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 902)] 
+>   10. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 926)] 
+>  11. FILTERING BATHYMETRY ...
+         -> MAKE DEEPER :: Loop count = 1 @ (7,6,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (7,13,4); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (8,4,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (9,3,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (11,25,4); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (12,26,3); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (13,25,4); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,22,2); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (19,19,4); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (21,20,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (22,22,4); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (29,5,4); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (30,6,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (34,2,4); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (34,5,3); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (35,1,2); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (7,13,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (11,25,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (13,25,3); d = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 2 @ (29,5,3); d = 2; l = 2
+       - Topography filtered.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 942)] 
+>  12. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button, or clickoutside the grid, to finish
+         -> Deepening cell at (25, 32) to k=11
+         -> Deepening cell at (25, 32) to k=10
+         -> Deepening cell at (24, 32) to k=12
+         -> Deepening cell at (24, 32) to k=11
+         -> Deepening cell at (23, 32) to k=12
+         -> Deepening cell at (23, 32) to k=11
+         -> Deepening cell at (22, 31) to k=12
+         -> Deepening cell at (22, 31) to k=11
+         -> Deepening cell at (22, 30) to k=12
+         -> Deepening cell at (22, 30) to k=11
+         -> Deepening cell at (21, 30) to k=12
+         -> Deepening cell at (21, 31) to k=12
+         -> Deepening cell at (20, 31) to k=12
+         -> Deepening cell at (20, 30) to k=12
+         -> Deepening cell at (11, 15) to k=10
+         -> Deepening cell at (11, 16) to k=11
+         -> Deepening cell at (11, 17) to k=12
+         -> Deepening cell at (11, 17) to k=11
+         -> Deepening cell at (11, 18) to k=12
+         -> Deepening cell at (11, 18) to k=11
+         -> Deepening cell at (11, 19) to k=12
+         -> Deepening cell at (11, 19) to k=11
+         -> Deepening cell at (10, 19) to k=11
+         -> Deepening cell at (10, 19) to k=10
+         -> Deepening cell at (10, 20) to k=11
+         -> Deepening cell at (10, 21) to k=12
+         -> Deepening cell at (12, 19) to k=12
+         -> Deepening cell at (12, 18) to k=14
+         -> Deepening cell at (12, 20) to k=12
+         -> Deepening cell at (11, 20) to k=12
+         -> Deepening cell at (11, 21) to k=12
+         -> Deepening cell at (11, 22) to k=12
+         -> Deepening cell at (11, 23) to k=12
+         -> Deepening cell at (12, 23) to k=12
+         -> Deepening cell at (12, 24) to k=12
+         -> Deepening cell at (11, 24) to k=12
+       - Out of grid range
+       * Mask alteration complete
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 964)] 
+       - User-editing complete.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 974)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 976)] 
+>  13. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 996)] 
+       - .k1 file saved
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1022)] 
+>  14. IDENTIFY ISLANDS ...
+       * found 1 land masses
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1035)] 
+>  15. UPDATING ISLANDS & PATHS ...
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1049)] 
+       * updated find: 1 islands
+       * updated find: S pole island (currently uncounted)
+       * total # true islands = 1
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1055)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1059)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1070)] 
+>  16. GENERATING .paths FILE ...
+       * Ignoring border #1
+       * Creating raw path #2 ...
+       * Building path #2 ...
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1084)] 
+       - .paths file saved
+>  17. GENERATING .psiles FILE ...
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1101)] 
+       - .psiles file saved
+>  18. GENERATING SEDIMENT TOPO ...
+       - Converted k1 file data (nothing to re-grid).
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1198)] 
+       - .depth.dat saved
+       - template file .sedcoremask.dat saved
+       - template file .reefmask.dat saved
+>  20. CREATING WIND PRODUCTS ...
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 219)
+In muffingen (line 1248)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 220)
+In muffingen (line 1248)] 
+       - Regridding wind stress (x) to GOLDSTEIN u-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 233)
+In muffingen (line 1248)] 
+       - Regridding wind stress (y) to GOLDSTEIN u-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 240)
+In muffingen (line 1248)] 
+       - Regridding wind stress (x) to GOLDSTEIN v-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 253)
+In muffingen (line 1248)] 
+       - Regridding wind stress (y) to GOLDSTEIN v-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 260)
+In muffingen (line 1248)] 
+       - Regridding wind velocity (x) to GOLDSTEIN c-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 269)
+In muffingen (line 1248)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 274)
+In muffingen (line 1248)] 
+       - Regridding wind velocity (y) to GOLDSTEIN c-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 277)
+In muffingen (line 1248)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 282)
+In muffingen (line 1248)] 
+       - Regridding wind speed to GOLDSTEIN c-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 292)
+In muffingen (line 1248)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 296)
+In muffingen (line 1248)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 300)
+In muffingen (line 1248)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 304)
+In muffingen (line 1248)] 
+       - Regridding wind speed to land c-grid
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 327)
+In muffingen (line 1248)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In make_grid_winds_foam (line 334)
+In muffingen (line 1248)] 
+       - Written tau u (u point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/fm0825ca/fm0825ca.taux_u.dat
+       - Written tau u (v point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/fm0825ca/fm0825ca.taux_v.dat
+       - Written tau v (u point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/fm0825ca/fm0825ca.tauy_u.dat
+       - Written tau v (v point) data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/fm0825ca/fm0825ca.tauy_v.dat
+       - Written u wind speed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/fm0825ca/fm0825ca.wvelx.dat
+       - Written v wind speed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/fm0825ca/fm0825ca.wvely.dat
+       - Written BIOGEM windspeed data to /Users/alexandrepohl/Documents/Etudes/Phanerozoic_GENIE/GENIE/muffingen/OUTPUT/fm0825ca/fm0825ca.windspeed_uvma.dat
+       - Written FULL GRID uvaa windspeed data
+       - Written FULL GRID uvma windspeed data
+       - Written ENTS uvaa windspeed (derived from annual mean velocity)
+       - Written ENTS uvma windspeed (derived from monthly velocity)
+       - Re-grided GCM wind products.
+>  21. LOADING PLANETARY ALBEDO DATA ...
+       - Read GCM albedo data.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1284)] 
+>  22. CREATING PLANETARY ALBEDO DATA ...
+       - Re-gridded GCM planetary albedo data.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1307)] 
+       - 2D planetary albedo file saved
+       - Generated zonal mean planetary albedo profile.
+       - Zonal mean .albd_pl.dat file saved
+>  23. LOADING SURFACE & CLOUD ALBEDO DATA ...
+       - Read GCM albedo data.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1363)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1364)] 
+>  23. CREATING SURFACE & CLOUD ALBEDO DATA ...
+       - Re-gridded GCM surface albedo data.
+       - Re-gridded GCM cloud albedo data.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1386)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1387)] 
+       - 2D surface albedo file saved
+       - 2D cloud albedo file saved
+       - Generated zonal mean surface and cloud albedo profiles.
+       - Zonal mean .albd_sur.dat file saved
+>  24. LOADING ICE MASK & OROGRAPHY DATA ...
+       - Read GCM orography data.
+       - FOAM ice mask input not supported.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1457)] 
+>  25. CREATING ICE MASK & OROGRAPHY DATA ...
+       - Created ice-free icemask.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1526)] 
+       - Orography re-gridded.
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1532)] 
+[Warning: PostScript format 'psc2' will not be supported in a future release.] 
+[> In inputcheck
+In print (line 41)
+In plot_2dgridded (line 239)
+In muffingen (line 1547)] 
+>  26. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 
