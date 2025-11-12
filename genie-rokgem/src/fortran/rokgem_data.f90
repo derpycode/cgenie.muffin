@@ -54,11 +54,11 @@ CONTAINS
     par_outdir_name = trim(par_outdir_name)//'/'
     par_rstdir_name = trim(par_rstdir_name)//'/'
     if (ctrl_debug_init > 0) then
-       ! --- RUN CONTROL ------------------------------------------------------------------------------------------------------------ !
+       ! --- RUN CONTROL --------------------------------------------------------------------------------------------------------- !
        print*,'--- RUN CONTROL ---'
        print*,'Continuing run?                                     : ',ctrl_continuing
        print*,'Simulation start year                               : ',start_year
-       ! --- I/O DIRECTORY DEFINITIONS ---------------------------------------------------------------------------------------------- !
+       ! --- I/O DIRECTORY DEFINITIONS ------------------------------------------------------------------------------------------- !
        print*,'--- I/O DEFINITIONS ---'
        print*,'(Paleo config) input dir. name                      : ',trim(par_pindir_name)
        print*,'Input dir. name                                     : ',trim(par_indir_name)
@@ -72,7 +72,7 @@ CONTAINS
        print*,'output 2d fields to .dat files                      : ',opt_2d_ascii_output
        print*,'output 2d fields to netcdf                          : ',opt_2d_netcdf_output
        print*,'append data to output files on restart              : ',opt_append_data
-       ! --- RIVER ROUTING PARAMETERS ---------------------------------------------------------------------------------------------- !
+       ! --- RIVER ROUTING PARAMETERS -------------------------------------------------------------------------------------------- !
        print*,'--- RIVER ROUTING PARAMETERS ---'
        print*,'routing scheme to use: '
        print*,'1 = roof routing using k1 file;' 
@@ -87,7 +87,7 @@ CONTAINS
        print*,'    suffix is grid dimensions (n_i_n_j.dat)         : ',trim(routing)
        print*,'maximum number of ocean cells a single land cell'
        print*,'    routes to                                       : ',max_drain_cells
-       !--- WEATHERING PARAMETERS -------------------------------------------------------------------------------------------------- !
+       !--- WEATHERING PARAMETERS ------------------------------------------------------------------------------------------------ !
        print*,'--- WEATHERING PARAMETERS ---'
        print*,'close system (populate unit weathering fluxes)?     : ',ctrl_force_sed_closedsystem 
        print*,'short circuit atmosphere                            : ',opt_short_circuit_atm   
@@ -126,7 +126,7 @@ CONTAINS
        print*,'CO2 outgassing rate (mol C yr-1)                    : ',par_outgas_CO2
        print*,'CO2 outgassing rate (mol C yr-1)                    : ',par_outgas_CO2
        print*,'mean volcanic/metamorphic d13C (o/oo)               : ',par_outgas_CO2_d13C
-       ! ------------------- GLOBAL AVERAGE WEATHERING PARAMETERS ------------------------------------------------------------------ !
+       ! ------------------- GLOBAL AVERAGE WEATHERING PARAMETERS ---------------------------------------------------------------- !
        print*,'--- GLOBAL AVERAGE WEATHERING PARAMETERS ---'
        print*,'global silicate weathering rate (mol Ca2+ yr-1)     : ',par_weather_CaSiO3
        print*,'basaltic silicate weathering rate (mol Ca2+ yr-1)   : ',par_weather_CaSiO3b
@@ -178,6 +178,7 @@ CONTAINS
        print*,'global kerogen ALK abundance                        : ',par_weather_kerogen_fracALK
        print*,'global kerogen S abundance                          : ',par_weather_kerogen_fracS
        print*,'global kerogen S d34S (o/oo)                        : ',par_weather_kerogen_fracS_d34S
+       print*,'global kerogen O2 oxidation demand                  : ',par_weather_kerogen_fracO2
        print*,'calibrate temperature fields to global average data : ',opt_calibrate_T_0D
        print*,'calibrate runoff fields to global average data      : ',opt_calibrate_R_0D
        print*,'calibrate productivity fields to global average data: ',opt_calibrate_P_0D
@@ -207,7 +208,7 @@ CONTAINS
        print*,'Fix associated FeCO3 fluxes                         : ',opt_weather_fixed_FeCO3
        print*,'Fix associated Ca5PO43 fluxes                       : ',opt_weather_fixed_Ca5PO43
        print*,'Fix associated SiO2 fluxes                          : ',opt_weather_fixed_SiO2
-       ! ------------------- 2D WEATHERING PARAMETERS --------------------------------------------------------------------------------!
+       ! ------------------- 2D WEATHERING PARAMETERS -----------------------------------------------------------------------------!
        print*,'--- 2D WEATHERING PARAMETERS ---'
        print*,'name of lithological data set (part 1)              : ',par_lith_data
        print*,'name of lithological data set (part 2)              : ',par_lith_data2
@@ -230,9 +231,9 @@ CONTAINS
        print*,'land productivity (kgC m-2 yr-1) calib. datafile    : ',par_data_P_2D
        print*,'separate kinetic and transport limited regimes?     : ',opt_weath_regimes
        print*,'orogeny landmask file                               : ',weath_regimes
-       ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ############################################################################# !
+       ! #### INSERT CODE TO LOAD ADDITIONAL PARAMETERS ########################################################################## !
        !
-       ! ############################################################################################################################ !
+       ! ######################################################################################################################### !
        print*,'======================================================='
     end if
 
@@ -340,9 +341,9 @@ CONTAINS
        DO j=1,n_j
           phys_rok(ipr_lat,i,j)  = (180.0/const_pi)*ASIN(loc_s(j)) ! lattitudes (degrees; +=N, -=S) of mid-points of grid cells
           phys_rok(ipr_latn,i,j)  = (180.0/const_pi)*ASIN(loc_sv(j)) ! lattitudes (degrees) of the northerly edges of grid cells
-          phys_rok(ipr_lon,i,j)  = (360.0/real(n_i))*(real(i)-0.5) + par_grid_lon_offset ! longitudes (degrees) of mid-points of grid cells
-          phys_rok(ipr_lone,i,j)  = (360.0/real(n_i))*(real(i)) + par_grid_lon_offset ! longitudes (degrees) of easterly edges of grid cells
-          phys_rok(ipr_dlat,i,j) = (180.0/const_pi)*(ASIN(loc_sv(j)) - ASIN(loc_sv(j-1))) ! heights of grid cells in degrees latitude
+          phys_rok(ipr_lon,i,j)  = (360.0/real(n_i))*(real(i)-0.5) + par_grid_lon_offset ! lon of mid-points of grid cells
+          phys_rok(ipr_lone,i,j)  = (360.0/real(n_i))*(real(i)) + par_grid_lon_offset ! lon of easterly edges of grid cells
+          phys_rok(ipr_dlat,i,j) = (180.0/const_pi)*(ASIN(loc_sv(j)) - ASIN(loc_sv(j-1))) ! heights of grid cells in degrees
           phys_rok(ipr_dlon,i,j) = (360.0/real(n_i)) ! widths of grid cells in degreees longitude
           phys_rok(ipr_A,i,j)    = 2.0*const_pi*(const_rEarth**2)*(1.0/real(n_i))*(loc_sv(j) - loc_sv(j-1)) ! areas of grid cells
           phys_rok(ipr_rA,i,j)   = 1.0/phys_rok(ipr_A,i,j) ! reciprocals of areas
@@ -390,7 +391,7 @@ CONTAINS
     !       CALL sub_load_data_ij(loc_filename,n_i,n_j,par_phys_windspeed(:,:))
     !    end if
   END SUBROUTINE sub_init_phys_ocnrok
-  ! ****************************************************************************************************************************** !     
+  ! ***************************************************************************************************************************** !     
 
   !======= SUBROUTINE TO READ IN OUTPUT YEARS ========================================================!
 

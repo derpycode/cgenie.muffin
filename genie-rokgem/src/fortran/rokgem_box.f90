@@ -446,11 +446,12 @@ CONTAINS
     REAL,INTENT(in)                 :: dum_runoff(n_i,n_j)                            ! run-off array (taken from EMBM)
     REAL,INTENT(in)                 :: dum_photo(n_i,n_j)                            ! photosythesis from land veg module (ENTS)
     REAL,INTENT(in)                 :: dum_respveg(n_i,n_j)            ! vegetation respiration from land veg module (ENTS)
-    REAL,INTENT(inout)              :: dum_sfxrok(n_ocn,n_i,n_j)                                ! ocean flux interface array (same no of tracers as used in biogem ocean)
-    REAL,INTENT(inout)              :: dum_sfxatm1(n_atm,n_io,n_jo)                             ! atmosphere flux interface array
+    REAL,INTENT(inout)              :: dum_sfxrok(n_ocn,n_i,n_j)  ! ocean flux interface array (same # tracers as biogem)
+    REAL,INTENT(inout)              :: dum_sfxatm1(n_atm,n_io,n_jo)                           ! atmosphere flux interface array
 
     ! local variables
-    INTEGER                         :: i, j, k
+    INTEGER                         :: i, j
+    INTEGER                         :: ia,io ! NOTE: use ia,io as tracer indeces rather than k in the original code ,,,
     REAL                            :: n, m
     REAL                            :: loc_avSLT
     REAL                            :: loc_SLT(n_i,n_j)
@@ -1127,7 +1128,7 @@ CONTAINS
     ! ######################################################################################################################### !
 
     ! ######################################################################################################################### !
-    ! ORGANIC MATTER / NUTRIENTS (KEROGEN)
+    ! ORGANIC MATTER / NUTRIENTS (KEROGEN) / O2 CONSUMPTION
     ! NOTE: granitic IS NOT distinguished from basaltic weathering
     ! NOTE: no carbonate weathering component
     ! NOTE: fixed vs. climate-modified (adjusted) option implemented for each kerogen elemental component
@@ -1144,12 +1145,19 @@ CONTAINS
          & fun_calc_isotope_fraction(par_weather_CaSiO3_fracC_d13C,loc_standard)*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ! O2 consumption associated with Corg weathering (and conversion of C -> dissolved CO2)
     ! NOTE: currently, this assumes an oxic atmosphere
-    ! NOTE: opt_short_circuit_atm is .true. by default
-    ! NOTE: H2S is dealt with later
+    ! NOTE: opt_short_circuit_atm is .true. by default (but this should be assumed .false. by default in the future)
+    ! NOTE: C:O2 stoichiometry needs to be derived form the Redfiel ratio and adjusted for whether N is included or not ...
+    !       ... all of which are set in BIOGEM and not accessible ... so we define par_weather_kerogen_fracO2
+    !       par_weather_kerogen_fracO2 needs to be set equal to the BIOGEM par_bio_red_POP_PO2/par_bio_red_POP_POC
+    !       minus the O2 demand associated with P (-> PO4) == 4.0/2.0 * par_bio_red_POP_POC (nominally, 106)
+    !      e.g., -138/106 (C:O2 from P:O2 and C:P) + 2/106 (less P oxidation) = -136/106 = 1.283018868
+    ! NOTE: we are assuming no N content of kerogen (and hence no O2 associated with PON)
     IF (opt_short_circuit_atm) THEN
-       loc_force_flux_weather_o(io_O2)  = loc_force_flux_weather_o(io_O2)  - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+       loc_force_flux_weather_o(io_O2)  = loc_force_flux_weather_o(io_O2)  + &
+            & par_weather_kerogen_fracO2*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ELSE
-       loc_force_flux_weather_a(ia_pO2) = loc_force_flux_weather_a(ia_pO2) - 1.0*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
+       loc_force_flux_weather_a(ia_pO2) = loc_force_flux_weather_a(ia_pO2) + &
+            & par_weather_kerogen_fracO2*par_weather_CaSiO3_fracC*loc_weather_CaSiO3
     ENDIF
     ! (2) associated P flux -- kerogen
     ! NOTE: plus (silicate) associated P flux -- retained for backwards compatability
@@ -1363,30 +1371,34 @@ CONTAINS
     ! -------------------------------------------------------- !
     ! -------------------------------------------------------- !
     
-    ! Spread out atmosphere variables' fluxes onto land
-    DO k=3,n_atm
-       loc_force_flux_weather_a_percell(k)  = loc_force_flux_weather_a(k)/nlandcells
-       loc_force_flux_weather_a_land(k,:,:) = landmask(:,:) * loc_force_flux_weather_a_percell(k)
+    ! Distribute global total atmosphere flux onto the land grid
+    DO ia=3,n_atm
+       loc_force_flux_weather_a_percell(ia)  = loc_force_flux_weather_a(ia)/nlandcells
+       loc_force_flux_weather_a_land(ia,:,:) = landmask(:,:) * loc_force_flux_weather_a_percell(ia)
     END DO
-    ! no need to route to the atmosphere - just take it straight from the cells above the land (assuming same grid)
-    ! convert from Mol/yr to Mol/sec/m^2 and put it into passing array (only take variable altered here - pCO2)
-    dum_sfxatm1(ia_PCO2,:,:)     =  loc_force_flux_weather_a_land(ia_PCO2,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
-    dum_sfxatm1(ia_PCO2_13C,:,:) =  loc_force_flux_weather_a_land(ia_PCO2_13C,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
+    ! set atmosphere exchange fluxes
+    ! convert from Mol/yr to Mol/sec/m^2 and put it into passing array
+    ! NOTE: do for all gases even though only CO2, d13C CO2, and O2 are likely to be non-zero
+    ! NOTE: CO2 is radiocarbon dead unless otherwise set
+    DO ia=3,n_atm
+       dum_sfxatm1(ia,:,:) = loc_force_flux_weather_a_land(ia,:,:)/(phys_rok(ipr_A,:,:)*conv_yr_s)
+    end do
     ! Spread out ocean variables' fluxes onto land
-    DO k=3,n_ocn
+    ! NOTE: opt_weather_runoff scales with runoff rather than an equal weighting to cell area
+    DO io=3,n_ocn
        IF (opt_weather_runoff) THEN
-          loc_force_flux_weather_o_percell(k)  = loc_force_flux_weather_o(k)/loc_totR
-          loc_force_flux_weather_o_land(k,:,:) = landmask(:,:) * dum_runoff(:,:) * loc_force_flux_weather_o_percell(k)
+          loc_force_flux_weather_o_percell(io)  = loc_force_flux_weather_o(io)/loc_totR
+          loc_force_flux_weather_o_land(io,:,:) = landmask(:,:) * dum_runoff(:,:) * loc_force_flux_weather_o_percell(io)
        else
-          loc_force_flux_weather_o_percell(k)  = loc_force_flux_weather_o(k)/nlandcells
-          loc_force_flux_weather_o_land(k,:,:) = landmask(:,:) * loc_force_flux_weather_o_percell(k)
+          loc_force_flux_weather_o_percell(io)  = loc_force_flux_weather_o(io)/nlandcells
+          loc_force_flux_weather_o_land(io,:,:) = landmask(:,:) * loc_force_flux_weather_o_percell(io)
        end if
     END DO
     ! route it into the coastal ocean cells (to pass to biogem in coupled model) and save the output to file
-    DO k=3,n_ocn
-       CALL sub_coastal_output(  loc_force_flux_weather_o_land(k,:,:),             &
-            &  runoff_drainto(:,:,:),runoff_detail(:,:),                           &
-            &  loc_force_flux_weather_o_ocean(k,:,:)                               )
+    DO io=3,n_ocn
+       CALL sub_coastal_output(loc_force_flux_weather_o_land(io,:,:), &
+            &  runoff_drainto(:,:,:),runoff_detail(:,:),              &
+            &  loc_force_flux_weather_o_ocean(io,:,:))
     END DO
     ! convert from Mol/yr to Mol/sec and put it into passing array 
     dum_sfxrok(:,:,:) = loc_force_flux_weather_o_ocean(:,:,:)/conv_yr_s
@@ -1418,14 +1430,14 @@ CONTAINS
        ENDIF
 
        IF (opt_2d_ascii_output) THEN
-          DO k=1,n_ocn
-             IF ((k.EQ.io_ALK).OR.(k.EQ.io_DIC).OR.(k.EQ.io_Ca).OR.(k.EQ.io_DIC_13C).OR.(k.EQ.io_DIC_14C)) THEN
+          DO io=1,n_ocn
+             IF ((io.EQ.io_ALK).OR.(io.EQ.io_DIC).OR.(io.EQ.io_Ca).OR.(io.EQ.io_DIC_13C).OR.(io.EQ.io_DIC_14C)) THEN
                 CALL sub_save_data_ij( &
-                     & TRIM(par_outdir_name)//'globavg_land_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
-                     n_i,n_j,loc_force_flux_weather_o_land(k,:,:))                                   
+                     & TRIM(par_outdir_name)//'globavg_land_'//TRIM(globtracer_names(io))//'_year_'//TRIM(year_text)//'.dat', &
+                     n_i,n_j,loc_force_flux_weather_o_land(io,:,:))                                   
                 CALL sub_save_data_ij( &
-                     & TRIM(par_outdir_name)//'globavg_ocean_'//TRIM(globtracer_names(k))//'_year_'//TRIM(year_text)//'.dat', &
-                     n_i,n_j,loc_force_flux_weather_o_ocean(k,:,:))  
+                     & TRIM(par_outdir_name)//'globavg_ocean_'//TRIM(globtracer_names(io))//'_year_'//TRIM(year_text)//'.dat', &
+                     n_i,n_j,loc_force_flux_weather_o_ocean(io,:,:))  
              ENDIF
           END DO
           CALL sub_save_data_ij(TRIM(par_outdir_name)//'globavg_atm_PCO2_year_'//TRIM(year_text)//'.dat', &

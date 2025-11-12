@@ -2701,6 +2701,10 @@
 			<value datatype="boolean">.true.</value>
                         <description>Toggle between isopycnal/diapycnal (.true.) and horizontal/vertical (.false.) mixing schemes</description>
                     </param>
+                    <param name="ctrl_diso_TSonly">
+			<value datatype="boolean">.false.</value>
+                        <description>Restrict isopycnal/diapycnal mixing scheme to T and S only</description>
+                    </param>
                     <param name="ssmaxsurf">
                         <value datatype="real">10.</value>
                         <description>Isopycnal slope limiting vertical flux due to isopycnal mixing. This is NOT a tunable parameter; reducing it is a quick fix for unwanted negative tracers</description>
@@ -4373,7 +4377,19 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                         <value datatype="real">1.8182e-02</value>
                         <description>maximum C/P (1.8182e-02 == 1.0/55.0 -- see Galbraith and Martiny, 2015)</description>
                     </param>
-<!-- malod: flexible stoichiometry  end -->
+                    <param name="opt_bio_red_PC_flex">
+                        <value datatype="integer">0</value>
+                        <description>[REVISED] C/P organic matter fixed or flexible stoichiometry option</description>
+                    </param>
+                    <param name="par_bio_red_PC_flex_min">
+                        <value datatype="real">62.0</value>
+                        <description>[REVISED] minimum C/P == 1 / 0.016 -- P/C of 0.016 is about the max -- see Figure 1, S3 Galbraith and Martiny, 2015</description>
+                    </param>
+                    <param name="par_bio_red_PC_flex_scale">
+                        <value datatype="real">1.0</value>
+                        <description>[REVISED] scaling of C/P to e.g., align with a global flux-weighted mean value of 106.0</description>
+                    </param>
+<!-- malod: flexible stoichiometry end -->
                     <param name="par_bio_red_POP_PO2">
 			<value datatype="real">-138.0</value>
                         <description>O2/P organic matter pseudo-Redfield ratio</description>
@@ -8397,6 +8413,10 @@ par_bio_red_PC_alpha2 scales the offset of 6.0e-3 of Galbraith & Martiny, 2015 C
                     <param name="par_weather_kerogen_fracS_d34S">
 			<value datatype="real">0.0</value>
 			      <description>global kerogen S d34S (o/oo)</description>
+                    </param>
+                    <param name="par_weather_kerogen_fracO2">
+			<value datatype="real">-1.283018868</value>
+			      <description>global kerogen oxidation O2 demand (should be negative!), e.g., -138/106 (C:O2 from P:O2 and C:P) + 2/106 (less P oxidation) = -136/106</description>
                     </param>
                     <param name="opt_calibrate_T_0D">
 			<value datatype="boolean">.FALSE.</value>

@@ -180,6 +180,9 @@ CONTAINS
        print*,'PC_alpha1, scaling of flexible C/P ratio            : ',par_bio_red_PC_alpha1
        print*,'PC_alpha2, offset of flexible C/P ratio             : ',par_bio_red_PC_alpha2
        print*,'maximum C/P                                         : ',par_bio_red_PC_max
+       print*,'option for C/P organic matter (flexible == 3)       : ',opt_bio_red_PC_flex
+       print*,'scaling of C/P                                      : ',par_bio_red_PC_flex_scale
+       print*,'minimum C/P                                         : ',par_bio_red_PC_flex_min
        print*,'O2/P organic matter pseudo-Redfield ratio           : ',par_bio_red_POP_PO2
        print*,'ALK/N alkalinty correction factor                   : ',par_bio_red_PON_ALK
        print*,'Production fraction of dissolved organic matter     : ',par_bio_red_DOMfrac
@@ -606,6 +609,10 @@ CONTAINS
     if (par_bio_remin_sinkingrate_physical < const_real_nullsmall) then
        par_bio_remin_sinkingrate_physical = par_bio_remin_sinkingrate
        par_bio_remin_sinkingrate_reaction = par_bio_remin_sinkingrate_scav
+    end if
+    ! flexible C:P
+    if (par_bio_red_PC_flex > 0) then
+       opt_bio_red_PC_flex = par_bio_red_PC_flex
     end if
     ! -------------------------------------------------------- !
     ! adjust units
@@ -1304,6 +1311,7 @@ CONTAINS
     ! NOTE: set no PON O2 demand if NO3 tracer not selected (and increase POC O2 demand)
     ! NOTE: NO3 uptake assumed as: 2H+ + 2NO3- -> 2PON + (5/2)O2 + H2O
     !       (and as implemented, per mol N, this ends up as (5/2)/2 = 5.0/4.0
+    ! NOTE: if N is not selected we are implicitly assuming a slightly different O2 demand for oxidation of the C and H in POM
     if (ocn_select(io_NO3)) then
        conv_sed_ocn(io_O2,is_PON) = -(5.0/4.0)
     else
