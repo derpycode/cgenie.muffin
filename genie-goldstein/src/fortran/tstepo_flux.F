@@ -20,6 +20,7 @@ c KICO ediff calc needs
       real tec, scc, dzrho, rdzrho, slim, tv1
       real dxrho(4), dxts(maxl,4), dyrho(4), dyts(maxl,4), dzts(maxl)
       integer ina, nnp, knp
+      integer loc_lmax
 
 c ------------------------------------------------------------ c
 c INITIALIZE VARIABLES
@@ -143,8 +144,15 @@ c flux above
      1                       *rdza(k)*diffv
                   endif
                enddo
+c     isoneutral diffusion
                if(diso)then
-c isoneutral diffusion
+c limit isoneutral diffusion to only T and S?
+                  if (ctrl_diso_TSonly) then
+                     loc_lmax = 2
+                  else
+                     loc_lmax = lmax                     
+                  end if
+c check for valid ocean level (k)
                   if(k.ge.k1(i,j).and.k.lt.kmax)then
                      if(dzrho.lt.-1e-12)then
                         tv1 = 0.0
@@ -153,7 +161,7 @@ c tracer loop
                            do nnp=0,1
                               ina = 1+nnp + 2*knp
 c phi derivatives
-                              do l=1,lmax
+                              do l=1,loc_lmax
                                  if(k+knp.ge.k1(i-1+2*nnp,j))then
                                     dxts(l,ina) = (ts1(l,i+nnp,j,k+knp)
      2                                   - ts1(l,i+nnp-1,j,k+knp))
@@ -194,7 +202,7 @@ c test vertical diffusion number
                         if(tv.gt.dmax)then
                            dmax = tv
                         endif
-                        do l=1,lmax
+                        do l=1,loc_lmax
                            dzts(l) = (ts1(l,i,j,k+1) 
      1                          - ts1(l,i,j,k))*rdza(k)
 c add isoneutral vertical flux

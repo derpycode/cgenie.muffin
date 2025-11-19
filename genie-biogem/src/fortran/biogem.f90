@@ -1724,7 +1724,7 @@ subroutine biogem(        &
                           locij_focnatm(ia_pH2S_34S,i,j)  = 0.0
                        end IF
                     end IF
-                 case ('KMM_lowO2')
+                 case ('KMM_lowO2') ! NOTE: currently this does nothing different from 'KMM' ...
                     IF (                                                       &
                          & (locij_focnatm(ia_pH2S,i,j) > const_real_nullsmall) &
                          & ) THEN
@@ -1736,10 +1736,15 @@ subroutine biogem(        &
                        ! update flux reporting
                        locij_focnatm(ia_pO2,i,j)   = locij_focnatm(ia_pO2,i,j)   - 2.0*locij_focnatm(ia_pH2S,i,j)
                        locij_focnatm(ia_pH2S,i,j)  = 0.0
-                       ! ### INSERT CODE FOR ISOTOPES ############################################################################ !
-                       !
-                       ! ######################################################################################################### !
+                       ! update isotope mass balance and reporting
+                       if (atm_select(ia_pH2S_34S)) then
+                          locijk_focn(io_SO4_34S,i,j,n_k) = locijk_focn(io_SO4_34S,i,j,n_k) + locij_focnatm(ia_pH2S_34S,i,j)
+                          locij_fatm(ia_pH2S_34S,i,j)     = 0.0
+                          locij_focnatm(ia_pH2S_34S,i,j)  = 0.0
+                       end IF
                     end IF
+                 case ('NONE')
+                    ! allow H2S exchange with atmosphere
                  case default
                     ! no flux to atmosphere
                     locij_fatm(ia_pH2S,i,j)    = 0.0
