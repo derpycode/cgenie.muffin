@@ -118,13 +118,15 @@ c     and not the vegetation biomass as a whole
 c     (and that there is no fractionation associated with respiration)
 c     if both fixed and respired carbon have the same isotopic composition, and the respiration rate exceeds photosynthesis,
 c     slightly odd (non physical) things might happen isotopically
+c     13/3/26: loc_r13C_photo*respveg changed to loc_r13C_Cveg*respveg
                
                call veg_resp(Cveg(i,j),tair(i,j),respveg(i,j))
-               respveg_13C(i,j)=loc_r13C_photo*respveg(i,j)
-               respveg_14C(i,j)=loc_r14C_photo*respveg(i,j)
+			   respveg_13C(i,j)=loc_r13C_Cveg*respveg(i,j)
+               respveg_14C(i,j)=loc_r14C_Cveg*respveg(i,j)
+
 
 c     msw Calculate leaf turnover (kgC/m2/yr)
-c     NOTE: the original also implicitly assumeed that leaf production is only associated with photosynthesis and 'new' carbon
+c     NOTE: the original also implicitly assumed that leaf production is only associated with photosynthesis and 'new' carbon
 c     combined, using loc_r13C_photo for both veg carbon loss terms means that once steady state biomass has been attained
 c     if pCO2 and climate does not change, loc_r13C_Cveg can never change
 c     ideally, one of respveg or leaf should reflect the isotopic composition of Cveg, and as 'leaf' in reality includes
