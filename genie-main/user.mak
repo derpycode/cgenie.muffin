@@ -84,3 +84,6 @@ NETCDF_DIR=/usr/local
 #NETCDF_DIR=/usr/local/Cellar/netcdf/4.9.2_1
 
 NETCDF_NAME=netcdf
+
+NETCDF_LINK_FLAGS=-L$(NETCDF_DIR)/lib -lnetcdf -lnetcdff
+#NETCDF_LINK_FLAGS=-L$(NETCDF_DIR)/lib -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lm -lz -lbz2 -lzstd -lxml2
