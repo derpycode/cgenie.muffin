@@ -20,11 +20,11 @@ All experiments are run from:$HOME/cgenie.muffin/genie-main
 The commands to run the model configurations as listed in the Methods are listed here.
 
 (1) Eocene simulations using Ridgwell and Schmidt (2010) physical forcing (Eocene55c), Reinhard et al. (2020) redox scheme (cgenie.muffin) and Naafs et al. (2019) nitrogen cycle parameters 
-./runmuffin.sh muffin.CB.p_p0055c.BASESN PUBS/submitted/Zhao_et_al.2026 Eocene55c_NT_05P2C 10000
-./runmuffin.sh muffin.CB.p_p0055c.BASESN PUBS/submitted/Zhao_et_al.2026 Eocene55c_NT_075P6C 10000
+./runmuffin.sh muffin.CB.p_p0055c.BASESN PUBS/submitted/Zhao_et_al.Nature.2026 Eocene55c_NT_05P2C 10000
+./runmuffin.sh muffin.CB.p_p0055c.BASESN PUBS/submitted/Zhao_et_al.Nature.2026 Eocene55c_NT_075P6C 10000
 
 (2) Modern simulation 
-./runmuffin.sh muffin.CB.worlg4.BASESFeTDTL_Ncycle PUBS/submitted/Zhao_et_al.2026 preind_NFeT_exp23_Nitri9_muffin 10000
+./runmuffin.sh muffin.CB.worlg4.BASESFeTDTL_Ncycle PUBS/submitted/Zhao_et_al.Nature.2026 preind_NFeT_exp23_Nitri9_muffin 10000
 
 ################################################################
 ################################################################
