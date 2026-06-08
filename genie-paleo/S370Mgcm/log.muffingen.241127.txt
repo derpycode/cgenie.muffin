@@ -1,0 +1,2290 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.9.26
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GCM == hadcm3 (OK)
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+       - Axis info read.
+>   4. READING MASK & TOPO GRIDS ...
+       - Mask & topo info read.
+>   5. RE-GRIDING MASK ...
+       - Mask re-gridded.
+       * Original land area fraction    = 0.17112
+       * Re-gridded land area fraction  = 0.15586
+>   6. FILTERING MASK ...
+       - Single cell embayments filtered out.
+       - Polar connections cleaned up.
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.15895
+>   7. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (6, 1) now land
+         -> Cell at (5, 1) now land
+         -> Cell at (4, 1) now land
+         -> Cell at (3, 1) now land
+         -> Cell at (2, 1) now land
+       - Out of grid range
+       * Mask alteration complete
+       * Revised land area fraction = 0.16204
+       - User-editing complete.
+>   8. CREATE FINAL MASK ...
+       - .mask_out.FINAL.dat saved
+       * Final land area fraction   = 0.16204
+>   9. RE-GRIDING TOPOGRAPHY ...
+       - Topography re-gridded.
+>   10. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  11. FILTERING BATHYMETRY ...
+         -> MAKE DEEPER :: Loop count = 1 @ (12,32,8); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (13,26,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (13,27,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (13,30,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (13,31,1); s = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (14,25,15); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (14,27,1); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (15,29,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,17,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,19,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,20,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,21,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,22,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,23,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (16,24,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (17,15,1); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (18,10,14); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (18,15,6); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (19,10,1); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (19,11,13); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (19,15,1); s = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (20,10,12); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,13,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (20,15,12); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,16,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,17,1); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,22,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,23,1); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,28,1); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (20,29,13); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (20,30,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (21,13,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (21,14,2); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (21,17,10); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (21,20,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (21,21,1); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (21,22,5); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (21,25,9); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (21,26,1); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (21,30,13); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (21,31,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (22,32,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (23,27,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (23,28,8); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (24,13,3); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 1 @ (24,24,2); d = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (25,8,3); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (25,26,1); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (26,22,2); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (27,25,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (27,30,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (28,24,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (28,31,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (29,17,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (29,22,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (29,23,9); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (29,31,15); d = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (30,20,11); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 1 @ (30,24,13); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (30,25,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (30,26,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 1 @ (31,21,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 1 @ (32,21,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (32,22,1); s = 2; l = 2
+         -> MAKE DEEPER :: Loop count = 1 @ (34,32,13); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 1 @ (35,33,1); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (12,32,7); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (13,26,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (13,27,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (14,27,2); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (15,29,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,15,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,16,1); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,17,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,19,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,20,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,21,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,22,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,23,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (16,24,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (17,15,2); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (18,10,13); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (18,15,5); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (19,10,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (19,15,2); s = 3; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (20,10,11); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (20,15,11); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,16,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,17,2); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,22,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,23,2); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,26,1); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,28,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (20,30,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (21,13,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (21,14,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (21,17,9); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (21,25,8); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (21,26,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (21,31,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (22,32,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (23,27,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (23,28,9); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 2 @ (24,13,2); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (25,26,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (26,25,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (27,25,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (27,30,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (28,24,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (28,31,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (29,17,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (29,21,1); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (29,22,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (29,23,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (30,25,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 2 @ (30,26,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 2 @ (31,21,2); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 2 @ (34,32,12); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (34,33,1); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 2 @ (35,33,2); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (12,32,6); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (13,26,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (13,27,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (14,27,3); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (15,29,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,15,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,16,2); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,17,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,19,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,20,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,21,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,22,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,23,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (16,24,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (18,15,4); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (19,10,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (19,15,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (20,10,10); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 3 @ (20,15,10); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,16,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,17,3); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,22,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,23,3); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,26,2); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,28,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (20,30,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (21,13,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (21,26,3); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (21,31,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (22,32,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (23,27,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (23,28,10); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (25,26,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (26,25,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (27,25,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (27,30,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (28,24,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (28,31,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (29,17,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (29,21,2); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (29,22,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (29,23,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (30,25,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 3 @ (30,26,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 3 @ (31,21,3); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 3 @ (34,32,11); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (34,33,2); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 3 @ (35,33,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 4 @ (12,32,5); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (14,27,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (15,29,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,16,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,17,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,19,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,20,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,21,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,22,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,23,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (16,24,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (19,10,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 4 @ (19,15,4); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 4 @ (20,10,9); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 4 @ (20,15,9); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 4 @ (20,16,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (20,17,4); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (20,26,3); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (20,28,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (20,30,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (21,26,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 4 @ (21,31,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (22,32,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (23,27,6); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 4 @ (25,26,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (26,25,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (27,25,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (27,30,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (28,24,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (28,31,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (29,17,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (29,21,3); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (29,22,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (30,25,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (30,26,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 4 @ (31,21,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 4 @ (34,33,3); s = 3; l = 0
+         -> MAKE DEEPER :: Loop count = 5 @ (12,32,4); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (13,27,4); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 5 @ (14,27,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (15,29,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,16,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,17,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,19,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,20,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,21,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,22,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,23,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (16,24,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (19,10,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 5 @ (19,15,5); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 5 @ (20,10,8); d = 4; l = 0
+         -> MAKE DEEPER :: Loop count = 5 @ (20,15,8); d = 4; l = 0
+         -> MAKE SHALLOWER :: Loop count = 5 @ (20,16,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (20,17,5); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (20,26,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (20,28,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (20,30,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (21,31,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (22,32,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (23,27,7); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 5 @ (25,26,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (26,25,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (27,25,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (27,30,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (28,24,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (28,31,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (29,17,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (29,21,4); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (29,22,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (30,25,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 5 @ (30,26,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 5 @ (31,21,5); s = 2; l = 1
+         -> MAKE DEEPER :: Loop count = 6 @ (12,32,3); d = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (13,26,4); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (13,27,5); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 6 @ (14,27,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (15,29,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,16,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,17,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,19,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,20,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,21,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,22,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,23,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (16,24,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (19,10,6); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 6 @ (19,15,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (20,16,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (20,17,6); s = 3; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (20,28,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (20,30,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (21,31,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (22,32,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (23,27,8); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 6 @ (25,26,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (26,25,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (27,25,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (27,30,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (28,24,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (28,31,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (29,17,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (29,21,5); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (29,22,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (30,25,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 6 @ (30,26,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 6 @ (31,21,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (13,26,5); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (13,27,6); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 7 @ (14,27,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (15,29,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,16,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,17,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,19,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,20,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,21,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,22,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,23,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (16,24,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (20,17,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (20,28,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (20,30,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (21,31,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (22,32,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (25,26,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (26,25,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (27,25,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (27,30,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (28,24,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (28,31,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (29,17,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (29,21,6); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (29,22,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (30,25,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 7 @ (30,26,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 7 @ (31,21,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (13,26,6); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (13,27,7); s = 3; l = 0
+         -> MAKE SHALLOWER :: Loop count = 8 @ (14,27,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (15,29,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,16,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,17,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,19,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,20,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,21,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,22,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,23,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (16,24,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (20,28,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (20,30,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (21,31,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (22,32,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (25,26,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (26,25,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (27,25,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (27,30,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (28,24,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (28,31,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (29,21,7); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (29,22,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (30,25,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 8 @ (30,26,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 8 @ (31,21,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (13,26,7); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (14,27,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (15,29,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,16,8); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,17,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,19,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,20,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,21,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,22,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,23,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (16,24,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (20,28,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (20,30,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (21,31,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (22,32,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (25,26,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (26,25,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (27,25,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (27,30,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (28,24,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (28,31,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (29,21,8); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (29,22,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (30,25,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 9 @ (30,26,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 9 @ (31,21,9); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (14,27,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (15,29,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (16,17,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (16,19,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (16,20,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (16,21,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (16,22,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (16,23,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (16,24,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (20,28,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (20,30,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (21,31,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (22,32,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (26,25,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (27,25,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (27,30,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (28,24,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (28,31,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (29,21,9); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 10 @ (30,25,10); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 10 @ (30,26,10); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 11 @ (14,27,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (16,17,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (16,19,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (16,20,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (16,21,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (16,22,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (16,23,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (16,24,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (20,28,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (20,30,11); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 11 @ (21,31,11); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 11 @ (22,32,11); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 11 @ (27,30,11); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 11 @ (28,31,11); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 11 @ (30,25,11); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 11 @ (30,26,11); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 12 @ (14,27,12); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 12 @ (16,19,12); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 12 @ (16,20,12); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 12 @ (16,21,12); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 12 @ (16,22,12); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 12 @ (16,23,12); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 12 @ (16,24,12); s = 2; l = 1
+         -> MAKE SHALLOWER :: Loop count = 12 @ (22,32,12); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 12 @ (27,30,12); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 12 @ (28,31,12); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 13 @ (27,30,13); s = 2; l = 2
+         -> MAKE SHALLOWER :: Loop count = 13 @ (28,31,13); s = 2; l = 2
+       - Topography filtered.
+>  12. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button, or clickoutside the grid, to finish
+         -> Shallowing cell at (18, 30) to k=2
+         -> Shallowing cell at (18, 30) to k=3
+         -> Shallowing cell at (18, 30) to k=4
+         -> Shallowing cell at (18, 30) to k=5
+         -> Shallowing cell at (18, 30) to k=6
+         -> Shallowing cell at (18, 30) to k=7
+         -> Shallowing cell at (18, 30) to k=8
+         -> Shallowing cell at (18, 30) to k=9
+         -> Shallowing cell at (18, 30) to k=10
+         -> Shallowing cell at (18, 30) to k=11
+         -> Shallowing cell at (18, 30) to k=12
+         -> Shallowing cell at (18, 30) to k=13
+         -> Shallowing cell at (18, 30) to k=14
+         -> Shallowing cell at (18, 29) to k=2
+         -> Shallowing cell at (18, 29) to k=3
+         -> Shallowing cell at (18, 29) to k=4
+         -> Shallowing cell at (18, 29) to k=5
+         -> Shallowing cell at (18, 29) to k=6
+         -> Shallowing cell at (18, 29) to k=7
+         -> Shallowing cell at (18, 29) to k=8
+         -> Shallowing cell at (18, 29) to k=9
+         -> Shallowing cell at (18, 29) to k=10
+         -> Shallowing cell at (18, 29) to k=11
+         -> Shallowing cell at (18, 29) to k=12
+         -> Shallowing cell at (18, 29) to k=13
+         -> Shallowing cell at (18, 29) to k=14
+         -> Shallowing cell at (18, 28) to k=2
+         -> Shallowing cell at (18, 28) to k=3
+         -> Shallowing cell at (18, 28) to k=4
+         -> Shallowing cell at (18, 28) to k=5
+         -> Shallowing cell at (18, 28) to k=6
+         -> Shallowing cell at (18, 28) to k=7
+         -> Shallowing cell at (18, 28) to k=8
+         -> Shallowing cell at (18, 28) to k=9
+         -> Shallowing cell at (18, 28) to k=10
+         -> Shallowing cell at (18, 28) to k=11
+         -> Shallowing cell at (18, 28) to k=12
+         -> Shallowing cell at (19, 28) to k=2
+         -> Shallowing cell at (18, 28) to k=13
+         -> Shallowing cell at (18, 28) to k=14
+         -> Shallowing cell at (19, 28) to k=3
+         -> Shallowing cell at (19, 28) to k=4
+         -> Shallowing cell at (19, 28) to k=5
+         -> Shallowing cell at (19, 28) to k=6
+         -> Shallowing cell at (19, 28) to k=7
+         -> Shallowing cell at (19, 28) to k=8
+         -> Shallowing cell at (19, 28) to k=9
+         -> Shallowing cell at (19, 28) to k=10
+         -> Shallowing cell at (19, 28) to k=11
+         -> Shallowing cell at (19, 28) to k=12
+         -> Shallowing cell at (19, 28) to k=13
+         -> Shallowing cell at (19, 28) to k=14
+         -> Shallowing cell at (20, 28) to k=2
+         -> Shallowing cell at (20, 28) to k=3
+         -> Shallowing cell at (20, 28) to k=4
+         -> Shallowing cell at (20, 28) to k=5
+         -> Shallowing cell at (20, 28) to k=6
+         -> Shallowing cell at (20, 28) to k=7
+         -> Shallowing cell at (20, 28) to k=8
+         -> Shallowing cell at (20, 28) to k=9
+         -> Shallowing cell at (20, 28) to k=10
+         -> Shallowing cell at (20, 28) to k=11
+         -> Shallowing cell at (20, 28) to k=12
+         -> Shallowing cell at (20, 28) to k=13
+         -> Shallowing cell at (20, 28) to k=14
+         -> Shallowing cell at (21, 28) to k=2
+         -> Shallowing cell at (21, 28) to k=3
+         -> Shallowing cell at (21, 28) to k=4
+         -> Shallowing cell at (21, 28) to k=5
+         -> Shallowing cell at (21, 28) to k=6
+         -> Shallowing cell at (21, 28) to k=7
+         -> Shallowing cell at (21, 28) to k=8
+         -> Shallowing cell at (21, 28) to k=9
+         -> Shallowing cell at (21, 28) to k=10
+         -> Shallowing cell at (21, 28) to k=11
+         -> Shallowing cell at (21, 28) to k=12
+         -> Shallowing cell at (20, 27) to k=8
+         -> Shallowing cell at (20, 27) to k=9
+         -> Shallowing cell at (20, 27) to k=10
+         -> Shallowing cell at (20, 27) to k=11
+         -> Shallowing cell at (20, 27) to k=12
+         -> Shallowing cell at (20, 27) to k=13
+         -> Shallowing cell at (19, 27) to k=8
+         -> Shallowing cell at (19, 27) to k=9
+         -> Shallowing cell at (19, 27) to k=10
+         -> Shallowing cell at (19, 27) to k=11
+         -> Shallowing cell at (19, 27) to k=12
+         -> Shallowing cell at (19, 27) to k=13
+         -> Shallowing cell at (19, 27) to k=14
+         -> Shallowing cell at (19, 27) to k=15
+         -> Deepening cell at (19, 27) to k=14
+         -> Shallowing cell at (18, 31) to k=2
+         -> Shallowing cell at (18, 31) to k=3
+         -> Shallowing cell at (18, 31) to k=4
+         -> Shallowing cell at (18, 31) to k=5
+         -> Shallowing cell at (18, 31) to k=6
+         -> Shallowing cell at (18, 31) to k=7
+         -> Shallowing cell at (18, 31) to k=8
+         -> Shallowing cell at (18, 31) to k=9
+         -> Shallowing cell at (18, 31) to k=10
+         -> Shallowing cell at (18, 31) to k=11
+         -> Shallowing cell at (18, 31) to k=12
+         -> Shallowing cell at (18, 31) to k=13
+         -> Deepening cell at (18, 31) to k=12
+         -> Shallowing cell at (17, 28) to k=13
+         -> Shallowing cell at (18, 27) to k=13
+         -> Shallowing cell at (18, 26) to k=13
+         -> Shallowing cell at (19, 26) to k=13
+         -> Shallowing cell at (19, 25) to k=12
+         -> Shallowing cell at (19, 25) to k=13
+         -> Shallowing cell at (20, 28) to k=15
+         -> Deepening cell at (20, 28) to k=14
+         -> Deepening cell at (19, 27) to k=13
+         -> Shallowing cell at (19, 27) to k=14
+         -> Shallowing cell at (19, 27) to k=15
+         -> Deepening cell at (19, 27) to k=14
+         -> Shallowing cell at (18, 27) to k=14
+         -> Deepening cell at (18, 27) to k=13
+         -> Shallowing cell at (16, 30) to k=7
+         -> Shallowing cell at (16, 30) to k=8
+         -> Shallowing cell at (17, 31) to k=8
+         -> Shallowing cell at (17, 31) to k=9
+         -> Shallowing cell at (17, 32) to k=2
+       - Cannot deepen/shallow cell at (15, 30)
+         -> Shallowing cell at (18, 32) to k=2
+         -> Shallowing cell at (18, 32) to k=3
+         -> Shallowing cell at (18, 32) to k=4
+         -> Shallowing cell at (18, 32) to k=5
+         -> Shallowing cell at (18, 32) to k=6
+         -> Shallowing cell at (18, 32) to k=7
+         -> Shallowing cell at (19, 32) to k=2
+         -> Shallowing cell at (19, 32) to k=3
+         -> Shallowing cell at (19, 32) to k=4
+         -> Shallowing cell at (19, 32) to k=5
+         -> Shallowing cell at (20, 32) to k=2
+         -> Shallowing cell at (20, 32) to k=3
+         -> Shallowing cell at (20, 32) to k=4
+         -> Shallowing cell at (20, 32) to k=5
+         -> Deepening cell at (20, 32) to k=4
+         -> Shallowing cell at (22, 29) to k=2
+         -> Shallowing cell at (22, 29) to k=3
+         -> Shallowing cell at (22, 30) to k=2
+         -> Shallowing cell at (22, 30) to k=3
+         -> Shallowing cell at (22, 30) to k=4
+         -> Shallowing cell at (22, 30) to k=5
+         -> Shallowing cell at (19, 32) to k=6
+         -> Deepening cell at (19, 32) to k=5
+         -> Shallowing cell at (20, 32) to k=5
+         -> Shallowing cell at (19, 32) to k=6
+         -> Shallowing cell at (18, 32) to k=8
+         -> Deepening cell at (17, 31) to k=8
+         -> Shallowing cell at (17, 31) to k=9
+         -> Shallowing cell at (17, 31) to k=10
+         -> Deepening cell at (17, 31) to k=9
+         -> Deepening cell at (17, 31) to k=8
+         -> Deepening cell at (17, 31) to k=7
+         -> Shallowing cell at (16, 30) to k=9
+         -> Shallowing cell at (16, 30) to k=10
+         -> Deepening cell at (16, 30) to k=9
+         -> Deepening cell at (16, 30) to k=8
+         -> Shallowing cell at (15, 29) to k=2
+         -> Deepening cell at (15, 29) to k=1
+         -> Shallowing cell at (16, 30) to k=9
+         -> Shallowing cell at (22, 30) to k=6
+         -> Shallowing cell at (22, 29) to k=4
+         -> Shallowing cell at (22, 29) to k=5
+         -> Deepening cell at (22, 30) to k=5
+         -> Shallowing cell at (22, 29) to k=6
+         -> Deepening cell at (22, 29) to k=5
+         -> Shallowing cell at (23, 29) to k=3
+         -> Shallowing cell at (24, 29) to k=3
+         -> Shallowing cell at (23, 29) to k=4
+         -> Shallowing cell at (25, 29) to k=3
+         -> Shallowing cell at (25, 29) to k=4
+         -> Deepening cell at (25, 29) to k=3
+         -> Shallowing cell at (16, 10) to k=2
+         -> Shallowing cell at (16, 10) to k=3
+         -> Shallowing cell at (16, 10) to k=4
+         -> Shallowing cell at (16, 10) to k=5
+         -> Shallowing cell at (16, 10) to k=6
+         -> Shallowing cell at (16, 10) to k=7
+         -> Shallowing cell at (16, 10) to k=8
+         -> Shallowing cell at (16, 10) to k=9
+         -> Shallowing cell at (16, 10) to k=10
+         -> Shallowing cell at (16, 10) to k=11
+         -> Shallowing cell at (16, 10) to k=12
+         -> Shallowing cell at (16, 10) to k=13
+         -> Shallowing cell at (16, 10) to k=14
+         -> Shallowing cell at (16, 11) to k=2
+         -> Shallowing cell at (16, 11) to k=3
+         -> Shallowing cell at (16, 11) to k=4
+         -> Shallowing cell at (16, 11) to k=5
+         -> Shallowing cell at (16, 11) to k=6
+         -> Shallowing cell at (16, 11) to k=7
+         -> Shallowing cell at (16, 11) to k=8
+         -> Shallowing cell at (16, 11) to k=9
+         -> Shallowing cell at (16, 11) to k=10
+         -> Shallowing cell at (16, 11) to k=11
+         -> Shallowing cell at (16, 11) to k=12
+         -> Shallowing cell at (16, 11) to k=13
+         -> Shallowing cell at (15, 11) to k=2
+         -> Shallowing cell at (15, 11) to k=3
+         -> Shallowing cell at (15, 11) to k=4
+         -> Shallowing cell at (15, 11) to k=5
+         -> Shallowing cell at (15, 11) to k=6
+         -> Shallowing cell at (15, 11) to k=7
+         -> Shallowing cell at (15, 11) to k=8
+         -> Shallowing cell at (15, 11) to k=9
+         -> Shallowing cell at (15, 11) to k=10
+         -> Shallowing cell at (15, 11) to k=11
+         -> Shallowing cell at (15, 11) to k=12
+         -> Shallowing cell at (15, 11) to k=13
+         -> Shallowing cell at (15, 11) to k=14
+         -> Shallowing cell at (16, 11) to k=14
+         -> Shallowing cell at (16, 12) to k=2
+         -> Shallowing cell at (16, 12) to k=3
+         -> Shallowing cell at (16, 12) to k=4
+         -> Shallowing cell at (16, 12) to k=5
+         -> Shallowing cell at (16, 12) to k=6
+         -> Shallowing cell at (16, 12) to k=7
+         -> Shallowing cell at (16, 12) to k=8
+         -> Shallowing cell at (16, 12) to k=9
+         -> Shallowing cell at (16, 12) to k=10
+         -> Shallowing cell at (16, 12) to k=11
+         -> Shallowing cell at (16, 12) to k=12
+         -> Shallowing cell at (16, 12) to k=13
+         -> Shallowing cell at (16, 12) to k=14
+         -> Shallowing cell at (16, 12) to k=15
+         -> Deepening cell at (16, 12) to k=14
+         -> Shallowing cell at (16, 12) to k=15
+         -> Shallowing cell at (15, 12) to k=2
+         -> Deepening cell at (16, 12) to k=14
+         -> Shallowing cell at (15, 12) to k=3
+         -> Shallowing cell at (15, 12) to k=4
+         -> Shallowing cell at (15, 12) to k=5
+         -> Shallowing cell at (15, 12) to k=6
+         -> Shallowing cell at (15, 12) to k=7
+         -> Shallowing cell at (15, 12) to k=8
+         -> Shallowing cell at (15, 12) to k=9
+         -> Shallowing cell at (15, 12) to k=10
+         -> Shallowing cell at (15, 12) to k=11
+         -> Shallowing cell at (15, 12) to k=12
+         -> Shallowing cell at (15, 12) to k=13
+         -> Shallowing cell at (15, 12) to k=14
+       - Cannot deepen/shallow cell at (17, 11)
+         -> Shallowing cell at (16, 10) to k=15
+         -> Deepening cell at (16, 10) to k=14
+         -> Shallowing cell at (16, 10) to k=15
+         -> Deepening cell at (16, 10) to k=14
+         -> Deepening cell at (16, 10) to k=13
+         -> Shallowing cell at (16, 10) to k=14
+         -> Shallowing cell at (16, 10) to k=15
+         -> Shallowing cell at (22, 29) to k=6
+         -> Shallowing cell at (25, 30) to k=2
+         -> Shallowing cell at (26, 29) to k=2
+         -> Shallowing cell at (25, 28) to k=2
+         -> Shallowing cell at (24, 28) to k=2
+         -> Shallowing cell at (23, 28) to k=2
+         -> Shallowing cell at (22, 28) to k=2
+         -> Shallowing cell at (21, 27) to k=5
+         -> Shallowing cell at (20, 26) to k=8
+         -> Shallowing cell at (20, 26) to k=9
+         -> Shallowing cell at (21, 25) to k=2
+         -> Shallowing cell at (21, 26) to k=2
+         -> Shallowing cell at (22, 25) to k=2
+         -> Shallowing cell at (22, 25) to k=3
+         -> Shallowing cell at (21, 25) to k=3
+         -> Shallowing cell at (21, 26) to k=3
+         -> Shallowing cell at (20, 23) to k=7
+         -> Shallowing cell at (21, 23) to k=5
+         -> Shallowing cell at (21, 23) to k=6
+         -> Shallowing cell at (19, 23) to k=8
+         -> Deepening cell at (19, 23) to k=7
+         -> Shallowing cell at (20, 23) to k=8
+         -> Deepening cell at (21, 23) to k=5
+         -> Shallowing cell at (21, 22) to k=5
+         -> Shallowing cell at (22, 22) to k=2
+         -> Shallowing cell at (22, 22) to k=3
+         -> Shallowing cell at (22, 22) to k=4
+         -> Shallowing cell at (22, 22) to k=5
+         -> Shallowing cell at (21, 22) to k=6
+         -> Shallowing cell at (21, 23) to k=6
+         -> Shallowing cell at (24, 23) to k=2
+         -> Shallowing cell at (23, 23) to k=2
+         -> Shallowing cell at (23, 24) to k=2
+         -> Shallowing cell at (24, 24) to k=2
+         -> Shallowing cell at (24, 24) to k=3
+         -> Shallowing cell at (24, 24) to k=4
+         -> Shallowing cell at (24, 24) to k=5
+         -> Shallowing cell at (24, 23) to k=3
+         -> Shallowing cell at (24, 23) to k=4
+         -> Shallowing cell at (24, 23) to k=5
+         -> Shallowing cell at (24, 23) to k=6
+         -> Shallowing cell at (24, 23) to k=7
+         -> Shallowing cell at (23, 23) to k=3
+         -> Shallowing cell at (23, 23) to k=4
+         -> Shallowing cell at (23, 23) to k=5
+         -> Shallowing cell at (23, 23) to k=6
+         -> Shallowing cell at (23, 23) to k=7
+         -> Shallowing cell at (23, 24) to k=3
+         -> Shallowing cell at (23, 24) to k=4
+         -> Shallowing cell at (23, 24) to k=5
+         -> Shallowing cell at (24, 23) to k=8
+         -> Deepening cell at (24, 23) to k=7
+         -> Shallowing cell at (24, 22) to k=2
+         -> Shallowing cell at (24, 22) to k=3
+         -> Shallowing cell at (24, 22) to k=4
+         -> Shallowing cell at (24, 22) to k=5
+         -> Shallowing cell at (24, 21) to k=2
+         -> Shallowing cell at (23, 20) to k=2
+         -> Shallowing cell at (23, 20) to k=3
+         -> Shallowing cell at (23, 20) to k=4
+         -> Shallowing cell at (23, 20) to k=5
+         -> Shallowing cell at (22, 20) to k=2
+         -> Shallowing cell at (22, 20) to k=3
+         -> Shallowing cell at (22, 20) to k=4
+         -> Shallowing cell at (22, 20) to k=5
+         -> Shallowing cell at (22, 20) to k=6
+         -> Deepening cell at (22, 20) to k=5
+         -> Shallowing cell at (22, 21) to k=2
+         -> Shallowing cell at (22, 21) to k=3
+         -> Shallowing cell at (22, 21) to k=4
+         -> Shallowing cell at (22, 21) to k=5
+         -> Shallowing cell at (21, 21) to k=8
+         -> Shallowing cell at (21, 21) to k=9
+         -> Shallowing cell at (21, 21) to k=10
+         -> Shallowing cell at (19, 23) to k=8
+         -> Shallowing cell at (19, 24) to k=8
+         -> Shallowing cell at (18, 22) to k=4
+         -> Shallowing cell at (17, 22) to k=4
+         -> Shallowing cell at (17, 22) to k=5
+         -> Shallowing cell at (17, 22) to k=6
+         -> Shallowing cell at (17, 22) to k=7
+         -> Shallowing cell at (18, 22) to k=5
+         -> Shallowing cell at (18, 22) to k=6
+         -> Shallowing cell at (18, 22) to k=7
+         -> Shallowing cell at (18, 22) to k=8
+         -> Shallowing cell at (17, 22) to k=8
+         -> Shallowing cell at (19, 22) to k=8
+         -> Shallowing cell at (19, 22) to k=9
+         -> Shallowing cell at (19, 22) to k=10
+         -> Shallowing cell at (19, 22) to k=11
+         -> Shallowing cell at (19, 22) to k=12
+         -> Shallowing cell at (16, 10) to k=16
+         -> Deepening cell at (16, 10) to k=15
+         -> Deepening cell at (16, 10) to k=14
+         -> Shallowing cell at (15, 14) to k=14
+         -> Shallowing cell at (16, 12) to k=15
+         -> Deepening cell at (16, 11) to k=13
+         -> Shallowing cell at (16, 11) to k=14
+         -> Deepening cell at (16, 12) to k=14
+         -> Shallowing cell at (16, 13) to k=14
+         -> Shallowing cell at (16, 14) to k=14
+         -> Shallowing cell at (16, 15) to k=14
+         -> Shallowing cell at (16, 16) to k=14
+         -> Deepening cell at (15, 16) to k=13
+         -> Deepening cell at (15, 17) to k=13
+         -> Shallowing cell at (16, 22) to k=4
+         -> Shallowing cell at (16, 22) to k=5
+         -> Shallowing cell at (16, 22) to k=6
+         -> Shallowing cell at (16, 22) to k=7
+         -> Shallowing cell at (16, 22) to k=8
+         -> Shallowing cell at (16, 22) to k=9
+         -> Shallowing cell at (16, 22) to k=10
+         -> Shallowing cell at (16, 22) to k=11
+         -> Shallowing cell at (16, 17) to k=14
+         -> Shallowing cell at (16, 19) to k=14
+         -> Deepening cell at (16, 19) to k=13
+         -> Shallowing cell at (16, 20) to k=13
+         -> Deepening cell at (16, 21) to k=8
+         -> Deepening cell at (16, 21) to k=7
+         -> Shallowing cell at (16, 21) to k=8
+         -> Shallowing cell at (16, 21) to k=9
+         -> Shallowing cell at (16, 21) to k=10
+         -> Shallowing cell at (16, 21) to k=11
+         -> Shallowing cell at (16, 21) to k=12
+         -> Shallowing cell at (16, 21) to k=13
+         -> Shallowing cell at (16, 21) to k=14
+         -> Deepening cell at (16, 21) to k=13
+         -> Shallowing cell at (16, 20) to k=14
+         -> Deepening cell at (16, 20) to k=13
+         -> Deepening cell at (16, 22) to k=10
+         -> Shallowing cell at (16, 22) to k=11
+         -> Shallowing cell at (16, 22) to k=12
+         -> Deepening cell at (16, 21) to k=12
+         -> Shallowing cell at (15, 21) to k=10
+         -> Shallowing cell at (15, 21) to k=11
+         -> Shallowing cell at (15, 21) to k=12
+         -> Deepening cell at (15, 20) to k=11
+         -> Shallowing cell at (15, 20) to k=12
+         -> Shallowing cell at (15, 20) to k=13
+         -> Shallowing cell at (16, 10) to k=15
+         -> Shallowing cell at (19, 28) to k=15
+         -> Shallowing cell at (19, 27) to k=15
+         -> Shallowing cell at (20, 28) to k=15
+         -> Shallowing cell at (18, 28) to k=15
+         -> Shallowing cell at (18, 30) to k=15
+         -> Shallowing cell at (18, 29) to k=15
+         -> Shallowing cell at (17, 30) to k=14
+         -> Shallowing cell at (17, 28) to k=14
+         -> Shallowing cell at (17, 29) to k=14
+         -> Shallowing cell at (18, 27) to k=14
+         -> Shallowing cell at (18, 26) to k=14
+         -> Shallowing cell at (19, 26) to k=14
+         -> Shallowing cell at (19, 25) to k=14
+         -> Shallowing cell at (20, 27) to k=14
+         -> Shallowing cell at (21, 28) to k=13
+         -> Shallowing cell at (20, 26) to k=10
+         -> Shallowing cell at (18, 25) to k=8
+         -> Deepening cell at (19, 24) to k=7
+         -> Shallowing cell at (17, 27) to k=10
+         -> Shallowing cell at (17, 27) to k=11
+         -> Deepening cell at (22, 29) to k=5
+         -> Shallowing cell at (16, 30) to k=10
+         -> Deepening cell at (16, 30) to k=9
+         -> Shallowing cell at (16, 29) to k=6
+         -> Shallowing cell at (16, 27) to k=3
+         -> Shallowing cell at (16, 28) to k=4
+         -> Shallowing cell at (17, 26) to k=5
+         -> Shallowing cell at (17, 26) to k=6
+         -> Shallowing cell at (17, 26) to k=7
+         -> Deepening cell at (17, 26) to k=6
+         -> Deepening cell at (17, 26) to k=5
+         -> Deepening cell at (17, 26) to k=4
+         -> Deepening cell at (17, 26) to k=3
+         -> Deepening cell at (17, 26) to k=2
+         -> Shallowing cell at (17, 26) to k=3
+         -> Deepening cell at (17, 26) to k=2
+         -> Deepening cell at (17, 26) to k=1
+         -> Shallowing cell at (17, 26) to k=2
+         -> Shallowing cell at (17, 26) to k=3
+         -> Shallowing cell at (17, 26) to k=4
+         -> Shallowing cell at (30, 24) to k=2
+         -> Shallowing cell at (30, 23) to k=6
+         -> Shallowing cell at (30, 23) to k=7
+         -> Shallowing cell at (30, 23) to k=8
+         -> Shallowing cell at (30, 22) to k=11
+         -> Shallowing cell at (31, 22) to k=8
+         -> Shallowing cell at (31, 22) to k=9
+         -> Shallowing cell at (31, 21) to k=8
+         -> Shallowing cell at (31, 21) to k=9
+         -> Shallowing cell at (31, 20) to k=8
+         -> Shallowing cell at (31, 20) to k=9
+         -> Shallowing cell at (29, 20) to k=9
+         -> Shallowing cell at (29, 20) to k=10
+         -> Shallowing cell at (29, 21) to k=9
+         -> Shallowing cell at (29, 20) to k=11
+         -> Shallowing cell at (29, 21) to k=10
+         -> Shallowing cell at (29, 21) to k=11
+         -> Deepening cell at (29, 21) to k=10
+         -> Shallowing cell at (29, 22) to k=5
+         -> Shallowing cell at (28, 22) to k=2
+         -> Deepening cell at (28, 22) to k=1
+         -> Shallowing cell at (29, 22) to k=6
+         -> Shallowing cell at (31, 23) to k=5
+         -> Shallowing cell at (31, 23) to k=6
+         -> Shallowing cell at (31, 19) to k=11
+         -> Shallowing cell at (31, 19) to k=12
+         -> Shallowing cell at (30, 19) to k=12
+         -> Shallowing cell at (28, 20) to k=2
+         -> Shallowing cell at (28, 19) to k=2
+         -> Shallowing cell at (28, 19) to k=3
+         -> Shallowing cell at (28, 18) to k=2
+         -> Shallowing cell at (28, 18) to k=3
+         -> Shallowing cell at (28, 18) to k=4
+         -> Shallowing cell at (28, 18) to k=5
+         -> Shallowing cell at (28, 18) to k=6
+         -> Deepening cell at (28, 18) to k=5
+         -> Deepening cell at (28, 18) to k=4
+         -> Shallowing cell at (28, 19) to k=4
+         -> Shallowing cell at (27, 17) to k=2
+         -> Shallowing cell at (27, 16) to k=2
+         -> Shallowing cell at (24, 13) to k=2
+         -> Shallowing cell at (24, 12) to k=2
+         -> Shallowing cell at (23, 12) to k=2
+         -> Shallowing cell at (24, 12) to k=3
+         -> Shallowing cell at (24, 12) to k=4
+         -> Shallowing cell at (24, 11) to k=2
+         -> Shallowing cell at (24, 11) to k=3
+         -> Shallowing cell at (24, 11) to k=4
+         -> Shallowing cell at (24, 11) to k=5
+         -> Shallowing cell at (23, 11) to k=2
+         -> Shallowing cell at (23, 11) to k=3
+         -> Shallowing cell at (23, 11) to k=4
+         -> Shallowing cell at (23, 11) to k=5
+         -> Shallowing cell at (22, 11) to k=6
+         -> Shallowing cell at (22, 11) to k=7
+         -> Shallowing cell at (24, 11) to k=6
+         -> Shallowing cell at (24, 12) to k=5
+         -> Shallowing cell at (22, 19) to k=6
+         -> Deepening cell at (22, 19) to k=5
+         -> Shallowing cell at (21, 20) to k=9
+         -> Shallowing cell at (21, 20) to k=10
+         -> Shallowing cell at (21, 20) to k=11
+         -> Shallowing cell at (21, 20) to k=12
+         -> Shallowing cell at (20, 20) to k=9
+         -> Shallowing cell at (20, 20) to k=10
+         -> Shallowing cell at (20, 20) to k=11
+         -> Shallowing cell at (20, 20) to k=12
+         -> Shallowing cell at (20, 20) to k=13
+         -> Shallowing cell at (20, 20) to k=14
+         -> Shallowing cell at (20, 21) to k=8
+         -> Shallowing cell at (20, 21) to k=9
+         -> Shallowing cell at (20, 21) to k=10
+         -> Shallowing cell at (20, 21) to k=11
+         -> Shallowing cell at (20, 21) to k=12
+         -> Shallowing cell at (20, 21) to k=13
+         -> Shallowing cell at (20, 22) to k=8
+         -> Shallowing cell at (20, 21) to k=14
+         -> Shallowing cell at (20, 22) to k=9
+         -> Shallowing cell at (20, 22) to k=10
+         -> Shallowing cell at (20, 22) to k=11
+         -> Shallowing cell at (20, 22) to k=12
+         -> Shallowing cell at (20, 22) to k=13
+         -> Shallowing cell at (20, 22) to k=14
+         -> Shallowing cell at (20, 19) to k=14
+         -> Shallowing cell at (20, 19) to k=15
+         -> Deepening cell at (20, 19) to k=14
+         -> Shallowing cell at (20, 18) to k=14
+         -> Shallowing cell at (20, 18) to k=15
+         -> Deepening cell at (20, 18) to k=14
+         -> Shallowing cell at (20, 17) to k=15
+         -> Shallowing cell at (20, 16) to k=15
+         -> Shallowing cell at (21, 19) to k=9
+         -> Shallowing cell at (21, 18) to k=8
+         -> Shallowing cell at (21, 18) to k=9
+         -> Shallowing cell at (22, 19) to k=6
+         -> Shallowing cell at (22, 19) to k=7
+         -> Shallowing cell at (22, 19) to k=8
+         -> Deepening cell at (21, 19) to k=8
+         -> Deepening cell at (21, 18) to k=8
+         -> Shallowing cell at (22, 18) to k=5
+         -> Shallowing cell at (21, 17) to k=3
+         -> Shallowing cell at (21, 17) to k=4
+         -> Shallowing cell at (21, 17) to k=5
+         -> Shallowing cell at (21, 17) to k=6
+         -> Shallowing cell at (21, 17) to k=7
+         -> Shallowing cell at (21, 17) to k=8
+         -> Shallowing cell at (21, 17) to k=9
+         -> Shallowing cell at (21, 17) to k=10
+         -> Deepening cell at (20, 17) to k=14
+         -> Shallowing cell at (20, 15) to k=5
+         -> Shallowing cell at (20, 15) to k=6
+         -> Shallowing cell at (20, 15) to k=7
+         -> Shallowing cell at (20, 15) to k=8
+         -> Shallowing cell at (20, 15) to k=9
+         -> Shallowing cell at (20, 15) to k=10
+         -> Shallowing cell at (20, 15) to k=11
+         -> Shallowing cell at (20, 15) to k=12
+         -> Shallowing cell at (20, 15) to k=13
+         -> Shallowing cell at (20, 15) to k=14
+         -> Shallowing cell at (20, 15) to k=15
+         -> Shallowing cell at (20, 15) to k=16
+         -> Deepening cell at (20, 15) to k=15
+         -> Shallowing cell at (20, 16) to k=16
+         -> Deepening cell at (20, 16) to k=15
+         -> Shallowing cell at (21, 16) to k=3
+         -> Shallowing cell at (21, 16) to k=4
+         -> Shallowing cell at (21, 16) to k=5
+         -> Shallowing cell at (21, 16) to k=6
+         -> Shallowing cell at (21, 16) to k=7
+         -> Shallowing cell at (21, 16) to k=8
+         -> Shallowing cell at (21, 16) to k=9
+         -> Shallowing cell at (21, 16) to k=10
+         -> Shallowing cell at (21, 15) to k=5
+         -> Shallowing cell at (21, 15) to k=6
+         -> Shallowing cell at (21, 15) to k=7
+         -> Shallowing cell at (21, 15) to k=8
+         -> Shallowing cell at (21, 15) to k=9
+         -> Deepening cell at (21, 15) to k=8
+         -> Shallowing cell at (21, 15) to k=9
+         -> Deepening cell at (21, 16) to k=9
+         -> Shallowing cell at (21, 16) to k=10
+         -> Shallowing cell at (21, 16) to k=11
+         -> Shallowing cell at (21, 16) to k=12
+         -> Deepening cell at (21, 16) to k=11
+         -> Shallowing cell at (21, 15) to k=10
+         -> Shallowing cell at (16, 22) to k=13
+         -> Shallowing cell at (16, 21) to k=13
+         -> Shallowing cell at (15, 21) to k=13
+         -> Shallowing cell at (16, 20) to k=14
+         -> Shallowing cell at (15, 20) to k=14
+         -> Shallowing cell at (15, 19) to k=14
+         -> Shallowing cell at (16, 19) to k=14
+         -> Shallowing cell at (16, 18) to k=14
+         -> Shallowing cell at (15, 18) to k=14
+         -> Shallowing cell at (15, 17) to k=14
+         -> Shallowing cell at (16, 17) to k=15
+         -> Shallowing cell at (16, 16) to k=15
+         -> Shallowing cell at (15, 16) to k=14
+         -> Shallowing cell at (16, 15) to k=15
+         -> Shallowing cell at (15, 15) to k=14
+         -> Shallowing cell at (15, 14) to k=15
+         -> Shallowing cell at (16, 14) to k=15
+         -> Shallowing cell at (16, 13) to k=15
+         -> Shallowing cell at (15, 13) to k=15
+         -> Shallowing cell at (14, 13) to k=15
+         -> Shallowing cell at (14, 12) to k=15
+         -> Shallowing cell at (15, 12) to k=15
+         -> Shallowing cell at (16, 12) to k=15
+         -> Shallowing cell at (16, 11) to k=15
+         -> Shallowing cell at (15, 11) to k=15
+         -> Shallowing cell at (15, 10) to k=14
+         -> Shallowing cell at (15, 9) to k=14
+         -> Shallowing cell at (14, 10) to k=14
+         -> Shallowing cell at (15, 8) to k=12
+         -> Shallowing cell at (15, 8) to k=13
+         -> Shallowing cell at (15, 8) to k=14
+         -> Shallowing cell at (14, 8) to k=12
+         -> Shallowing cell at (14, 8) to k=13
+         -> Shallowing cell at (14, 8) to k=14
+         -> Shallowing cell at (14, 8) to k=15
+         -> Deepening cell at (14, 8) to k=14
+         -> Shallowing cell at (13, 10) to k=9
+         -> Shallowing cell at (13, 10) to k=10
+         -> Shallowing cell at (13, 10) to k=11
+         -> Shallowing cell at (13, 10) to k=12
+         -> Shallowing cell at (13, 10) to k=13
+         -> Shallowing cell at (13, 10) to k=14
+         -> Shallowing cell at (13, 8) to k=10
+         -> Shallowing cell at (13, 8) to k=11
+         -> Shallowing cell at (13, 8) to k=12
+         -> Shallowing cell at (13, 8) to k=13
+         -> Shallowing cell at (12, 8) to k=10
+         -> Shallowing cell at (12, 8) to k=11
+         -> Shallowing cell at (12, 8) to k=12
+         -> Shallowing cell at (12, 8) to k=13
+         -> Shallowing cell at (12, 9) to k=12
+         -> Shallowing cell at (12, 9) to k=13
+         -> Shallowing cell at (12, 10) to k=9
+         -> Shallowing cell at (12, 11) to k=5
+         -> Shallowing cell at (12, 12) to k=3
+         -> Shallowing cell at (13, 10) to k=15
+         -> Deepening cell at (13, 10) to k=14
+         -> Shallowing cell at (13, 11) to k=9
+         -> Shallowing cell at (13, 11) to k=10
+         -> Shallowing cell at (13, 11) to k=11
+         -> Shallowing cell at (13, 11) to k=12
+         -> Shallowing cell at (13, 11) to k=13
+         -> Shallowing cell at (13, 11) to k=14
+         -> Shallowing cell at (13, 12) to k=13
+         -> Deepening cell at (13, 12) to k=12
+         -> Shallowing cell at (13, 12) to k=13
+         -> Deepening cell at (13, 8) to k=12
+         -> Deepening cell at (12, 8) to k=12
+         -> Shallowing cell at (13, 7) to k=3
+         -> Shallowing cell at (13, 7) to k=4
+         -> Shallowing cell at (13, 7) to k=5
+         -> Shallowing cell at (13, 7) to k=6
+         -> Shallowing cell at (13, 7) to k=7
+         -> Shallowing cell at (13, 7) to k=8
+         -> Shallowing cell at (13, 7) to k=9
+         -> Shallowing cell at (13, 7) to k=10
+         -> Shallowing cell at (13, 7) to k=11
+         -> Shallowing cell at (13, 6) to k=3
+         -> Shallowing cell at (13, 6) to k=4
+         -> Shallowing cell at (13, 6) to k=5
+         -> Shallowing cell at (13, 6) to k=6
+         -> Shallowing cell at (13, 6) to k=7
+         -> Shallowing cell at (13, 6) to k=8
+         -> Shallowing cell at (13, 6) to k=9
+         -> Shallowing cell at (13, 6) to k=10
+         -> Shallowing cell at (13, 6) to k=11
+         -> Shallowing cell at (12, 5) to k=3
+         -> Shallowing cell at (12, 5) to k=4
+         -> Shallowing cell at (12, 5) to k=5
+         -> Shallowing cell at (12, 5) to k=6
+         -> Shallowing cell at (12, 5) to k=7
+         -> Shallowing cell at (12, 5) to k=8
+         -> Shallowing cell at (12, 5) to k=9
+         -> Shallowing cell at (12, 5) to k=10
+         -> Shallowing cell at (12, 5) to k=11
+         -> Shallowing cell at (12, 5) to k=12
+         -> Shallowing cell at (12, 7) to k=3
+         -> Shallowing cell at (11, 7) to k=3
+         -> Shallowing cell at (12, 6) to k=3
+         -> Shallowing cell at (12, 4) to k=2
+         -> Shallowing cell at (12, 4) to k=3
+         -> Shallowing cell at (12, 4) to k=4
+         -> Shallowing cell at (12, 4) to k=5
+         -> Shallowing cell at (12, 4) to k=6
+         -> Shallowing cell at (12, 4) to k=7
+         -> Shallowing cell at (12, 4) to k=8
+         -> Shallowing cell at (12, 4) to k=9
+         -> Shallowing cell at (12, 4) to k=10
+         -> Shallowing cell at (12, 4) to k=11
+         -> Shallowing cell at (12, 4) to k=12
+         -> Shallowing cell at (12, 5) to k=13
+         -> Deepening cell at (12, 5) to k=12
+         -> Deepening cell at (12, 5) to k=11
+         -> Shallowing cell at (12, 4) to k=13
+         -> Shallowing cell at (12, 4) to k=14
+         -> Shallowing cell at (12, 4) to k=15
+         -> Deepening cell at (12, 4) to k=14
+         -> Shallowing cell at (12, 3) to k=2
+         -> Shallowing cell at (13, 3) to k=2
+         -> Shallowing cell at (12, 3) to k=3
+         -> Shallowing cell at (12, 3) to k=4
+         -> Shallowing cell at (12, 3) to k=5
+         -> Shallowing cell at (12, 3) to k=6
+         -> Shallowing cell at (12, 3) to k=7
+         -> Shallowing cell at (12, 3) to k=8
+         -> Shallowing cell at (12, 3) to k=9
+         -> Shallowing cell at (12, 3) to k=10
+         -> Shallowing cell at (12, 3) to k=11
+         -> Shallowing cell at (12, 3) to k=12
+         -> Shallowing cell at (12, 3) to k=13
+         -> Shallowing cell at (12, 3) to k=14
+         -> Shallowing cell at (12, 3) to k=15
+         -> Shallowing cell at (13, 3) to k=3
+         -> Shallowing cell at (13, 3) to k=4
+         -> Shallowing cell at (13, 3) to k=5
+         -> Shallowing cell at (13, 3) to k=6
+         -> Shallowing cell at (13, 3) to k=7
+         -> Shallowing cell at (13, 3) to k=8
+         -> Shallowing cell at (13, 3) to k=9
+         -> Shallowing cell at (13, 3) to k=10
+         -> Shallowing cell at (13, 3) to k=11
+         -> Shallowing cell at (13, 3) to k=12
+         -> Shallowing cell at (13, 3) to k=13
+         -> Shallowing cell at (13, 3) to k=14
+         -> Shallowing cell at (13, 3) to k=15
+         -> Shallowing cell at (14, 3) to k=2
+         -> Shallowing cell at (14, 3) to k=3
+         -> Shallowing cell at (14, 3) to k=4
+         -> Shallowing cell at (14, 3) to k=5
+         -> Shallowing cell at (14, 3) to k=6
+         -> Shallowing cell at (14, 3) to k=7
+         -> Shallowing cell at (14, 3) to k=8
+         -> Shallowing cell at (14, 3) to k=9
+         -> Shallowing cell at (14, 3) to k=10
+         -> Shallowing cell at (14, 3) to k=11
+         -> Shallowing cell at (14, 3) to k=12
+         -> Shallowing cell at (14, 3) to k=13
+         -> Shallowing cell at (14, 3) to k=14
+         -> Shallowing cell at (14, 3) to k=15
+         -> Shallowing cell at (14, 3) to k=16
+         -> Deepening cell at (14, 3) to k=15
+         -> Shallowing cell at (15, 3) to k=2
+         -> Shallowing cell at (15, 3) to k=3
+         -> Shallowing cell at (15, 3) to k=4
+         -> Shallowing cell at (15, 3) to k=5
+         -> Shallowing cell at (15, 3) to k=6
+         -> Shallowing cell at (15, 3) to k=7
+         -> Shallowing cell at (15, 3) to k=8
+         -> Shallowing cell at (15, 3) to k=9
+         -> Shallowing cell at (15, 3) to k=10
+         -> Shallowing cell at (15, 3) to k=11
+         -> Shallowing cell at (15, 3) to k=12
+         -> Shallowing cell at (15, 3) to k=13
+         -> Shallowing cell at (15, 3) to k=14
+         -> Shallowing cell at (15, 3) to k=15
+         -> Shallowing cell at (15, 2) to k=2
+         -> Shallowing cell at (15, 2) to k=3
+         -> Shallowing cell at (15, 2) to k=4
+         -> Shallowing cell at (15, 2) to k=5
+         -> Shallowing cell at (15, 2) to k=6
+         -> Shallowing cell at (15, 2) to k=7
+         -> Shallowing cell at (15, 2) to k=8
+         -> Shallowing cell at (15, 2) to k=9
+         -> Shallowing cell at (15, 2) to k=10
+         -> Shallowing cell at (15, 2) to k=11
+         -> Shallowing cell at (15, 2) to k=12
+         -> Shallowing cell at (15, 2) to k=13
+         -> Shallowing cell at (15, 2) to k=14
+         -> Shallowing cell at (15, 2) to k=15
+         -> Shallowing cell at (14, 2) to k=2
+         -> Shallowing cell at (14, 2) to k=3
+         -> Shallowing cell at (14, 2) to k=4
+         -> Shallowing cell at (14, 2) to k=5
+         -> Shallowing cell at (14, 2) to k=6
+         -> Shallowing cell at (14, 2) to k=7
+         -> Shallowing cell at (14, 2) to k=8
+         -> Shallowing cell at (14, 2) to k=9
+         -> Shallowing cell at (14, 2) to k=10
+         -> Shallowing cell at (14, 2) to k=11
+         -> Shallowing cell at (14, 2) to k=12
+         -> Shallowing cell at (14, 2) to k=13
+         -> Shallowing cell at (14, 2) to k=14
+         -> Shallowing cell at (14, 2) to k=15
+         -> Shallowing cell at (14, 2) to k=16
+         -> Deepening cell at (14, 2) to k=15
+         -> Shallowing cell at (13, 2) to k=2
+         -> Shallowing cell at (13, 2) to k=3
+         -> Shallowing cell at (13, 2) to k=4
+         -> Shallowing cell at (13, 2) to k=5
+         -> Shallowing cell at (13, 2) to k=6
+         -> Shallowing cell at (13, 2) to k=7
+         -> Shallowing cell at (13, 2) to k=8
+         -> Shallowing cell at (13, 2) to k=9
+         -> Shallowing cell at (13, 2) to k=10
+         -> Shallowing cell at (13, 2) to k=11
+         -> Shallowing cell at (13, 2) to k=12
+         -> Shallowing cell at (13, 2) to k=13
+         -> Shallowing cell at (13, 2) to k=14
+         -> Shallowing cell at (13, 2) to k=15
+         -> Shallowing cell at (12, 2) to k=2
+         -> Shallowing cell at (12, 2) to k=3
+         -> Shallowing cell at (12, 2) to k=4
+         -> Shallowing cell at (12, 2) to k=5
+         -> Shallowing cell at (12, 2) to k=6
+         -> Shallowing cell at (12, 2) to k=7
+         -> Shallowing cell at (12, 2) to k=8
+         -> Shallowing cell at (12, 2) to k=9
+         -> Shallowing cell at (12, 2) to k=10
+         -> Shallowing cell at (12, 2) to k=11
+         -> Shallowing cell at (12, 2) to k=12
+         -> Shallowing cell at (12, 2) to k=13
+         -> Shallowing cell at (12, 2) to k=14
+         -> Shallowing cell at (12, 2) to k=15
+         -> Shallowing cell at (13, 2) to k=16
+         -> Deepening cell at (13, 2) to k=15
+         -> Shallowing cell at (13, 2) to k=16
+         -> Deepening cell at (13, 2) to k=15
+         -> Shallowing cell at (12, 1) to k=2
+         -> Shallowing cell at (12, 1) to k=3
+         -> Shallowing cell at (12, 1) to k=4
+         -> Shallowing cell at (12, 1) to k=5
+         -> Shallowing cell at (12, 1) to k=6
+         -> Shallowing cell at (12, 1) to k=7
+         -> Shallowing cell at (12, 1) to k=8
+         -> Shallowing cell at (12, 1) to k=9
+         -> Shallowing cell at (12, 1) to k=10
+         -> Shallowing cell at (12, 1) to k=11
+         -> Shallowing cell at (12, 1) to k=12
+         -> Shallowing cell at (12, 1) to k=13
+         -> Shallowing cell at (12, 1) to k=14
+         -> Shallowing cell at (12, 1) to k=15
+         -> Shallowing cell at (11, 2) to k=2
+         -> Shallowing cell at (11, 2) to k=3
+         -> Shallowing cell at (11, 2) to k=4
+         -> Shallowing cell at (11, 2) to k=5
+         -> Shallowing cell at (11, 2) to k=6
+         -> Shallowing cell at (11, 2) to k=7
+         -> Shallowing cell at (11, 2) to k=8
+         -> Shallowing cell at (11, 2) to k=9
+         -> Shallowing cell at (11, 2) to k=10
+         -> Shallowing cell at (11, 2) to k=11
+         -> Shallowing cell at (11, 2) to k=12
+         -> Shallowing cell at (11, 2) to k=13
+         -> Shallowing cell at (11, 2) to k=14
+         -> Shallowing cell at (11, 2) to k=15
+         -> Deepening cell at (11, 2) to k=14
+       - Cannot deepen/shallow cell at (13, 1)
+         -> Shallowing cell at (12, 1) to k=16
+         -> Deepening cell at (12, 1) to k=15
+         -> Shallowing cell at (11, 1) to k=2
+         -> Shallowing cell at (11, 1) to k=3
+         -> Shallowing cell at (11, 1) to k=4
+         -> Shallowing cell at (11, 1) to k=5
+         -> Shallowing cell at (11, 1) to k=6
+         -> Shallowing cell at (11, 1) to k=7
+         -> Shallowing cell at (11, 1) to k=8
+         -> Shallowing cell at (11, 1) to k=9
+         -> Shallowing cell at (11, 1) to k=10
+         -> Shallowing cell at (11, 1) to k=11
+         -> Shallowing cell at (11, 1) to k=12
+         -> Shallowing cell at (11, 1) to k=13
+         -> Shallowing cell at (11, 1) to k=14
+         -> Shallowing cell at (11, 1) to k=15
+         -> Shallowing cell at (11, 1) to k=16
+       - Cannot deepen/shallow cell at (11, 1)
+         -> Deepening cell at (11, 1) to k=15
+         -> Deepening cell at (11, 1) to k=14
+         -> Shallowing cell at (10, 1) to k=2
+         -> Shallowing cell at (10, 1) to k=3
+         -> Shallowing cell at (10, 1) to k=4
+         -> Shallowing cell at (10, 1) to k=5
+         -> Shallowing cell at (10, 1) to k=6
+         -> Shallowing cell at (10, 1) to k=7
+         -> Shallowing cell at (10, 1) to k=8
+         -> Shallowing cell at (10, 1) to k=9
+         -> Shallowing cell at (10, 1) to k=10
+         -> Shallowing cell at (10, 1) to k=11
+         -> Shallowing cell at (10, 1) to k=12
+         -> Shallowing cell at (10, 1) to k=13
+         -> Deepening cell at (10, 1) to k=12
+         -> Deepening cell at (10, 1) to k=11
+         -> Shallowing cell at (10, 1) to k=12
+         -> Shallowing cell at (10, 1) to k=13
+         -> Shallowing cell at (10, 1) to k=14
+         -> Shallowing cell at (10, 1) to k=15
+         -> Deepening cell at (10, 1) to k=14
+         -> Shallowing cell at (9, 1) to k=2
+         -> Shallowing cell at (9, 1) to k=3
+         -> Shallowing cell at (9, 1) to k=4
+         -> Shallowing cell at (9, 1) to k=5
+         -> Shallowing cell at (9, 1) to k=6
+         -> Shallowing cell at (9, 1) to k=7
+         -> Shallowing cell at (9, 1) to k=8
+         -> Shallowing cell at (9, 1) to k=9
+         -> Shallowing cell at (9, 1) to k=10
+         -> Shallowing cell at (9, 1) to k=11
+         -> Shallowing cell at (9, 1) to k=12
+         -> Shallowing cell at (9, 1) to k=13
+         -> Shallowing cell at (9, 1) to k=14
+         -> Shallowing cell at (8, 1) to k=2
+         -> Shallowing cell at (8, 1) to k=3
+         -> Shallowing cell at (8, 1) to k=4
+         -> Shallowing cell at (8, 1) to k=5
+         -> Shallowing cell at (8, 1) to k=6
+         -> Shallowing cell at (8, 1) to k=7
+         -> Shallowing cell at (8, 1) to k=8
+         -> Shallowing cell at (8, 1) to k=9
+         -> Shallowing cell at (8, 1) to k=10
+         -> Shallowing cell at (8, 1) to k=11
+         -> Shallowing cell at (8, 1) to k=12
+         -> Shallowing cell at (8, 1) to k=13
+         -> Shallowing cell at (8, 1) to k=14
+         -> Shallowing cell at (8, 1) to k=15
+         -> Deepening cell at (8, 1) to k=14
+         -> Shallowing cell at (7, 1) to k=2
+         -> Shallowing cell at (7, 1) to k=3
+         -> Shallowing cell at (7, 1) to k=4
+         -> Shallowing cell at (7, 1) to k=5
+         -> Shallowing cell at (7, 1) to k=6
+         -> Shallowing cell at (7, 1) to k=7
+         -> Shallowing cell at (7, 1) to k=8
+         -> Shallowing cell at (7, 1) to k=9
+         -> Shallowing cell at (7, 1) to k=10
+         -> Shallowing cell at (7, 1) to k=11
+         -> Shallowing cell at (7, 1) to k=12
+         -> Shallowing cell at (7, 1) to k=13
+         -> Shallowing cell at (7, 1) to k=14
+         -> Shallowing cell at (7, 1) to k=15
+         -> Deepening cell at (7, 1) to k=14
+         -> Shallowing cell at (9, 1) to k=15
+         -> Deepening cell at (9, 1) to k=14
+         -> Shallowing cell at (9, 2) to k=2
+         -> Shallowing cell at (9, 2) to k=3
+         -> Shallowing cell at (9, 2) to k=4
+         -> Shallowing cell at (9, 2) to k=5
+         -> Shallowing cell at (9, 2) to k=6
+         -> Shallowing cell at (9, 2) to k=7
+         -> Shallowing cell at (9, 2) to k=8
+         -> Deepening cell at (9, 2) to k=7
+         -> Shallowing cell at (9, 2) to k=8
+         -> Shallowing cell at (7, 1) to k=15
+         -> Deepening cell at (7, 1) to k=14
+         -> Shallowing cell at (8, 2) to k=2
+         -> Shallowing cell at (8, 2) to k=3
+         -> Shallowing cell at (8, 2) to k=4
+         -> Shallowing cell at (8, 2) to k=5
+         -> Shallowing cell at (8, 2) to k=6
+         -> Shallowing cell at (8, 2) to k=7
+         -> Shallowing cell at (7, 2) to k=2
+         -> Shallowing cell at (7, 2) to k=3
+         -> Shallowing cell at (7, 2) to k=4
+         -> Shallowing cell at (7, 2) to k=5
+         -> Shallowing cell at (7, 2) to k=6
+         -> Shallowing cell at (7, 2) to k=7
+         -> Shallowing cell at (7, 2) to k=8
+         -> Shallowing cell at (7, 2) to k=9
+         -> Shallowing cell at (7, 2) to k=10
+         -> Shallowing cell at (7, 2) to k=11
+         -> Deepening cell at (7, 2) to k=10
+         -> Deepening cell at (7, 2) to k=9
+         -> Shallowing cell at (6, 2) to k=2
+         -> Shallowing cell at (6, 2) to k=3
+         -> Shallowing cell at (6, 2) to k=4
+         -> Shallowing cell at (6, 2) to k=5
+         -> Shallowing cell at (6, 2) to k=6
+         -> Shallowing cell at (6, 2) to k=7
+         -> Shallowing cell at (6, 2) to k=8
+         -> Shallowing cell at (6, 2) to k=9
+         -> Shallowing cell at (5, 2) to k=2
+         -> Shallowing cell at (5, 2) to k=3
+         -> Shallowing cell at (5, 2) to k=4
+         -> Shallowing cell at (5, 2) to k=5
+         -> Shallowing cell at (5, 2) to k=6
+         -> Shallowing cell at (5, 2) to k=7
+         -> Shallowing cell at (5, 2) to k=8
+         -> Shallowing cell at (5, 2) to k=9
+         -> Deepening cell at (7, 2) to k=8
+         -> Shallowing cell at (9, 2) to k=9
+         -> Deepening cell at (9, 2) to k=8
+         -> Deepening cell at (9, 2) to k=7
+         -> Deepening cell at (9, 2) to k=6
+         -> Shallowing cell at (9, 2) to k=7
+         -> Shallowing cell at (11, 4) to k=2
+         -> Shallowing cell at (11, 4) to k=3
+         -> Shallowing cell at (11, 4) to k=4
+         -> Shallowing cell at (11, 4) to k=5
+         -> Shallowing cell at (11, 4) to k=6
+         -> Shallowing cell at (11, 4) to k=7
+         -> Shallowing cell at (12, 10) to k=10
+         -> Deepening cell at (12, 10) to k=9
+         -> Shallowing cell at (13, 13) to k=10
+         -> Shallowing cell at (14, 16) to k=11
+         -> Shallowing cell at (14, 16) to k=12
+         -> Shallowing cell at (14, 15) to k=13
+         -> Shallowing cell at (14, 14) to k=14
+         -> Shallowing cell at (14, 16) to k=13
+         -> Shallowing cell at (14, 15) to k=14
+         -> Shallowing cell at (15, 15) to k=15
+         -> Deepening cell at (15, 15) to k=14
+         -> Shallowing cell at (14, 15) to k=15
+         -> Shallowing cell at (14, 15) to k=16
+         -> Deepening cell at (14, 15) to k=15
+         -> Deepening cell at (14, 15) to k=14
+         -> Shallowing cell at (15, 14) to k=16
+         -> Deepening cell at (15, 14) to k=15
+         -> Deepening cell at (15, 14) to k=14
+         -> Shallowing cell at (14, 17) to k=8
+         -> Shallowing cell at (14, 17) to k=9
+         -> Deepening cell at (14, 17) to k=8
+         -> Shallowing cell at (14, 17) to k=9
+         -> Shallowing cell at (14, 17) to k=10
+         -> Deepening cell at (14, 17) to k=9
+         -> Shallowing cell at (1, 2) to k=2
+         -> Shallowing cell at (1, 2) to k=3
+         -> Shallowing cell at (1, 2) to k=4
+         -> Shallowing cell at (1, 2) to k=5
+         -> Shallowing cell at (1, 2) to k=6
+         -> Shallowing cell at (1, 2) to k=7
+         -> Shallowing cell at (1, 2) to k=8
+         -> Shallowing cell at (1, 2) to k=9
+         -> Shallowing cell at (1, 2) to k=10
+         -> Shallowing cell at (1, 2) to k=11
+         -> Shallowing cell at (1, 2) to k=12
+         -> Shallowing cell at (1, 2) to k=13
+         -> Shallowing cell at (1, 2) to k=14
+         -> Shallowing cell at (1, 2) to k=15
+         -> Shallowing cell at (1, 2) to k=16
+         -> Deepening cell at (1, 2) to k=15
+         -> Shallowing cell at (1, 2) to k=16
+         -> Deepening cell at (1, 2) to k=15
+         -> Deepening cell at (21, 15) to k=9
+         -> Shallowing cell at (21, 14) to k=5
+         -> Shallowing cell at (21, 14) to k=6
+         -> Shallowing cell at (21, 14) to k=7
+         -> Shallowing cell at (21, 14) to k=8
+         -> Shallowing cell at (21, 14) to k=9
+         -> Shallowing cell at (21, 14) to k=10
+         -> Deepening cell at (21, 14) to k=9
+         -> Deepening cell at (21, 14) to k=8
+         -> Shallowing cell at (21, 14) to k=9
+         -> Shallowing cell at (21, 14) to k=10
+         -> Deepening cell at (21, 14) to k=9
+         -> Shallowing cell at (20, 14) to k=5
+         -> Shallowing cell at (20, 14) to k=6
+         -> Shallowing cell at (20, 14) to k=7
+         -> Shallowing cell at (20, 14) to k=8
+         -> Shallowing cell at (20, 14) to k=9
+         -> Shallowing cell at (20, 14) to k=10
+         -> Deepening cell at (20, 14) to k=9
+         -> Deepening cell at (21, 14) to k=8
+         -> Deepening cell at (21, 15) to k=8
+         -> Shallowing cell at (21, 12) to k=8
+         -> Deepening cell at (21, 12) to k=7
+         -> Shallowing cell at (21, 13) to k=8
+         -> Shallowing cell at (21, 13) to k=9
+         -> Shallowing cell at (21, 13) to k=10
+         -> Shallowing cell at (21, 12) to k=8
+         -> Shallowing cell at (21, 12) to k=9
+         -> Shallowing cell at (21, 12) to k=10
+         -> Shallowing cell at (21, 12) to k=11
+         -> Shallowing cell at (19, 22) to k=13
+         -> Shallowing cell at (20, 13) to k=6
+         -> Shallowing cell at (20, 13) to k=7
+         -> Shallowing cell at (20, 13) to k=8
+         -> Shallowing cell at (20, 13) to k=9
+         -> Shallowing cell at (20, 13) to k=10
+         -> Deepening cell at (20, 13) to k=9
+         -> Shallowing cell at (21, 14) to k=9
+         -> Deepening cell at (21, 14) to k=8
+         -> Shallowing cell at (19, 13) to k=2
+         -> Shallowing cell at (19, 13) to k=3
+         -> Shallowing cell at (19, 13) to k=4
+         -> Shallowing cell at (19, 13) to k=5
+         -> Shallowing cell at (19, 13) to k=6
+         -> Shallowing cell at (19, 13) to k=7
+         -> Shallowing cell at (19, 13) to k=8
+         -> Shallowing cell at (19, 13) to k=9
+         -> Shallowing cell at (19, 12) to k=2
+         -> Shallowing cell at (19, 12) to k=3
+         -> Shallowing cell at (19, 12) to k=4
+         -> Shallowing cell at (19, 12) to k=5
+         -> Shallowing cell at (19, 12) to k=6
+         -> Shallowing cell at (19, 12) to k=7
+         -> Shallowing cell at (19, 12) to k=8
+         -> Shallowing cell at (20, 12) to k=7
+         -> Shallowing cell at (20, 12) to k=8
+         -> Shallowing cell at (20, 12) to k=9
+         -> Shallowing cell at (19, 12) to k=9
+         -> Shallowing cell at (19, 11) to k=2
+         -> Shallowing cell at (19, 11) to k=3
+         -> Shallowing cell at (19, 11) to k=4
+         -> Shallowing cell at (19, 11) to k=5
+         -> Shallowing cell at (19, 11) to k=6
+         -> Shallowing cell at (19, 11) to k=7
+         -> Shallowing cell at (19, 11) to k=8
+         -> Shallowing cell at (19, 11) to k=9
+         -> Shallowing cell at (19, 10) to k=2
+         -> Shallowing cell at (19, 10) to k=3
+         -> Shallowing cell at (19, 10) to k=4
+         -> Shallowing cell at (19, 10) to k=5
+         -> Shallowing cell at (19, 10) to k=6
+         -> Shallowing cell at (19, 10) to k=7
+         -> Shallowing cell at (19, 10) to k=8
+         -> Shallowing cell at (19, 10) to k=9
+         -> Shallowing cell at (18, 10) to k=2
+         -> Shallowing cell at (18, 10) to k=3
+         -> Shallowing cell at (18, 10) to k=4
+         -> Shallowing cell at (18, 10) to k=5
+         -> Shallowing cell at (18, 10) to k=6
+         -> Shallowing cell at (18, 10) to k=7
+         -> Shallowing cell at (18, 10) to k=8
+         -> Shallowing cell at (18, 10) to k=9
+         -> Shallowing cell at (18, 9) to k=2
+         -> Shallowing cell at (18, 9) to k=3
+         -> Shallowing cell at (18, 9) to k=4
+         -> Shallowing cell at (18, 9) to k=5
+         -> Shallowing cell at (18, 9) to k=6
+         -> Shallowing cell at (18, 9) to k=7
+         -> Shallowing cell at (18, 9) to k=8
+         -> Shallowing cell at (18, 9) to k=9
+         -> Shallowing cell at (19, 9) to k=2
+         -> Shallowing cell at (19, 9) to k=3
+         -> Shallowing cell at (18, 9) to k=10
+         -> Shallowing cell at (19, 9) to k=4
+         -> Shallowing cell at (19, 9) to k=5
+         -> Shallowing cell at (19, 9) to k=6
+         -> Shallowing cell at (19, 9) to k=7
+         -> Shallowing cell at (19, 9) to k=8
+         -> Shallowing cell at (19, 9) to k=9
+         -> Shallowing cell at (19, 9) to k=10
+         -> Shallowing cell at (18, 8) to k=2
+         -> Shallowing cell at (18, 8) to k=3
+         -> Shallowing cell at (18, 8) to k=4
+         -> Shallowing cell at (18, 8) to k=5
+         -> Shallowing cell at (18, 8) to k=6
+         -> Shallowing cell at (18, 8) to k=7
+         -> Shallowing cell at (18, 8) to k=8
+         -> Shallowing cell at (18, 8) to k=9
+         -> Shallowing cell at (18, 8) to k=10
+         -> Shallowing cell at (18, 8) to k=11
+         -> Shallowing cell at (18, 8) to k=12
+         -> Deepening cell at (18, 8) to k=11
+         -> Deepening cell at (18, 8) to k=10
+         -> Shallowing cell at (19, 8) to k=2
+         -> Shallowing cell at (19, 8) to k=3
+         -> Shallowing cell at (19, 8) to k=4
+         -> Shallowing cell at (19, 8) to k=5
+         -> Shallowing cell at (19, 8) to k=6
+         -> Shallowing cell at (18, 8) to k=11
+         -> Shallowing cell at (19, 8) to k=7
+         -> Shallowing cell at (19, 8) to k=8
+         -> Shallowing cell at (19, 8) to k=9
+         -> Shallowing cell at (19, 8) to k=10
+         -> Shallowing cell at (19, 8) to k=11
+         -> Shallowing cell at (19, 8) to k=12
+         -> Shallowing cell at (19, 8) to k=13
+         -> Shallowing cell at (19, 8) to k=14
+         -> Shallowing cell at (20, 8) to k=13
+         -> Shallowing cell at (20, 8) to k=14
+         -> Shallowing cell at (20, 8) to k=15
+         -> Deepening cell at (20, 8) to k=14
+         -> Shallowing cell at (20, 9) to k=13
+         -> Shallowing cell at (20, 9) to k=14
+         -> Shallowing cell at (21, 9) to k=14
+         -> Shallowing cell at (21, 9) to k=15
+         -> Deepening cell at (21, 9) to k=14
+         -> Shallowing cell at (21, 8) to k=13
+         -> Shallowing cell at (21, 7) to k=13
+         -> Shallowing cell at (21, 8) to k=14
+         -> Shallowing cell at (21, 7) to k=14
+         -> Shallowing cell at (20, 7) to k=13
+         -> Shallowing cell at (21, 6) to k=13
+         -> Shallowing cell at (21, 6) to k=14
+         -> Shallowing cell at (20, 7) to k=14
+         -> Shallowing cell at (22, 6) to k=14
+         -> Shallowing cell at (23, 6) to k=14
+         -> Shallowing cell at (23, 5) to k=14
+         -> Shallowing cell at (22, 5) to k=14
+         -> Shallowing cell at (21, 10) to k=14
+         -> Shallowing cell at (21, 11) to k=6
+         -> Shallowing cell at (21, 11) to k=7
+         -> Shallowing cell at (21, 11) to k=8
+         -> Shallowing cell at (21, 11) to k=9
+         -> Shallowing cell at (21, 11) to k=10
+         -> Shallowing cell at (21, 11) to k=11
+         -> Shallowing cell at (21, 11) to k=12
+         -> Shallowing cell at (21, 11) to k=13
+         -> Shallowing cell at (21, 11) to k=14
+         -> Shallowing cell at (20, 11) to k=6
+         -> Shallowing cell at (20, 11) to k=7
+         -> Shallowing cell at (20, 11) to k=8
+         -> Shallowing cell at (20, 11) to k=9
+         -> Shallowing cell at (20, 11) to k=10
+         -> Shallowing cell at (20, 11) to k=11
+         -> Shallowing cell at (20, 11) to k=12
+         -> Shallowing cell at (20, 11) to k=13
+         -> Shallowing cell at (20, 11) to k=14
+         -> Shallowing cell at (21, 15) to k=9
+         -> Shallowing cell at (21, 15) to k=10
+         -> Deepening cell at (21, 15) to k=9
+         -> Deepening cell at (21, 15) to k=8
+         -> Deepening cell at (21, 15) to k=7
+         -> Deepening cell at (21, 15) to k=6
+         -> Deepening cell at (21, 15) to k=5
+         -> Deepening cell at (21, 15) to k=4
+         -> Deepening cell at (21, 15) to k=3
+         -> Deepening cell at (21, 15) to k=2
+         -> Shallowing cell at (21, 15) to k=3
+         -> Shallowing cell at (21, 15) to k=4
+         -> Shallowing cell at (21, 15) to k=5
+         -> Shallowing cell at (21, 15) to k=6
+         -> Shallowing cell at (21, 15) to k=7
+         -> Shallowing cell at (21, 15) to k=8
+         -> Deepening cell at (20, 14) to k=8
+         -> Shallowing cell at (20, 14) to k=9
+         -> Shallowing cell at (19, 12) to k=10
+         -> Deepening cell at (19, 12) to k=9
+         -> Shallowing cell at (19, 13) to k=10
+         -> Deepening cell at (19, 13) to k=9
+         -> Shallowing cell at (19, 10) to k=10
+         -> Deepening cell at (19, 10) to k=9
+         -> Shallowing cell at (19, 11) to k=10
+         -> Deepening cell at (19, 11) to k=9
+         -> Shallowing cell at (19, 10) to k=10
+         -> Shallowing cell at (19, 10) to k=11
+         -> Deepening cell at (19, 10) to k=10
+         -> Deepening cell at (19, 10) to k=9
+         -> Shallowing cell at (23, 11) to k=6
+         -> Shallowing cell at (24, 12) to k=6
+         -> Shallowing cell at (16, 23) to k=4
+         -> Shallowing cell at (14, 13) to k=16
+         -> Deepening cell at (14, 13) to k=15
+         -> Shallowing cell at (13, 13) to k=11
+         -> Shallowing cell at (13, 12) to k=14
+         -> Deepening cell at (13, 12) to k=13
+         -> Shallowing cell at (23, 10) to k=10
+         -> Shallowing cell at (24, 10) to k=10
+         -> Shallowing cell at (22, 10) to k=11
+         -> Shallowing cell at (23, 9) to k=12
+         -> Shallowing cell at (24, 9) to k=12
+         -> Shallowing cell at (22, 8) to k=13
+         -> Shallowing cell at (22, 7) to k=13
+         -> Shallowing cell at (23, 8) to k=13
+         -> Shallowing cell at (22, 9) to k=13
+         -> Shallowing cell at (23, 9) to k=13
+         -> Shallowing cell at (24, 9) to k=13
+         -> Shallowing cell at (25, 9) to k=13
+         -> Shallowing cell at (26, 9) to k=13
+         -> Shallowing cell at (27, 9) to k=14
+         -> Shallowing cell at (28, 9) to k=14
+         -> Shallowing cell at (29, 9) to k=14
+         -> Shallowing cell at (29, 8) to k=14
+         -> Shallowing cell at (28, 8) to k=14
+         -> Shallowing cell at (28, 6) to k=15
+         -> Shallowing cell at (29, 6) to k=15
+         -> Shallowing cell at (25, 9) to k=14
+         -> Deepening cell at (25, 9) to k=13
+         -> Shallowing cell at (26, 10) to k=12
+         -> Shallowing cell at (26, 10) to k=13
+         -> Shallowing cell at (27, 10) to k=13
+         -> Shallowing cell at (27, 11) to k=12
+         -> Shallowing cell at (27, 12) to k=12
+         -> Shallowing cell at (27, 11) to k=13
+         -> Deepening cell at (27, 11) to k=12
+         -> Shallowing cell at (26, 11) to k=11
+         -> Shallowing cell at (26, 11) to k=12
+         -> Shallowing cell at (26, 12) to k=11
+         -> Shallowing cell at (26, 12) to k=12
+         -> Shallowing cell at (25, 11) to k=11
+         -> Shallowing cell at (25, 11) to k=12
+         -> Shallowing cell at (25, 10) to k=12
+         -> Shallowing cell at (25, 10) to k=13
+         -> Deepening cell at (25, 10) to k=12
+       - Cannot deepen/shallow cell at (31, 11)
+         -> Shallowing cell at (30, 11) to k=13
+         -> Shallowing cell at (30, 11) to k=14
+         -> Shallowing cell at (30, 11) to k=15
+         -> Shallowing cell at (30, 11) to k=16
+         -> Deepening cell at (30, 11) to k=15
+         -> Shallowing cell at (30, 12) to k=13
+         -> Shallowing cell at (30, 12) to k=14
+         -> Shallowing cell at (30, 12) to k=15
+         -> Shallowing cell at (30, 13) to k=13
+         -> Shallowing cell at (30, 13) to k=14
+         -> Shallowing cell at (30, 14) to k=13
+         -> Shallowing cell at (29, 14) to k=13
+         -> Shallowing cell at (29, 12) to k=13
+         -> Shallowing cell at (29, 12) to k=14
+         -> Deepening cell at (29, 12) to k=13
+         -> Shallowing cell at (29, 13) to k=13
+         -> Shallowing cell at (28, 12) to k=12
+         -> Shallowing cell at (28, 13) to k=12
+         -> Shallowing cell at (30, 16) to k=11
+         -> Shallowing cell at (29, 16) to k=11
+         -> Shallowing cell at (29, 16) to k=12
+         -> Shallowing cell at (30, 16) to k=12
+         -> Shallowing cell at (30, 15) to k=11
+         -> Shallowing cell at (30, 15) to k=12
+         -> Shallowing cell at (29, 15) to k=11
+         -> Shallowing cell at (29, 15) to k=12
+         -> Shallowing cell at (30, 16) to k=13
+         -> Deepening cell at (30, 16) to k=12
+         -> Shallowing cell at (30, 17) to k=13
+         -> Deepening cell at (30, 17) to k=12
+         -> Shallowing cell at (31, 17) to k=13
+         -> Shallowing cell at (31, 19) to k=13
+         -> Deepening cell at (31, 19) to k=12
+         -> Shallowing cell at (31, 18) to k=13
+         -> Shallowing cell at (32, 17) to k=10
+         -> Shallowing cell at (32, 17) to k=11
+         -> Shallowing cell at (31, 16) to k=11
+         -> Shallowing cell at (31, 16) to k=12
+         -> Shallowing cell at (31, 16) to k=13
+         -> Shallowing cell at (31, 16) to k=14
+         -> Shallowing cell at (32, 16) to k=3
+         -> Shallowing cell at (32, 16) to k=4
+         -> Shallowing cell at (32, 16) to k=5
+         -> Shallowing cell at (32, 16) to k=6
+         -> Shallowing cell at (26, 8) to k=15
+         -> Shallowing cell at (25, 8) to k=15
+         -> Shallowing cell at (32, 16) to k=7
+         -> Shallowing cell at (32, 16) to k=8
+         -> Shallowing cell at (32, 16) to k=9
+         -> Shallowing cell at (32, 16) to k=10
+         -> Shallowing cell at (32, 16) to k=11
+         -> Shallowing cell at (32, 16) to k=12
+         -> Shallowing cell at (32, 16) to k=13
+         -> Shallowing cell at (32, 16) to k=14
+         -> Shallowing cell at (32, 16) to k=15
+         -> Shallowing cell at (32, 15) to k=3
+         -> Shallowing cell at (32, 15) to k=4
+         -> Shallowing cell at (32, 15) to k=5
+         -> Shallowing cell at (32, 15) to k=6
+         -> Shallowing cell at (32, 15) to k=7
+         -> Shallowing cell at (32, 15) to k=8
+         -> Shallowing cell at (32, 15) to k=9
+         -> Shallowing cell at (32, 15) to k=10
+         -> Shallowing cell at (32, 15) to k=11
+         -> Shallowing cell at (32, 15) to k=12
+         -> Shallowing cell at (32, 15) to k=13
+         -> Shallowing cell at (32, 15) to k=14
+         -> Shallowing cell at (32, 15) to k=15
+         -> Shallowing cell at (33, 13) to k=2
+         -> Shallowing cell at (33, 14) to k=2
+         -> Shallowing cell at (33, 14) to k=3
+         -> Shallowing cell at (33, 14) to k=4
+         -> Shallowing cell at (33, 13) to k=3
+         -> Shallowing cell at (33, 13) to k=4
+         -> Shallowing cell at (33, 13) to k=5
+         -> Shallowing cell at (33, 13) to k=6
+         -> Shallowing cell at (33, 13) to k=7
+         -> Shallowing cell at (33, 13) to k=8
+         -> Shallowing cell at (33, 12) to k=2
+         -> Shallowing cell at (33, 12) to k=3
+         -> Shallowing cell at (33, 12) to k=4
+         -> Shallowing cell at (33, 12) to k=5
+         -> Shallowing cell at (33, 12) to k=6
+         -> Shallowing cell at (33, 12) to k=7
+         -> Shallowing cell at (33, 12) to k=8
+         -> Shallowing cell at (33, 12) to k=9
+         -> Shallowing cell at (33, 12) to k=10
+         -> Shallowing cell at (33, 12) to k=11
+         -> Shallowing cell at (33, 12) to k=12
+         -> Shallowing cell at (33, 12) to k=13
+         -> Shallowing cell at (33, 12) to k=14
+         -> Deepening cell at (33, 12) to k=13
+         -> Shallowing cell at (33, 11) to k=2
+         -> Shallowing cell at (33, 11) to k=3
+         -> Shallowing cell at (33, 11) to k=4
+         -> Shallowing cell at (33, 11) to k=5
+         -> Shallowing cell at (33, 11) to k=6
+         -> Shallowing cell at (33, 11) to k=7
+         -> Shallowing cell at (33, 11) to k=8
+         -> Shallowing cell at (33, 11) to k=9
+         -> Shallowing cell at (33, 11) to k=10
+         -> Shallowing cell at (33, 11) to k=11
+         -> Shallowing cell at (33, 11) to k=12
+         -> Shallowing cell at (33, 11) to k=13
+         -> Shallowing cell at (33, 11) to k=14
+         -> Shallowing cell at (33, 11) to k=15
+         -> Shallowing cell at (34, 11) to k=3
+         -> Shallowing cell at (34, 10) to k=3
+         -> Shallowing cell at (34, 9) to k=3
+         -> Shallowing cell at (33, 10) to k=2
+         -> Shallowing cell at (33, 10) to k=3
+         -> Shallowing cell at (33, 10) to k=4
+         -> Shallowing cell at (33, 10) to k=5
+         -> Shallowing cell at (33, 10) to k=6
+         -> Shallowing cell at (33, 10) to k=7
+         -> Shallowing cell at (33, 10) to k=8
+         -> Shallowing cell at (33, 10) to k=9
+         -> Shallowing cell at (33, 10) to k=10
+         -> Shallowing cell at (33, 10) to k=11
+         -> Shallowing cell at (33, 10) to k=12
+         -> Shallowing cell at (33, 10) to k=13
+         -> Shallowing cell at (33, 10) to k=14
+         -> Shallowing cell at (33, 10) to k=15
+         -> Shallowing cell at (33, 10) to k=16
+         -> Deepening cell at (33, 10) to k=15
+         -> Shallowing cell at (33, 9) to k=2
+         -> Shallowing cell at (33, 9) to k=3
+         -> Shallowing cell at (33, 9) to k=4
+         -> Shallowing cell at (33, 9) to k=5
+         -> Shallowing cell at (33, 9) to k=6
+         -> Shallowing cell at (33, 9) to k=7
+         -> Shallowing cell at (33, 9) to k=8
+         -> Shallowing cell at (33, 9) to k=9
+         -> Shallowing cell at (33, 9) to k=10
+         -> Shallowing cell at (33, 9) to k=11
+         -> Shallowing cell at (33, 9) to k=12
+         -> Shallowing cell at (33, 9) to k=13
+         -> Shallowing cell at (33, 9) to k=14
+         -> Shallowing cell at (33, 9) to k=15
+         -> Shallowing cell at (33, 8) to k=2
+         -> Shallowing cell at (33, 8) to k=3
+         -> Shallowing cell at (33, 8) to k=4
+         -> Shallowing cell at (33, 8) to k=5
+         -> Shallowing cell at (33, 8) to k=6
+         -> Shallowing cell at (33, 8) to k=7
+         -> Shallowing cell at (33, 8) to k=8
+         -> Shallowing cell at (33, 8) to k=9
+         -> Shallowing cell at (33, 8) to k=10
+         -> Shallowing cell at (33, 8) to k=11
+         -> Shallowing cell at (33, 8) to k=12
+         -> Shallowing cell at (33, 8) to k=13
+         -> Shallowing cell at (33, 8) to k=14
+         -> Shallowing cell at (33, 8) to k=15
+         -> Deepening cell at (33, 8) to k=14
+         -> Shallowing cell at (33, 7) to k=2
+         -> Shallowing cell at (33, 7) to k=3
+         -> Shallowing cell at (33, 7) to k=4
+         -> Shallowing cell at (33, 7) to k=5
+         -> Shallowing cell at (33, 7) to k=6
+         -> Shallowing cell at (33, 7) to k=7
+         -> Shallowing cell at (33, 7) to k=8
+         -> Shallowing cell at (33, 7) to k=9
+         -> Shallowing cell at (33, 7) to k=10
+         -> Shallowing cell at (33, 7) to k=11
+         -> Shallowing cell at (33, 7) to k=12
+         -> Shallowing cell at (33, 7) to k=13
+         -> Shallowing cell at (33, 7) to k=14
+         -> Shallowing cell at (33, 6) to k=2
+         -> Shallowing cell at (33, 6) to k=3
+         -> Shallowing cell at (33, 6) to k=4
+         -> Shallowing cell at (33, 6) to k=5
+         -> Shallowing cell at (33, 6) to k=6
+         -> Shallowing cell at (33, 6) to k=7
+         -> Shallowing cell at (33, 6) to k=8
+         -> Shallowing cell at (33, 6) to k=9
+         -> Shallowing cell at (33, 6) to k=10
+         -> Shallowing cell at (33, 6) to k=11
+         -> Shallowing cell at (33, 6) to k=12
+         -> Shallowing cell at (33, 6) to k=13
+         -> Shallowing cell at (33, 6) to k=14
+         -> Shallowing cell at (34, 6) to k=11
+         -> Shallowing cell at (34, 6) to k=12
+         -> Shallowing cell at (34, 6) to k=13
+         -> Deepening cell at (34, 6) to k=12
+         -> Shallowing cell at (33, 5) to k=2
+         -> Shallowing cell at (33, 5) to k=3
+         -> Shallowing cell at (33, 5) to k=4
+         -> Shallowing cell at (33, 5) to k=5
+         -> Shallowing cell at (33, 5) to k=6
+         -> Shallowing cell at (33, 5) to k=7
+         -> Shallowing cell at (33, 5) to k=8
+         -> Shallowing cell at (33, 5) to k=9
+         -> Shallowing cell at (33, 5) to k=10
+         -> Shallowing cell at (33, 5) to k=11
+         -> Shallowing cell at (33, 5) to k=12
+         -> Shallowing cell at (33, 5) to k=13
+         -> Shallowing cell at (33, 5) to k=14
+         -> Shallowing cell at (33, 5) to k=15
+         -> Shallowing cell at (33, 4) to k=2
+         -> Shallowing cell at (33, 4) to k=3
+         -> Shallowing cell at (33, 4) to k=4
+         -> Shallowing cell at (33, 4) to k=5
+         -> Shallowing cell at (33, 4) to k=6
+         -> Shallowing cell at (33, 4) to k=7
+         -> Shallowing cell at (33, 4) to k=8
+         -> Shallowing cell at (33, 4) to k=9
+         -> Shallowing cell at (33, 4) to k=10
+         -> Shallowing cell at (33, 4) to k=11
+         -> Shallowing cell at (33, 4) to k=12
+         -> Shallowing cell at (33, 4) to k=13
+         -> Shallowing cell at (33, 4) to k=14
+         -> Shallowing cell at (33, 4) to k=15
+         -> Shallowing cell at (34, 4) to k=5
+         -> Shallowing cell at (34, 4) to k=6
+         -> Shallowing cell at (34, 4) to k=7
+         -> Shallowing cell at (34, 4) to k=8
+         -> Shallowing cell at (34, 4) to k=9
+         -> Shallowing cell at (34, 4) to k=10
+         -> Shallowing cell at (34, 4) to k=11
+         -> Shallowing cell at (34, 4) to k=12
+         -> Shallowing cell at (34, 4) to k=13
+         -> Shallowing cell at (34, 4) to k=14
+         -> Shallowing cell at (34, 4) to k=15
+         -> Shallowing cell at (35, 4) to k=5
+         -> Shallowing cell at (35, 4) to k=6
+         -> Shallowing cell at (35, 4) to k=7
+         -> Shallowing cell at (35, 4) to k=8
+         -> Shallowing cell at (35, 4) to k=9
+         -> Shallowing cell at (35, 4) to k=10
+         -> Shallowing cell at (35, 4) to k=11
+         -> Shallowing cell at (35, 4) to k=12
+         -> Shallowing cell at (35, 4) to k=13
+         -> Shallowing cell at (35, 4) to k=14
+         -> Shallowing cell at (35, 4) to k=15
+         -> Shallowing cell at (35, 4) to k=16
+         -> Deepening cell at (35, 4) to k=15
+         -> Shallowing cell at (35, 3) to k=14
+         -> Shallowing cell at (34, 3) to k=14
+         -> Shallowing cell at (33, 3) to k=2
+         -> Shallowing cell at (33, 3) to k=3
+         -> Shallowing cell at (33, 3) to k=4
+         -> Shallowing cell at (33, 3) to k=5
+         -> Shallowing cell at (33, 3) to k=6
+         -> Shallowing cell at (33, 3) to k=7
+         -> Shallowing cell at (33, 3) to k=8
+         -> Shallowing cell at (33, 3) to k=9
+         -> Shallowing cell at (33, 3) to k=10
+         -> Shallowing cell at (33, 3) to k=11
+         -> Shallowing cell at (33, 3) to k=12
+         -> Shallowing cell at (33, 3) to k=13
+         -> Shallowing cell at (33, 3) to k=14
+         -> Shallowing cell at (33, 2) to k=2
+         -> Shallowing cell at (33, 2) to k=3
+         -> Shallowing cell at (33, 2) to k=4
+         -> Shallowing cell at (33, 2) to k=5
+         -> Shallowing cell at (33, 2) to k=6
+         -> Shallowing cell at (33, 2) to k=7
+         -> Shallowing cell at (33, 2) to k=8
+         -> Shallowing cell at (33, 2) to k=9
+         -> Shallowing cell at (33, 2) to k=10
+         -> Shallowing cell at (33, 2) to k=11
+         -> Shallowing cell at (33, 2) to k=12
+         -> Shallowing cell at (33, 2) to k=13
+         -> Shallowing cell at (33, 2) to k=14
+         -> Shallowing cell at (34, 2) to k=2
+         -> Shallowing cell at (34, 2) to k=3
+         -> Shallowing cell at (34, 2) to k=4
+         -> Shallowing cell at (34, 2) to k=5
+         -> Shallowing cell at (34, 2) to k=6
+         -> Shallowing cell at (34, 2) to k=7
+         -> Shallowing cell at (34, 2) to k=8
+         -> Shallowing cell at (34, 2) to k=9
+         -> Shallowing cell at (34, 2) to k=10
+         -> Shallowing cell at (34, 2) to k=11
+         -> Shallowing cell at (34, 2) to k=12
+         -> Shallowing cell at (34, 2) to k=13
+         -> Shallowing cell at (34, 2) to k=14
+         -> Shallowing cell at (35, 2) to k=2
+         -> Shallowing cell at (35, 2) to k=3
+         -> Shallowing cell at (35, 2) to k=4
+         -> Shallowing cell at (35, 2) to k=5
+         -> Shallowing cell at (35, 2) to k=6
+         -> Shallowing cell at (35, 2) to k=7
+         -> Shallowing cell at (35, 2) to k=8
+         -> Shallowing cell at (35, 2) to k=9
+         -> Shallowing cell at (35, 2) to k=10
+         -> Shallowing cell at (35, 2) to k=11
+         -> Shallowing cell at (35, 2) to k=12
+         -> Shallowing cell at (35, 2) to k=13
+         -> Shallowing cell at (35, 2) to k=14
+         -> Shallowing cell at (35, 1) to k=2
+         -> Shallowing cell at (35, 1) to k=3
+         -> Shallowing cell at (35, 1) to k=4
+         -> Shallowing cell at (35, 1) to k=5
+         -> Shallowing cell at (35, 1) to k=6
+         -> Shallowing cell at (35, 1) to k=7
+         -> Shallowing cell at (35, 1) to k=8
+         -> Shallowing cell at (35, 1) to k=9
+         -> Shallowing cell at (35, 1) to k=10
+         -> Shallowing cell at (35, 1) to k=11
+         -> Shallowing cell at (35, 1) to k=12
+         -> Shallowing cell at (35, 1) to k=13
+         -> Shallowing cell at (35, 1) to k=14
+         -> Shallowing cell at (34, 1) to k=2
+         -> Shallowing cell at (34, 1) to k=3
+         -> Shallowing cell at (34, 1) to k=4
+         -> Shallowing cell at (34, 1) to k=5
+         -> Shallowing cell at (34, 1) to k=6
+         -> Shallowing cell at (34, 1) to k=7
+         -> Shallowing cell at (34, 1) to k=8
+         -> Shallowing cell at (34, 1) to k=9
+         -> Shallowing cell at (34, 1) to k=10
+         -> Shallowing cell at (34, 1) to k=11
+         -> Shallowing cell at (34, 1) to k=12
+         -> Shallowing cell at (34, 1) to k=13
+         -> Shallowing cell at (34, 1) to k=14
+         -> Shallowing cell at (34, 1) to k=15
+         -> Deepening cell at (34, 1) to k=14
+         -> Shallowing cell at (33, 1) to k=2
+         -> Shallowing cell at (33, 1) to k=3
+         -> Shallowing cell at (33, 1) to k=4
+         -> Shallowing cell at (33, 1) to k=5
+         -> Shallowing cell at (33, 1) to k=6
+         -> Shallowing cell at (33, 1) to k=7
+         -> Shallowing cell at (33, 1) to k=8
+         -> Shallowing cell at (33, 1) to k=9
+         -> Shallowing cell at (33, 1) to k=10
+         -> Shallowing cell at (33, 1) to k=11
+         -> Shallowing cell at (33, 1) to k=12
+         -> Shallowing cell at (33, 1) to k=13
+         -> Shallowing cell at (33, 1) to k=14
+         -> Shallowing cell at (32, 1) to k=2
+         -> Shallowing cell at (32, 1) to k=3
+         -> Shallowing cell at (32, 1) to k=4
+         -> Shallowing cell at (32, 1) to k=5
+         -> Shallowing cell at (32, 1) to k=6
+         -> Shallowing cell at (32, 1) to k=7
+         -> Shallowing cell at (32, 1) to k=8
+         -> Shallowing cell at (32, 1) to k=9
+         -> Shallowing cell at (32, 1) to k=10
+         -> Shallowing cell at (32, 1) to k=11
+         -> Shallowing cell at (32, 1) to k=12
+         -> Shallowing cell at (32, 1) to k=13
+         -> Shallowing cell at (32, 1) to k=14
+         -> Shallowing cell at (32, 1) to k=15
+         -> Shallowing cell at (32, 1) to k=16
+         -> Deepening cell at (32, 1) to k=15
+         -> Shallowing cell at (36, 1) to k=2
+         -> Shallowing cell at (36, 1) to k=3
+         -> Shallowing cell at (36, 1) to k=4
+         -> Shallowing cell at (36, 1) to k=5
+         -> Shallowing cell at (36, 1) to k=6
+         -> Shallowing cell at (36, 1) to k=7
+         -> Shallowing cell at (36, 1) to k=8
+         -> Shallowing cell at (36, 1) to k=9
+         -> Shallowing cell at (36, 1) to k=10
+         -> Shallowing cell at (36, 1) to k=11
+         -> Shallowing cell at (36, 1) to k=12
+         -> Shallowing cell at (36, 1) to k=13
+         -> Shallowing cell at (36, 1) to k=14
+         -> Shallowing cell at (36, 1) to k=15
+         -> Shallowing cell at (36, 2) to k=2
+         -> Shallowing cell at (36, 2) to k=3
+         -> Shallowing cell at (36, 2) to k=4
+         -> Shallowing cell at (36, 2) to k=5
+         -> Shallowing cell at (36, 2) to k=6
+         -> Shallowing cell at (36, 2) to k=7
+         -> Shallowing cell at (36, 2) to k=8
+         -> Shallowing cell at (36, 2) to k=9
+         -> Shallowing cell at (36, 2) to k=10
+         -> Shallowing cell at (36, 2) to k=11
+         -> Shallowing cell at (36, 2) to k=12
+         -> Shallowing cell at (36, 2) to k=13
+         -> Shallowing cell at (36, 2) to k=14
+         -> Shallowing cell at (36, 2) to k=15
+         -> Shallowing cell at (36, 3) to k=7
+         -> Shallowing cell at (36, 3) to k=8
+         -> Deepening cell at (36, 3) to k=7
+         -> Shallowing cell at (36, 4) to k=5
+         -> Shallowing cell at (36, 5) to k=2
+         -> Shallowing cell at (35, 5) to k=6
+         -> Deepening cell at (35, 5) to k=5
+         -> Shallowing cell at (34, 5) to k=11
+         -> Shallowing cell at (34, 5) to k=12
+         -> Shallowing cell at (34, 5) to k=13
+         -> Deepening cell at (34, 5) to k=12
+         -> Shallowing cell at (34, 5) to k=13
+         -> Shallowing cell at (34, 5) to k=14
+         -> Shallowing cell at (34, 6) to k=13
+         -> Deepening cell at (34, 6) to k=12
+         -> Shallowing cell at (34, 7) to k=6
+         -> Shallowing cell at (34, 7) to k=7
+         -> Shallowing cell at (34, 7) to k=8
+         -> Shallowing cell at (34, 7) to k=9
+         -> Deepening cell at (34, 7) to k=8
+         -> Shallowing cell at (34, 7) to k=9
+         -> Deepening cell at (34, 7) to k=8
+         -> Deepening cell at (34, 7) to k=7
+         -> Deepening cell at (33, 12) to k=12
+         -> Shallowing cell at (24, 8) to k=14
+         -> Shallowing cell at (28, 10) to k=14
+         -> Shallowing cell at (29, 10) to k=14
+         -> Shallowing cell at (23, 16) to k=2
+         -> Deepening cell at (23, 16) to k=1
+         -> Shallowing cell at (21, 15) to k=9
+         -> Deepening cell at (21, 15) to k=8
+         -> Deepening cell at (21, 15) to k=7
+         -> Deepening cell at (21, 14) to k=7
+         -> Shallowing cell at (21, 14) to k=8
+         -> Shallowing cell at (21, 14) to k=9
+         -> Shallowing cell at (20, 14) to k=10
+         -> Deepening cell at (20, 14) to k=9
+         -> Deepening cell at (21, 14) to k=8
+         -> Shallowing cell at (11, 9) to k=3
+         -> Shallowing cell at (11, 8) to k=5
+         -> Shallowing cell at (24, 13) to k=3
+         -> Deepening cell at (24, 13) to k=2
+         -> Shallowing cell at (24, 12) to k=7
+         -> Deepening cell at (24, 12) to k=6
+         -> Deepening cell at (24, 12) to k=5
+         -> Shallowing cell at (24, 12) to k=6
+         -> Deepening cell at (24, 12) to k=5
+         -> Shallowing cell at (14, 21) to k=3
+         -> Deepening cell at (14, 21) to k=2
+         -> Shallowing cell at (15, 22) to k=5
+         -> Deepening cell at (12, 4) to k=13
+         -> Deepening cell at (12, 4) to k=12
+         -> Deepening cell at (12, 4) to k=11
+         -> Deepening cell at (12, 4) to k=10
+         -> Shallowing cell at (12, 4) to k=11
+         -> Shallowing cell at (12, 4) to k=12
+         -> Shallowing cell at (12, 4) to k=13
+         -> Deepening cell at (12, 4) to k=12
+         -> Shallowing cell at (12, 4) to k=13
+         -> Shallowing cell at (12, 4) to k=14
+         -> Shallowing cell at (12, 4) to k=15
+         -> Deepening cell at (12, 4) to k=14
+         -> Shallowing cell at (11, 8) to k=6
+         -> Shallowing cell at (21, 14) to k=9
+         -> Deepening cell at (21, 14) to k=8
+         -> Deepening cell at (21, 14) to k=7
+         -> Shallowing cell at (21, 14) to k=8
+         -> Shallowing cell at (21, 14) to k=9
+         -> Deepening cell at (21, 14) to k=8
+         -> Deepening cell at (21, 14) to k=7
+         -> Deepening cell at (21, 14) to k=6
+         -> Deepening cell at (21, 14) to k=5
+         -> Deepening cell at (21, 14) to k=4
+         -> Deepening cell at (21, 14) to k=3
+         -> Deepening cell at (21, 14) to k=2
+         -> Deepening cell at (21, 14) to k=1
+         -> Shallowing cell at (21, 14) to k=2
+         -> Shallowing cell at (21, 14) to k=3
+         -> Shallowing cell at (21, 14) to k=4
+         -> Shallowing cell at (21, 14) to k=5
+         -> Shallowing cell at (21, 14) to k=6
+         -> Shallowing cell at (21, 14) to k=7
+         -> Shallowing cell at (1, 3) to k=4
+         -> Deepening cell at (1, 3) to k=3
+         -> Shallowing cell at (1, 3) to k=4
+         -> Shallowing cell at (17, 31) to k=8
+         -> Shallowing cell at (18, 32) to k=9
+       - Out of grid range
+       * Mask alteration complete
+       - User-editing complete.
+>  13. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  14. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+       * found 3 land masses
+       * found 4 land masses
+       * found 5 land masses
+       * found 6 land masses
+       * found 7 land masses
+       * found 8 land masses
+>  15. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * updated find: N pole island (currently uncounted)
+       * updated find: 3 islands
+       * total # true islands = 3
+>  16. GENERATING .paths FILE ...
+       * Ignoring border #1
+       * Creating raw path #2 ...
+       * Creating raw path #3 ...
+       * Creating raw path #4 ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (23,25)
+         -> SE corner :: Add additional path entry @ (23,23)
+         -> NE corner :: Skip path entry @ (24,23)
+         -> SE corner :: Add additional path entry @ (22,20)
+         -> NE corner :: Skip path entry @ (22,22)
+         -> SE corner :: Add additional path entry @ (21,22)
+       * Building path #3 ...
+         -> NE corner :: Skip path entry @ (22,32)
+         -> SE corner :: Add additional path entry @ (18,28)
+       * Building path #4 ...
+       - .paths file saved
+>  17. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  18. GENERATING SEDIMENT TOPO ...
+       - Converted k1 file data (nothing to re-grid).
+       - .depth.dat saved
+       - template file .sedcoremask.dat saved
+       - template file .reefmask.dat saved
+>  19. SWITCH GRIDS ...
+       - Axis info re-read.
+       - Mask info re-read.
+>  20. CREATING WIND PRODUCTS ...
+       - windspeed variable (wind_mm_10m) does not exists in .nc
+       - Creating wind product input mask
+       - Regridding wind stress (x) to GOLDSTEIN u-grid
+       - Regridding wind stress (y) to GOLDSTEIN u-grid
+       - Regridding wind stress (x) to GOLDSTEIN v-grid
+       - Regridding wind stress (y) to GOLDSTEIN v-grid
+       - Regridding wind velocity (x) to GOLDSTEIN c-grid
+       - Regridding wind velocity (y) to GOLDSTEIN c-grid
+       - Regridding wind speed to GOLDSTEIN c-grid
+       - Regridding wind speed to land c-grid
+       - Written tau u (u point) data
+       - Written tau u (v point) data
+       - Written tau v (u point) data
+       - Written tau v (v point) data
+       - Written u wind velocity data
+       - Written v wind velocity data
+       - Written BIOGEM windspeed data
+       - Written FULL GRID uvaa windspeed data
+       - Written ENTS uvaa windspeed (derived from velocity)
+       - Re-grided GCM wind products.
+>  21. LOADING PLANETARY ALBEDO DATA ...
+       - Read GCM albedo data.
+>  22. CREATING PLANETARY ALBEDO DATA ...
+       - Re-gridded GCM planetary albedo data.
+       - 2D planetary albedo file saved
+       - Generated zonal mean planetary albedo profile.
+       - Zonal mean .albd_pl.dat file saved
+>  23. LOADING SURFACE & CLOUD ALBEDO DATA ...
+       - Read GCM albedo data.
+>  23. CREATING SURFACE & CLOUD ALBEDO DATA ...
+       - Re-gridded GCM surface albedo data.
+       - Re-gridded GCM cloud albedo data.
+       - 2D surface albedo file saved
+       - 2D cloud albedo file saved
+       - Generated zonal mean surface and cloud albedo profiles.
+       - Zonal mean .albd_sur.dat file saved
+>  24. LOADING ICE MASK & OROGRAPHY DATA ...
+      *** WARNING *** icemask input file not found. Assume no icesheets
+       - Read GCM orography and icemask data.
+>  25. CREATING ICE MASK & OROGRAPHY DATA ...
+       - Ice mask re-gridded.
+         NOTE: Ice mask is not adjusted after this point so may need to be hand-edited if the land-sea mask changes.
+       - Orography re-gridded.
+>  26. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 

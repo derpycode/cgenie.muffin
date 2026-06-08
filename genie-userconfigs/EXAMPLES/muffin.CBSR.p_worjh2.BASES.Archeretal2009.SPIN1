@@ -1,30 +1,32 @@
+## *******************************************************************
+# *** EXAMPLE *******************************************************
+# *******************************************************************
 #
+# *** CLIMATE *******************************************************
 #
-# --- CLIMATE ---------------------------------------------------------
-#
-# set climate feedback
+# set no climate feedback
 ea_36=y
 #
-# --- BIOLOGICAL NEW PRODUCTION ---------------------------------------
+# *** BIOLOGICAL NEW PRODUCTION *************************************
 #
 # maximum rate of conversion of dissolved PO4 into organic matter by phytoplankton (mol kg-1 yr-1)
 bg_par_bio_k0_PO4=8.9876e-006
 # [PO4] M-M half-sat value (mol kg-1)
 bg_par_bio_c0_PO4=8.9369e-007
 #
-# --- ORGANIC MATTER EXPORT RATIOS ------------------------------------
+# *** ORGANIC MATTER EXPORT RATIOS **********************************
 #
-# production fraction of dissolved organic matter
+#production fraction of dissolved organic matter
 bg_par_bio_red_DOMfrac=0.66
 #
-# --- INORGANIC MATTER EXPORT RATIOS ----------------------------------
+# *** INORGANIC MATTER EXPORT RATIOS ********************************
 #
 # underlying export CaCO3 as a proportion of particulate organic matter (i.e., CaCO3/POC)
 bg_par_bio_red_POC_CaCO3=0.0485
 # exponent for modifier of CaCO3:POC export ratio
 bg_par_bio_red_POC_CaCO3_pP=0.7440
 #
-# --- REMINERALIZATION ------------------------------------------------
+# *** REMINERALIZATION **********************************************
 #
 # DOC lifetime (yrs)
 bg_par_bio_remin_DOMlifetime=0.5
@@ -41,46 +43,52 @@ bg_par_bio_remin_CaCO3_eL1=1.8905e+003
 # remineralization length #2 for CaCO3
 bg_par_bio_remin_CaCO3_eL2=1000000.0
 #
-# --- SEDIMENTS ------------------------------------------------
+# *** SEDIMENTS *****************************************************
 #
-# sediment  grid options
+# max cut-off depth for neritic (non deep sea) sediment grid points
+# NOTE: sediment grid points shallower that this and not defined as reefal cells, are assumed to be 'mud'
 sg_par_sed_Dmax_neritic=175.0
-# sediment diagenesis options
+# sediment diagenesis option
+# NOTE: "ridgwell2001lookup" is the the simplest/fastest option
 sg_par_sed_diagen_CaCO3opt="archer1991explicit"
-sg_ctrl_sed_bioturb=.false.
-sg_ctrl_sed_bioturb_Archer=.false.
-sg_par_n_sed_mix=20
-# set invarient surface bioturbation mixing rate
-sg_par_sed_mix_k_sur_max=0.15
-sg_par_sed_mix_k_sur_min=0.15
-# no additional detrital flux
+# bioturbation
+# NOTE: turn OFF bioturbation to equilibriate the system faster
+sg_ctrl_sed_bioturb=.FALSE.
+# generic paleo detrital flux (g cm-2 kyr-1)
+# NOTE: set to zero when applying a dust field (unless an additional detrital flux is required)
 sg_par_sed_fdet=0.0
 #
-# --- WEATHERING -----------------------------------------------
+# *** WEATHERING ****************************************************
 #
 # set a 'CLOSED' system
-bg_ctrl_force_sed_closedsystem=.true.
-# set total weathering rate
-rg_par_weather_CaCO3=10.0E+12
-# set bulk weathering isotopic composition
-rg_par_weather_CaCO3_d13C=3.0
+# NOTE: set to .FALSE. and set weathering to balance burial for a fully open cycle
+bg_ctrl_force_sed_closedsystem=.TRUE.
+# automatically seed all weathering fluxes as non-zero
+rg_ctrl_force_sed_closedsystem=.TRUE.
 #
-# --- DATA SAVING -----------------------------------------------------
+# *** DATA SAVING ***************************************************
 #
-bg_par_data_save_level=4
-bg_ctrl_debug_lvl0=.true.
-ma_debug_loop=1
+# Preformed diagnostics option == BASIC + biology + tracer + proxy
+bg_par_data_save_level=11
+# force time-slice save at run end only
+bg_par_infile_slice_name='save_timeslice_NONE.dat'
 #
-# --- FORCINGS --------------------------------------------------------
+# *** FORCINGS ******************************************************
 #
-# specify forcings
-bg_par_forcing_name="worjh2.RpCO2_Rp13CO2.detplusopalSED"
+# specify forcings -- generic forcing of atmopsheric pCO2 and d13C PLUS a non-carbonate (detrital) flux (to the sediments)
+bg_par_forcing_name="worjh2.RpCO2_Rp13CO2_detplusopalSED"
 bg_par_atm_force_scale_val_3=278.0E-06
 bg_par_atm_force_scale_val_4=-6.5
 #
-# --- MISC ------------------------------------------------------------
+# *** MISC **********************************************************
 #
+# configure automatically-generated SEDGEM parameter settings
+# silicate weathering fraction -- zero to align with Ridgwell and Hargreaves [2007]
+sg_par_sed_diag_fracSiweath=0.0
+# volcanic outgassing d13C (becomes irrelevant ...)
+sg_par_sed_diag_volcanicd13C = -6.0
 #
-# --- END -------------------------------------------------------------
-#
+# *******************************************************************
+# *** END ***********************************************************
+# *******************************************************************
 #
