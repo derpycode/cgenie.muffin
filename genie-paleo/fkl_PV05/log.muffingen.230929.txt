@@ -1,0 +1,425 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.9.24
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * A blank template grid will be generated: 
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+         (Nothing to load.)
+>   4. READING MASK & TOPO GRIDS ...
+         (Nothing to load.)
+>   5. RE-GRIDING MASK ...
+       - Blank mask created (nothing to re-grid).
+>   6. FILTERING MASK ...
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = -3.3307e-15
+>   7. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (15, 16) now ocean
+         -> Cell at (15, 16) now land
+         -> Cell at (15, 15) now land
+         -> Cell at (15, 14) now land
+         -> Cell at (15, 13) now land
+         -> Cell at (15, 12) now land
+         -> Cell at (15, 11) now land
+         -> Cell at (15, 10) now land
+         -> Cell at (15, 9) now land
+         -> Cell at (15, 8) now land
+         -> Cell at (15, 7) now land
+         -> Cell at (15, 6) now land
+         -> Cell at (15, 5) now land
+         -> Cell at (15, 4) now land
+         -> Cell at (15, 3) now land
+         -> Cell at (14, 3) now land
+         -> Cell at (14, 4) now land
+         -> Cell at (14, 5) now land
+         -> Cell at (14, 6) now land
+         -> Cell at (14, 7) now land
+         -> Cell at (14, 8) now land
+         -> Cell at (14, 9) now land
+         -> Cell at (14, 10) now land
+         -> Cell at (14, 11) now land
+         -> Cell at (14, 12) now land
+         -> Cell at (14, 13) now land
+         -> Cell at (14, 14) now land
+         -> Cell at (14, 15) now land
+         -> Cell at (14, 16) now land
+         -> Cell at (13, 16) now land
+         -> Cell at (12, 16) now land
+         -> Cell at (11, 16) now land
+         -> Cell at (10, 16) now land
+         -> Cell at (9, 16) now land
+         -> Cell at (8, 16) now land
+         -> Cell at (7, 16) now land
+         -> Cell at (7, 15) now land
+         -> Cell at (8, 15) now land
+         -> Cell at (10, 15) now land
+         -> Cell at (9, 15) now land
+         -> Cell at (11, 15) now land
+         -> Cell at (12, 15) now land
+         -> Cell at (13, 15) now land
+         -> Cell at (13, 3) now land
+         -> Cell at (12, 3) now land
+         -> Cell at (11, 3) now land
+         -> Cell at (10, 3) now land
+         -> Cell at (9, 3) now land
+         -> Cell at (8, 3) now land
+         -> Cell at (7, 3) now land
+         -> Cell at (7, 4) now land
+         -> Cell at (8, 4) now land
+         -> Cell at (9, 4) now land
+         -> Cell at (10, 4) now land
+         -> Cell at (11, 4) now land
+         -> Cell at (12, 4) now land
+         -> Cell at (13, 4) now land
+         -> Cell at (13, 14) now land
+         -> Cell at (13, 13) now land
+         -> Cell at (13, 12) now land
+         -> Cell at (13, 11) now land
+         -> Cell at (13, 10) now land
+         -> Cell at (13, 9) now land
+         -> Cell at (13, 8) now land
+         -> Cell at (13, 7) now land
+         -> Cell at (13, 6) now land
+         -> Cell at (13, 5) now land
+         -> Cell at (12, 11) now ocean
+         -> Cell at (14, 6) now ocean
+         -> Cell at (14, 6) now land
+         -> Cell at (13, 6) now land
+         -> Cell at (6, 16) now land
+         -> Cell at (6, 15) now land
+         -> Cell at (6, 4) now land
+         -> Cell at (6, 3) now land
+       - Out of grid range
+       * Mask alteration complete
+       * Revised land area fraction = 0.21605
+       - User-editing complete.
+>   8. CREATE FINAL MASK ...
+       - .mask_out.FINAL.dat saved
+       * Final land area fraction   = 0.21605
+>   9. RE-GRIDING TOPOGRAPHY ...
+         (Nothing to re-grid -- set uniform ocean depth.)
+>   10. RE-GRIDING OCEAN BATHYMETRY ...
+       - Bathymetry re-gridding complete.
+>  12. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button, or clickoutside the grid, to finish
+         -> Deepening cell at (12, 14) to k=2
+         -> Deepening cell at (12, 14) to k=1
+         -> Shallowing cell at (12, 14) to k=2
+         -> Shallowing cell at (12, 14) to k=3
+         -> Shallowing cell at (12, 14) to k=4
+         -> Shallowing cell at (12, 14) to k=5
+         -> Shallowing cell at (12, 14) to k=6
+         -> Shallowing cell at (12, 14) to k=7
+         -> Shallowing cell at (12, 14) to k=8
+         -> Shallowing cell at (12, 14) to k=9
+         -> Deepening cell at (12, 14) to k=8
+         -> Shallowing cell at (12, 14) to k=9
+         -> Shallowing cell at (12, 14) to k=10
+         -> Shallowing cell at (12, 14) to k=11
+         -> Shallowing cell at (12, 14) to k=12
+         -> Shallowing cell at (12, 14) to k=13
+         -> Shallowing cell at (12, 14) to k=14
+         -> Shallowing cell at (12, 14) to k=15
+         -> Shallowing cell at (12, 13) to k=4
+         -> Shallowing cell at (12, 13) to k=5
+         -> Deepening cell at (12, 13) to k=4
+         -> Shallowing cell at (12, 13) to k=5
+         -> Shallowing cell at (12, 13) to k=6
+         -> Shallowing cell at (12, 13) to k=7
+         -> Shallowing cell at (12, 13) to k=8
+         -> Shallowing cell at (12, 13) to k=9
+         -> Shallowing cell at (12, 13) to k=10
+         -> Shallowing cell at (12, 13) to k=11
+         -> Shallowing cell at (12, 13) to k=12
+         -> Shallowing cell at (12, 13) to k=13
+         -> Shallowing cell at (12, 13) to k=14
+         -> Shallowing cell at (12, 13) to k=15
+         -> Shallowing cell at (12, 12) to k=4
+         -> Shallowing cell at (12, 12) to k=5
+         -> Deepening cell at (12, 12) to k=4
+         -> Shallowing cell at (12, 12) to k=5
+         -> Shallowing cell at (12, 12) to k=6
+         -> Shallowing cell at (12, 12) to k=7
+         -> Shallowing cell at (12, 12) to k=8
+         -> Shallowing cell at (12, 12) to k=9
+         -> Shallowing cell at (12, 12) to k=10
+         -> Shallowing cell at (12, 12) to k=11
+         -> Shallowing cell at (12, 12) to k=12
+         -> Shallowing cell at (12, 12) to k=13
+         -> Shallowing cell at (12, 12) to k=14
+         -> Shallowing cell at (12, 12) to k=15
+         -> Shallowing cell at (12, 11) to k=4
+         -> Shallowing cell at (12, 11) to k=5
+         -> Shallowing cell at (12, 11) to k=6
+         -> Shallowing cell at (12, 11) to k=7
+         -> Shallowing cell at (12, 11) to k=8
+         -> Shallowing cell at (12, 11) to k=9
+         -> Shallowing cell at (12, 11) to k=10
+         -> Shallowing cell at (12, 11) to k=11
+         -> Shallowing cell at (12, 11) to k=12
+         -> Shallowing cell at (12, 11) to k=13
+         -> Shallowing cell at (12, 11) to k=14
+         -> Shallowing cell at (12, 11) to k=15
+         -> Shallowing cell at (12, 10) to k=4
+         -> Shallowing cell at (12, 10) to k=5
+         -> Shallowing cell at (12, 10) to k=6
+         -> Shallowing cell at (12, 10) to k=7
+         -> Shallowing cell at (12, 10) to k=8
+         -> Shallowing cell at (12, 10) to k=9
+         -> Shallowing cell at (12, 10) to k=10
+         -> Shallowing cell at (12, 10) to k=11
+         -> Shallowing cell at (12, 10) to k=12
+         -> Shallowing cell at (12, 10) to k=13
+         -> Shallowing cell at (12, 10) to k=14
+         -> Shallowing cell at (12, 10) to k=15
+         -> Shallowing cell at (12, 9) to k=4
+         -> Shallowing cell at (12, 9) to k=5
+         -> Shallowing cell at (12, 9) to k=6
+         -> Shallowing cell at (12, 9) to k=7
+         -> Shallowing cell at (12, 9) to k=8
+         -> Shallowing cell at (12, 9) to k=9
+         -> Shallowing cell at (12, 9) to k=10
+         -> Shallowing cell at (12, 9) to k=11
+         -> Shallowing cell at (12, 9) to k=12
+         -> Shallowing cell at (12, 9) to k=13
+         -> Shallowing cell at (12, 9) to k=14
+         -> Shallowing cell at (12, 9) to k=15
+         -> Shallowing cell at (12, 8) to k=4
+         -> Shallowing cell at (12, 8) to k=5
+         -> Shallowing cell at (12, 8) to k=6
+         -> Shallowing cell at (12, 8) to k=7
+         -> Shallowing cell at (12, 8) to k=8
+         -> Shallowing cell at (12, 8) to k=9
+         -> Shallowing cell at (12, 8) to k=10
+         -> Shallowing cell at (12, 8) to k=11
+         -> Shallowing cell at (12, 8) to k=12
+         -> Shallowing cell at (12, 8) to k=13
+         -> Shallowing cell at (12, 8) to k=14
+         -> Shallowing cell at (12, 8) to k=15
+         -> Shallowing cell at (12, 7) to k=4
+         -> Shallowing cell at (12, 7) to k=5
+         -> Shallowing cell at (12, 7) to k=6
+         -> Shallowing cell at (12, 7) to k=7
+         -> Shallowing cell at (12, 7) to k=8
+         -> Shallowing cell at (12, 7) to k=9
+         -> Shallowing cell at (12, 7) to k=10
+         -> Shallowing cell at (12, 7) to k=11
+         -> Shallowing cell at (12, 7) to k=12
+         -> Shallowing cell at (12, 7) to k=13
+         -> Shallowing cell at (12, 7) to k=14
+         -> Shallowing cell at (12, 7) to k=15
+         -> Shallowing cell at (12, 6) to k=4
+         -> Shallowing cell at (12, 6) to k=5
+         -> Shallowing cell at (12, 6) to k=6
+         -> Shallowing cell at (12, 6) to k=7
+         -> Shallowing cell at (12, 6) to k=8
+         -> Shallowing cell at (12, 6) to k=9
+         -> Shallowing cell at (12, 6) to k=10
+         -> Shallowing cell at (12, 6) to k=11
+         -> Shallowing cell at (12, 6) to k=12
+         -> Shallowing cell at (12, 6) to k=13
+         -> Shallowing cell at (12, 6) to k=14
+         -> Shallowing cell at (12, 6) to k=15
+         -> Shallowing cell at (12, 5) to k=4
+         -> Shallowing cell at (12, 5) to k=5
+         -> Shallowing cell at (12, 5) to k=6
+         -> Shallowing cell at (12, 5) to k=7
+         -> Shallowing cell at (12, 5) to k=8
+         -> Shallowing cell at (12, 5) to k=9
+         -> Shallowing cell at (12, 5) to k=10
+         -> Shallowing cell at (12, 5) to k=11
+         -> Shallowing cell at (12, 5) to k=12
+         -> Shallowing cell at (12, 5) to k=13
+         -> Shallowing cell at (12, 5) to k=14
+         -> Shallowing cell at (12, 5) to k=15
+         -> Shallowing cell at (11, 10) to k=4
+         -> Shallowing cell at (11, 10) to k=5
+         -> Shallowing cell at (11, 10) to k=6
+         -> Shallowing cell at (11, 10) to k=7
+         -> Shallowing cell at (11, 10) to k=8
+         -> Shallowing cell at (11, 10) to k=9
+         -> Shallowing cell at (11, 10) to k=10
+         -> Shallowing cell at (11, 10) to k=11
+         -> Shallowing cell at (11, 10) to k=12
+         -> Shallowing cell at (11, 10) to k=13
+         -> Shallowing cell at (11, 10) to k=14
+         -> Deepening cell at (11, 10) to k=13
+         -> Shallowing cell at (11, 10) to k=14
+         -> Shallowing cell at (11, 10) to k=15
+         -> Shallowing cell at (11, 9) to k=4
+         -> Shallowing cell at (11, 9) to k=5
+         -> Shallowing cell at (11, 9) to k=6
+         -> Shallowing cell at (11, 9) to k=7
+         -> Shallowing cell at (11, 9) to k=8
+         -> Shallowing cell at (11, 9) to k=9
+         -> Shallowing cell at (11, 9) to k=10
+         -> Shallowing cell at (11, 9) to k=11
+         -> Shallowing cell at (11, 9) to k=12
+         -> Shallowing cell at (11, 9) to k=13
+         -> Shallowing cell at (11, 9) to k=14
+         -> Shallowing cell at (11, 9) to k=15
+         -> Shallowing cell at (11, 5) to k=4
+         -> Shallowing cell at (11, 5) to k=5
+         -> Shallowing cell at (11, 5) to k=6
+         -> Shallowing cell at (11, 5) to k=7
+         -> Deepening cell at (11, 5) to k=6
+         -> Shallowing cell at (11, 5) to k=7
+         -> Shallowing cell at (11, 5) to k=8
+         -> Shallowing cell at (11, 5) to k=9
+         -> Deepening cell at (11, 5) to k=8
+         -> Shallowing cell at (11, 5) to k=9
+         -> Shallowing cell at (11, 5) to k=10
+         -> Deepening cell at (11, 5) to k=9
+         -> Deepening cell at (11, 5) to k=8
+         -> Deepening cell at (11, 5) to k=7
+         -> Deepening cell at (11, 5) to k=6
+         -> Deepening cell at (11, 5) to k=5
+         -> Deepening cell at (11, 5) to k=4
+         -> Deepening cell at (11, 5) to k=3
+         -> Deepening cell at (11, 5) to k=2
+         -> Deepening cell at (11, 5) to k=1
+       - Cannot deepen/shallow cell at (11, 5)
+         -> Shallowing cell at (11, 5) to k=2
+         -> Deepening cell at (11, 5) to k=1
+         -> Shallowing cell at (11, 5) to k=2
+         -> Shallowing cell at (11, 5) to k=3
+         -> Deepening cell at (11, 11) to k=2
+         -> Shallowing cell at (11, 11) to k=3
+         -> Deepening cell at (11, 11) to k=2
+         -> Deepening cell at (11, 11) to k=1
+       - Cannot deepen/shallow cell at (11, 11)
+         -> Shallowing cell at (11, 11) to k=2
+         -> Deepening cell at (11, 11) to k=1
+         -> Shallowing cell at (11, 11) to k=2
+         -> Shallowing cell at (11, 11) to k=3
+         -> Shallowing cell at (11, 11) to k=4
+         -> Shallowing cell at (11, 11) to k=5
+         -> Shallowing cell at (11, 11) to k=6
+         -> Shallowing cell at (11, 11) to k=7
+         -> Shallowing cell at (11, 11) to k=8
+         -> Shallowing cell at (11, 11) to k=9
+         -> Shallowing cell at (11, 11) to k=10
+         -> Shallowing cell at (11, 11) to k=11
+         -> Shallowing cell at (11, 11) to k=12
+         -> Shallowing cell at (11, 11) to k=13
+         -> Shallowing cell at (11, 11) to k=14
+         -> Shallowing cell at (11, 11) to k=15
+         -> Shallowing cell at (11, 8) to k=4
+         -> Shallowing cell at (11, 8) to k=5
+         -> Shallowing cell at (11, 8) to k=6
+         -> Shallowing cell at (11, 8) to k=7
+         -> Shallowing cell at (11, 8) to k=8
+         -> Shallowing cell at (11, 8) to k=9
+         -> Shallowing cell at (11, 8) to k=10
+         -> Shallowing cell at (11, 8) to k=11
+         -> Shallowing cell at (11, 8) to k=12
+         -> Shallowing cell at (11, 8) to k=13
+         -> Shallowing cell at (11, 8) to k=14
+         -> Shallowing cell at (11, 8) to k=15
+         -> Shallowing cell at (11, 7) to k=4
+         -> Shallowing cell at (11, 7) to k=5
+         -> Shallowing cell at (11, 7) to k=6
+         -> Shallowing cell at (11, 7) to k=7
+         -> Shallowing cell at (11, 7) to k=8
+         -> Shallowing cell at (11, 7) to k=9
+         -> Shallowing cell at (11, 7) to k=10
+         -> Shallowing cell at (11, 7) to k=11
+         -> Shallowing cell at (11, 7) to k=12
+         -> Shallowing cell at (11, 7) to k=13
+         -> Shallowing cell at (11, 7) to k=14
+         -> Shallowing cell at (11, 7) to k=15
+         -> Shallowing cell at (11, 12) to k=4
+         -> Shallowing cell at (11, 12) to k=5
+         -> Shallowing cell at (11, 12) to k=6
+         -> Shallowing cell at (11, 12) to k=7
+         -> Shallowing cell at (11, 12) to k=8
+         -> Shallowing cell at (11, 12) to k=9
+         -> Shallowing cell at (11, 12) to k=10
+         -> Shallowing cell at (11, 12) to k=11
+         -> Shallowing cell at (11, 12) to k=12
+         -> Shallowing cell at (11, 12) to k=13
+         -> Shallowing cell at (11, 12) to k=14
+         -> Shallowing cell at (11, 12) to k=15
+         -> Shallowing cell at (10, 10) to k=4
+         -> Shallowing cell at (10, 10) to k=5
+         -> Shallowing cell at (10, 10) to k=6
+         -> Shallowing cell at (10, 10) to k=7
+         -> Shallowing cell at (10, 10) to k=8
+         -> Shallowing cell at (10, 10) to k=9
+         -> Shallowing cell at (10, 10) to k=10
+         -> Shallowing cell at (10, 10) to k=11
+         -> Shallowing cell at (10, 10) to k=12
+         -> Shallowing cell at (10, 10) to k=13
+         -> Shallowing cell at (10, 10) to k=14
+         -> Shallowing cell at (10, 10) to k=15
+         -> Shallowing cell at (10, 10) to k=16
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+         -> Deepening cell at (10, 10) to k=15
+         -> Shallowing cell at (10, 9) to k=4
+         -> Shallowing cell at (10, 9) to k=5
+         -> Shallowing cell at (10, 9) to k=6
+         -> Shallowing cell at (10, 9) to k=7
+         -> Shallowing cell at (10, 9) to k=8
+         -> Shallowing cell at (10, 9) to k=9
+         -> Shallowing cell at (10, 9) to k=10
+         -> Shallowing cell at (10, 9) to k=11
+         -> Shallowing cell at (10, 9) to k=12
+         -> Shallowing cell at (10, 9) to k=13
+         -> Shallowing cell at (10, 9) to k=14
+         -> Shallowing cell at (10, 9) to k=15
+       - Out of grid range
+       * Mask alteration complete
+       - User-editing complete.
+>  13. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  14. IDENTIFY ISLANDS ...
+       * found 1 land masses
+>  15. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: N pole island (currently uncounted)
+       * updated find: S pole island (currently uncounted)
+       * total # true islands = 2
+>  16. GENERATING .paths FILE ...
+       * Ignoring border #1
+       * Creating raw path #2 ...
+       * Creating raw path #3 ...
+       * Building path #2 ...
+       * Building path #3 ...
+       - .paths file saved
+>  17. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  18. GENERATING SEDIMENT TOPO ...
+       - Created randomized sediment topography (nothing to re-grid).
+       - .depth.dat saved
+       - template file .sedcoremask.dat saved
+       - template file .reefmask.dat saved
+>  20. CREATING WIND PRODUCTS ...
+       * Northern gateway (> 40N) found.
+       * Southern gateway (< -40S) found.
+       - Generated zonal wind products.
+>  21. LOADING ALBEDO DATA ...
+         (Nothing to load.)
+>  22. CREATING ALBEDO DATA ...
+       - Created generic zonal mean albedo profile.
+       - .albd.dat file saved
+>  23. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 
