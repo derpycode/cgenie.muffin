@@ -1,0 +1,673 @@
+ 
+------------------------------------------------------------
+   Hello! Welcome to muffingen v0.9.26
+   We are going to make a GREAT model configuration!
+------------------------------------------------------------
+ 
+>   1. CHECKING PRIMARY OPTIONS ...
+       * GENIE grid will be loaded directly from k1, mask, or k2 text file: fkl_PV05
+>   2. CREATING GENIE GRID ...
+       - GENIE grid generated.
+>   3. READING AXES INFORMATION ...
+         (Nothing to load.)
+>   4. READING MASK & TOPO GRIDS ...
+       - k1 read.
+       - GENIE grid re-generated.
+>   5. RE-GRIDING MASK ...
+         (Nothing to do ... k1/k2/mask file already loaded.)
+>   6. FILTERING MASK ...
+       * found 1 water masses
+       - Small water bodies cleaned up.
+       * Revised land area fraction = 0.21605
+>   7. USER EDITING OF MASK ...
+       * Mask alteration procedure :
+         (1) left button to turn grid cell to ocean
+         (2) right button to turn grid cell to land
+         (3) middle button, or clickoutside the grid, to finish
+         -> Cell at (6, 4) now land
+         -> Cell at (7, 4) now land
+         -> Cell at (6, 4) now ocean
+         -> Cell at (6, 3) now ocean
+         -> Cell at (7, 3) now ocean
+         -> Cell at (7, 4) now ocean
+         -> Cell at (8, 4) now ocean
+         -> Cell at (8, 3) now ocean
+         -> Cell at (9, 3) now ocean
+         -> Cell at (9, 4) now ocean
+         -> Cell at (10, 4) now ocean
+         -> Cell at (10, 3) now ocean
+         -> Cell at (12, 3) now ocean
+         -> Cell at (11, 4) now ocean
+         -> Cell at (11, 3) now ocean
+         -> Cell at (12, 4) now ocean
+         -> Cell at (13, 4) now ocean
+         -> Cell at (14, 4) now ocean
+         -> Cell at (15, 4) now ocean
+         -> Cell at (15, 3) now ocean
+         -> Cell at (14, 3) now ocean
+         -> Cell at (13, 3) now ocean
+         -> Cell at (6, 16) now ocean
+         -> Cell at (7, 16) now ocean
+         -> Cell at (8, 16) now ocean
+         -> Cell at (9, 16) now ocean
+         -> Cell at (11, 16) now ocean
+         -> Cell at (12, 16) now ocean
+         -> Cell at (13, 16) now ocean
+         -> Cell at (14, 16) now ocean
+         -> Cell at (15, 16) now ocean
+         -> Cell at (10, 16) now ocean
+         -> Cell at (6, 15) now ocean
+         -> Cell at (7, 15) now ocean
+         -> Cell at (8, 15) now ocean
+         -> Cell at (9, 15) now ocean
+         -> Cell at (10, 15) now ocean
+         -> Cell at (11, 15) now ocean
+         -> Cell at (12, 15) now ocean
+         -> Cell at (13, 15) now ocean
+         -> Cell at (14, 15) now ocean
+         -> Cell at (15, 15) now ocean
+         -> Cell at (15, 14) now ocean
+         -> Cell at (14, 14) now ocean
+         -> Cell at (13, 14) now ocean
+         -> Cell at (13, 13) now ocean
+         -> Cell at (14, 13) now ocean
+         -> Cell at (15, 13) now ocean
+         -> Cell at (15, 12) now ocean
+         -> Cell at (14, 12) now ocean
+         -> Cell at (13, 12) now ocean
+         -> Cell at (13, 10) now ocean
+         -> Cell at (14, 11) now ocean
+         -> Cell at (14, 10) now ocean
+         -> Cell at (15, 10) now ocean
+         -> Cell at (15, 11) now ocean
+         -> Cell at (13, 11) now ocean
+         -> Cell at (13, 9) now ocean
+         -> Cell at (14, 9) now ocean
+         -> Cell at (15, 9) now ocean
+         -> Cell at (15, 8) now ocean
+         -> Cell at (14, 8) now ocean
+         -> Cell at (13, 8) now ocean
+         -> Cell at (13, 7) now ocean
+         -> Cell at (14, 7) now ocean
+         -> Cell at (15, 7) now ocean
+         -> Cell at (15, 6) now ocean
+         -> Cell at (14, 6) now ocean
+         -> Cell at (13, 6) now ocean
+         -> Cell at (13, 5) now ocean
+         -> Cell at (14, 5) now ocean
+         -> Cell at (15, 5) now ocean
+         -> Cell at (5, 12) now ocean
+         -> Cell at (5, 12) now ocean
+         -> Cell at (5, 12) now land
+         -> Cell at (6, 12) now land
+         -> Cell at (7, 12) now land
+         -> Cell at (8, 12) now land
+         -> Cell at (9, 12) now land
+         -> Cell at (10, 12) now land
+         -> Cell at (11, 12) now land
+         -> Cell at (12, 12) now land
+         -> Cell at (13, 12) now land
+         -> Cell at (14, 12) now land
+         -> Cell at (15, 12) now land
+         -> Cell at (16, 12) now land
+         -> Cell at (4, 12) now land
+         -> Cell at (3, 12) now land
+         -> Cell at (3, 9) now land
+         -> Cell at (4, 9) now land
+         -> Cell at (5, 9) now land
+         -> Cell at (6, 9) now land
+         -> Cell at (7, 9) now land
+         -> Cell at (8, 9) now land
+         -> Cell at (9, 9) now land
+         -> Cell at (10, 9) now land
+         -> Cell at (11, 9) now land
+         -> Cell at (12, 9) now land
+         -> Cell at (13, 9) now land
+         -> Cell at (14, 9) now land
+         -> Cell at (15, 9) now land
+         -> Cell at (16, 9) now land
+         -> Cell at (16, 8) now land
+         -> Cell at (15, 8) now land
+         -> Cell at (14, 8) now land
+         -> Cell at (13, 8) now land
+         -> Cell at (12, 8) now land
+         -> Cell at (11, 8) now land
+         -> Cell at (10, 8) now land
+         -> Cell at (9, 8) now land
+         -> Cell at (8, 8) now land
+         -> Cell at (8, 8) now land
+         -> Cell at (6, 8) now land
+         -> Cell at (7, 8) now land
+         -> Cell at (5, 8) now land
+         -> Cell at (4, 8) now land
+         -> Cell at (3, 8) now land
+         -> Cell at (3, 13) now land
+         -> Cell at (4, 13) now land
+         -> Cell at (5, 13) now land
+         -> Cell at (3, 13) now land
+         -> Cell at (3, 12) now land
+         -> Cell at (3, 12) now ocean
+         -> Cell at (3, 13) now ocean
+         -> Cell at (3, 9) now ocean
+         -> Cell at (3, 8) now ocean
+         -> Cell at (16, 9) now ocean
+         -> Cell at (16, 8) now ocean
+         -> Cell at (16, 12) now ocean
+         -> Cell at (6, 13) now land
+         -> Cell at (7, 13) now land
+         -> Cell at (8, 13) now land
+         -> Cell at (9, 13) now land
+         -> Cell at (10, 13) now land
+         -> Cell at (11, 13) now land
+         -> Cell at (11, 13) now land
+         -> Cell at (13, 13) now land
+         -> Cell at (15, 13) now land
+         -> Cell at (14, 13) now land
+         -> Cell at (12, 13) now land
+         -> Cell at (4, 14) now land
+         -> Cell at (5, 14) now land
+         -> Cell at (6, 14) now land
+         -> Cell at (7, 14) now land
+         -> Cell at (8, 14) now land
+         -> Cell at (9, 14) now land
+         -> Cell at (10, 14) now land
+         -> Cell at (11, 14) now land
+         -> Cell at (12, 14) now land
+         -> Cell at (13, 14) now land
+         -> Cell at (14, 14) now land
+         -> Cell at (15, 14) now land
+         -> Cell at (15, 7) now land
+         -> Cell at (14, 7) now land
+         -> Cell at (13, 7) now land
+         -> Cell at (12, 7) now land
+         -> Cell at (11, 7) now land
+         -> Cell at (10, 7) now land
+         -> Cell at (9, 7) now land
+         -> Cell at (8, 7) now land
+         -> Cell at (7, 7) now land
+         -> Cell at (6, 7) now land
+         -> Cell at (5, 7) now land
+         -> Cell at (4, 7) now land
+         -> Cell at (4, 6) now land
+         -> Cell at (5, 6) now land
+         -> Cell at (6, 6) now land
+         -> Cell at (7, 6) now land
+         -> Cell at (8, 6) now land
+         -> Cell at (9, 6) now land
+         -> Cell at (10, 6) now land
+         -> Cell at (11, 6) now land
+         -> Cell at (12, 6) now land
+         -> Cell at (13, 6) now land
+         -> Cell at (14, 6) now land
+         -> Cell at (15, 6) now land
+         -> Cell at (15, 9) now ocean
+         -> Cell at (14, 9) now ocean
+         -> Cell at (13, 9) now ocean
+         -> Cell at (11, 9) now ocean
+         -> Cell at (11, 9) now ocean
+         -> Cell at (10, 9) now ocean
+         -> Cell at (4, 9) now ocean
+         -> Cell at (5, 9) now ocean
+         -> Cell at (6, 9) now ocean
+         -> Cell at (7, 9) now ocean
+         -> Cell at (8, 9) now ocean
+         -> Cell at (9, 9) now ocean
+         -> Cell at (12, 9) now ocean
+         -> Cell at (4, 11) now land
+         -> Cell at (6, 11) now land
+         -> Cell at (5, 11) now land
+         -> Cell at (7, 11) now land
+         -> Cell at (9, 11) now land
+         -> Cell at (10, 11) now land
+         -> Cell at (11, 11) now land
+         -> Cell at (12, 11) now land
+         -> Cell at (13, 11) now land
+         -> Cell at (14, 11) now land
+         -> Cell at (15, 11) now land
+         -> Cell at (8, 11) now land
+         -> Cell at (4, 14) now ocean
+         -> Cell at (6, 14) now ocean
+         -> Cell at (6, 14) now ocean
+         -> Cell at (5, 14) now ocean
+         -> Cell at (7, 14) now ocean
+         -> Cell at (9, 14) now ocean
+         -> Cell at (10, 14) now ocean
+         -> Cell at (12, 14) now ocean
+         -> Cell at (15, 14) now ocean
+         -> Cell at (14, 14) now ocean
+         -> Cell at (13, 14) now ocean
+         -> Cell at (11, 14) now ocean
+         -> Cell at (8, 14) now ocean
+         -> Cell at (4, 6) now ocean
+         -> Cell at (4, 6) now land
+         -> Cell at (11, 6) now land
+       - Out of grid range
+       * Mask alteration complete
+       * Revised land area fraction = 0.22222
+       - User-editing complete.
+>   8. CREATE FINAL MASK ...
+       - .mask_out.FINAL.dat saved
+       * Final land area fraction   = 0.22222
+>   9. RE-GRIDING TOPOGRAPHY ...
+         (Nothing to re-grid -- convert k1 file data.)
+>   10. RE-GRIDING OCEAN BATHYMETRY ...
+         (Nothing to re-grid as k1 file already loaded.)
+>  12. USER EDITING OF TOPO ...
+       * Topography alteration procedure :
+         (1) left button to deepen grid cell
+         (2) right button to shallow grid cell
+         (3) middle button, or clickoutside the grid, to finish
+         -> Shallowing cell at (6, 4) to k=16
+         -> Deepening cell at (6, 4) to k=15
+         -> Deepening cell at (6, 4) to k=14
+         -> Deepening cell at (6, 4) to k=13
+         -> Deepening cell at (6, 4) to k=12
+         -> Deepening cell at (6, 4) to k=11
+         -> Deepening cell at (6, 4) to k=10
+         -> Deepening cell at (6, 4) to k=9
+         -> Deepening cell at (6, 4) to k=8
+         -> Deepening cell at (6, 4) to k=7
+         -> Deepening cell at (6, 4) to k=6
+         -> Deepening cell at (6, 4) to k=5
+         -> Shallowing cell at (6, 4) to k=6
+         -> Deepening cell at (6, 4) to k=5
+         -> Shallowing cell at (6, 4) to k=6
+         -> Deepening cell at (6, 4) to k=5
+         -> Deepening cell at (6, 4) to k=4
+         -> Deepening cell at (6, 4) to k=3
+         -> Shallowing cell at (6, 3) to k=16
+         -> Deepening cell at (6, 3) to k=15
+         -> Deepening cell at (6, 3) to k=14
+         -> Deepening cell at (6, 3) to k=13
+         -> Deepening cell at (6, 3) to k=12
+         -> Deepening cell at (6, 3) to k=11
+         -> Deepening cell at (6, 3) to k=10
+         -> Deepening cell at (6, 3) to k=9
+         -> Deepening cell at (6, 3) to k=8
+         -> Deepening cell at (6, 3) to k=7
+         -> Deepening cell at (6, 3) to k=6
+         -> Deepening cell at (6, 3) to k=5
+         -> Deepening cell at (6, 3) to k=4
+         -> Deepening cell at (6, 3) to k=3
+         -> Shallowing cell at (7, 3) to k=16
+         -> Deepening cell at (7, 3) to k=15
+         -> Deepening cell at (7, 3) to k=14
+         -> Deepening cell at (7, 3) to k=13
+         -> Deepening cell at (7, 3) to k=12
+         -> Deepening cell at (7, 3) to k=11
+         -> Deepening cell at (7, 3) to k=10
+         -> Deepening cell at (7, 3) to k=9
+         -> Deepening cell at (7, 3) to k=8
+         -> Deepening cell at (7, 3) to k=7
+         -> Deepening cell at (7, 3) to k=6
+         -> Deepening cell at (7, 3) to k=5
+         -> Deepening cell at (7, 3) to k=4
+         -> Shallowing cell at (7, 3) to k=5
+         -> Shallowing cell at (7, 3) to k=6
+         -> Deepening cell at (7, 3) to k=5
+         -> Deepening cell at (7, 3) to k=4
+         -> Deepening cell at (7, 3) to k=3
+         -> Shallowing cell at (7, 4) to k=16
+         -> Deepening cell at (7, 4) to k=15
+         -> Deepening cell at (7, 4) to k=14
+         -> Deepening cell at (7, 4) to k=13
+         -> Deepening cell at (7, 4) to k=12
+         -> Deepening cell at (7, 4) to k=11
+         -> Deepening cell at (7, 4) to k=10
+         -> Deepening cell at (7, 4) to k=9
+         -> Deepening cell at (7, 4) to k=8
+         -> Deepening cell at (7, 4) to k=7
+         -> Deepening cell at (7, 4) to k=6
+         -> Deepening cell at (7, 4) to k=5
+         -> Deepening cell at (7, 4) to k=4
+         -> Deepening cell at (7, 4) to k=3
+         -> Shallowing cell at (8, 4) to k=16
+         -> Deepening cell at (8, 4) to k=15
+         -> Deepening cell at (8, 4) to k=14
+         -> Deepening cell at (8, 4) to k=13
+         -> Deepening cell at (8, 4) to k=12
+         -> Deepening cell at (8, 4) to k=11
+         -> Deepening cell at (8, 4) to k=10
+         -> Deepening cell at (8, 4) to k=9
+         -> Deepening cell at (8, 4) to k=8
+         -> Deepening cell at (8, 4) to k=7
+         -> Deepening cell at (8, 4) to k=6
+         -> Deepening cell at (8, 4) to k=5
+         -> Deepening cell at (8, 4) to k=4
+         -> Deepening cell at (8, 4) to k=3
+         -> Shallowing cell at (8, 3) to k=16
+         -> Deepening cell at (8, 3) to k=15
+         -> Deepening cell at (8, 3) to k=14
+         -> Deepening cell at (8, 3) to k=13
+         -> Deepening cell at (8, 3) to k=12
+         -> Deepening cell at (8, 3) to k=11
+         -> Deepening cell at (8, 3) to k=10
+         -> Deepening cell at (8, 3) to k=9
+         -> Deepening cell at (8, 3) to k=8
+         -> Deepening cell at (8, 3) to k=7
+         -> Deepening cell at (8, 3) to k=6
+         -> Shallowing cell at (8, 3) to k=7
+         -> Shallowing cell at (8, 3) to k=8
+         -> Deepening cell at (8, 3) to k=7
+         -> Deepening cell at (8, 3) to k=6
+         -> Deepening cell at (8, 3) to k=5
+         -> Deepening cell at (8, 3) to k=4
+         -> Deepening cell at (8, 3) to k=3
+         -> Shallowing cell at (9, 3) to k=16
+         -> Deepening cell at (9, 3) to k=15
+         -> Deepening cell at (9, 3) to k=14
+         -> Deepening cell at (9, 3) to k=13
+         -> Deepening cell at (9, 3) to k=12
+         -> Deepening cell at (9, 3) to k=11
+         -> Deepening cell at (9, 3) to k=10
+         -> Deepening cell at (9, 3) to k=9
+         -> Deepening cell at (9, 3) to k=8
+         -> Shallowing cell at (9, 3) to k=9
+         -> Deepening cell at (9, 3) to k=8
+         -> Deepening cell at (9, 3) to k=7
+         -> Shallowing cell at (9, 3) to k=8
+         -> Shallowing cell at (9, 3) to k=9
+         -> Deepening cell at (9, 3) to k=8
+         -> Deepening cell at (9, 3) to k=7
+         -> Shallowing cell at (9, 3) to k=8
+         -> Deepening cell at (9, 3) to k=7
+         -> Deepening cell at (9, 3) to k=6
+         -> Deepening cell at (9, 3) to k=5
+         -> Deepening cell at (9, 3) to k=4
+         -> Deepening cell at (9, 3) to k=3
+         -> Shallowing cell at (9, 4) to k=16
+         -> Deepening cell at (9, 4) to k=15
+         -> Deepening cell at (9, 4) to k=14
+         -> Deepening cell at (9, 4) to k=13
+         -> Deepening cell at (9, 4) to k=12
+         -> Deepening cell at (9, 4) to k=11
+         -> Deepening cell at (9, 4) to k=10
+         -> Deepening cell at (9, 4) to k=9
+         -> Deepening cell at (9, 4) to k=8
+         -> Deepening cell at (9, 4) to k=7
+         -> Deepening cell at (9, 4) to k=6
+         -> Deepening cell at (9, 4) to k=5
+         -> Deepening cell at (9, 4) to k=4
+         -> Deepening cell at (9, 4) to k=3
+         -> Shallowing cell at (10, 4) to k=16
+         -> Deepening cell at (10, 4) to k=15
+         -> Deepening cell at (10, 4) to k=14
+         -> Deepening cell at (10, 4) to k=13
+         -> Deepening cell at (10, 4) to k=12
+         -> Deepening cell at (10, 4) to k=11
+         -> Deepening cell at (10, 4) to k=10
+         -> Deepening cell at (10, 4) to k=9
+         -> Deepening cell at (10, 4) to k=8
+         -> Deepening cell at (10, 4) to k=7
+         -> Deepening cell at (10, 4) to k=6
+         -> Deepening cell at (10, 4) to k=5
+         -> Deepening cell at (10, 4) to k=4
+         -> Shallowing cell at (10, 4) to k=5
+         -> Shallowing cell at (10, 4) to k=6
+         -> Shallowing cell at (10, 4) to k=7
+         -> Deepening cell at (10, 4) to k=6
+         -> Deepening cell at (10, 4) to k=5
+         -> Deepening cell at (10, 4) to k=4
+         -> Deepening cell at (10, 4) to k=3
+         -> Shallowing cell at (10, 3) to k=16
+         -> Deepening cell at (10, 3) to k=15
+         -> Deepening cell at (10, 3) to k=14
+         -> Deepening cell at (10, 3) to k=13
+         -> Deepening cell at (10, 3) to k=12
+         -> Deepening cell at (10, 3) to k=11
+         -> Deepening cell at (10, 3) to k=10
+         -> Deepening cell at (10, 3) to k=9
+         -> Deepening cell at (10, 3) to k=8
+         -> Deepening cell at (10, 3) to k=7
+         -> Deepening cell at (10, 3) to k=6
+         -> Deepening cell at (10, 3) to k=5
+         -> Deepening cell at (10, 3) to k=4
+         -> Deepening cell at (10, 3) to k=3
+         -> Deepening cell at (10, 3) to k=2
+         -> Deepening cell at (10, 3) to k=1
+       - Cannot deepen/shallow cell at (10, 3)
+         -> Shallowing cell at (10, 3) to k=2
+         -> Shallowing cell at (10, 3) to k=3
+         -> Shallowing cell at (11, 3) to k=16
+         -> Deepening cell at (11, 3) to k=15
+         -> Deepening cell at (11, 3) to k=14
+         -> Deepening cell at (11, 3) to k=13
+         -> Deepening cell at (11, 3) to k=12
+         -> Deepening cell at (11, 3) to k=11
+         -> Deepening cell at (11, 3) to k=10
+         -> Deepening cell at (11, 3) to k=9
+         -> Deepening cell at (11, 3) to k=8
+         -> Deepening cell at (11, 3) to k=7
+         -> Deepening cell at (11, 3) to k=6
+         -> Deepening cell at (11, 3) to k=5
+         -> Deepening cell at (11, 3) to k=4
+         -> Deepening cell at (11, 3) to k=3
+         -> Shallowing cell at (11, 4) to k=16
+         -> Deepening cell at (11, 4) to k=15
+         -> Deepening cell at (11, 4) to k=14
+         -> Deepening cell at (11, 4) to k=13
+         -> Deepening cell at (11, 4) to k=12
+         -> Deepening cell at (11, 4) to k=11
+         -> Deepening cell at (11, 4) to k=10
+         -> Deepening cell at (11, 4) to k=9
+         -> Deepening cell at (11, 4) to k=8
+         -> Deepening cell at (11, 4) to k=7
+         -> Deepening cell at (11, 4) to k=6
+         -> Deepening cell at (11, 4) to k=5
+         -> Deepening cell at (11, 4) to k=4
+         -> Deepening cell at (11, 4) to k=3
+         -> Shallowing cell at (12, 4) to k=16
+         -> Deepening cell at (12, 4) to k=15
+         -> Deepening cell at (12, 4) to k=14
+         -> Deepening cell at (12, 4) to k=13
+         -> Deepening cell at (12, 4) to k=12
+         -> Deepening cell at (12, 4) to k=11
+         -> Deepening cell at (12, 4) to k=10
+         -> Deepening cell at (12, 4) to k=9
+         -> Deepening cell at (12, 4) to k=8
+         -> Shallowing cell at (12, 4) to k=9
+         -> Deepening cell at (12, 4) to k=8
+         -> Deepening cell at (12, 4) to k=7
+         -> Deepening cell at (12, 4) to k=6
+         -> Deepening cell at (12, 4) to k=5
+         -> Deepening cell at (12, 4) to k=4
+         -> Deepening cell at (12, 4) to k=3
+         -> Shallowing cell at (13, 4) to k=16
+         -> Deepening cell at (13, 4) to k=15
+         -> Deepening cell at (13, 4) to k=14
+         -> Deepening cell at (13, 4) to k=13
+         -> Deepening cell at (13, 4) to k=12
+         -> Deepening cell at (13, 4) to k=11
+         -> Deepening cell at (13, 4) to k=10
+         -> Deepening cell at (13, 4) to k=9
+         -> Deepening cell at (13, 4) to k=8
+         -> Deepening cell at (13, 4) to k=7
+         -> Deepening cell at (13, 4) to k=6
+         -> Deepening cell at (13, 4) to k=5
+         -> Deepening cell at (13, 4) to k=4
+         -> Deepening cell at (13, 4) to k=3
+         -> Shallowing cell at (14, 4) to k=16
+         -> Deepening cell at (14, 4) to k=15
+         -> Deepening cell at (14, 4) to k=14
+         -> Deepening cell at (14, 4) to k=13
+         -> Deepening cell at (14, 4) to k=12
+         -> Deepening cell at (14, 4) to k=11
+         -> Deepening cell at (14, 4) to k=10
+         -> Deepening cell at (14, 4) to k=9
+         -> Deepening cell at (14, 4) to k=8
+         -> Deepening cell at (14, 4) to k=7
+         -> Deepening cell at (14, 4) to k=6
+         -> Deepening cell at (14, 4) to k=5
+         -> Deepening cell at (14, 4) to k=4
+         -> Deepening cell at (14, 4) to k=3
+         -> Shallowing cell at (15, 4) to k=16
+         -> Deepening cell at (15, 4) to k=15
+         -> Deepening cell at (15, 4) to k=14
+         -> Deepening cell at (15, 4) to k=13
+         -> Deepening cell at (15, 4) to k=12
+         -> Deepening cell at (15, 4) to k=11
+         -> Deepening cell at (15, 4) to k=10
+         -> Deepening cell at (15, 4) to k=9
+         -> Deepening cell at (15, 4) to k=8
+         -> Deepening cell at (15, 4) to k=7
+         -> Deepening cell at (15, 4) to k=6
+         -> Deepening cell at (15, 4) to k=5
+         -> Deepening cell at (15, 4) to k=4
+         -> Shallowing cell at (15, 4) to k=5
+         -> Shallowing cell at (15, 4) to k=6
+         -> Deepening cell at (15, 4) to k=5
+         -> Deepening cell at (15, 4) to k=4
+         -> Deepening cell at (15, 4) to k=3
+         -> Shallowing cell at (15, 3) to k=16
+         -> Deepening cell at (15, 3) to k=15
+         -> Deepening cell at (15, 3) to k=14
+         -> Deepening cell at (15, 3) to k=13
+         -> Deepening cell at (15, 3) to k=12
+         -> Deepening cell at (15, 3) to k=11
+         -> Deepening cell at (15, 3) to k=10
+         -> Deepening cell at (15, 3) to k=9
+         -> Deepening cell at (15, 3) to k=8
+         -> Deepening cell at (15, 3) to k=7
+         -> Deepening cell at (15, 3) to k=6
+         -> Deepening cell at (15, 3) to k=5
+         -> Deepening cell at (15, 3) to k=4
+         -> Deepening cell at (15, 3) to k=3
+         -> Shallowing cell at (14, 3) to k=16
+         -> Deepening cell at (14, 3) to k=15
+         -> Shallowing cell at (14, 3) to k=16
+         -> Deepening cell at (14, 3) to k=15
+         -> Deepening cell at (14, 3) to k=14
+         -> Deepening cell at (14, 3) to k=13
+         -> Deepening cell at (14, 3) to k=12
+         -> Deepening cell at (14, 3) to k=11
+         -> Shallowing cell at (14, 3) to k=12
+         -> Deepening cell at (14, 3) to k=11
+         -> Deepening cell at (14, 3) to k=10
+         -> Deepening cell at (14, 3) to k=9
+         -> Deepening cell at (14, 3) to k=8
+         -> Deepening cell at (14, 3) to k=7
+         -> Deepening cell at (14, 3) to k=6
+         -> Deepening cell at (14, 3) to k=5
+         -> Deepening cell at (14, 3) to k=4
+         -> Deepening cell at (14, 3) to k=3
+         -> Shallowing cell at (13, 3) to k=16
+         -> Deepening cell at (13, 3) to k=15
+         -> Deepening cell at (13, 3) to k=14
+         -> Deepening cell at (13, 3) to k=13
+         -> Deepening cell at (13, 3) to k=12
+         -> Deepening cell at (13, 3) to k=11
+         -> Deepening cell at (13, 3) to k=10
+         -> Deepening cell at (13, 3) to k=9
+         -> Deepening cell at (13, 3) to k=8
+         -> Deepening cell at (13, 3) to k=7
+         -> Deepening cell at (13, 3) to k=6
+         -> Deepening cell at (13, 3) to k=5
+         -> Deepening cell at (13, 3) to k=4
+         -> Deepening cell at (13, 3) to k=3
+         -> Shallowing cell at (12, 3) to k=16
+         -> Deepening cell at (12, 3) to k=15
+         -> Deepening cell at (12, 3) to k=14
+         -> Deepening cell at (12, 3) to k=13
+         -> Deepening cell at (12, 3) to k=12
+         -> Deepening cell at (12, 3) to k=11
+         -> Deepening cell at (12, 3) to k=10
+         -> Deepening cell at (12, 3) to k=9
+         -> Deepening cell at (12, 3) to k=8
+         -> Deepening cell at (12, 3) to k=7
+         -> Deepening cell at (12, 3) to k=6
+         -> Deepening cell at (12, 3) to k=5
+         -> Deepening cell at (12, 3) to k=4
+         -> Deepening cell at (12, 3) to k=3
+         -> Deepening cell at (12, 3) to k=2
+         -> Deepening cell at (12, 3) to k=1
+       - Cannot deepen/shallow cell at (12, 3)
+       - Cannot deepen/shallow cell at (12, 3)
+         -> Shallowing cell at (12, 3) to k=2
+         -> Shallowing cell at (12, 3) to k=3
+         -> Deepening cell at (10, 10) to k=2
+         -> Deepening cell at (10, 10) to k=1
+       - Cannot deepen/shallow cell at (10, 10)
+         -> Shallowing cell at (10, 10) to k=2
+         -> Deepening cell at (10, 10) to k=1
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+         -> Shallowing cell at (10, 10) to k=2
+         -> Deepening cell at (10, 10) to k=1
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+       - Cannot deepen/shallow cell at (10, 10)
+         -> Shallowing cell at (10, 10) to k=2
+         -> Deepening cell at (10, 9) to k=2
+         -> Deepening cell at (10, 9) to k=1
+       - Cannot deepen/shallow cell at (10, 9)
+       - Cannot deepen/shallow cell at (10, 9)
+       - Cannot deepen/shallow cell at (10, 9)
+         -> Shallowing cell at (10, 9) to k=2
+         -> Deepening cell at (10, 9) to k=1
+       - Cannot deepen/shallow cell at (10, 9)
+       - Cannot deepen/shallow cell at (10, 9)
+       - Out of grid range
+       * Mask alteration complete
+       - User-editing complete.
+>  13. CALCULATING RUN-OFF AND GENERATE .k1 FILE ...
+       - .k1 file saved
+>  14. IDENTIFY ISLANDS ...
+       * found 1 land masses
+       * found 2 land masses
+>  15. UPDATING ISLANDS & PATHS ...
+       * updated find: 1 islands
+       * updated find: 2 islands
+       * updated find: N pole island (currently uncounted)
+       * updated find: S pole island (currently uncounted)
+       * total # true islands = 3
+>  16. GENERATING .paths FILE ...
+       * Ignoring border #1
+       * Creating raw path #2 ...
+       * Creating raw path #3 ...
+       * Creating raw path #4 ...
+       * Building path #2 ...
+         -> NE corner :: Skip path entry @ (16,9)
+         -> SE corner :: Add additional path entry @ (3,5)
+       * Building path #3 ...
+       * Building path #4 ...
+       - .paths file saved
+>  17. GENERATING .psiles FILE ...
+       - .psiles file saved
+>  18. GENERATING SEDIMENT TOPO ...
+       - Created randomized sediment topography (nothing to re-grid).
+       - .depth.dat saved
+       - template file .sedcoremask.dat saved
+       - template file .reefmask.dat saved
+>  20. CREATING WIND PRODUCTS ...
+       * Northern gateway (> 40N) found.
+       * Southern gateway (< -40S) found.
+       - Generated idealized zonal wind products.
+       - Generated idealized 2D windspeed on full grid.
+>  21. LOADING PLANETARY ALBEDO DATA ...
+         (Nothing to load.)
+>  22. CREATING PLANETARY ALBEDO DATA ...
+       - Created generic zonal mean planetary albedo profile.
+       - Zonal mean .albd_pl.dat file saved
+>  23. LOADING SURFACE & CLOUD ALBEDO DATA ...
+         (Nothing to load.)
+>  23. CREATING SURFACE & CLOUD ALBEDO DATA ...
+       - Created generic zonal mean cloud albedo profile.
+       - Generic 2D cloud albedo file saved
+       - Generic zonal mean .albd_cl.dat file saved
+>  24. LOADING ICE MASK & OROGRAPHY DATA ...
+         (Nothing to load.)
+>  25. CREATING ICE MASK & OROGRAPHY DATA ...
+       - Created flat orography.
+       - Created ice-free icemask.
+>  26. GENERATING CONFIG FILE PARAMETER LINES ...
+       - .config file saved
+ 
+------------------------------------------------------------
+   Congratulations! SOMETHING was created ... 
+   ... hope it was what you wished for! :o)
+------------------------------------------------------------
+ 
