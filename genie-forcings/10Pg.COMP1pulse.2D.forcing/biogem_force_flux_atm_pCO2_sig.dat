@@ -1,0 +1,10 @@
+-START-OF-DATA-
+1750.0	0
+2050.0	0
+2051.0	-73.28
+2051.0  0
+2500.0  0
+-END-OF-DATA-
+
+NOTES:
+Units are GtCO2/yr ; need conversion factor bg_par_atm_force_scale_val_3=2.2722109e+13 to get to mol C yr-1
