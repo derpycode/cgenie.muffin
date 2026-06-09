@@ -21,14 +21,14 @@ All experiments are run from:$HOME/cgenie.muffin/genie-main
 The commands to run the model configurations as listed in the Methods are listed here.
 
 (1) endmember experiments
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES genie-userconfigs/PUBS/submitted 3pal_pre_max 20000
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES genie-userconfigs/PUBS/submitted 3pal_pre_min 20000
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES genie-userconfigs/PUBS/submitted 3pal_obl_max 20000
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES genie-userconfigs/PUBS/submitted 3pal_obl_min 20000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES PUBS/submitted/Jiang_et_al._2026 qq_3pal_pre_max 20000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES PUBS/submitted/Jiang_et_al._2026 qq_3pal_pre_min 20000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES PUBS/submitted/Jiang_et_al._2026 qq_3pal_obl_max 20000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES PUBS/submitted/Jiang_et_al._2026 qq_3pal_obl_min 20000
 
 
 (2) 100-member ensemble experiments
 e.g., to run ensemble member QQ.petm01
-./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES genie-userconfigs/PUBS/submitted QQ.petm01.ID.1 20000
+./runmuffin.sh cgenie.eb_go_gs_ac_bg_sg_rg.p0055c.BASES PUBS/submitted/Jiang_et_al._2026 QQ.petm01.ID.1 20000
 
 Note: QQ.petm01.ID.* is 100-member emsemble with state-dependent climate sensitivity
