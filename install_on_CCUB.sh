@@ -12,7 +12,8 @@ sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/runmuffin_nocleanall.sh
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" genie-main/user.sh
 sed -i -e "s/CCUBlogin/$CCUBlogin/g" kshrc.txt
 
-# placing .kshrc file at right location (and renaming)
+# placing .kshrc file and NetCDF librarby at right location (and renaming)
 mv kshrc.txt /user2/c-ccub/$CCUBlogin/.kshrc
+mv NetCDF_for_GENIE /user2/c-ccub/$CCUBlogin/.
 
 

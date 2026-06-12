@@ -1,0 +1,41 @@
+# NetCDF C Configuration Summary
+==============================
+
+# General
+-------
+NetCDF Version:		4.7.0
+Configured On:		Tue Sep 19 15:45:43 CEST 2023
+Host System:		x86_64-pc-linux-gnu
+Build Directory: 	/work/crct/ju8253pe/MODEL/LIB_NC/lib/netcdf-c-4.7.0
+Install Prefix:         /work/crct/ju8253pe/MODEL/LIB_NC/install_lib
+
+# Compiling Options
+-----------------
+C Compiler:		/soft/c7/gcc/9.1.0/bin/gcc
+CFLAGS:			-g
+CPPFLAGS:		-I/work/crct/ju8253pe/MODEL/LIB_NC/install_lib/include
+LDFLAGS:		-L/work/crct/ju8253pe/MODEL/LIB_NC/install_lib/lib
+AM_CFLAGS:		
+AM_CPPFLAGS:		
+AM_LDFLAGS:		
+Shared Library:		no
+Static Library:		yes
+Extra libraries:	-lm -ldl
+
+# Features
+--------
+NetCDF-2 API:		yes
+HDF4 Support:		no
+HDF5 Support:		no
+NetCDF-4 API:		no
+NC-4 Parallel Support:	no
+PnetCDF Support:	no
+DAP2 Support:		no
+DAP4 Support:		no
+Byte-Range Support:	no
+Diskless Support:	yes
+MMap Support:		no
+JNA Support:		no
+CDF5 Support:		yes
+ERANGE Fill Support:	no
+Relaxed Boundary Check:	yes

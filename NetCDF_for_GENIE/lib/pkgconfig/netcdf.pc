@@ -1,0 +1,13 @@
+prefix=/work/crct/ju8253pe/MODEL/LIB_NC/install_lib
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+ccompiler=gcc
+
+Name: netcdf-c
+Description: NetCDF Client Library for C
+URL: http://www.unidata.ucar.edu/netcdf
+Version: 4.7.0
+Libs: -L${libdir} -L/work/crct/ju8253pe/MODEL/LIB_NC/install_lib/lib -lnetcdf -lm -ldl
+Libs.private: -lm -ldl
+Cflags: -I${includedir}
