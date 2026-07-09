@@ -488,6 +488,7 @@ CONTAINS
     real::shannon(n_i,n_j),simpson(n_i,n_j),nthresh(n_i,n_j),berger(n_i,n_j)
     real::picochl(n_i,n_j),nanochl(n_i,n_j),microchl(n_i,n_j)
     real::nphyto
+
     !-----------------------------------------------------------------------
     !       INITIALIZE LOCAL VARIABLES
     !-----------------------------------------------------------------------
@@ -551,8 +552,38 @@ CONTAINS
                write (longstrng, "(A,A31,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Heterotrophic Uptake - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
                call sub_adddef_netcdf(loc_iou,3,'eco2D'//shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
                call sub_putvar2d('eco2D'//shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:)) 
-             endif 
-          endif
+            endif
+
+            ! only export carbon loss
+            if (io .eq. iCarb) then
+               
+               loc_ij(:,:) = int_peaten_timeslice(jp,:,:,n_k)
+               ! short string: eco2D_Eaten_C_001
+               ! unit formatter: A2,A,A8,A,A1
+               write (shrtstrng, "(A5, A7, A, A1, I3.3)") 'eco2D','_Eaten_',trim(adjustl(quotastrng(io))),'_',jp
+               write (longstrng, "(A, A16,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Grazed - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               call sub_putvar2d(shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+
+               !short string: eco2D_Mortality_C_001
+               loc_ij(:,:) = int_pmort_timeslice(jp,:,:,n_k)
+               write (shrtstrng, "(A5, A11, A, A1, I3.3)") 'eco2D','_Mortality_',trim(adjustl(quotastrng(io))),'_',jp
+               write (longstrng, "(A, A20,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Mortality - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               call sub_putvar2d(shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+
+               !short string: eco2D_Respiration_C_001
+               loc_ij(:,:) = int_prespir_timeslice(jp,:,:,n_k)
+               write (shrtstrng, "(A5, A13, A, A1, I3.3)") 'eco2D','_Respiration_',trim(adjustl(quotastrng(io))),'_',jp
+               write (longstrng, "(A,A22,I3.3,A2,A,A8,A,A1)") trim(adjustl(quotastrng(io))),' Respiration - Popn. #',jp,' (',trim(adjustl(diamtr)),' micron ',trim(pft(jp)),')'
+               call sub_adddef_netcdf(loc_iou,3,shrtstrng,longstrng,trim(quotaunits(io))//' d^-1',loc_c0,loc_c0)
+               call sub_putvar2d(shrtstrng,loc_iou,n_i,n_j,loc_ntrec,loc_ij(:,:),loc_mask(:,:))
+
+            endif
+         endif
+
+          
+          
        end do
        ! Write community total biomasses and inorganic resource fluxes
        write (shrtstrng, "(A10,A,A6)") "_Plankton_",trim(adjustl(quotastrng(io))),"_Total" 
