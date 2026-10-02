@@ -160,11 +160,14 @@ cmsw Land radiation and hydrology arrays
      & ,bcap(maxients,maxjents)            ! bucket capacity m
      & ,bcapavg(maxients,maxjents)         ! avg bucket capacity (m)
      & ,fxavg(7,maxients,maxjents)         ! avg heat fluxes (W/m2)/timescale avg over
+     & ,solfor(maxients,maxjents)          ! incoming solar radiation (W/m2)
+     & ,fxsw(maxients,maxjents)            ! incoming shortwave radiation after atm albedo (W/m2)
+     & ,solconst                           ! solar constant (W/m2)
      & ,snowavg(maxients,maxjents)         ! avg fractional snow cover
      & ,z0avg(maxients,maxjents)           ! avg roughness length (m)
-     & ,albedol                    ! land albedo
+     & ,albedol                            ! land albedo
      & ,albsavg(maxients,maxjents)         ! average surface albedo
-     & ,dtdim                      ! length of ocean timestep (s)
+     & ,dtdim                              ! length of ocean timestep (s)
      & ,z0(maxients,maxjents)              ! roughness length (m) 
      & ,lambda                     ! decay timescale for new pptn scheme
      & ,asnow                      ! snow albedo
@@ -178,11 +181,12 @@ c     & ,palbavg(maxients,maxjents)         ! average planetary albedo
      & ,evapavg(maxients,maxjents)         ! average evapotranspiration (m/s)
      & ,pptnavg(maxients,maxjents)         ! average pptn (m/s)
      & ,runavg(maxients,maxjents)          ! average runoff (m/s)
-     & ,gmairttot                  ! summed global mean temperature
+     & ,gmairttot                          ! summed global mean temperature
      & ,fvfv(maxients,maxjents)            ! vegetation fraction for fixed vegetation
 
       COMMON /entsrad/
      & tqld,tqldavg,bcap,bcapavg,fxavg,snowavg,z0avg,
+     & solfor,fxsw,solconst,
      & albedol,dtdim,z0,lambda,
      & asnow,asnowv,
      & albsavg,aveg,apeat,asand,

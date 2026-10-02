@@ -20,6 +20,9 @@ c     msw
 
 c     SKT Add isotopes
       real loc_delta_photo
+      real const_lambda_14C
+      parameter (const_lambda_14C = 1./8267.0)
+      real loc_fracdecay
       real loc_alpha_13C,loc_alpha_14C
       real loc_r13C_photo,loc_r14C_photo
       real loc_pCO2,loc_pCO2_13C,loc_pCO2_14C
@@ -67,6 +70,7 @@ c     (in fact, if ENTS si called more often than the mixing routne in ATCHEM, t
                loc_r14C_Cveg  = Cveg_14C(i,j)/Cveg(i,j)
                loc_r13C_Csoil = Csoil_13C(i,j)/Csoil(i,j)
                loc_r14C_Csoil = Csoil_14C(i,j)/Csoil(i,j)
+               loc_fracdecay = EXP(-dtland*const_lambda_14C)
 
 c     set isotopic fractionation associated with photosynthesis
 c     NOTE: make grid-point specific in case temperature is needed later
@@ -108,7 +112,7 @@ c     msw Calculate photosynthesis (kgC/m2/yr)
                
                call photosynthesis(Cveg(i,j),tair(i,j),
      &              loc_pCO2,qlnd(i,j),bcap(i,j),
-     &              fv(i,j),photo(i,j))
+     &              fxsw(i,j),fv(i,j),photo(i,j))
                photo_13C(i,j)=loc_r13C_photo*photo(i,j)
                photo_14C(i,j)=loc_r14C_photo*photo(i,j)          
 
@@ -118,12 +122,11 @@ c     and not the vegetation biomass as a whole
 c     (and that there is no fractionation associated with respiration)
 c     if both fixed and respired carbon have the same isotopic composition, and the respiration rate exceeds photosynthesis,
 c     slightly odd (non physical) things might happen isotopically
-c     13/3/26: loc_r13C_photo*respveg changed to loc_r13C_Cveg*respveg
+c     SKT: change to loc_r13C_Cveg???
                
                call veg_resp(Cveg(i,j),tair(i,j),respveg(i,j))
-			   respveg_13C(i,j)=loc_r13C_Cveg*respveg(i,j)
+               respveg_13C(i,j)=loc_r13C_Cveg*respveg(i,j)
                respveg_14C(i,j)=loc_r14C_Cveg*respveg(i,j)
-
 
 c     msw Calculate leaf turnover (kgC/m2/yr)
 c     NOTE: the original also implicitly assumed that leaf production is only associated with photosynthesis and 'new' carbon
@@ -137,7 +140,7 @@ c     TODO: a 14C decay term for vegetation carbon biomass could be added here
      &              respveg(i,j),
      &              epsv(i,j),leaf(i,j))
                leaf_13C(i,j)=loc_r13C_Cveg*leaf(i,j)
-               leaf_14C(i,j)=loc_r14C_Cveg*leaf(i,j)
+               leaf_14C(i,j)=loc_r14C_Cveg*loc_fracdecay*leaf(i,j)
 
 c     msw Calculate soil respiration (kgC/m2/yr) using land temp.
 c     NOTE: now the isotopic loss term from soils depends on the isotopic composition of the soil reservoir (loc_r13C_Csoil)
@@ -146,7 +149,8 @@ c     TODO: add a 14C decay term
 
                call soil_resp(Csoil(i,j),tlnd(i,j),respsoil(i,j)) 
                respsoil_13C(i,j)=loc_r13C_Csoil*respsoil(i,j)
-               respsoil_14C(i,j)=loc_r14C_Csoil*respsoil(i,j)
+               respsoil_14C(i,j)=loc_r14C_Csoil*loc_fracdecay*
+     &              respsoil(i,j)
                
 c     msw vegetation carbon ODE
 
@@ -183,7 +187,6 @@ c     SKT update isotopes
                Csoil_14C(i,j)=Csoil_14C(i,j)+k1s_14C
 
 c     msw Calculate CO2 fluxes for atchem coupler (mol/m2/s)
-c     TODO: 14C will be need to be enabled at some point ...
                
                if (atchem_update) then
                   sfxatm_lnd(3,i,j) = (-photo(i,j)+respveg(i,j)+
@@ -191,9 +194,9 @@ c     TODO: 14C will be need to be enabled at some point ...
                   sfxatm_lnd(4,i,j) = (-photo_13C(i,j)+
      &                 respveg_13C(i,j)+
      &                 respsoil_13C(i,j))*rmu*rsyr
-c     sfxatm_lnd(5,i,j) = (-photo_14C(i,j)+
-c     &              respveg_14C(i,j)+
-c     &              respsoil_14C(i,j))*rmu*rsyr
+                  sfxatm_lnd(5,i,j) = (-photo_14C(i,j)+
+     &                 respveg_14C(i,j)+
+     &                 respsoil_14C(i,j))*rmu*rsyr
 
                endif
 
@@ -215,7 +218,7 @@ cmsw Photosynthesis (kgC/m2/yr)
 
       subroutine photosynthesis(dum_cveg,dum_tair,
      &                          dum_pco2,dum_qlnd,dum_bcap,
-     &                          dum_fv,dum_photo)
+     &                          dum_fxsw,dum_fv,dum_photo)
 
 #include "genie_ents.cmn"
 c      include '../genie-cgoldstein/var.cmn'
@@ -223,29 +226,40 @@ c      include '../genie-cgoldstein/var.cmn'
 
       real,intent(in):: dum_cveg,dum_tair
       real,intent(in):: dum_pco2,dum_qlnd,dum_bcap
+      real,intent(in):: dum_fxsw
       real,intent(out):: dum_fv,dum_photo
 
-      real fta,fws,fco2
+      real fta,fws,fco2,par
+      real loc_k1
 
+c effect of CO2 on photosynthesis
       if(dum_pco2.ge.k13)then
          fco2=(dum_pco2-k13)/(dum_pco2-k13+k14)
       else
          fco2=0.
       endif
-
+	  
+c effect of water stress on photosynthesis
       fws=max(0.,min(1.,((4*dum_qlnd/dum_bcap)-2)))
-
-      dum_fv=max(1.e-5,1.-exp(-k17*dum_cveg))
-
+	  
+c effect of temperature on photosynthesis
       fta=((2.**(0.1*(dum_tair-topt))) /
      &    ( (1.+exp(0.3*(dum_tair-k11)))*
      &    (1.+exp(-0.3*(dum_tair-k12))) ))
      & +  ((2.**(0.1*(dum_tair-topt))) /
      &    ( (1.+exp(0.6*(dum_tair-k11a)))*
-     &    (1.+exp(-0.3*(dum_tair-k12))) )) 
+     &    (1.+exp(-0.3*(dum_tair-k12))) ))
+	 
 
-      dum_photo=k18*rk19*
-     &          fco2*fws*fta*dum_fv
+c effect of light on photosynthesis
+c PV 50% photosynthetically active radiation (par) (Monteith, 1972)
+      par=0.5*dum_fxsw
+	  
+c vegetation fraction (equivalent to effect of canopy light extinction on LAI)
+      dum_fv=max(1.e-5,1.-exp(-k17*dum_cveg))
+
+c calculate photosynthesis  
+      dum_photo=par*k18*rk19*fco2*fws*fta*dum_fv
 
       end
 

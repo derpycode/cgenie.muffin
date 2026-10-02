@@ -12,6 +12,7 @@
      :     dum_dsc,dum_saln0,dum_dz,dum_ec,dum_rho,
      :     dum_fx0a,dum_fx0o,dum_fxsen,dum_fxlw,
      :     dum_evap,dum_pptn,dum_relh,dum_istep0,
+     :     dum_solfor,dum_fxsw,dum_solconst, !< surface radiation fluxes
      :     dum_el_photo,dum_el_respveg,dum_el_respsoil,dum_el_leaf,
      :     landice_slicemask_lic,            !< land ice sheet mask
      :     albs_lnd,                         !< surface albedo over land
@@ -69,6 +70,12 @@ c SG  Variables passed from other modules
       real ,dimension(maxi,maxj)::dum_relh
 c SG <
 
+c SKT Radiation fluxes for photosynthesis
+      real ,dimension(maxi,maxj)::dum_solfor
+      real ,dimension(maxi,maxj)::dum_fxsw
+c SKT Solar constant
+      real dum_solconst
+	  
 c GHC  Variables passed from genie_global
       real ,dimension(maxi,maxj)::dum_el_photo
       real ,dimension(maxi,maxj)::dum_el_respveg
@@ -336,7 +343,10 @@ cccccccccccccccccccccccccccccccccccccc
      :          land_snow_lnd)
      
          endif
-
+		 
+c SKT solar constant
+      solconst = dum_solconst
+	  
 c ghc > copy carbon arrays into genie_global arrays for rokgem
           do j=1,jmax
                 do i=1,imax
@@ -388,6 +398,8 @@ c roughness length
 				  albs_sur(i,j)=real(albs_sur(i,j))
                   albs_atm(i,j)=real(albs_atm(i,j))
 				  palb(i,j)=real(palb(i,j))
+                  solfor(i,j)=real(dum_solfor(i,j))
+                  fxsw(i,j)=real(dum_fxsw(i,j))
                enddo
             enddo
 

@@ -123,7 +123,7 @@ contains
          evap_atm,precip_atm, &                   ! output
          dhght_sic,dfrac_sic, &                   ! output
          atmos_lowestlh_atm, &                    ! output
-         go_solfor,go_fxsw, &                     ! output (to BIOGEM)
+         go_solfor,go_fxsw, &                     ! output (to BIOGEM and ENTS)
          intrac_atm_max, &                        ! input
          genie_sfcatm1, &                         ! input (from ATCHEM)
          eb_ca,global_daysperyear, &
@@ -363,6 +363,7 @@ contains
          go_dsc,go_saln0,go_dz,go_ec,go_rho, &
          eb_fx0a,eb_fx0o,eb_fxsen,eb_fxlw, &
          eb_evap,eb_pptn,eb_relh,go_istep0, &
+         go_solfor,go_fxsw,genie_solar_constant, &  ! SKT - added for carbon.F
          el_photo,el_respveg,el_respsoil,el_leaf, & ! GHC - added these for use with rokgem
          landice_slicemask_lic, &
          albs_lnd, &	 						  ! output (to BIOGEM)
@@ -714,9 +715,9 @@ contains
          & land_temp_lnd,                                    &
          & land_moisture_lnd,                                &
 		 & land_snow_lnd,                                    &
-         & albs_lnd,									     &
+         & albs_lnd,                                         &
          & eb_albs_sur,                                      &
-         & eb_albs_atm,                                       &
+         & eb_albs_atm,                                      &
          & eb_palb,                                          &		 
          & el_fv,                                            &
          & el_photo,                                         &
