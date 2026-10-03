@@ -2,10 +2,10 @@ c     msw
 c     msw Calculates fluxes then updates carbon reservoirs
 c     msw
       subroutine carbon (
-     :     torog_atm,           !< surface air temperature adjusted for orography
+     :     torog_atm,             !< surface air temperature adjusted for orography
      :     sfcatm_lnd,
      :     landice_slicemask_lic, !< land ice sheet mask
-     :     sfxatm_lnd           !< land-atmosphere carbon exchange fluxes
+     :     sfxatm_lnd             !< land-atmosphere carbon exchange fluxes
      :     )
 
 #include "genie_ents.cmn"
@@ -221,8 +221,8 @@ cmsw Photosynthesis (kgC/m2/yr)
      &                          dum_fxsw,dum_fv,dum_photo)
 
 #include "genie_ents.cmn"
-c      include '../genie-cgoldstein/var.cmn'
 #include "var_ents.cmn"
+c      include '../genie-cgoldstein/var.cmn'
 
       real,intent(in):: dum_cveg,dum_tair
       real,intent(in):: dum_pco2,dum_qlnd,dum_bcap
@@ -232,34 +232,57 @@ c      include '../genie-cgoldstein/var.cmn'
       real fta,fws,fco2,par
       real loc_k1
 
-c effect of CO2 on photosynthesis
+c CO2 limitation term
       if(dum_pco2.ge.k13)then
          fco2=(dum_pco2-k13)/(dum_pco2-k13+k14)
       else
          fco2=0.
       endif
 	  
-c effect of water stress on photosynthesis
+c water stress limitation term
       fws=max(0.,min(1.,((4*dum_qlnd/dum_bcap)-2)))
 	  
-c effect of temperature on photosynthesis
-      fta=((2.**(0.1*(dum_tair-topt))) /
+c temperature limitation term
+      select case (trim(par_opt_photo))
+	  
+        case ('williamson2006')
+c         double temperature peak
+          fta=((2.**(0.1*(dum_tair-topt))) /
      &    ( (1.+exp(0.3*(dum_tair-k11)))*
      &    (1.+exp(-0.3*(dum_tair-k12))) ))
      & +  ((2.**(0.1*(dum_tair-topt))) /
      &    ( (1.+exp(0.6*(dum_tair-k11a)))*
      &    (1.+exp(-0.3*(dum_tair-k12))) ))
 	 
+        case ('lightlim')
+c         single temperature peak
+          fta=((2.**(0.1*(dum_tair-topt))) /
+     &    ( (1.+exp(0.3*(dum_tair-k11)))*
+     &    (1.+exp(-0.3*(dum_tair-k12))) ))
+	 
+        case default
+c         single temperature peak
+          fta=((2.**(0.1*(dum_tair-topt))) /
+     &    ( (1.+exp(0.3*(dum_tair-k11)))*
+     &    (1.+exp(-0.3*(dum_tair-k12))) ))
+	 
+      end SELECT
 
-c effect of light on photosynthesis
-c PV 50% photosynthetically active radiation (par) (Monteith, 1972)
+c light limitation term, 50% photosynthetically active radiation (par) (Monteith, 1972)
       par=0.5*dum_fxsw
 	  
 c vegetation fraction (equivalent to effect of canopy light extinction on LAI)
       dum_fv=max(1.e-5,1.-exp(-k17*dum_cveg))
 
-c calculate photosynthesis  
-      dum_photo=par*k18*rk19*fco2*fws*fta*dum_fv
+c calculate photosynthesis  	  
+      select case (trim(par_opt_photo))
+        case ('williamson2006')
+            dum_photo=k18*rk19*fco2*fws*fta*dum_fv
+        case ('lightlim')
+            dum_photo=par*k18*rk19*fco2*fws*fta*dum_fv
+       case default
+            dum_photo=par*k18*rk19*fco2*fws*fta*dum_fv
+      end SELECT
 
       end
 

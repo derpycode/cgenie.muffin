@@ -12,8 +12,8 @@ OTHER THAN K21 WHICH IS DEFINED IN SETUP_ENTS.F AS IT IS THE UNIVERSAL GAS CONST
 0.45             ! k8    Used to calculate bucket capacity 
 0.15             ! k9    
 0.02             ! k10   
-309.15           ! k11   Used to calculate fta
-283.15           ! k11a
+309.15           ! k11   Used to calculate fta (k11a in williamson2006)
+283.15           ! k11a  Used to calculate fta (k11b in williamson2006)
 268.15           ! k12
 29.              ! k13   Used to calculate fco2
 145.             ! k14

@@ -73,5 +73,7 @@ c MAF : genie-main/src/xml-config/xml/definition.xml
       common /ents_ctrl/debug_init,debug_end,debug_loop
 
       character par_opt_13Cfrac_veg*200
-	  common /ents_ctrl/par_opt_13Cfrac_veg
-      
+      common /ents_ctrl/par_opt_13Cfrac_veg
+
+      character par_opt_photo*200
+      common /ents_ctrl/par_opt_photo  

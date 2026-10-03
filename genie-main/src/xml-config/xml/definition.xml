@@ -2930,7 +2930,7 @@
                         <description>ents_1 ENTS data directory</description>
                     </param>
                     <param name="outdir_name">
-			<value datatype="string"><varref>RUNTIME_OUTDIR</varref><sep/>ents</value>
+			            <value datatype="string"><varref>RUNTIME_OUTDIR</varref><sep/>ents</value>
                         <description>ents_2 ENTS results directory</description>
                     </param>
                     <param name="condir_name">
@@ -2970,6 +2970,11 @@
                         <description>Stable carbon isotope fractionation scheme in land plants.
 						             schubert2012: CO2-dependent fractionation (Schubert and Jahren, 2012)
 									        fixed: fixed -20.1 permill fractionation (Farquhar,1989)
+                        </description>
+                    </param>
+                    <param name="par_opt_photo">
+                        <value datatype="string">lightlim</value>
+                        <description>photosynthesis curve option
                         </description>
                     </param>
                     <param name="topt">
