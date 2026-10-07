@@ -96,8 +96,8 @@ c      read(65,*)k7
 c      read(65,*)k8
 c      read(65,*)k9
 c      read(65,*)k10
-c      read(65,*)k11
 c      read(65,*)k11a
+c      read(65,*)k11b
 c      read(65,*)k12
 c      read(65,*)k13
 c      read(65,*)k14
@@ -199,7 +199,6 @@ c      open(66,file='../genie-ents/config/ents_config.par')
       open(66,file=condir_name(1:lencon)//'ents_config.par')
 
 cmsw Calculate length of timestep (yrs)
-
       read(66,*) msimpleland 
       if (debug_init)
      & print*,'ENTS called every',msimpleland,'ocean timesteps'
@@ -299,9 +298,10 @@ cmsw Prescribe surface albedo over ice sheets to be 0.8
             endif
          enddo
       enddo
-
+	  
       if (debug_init)
      & print*,'dum_syr ',dum_syr
+	 
 
 cmsw Switches for different pptn scheme and orography
 
@@ -398,10 +398,10 @@ cmsw New water stress function
 
 cmsw New temperature response function
       fta=((2.**(0.1*(dum_tq(1,1,1)-topt))) /
-     &    ( (1.+exp(0.3*(dum_tq(1,1,1)-k11)))*
+     &    ( (1.+exp(0.3*(dum_tq(1,1,1)-k11a)))*
      &    (1.+exp(-0.3*(dum_tq(1,1,1)-k12))) ))
      & +  ((2.**(0.1*(dum_tq(1,1,1)-topt))) /
-     &    ( (1.+exp(0.6*(dum_tq(1,1,1)-k11a)))*
+     &    ( (1.+exp(0.6*(dum_tq(1,1,1)-k11b)))*
      &    (1.+exp(-0.3*(dum_tq(1,1,1)-k12))) ))
 
  
@@ -632,7 +632,7 @@ cmsw zero annual average arrays
             srelh(i,j)=0.
 
             sbcap(i,j)=0.
-            salbs(i,j)=0.		
+            salbs(i,j)=0.
             ssnow(i,j)=0.
             sz0(i,j)=0.
 

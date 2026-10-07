@@ -22,8 +22,8 @@ cmsw Tunable Constants
      & k8,
      & k9,
      & k10,
-     & k11,    
-     & k11a,                 
+     & k11a,    
+     & k11b,                 
      & k12,  
      & k13,                     
      & k14,                     
@@ -38,6 +38,7 @@ cmsw Tunable Constants
      & k31,
      & k32,
      & kz0,
+     & eps_max,
      & rk19,
      & rk25,
      & rk30,
@@ -73,9 +74,9 @@ cmsw Model specific constants
       PARAMETER ( tzero=273.15 )
 
 
-      COMMON /landconsts_real/k0,k7,k8,k9,k10,k11,k11a,k12,k13,k14
+      COMMON /landconsts_real/k0,k7,k8,k9,k10,k11a,k11b,k12,k13,k14
      & ,k16,k17,k18,k20,k21,k24
-     & ,k26,k29,k31,k32,kz0
+     & ,k26,k29,k31,k32,kz0,eps_max
      & ,rk25,rk19,rk30,mu,rmu,topt,copt
      & ,k_a,gtm,rgtm,mtp,rmtp,asurfrea,rasurf,rsyr
      & ,q10,gtk,rgtk,dtland

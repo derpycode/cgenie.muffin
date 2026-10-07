@@ -86,9 +86,9 @@ c SG > namelist declaration for ENTS goin variables
       NAMELIST /ents_control/par_opt_13Cfrac_veg
       NAMELIST /ents_control/par_opt_photo
       NAMELIST /ents_control/topt,copt
-      NAMELIST /ents_control/k7,k8,k9,k10,k11,k11a,k12
+      NAMELIST /ents_control/k7,k8,k9,k10,k11a,k11b,k12
       NAMELIST /ents_control/k13,k14,k16,k17,k18,k20,k24,k26
-      NAMELIST /ents_control/k29,k31,k32,kz0
+      NAMELIST /ents_control/k29,k31,k32,kz0,eps_max
       NAMELIST /ents_control/ents_out_name,ents_netin
       NAMELIST /ents_control/ents_netout,ents_ascout,ents_filenetin
       NAMELIST /ents_control/ents_dirnetout,rstdir_name

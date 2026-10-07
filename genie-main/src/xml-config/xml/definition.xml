@@ -2973,8 +2973,8 @@
                         </description>
                     </param>
                     <param name="par_opt_photo">
-                        <value datatype="string">lightlim</value>
-                        <description>photosynthesis curve option
+                        <value datatype="string">williamson2006</value>
+                        <description>photosynthesis curve option "paleo" (incl. light limitation) or "williamson2006"
                         </description>
                     </param>
                     <param name="topt">
@@ -3004,13 +3004,13 @@
                         <value datatype="real">0.02</value>
                         <description>for bucket capacity (Eq 12)</description>
                     </param>
-                    <param name="k11">
-                        <value datatype="real">309.15</value>
-                        <description>!CAREFUL! k11a in Williamson 2006. For temperature response of tropical vegetation (Eq 19)</description>
-                    </param>
                     <param name="k11a">
+                        <value datatype="real">309.15</value>
+                        <description>For temperature response of tropical vegetation (Eq 19 in Willamson 2006)</description>
+                    </param>
+                    <param name="k11b">
                         <value datatype="real">283.15</value>
-                        <description>!CAREFUL! k11b in Willamson 2006. For temperature response of boreal vegetation (Eq 20)</description>
+                        <description>For temperature response of boreal vegetation (Eq 20 in Willamson 2006)</description>
                     </param>
                     <param name="k12">
                         <value datatype="real">268.15</value>
@@ -3063,6 +3063,10 @@
                     <param name="kz0">
                         <value datatype="real">0.0452</value>
                         <description>KZ0 roughness dependence on Cveg (Eq 6)</description>
+                    </param>
+                    <param name="eps_max">
+                        <value datatype="real">0.8e-3</value>
+                        <description>potential (maximum) light-use efficiency [KgC/MJ] for par_opt_photo='paleo'</description>
                     </param>
                     <param name="ents_out_name">
                         <value datatype="string">spn</value>
