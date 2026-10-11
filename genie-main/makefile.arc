@@ -551,14 +551,15 @@ ifeq ($(MACHINE),WIN32)
   NETCDF += $(LIB_FLAG)netcdf_f90.lib
 endif
 
-# === openBLAS path ===
+# === BLAS path ===
 ### FOR CLUSTER 
-OPENBLAS_NAME=OpenBLAS-0.3.9
-OPENBLAS_PATH=/share/apps/
-OPENBLAS= $(LIB_SEARCH_FLAG)$(PATH_QUOTE)$(OPENBLAS_PATH)$(OPENBLAS_NAME)/lib$(PATH_QUOTE) $(LIB_FLAG)openblas  
+BLAS_PATH=/share/apps/OpenBLAS-0.3.9
+BLAS= $(LIB_SEARCH_FLAG)$(PATH_QUOTE)$(BLAS_PATH)/lib$(PATH_QUOTE) $(LIB_FLAG)openblas  
 ### FOR LOCAL COMPUTER 
-# OPENBLAS= $(LIB_FLAG)openblas  
-
+# BLAS= $(LIB_FLAG)openblas  
+### Default (but lapack can be slower than openblas by a factor of up to ~3)
+BLAS_PATH=$(LIB_DIR)/liblapack
+BLAS= $(LIB_SEARCH_FLAG)$(PATH_QUOTE)$(BLAS_PATH) $(LIB_FLAG)lapack  
 
 # === Tcl/Tk (wishx and xqplot.tcl) ===
 LOCFLAGS=-DWISHX=\"$(CODE_DIR)/genie-main/inputdata/wishx\" -DXQPLOTTCL=\"$(CODE_DIR)/genie-main/inputdata/xqplot.tcl\" -DXFONT=\"$(CODE_DIR)/genie-main/inputdata/fonts\"

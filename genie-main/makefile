@@ -56,7 +56,8 @@ MODULE_NAMES = goldstein \
                ocnlite
 
 UTIL_NAMES = nc1 \
-             util1 
+             util1 \
+             lapack  
 
 # Construct variables/lists used for linking and dependencies
 # construct vars for the 'external' modules
@@ -149,12 +150,12 @@ $(CLEAN_MODULE_TARGETS) : clean_% :
 $(EXE_MAIN) : $(CONTROL_OBJS) $(UTIL_LIBS) $(LOCAL_LIBS) $(MODULE_LIBS) $(OBJECTS_MAIN) $(OTHER_FILES)
 	$(F77_LD) $(LDFLAGS) $(OBJECTS_MAIN) $(OUT_FLAG)$(EXE_MAIN) \
         $(LINK_MODULE_LIBRARIES) $(LINK_UTIL_LIBRARIES) \
-	$(NETCDF) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS) $(OPENBLAS)
+	$(NETCDF) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS) $(BLAS)
 
 $(EXE_COSTFN) : $(EXE) $(CONTROL_OBJS) $(UTIL_LIBS) $(LOCAL_LIBS) $(MODULE_LIBS) $(OBJECTS_COSTFN) $(OTHER_FILES)
 	$(F77_LD) $(LDFLAGS) $(OBJECTS_COSTFN) $(OUT_FLAG)$(EXE_COSTFN) \
         $(LINK_MODULE_LIBRARIES) $(LINK_UTIL_LIBRARIES) \
-	$(NETCDF) $(GLIMMER) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS) $(OPENBLAS)
+	$(NETCDF) $(GLIMMER) $(FORTRANLIBS) $(XLIB) $(BOUNDS_FLAGS) $(BLAS)
 
 # Rule to make custom netcdf comparison program
 nccompare :
