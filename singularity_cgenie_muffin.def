@@ -1,0 +1,90 @@
+Bootstrap: docker
+From: centos:7
+
+%post
+    yum install -y epel-release
+    yum install -y net-tools
+    yum install -y wget
+    yum install -y libcurl-devel
+    yum install -y make
+    yum install -y which
+    yum groupinstall -y 'Development Tools'
+    yum install -y centos-release-scl
+    yum install -y devtoolset-8-gcc*
+    yum install -y zlib-devel
+    yum install -y hdf5-devel
+    yum install -y libxslt
+
+    # enable gcc-8
+    scl enable devtoolset-8 bash
+
+    # export envrionmental variables so they can be used for netcdf and cgenie muffin builds  
+    export LD_LIBRARY_PATH=/opt/rh/devtoolset-8/root/usr/lib/gcc/x86_64-redhat-linux/8:$LD_LIBRARY_PATH
+    export PATH=/opt/rh/devtoolset-8/root/usr/bin:$PATH
+    export CXX=/opt/rh/devtoolset-8/root/usr/bin/g++ 
+    export CC=/opt/rh/devtoolset-8/root/usr/bin/gcc 
+    export FC=/opt/rh/devtoolset-8/root/usr/bin/gfortran
+    export F77=/opt/rh/devtoolset-8/root/usr/bin/gfortran    
+
+    # grab netcdf-c and put it in /tmp/netcdf-c
+    cd /tmp
+    mkdir netcdf-c
+    cd netcdf-c
+    wget https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.0.tar.gz
+    tar xzvf v4.8.0.tar.gz
+    cd netcdf-c-4.8.0
+
+    # configure and build netcdf-c
+    CFLAGS="$CFLAGS -I/usr/include" \
+    LDFLAGS="-L/usr/lib64" \
+    ./configure --prefix=/opt/netcdf --disable-netcdf-4 --disable-dap-remote-tests
+    make check
+    make install
+    rm -rf /tmp/netcdf-c
+
+    export LD_LIBRARY_PATH=/opt/netcdf/lib:$LD_LIBRARY_PATH
+     
+    # grab netcdf-cxx and put it in /tmp/netcdf-cxx 
+    cd /tmp 
+    mkdir netcdf-cxx
+    cd netcdf-cxx
+    wget https://downloads.unidata.ucar.edu/netcdf-cxx/4.2/netcdf-cxx-4.2.tar.gz
+    tar xzvf netcdf-cxx-4.2.tar.gz
+    cd netcdf-cxx-4.2
+    
+    # configure and build netcdf-cxx
+    CPPFLAGS="$CPPFLAGS -I/usr/include -I/opt/netcdf/include" LDFLAGS="-L/usr/lib64 -L/opt/netcdf/lib" ./configure --prefix=/opt/netcdf
+    make check
+    make install
+    rm -rf /tmp/netcdf-cxx
+
+    # grab netcdf-fortran and put it in /tmp/netcdf-fortran
+    cd /tmp
+    mkdir netcdf-fortran
+    cd netcdf-fortran
+    wget https://downloads.unidata.ucar.edu/netcdf-fortran/4.5.3/netcdf-fortran-4.5.3.tar.gz
+    tar xzvf netcdf-fortran-4.5.3.tar.gz
+    cd netcdf-fortran-4.5.3
+
+    # configure and build netcdf-fortran
+    CPPFLAGS="$CPPFLAGS -I/usr/include -I/opt/netcdf/include" FFLAGS="-I/usr/include -I/opt/netcdf/include" LDFLAGS="-L/usr/lib64 -L/opt/netcdf/lib" ./configure --prefix=/opt/netcdf 
+    make check
+    make install
+    rm -rf /tmp/netcdf-fortran    
+
+%environment
+    # edit command prompt so its short and shows you in a container
+    export PS1="Singularity > "
+
+    # add devtoolset to PATH and LD_LIBRARY_PATH
+    export PATH=/opt/rh/devtoolset-8/root/usr/bin:$PATH
+    export LD_LIBRARY_PATH=/opt/rh/devtoolset-8/root/usr/lib/gcc/x86_64-redhat-linux/8:$LD_LIBRARY_PATH
+
+    # add compilers as global variables so they can be used to compile cgenie code
+    export CXX=/opt/rh/devtoolset-8/root/usr/bin/g++
+    export CC=/opt/rh/devtoolset-8/root/usr/bin/gcc
+    export FC=/opt/rh/devtoolset-8/root/usr/bin/gfortran
+    export F77=/opt/rh/devtoolset-8/root/usr/bin/gfortran
+
+    # add netcdf to LD_LIBRARY_PATH 
+    export LD_LIBRARY_PATH=/opt/netcdf/lib:$LD_LIBRARY_PATH
