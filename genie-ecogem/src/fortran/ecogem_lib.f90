@@ -150,6 +150,13 @@ MODULE ecogem_lib
   ! Mixotrophy parameters
   real :: trophic_tradeoff
   namelist/ini_ecogem_nml/trophic_tradeoff
+  ! foramecogenie parameters (11)
+  logical::ctrl_use_foramecogenie
+  real :: foram_auto_cost, foram_hetero_cost
+  real :: foram_spine_scale, foram_symbiont_esd_scale
+  namelist/ini_ecogem_nml/foram_auto_cost, foram_hetero_cost
+  namelist/ini_ecogem_nml/foram_spine_scale, foram_symbiont_esd_scale
+  namelist/ini_ecogem_nml/ctrl_use_foramecogenie
   ! Temperature dependence
   real ::  temp_A,temp_P,temp_K,temp_T0   !
   namelist/ini_ecogem_nml/temp_A,temp_P,temp_K,temp_T0
@@ -290,6 +297,9 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::export_flux   ! surface export flux for each plankton (iomax,npmax,i,j,k)    Fanny/Maria - Aug19
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::AP_flux   ! surface autotrophic flux for each plankton (iomax,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::HP_flux   ! surface heterotrophic flux for each plankton (iomax,npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:):: plankton_respir   ! respiration carbon flux for each plankton (npmax,i,j,k), RY, Oct 2023
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:):: plankton_mort   ! mortality carbon flux for each plankton (npmax,i,j,k), RY, Oct 2023
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:):: plankton_eaten   !grazed carbon flux for each plankton (npmax,i,j,k), RY, Oct 2023
   !ckc isotope uptake flux array, to trace full food web interaction
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:)::up_flux_iso   !ckc rate of upstake isotopes (iimaxiso,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:)  ::eco_carb      ! carbonate chemistry variables
@@ -305,7 +315,7 @@ MODULE ecogem_lib
   character(len=5) ,ALLOCATABLE,DIMENSION(:)    ::rsrcstrng                                ! Inorganic resource labels
   INTEGER          ,ALLOCATABLE,DIMENSION(:)    ::random_n                                 ! n population replicates
   INTEGER          ,ALLOCATABLE,DIMENSION(:)    ::nut2quota                                ! match nutrients to quotas
-  REAL             ,ALLOCATABLE,DIMENSION(:)    ::volume,diameter ,logvol,logesd           ! Size parameters
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::volume,diameter,logvol,logesd           ! Size parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::autotrophy,heterotrophy                  ! Trophic strategy
   LOGICAL          ,ALLOCATABLE,DIMENSION(:)    ::herbivory,carnivory                      ! Feeding behavior - Added by Grigoratou, Nov18
   real             ,ALLOCATABLE,DIMENSION(:)    ::pp_opt_a_array,pp_sig_a_array,ns_array   ! grazing parameters as arrays
@@ -318,6 +328,10 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::qcarbon,alphachl                         ! Carbon quota and Photosynthesis parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::graz,kg,pp_opt,pp_sig                    ! Grazing parameters
   REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir,biosink,mort,beta_graz,beta_mort  ! Other loss parameters
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::symbiont_auto_cost, symbiont_hetero_cost ! RY, foramecogenie symbiont cost parameter
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::auto_volume, spine_esd_scale, symbiont_esd_scale           ! RY, foramecogenie size parameter
+  REAL             ,ALLOCATABLE,DIMENSION(:)    ::respir_cost                              ! RY, foramecogenie grazing parameter
+  
   ! Grazing kernel
   REAL,ALLOCATABLE,DIMENSION(:,:)::gkernel,gkernelT
   ! netCDF and netCDF restart parameters
@@ -348,7 +362,6 @@ MODULE ecogem_lib
   real::par_misc_t_err                                           !
   LOGICAL::par_misc_t_go = .FALSE.                               !
   LOGICAL::par_misc_t_echo_header = .TRUE.                       !
-  !
   real::par_misc_t_tseries = 0.0
   real::par_misc_t_tslice  = 0.0
   logical::par_misc_t_intseries = .FALSE.
@@ -385,6 +398,9 @@ MODULE ecogem_lib
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_export_timeslice   ! Surface export flux for each plankton (iomax,npmax,i,j,k)  Fanny/Maria - Aug19
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_AP_timeslice   ! Surface autotrophic uptake flux for each plankton (iomax,npmax,i,j,k)
   REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:,:) ::int_HP_timeslice   ! Surface heterotrophic uptake flux for each plankton (iomax,npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:) ::int_peaten_timeslice   ! Surface grazed (carbon) flux for each plankton (npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:) ::int_pmort_timeslice   ! Surface mortality (carbon) flux for each plankton (npmax,i,j,k)
+  REAL             ,ALLOCATABLE,DIMENSION(:,:,:,:) ::int_prespir_timeslice   ! Surface respiration (carbon) flux for each plankton (npmax,i,j,k)
 
   ! ### ADD ADDITIONAL TIME-SLICE ARRAY DEFINITIONS HERE ######################################################################### !
 

@@ -1,0 +1,24 @@
+
+  00 01 02 03   04 05 06  07  08  09
+  \/ \/ \/ \/   \/ \/ \/  \/  \/  \/
+
+-START-OF-DATA-
+-END-OF-DATA-
+
+  /\ /\ /\ /\   /\ /\ /\  /\  /\  /\
+  00 01 02 03   04 05 06  07  08  09
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #00: TRACER NUMBER
+COLUMN #01: include restoring forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #02: restrict restoring forcing to surface? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #03: time constant of restoring forcing (years) [DATA FORMAT: real]
+COLUMN #04: include flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #05: scale flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #06: make forcing uniform over this dimension (3 == 3D, 2 == 2D, 0 == point, -1 == SURFACE, -2 == BENTHIC, ELSE spatially explicit forcing) [DATA FORMAT: interger]
+COLUMN #07: i grid location of point forcing [DATA FORMAT: interger]
+COLUMN #08: j grid location of point forcing [DATA FORMAT: interger]
+COLUMN #09: k grid location of point forcing [DATA FORMAT: interger]
+COLUMN END: TRACER DESCRIPTION
