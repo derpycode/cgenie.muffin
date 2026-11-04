@@ -1,0 +1,21 @@
+
+  00 01 02 03  04  05
+  \/ \/ \/ \/  \/  \/
+
+-START-OF-DATA-
+ 22  t  F  -1  01  01  '[detrital (refractory) material (wt%)]'
+-END-OF-DATA-
+
+  /\ /\ /\ /\  /\  /\
+  00 01 02 03  04  05
+
+DATA FORMAT AND ORDER
+---------------------
+
+COLUMN #00: TRACER NUMBER
+COLUMN #01: include flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #02: scale flux forcing of tracer? [DATA FORMAT: 'T'/'F' ('t'/'f')]
+COLUMN #03: make forcing uniform over this dimension (3 == 3D, 2 == 2D, 0 == point, -1 == SURFACE, -2 == BENTHIC, ELSE spatially explicit forcing) [DATA FORMAT: interger]
+COLUMN #04: i grid location of point forcing [DATA FORMAT: interger]
+COLUMN #05: j grid location of point forcing [DATA FORMAT: interger]
+COLUMN END: TRACER DESCRIPTION
