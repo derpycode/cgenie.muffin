@@ -28,11 +28,7 @@ ccccc
       real photo_ini
       real fws,fta,fco2
       real rland_pts
-c      real asurf
-
       real z0_ini
-c      real copt
-
       real tv
 
       integer i,j,l,isdump
@@ -46,24 +42,17 @@ c      real copt
 c SG > Variables passed from other modules
       real :: dum_rsc
       real :: dum_syr
-c      integer :: dum_nyear
       real :: dum_dphi
       real,dimension(maxj)::dum_ds
-c      integer :: dum_kmax
-c      integer,dimension(maxi,maxj) :: dum_k1
       real,intent (inout),dimension(maxi,maxj)::dum_ca
       real,dimension(2,maxi,maxj)::dum_tq
       real :: dum_rmax
       real :: dum_rdtdim
       real,dimension(maxi,maxj)::dum_co2_out
       real :: gn_daysperyear
-c     double precision :: imax_real
-c SG Remove imax_real if not needed
-c SG <
 
 c land ice mask
       real,dimension(maxi,maxj),intent(in)::landice_slicemask_lic
-
 c surface albedo
       real,dimension(maxi,maxj),intent(inout)::albs_lnd 
 c land snow cover
@@ -81,68 +70,27 @@ c
 c        end interface
 cccccccccccccccccccccccc
 
-c     imax_real = 1.0/imax
-cmsw values of tunable constants
-c pbh k_constants are no longer read in from "k_constants.dat" but are now namelist paramaters
 c k21 is now hard-wired. This is the Universal Gas Constant 
-
-c      open(65,file='../genie-ents/data/k_constants.dat')
-c      open(65,file=indir_name(1:lenin)//'k_constants.dat')
-
-c      read(65,*)topt
-c      read(65,*)copt
-
-c      read(65,*)k7
-c      read(65,*)k8
-c      read(65,*)k9
-c      read(65,*)k10
-c      read(65,*)k11a
-c      read(65,*)k11b
-c      read(65,*)k12
-c      read(65,*)k13
-c      read(65,*)k14
-c      read(65,*)k16
-c      read(65,*)k17
-c      read(65,*)k18
-
-      rk19=(copt-k13+k14)/(copt-k13)
-
-c      read(65,*)k20
-c      read(65,*)k21
       k21=8.314
-c      read(65,*)k24
-
-c      read(65,*)k26
-c      read(65,*)k29
-c      read(65,*)k31
-c      read(65,*)k32
-c      read(65,*)kz0
-
-      k0=exp(-k31/(tzero-k32))
-      q10=exp((10.*k31)/((tzero-k32)**2))
-
-c      close(65)
-
 ! molar mass of carbon (kgC/molC)
       mu=0.012 
+! number of moles of molecules in the atm
+	  k_a = 1.773e20
 
-cmsw reciprocals used to speed up calculation
-
+cmsw reciprocals and others used to speed up calculation
+      k0=exp(-k31/(tzero-k32))
+      q10=exp((10.*k31)/((tzero-k32)**2))
       rmu=1./mu
+	  rk19=(copt-k13+k14)/(copt-k13)
       rk30=1./exp(-k31/(topt-k32))
-      rk25=1./exp(-k20/(k21*topt))
- 
-cmsw 'Proper' constants
- 
-      k_a = 1.773e20            ! number of moles of molecules in the atm
+      rk25=1./exp(-k20/(k21*topt))          
 
 cmsw  Some conversion factors
-
       gtm = 1.e15/12.           ! GtC to moles C
       gtk = 1.e12               ! GtC to kgC
       rgtm = 12./1.e15          ! mol C to GtC
       rgtk = 1.e-12             ! kgC to GtC
-      mtp = 1.e-6                ! ppmv to ppv
+      mtp = 1.e-6               ! ppmv to ppv
       rmtp = 1.e6               ! ppv to ppmv 
       asurfrea = dum_rsc*dum_rsc*dum_ds(1)*dum_dphi ! Each grid box area (m2)
       rasurf = 1./asurfrea      ! reciprocal of above
@@ -166,21 +114,6 @@ c	 print*,'dum ',dum
 c      endif
 #endif
 
-cdjl  Read in filenames for orography and icemask
-cdjl  Also, time-varying parameters
-c      read(5,'(200a)') junk
-c      print*,'junk ',trim(junk)
-c      read(5,*) t_orog,norog,orogsteps
-c      print*,'t_orog,norog,orogsteps ',t_orog,norog,orogsteps
-c      read(5,'(200a)') filenameorog
-c      print*,'filenameorog ',trim(filenameorog)
-c      read(5,'(200a)') junk
-c      print*,'junk ',trim(junk)
-c      read(5,*) t_lice,nlice,licesteps
-c      print*,'t_lice,nlice,licesteps ',t_lice,nlice,licesteps
-c      read(5,'(200a)') filenamelice
-c      print*,'filenamelice ',trim(filenamelice)
-
 cmsw Precip parameters
 
       if (debug_init)
@@ -194,11 +127,10 @@ c      read(5,*)dum_rmax,timepptn
      & print*,'ents_nyear ',real(ents_nyear)
 
 cmsw Open goin file and read in restart if required
-
-c      open(66,file='../genie-ents/config/ents_config.par')
       open(66,file=condir_name(1:lencon)//'ents_config.par')
 
 cmsw Calculate length of timestep (yrs)
+
       read(66,*) msimpleland 
       if (debug_init)
      & print*,'ENTS called every',msimpleland,'ocean timesteps'
@@ -228,10 +160,8 @@ cmsw Print out initial sizes of global carbon reservoirs
 
       rland_pts=1./land_pts_ents
 
-cmsw Set up spatial initial carbon boxes
-cmsw (carbon partitioned equally spatially)
-cmsw as all grid boxes have same area, asurf
-cmsw Units kgC/m2
+cmsw Set up spatial initial carbon boxes [kgC/m2]
+cmsw carbon partitioned equally spatially -- all grids have same area, asurf
 
       do i=1,imax
          do j=1,jmax
@@ -252,59 +182,36 @@ cmsw Units kgC/m2
          enddo
       enddo
 
-c SKT initialize isotope arrays
-c      do i=1,imax
-c         do j=1,jmax
-c            Cveg_13C(i,j) = 0.0
-c            Csoil_13C(i,j) = 0.0
-c            Cveg_14C(i,j) = 0.0
-c            Csoil_14C(i,j) = 0.0
-c         enddo
-c     enddo
-
+cmsw Ocean albedo is setup in radfor.F
 cmsw Land surface albedo paramaters
-
       asnow=0.8
       asnowv=0.3
       aveg=0.1
       apeat=0.11
       asand=0.3
-
-cmsw Ocean albedo is setup in radfor.F
-
 cmsw Land albedo constant
-
       albedol = 0.2
 
 cmsw Prescribed surface albedo
-
       do i=1,imax
          do j=1,jmax
             if(ents_k1(i,j).gt.ents_kmax)then
 cmsw Constant land surface albedo
-
                albs_lnd(i,j)=albedol
- 
 cmsw Prescribe surface albedo over ice sheets to be 0.8
-
                if(landice_slicemask_lic(i,j).gt.1.)then
                   albs_lnd(i,j)=0.8
                endif
-
             else
-
                albs_lnd(i,j)=0.
-
             endif
          enddo
       enddo
-	  
+
       if (debug_init)
      & print*,'dum_syr ',dum_syr
-	 
 
 cmsw Switches for different pptn scheme and orography
-
       if (debug_init)
      & print*,'THIS OPTION IS NO LONGER IN USE HERE - orography'//
      & 'functionality has been moved to genie-embm'
@@ -313,7 +220,6 @@ cmsw Switches for different pptn scheme and orography
      & print*,tv
 
 cmsw Switch for snow albedo feedback
-
       if (debug_init)
      & print*,'Use snow scheme? 1=Y 0=N'
       read(66,*)snowswitch
@@ -321,7 +227,6 @@ cmsw Switch for snow albedo feedback
      & print*,snowswitch
 
 cmsw Switch for offline model
-
       if (debug_init)
      & print*,'THIS OPTION IS NO LONGER IN USE HERE - offline'//
      & 'functionality has been moved to genie-embm'
@@ -330,7 +235,6 @@ c     read(66,*)offlineswitch
      & print*,tv
 
 cmsw Switch for seasonal fields
-
       if (debug_init)
      & print*,'THIS OPTION IS NO LONGER IN USE HERE - seasonal forcing'
      & //'functionality has been moved to genie-embm'
@@ -339,12 +243,10 @@ cmsw Switch for seasonal fields
      & print*,tv
 
 cmsw Initialise roughness length calculation
-
       z0_ini=max(0.001,kz0*Cveg(1,1))
 
 cmsw setup initial land temperature,
 cmsw bucket size and set ca over land
-
       if (debug_init)
      & print*,'Initial land temp and water'
       if (debug_init)
@@ -358,7 +260,6 @@ cmsw bucket size and set ca over land
      & print*,'Initial roughness length is'
       if (debug_init)
      & print*,z0_ini,'m'
-      
 
       do i=1,imax
          do j=1,jmax
@@ -384,12 +285,10 @@ cmsw snow matrix
        enddo
       
 cmsw Length of ocean timestep (s)
-
        dtdim = 1./dum_rdtdim
 
 cmsw Initialize photo and fv arrays for use in surflux 
 cmsw (calculation of transpiration)
-
       fv_ini=max(1.e-5,1.-exp(-k17*Cveg_ini*gtk*rasurf
      1         *rland_pts))
 
@@ -430,7 +329,6 @@ cmsw New temperature response function
       enddo
 
 cmsw Emissions option
-
       read(66,'(a1)') include_emissions
       if (debug_init)
      & print*,'Force model with an emissions timeseries?'
@@ -533,16 +431,13 @@ cmsw initial roughness length
 #endif
 
 cmsw Initialise sealevel module
-
       open(66,file=condir_name(1:lencon)//'sealevel_config.par')
       if (debug_init)
      & print*,' '
       if (debug_init)
      & print*,'SEALEVEL MODULE INITIALIZATION'
 
-cmsw For change in sea level need a reference average
-cmsw ocean density
-   
+cmsw For change in sealevel need a reference average ocean density
       if (debug_init)
      & print*,'Reference average ocean density used'
      &      ,' for change in sea-level calculation'
@@ -553,11 +448,8 @@ cmsw ocean density
 #ifdef icemelt
       print*,'GREENLAND ICE SHEET MELT OPTION USED'
 
-cmsw For change in sea level due to Greenland melt need
-cmsw the annual average air temperature over Greenland at
-cmsw the begging of the run. Must be preindustrial air temp.
-cmsw for parameterisation to work properly.
-
+cmsw For change in sealevel due to Greenland melt need the annual average air temp 
+cmsw over Greenland at start run. Must be preindustrial temp for parameterisation to work properly.
       if (debug_init)
      & print*,'Annual average temp over Greenland at beginning of run'
      &      ,' for change in sea level calculation'
@@ -566,13 +458,11 @@ cmsw for parameterisation to work properly.
      & print*,glairtini
 
 cmsw Switch for adding Greenland freshwater melt to the ocean
-
       print*,'Greenland freshwater melt added to ocean? 1=Y 0=N'
       read(66,*)icemeltfwfswitch
       print*,icemeltfwfswitch
 
 cmsw Restart icemelt?
-
       if (debug_init)
      & print*,'Restart from previous Greenland melt run? 1=Y 0=N'
       read(66,*)isdump
@@ -580,7 +470,6 @@ cmsw Restart icemelt?
      & print*,isdump
 
 cmsw Initialize variables for Greenland melt
-
       issl=0.
       glairts=0.
       glmelt=0.
